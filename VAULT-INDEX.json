@@ -848,25 +848,25 @@
         "API - Index",
         "Microservices - Integration Service",
         "WH - Warehouse Sadewa",
+        "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "WH - Fulfillment Flow & WMS Tinggarjaya",
         "API - Integration Service",
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada"
       ],
-      "hash": "1b11d980846efad72120d89e3cec06d8e2a3c75c83d5b60b3017b5d785e05ed7",
-      "ukuran_kb": 23.0,
-      "ringkasan": "Menjawab endpoint apa saja yang disediakan warehouse-service — mulai dari penerimaan event order dari marketplace (event ingestion), operasi WMS harian (approve/pick/pack/RTS/cetak resi/serah terima kurir), sampai role dan header otorisasi yang dibutuhkan tiap rute. Juga menjelaskan format request/response, filter antrian fulfillment, serta rute komplain gudang dan toko mitra Sadewa beserta gerbang aksesnya yang berbeda dari rute operasional biasa.",
+      "hash": "4c6dfcacb35d8bfbe84ee35531d1de946d95221aec5fddced1633b6ffea9a9ae",
+      "ukuran_kb": 23.7,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di warehouse-service — event ingestion fulfillment, operasi WMS (queue, approve, pick, pack, RTS, cetak label, handover, dashboard), master produk, toko gudang Sadewa, dan komplain gudang — beserta method/path, role yang diizinkan, format request/response, dan kode error tiap endpoint. Juga menjawab bagaimana auth diberlakukan (gateway key BIP-Gateway-ID, role guard header BIP-System-Roles) dan pengecualian gerbang untuk rute komplain.",
       "kata_kunci": [
         "warehouse-service",
         "WMS",
         "fulfillment",
+        "API endpoint",
         "resi",
-        "picking",
+        "arrange",
         "packing",
-        "RTS",
-        "handover",
         "komplain gudang",
         "Sadewa",
-        "API endpoint"
+        "role guard"
       ]
     },
     {
@@ -1517,6 +1517,7 @@
         "API - Manufacture Service",
         "API - Warehouse Service",
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
+        "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "Microservices - Notification Service",
         "API - Procurement Service",
         "CORE - API Master Gateway",
@@ -1529,20 +1530,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "f84f909664af5137e6bdb1dc1b3c1951803b8d69af53cf9533f45dc4f0604001",
-      "ukuran_kb": 509.8,
-      "ringkasan": "Menjawab: apa itu portal web `hris-dashboard` (One Bharata), stack yang dipakai, dan bagaimana login, SSO Identity Provider, serta role gating dari cookie `system_roles` bekerja. Juga menjelaskan pengelompokan menu sidebar HRIS dan Pengaturan HRGA terpusat, fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), konvensi data-fetching TanStack Query dan konvensi bagan Recharts, serta daftar modul yang sudah dan belum diimplementasikan.",
+      "hash": "a4ad79e0fbc9d356b800ad9d0f0de270e9ffefba7b607b5c312e4009078fe716",
+      "ukuran_kb": 511.1,
+      "ringkasan": "Menjawab: apa itu portal hris-dashboard (\"One Bharata\"), stack teknologi yang dipakai (Next.js, TanStack Query, dst), bagaimana autentikasi dan SSO Identity Provider bekerja, serta bagaimana role dari cookie system_roles menggerbang sidebar/menu per modul. Juga menjawab bagaimana fitur multi-perusahaan (kelola perusahaan, departemen, shift, WiFi, rekrutmen lintas perusahaan) dan pengelompokan menu Pengaturan HRGA terpusat diorganisasi di frontend.",
       "kata_kunci": [
         "erp-frontend",
-        "web ERP",
         "hris-dashboard",
         "One Bharata",
         "SSO",
         "system_roles",
-        "sidebar",
+        "sidebar menu",
         "multi-perusahaan",
-        "TanStack Query",
-        "Recharts"
+        "Next.js",
+        "role gating",
+        "TanStack Query"
       ]
     },
     {
@@ -3106,22 +3107,20 @@
         "IT - Background Jobs & Schedulers",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "a7721acdc28c1733e87c7d3319da70da73801a1a9b520ae622a25733cd8b1ab9",
-      "ukuran_kb": 40.3,
-      "ringkasan": "Menjawab: bagaimana arsitektur warehouse-service (stack, path repo, port, env, collection MongoDB), bagaimana event order dari marketplace disinkronkan lewat event ingestion, reconciler 60 detik, dan open-order sweep 5 menit, serta apa saja operasi WMS (queue, approve, pick, pack, RTS, label, handover, dashboard) beserta role guard-nya termasuk pembatasan akses mitra gudang Sadewa. Juga menjawab bagaimana register komplain gudang (dari ulasan marketplace) dan notifikasinya bekerja, serta state machine `status_wms`.",
+      "hash": "0a968e93af3667dce2919a1f802f63d03b5f02c12293ceea0620581273e81b1c",
+      "ukuran_kb": 42.3,
+      "ringkasan": "Menjawab: bagaimana arsitektur warehouse-service bekerja secara internal — event ingestion, reconciler 60 detik dengan cursor per status, open-order sweep 5 menit sebagai jaring pengaman, dan state machine status_wms — beserta env/port yang dipakai dan model data warehouse_db. Juga menjawab bagaimana role guard operasi WMS diterapkan (termasuk pengecualian admin_gudang_sadewa) dan status implementasi tiap fitur termasuk komplain gudang beserta notifikasinya (DEV vs PROD).",
       "kata_kunci": [
         "warehouse-service",
-        "WMS",
-        "fulfillment",
+        "WMS Tinggarjaya",
         "reconciler",
         "state machine",
-        "picking",
-        "packing",
-        "RTS",
-        "label resi",
-        "Sadewa",
+        "status_wms",
+        "open-order sweep",
         "komplain gudang",
-        "gudang"
+        "Sadewa",
+        "fulfillment",
+        "microservice"
       ]
     },
     {
@@ -6963,7 +6962,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** 2026-09-17, disetujui pemilik proses (opsi A). **Belum ada kodenya.** Menggantikan **keputusan 2** [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] (pengaju memilih tujuan lebih dulu) dan memicu keputusan 12-nya. Keputusan lain ADR 0099 tetap berlaku.",
+      "status_teks": "**Diusulkan** 2026-09-17, disetujui pemilik proses (opsi A). **Keputusan 2 sisi register gudang (T9) merged 2026-09-17** (bip-erp #1957, erp-frontend #1634), terverifikasi DEV lewat gateway dan bundel frontend, **belum PROD**; keputusan lain belum ada kodenya. Menggantikan **keputusan 2** [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] (pengaju memilih tujuan lebih dulu) dan memicu keputusan 12-nya. Keputusan lain ADR 0099 tetap berlaku.",
       "publik": true,
       "tautan": [
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
@@ -6981,22 +6980,20 @@
         "APP - MyBharata",
         "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus"
       ],
-      "hash": "d7be55e12fa1c4b3ef5d38fa969636e661eece528eae87b81b45379f74c68bcc",
-      "ukuran_kb": 16.3,
-      "ringkasan": "Menjawab: kenapa pengajuan komplain produk kini satu formulir saja, bagaimana unit penanggung jawab (gudang atau QC) ditentukan otomatis dari kategori keluhan yang dipilih pengaju tanpa tabel pemetaan, dan bagaimana proses ganti kategori/pengalihan antar unit serta pemilahan keluhan \"Lainnya\" oleh SPV brand berjalan. Juga menjelaskan kenapa komplain gudang yang ditolak atau dialihkan tidak lagi menurunkan skor KPI packer, dan batasan yang belum ditanggung (nomor batch/kedaluwarsa masih manual, belum tersambung CAPA, hanya cakupan Shopee).",
+      "hash": "a4390fdd64c89029cdb9cb95b7038fdcb7c1f1da80f436ffcc7d866a07eec257",
+      "ukuran_kb": 17.1,
+      "ringkasan": "Menjawab: kenapa dan bagaimana seluruh komplain produk (dari ulasan marketplace maupun tanpa ulasan) digabung jadi satu formulir dengan unit tujuan diturunkan otomatis dari kategori yang dipilih pengaju, bukan dipilih manual seperti keputusan sebelumnya. Juga menjawab apa yang berubah bagi pengaju dan unit penerima (ganti kategori, alih komplain ke unit lain, pemilahan kategori \"Lainnya\" oleh SPV brand), dampaknya ke KPI packer gudang, serta batasan yang sengaja tidak dijanjikan (nomor batch, kedaluwarsa, integrasi CAPA, ekspedisi/vendor).",
       "kata_kunci": [
-        "komplain produk",
-        "product complaint",
-        "satu pintu",
-        "single entry point",
         "ADR 0103",
+        "komplain produk",
+        "satu pintu",
         "kategori komplain",
-        "quality complaint",
-        "komplain gudang",
+        "unit tujuan",
         "KPI packer",
-        "ganti kategori",
-        "CAPA",
-        "ulasan marketplace"
+        "quality complaint",
+        "register komplain",
+        "Kyura",
+        "Beauty Hacks"
       ]
     },
     {
@@ -15060,19 +15057,20 @@
         "APP - MyBharata",
         "REF - Kepemilikan Data"
       ],
-      "hash": "1f39adff26287314de7aa3c88426111989c207ad1c6e96620096ec71ec1155e3",
-      "ukuran_kb": 10.9,
-      "ringkasan": "Menjawab: daftar task backend dan frontend untuk fitur komplain dari ulasan marketplace beserta status pengerjaannya masing-masing (selesai/belum, PR terkait), keputusan apa saja yang masih menunggu orang bukan kode (tujuan yang belum punya register, kewajiban regulatif BPOM, kekosongan CS Beauty Hacks, daftar kategori QC), serta urutan ketergantungan task rancangan satu pintu menurut ADR 0103.",
+      "hash": "f8c598c9cbc370f73446116486f401acebb39b3cf2121a71effda47aca1a2376",
+      "ukuran_kb": 11.7,
+      "ringkasan": "Menjawab: daftar task backend dan frontend untuk fitur komplain dari ulasan marketplace beserta status pengerjaan tiap task (selesai/belum, PR terkait, sudah di DEV atau masih menunggu deploy PROD manusia). Juga menjawab keputusan apa saja yang masih menunggu manajemen (tujuan yang belum punya register, kewajiban regulatif BPOM, toko Beauty Hacks tanpa CS, daftar kategori QC) dan mencatat revisi rancangan dari master kategori terpisah (dibatalkan) menjadi satu pintu berkategori sesuai ADR 0103.",
       "kata_kunci": [
         "komplain",
         "ulasan marketplace",
-        "task",
-        "analisa kebutuhan",
-        "satu pintu",
-        "gudang",
+        "papan tugas",
+        "task board",
+        "ADR 0099",
+        "ADR 0103",
+        "warehouse",
         "QC",
-        "backlog",
-        "ANALISA"
+        "analisa-kebutuhan",
+        "Shopee"
       ]
     },
     {
