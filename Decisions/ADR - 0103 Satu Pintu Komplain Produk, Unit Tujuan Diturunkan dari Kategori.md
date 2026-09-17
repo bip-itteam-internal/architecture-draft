@@ -1,3 +1,5 @@
+> **Status**: 🟡 **Diusulkan** 2026-09-17, disetujui pemilik proses (opsi A). **Belum ada kodenya.** Menggantikan **keputusan 2** [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] (pengaju memilih tujuan lebih dulu) dan memicu keputusan 12-nya. Keputusan lain ADR 0099 tetap berlaku.
+
 ## Untuk Manajemen
 
 - **Yang berubah di layar**: semua keluhan produk diajukan lewat SATU formulir, baik dari baris ulasan marketplace maupun tanpa ulasan. Pengaju cukup memilih jenis keluhannya; unit yang akan menangani tampil sendiri dan tidak bisa diubah pengaju. Nama produk dan SKU diisi sistem dari pesanannya, jadi pengaju hanya menulis cerita keluhan dan melampirkan foto. Formulir lama "Komplain ke QC" diganti formulir ini. Bila jenis keluhannya ternyata keliru, unit penerima menekan "Ganti kategori" dan komplain pindah sendiri ke unit yang benar, pengaju dikabari. Keluhan yang tidak cocok dengan jenis mana pun diteruskan ke supervisor brand pemilik toko untuk dipilah. Komplain gudang yang ditolak tidak lagi menurunkan skor packer.
@@ -14,7 +16,6 @@
 
 *Satu pintu pengajuan untuk semua komplain produk. Pengaju memilih kategori, bukan unit; unit tujuan diturunkan dari register mana yang memiliki kategori itu, tanpa tabel pemetaan dan tanpa register ketiga. Produk, SKU, dan pesanan diisi server dari data pesanan. Unit penerima dapat mengalihkan komplain ke unit lain, keluhan tanpa kategori dipilah SPV brand, dan komplain gudang yang ditolak atau dialihkan tidak lagi dihitung ke KPI packer.*
 
-- **Status**: 🟡 **Diusulkan** 2026-09-17, disetujui pemilik proses (opsi A). **Belum ada kodenya.** Menggantikan **keputusan 2** [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] (pengaju memilih tujuan lebih dulu) dan memicu keputusan 12-nya. Keputusan lain ADR 0099 tetap berlaku.
 - **Path di repo**:
   - `bip-erp/services/warehouse/komplain.go` (daftar kategori diterbitkan, status `dialihkan`, ganti kategori)
   - `bip-erp/services/warehouse/kpi_komplain.go` (`ditolak` dan `dialihkan` tidak dihitung)
