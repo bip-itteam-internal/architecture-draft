@@ -119,11 +119,13 @@ SPV Marketing (misal BeautyHacks)
 
 **Dropdown employee otomatis terfilter per departemen**: form dialog di frontend membaca `department` dari cookie auth SPV → kirim ke endpoint employee list (`?position=icc&department=beautyhacks`). SPV BeautyHacks hanya melihat karyawan ICC dari BeautyHacks.
 
-### Flow 2: ICC Dashboard — Staff ICC Lihat Performa Sendiri
+### Flow 2: Performa Saya (dulu "ICC Dashboard") — Staff ICC Lihat Performa Sendiri
+
+> Nama menu "ICC Dashboard" sudah diganti "Performa Saya" di `main`. 🔜 Di branch erp-frontend `feat/marketing-pekerjaan-saya` (belum merge per 2026-09-17) menunya pindah ke induk **Marketing › Pekerjaan Saya**, dan Marketplace Advertiser dapat membukanya lewat paket posisi "Marketing: Pemegang Akun Toko" ([[ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko]]).
 
 ```
 Staff ICC login (position=icc atau systemRoles.insentive=icc)
-  → Halaman /icc/my-accounts (sidebar: "ICC Dashboard")
+  → Halaman /icc/my-accounts (sidebar: "Performa Saya")
   → GET /icc/mappings/me   ← tanpa RequireMarketingLeader; filter by BIP-Employee-ID header
     → Returns: array mapping milik staff ini (bisa >1 jika handle banyak toko)
 
@@ -144,7 +146,7 @@ Staff ICC login (position=icc atau systemRoles.insentive=icc)
 
 ```
 SPV/Leader login (department = "beautyhacks" atau "kyura")
-  → Halaman /icc/team (sidebar: "Team Performance")
+  → Halaman /icc/team (sidebar: "Team Performance"; 🔜 di induk "Kelola Tim" menggantikan induk "ICC")
   → GET /icc/mappings?team=beautyhacks   ← filter by department
     → Returns: semua mapping tim BeautyHacks
 
@@ -189,6 +191,7 @@ Middleware `RequireMarketingLeader` di `shared-library/common/roles.go`:
 | ADV Leader | `insentive` | `adv_leader` | Assign + lihat semua |
 | IT Admin (fallback) | `integration` | `supervisor` / `admin` | Lihat semua + assign |
 | Staff ICC | `position=icc` atau `systemRoles.insentive=icc` | — | Hanya endpoint `/me` |
+| Pemegang paket "Marketing: Pemegang Akun Toko" (🔜) | izin `akuntoko.performa.view`, `akuntoko.komplain.work` | — | Membuka MENU Performa Saya, Ulasan, Komplain ke Gudang; tidak mengubah otorisasi endpoint `/icc/mappings*` |
 
 > **Isolasi data per tim (Phase 3)**: SPV Kyura hanya melihat mapping dengan `team="kyura"`; SPV BeautyHacks hanya melihat `team="beautyhacks"`. IT Supervisor tetap super-akses (lihat semua). Field `team` diisi otomatis dari department karyawan saat Create — SPV tidak bisa isi manual.
 
@@ -323,6 +326,7 @@ bersifat global. Pipeline: `$unwind → $group by advertiser_id` untuk deduplika
 | **10** | Advertiser TikTok Ads boleh dipegang >1 karyawan aktif: index diganti dari unique global jadi unique per-pasangan `(tiktok_advertiser_id, employee_id)`, `available-advertisers` tak lagi menyaring yang sudah assigned. Toko/Shopee/Lazada TETAP 1:1 (tidak diubah) | ✅ Selesai (2026-08-26), branch `feat/icc-advertiser-shared` |
 | **11** | Karyawan berposisi **Marketplace Advertiser** dipisah dari tab "Toko & Iklan" ke tab baru **"Marketplace Adv"** (pindah eksklusif, bukan duplikat) — lihat [[#Tab "Marketplace Adv" — Marketplace Advertiser dipisah dari Toko & Iklan]] | ✅ Selesai (2026-09-06), branch `feat/icc-marketplace-adv-tab` |
 | **12** | Kartu "Langsung di bawah SPV" disembunyikan dari tab **"Toko & Iklan"** begitu bagian Account Specialist-nya (`kelompok`) kosong — simetris dengan penyaringan yang sudah ada di tab Marketplace Adv (lihat [[#Tab "Marketplace Adv" — Marketplace Advertiser dipisah dari Toko & Iklan]]) | ✅ Selesai (2026-09-11), branch `feat/icc-sembunyikan-tanpa-leader-tab-toko` |
+| **13** | Induk sidebar "ICC" diganti **"Kelola Tim"** (ICC Management, Team Performance, Analisis Account Specialist); Performa Saya pindah ke induk **"Pekerjaan Saya"**; izin posisi modul `akuntoko` membuka Performa Saya untuk Marketplace Advertiser dan Ulasan/Komplain ke Gudang untuk Account Specialist. Lihat [[ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko]] | 🔜 Branch erp-frontend `feat/marketing-pekerjaan-saya` + bip-erp `feat/employee-izin-akuntoko`, belum merge per 2026-09-17 |
 
 ---
 
@@ -423,8 +427,8 @@ ICC Management (departemen = Kyura, Beauty Hacks, ...)
 > SIAPA PUN yang lapor langsung ke SPV (posisi apa pun, bukan cuma ICC), sebelum task
 > Fase 11 ini. Tombolnya ADA (`bisaAssign = kartu.jenis === "tanpa-leader"`,
 > `leader-card-khusus.tsx`) dan memakai `modeLangsungSpv` di dialog assign supaya
-> kandidatnya tidak dibatasi ke posisi ICC. Lihat [[#Tab "Marketplace Adv" —
-> Marketplace Advertiser dipisah dari Toko & Iklan]] untuk kelanjutannya.
+> kandidatnya tidak dibatasi ke posisi ICC. Lihat
+> [[#Tab "Marketplace Adv" — Marketplace Advertiser dipisah dari Toko & Iklan]] untuk kelanjutannya.
 
 > ⚠️ **Susulan (Fase 12, 2026-09-11)**: diagram di atas sudah TIDAK akurat untuk tab
 > "Toko & Iklan" — kartu "Langsung di bawah SPV" sejak Fase 12 **disembunyikan** dari
