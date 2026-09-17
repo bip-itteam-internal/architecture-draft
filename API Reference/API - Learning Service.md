@@ -79,8 +79,8 @@ Mengirim key ke sana menghasilkan nol supervisor lalu **409 "departemen belum pu
 | Method | Path | Izin | Fungsi |
 |---|---|---|---|
 | GET | `/training/plan-items?tahun=YYYY` | view | Daftar butir rencana tahun itu (bawaan tahun berjalan WIB) beserta status pelaksanaan dan kelas tertaut |
-| POST | `/training/plan-items` | work | Tambah butir `{tahun, bulan, judul, training_type_id?, department_key?, catatan?}`. Bulan target sudah lewat → 409 |
-| PUT | `/training/plan-items/:id` | work | Ubah isi/bulan butir aktif. Bulan tujuan sudah lewat, butir dibatalkan/terkunci, atau memindah butir yang bulannya sudah berjalan → 409 |
+| POST | `/training/plan-items` | work | Tambah butir `{tahun, bulan, judul, training_type_id?, department_keys?, catatan?}`. `department_keys` = daftar departemen sasaran (boleh lebih dari satu, maks 50, spasi/duplikat dibuang, tiap kunci diperiksa ke master employee-service; kunci tak ada → 400, employee-service tak terjangkau → 502). `department_key` tunggal lama masih diterima dan digabung ke daftar. Bulan target sudah lewat → 409 |
+| PUT | `/training/plan-items/:id` | work | Ubah isi/bulan butir aktif, badan sama dengan POST; `department_keys` ditulis utuh dan field lama `department_key` dibuang (`$unset`). Bulan tujuan sudah lewat, butir dibatalkan/terkunci, atau memindah butir yang bulannya sudah berjalan → 409 |
 | POST | `/training/plan-items/:id/cancel` | work | Batalkan, `{alasan}` wajib (maks 500 karakter). Sudah dibatalkan, terkunci, atau sudah terlaksana → 409 |
 | DELETE | `/training/plan-items/:id` | work | Hapus. Terkunci, bulan sudah berjalan, atau masih tertaut kelas → 409 |
 
