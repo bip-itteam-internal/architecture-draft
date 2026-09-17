@@ -1,5 +1,7 @@
 > **Status**: ⚠️ Diterima, sebagian besar diimplementasikan. **Keputusan 1, 2, 3, 4, 5, dan 6 sudah ada di kode** per 2026-09-16 dan **merged ke `main` hari itu juga**, terverifikasi di DEV; belum di PROD. **Keputusan 8 separuh berjalan**: notifikasi register GUDANG merged 2026-09-17 (bip-erp #1940, erp-frontend #1625) dan terverifikasi DEV, belum PROD; notifikasi ulasan bintang rendah ke pemegang toko belum dikerjakan. Sisanya (jalur QC dari ulasan, tujuan tanpa register) masih usulan.
 >
+> ⛔ **Keputusan 2 DIGANTIKAN 2026-09-17** oleh [[ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori]]: pengaju tidak lagi memilih tujuan, melainkan memilih kategori, dan unit tujuannya diturunkan dari register pemilik kategori itu. Larangan register ketiga dan master kategori pusat tetap berlaku. ADR itu juga memicu keputusan 12 dan mengubah cara KPI gudang packing menghitung komplain yang ditolak.
+>
 > ⛔ **Satu asumsi ADR ini terbukti KELIRU dan sudah dikoreksi di kode.** Persona "Account Specialist" di sini diasumsikan terjangkau lewat peran marketing. Diukur di PROD 2026-09-16: keempat puluh orangnya berperan `insentive: icc`, **nol** punya peran `kyura`/`beauty_hacks`, dan hanya **dua** punya peran `integration`. Peran tidak mewakili kepemilikan toko, jadi hak baca dan hak mengajukan diturunkan dari `icc_account_mappings`, bukan dari daftar peran. Jangan merancang gerbang berikutnya di atas asumsi lama itu.
 
 ## Untuk Manajemen
@@ -51,7 +53,7 @@ Kebutuhan datang sebagai solusi: "klasifikasikan ulasan per toko supaya pemegang
 
 | Register | Untuk | Keadaan |
 |---|---|---|
-| `quality_complaint` (employee_db) | marketing ke QC | dua layar, dipakai |
+| `quality_complaint` (employee_db) | marketing ke QC | dua layar, ~~dipakai~~ *koreksi 2026-09-17: koleksinya belum pernah tercipta di PROD, nol dokumen* |
 | `warehouse_komplain_gudang` (warehouse_db) | marketing ke gudang packing | **tak punya layar, nol dokumen di produksi** |
 
 Register gudang itu sudah lengkap: kategori tertutup (`salah_produk`, `salah_jumlah`, `salah_alamat`, `rusak_kemasan`, `kurang_lengkap`), status `baru`/`diproses`/`selesai`/`ditolak`, kolom `tindak_lanjut` dan `selesai_at`, bukti foto, atribusi packer yang disalin dari pesanan saat komplain dibuat, indeks unik `(order_id, kategori)` supaya satu pesanan yang dilaporkan tiga orang tidak menurunkan skor gudang tiga kali, dan gerbang tulis `RequireMarketingStaff` yang sama dengan jalur QC. Ia bahkan sudah jadi KPI baris 1 gudang packing lewat `kpi_sumber_warehouse_packing.go`.
@@ -71,6 +73,7 @@ Penelusuran menyeluruh atas seluruh service (nama koleksi dan tipe struct yang m
 1. **Pakai register yang SUDAH ADA di tiap tujuan. Jangan bangun register ketiga, dan jangan tambahkan field tujuan ke salah satunya.** Keluhan pekerjaan gudang masuk ke register gudang; keluhan mutu masuk ke register QC. Keduanya sudah punya alur, gerbang, dan konsumen KPI-nya sendiri, dan menyatukannya berarti membuang dua hal yang sudah bekerja demi satu bentuk yang lebih rapi di atas kertas.
 
 2. **Tidak ada master kategori baru.** Versi pertama ADR ini menetapkannya; itu dibatalkan. Register gudang sudah memiliki daftar kategori tertutup beserta alasan tertulisnya, yaitu bahwa teks bebas membuat metriknya mustahil dijumlahkan. Master ketiga hanya akan jadi sumber kedua yang menyimpang. Pengaju memilih **tujuan** lebih dulu, lalu memilih kategori dari daftar milik tujuan itu sendiri.
+   - *Digantikan 2026-09-17 oleh [[ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori]].* Kalimat terakhir di atas tidak berlaku lagi: pengaju memilih kategori saja, karena salah memilih tujuan terbukti mahal (komplain gudang yang ditolak tetap menurunkan skor packer). Separuh pertamanya tetap: tidak ada master kategori pusat, tiap register memiliki daftarnya sendiri dan kini menerbitkannya.
 
 3. **Pekerjaan terbesarnya adalah LAYAR untuk register gudang**, bukan model data. Termasuk membuka rute BACA `/wms/komplain` ke marketing, yang hari ini sengaja dibatasi peran gudang dan dicatat di kodenya sebagai perubahan tersendiri.
 
@@ -92,6 +95,7 @@ Penelusuran menyeluruh atas seluruh service (nama koleksi dan tipe struct yang m
 11. **Kategori dugaan efek tidak diinginkan DITAHAN** sampai QA/RA menyatakan apakah keluhan semacam itu wajib masuk jalur CAPA atau pelaporan BPOM.
 
 12. **Dua utang register QC ditutup hanya bila jalur QC benar-benar disentuh**: `company_id` yang belum ada, dan race `ReplaceOne` berfilter `_id` saja. Keduanya sudah tercatat di [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]].
+   - *Terpicu 2026-09-17*: ADR 0103 menyentuh register QC (kategori tertutup, isian server), jadi kedua utang ini masuk task yang sama.
 
 ## Consequences
 
