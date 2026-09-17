@@ -103,7 +103,7 @@ Daftar di bawah = seluruh `mongodb.GetCollection(...)` di `services/recruitment`
 - background_check
 - offer
 - manpower_plan
-- mpp_vacancy_decision *(keputusan HR atas posisi kosong akibat resign: `diganti`/`tidak_diganti`; tanpa index. 🔜 branch `fix/recruitment-mpp-posisi-kosong-hak-tulis` menambah `resign_id` ber-omitempty; dokumen lama tanpa field itu tetap berlaku lewat aturan waktu, lihat [[Microservices - Recruitment Service]])*
+- mpp_vacancy_decision *(keputusan HR atas posisi kosong akibat resign: `diganti`/`tidak_diganti`; tanpa index. bip-erp #1961 (merged 2026-09-17) menambah `resign_id` ber-omitempty; dokumen lama tanpa field itu tetap berlaku lewat aturan waktu, lihat [[Microservices - Recruitment Service]])*
 - job_type · candidate_source · interview_type · job_location · assessment_type *(master)*
 - onboarding_template · onboarding_instance · onboarding_review · onboarding_review_response
 - email_template
