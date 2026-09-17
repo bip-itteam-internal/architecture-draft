@@ -1,4 +1,4 @@
-**Status**: ✅ Diputuskan 2026-09-02, **terimplementasi, BELUM di-deploy**. bip-erp branch `feat/attendance-jadwal-host-live` (6 commit) + erp-frontend branch `feat/marketing-jadwal-host-live` (2 commit). Verifikasi lewat gateway belum dijalankan.
+**Status**: ✅ Diputuskan 2026-09-02, **di PROD** (terukur 2026-09-17, baca saja: rute `/marketing/jadwal-host-live` ada di build `frontend-hris` prod, `/jadwal-host-live/anggota` ada di biner `Attendance-Service`, paket `jadwal_penjadwal_hostlive` ter-seed dan terpasang ke dua akun). Asalnya bip-erp branch `feat/attendance-jadwal-host-live` + erp-frontend branch `feat/marketing-jadwal-host-live`. Verifikasi lewat gateway belum tercatat.
 
 ## Context
 
