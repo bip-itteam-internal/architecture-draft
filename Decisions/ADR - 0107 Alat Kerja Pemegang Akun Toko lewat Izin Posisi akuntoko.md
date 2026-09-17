@@ -1,4 +1,4 @@
-**Status**: 🟡 Diputuskan 2026-09-17, **belum merge**: bip-erp branch `feat/employee-izin-akuntoko` (katalog, paket, registrasi) dan erp-frontend branch `feat/marketing-pekerjaan-saya` (induk menu dan gerbang). Jalur izin di gerbang baca komplain gudang menyusul di bip-erp branch `feat/warehouse-komplain-izin-akuntoko`.
+**Status**: ✅ Diputuskan 2026-09-17, **merged, belum PROD**: bip-erp [#1963](https://github.com/bip-itteam-internal/bip-erp/pull/1963) (katalog, paket, registrasi) dan [#1964](https://github.com/bip-itteam-internal/bip-erp/pull/1964) (jalur izin di gerbang baca komplain gudang), erp-frontend [#1640](https://github.com/bip-itteam-internal/erp-frontend/pull/1640) (induk menu dan gerbang). DEV terukur lewat gateway 2026-09-17: modul `akuntoko` ada di `/master/permission-modules`, paket ter-seed dengan dua izinnya, dan akun uji tanpa peran gudang/marketing mendapat `GET /api/warehouse/wms/komplain` 403 tanpa paket, 200 `{"data":[]}` sesudah paket tingkat akun dipasang dan login ulang, lalu 403 lagi sesudah dicabut.
 
 ## Context
 
@@ -34,7 +34,7 @@ Tiga cara membuka akses ditimbang:
 6. **Cakupan data tetap kepemilikan toko**, bukan izin: Performa Saya dan Komplain ke Gudang hanya toko milik pembaca. Ulasan tetap menampilkan semua toko (konten publik marketplace) dengan tombol komplain hanya pada toko miliknya; penyaringan per brand di luar keputusan ini.
 7. **Induk menurut HUBUNGAN, bukan modul asal.** Kategori Marketing: "Pekerjaan Saya" (Performa Saya, Ulasan, Komplain ke Gudang, Komplain ke QC, Engagement) dan "Kelola Tim" (ICC Management, Team Performance, Analisis Account Specialist) menggantikan induk "ICC". Rute tidak berubah.
 8. **Pintu kategori.** Pemegang paket tanpa peran marketing wajib tetap mendapat kategori Marketing: `sidebar.tsx` mengoper hasil `bolehMenu` kedua izin ke `bolehLihatModulMarketing`, pola yang sama dengan `jadwal` dan `engagement`.
-9. **Backend baca komplain gudang menerima izin itu** (menyusul, branch `feat/warehouse-komplain-izin-akuntoko`), supaya pemegang paket yang belum memegang toko mendapat daftar kosong, bukan 403. **HR tidak memasang paket di PROD sebelum itu naik** (keputusan review 2026-09-17).
+9. **Backend baca komplain gudang menerima izin itu** (bip-erp #1964, `gerbangBacaKomplain`), supaya pemegang paket yang belum memegang toko mendapat daftar kosong, bukan 403. **HR tidak memasang paket di PROD sebelum itu naik** (keputusan review 2026-09-17).
 
 ## Consequences
 
@@ -42,6 +42,7 @@ Tiga cara membuka akses ditimbang:
 
 **Yang diterima sadar.**
 - Aksesnya bergantung langkah manusia: HR memasang paket ke posisi, lalu karyawan login ulang (klaim dibentuk saat token terbit). Tanpa itu tak ada yang berubah bagi siapa pun.
+- Mencabut paket tidak langsung menutup rute baca yang sudah pernah dibuka: cache respons gateway (kunci `employee_id` + URL, tanpa melihat izin, TTL 3 menit, [[CORE - API Master Gateway]]) tetap menyajikan 200 lama untuk URL yang sama sampai kedaluwarsa. Terlihat saat verifikasi DEV; URL yang belum ter-cache langsung 403.
 - Komplain ke QC masih tertutup bagi Account Specialist sampai T11.
 - Nama induk "Pekerjaan Saya" bentrok dengan tab Engagement `engagement.tabMine`; penggantian nama tab jadi task terpisah.
 - Cermin frontend `bolehBacaKomplain` tetap tak mengenal kepemilikan toko: Account Specialist yang memegang toko tapi belum dipasangi paket masih melihat layar terkunci walau backend mau membalas. Paketlah yang menutup celah itu.

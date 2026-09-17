@@ -121,7 +121,7 @@ SPV Marketing (misal BeautyHacks)
 
 ### Flow 2: Performa Saya (dulu "ICC Dashboard") — Staff ICC Lihat Performa Sendiri
 
-> Nama menu "ICC Dashboard" sudah diganti "Performa Saya" di `main`. 🔜 Di branch erp-frontend `feat/marketing-pekerjaan-saya` (belum merge per 2026-09-17) menunya pindah ke induk **Marketing › Pekerjaan Saya**, dan Marketplace Advertiser dapat membukanya lewat paket posisi "Marketing: Pemegang Akun Toko" ([[ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko]]).
+> Nama menu "ICC Dashboard" sudah diganti "Performa Saya" di `main`. Sejak erp-frontend [#1640](https://github.com/bip-itteam-internal/erp-frontend/pull/1640) (merged 2026-09-17) menunya pindah ke induk **Marketing › Pekerjaan Saya**, dan Marketplace Advertiser dapat membukanya lewat paket posisi "Marketing: Pemegang Akun Toko" ([[ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko]]).
 
 ```
 Staff ICC login (position=icc atau systemRoles.insentive=icc)
@@ -146,7 +146,7 @@ Staff ICC login (position=icc atau systemRoles.insentive=icc)
 
 ```
 SPV/Leader login (department = "beautyhacks" atau "kyura")
-  → Halaman /icc/team (sidebar: "Team Performance"; 🔜 di induk "Kelola Tim" menggantikan induk "ICC")
+  → Halaman /icc/team (sidebar: "Team Performance" di induk "Kelola Tim", menggantikan induk "ICC")
   → GET /icc/mappings?team=beautyhacks   ← filter by department
     → Returns: semua mapping tim BeautyHacks
 
@@ -191,7 +191,7 @@ Middleware `RequireMarketingLeader` di `shared-library/common/roles.go`:
 | ADV Leader | `insentive` | `adv_leader` | Assign + lihat semua |
 | IT Admin (fallback) | `integration` | `supervisor` / `admin` | Lihat semua + assign |
 | Staff ICC | `position=icc` atau `systemRoles.insentive=icc` | — | Hanya endpoint `/me` |
-| Pemegang paket "Marketing: Pemegang Akun Toko" (🔜) | izin `akuntoko.performa.view`, `akuntoko.komplain.work` | — | Membuka MENU Performa Saya, Ulasan, Komplain ke Gudang; tidak mengubah otorisasi endpoint `/icc/mappings*` |
+| Pemegang paket "Marketing: Pemegang Akun Toko" | izin `akuntoko.performa.view`, `akuntoko.komplain.work` | — | Membuka MENU Performa Saya, Ulasan, Komplain ke Gudang; tidak mengubah otorisasi endpoint `/icc/mappings*` |
 
 > **Isolasi data per tim (Phase 3)**: SPV Kyura hanya melihat mapping dengan `team="kyura"`; SPV BeautyHacks hanya melihat `team="beautyhacks"`. IT Supervisor tetap super-akses (lihat semua). Field `team` diisi otomatis dari department karyawan saat Create — SPV tidak bisa isi manual.
 
@@ -326,7 +326,7 @@ bersifat global. Pipeline: `$unwind → $group by advertiser_id` untuk deduplika
 | **10** | Advertiser TikTok Ads boleh dipegang >1 karyawan aktif: index diganti dari unique global jadi unique per-pasangan `(tiktok_advertiser_id, employee_id)`, `available-advertisers` tak lagi menyaring yang sudah assigned. Toko/Shopee/Lazada TETAP 1:1 (tidak diubah) | ✅ Selesai (2026-08-26), branch `feat/icc-advertiser-shared` |
 | **11** | Karyawan berposisi **Marketplace Advertiser** dipisah dari tab "Toko & Iklan" ke tab baru **"Marketplace Adv"** (pindah eksklusif, bukan duplikat) — lihat [[#Tab "Marketplace Adv" — Marketplace Advertiser dipisah dari Toko & Iklan]] | ✅ Selesai (2026-09-06), branch `feat/icc-marketplace-adv-tab` |
 | **12** | Kartu "Langsung di bawah SPV" disembunyikan dari tab **"Toko & Iklan"** begitu bagian Account Specialist-nya (`kelompok`) kosong — simetris dengan penyaringan yang sudah ada di tab Marketplace Adv (lihat [[#Tab "Marketplace Adv" — Marketplace Advertiser dipisah dari Toko & Iklan]]) | ✅ Selesai (2026-09-11), branch `feat/icc-sembunyikan-tanpa-leader-tab-toko` |
-| **13** | Induk sidebar "ICC" diganti **"Kelola Tim"** (ICC Management, Team Performance, Analisis Account Specialist); Performa Saya pindah ke induk **"Pekerjaan Saya"**; izin posisi modul `akuntoko` membuka Performa Saya untuk Marketplace Advertiser dan Ulasan/Komplain ke Gudang untuk Account Specialist. Lihat [[ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko]] | 🔜 Branch erp-frontend `feat/marketing-pekerjaan-saya` + bip-erp `feat/employee-izin-akuntoko`, belum merge per 2026-09-17 |
+| **13** | Induk sidebar "ICC" diganti **"Kelola Tim"** (ICC Management, Team Performance, Analisis Account Specialist); Performa Saya pindah ke induk **"Pekerjaan Saya"**; izin posisi modul `akuntoko` membuka Performa Saya untuk Marketplace Advertiser dan Ulasan/Komplain ke Gudang untuk Account Specialist. Lihat [[ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko]] | ✅ Merged 2026-09-17: erp-frontend [#1640](https://github.com/bip-itteam-internal/erp-frontend/pull/1640), bip-erp [#1963](https://github.com/bip-itteam-internal/bip-erp/pull/1963) + [#1964](https://github.com/bip-itteam-internal/bip-erp/pull/1964); belum PROD |
 
 ---
 
