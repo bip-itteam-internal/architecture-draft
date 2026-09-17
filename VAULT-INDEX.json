@@ -2116,8 +2116,8 @@
         "CORE - HRIS Orchestrator",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "4aaa149bdcb5c2a598d6012c629d3e2f7d805beaba92e2c7f9fe494f401adbcf",
-      "ukuran_kb": 56.5,
+      "hash": "dd5c486cfb300aa48a8fd1d798b8b64cda5d0268e6299df6b47a84a3584b538a",
+      "ukuran_kb": 56.6,
       "ringkasan": "Menjawab: endpoint apa saja yang dimiliki attendance-service (clock-in/out, registry data type, jadwal kerja dan rotasi shift, WiFi kantor, leave, perjalanan dinas, guestbook, hari libur, laporan), bagaimana `schedule-list` di-resolve per perusahaan, dan di mana aturan jadwal, ambang telat, serta sanksi sebenarnya diatur (BUSINESS_LOGIC_IMPLEMENTATION.md di repo mobile). Juga menjawab bagaimana service lain memanggil rute internal seperti `/internal/jadwal-resolusi`, `/internal/status-tap`, `/internal/late-recap` untuk usulan SP1, dan `/kpi/attendance` untuk KPI kedisiplinan, termasuk gerbang `ATTENDANCE_SERVICE_KEY` yang tetap mewajibkan header `BIP-Gateway-ID` dan batas periode 26 ke 25 dari `rentangPeriodeTelat`.",
       "kata_kunci": [
         "attendance service",
@@ -8176,8 +8176,8 @@
         "HRIS - Attendance Correction",
         "HRIS - Tukar Jadwal Kerja"
       ],
-      "hash": "bff24464927b65d552671265c489418bec36ff0c68f16e2f0cd2d769d5e914fd",
-      "ukuran_kb": 14.2,
+      "hash": "d8a1e5ae0b1badac63dbf07e84febe45f3603b8d6984d44876274e3f2e0ee5a1",
+      "ukuran_kb": 14.3,
       "ringkasan": "Menjawab: bagaimana sistem presensi karyawan dirancang (mesin fingerprint Solution X105 dengan listener pyzk sebagai fallback, aplikasi mobile dengan face recognition, geolocation, dan geofencing WiFi dalam radius 50 m), serta bagaimana layar attendance HRIS menyaring data per bulan kalender dan departemen. Juga menjawab bagaimana kartu ringkasan membandingkan bulan berjalan vs bulan selesai, kenapa kartu Terlambat bersumber dari buku tamu security dan bukan status entri (dan bedanya dengan hitungan kandidat SP berbasis siklus payroll 26 ke 25), rumus persentase kehadiran berbasis keterlambatan, serta ambang dan toleransi keterlambatan yang juga mengikat cron.",
       "kata_kunci": [
         "attendance system",
