@@ -86,7 +86,7 @@
 - **Praktik nyata** (*survei 2026-09*), per peran:
   - **Sales admin**: merekap penjualan harian ke basis data kerja sendiri; tiap awal bulan mencocokkan dashboard, ERP, dan Accurate; rekonsiliasi bulanan dengan gudang.
   - **Piutang**: rekonsiliasi kas toko mingguan (saldo seller center terhadap Accurate) beserta analisis selisih harga, biaya, dan nilai settle; merekap penarikan saldo per CV lewat **alat web terpisah di luar ERP** karena data sistem belum sesuai. Alat itu layak ditelusuri sebelum penjualan marketplace per CV dirancang ([[Finance - Buku Besar CV]]); identitas dan pemiliknya **TBD**.
-  - **Retur**: memvalidasi retur di empat sumber (ERP, marketplace, Accurate, gudang). ⚠️ Retur untuk faktur sejak Juli 2026 dilaporkan **diunggah manual** ke Accurate lalu dilaporkan ke IT, bertentangan dengan pain point di atas yang menyatakan retur ditarik otomatis. Berapa retur sejak Juli yang terbukukan lewat job integrasi dan berapa lewat unggahan manual: **TBD ukur** di prod.
+  - **Retur**: memvalidasi retur di empat sumber (ERP, marketplace, Accurate, gudang), menindaklanjuti retur yang belum sampai gudang, dan merekap retur yang masih tertahan untuk jurnal penyesuaian akhir bulan. ⚠️ Saat mencocokkan piutang terbuka, retur yang ternyata **belum terbukukan** di Accurate diunggah manual; untuk faktur sejak Juli 2026 unggahan manual itu dicatat dan dilaporkan ke IT. Artinya penarikan retur otomatis di pain point di atas masih punya celah. Seberapa besar celahnya: **TBD ukur** di prod (rekap yang dikirim ke IT adalah sumber volumenya).
   - Ketiganya menyebut menunggu perbaikan data atau sistem dari IT, 1 sampai 5 hari per kasus, dan tindak lanjut gudang untuk retur.
 
 ### Account Payable: pembayar
@@ -189,7 +189,7 @@ Rincian job dan rute di [[Microservices - Integration Service]].
 ```
 AR sales admin : rekap penjualan harian ke basis data kerja sendiri; awal bulan cocokkan dashboard, ERP, Accurate
 AR piutang     : rekon kas toko mingguan (seller center vs Accurate); rekap penarikan per CV di alat web luar ERP
-AR retur       : validasi retur di ERP, marketplace, Accurate, gudang; retur faktur sejak Juli diunggah manual (TBD ukur)
+AR retur       : validasi retur di ERP, marketplace, Accurate, gudang; retur yang lolos dari sinkron diunggah manual (TBD ukur)
   ▼  data dikoreksi, sering menunggu perbaikan IT atau gudang
 Senior Accountant : saldo kas toko dari Accurate disajikan manual, diperbarui berulang sampai sama dengan seller center
 ```

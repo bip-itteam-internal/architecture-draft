@@ -105,7 +105,7 @@ Jawaban tambahan datang dari sisi yang pada analisa awal masih kosong: pemeriksa
 **Kandidat di luar ADR 0096** (belum jadi task; masing-masing butuh `/start-task` atau `/analisa-kebutuhan` sendiri):
 
 - **Penelusuran realisasi anggaran sampai transaksinya** di layar anggaran dan Cost Control. Kecil, dan kodenya sudah dicocokkan (lihat persona Cost Control): kartu varians hanya menyajikan total, dan tak ada tautan ke transaksi Accurate pembentuk realisasi.
-- **Retur marketplace sejak faktur Juli 2026 diunggah manual ke Accurate.** Ukur dulu di prod berapa yang terbukukan lewat job integrasi dan berapa lewat unggahan manual; rekap yang sudah dikirim pengguna ke IT adalah sumber volume objektifnya. Baru jadi task perbaikan integrasi bila terbukti.
+- **Retur marketplace yang lolos dari sinkron otomatis diunggah manual ke Accurate** (untuk faktur sejak Juli 2026 dicatat dan dilaporkan ke IT). Ukur dulu di prod seberapa besar celahnya dibanding yang terbukukan lewat job integrasi; rekap yang sudah dikirim pengguna ke IT adalah sumber volume objektifnya. Baru jadi task perbaikan integrasi bila terbukti.
 - **Costing HPP produk** dikerjakan di Excel dan WhatsApp, di luar ERP. Belum ada keputusan apakah masuk ERP; kaitannya dengan HPP yang dipakai insentif belum diketahui.
 - **Rekap gaji diperiksa dua jabatan** dari sudut berbeda. Konfirmasi ke Supervisor FAT apakah pemisahan tugas yang disengaja; ini pertanyaan proses, bukan task kode.
 - **Menunggu perbaikan data atau sistem dari IT** (1 sampai 5 hari per kasus) disebut berulang oleh AR dan Senior Accountant. Belum ada data antreannya; bila ingin diukur, sumbernya tiket IT, bukan survei.
