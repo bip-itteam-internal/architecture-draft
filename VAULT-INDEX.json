@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-17",
-  "jumlah_dokumen": 420,
+  "jumlah_dokumen": 422,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -6897,6 +6897,43 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI.md",
+      "judul": "ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan** 2026-09-17, disetujui pemilik proses (opsi A1 + K1), kode belum ada.",
+      "publik": true,
+      "tautan": [
+        "HRIS - Training Program",
+        "HRIS - Matriks KPI per Departemen",
+        "Microservices - Learning Service",
+        "Microservices - Employee Service",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
+        "HRIS - Dashboard per Posisi",
+        "API - Learning Service",
+        "HRIS - Career & Promotion",
+        "HRIS - HRD Documents",
+        "RUN - Menambah Metrik KPI Otomatis"
+      ],
+      "hash": "d977993cfcdc6ff7da376eb9daf6068fc544b26c2b0bed43a154cd808468a571",
+      "ukuran_kb": 11.4,
+      "ringkasan": "Menjawab: bagaimana dua metrik KPI Training & Performance Officer yang selama ini diisi manual (kesesuaian materi dan dampak pelatihan) akhirnya diisi otomatis oleh sistem -- pertanyaan kesesuaian materi skala 1-10 ditanyakan langsung ke peserta terpisah dari penilaian trainer, dan dampak pelatihan dihitung dari kenaikan skor kpi_score peserta antara bulan sebelum dan sesudah kelas dengan jeda dua bulan. Juga menjelaskan kenapa opsi membangun jobdesk per posisi dan kurikulum per jabatan ditolak untuk keputusan ini, serta metrik apa yang tidak ikut dijumlah ke nilai kepuasan trainer.",
+      "kata_kunci": [
+        "kesesuaian materi",
+        "training relevance",
+        "kenaikan KPI peserta",
+        "dampak pelatihan",
+        "training impact",
+        "People and Development",
+        "Training Officer",
+        "evaluasi pasca-pelatihan",
+        "post-training evaluation",
+        "ADR 0102"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -8927,6 +8964,7 @@
         "Microservices - Learning Service",
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
         "APP - Web ERP",
+        "ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI",
         "HRIS - Training Program",
         "Microservices - Marketing Analytics Service",
         "ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support",
@@ -8936,20 +8974,19 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "4fb642a6d64f4cd4c46e1a07a2de42a5d03fc54565052cbcadef32ad35d256d5",
-      "ukuran_kb": 260.9,
-      "ringkasan": "Menjawab: apa saja label metrik KPI yang berlaku untuk tiap departemen/jabatan persis seperti tersimpan di koleksi kpi_template production (termasuk typo dan penomoran aslinya), berapa target/bobotnya, dan sejauh mana tiap metrik sudah bisa dihitung otomatis oleh sistem (klasifikasi otomatis / semi / terblokir data / manual per departemen). Juga menjawab status terkini per departemen (Finance, Human Resource, Training & Perfomance Officer, Recruitment & Onboarding, Kyura, Live Support, dll) berdasarkan sensus data production terbaru, riwayat ralat (mis. modul Kaizen dan forecast kas yang sempat dicatat keliru sebagai tidak ada), serta departemen yang belum punya template KPI sama sekali (Percetakan, Marketing Offline Distribution).",
+      "hash": "1da9b619bcf6872ccbf00f0adf61576d0321a47acb06467b23c2f38f55ca9823",
+      "ukuran_kb": 262.7,
+      "ringkasan": "Menjawab: apa saja metrik KPI, bobot, dan target tiap posisi di tiap departemen (salinan lengkap kpi_template production), dan sejauh mana tiap metrik sudah otomatis, semi-otomatis, terblokir data, atau masih manual. Jadi dokumen kerja acuan bagi dev yang akan mengotomatiskan metrik departemen tertentu, lengkap dengan riwayat ralat atas bagian yang sempat keliru (Kaizen, forecast kas, Recruitment, Finance, Training & Performance Officer, Live Support) dan departemen yang belum punya template sama sekali.",
       "kata_kunci": [
-        "KPI",
+        "KPI template",
+        "matriks KPI",
+        "bobot metrik",
+        "target KPI",
+        "klasifikasi otomasi KPI",
         "kpi_template",
-        "matriks KPI per departemen",
-        "target metrik",
-        "bobot KPI",
-        "otomasi skor KPI",
+        "KPI per departemen",
         "auto score",
-        "klasifikasi otomasi",
-        "employee_db",
-        "scorecard"
+        "skor KPI karyawan"
       ]
     },
     {
@@ -9611,25 +9648,27 @@
         "ADR - 0002 Database-per-Service",
         "CORE - API Master Gateway",
         "CORE - SSO Flow",
+        "ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI",
         "APP - Web ERP",
         "HRIS - Work Review",
         "Microservices - Calendar Service",
         "HRIS - Big Pictures",
         "HRIS - Analysis"
       ],
-      "hash": "0baa71222632b3a39b52593449be2ca84a1957727b0010d6c16bda7debc701e0",
-      "ukuran_kb": 46.1,
-      "ringkasan": "Menjawab: apa desain konsep dan ruang lingkup MVP program pelatihan karyawan (training & development), adaptasi apa yang diambil dari referensi ERPGo, seperti apa model data dan alur proses bisnisnya, serta bagian mana yang sudah live versus masih rencana lanjutan (LMS materi, Talent Pool, pre-test).",
+      "hash": "29bf09a872636d8c1a683e91118b59b8f4d48bfbfec48f62dda6580173858317",
+      "ukuran_kb": 47.9,
+      "ringkasan": "Menjawab: apa status implementasi modul Pelatihan & Pengembangan Karyawan (learning-service) saat ini -- fitur mana yang sudah live di produksi (pencatatan kelas oleh HR, pengajuan & evaluasi trainer, post-test berskor) dan mana yang masih di branch atau belum ada kode sama sekali (pre-test, materi LMS, kurikulum jabatan, Talent Pool), termasuk kenapa alur karyawan biasa lewat MyBharata (Pelatihan Saya / Pengajuan Pelatihan) belum terbukti benar-benar dipakai. Juga memuat desain MVP asal (adaptasi selektif dari modul Training ERPGo), model data, dan rencana rollout bertahap.",
       "kata_kunci": [
         "training program",
         "pelatihan karyawan",
-        "HRIS",
+        "learning service",
         "LMS",
-        "ERPGo",
-        "Talent Pool",
-        "kurikulum jabatan",
-        "MVP",
-        "pengajuan pelatihan"
+        "post-test",
+        "pre-test",
+        "evaluasi trainer",
+        "Pelatihan Saya",
+        "Pengajuan Pelatihan",
+        "rollout bertahap"
       ]
     },
     {
@@ -14158,6 +14197,31 @@
         "MCP backend",
         "tindak lanjut",
         "audit kepatuhan"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Kesesuaian Materi dan Kenaikan KPI Peserta.md",
+      "judul": "ANALISA - Kesesuaian Materi dan Kenaikan KPI Peserta",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI"
+      ],
+      "hash": "58e634682fecee7570efb0a91d3937b0f465d0b5bc6c82834646d4c77eaf734a",
+      "ukuran_kb": 5.6,
+      "ringkasan": "Menjawab: apa saja task teknis dan urutan pengerjaannya untuk mengimplementasikan ADR-0102 (kesesuaian materi dinilai peserta dan kenaikan KPI peserta sebagai metrik pelatihan) -- dari perubahan backend learning-service dan employee-service, penambahan kontrak GET /kpi/pelatihan, layar web dan MyBharata, sampai urutan deploy dan gerbang verifikasinya. Papan kerja yang berubah tiap item selesai, bukan dokumen arsitektur atau rencana per berkas.",
+      "kata_kunci": [
+        "task pelatihan",
+        "kesesuaian materi",
+        "kenaikan KPI peserta",
+        "rencana implementasi",
+        "learning-service",
+        "employee-service",
+        "GET /kpi/pelatihan",
+        "analisa kebutuhan"
       ]
     },
     {
