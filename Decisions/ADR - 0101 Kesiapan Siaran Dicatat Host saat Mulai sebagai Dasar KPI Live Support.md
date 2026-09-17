@@ -53,7 +53,7 @@ Diukur di produksi 2026-09-16, bukan disimpulkan:
 
 ### Yang memburuk atau tetap terbuka
 
-- ⛔ **Skor Live Support TETAP diisi manual.** `layakDifinalisasi` menuntut seluruh metrik punya `auto` dan nilai; tema dan teaser (bobot 0,70) tak punya sistem pencatat. 🟡 *Diperbarui 2026-09-17*: sistem pencatatnya diputuskan dan dikodekan (belum merged) di [[ADR - 0106 Tema dan Teaser Live Support Disetor dan Diputus Penyetuju Departemen sebagai Dasar KPI]]. ADR itu juga **menyimpang sadar dari §3 di atas**: marketing-analytics kini memanggil employee-service untuk penyetuju departemen.
+- ⛔ **Skor Live Support TETAP diisi manual.** `layakDifinalisasi` menuntut seluruh metrik punya `auto` dan nilai; tema dan teaser (bobot 0,70) tak punya sistem pencatat. 🟡 *Diperbarui 2026-09-17*: sistem pencatatnya diputuskan dan di-merge 2026-09-17 (belum deploy) di [[ADR - 0106 Tema dan Teaser Live Support Disetor dan Diputus Penyetuju Departemen sebagai Dasar KPI]]. ADR itu juga **menyimpang sadar dari §3 di atas**: marketing-analytics kini memanggil employee-service untuk penyetuju departemen.
 - ⚠️ **Tak ada angka September.** Terukur 2026-09-17: `sesi_departemen_tanpa_pendukung` Kyura **130** dan `sesi_total` nol, karena belum satu sesi pun dicatat lewat aplikasi baru. Metriknya baru berisi sesudah MyBharata dirilis.
 - ⚠️ **Blok `auto` sengaja belum dipasang.** Memasangnya sebelum ada sesi berceklis membuat metriknya langsung gagal hitung untuk periode berjalan.
 - ⚠️ **`pendukung[]` datang dari body tanpa verifikasi terhadap sesi.** Penjaga posisi memastikan yang dinilai memang Live Support, tetapi **tidak** mencegah host berkolusi dengan Live Support sungguhan, karena employee-service tak melihat isi `pendukung[]` tiap sesi. Yang tersisa hanya jejak `diisi_oleh`.
