@@ -1520,7 +1520,7 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "433d4e01dbd3faa4234fe3badf9b74c54e358fbec9441708a5f6787f4af30baa",
+      "hash": "3701e1335f01cdc244fcbdb16b5c8f07356a3cdb03c6f6d440739f7ece7ee890",
       "ukuran_kb": 496.6,
       "ringkasan": "Menjawab: apa itu erp-frontend (\"One Bharata\") dan stack teknologinya, bagaimana autentikasi serta role-based access bekerja (cookie system_roles, SSO Identity Provider untuk app lain seperti Task Manager), dan bagaimana struktur menu/sidebar (kategori, sub-menu, Pengaturan HRGA terpusat) tersusun. Juga menjelaskan konvensi data-fetching TanStack Query dan bagan Recharts/ChartContainer, dukungan multi-perusahaan (multi-tenant), serta daftar modul/fitur yang sudah dan belum diimplementasikan. Memuat pula layar Jadwal Host Live milik marketing, termasuk pratinjau isi pola (ruas shift berjam, siklus, kalender) yang sedang di branch.",
       "kata_kunci": [
@@ -2802,8 +2802,8 @@
         "DB - Overview and Notes",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "097e4c385af1d248b382f6ea7dda773c5cbf8c7d2b478f14d3bc452e82f4a1cb",
-      "ukuran_kb": 23.8,
+      "hash": "18f47cad5c6639a26db8852437de4f9b62a8ba3e631478ff340580ce77814c0c",
+      "ukuran_kb": 23.9,
       "ringkasan": "Menjawab pertanyaan tentang bagaimana notifikasi dikirim ke berbagai channel (inbox in-app, push FCM browser/ponsel, WhatsApp, splash promotion, article) dari satu notification-service, termasuk daftar endpoint, aturan paginasi inbox yang opt-in, kategori inbox sebagai daftar-izin, dan mekanisme fan-out push dua kanal yang dipusatkan dari satu titik pengiriman (/inbox/send). Juga menjelaskan gerbang keamanan (header BIP-Gateway-ID + service key) dan urutan deploy yang mengikat sejak fan-out push dipusatkan.",
       "kata_kunci": [
         "notification-service",
@@ -3062,7 +3062,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — event ingestion + reconciler ✅; operasi WMS lengkap (approve/pick/pack/rts/labels/handover/dashboard/export rekon) ✅; jalur cepat APPROVED→RTS + gerbang rekon `exported_at` ✅; master produk CRUD ✅; frontend warehouse lengkap ✅ (queue+filter+unduh, picking, packing, RTS, label, handover). ✅ **Deadlock cursor reconciler diperbaiki & deploy 2026-07-24** (PR #638, commit `14b9795c`) — lihat *Event Ingestion & Reconciler*. ⚠️ **Register komplain gudang** ✅ ada di kode berikut layar baca-tindak-lanjut dan pintu pengajuan dari baris ulasan marketplace (seluruhnya merged 2026-09-16, di DEV, **belum di PROD**), jadi di produksi masih **nol dokumen**. 🔜 Notifikasi ke gudang dan pengaju ada di branch `feat/warehouse-komplain-notifikasi` — lihat *Komplain Gudang*.",
+      "status_teks": "Implemented (ada catatan) — event ingestion + reconciler ✅; operasi WMS lengkap (approve/pick/pack/rts/labels/handover/dashboard/export rekon) ✅; jalur cepat APPROVED→RTS + gerbang rekon `exported_at` ✅; master produk CRUD ✅; frontend warehouse lengkap ✅ (queue+filter+unduh, picking, packing, RTS, label, handover). ✅ **Deadlock cursor reconciler diperbaiki & deploy 2026-07-24** (PR #638, commit `14b9795c`) — lihat *Event Ingestion & Reconciler*. ⚠️ **Register komplain gudang** ✅ ada di kode berikut layar baca-tindak-lanjut dan pintu pengajuan dari baris ulasan marketplace (seluruhnya merged 2026-09-16, di DEV, **belum di PROD**), jadi di produksi masih **nol dokumen**. Notifikasi ke gudang dan pengaju merged 2026-09-17 (#1940) dan terverifikasi DEV, **belum di PROD** — lihat *Komplain Gudang*.",
       "publik": true,
       "tautan": [
         "WH - Fulfillment Flow & WMS Tinggarjaya",
@@ -3083,8 +3083,8 @@
         "IT - Background Jobs & Schedulers",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "61a500191d95c485deee5d674c0839b8f176917272f82e7fee344c5a9e106fa0",
-      "ukuran_kb": 37.9,
+      "hash": "461a1c06559ab4c795792a75692e22d6c92fb4da07845c8ab72dd63d85b5db15",
+      "ukuran_kb": 38.5,
       "ringkasan": "Menjawab pertanyaan tentang cara kerja warehouse-service (WMS Tinggarjaya): bagaimana event order dari marketplace masuk dan disinkronkan lewat reconciler 60 detik dan open-order sweep 5 menit, state machine status_wms, operasi gudang harian (approve, pick, pack, RTS, label, dashboard) beserta role guard-nya termasuk pembatasan khusus mitra gudang Sadewa. Juga mencakup register komplain gudang yang jadi bahan KPI packing, endpoint API, model data warehouse_db, dan status implementasi tiap fitur (sudah di prod vs masih di branch).",
       "kata_kunci": [
         "warehouse-service",
@@ -6790,7 +6790,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "Diterima, sebagian besar diimplementasikan. **Keputusan 1, 2, 3, 4, 5, dan 6 sudah ada di kode** per 2026-09-16 dan **merged ke `main` hari itu juga**, terverifikasi di DEV; belum di PROD. **Keputusan 8 separuh berjalan**: notifikasi register GUDANG ada di branch bip-erp `feat/warehouse-komplain-notifikasi` + erp-frontend `feat/inbox-kategori-komplain-gudang` per 2026-09-17, belum merge; notifikasi ulasan bintang rendah ke pemegang toko belum dikerjakan. Sisanya (jalur QC dari ulasan, tujuan tanpa register) masih usulan.",
+      "status_teks": "Diterima, sebagian besar diimplementasikan. **Keputusan 1, 2, 3, 4, 5, dan 6 sudah ada di kode** per 2026-09-16 dan **merged ke `main` hari itu juga**, terverifikasi di DEV; belum di PROD. **Keputusan 8 separuh berjalan**: notifikasi register GUDANG merged 2026-09-17 (bip-erp #1940, erp-frontend #1625) dan terverifikasi DEV, belum PROD; notifikasi ulasan bintang rendah ke pemegang toko belum dikerjakan. Sisanya (jalur QC dari ulasan, tujuan tanpa register) masih usulan.",
       "publik": true,
       "tautan": [
         "Microservices - Integration Service",
@@ -6806,8 +6806,8 @@
         "Sales - ICC Account Manager Mapping",
         "ADR - 0060 Cakupan Keterlihatan Tiket Engagement"
       ],
-      "hash": "cc2b06af95a7563e7a01bc3191051681bf862dda9f38c0ea6e050ea97720225c",
-      "ukuran_kb": 13.7,
+      "hash": "9b974f1e90651e85b8cb841af484a5542fc7fb7e1f9cce1aed7e629320faa488",
+      "ukuran_kb": 13.6,
       "ringkasan": "Menjawab pertanyaan kenapa dan bagaimana komplain yang berasal dari ulasan marketplace (Shopee) dirutekan ke register komplain yang SUDAH ADA per departemen tujuan (gudang lewat warehouse_komplain_gudang, QC lewat quality_complaint) alih-alih membangun register ketiga. Menjelaskan data ulasan yang mendasari keputusan (volume kecil per bulan, sebaran tema keluhan, kepemilikan toko diturunkan dari icc_account_mappings bukan dari peran marketing), status implementasi tiap keputusan, serta apa yang sengaja tidak dijanjikan (TikTok, balas otomatis ke pembeli, klasifikasi otomatis, tenggat SLA).",
       "kata_kunci": [
         "ADR 0099",
@@ -14131,8 +14131,8 @@
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
         "APP - MyBharata"
       ],
-      "hash": "2b26f146f0aa7192b08e7bc1c33472c2a03798534071407252532b632ab8d2eb",
-      "ukuran_kb": 5.7,
+      "hash": "8fb1bce3e75b938a62a100747d119d1f34d0d2c7fefc1c06b5fafc2f09e19171",
+      "ukuran_kb": 5.8,
       "ringkasan": "Menjawab pertanyaan tentang status pengerjaan fitur komplain dari ulasan marketplace: daftar task backend (buka rute baca register gudang, salinan ulasan ke register, notifikasi ke gudang) dan frontend (layar komplain gudang, tombol ajukan dari baris ulasan) beserta status merged/branch/PROD tiap task per 2026-09-17. Juga mencatat keputusan yang masih menunggu manajemen (tujuan komplain tanpa register seperti ekspedisi/vendor, kewajiban regulatif keluhan efek samping, lima toko Beauty Hacks tanpa CS) dan task yang dibatalkan (master kategori komplain baru).",
       "kata_kunci": [
         "ANALISA komplain",
