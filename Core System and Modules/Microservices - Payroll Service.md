@@ -289,6 +289,8 @@ bukan git log.
 | `payroll_company` | **41** | cocok dengan skala HRD (1 PT + 40 CV) |
 | `salary_component` | **19** (bukan 18) | baris lama "Tunjangan Kehadiran" (deduction) masih aktif, lihat §Master Komponen Gaji |
 
+> **Diukur ulang 2026-09-17** (jumlah dokumen dan tanggal dokumen terbaru per koleksi saja; status run dan isi field tidak terbaca): `payroll_run` **1**, dibuat 2026-09-03, jadi kedua run draft di tabel di atas tidak ada lagi; `payroll_run_line` 174; `employee_salary` 180 (terbaru 2026-08-28); `salary_component` 23; `payroll_company` 41. Apakah run 2026-09-03 sudah `approved`/`published`, dan karena itu apakah slip pernah dilihat karyawan, belum diukur.
+
 **Urutan yang menahan run pertama** per 2026-08-28, sesudah dua penghambat teratas gugur
 (dasar upah kini terisi 136/158 dan kedua run sudah dihitung ulang dengan perbaikan periode):
 **pengali mangkir yang menyimpang dari Pasal 20** → sign-off tabel TER → 22 orang yang dasar
