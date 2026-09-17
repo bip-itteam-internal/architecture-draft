@@ -19,6 +19,8 @@
 
 Siapa memakai apa per posisi, akses nyatanya di prod, dan alur kerja antar posisi: [[Finance - FAT Persona]].
 
+Panduan membangun sistem per proses bisnis Finance (pengajuan, pembayaran, penjualan, retur, rekonsiliasi, buku besar, gaji, pajak, anggaran, tutup buku, costing): [[Finance - Proses Bisnis dan Kebutuhan Sistem]].
+
 ## Sistem akuntansi kedua yang berjalan di luar peta ini
 
 ⚠️ Sejak **5 Agustus 2026** ada buku besar double-entry + konsolidasi untuk **40 CV** grup yang berjalan sepenuhnya di luar ERP dan di luar [[External - Accurate]]: [[APP - Buku Besar Konsolidasi CV FINCON]]. Entitas yang dibukukannya **sama** dengan badan usaha di [[Microservices - Payroll Service]] dan rekening/proyek Accurate, sehingga laba per CV kini punya dua sumber yang tak direkonsiliasi. Ia sekaligus menutup satu celah asli — kertas kerja konsolidasi + jurnal eliminasi intercompany yang tidak dimiliki ERP maupun Accurate.
@@ -31,6 +33,7 @@ Arahnya belum diputuskan; pilihan dan konsekuensinya di [[ADR - 0068 Buku Besar 
 - [[Finance - Incentive]] — perhitungan insentif
 - [[Finance - Dashboard per Posisi (FAT)]] — dashboard keuangan per posisi (kartu + grafik keputusan)
 - [[Finance - FAT Persona]]: persona per posisi dan alur kerja antar posisi
+- [[Finance - Proses Bisnis dan Kebutuhan Sistem]]: sebelas proses bisnis, yang sudah ada di ERP, celah, dan urutan membangunnya
 - [[APP - Buku Besar Konsolidasi CV FINCON]] — buku besar & konsolidasi 40 CV **di luar ERP** · [[ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate]]
 - [[External - Accurate]] (akuntansi) · [[Vendor - CRM]] (sumber data purchase order)
 
