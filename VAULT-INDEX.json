@@ -1455,8 +1455,8 @@
         "API - Learning Service",
         "ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI",
         "Microservices - Calendar Service",
-        "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
         "ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi",
+        "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "HRIS - Attrition",
         "Microservices - Attendance Service",
@@ -1534,8 +1534,8 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "aecf16679c1106d3548933ae24013370ef53242bde7aa47459b8335c125b2665",
-      "ukuran_kb": 521.6,
+      "hash": "a28fe2c9ca37e99ba0dc94f17914c83dcffce6ffa65db5573ee30c9400e7d78e",
+      "ukuran_kb": 521.9,
       "ringkasan": "Menjawab: apa stack dan struktur portal web ERP (erp-frontend, \"One Bharata\"), bagaimana login, refresh token, dan SSO Identity Provider bekerja, serta bagaimana cookie system_roles (modul dan role) menggerbang sidebar dan menu. Juga menjawab cara menu dikelompokkan lewat induk bersarang (termasuk Pengaturan HRGA terpusat dan tab-tabnya), bagaimana fitur multi-perusahaan seperti CompanySwitcher dan rekrutmen lintas perusahaan tampil di web, serta konvensi data-fetching TanStack Query dan bagan Recharts yang wajib diikuti.",
       "kata_kunci": [
         "web ERP",
@@ -7043,8 +7043,8 @@
       "judul": "ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** (2026-09-17). Irisan 1 sudah diimplementasikan di branch erp-frontend `feat/beranda-portal-zona` (belum merge, belum di `main`) dan diverifikasi di layar terhadap backend DEV; irisan 2 dan 3 belum. Membalik konsekuensi \"kehilangan kartu Kehadiran dan Pengumuman\" yang diterima 2026-08-26 dan 2026-09-15.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Berlaku sebagian** (2026-09-17). Irisan 1 merged ke `main` erp-frontend lewat PR [#1642](https://github.com/bip-itteam-internal/erp-frontend/pull/1642) (merge commit `68ff4f937`), diverifikasi di layar terhadap backend DEV sebelum merge; deploy dev/prod belum diverifikasi. Irisan 2 dan 3 belum. Membalik konsekuensi \"kehilangan kartu Kehadiran dan Pengumuman\" yang diterima 2026-08-26 dan 2026-09-15.",
       "publik": true,
       "tautan": [
         "APP - Web ERP",
@@ -7058,9 +7058,9 @@
         "HRIS - Key Performance Index",
         "REF - Dashboard per Posisi (Indeks Cakupan)"
       ],
-      "hash": "a7455a6a1b0a2041596b08da7edefd67f8bd47a40529dc07e35b41cb4ff710ed",
-      "ukuran_kb": 21.7,
-      "ringkasan": "Menjawab: bagaimana susunan beranda portal /dashboard web ERP untuk semua karyawan (kepala dengan kehadiran hari ini, Perlu tindakan saya, agenda hari ini, KPI saya, pengumuman, lalu ruang kerja posisi), kenapa bagian personal tidak lagi digantikan dashboard departemen, dan dari mana angka antrean dibaca (GET /api/employee/pengajuan/ringkasan). Juga menjawab kenapa kehadiran hanya tampil bila catatan /attendance/today bertanggal hari ini, kenapa KPI menampilkan metrik yang menunggu dan skor bulan lalu alih-alih skor bulan berjalan, kenapa catatan Pengajuan Barang & Dana tak termuat tampil permanen, status irisan 1 di branch, serta irisan 2-3 dan hal yang belum diputuskan.",
+      "hash": "4a60c706b439b5b2de55e4d83702b7475e0a9392c99d8214eae38fbbfa942803",
+      "ukuran_kb": 21.9,
+      "ringkasan": "Menjawab: bagaimana susunan beranda portal /dashboard web ERP untuk semua karyawan (kepala dengan kehadiran hari ini, Perlu tindakan saya, agenda hari ini, KPI saya, pengumuman, lalu ruang kerja posisi), kenapa bagian personal tidak lagi digantikan dashboard departemen, dan dari mana angka antrean dibaca (GET /api/employee/pengajuan/ringkasan). Juga menjawab kenapa kehadiran hanya tampil bila catatan /attendance/today bertanggal hari ini, kenapa KPI menampilkan metrik yang menunggu dan skor bulan lalu alih-alih skor bulan berjalan, kenapa catatan Pengajuan Barang & Dana tak termuat tampil permanen, bahwa irisan 1 sudah merged (erp-frontend #1642), serta irisan 2-3 dan hal yang belum diputuskan.",
       "kata_kunci": [
         "beranda portal",
         "dashboard",
