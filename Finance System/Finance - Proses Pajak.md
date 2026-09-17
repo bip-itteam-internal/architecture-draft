@@ -4,7 +4,7 @@
 
 *Proses P8, pajak, dari [[Finance - Proses Bisnis dan Kebutuhan Sistem]]. Dok ini memuat tujuan, cara dikerjakan hari ini, yang sudah ada di ERP, alur target di sistem, celah yang harus ditutup, kontrol yang wajib dijaga, dan ukuran untuk membuktikan efisiensinya. Penilaian cakupan dan kesesuaiannya ada di dok induk.*
 
-- **Status**: ⚠️ **Implemented (ada catatan)**. Tax Control ada di kode; master jenis pajak dan kewajiban di prod masih kosong (2026-09-12), dan data acuan satu sumber belum ada.
+- **Status**: ⚠️ **Implemented (ada catatan)**. Tax Control ada di kode; master jenis pajak dan kewajiban di prod masih kosong (diukur ulang 2026-09-17), dan data acuan satu sumber belum ada.
 - **Sumber**: survei alur kerja Finance (isian mandiri 14 sampai 16 September 2026, butir bertanda *survei 2026-09*), kode `bip-erp` dan `erp-frontend` di `origin/main` 2026-09-17. Keadaan prod bertanggal di tiap butir; ukur ulang sebelum dipakai memutuskan.
 - **Kelompok celah**: **A** sudah ada, tinggal dipakai · **B** sudah ada, perlu diperbaiki · **C** belum ada, perlu dibangun (definisi di dok induk).
 
@@ -18,7 +18,7 @@ Data transaksi dicek dan dikonfirmasi, catatan perusahaan diekualisasi dengan Co
 
 ## Sudah ada di ERP
 
-Tax Control berisi kewajiban per masa, pengingat jatuh tempo H-7 dan H-3, pencatatan pelaporan, dan unggah BPE serta bukti bayar ([[API - Finance Service]], [[Finance - Rancangan Finance Service]]). Prod 2026-09-12: master jenis pajak dan kewajiban masih 0. Master jenis pajak mengenal periodisitas bulanan dan tahunan (`bip-erp/services/finance/pajak_master.go:25`, `:88-91`), dan master bawaannya memuat PPh Badan tahunan yang masanya diwakili bulan terakhir tahun itu (`bip-erp/services/finance/pajak_master_seed.go:52-55`). Jadi kewajiban tahunan bisa dilacak; data laporan keuangan untuk SPT tahunan tidak disediakan modul ini.
+Tax Control berisi kewajiban per masa, pengingat jatuh tempo H-7 dan H-3, pencatatan pelaporan, dan unggah BPE serta bukti bayar ([[API - Finance Service]], [[Finance - Rancangan Finance Service]]). Prod 2026-09-12 dan diukur ulang 2026-09-17: master jenis pajak dan kewajiban masih 0. Master jenis pajak mengenal periodisitas bulanan dan tahunan (`bip-erp/services/finance/pajak_master.go:25`, `:88-91`), dan master bawaannya memuat PPh Badan tahunan yang masanya diwakili bulan terakhir tahun itu (`bip-erp/services/finance/pajak_master_seed.go:52-55`). Jadi kewajiban tahunan bisa dilacak; data laporan keuangan untuk SPT tahunan tidak disediakan modul ini.
 
 ## Alur target
 
