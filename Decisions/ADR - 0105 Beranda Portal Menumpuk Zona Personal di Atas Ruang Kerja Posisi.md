@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan** (2026-09-17). Irisan 1 sudah diimplementasikan di branch erp-frontend `feat/beranda-portal-zona` (belum merge, belum di `main`) dan diverifikasi di layar terhadap backend DEV; irisan 2 dan 3 belum. Membalik konsekuensi "kehilangan kartu Kehadiran dan Pengumuman" yang diterima 2026-08-26 dan 2026-09-15.
+> **Status**: ⚠️ **Berlaku sebagian** (2026-09-17). Irisan 1 merged ke `main` erp-frontend lewat PR [#1642](https://github.com/bip-itteam-internal/erp-frontend/pull/1642) (merge commit `68ff4f937`), diverifikasi di layar terhadap backend DEV sebelum merge; deploy dev/prod belum diverifikasi. Irisan 2 dan 3 belum. Membalik konsekuensi "kehilangan kartu Kehadiran dan Pengumuman" yang diterima 2026-08-26 dan 2026-09-15.
 
 ## Untuk Manajemen
 
@@ -25,7 +25,7 @@
 
 *Beranda portal (`/dashboard`) berhenti memilih ANTARA bagian personal dan dashboard posisi, lalu menumpuk keduanya: tiga zona personal untuk semua orang di atas, ruang kerja posisi di bawah. Antrean "perlu tindakan" dibaca dari endpoint agregat yang sudah ada, `GET /api/employee/pengajuan/ringkasan`, bukan dirangkai di frontend dan bukan endpoint baru.*
 
-- **Status**: 🟡 **Diusulkan**. Arah disetujui user 2026-09-17. Irisan 1 diimplementasikan di branch erp-frontend `feat/beranda-portal-zona` (belum merge); irisan 2 dan 3 belum. Lihat § Pelaksanaan Irisan 1.
+- **Status**: ⚠️ **Berlaku sebagian**. Arah disetujui user 2026-09-17. Irisan 1 merged ke `main` erp-frontend 2026-09-17 (PR #1642), deploy belum diverifikasi; irisan 2 dan 3 belum. Lihat § Pelaksanaan Irisan 1.
 - **Path di repo** (irisan 1, di branch): `erp-frontend/src/app/(main)/(erp)/dashboard/page.tsx` · `erp-frontend/src/features/erp/portal/components/` (`beranda-portal.tsx`, `kehadiran-hari-ini.tsx`, `perlu-tindakan.tsx`, `agenda-hari-ini.tsx`, `kpi-saya-ringkas.tsx`) · `erp-frontend/src/features/erp/portal/lib/` (`kehadiran-hari-ini.ts`, `baris-tindakan.ts`, `ringkasan-kpi.ts`, aturan murni beserta test) · `erp-frontend/src/features/pengajuan/use-ringkasan-pengajuan.ts` (dipakai ulang). Irisan 2 (rencana): `bip-erp/services/employee/ringkasan_pengajuan.go` (`registriRingkasan`)
 - **Tanggal**: 2026-09-17
 
@@ -136,7 +136,7 @@ Rancangan awal menaruh zona B sendirian di kolom kiri dan seluruh zona C (agenda
 
 ## Pelaksanaan Irisan 1
 
-- **Branch**: erp-frontend `feat/beranda-portal-zona`, PR [#1642](https://github.com/bip-itteam-internal/erp-frontend/pull/1642) dibuka 2026-09-17 (sudah memuat merge `origin/main` dan lolos hook pre-push `tsc`, `lint`, `build`). Belum merge per tanggal itu; ukur ulang sebelum dipakai.
+- **Branch**: erp-frontend `feat/beranda-portal-zona`, PR [#1642](https://github.com/bip-itteam-internal/erp-frontend/pull/1642) **merged 2026-09-17** (merge commit `68ff4f937`). Sebelum merge, `origin/main` digabungkan ulang karena `id.ts`/`en.ts` sempat disunting paralel, dan hook pre-push (`tsc`, `lint` seluruh repo, `build`) lolos atas hasil gabungan itu. Deploy dev/prod belum diverifikasi per tanggal itu; ukur ulang sebelum dipakai.
 - **Penyimpangan sadar dari rancangan awal ADR ini**, keempatnya sudah ditulis di keputusannya masing-masing: kehadiran bersyarat tanggal hari ini (§3), catatan kaki kunci `degraded` (§4), isi blok KPI (§5), dan agenda di kolom kiri (§7).
 - **Diverifikasi di layar** (Chrome headless, `next start` atas hasil build, gateway DEV, login sungguhan lewat form) dengan tiga akun uji: staf tanpa dashboard departemen, HRD Supervisor, Direktur. Angka "Perlu tindakan" sama dengan lencana `/portal/pengajuan` untuk akun yang sama; kehadiran tampil untuk catatan bertanggal hari ini dan "belum ada catatan" untuk 404; jumlah metrik KPI sama dengan `menunggu_penilaian`; ringkasan yang diblokir menghasilkan kalimat galat, bukan kalimat kosong; tema terang dan gelap, lebar 1440 dan 390 tanpa luber mendatar, bahasa id dan en.
 - **Test**: aturan murni (`kehadiran-hari-ini`, `baris-tindakan`, `ringkasan-kpi`) dengan kontrol negatif untuk kasus intinya (placeholder, catatan kemarin, catatan besok); komponen `PerluTindakan` dan `AgendaHariIni`; regresi halaman `/dashboard` (gerbang lama tetap, beranda kini ikut tampil bersama dashboard departemen, dashboard di BAWAH beranda, sebelum mount tanpa zona D).
