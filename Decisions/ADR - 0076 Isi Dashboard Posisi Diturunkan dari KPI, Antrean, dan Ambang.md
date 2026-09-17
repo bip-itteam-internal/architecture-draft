@@ -88,3 +88,4 @@ Susunan, ukuran, jarak, dan urutan baca mengikuti [[REF - Layout Dashboard erp-f
 - [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] — model hak akses per posisi
 - [[HRIS - Alur KPI Otomatis]] — bagaimana metrik jadi angka
 - [[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]] — batas kewenangan atas skor otomatis
+- [[ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi]]: letak dashboard posisi di beranda `/dashboard`, di bawah zona personal
