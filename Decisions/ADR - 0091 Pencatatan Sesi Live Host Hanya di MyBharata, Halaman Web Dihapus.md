@@ -65,7 +65,7 @@ Dua kemampuan yang hanya ada di web, mencatat atas nama host dan memulai beberap
 
 ### Yang memburuk atau tetap terbuka
 
-- ⚠️ **Leader tak punya lagi riwayat per sesi seluruh tim di layar mana pun.** Analisis Live dan ICC hanya ringkasan per orang, dan MyBharata hanya sesi milik sendiri. Bila rincian per sesi dibutuhkan lagi, itu keputusan baru.
+- ⚠️ **Leader tak punya lagi riwayat per sesi seluruh tim di layar mana pun.** Analisis Live dan ICC hanya ringkasan per orang, dan MyBharata hanya sesi milik sendiri. Bila rincian per sesi dibutuhkan lagi, itu keputusan baru. 🟡 *Diperbarui 2026-09-17*: keputusan baru itu [[ADR - 0108 Monitoring Sesi Live di Web Hanya Baca untuk Leader dan Live Support]] membuka kembali **bagian baca** (sesi berjalan dan riwayat per sesi, untuk leader marketing dan jabatan Live Support) lewat rute `/live-support/sesi*`; bagian tulis dan izin `marketing.sesi-live.work` tetap dicabut.
 - ⚠️ **Host yang belum memasang build MyBharata yang memuat Sesi Live tidak bisa mencatat sesi.** Prasyarat deploy `frontend-hris` ke PROD: host aktif sudah memakai build itu.
 - **Leader tidak bisa lagi mencatat sesi atas nama host**, dan belum diperiksa apakah MyBharata memulai beberapa akun dalam satu dialog seperti web.
 - **Alamat lama tidak memberi petunjuk ke MyBharata**: halaman tidak ditemukan yang umum.

@@ -193,6 +193,30 @@ Keduanya membalas **200 dengan amplop `unavailable_channels: SEMUA`** saat sumbe
 | PATCH | `/live-support/karya/:id` | Perbaiki setoran DITOLAK lalu kirim ulang (status → `menunggu`, alasan dan jejak keputusan dihapus, `periode` tetap). Body sama dengan setor; `jenis` tak boleh diganti (**400**). Bukan pemilik → **404**; status lain → **409** | Pemilik |
 | PATCH | `/live-support/karya/:id/keputusan` | Body `keputusan` (`setujui`/`tolak`)·`alasan` (wajib saat tolak, ≤1.000). **400** keputusan/alasan tak sah (dicek sebelum membaca dokumen); **404**; **403** setoran sendiri, departemen tanpa penyetuju terdaftar, atau bukan penyetujunya; **409** sudah diputus; **502** penyetuju tak bisa dipastikan (keputusan tak disimpan). Sukses mengirim inbox `live-support-karya-decided` ke penyetor | Penyetuju departemen penyetor (`GET /internal/department-approver` employee-service) |
 
+## Monitoring sesi live (`/live-support/sesi*`)
+
+🟡 **Belum merged, belum deploy** (bip-erp `feat/marketing-analytics-monitoring-sesi-live`). Keputusan: [[ADR - 0108 Monitoring Sesi Live di Web Hanya Baca untuk Leader dan Live Support]]; aturan lengkap: [[Microservices - Marketing Analytics Service]] § Monitoring sesi live hanya baca. Hanya baca; tanpa tutup otomatis saat dibaca. Seluruh galat berbentuk `{"error": "<pesan>"}`. `live_support_sesi.go`.
+
+**Gerbang (di handler, sama untuk kedua rute)**: header `BIP-Employee-ID` kosong → **403**; `common.IsMarketingLeader` → lingkup `semua`; jabatan Live Support (`PosisiCocok`) → lingkup `departemen`; selain itu → **403** berpesan syarat.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/live-support/sesi/berjalan` | Sesi yang belum diakhiri, `mulai` naik (paling lama berjalan dulu) |
+| GET | `/live-support/sesi` `?dari=YYYY-MM-DD&sampai=YYYY-MM-DD` | Sesi yang dimulai dalam rentang WIB, `mulai` turun. `dari`/`sampai` wajib, maks 92 hari (`bacaRentangHariWIB`) → **400**. Tak menerima `shop_id`/`host` |
+
+**Balasan** `{lingkup: "semua"|"departemen", toko_kosong: bool, rows: [...]}`, `rows` tak pernah `null`. Tiap baris:
+
+| Field | Isi |
+|---|---|
+| `shift` | Dokumen `LiveShift` utuh (host, pendukung, kesiapan, jeda, alasan selesai, ambil alih) |
+| `shop_name` | Dari `department_shops`; kosong bila tak terpetakan atau (leader) master gagal dibaca |
+| `durasi_efektif_detik` · `perlu_koreksi` | Dari `RingkasShiftBanyak` (tumpang tindih akun + toko ikut dideteksi) |
+| `batas_tutup_otomatis` | `batasTutupShift` (jam shift berakhir + 60 menit), `null` bila tak berlaku |
+| `status_permintaan` | Keadaan permintaan ambil alih SAAT DIBACA: `menunggu`·`ditolak`·`dijalankan`·`kedaluwarsa`·`sesi_berakhir`; absen bila tak pernah ada. ⛔ Konsumen membaca ini, bukan `shift.permintaan_ambil_alih.status` |
+| `penjualan` | `{gmv, orders, ada_data, porsi_host[{employee_id, nama, gmv}]}` untuk lingkup `semua`; **`null`** untuk lingkup `departemen` (kunci tetap ada). `ada_data: false` = belum terjodoh sesi TikTok, bukan Rp 0 |
+
+**Galat khusus lingkup**: `departemen` + `department_shops` gagal dibaca → **503**; `departemen` tanpa toko terpetakan (atau header departemen kosong) → **200** `toko_kosong: true`, `rows: []`; `semua` + sesi TikTok gagal dibaca → **503**; store gagal → **500**.
+
 ## Pengumpul KPI
 
 | Method | Path | Fungsi | Gerbang |
