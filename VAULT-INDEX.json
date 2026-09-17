@@ -1534,8 +1534,8 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "00e8c1555943291bdb0f06f92928491eb0f6c979153ae2f9b7b97da80fb99fe2",
-      "ukuran_kb": 521.5,
+      "hash": "aecf16679c1106d3548933ae24013370ef53242bde7aa47459b8335c125b2665",
+      "ukuran_kb": 521.6,
       "ringkasan": "Menjawab: apa stack dan struktur portal web ERP (erp-frontend, \"One Bharata\"), bagaimana login, refresh token, dan SSO Identity Provider bekerja, serta bagaimana cookie system_roles (modul dan role) menggerbang sidebar dan menu. Juga menjawab cara menu dikelompokkan lewat induk bersarang (termasuk Pengaturan HRGA terpusat dan tab-tabnya), bagaimana fitur multi-perusahaan seperti CompanySwitcher dan rekrutmen lintas perusahaan tampil di web, serta konvensi data-fetching TanStack Query dan bagan Recharts yang wajib diikuti.",
       "kata_kunci": [
         "web ERP",
@@ -7058,8 +7058,8 @@
         "HRIS - Key Performance Index",
         "REF - Dashboard per Posisi (Indeks Cakupan)"
       ],
-      "hash": "75153199ece29f5445995f0a5f83a412f4ba506cd76449052ccdf84099d2c754",
-      "ukuran_kb": 21.5,
+      "hash": "a7455a6a1b0a2041596b08da7edefd67f8bd47a40529dc07e35b41cb4ff710ed",
+      "ukuran_kb": 21.7,
       "ringkasan": "Menjawab: bagaimana susunan beranda portal /dashboard web ERP untuk semua karyawan (kepala dengan kehadiran hari ini, Perlu tindakan saya, agenda hari ini, KPI saya, pengumuman, lalu ruang kerja posisi), kenapa bagian personal tidak lagi digantikan dashboard departemen, dan dari mana angka antrean dibaca (GET /api/employee/pengajuan/ringkasan). Juga menjawab kenapa kehadiran hanya tampil bila catatan /attendance/today bertanggal hari ini, kenapa KPI menampilkan metrik yang menunggu dan skor bulan lalu alih-alih skor bulan berjalan, kenapa catatan Pengajuan Barang & Dana tak termuat tampil permanen, status irisan 1 di branch, serta irisan 2-3 dan hal yang belum diputuskan.",
       "kata_kunci": [
         "beranda portal",
