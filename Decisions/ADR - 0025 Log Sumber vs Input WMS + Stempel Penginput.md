@@ -273,7 +273,7 @@ PEMBUKUAN sejak PR #1830 (`koreksiBarangAsing`: barang ikut ORDER), bukan di sum
 masih terbuka tetap **qty kurang**. ⛔ **Penyimpangan sadar dari "kondisi gudang menang"**: paket dari
 order BATAL kini dibukukan UTUH mengikuti order walau komponennya belum lengkap discan, jadi **stok
 komponen di Accurate mendahului fisik** dan ditutup lewat scan susulan. Keputusan & batasannya di
-[[ADR - 0040 Retur Paket Utuh via Baris Induk Faktur]] (amandemen 2026-09-15). Tampilannya di layar sebagai tab **Selisih Retur** yang dihitung terjadwal per periode dan bisa ditandai beres diputuskan di [[ADR - 0103 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres]] (🟡 diusulkan).
+[[ADR - 0040 Retur Paket Utuh via Baris Induk Faktur]] (amandemen 2026-09-15). Tampilannya di layar sebagai tab **Selisih Retur** yang dihitung terjadwal per periode dan bisa ditandai beres diputuskan di [[ADR - 0104 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres]] (🟡 diusulkan).
 
 > **Amandemen — GERBANG PUNYA JALAN MASUK, TAK PUNYA JALAN KELUAR** (🟡 2026-09-16, branch
 `feat/retur-lepas-tertahan`, belum merge). Decision #8 mengatur kapan retur DITAHAN dan tak pernah
