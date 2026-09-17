@@ -50,7 +50,7 @@ Dari **24 metrik General Affair, sembilan terkunci pada satu hal yang sama**: ti
 | Bobot | Metrik | Sumber | Keadaan |
 |---:|---|---|---|
 | 0,3 | Realisasi preventive maintenance | modul checklist belum ada; space tiket tanpa tipe preventif | ❌ |
-| 0,35 | Menyelesaikan kerusakan (perbaikan berhasil ÷ total) | tiket space task-management `Building Maintenance`, sumber `kinerja_tiket` / `selesai_dinilai` | 🟡 bip-erp PR [#1962](https://github.com/bip-itteam-internal/bip-erp/pull/1962) dibuka 2026-09-17, belum merge; 9 tiket Juni-September, 6 masih Todo |
+| 0,35 | Menyelesaikan kerusakan (perbaikan berhasil ÷ total) | tiket space task-management `Building Maintenance`, sumber `kinerja_tiket` / `selesai_dinilai` | 🟡 bip-erp PR [#1962](https://github.com/bip-itteam-internal/bip-erp/pull/1962) merged 2026-09-17, terverifikasi DEV, belum deploy PROD; 9 tiket Juni-September, 6 masih Todo |
 | 0,35 | Efisiensi biaya maintenance | master anggaran belum ada | ❌ |
 
 **Dinilai dari, peran General Asset Staff:**
