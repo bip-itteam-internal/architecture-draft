@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-17",
-  "jumlah_dokumen": 442,
+  "jumlah_dokumen": 443,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1449,6 +1449,7 @@
         "API - Learning Service",
         "Microservices - Calendar Service",
         "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
+        "ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "HRIS - Attrition",
         "Microservices - Attendance Service",
@@ -1523,8 +1524,8 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "694bb4f8adb690502fdd37673661eb8c5b7f5181a8eb199c282c9cdf062bafb6",
-      "ukuran_kb": 497.7,
+      "hash": "c1168c137ecff3141778cfd41919fad6515282d6f99bc260a9ea451969a31d2e",
+      "ukuran_kb": 498.2,
       "ringkasan": "Menjawab: apa itu portal web ERP (erp-frontend, One Bharata), stack apa yang dipakai, bagaimana login, SSO, cookie system_roles, dan role gating sidebar bekerja, serta bagaimana menu HRIS dan Pengaturan HRGA dikelompokkan. Juga menjawab fitur multi-perusahaan di web (CompanySwitcher, rekrutmen lintas perusahaan), konvensi data-fetching TanStack Query untuk sidebar dan badge, serta aturan bagan Recharts dengan ChartContainer.",
       "kata_kunci": [
         "web ERP",
@@ -5804,10 +5805,11 @@
         "REF - Layout Dashboard erp-frontend",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "HRIS - Alur KPI Otomatis",
-        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem"
+        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
+        "ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi"
       ],
-      "hash": "6f6442ef91f90d3150d9728027990159c01108526c097a6d41ec281e492c7a5f",
-      "ukuran_kb": 7.2,
+      "hash": "4a3bf1e24ca1a2a8558c83be65db6b5f11d34926920ee319e9704634745ea38f",
+      "ukuran_kb": 7.4,
       "ringkasan": "Menjawab: dari mana isi dashboard sebuah posisi boleh diturunkan (tiga sumbu: KPI yang dinilai, pekerjaan yang menunggu, dan ambang yang tertulis), apa yang dilarang jadi isi (demografi dan rekap yang tak menuntut tindakan), serta kapan sebuah posisi justru tidak direkomendasikan dibuatkan dashboard sama sekali. Menjelaskan juga kenapa metrik tanpa sumber wajib dirender sebagai panel jujur bernama hook/endpoint-nya, bukan angka nol, dan kenapa ambang lulus/gagal hanya boleh dipasang bila targetnya benar-benar ada di kpi_template atau master data. Memuat sebaran 311 metrik KPI di 10 divisi beserta porsi otomatis vs manual (87,5% manual) yang jadi dasar seluruh keputusannya.",
       "kata_kunci": [
         "dashboard posisi",
@@ -7007,7 +7009,7 @@
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput"
       ],
       "hash": "aa59919b86d35f23b48dd8ab219826093d490dd52424844f6f0f5e43134be87c",
-      "ukuran_kb": 16.4,
+      "ukuran_kb": 16.6,
       "ringkasan": "Menjawab: bagaimana finance melihat selisih antara pembukuan retur ke Accurate, scan retur gudang di WMS, dan isi dokumen Accurate; kenapa selisih dihitung terjadwal per periode dan disimpan per temuan alih-alih dihitung saat layar dibuka; jenis selisih apa yang dideteksi di tiap tahap, bagaimana temuan ditandai beres dengan alasan, dan izin apa yang mengatur siapa boleh melihat dan menandai. Juga menjelaskan kenapa nilai terdampak tidak boleh dijumlahkan antar jenis.",
       "kata_kunci": [
         "selisih retur",
@@ -7020,6 +7022,42 @@
         "finance.returselisih",
         "tutup buku",
         "Accurate"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi.md",
+      "judul": "ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan** (2026-09-17). Arah disetujui user; kode belum ada. Membalik konsekuensi \"kehilangan kartu Kehadiran dan Pengumuman\" yang diterima 2026-08-26 dan 2026-09-15.",
+      "publik": true,
+      "tautan": [
+        "APP - Web ERP",
+        "API - Employee Service",
+        "API - Attendance Service",
+        "REF - Layout Dashboard erp-frontend",
+        "Microservices - Calendar Service",
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "APP - MyBharata",
+        "HRIS - Key Performance Index",
+        "REF - Dashboard per Posisi (Indeks Cakupan)"
+      ],
+      "hash": "f345198ce84212b939d1f10568852b9352ddc87867831743743cc334ab0bbdd4",
+      "ukuran_kb": 13.9,
+      "ringkasan": "Menjawab: bagaimana susunan beranda portal /dashboard web ERP untuk semua karyawan (zona Kepala saya, Perlu tindakan saya, Hari ini, dan Ruang kerja posisi), kenapa bagian personal seperti kehadiran dan pengumuman tidak lagi digantikan dashboard departemen, dan dari mana angka antrean persetujuan dibaca (GET /api/employee/pengajuan/ringkasan, bukan dirangkai di frontend atau endpoint baru). Juga menjawab kenapa widget per posisi dan widget yang diatur pemakai ditolak, urutan irisan pembangunan termasuk antrean peninjau /hr/requests?as=reviewer beserta risiko hitung ganda dengan kunci karyawan, serta hal yang belum diputuskan seperti pengajuan milik sendiri dan sisa kuota cuti di web.",
+      "kata_kunci": [
+        "beranda portal",
+        "dashboard",
+        "home page",
+        "Portal Saya",
+        "perlu tindakan",
+        "pending approval",
+        "pengajuan ringkasan",
+        "dashboard per posisi",
+        "beranda MyBharata",
+        "zona personal"
       ]
     },
     {
@@ -15212,7 +15250,7 @@
         "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift"
       ],
       "hash": "acd34b18b981c4130c4c9aaab63c5565d5e8494ecf00513ccee0f57288a6cbf6",
-      "ukuran_kb": 6.9,
+      "ukuran_kb": 7.0,
       "ringkasan": "Menjawab: pekerjaan apa saja untuk membangun tab Selisih Retur, urutan dan dependensinya, repo mana yang disentuh tiap task, kriteria selesainya, dan perintah start-task siap pakai. Memuat pembagian Tahap 1 (data ERP dan WMS) dan Tahap 2 (catatan ERP vs Accurate) serta sisa yang belum dijadwalkan.",
       "kata_kunci": [
         "selisih retur",
