@@ -6,7 +6,7 @@
 - **Path di repo**: `bip-erp/services/marketing-analytics/`
 - **Port**: env `PORT`, alias `SERVICE_PORT`, fallback `6985` (`main.go`)
 - **Prefix gateway**: `marketing-analytics` (`api-gateway/main.go`, env `MARKETING_ANALYTICS_MODULE_URL`)
-- **Status**: ⚠️ Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **53 baris pendaftaran rute** di berkas produksi `origin/main` (enumerasi ulang 2026-09-12 dengan metode baris, lihat § Endpoint; enumerasi sebelumnya 45 pada 2026-09-11 dan 41 pada audit 2026-08-26, tak sebanding langsung; branch Analisis Account Specialist menambah satu, belum PR). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `mart_buyer_cohort` masih kosong, lock job hanya in-process. (`/matrix/sku-shop` **tidak lagi** stub — terimplementasi sejak 2026-08-02, 576 baris + 631 baris test; dok ini menyebutnya stub selama tiga minggu lebih.) **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD dan dipakai host sejak 2026-09-09** (catatan lama "0 dokumen" dicoret 2026-09-11, lihat § Belum Diimplementasikan). Sejak 2026-09-11 klien pencatatnya hanya MyBharata: halaman web Sesi Live Host dihapus ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]; erp-frontend [#1540](https://github.com/bip-itteam-internal/erp-frontend/pull/1540), merged 2026-09-11, di PROD sejak 2026-09-12 lewat image `frontend-hris` 07:35 WIB).
+- **Status**: ⚠️ Implemented dengan catatan (audit kode 2026-08-26). Berjalan di production dengan channel **TikTok + Shopee**, penjadwal internal 48 jam, dan **53 baris pendaftaran rute** di berkas produksi `origin/main` (enumerasi ulang 2026-09-12 dengan metode baris, lihat § Endpoint; enumerasi sebelumnya 45 pada 2026-09-11 dan 41 pada audit 2026-08-26, tak sebanding langsung; branch Analisis Account Specialist menambah satu, belum PR). `mart_live_sessions` kini **terisi 4.836 sesi** (verifikasi produksi 2026-08-22). Catatan: `mart_buyer_cohort` masih kosong, lock job hanya in-process. (`/matrix/sku-shop` **tidak lagi** stub — terimplementasi sejak 2026-08-02, 576 baris + 631 baris test; dok ini menyebutnya stub selama tiga minggu lebih.) **Pencatatan sesi live oleh host (`/live-shifts`) sudah live di PROD dan dipakai host sejak 2026-09-09** (catatan lama "0 dokumen" dicoret 2026-09-11, lihat § Belum Diimplementasikan). **Sejak 2026-09-17 di PROD**: `live_shifts` menerima ceklis kesiapan siaran + Live Support yang bertugas, dan rute baru `GET /kpi/kesiapan-live` (di luar hitungan 53 baris di atas yang bertanggal 2026-09-12) melayani KPI posisi Live Support ([[ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support]]). Sejak 2026-09-11 klien pencatatnya hanya MyBharata: halaman web Sesi Live Host dihapus ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]; erp-frontend [#1540](https://github.com/bip-itteam-internal/erp-frontend/pull/1540), merged 2026-09-11, di PROD sejak 2026-09-12 lewat image `frontend-hris` 07:35 WIB).
 
 ## Prinsip Arsitektur
 
@@ -239,6 +239,27 @@ Endpoint `/api/v2/livestream/*` menuntut ekor signature **`user_id`**, bukan `sh
 
 Sampai penghalang di atas terjawab, **host Shopee tetap dicatat manual** lewat `/live-shifts`, sejak 2026-09-11 hanya dari MyBharata ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]]).
 
+### KPI Kesiapan Siaran Live Support (`/kpi/kesiapan-live`)
+
+✅ PROD 2026-09-17 (bip-erp #1915 + #1930). `GET /kpi/kesiapan-live?periode=YYYY-MM&department=…&employee_id=…&key=…`, digerbang `GerbangKunciKinerjaToko` (kunci layanan, **401** tanpa `key`), konsumennya sumber KPI `kesiapan_live` di [[Microservices - Employee Service]]. Keputusannya [[ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support]].
+
+⛔ **Beda dari `/kpi/kinerja-live` di atas, dan bedanya bukan kosmetik**: yang ini menyelesaikan orang lewat `live_shifts.pendukung[]`, bukan `host[]`, dan mengukur apa yang **disiapkan** untuk siaran, bukan hasilnya. Karena itu ia berkas sendiri (`kpi_kesiapan_live.go`), tidak menumpang sebagai sub-metrik. `employee_id` **wajib** di sini (400 bila kosong), berbeda dari saudaranya yang memakainya opsional: kesiapan hanya punya arti per orang.
+
+Penghitungnya fungsi murni `hitungKesiapanLive`, atas shift yang sudah disaring ke toko TikTok departemen (`tokoTikTokDepartemen` + `saringShiftToko`, batas yang sama dengan jalur individu `/kpi/kinerja-live`).
+
+| Field | Lingkup | Arti |
+|---|---|---|
+| `sesi_total` | orang | sesi departemen yang `pendukung[]`-nya memuat orang ini, termasuk yang tak pernah ditanya. Penyebut **cakupan** |
+| `sesi_berceklis` | orang | sesi yang benar-benar punya `kesiapan`. Penyebut **persentase** |
+| `device_lengkap`, `display_sesuai` | orang | cacahan butir yang dijawab ya |
+| `device_lengkap_persen`, `display_sesuai_persen` | orang | **pointer; `null` saat `sesi_berceklis` nol**, bukan 0 |
+| `sesi_departemen_tanpa_pendukung` | ⚠️ **departemen** | sesi tanpa pendukung tak dimiliki siapa pun; hanya boleh masuk `Catatan`, tak pernah ke nilai maupun cakupan |
+| `toko_diminta` | departemen | cacahan toko TikTok terpetakan. **Nol berarti sebab di master data**, bukan "belum ada sesi" |
+
+Terukur 2026-09-17 untuk Kyura periode 2026-09: `toko_diminta` **17**, `sesi_departemen_tanpa_pendukung` **130**, `sesi_total` 0. Itu wajar, karena belum ada klien yang mengirim `pendukung[]`.
+
+⚠️ Satu ceklis per sesi. Siaran serentak di beberapa akun tetap sesi terpisah ([[ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun]]) dan pemilih akun MyBharata pilihan tunggal, jadi tiap sesi punya ceklisnya sendiri dan dihitung satu.
+
 ### Pencatatan sesi live oleh host (`/live-shifts`)
 
 > ⛔ **Klien pencatat sejak 2026-09-11 hanya MyBharata.** Halaman web Sesi Live Host (`/marketing-analytics/live-shift`) dihapus beserta menunya ([[ADR - 0091 Pencatatan Sesi Live Host Hanya di MyBharata, Halaman Web Dihapus]], erp-frontend [#1540](https://github.com/bip-itteam-internal/erp-frontend/pull/1540), merged 2026-09-11, di PROD sejak 2026-09-12 lewat image `frontend-hris` 07:35 WIB). Rute di bawah tidak berubah, dan `GET /live-shifts/performa` tetap dibaca Analisis Live dan panel ICC. Keterangan layar web di bagian-bagian berikut adalah riwayat.
@@ -247,7 +268,7 @@ Enam route digerbang `common.RequireLiveShiftUser` (`live_shift_handler.go`); ro
 
 | Endpoint | Isi |
 |---|---|
-| `POST /live-shifts` | Mulai sesi. Host yang login otomatis jadi host — `employee_id` dari header gateway, bukan dari body (field body bernama sama hanya jadi jalan memalsukannya) |
+| `POST /live-shifts` | Mulai sesi. Host yang login otomatis jadi host — `employee_id` dari header gateway, bukan dari body (field body bernama sama hanya jadi jalan memalsukannya). Sejak 2026-09-17 juga menerima `pendukung[]` dan `kesiapan` opsional, lihat §Ceklis kesiapan di bawah |
 | `PATCH /live-shifts/:id/jeda` | Jeda / Lanjutkan. Menutup jeda terakhir bila sedang dijeda, menambah jeda baru bila tidak |
 | `PATCH /live-shifts/:id/selesai` | Akhiri; menutup jeda yang masih menggantung |
 | `GET /live-shifts/berjalan` | Sesi berjalan, untuk menentukan keadaan tombol |
@@ -262,6 +283,25 @@ Enam route digerbang `common.RequireLiveShiftUser` (`live_shift_handler.go`); ro
 **Rentang baca sesi dilebarkan simetris 12 jam** di kedua ujung, sementara rentang shift memakai tanggal asli. Sesi live melewati tengah malam adalah 5,2% dari seluruh sesi (213 dari 4.130 terukur), dan durasi sesi bersih terpanjang tepat 12 jam — jadi pelebaran sebesar itu menangkap semuanya tanpa menyeret sesi yang sudah pasti tak beririsan. Melebarkan satu ujung saja memindahkan bug, bukan memperbaikinya.
 
 **Tanggal diurai zona WIB**, bukan UTC (`time.ParseInLocation` + `zonaWIB`). `time.Parse` polos membuat rentang "10 Agustus" sebenarnya terbaca 10 Agt 07:00 s.d. 11 Agt 06:59 WIB, sehingga shift dini hari — jam live yang nyata dipakai — muncul pada tanggal yang salah.
+
+#### Ceklis kesiapan & Live Support yang bertugas (✅ PROD 2026-09-17, [[ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support]])
+
+bip-erp #1915 + #1930, image `marketing-analytics-service` 2026-09-17 08:12:27 WIB. Klien pengisinya MyBharata ([[APP - MyBharata]], my-bharata #152, merged ke `dev`, **belum dirilis** per 2026-09-17), jadi di produksi belum satu pun sesi membawa kedua field ini.
+
+Dua field opsional di `live_shifts` (`live_shift_entity.go`):
+
+| Field | Bentuk | Aturan yang mengikat |
+|---|---|---|
+| `pendukung[]` | `{employee_id, nama}` | Live Support yang bertugas. Tipe **terpisah** dari `host[]`, sengaja tanpa `shift_id`/`status_jadwal`. Selalu ditulis sebagai larik (kosong bila tak ada), supaya "sesi tanpa pendukung" bisa dicacah dengan `{$size:0}`. Entri tanpa `employee_id` ditolak **400** |
+| `kesiapan` | `{device_lengkap, display_sesuai, catatan?, item_kurang?, diisi_oleh, diisi_pada}` | **Pointer; kuncinya tak ditulis sama sekali saat nil**, sehingga penghitung memakai `{$type:"object"}` dan tak pernah mencampur "tak pernah ditanya" dengan "dijawab tidak". `diisi_oleh`/`diisi_pada` distempel dari header gateway dan jam server, tak diterima dari body |
+
+⛔ **`dokumenLiveShift` (`live_shift_store.go`) adalah DAFTAR-IZIN field yang ditulis tangan**, bukan serialisasi struct. Field baru di `LiveShift` yang tak didaftarkan di sana **hilang saat menyentuh Mongo**, sementara seluruh test handler tetap hijau karena store palsu merekam struct, bukan dokumen. Kedua field di atas terdaftar dan dikunci `TestDokumenLiveShiftMemuatPendukungDanKesiapan`.
+
+**Validasi di server** (`validasiKesiapan`): bila ada butir yang dijawab tidak, `catatan` atau `item_kurang` wajib terisi (yang cuma spasi tak dihitung), kalau tidak **400**. Siaran tetap boleh dimulai begitu alasannya ada. Kedua field **tidak wajib**, supaya build MyBharata lama tetap bisa mencatat sesi.
+
+**Ambil alih mewarisi `pendukung`, tidak mewarisi `kesiapan`** (`eksekusiAmbilAlih`, `live_shift_ambil_alih.go`): Live Support yang sama masih menopang akun yang sama, sedangkan kesiapan adalah pemeriksaan pada satu momen yang tak terulang saat ambil alih.
+
+⚠️ Klien MyBharata **tidak mengirim `item_kurang`** walau backend menerimanya (daftar item alat belum disepakati; layar memakai satu isian Catatan).
 
 #### Siaran serentak di beberapa akun (⚠️ sebagian terimplementasi, [[ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun]])
 
