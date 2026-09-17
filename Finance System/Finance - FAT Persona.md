@@ -8,6 +8,7 @@
 - **Peran dan tujuan** diambil dari deskripsi dashboard per posisi `erp-frontend/src/features/finance/posisi/data/<posisi>.ts` (field `judul`, `subJudul`, `grade`, `melaporKe`). Field `jumlahOrang` di sana **statis** dan tidak mengikuti produksi (mis. AR Staf tertulis 2, prod 4; Junior Accounting tertulis 1, prod 7).
 - **Jumlah orang dan akses** dari produksi: `work_data` + `system_authentication` (paket per akun, `system_roles`) + `master_department.position_items[].permission_sets` (paket per posisi). Paket posisi dan paket akun digabung saat login ([[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]). Akun tanpa paket finance jatuh ke tier `system_roles.finance`: admin semua izin, supervisor semua kecuali `finance.profit.view`, staff hanya `finance.ar.view`, `finance.ap.view`, `finance.accounting.view`, dan tanpa tier sama sekali tidak mendapat izin finance apa pun (`bip-erp/shared-library/common/catalog_finance.go:65-88`).
 - **Alur** dari kode `bip-erp` dan `erp-frontend` di `origin/main` 2026-09-12.
+- **Praktik nyata** (butir bertanda *survei 2026-09*) dari survei alur kerja Finance lewat Form Builder: isian mandiri, jawaban masuk 14 sampai 16 September 2026, belum diwawancarai, dan belum semua jabatan terwakili; sisi persetujuan belum dikonfirmasi. Yang dimuat di sini hanya pola proses. Jawaban per orang, kutipan, dan skor disimpan di luar vault. Durasi yang diisi responden **tidak andal** (satu tugas bisa tertulis melebihi jam kerja sehari) dan sengaja tidak dipakai. Klaim survei yang bertentangan dengan kode atau belum diukur ke prod ditandai **TBD ukur**.
 - Dok ini tidak memuat nama orang maupun `employee_id`.
 
 ## Aktor (ringkas)
@@ -50,6 +51,11 @@
 - **Aksi utama**: memeriksa bukti transfer yang diunggah AP, menyetujui atau menolaknya beserta alasan (rute di `bip-erp/services/procurement/main.go:1146-1150`); menyusun laporan keuangan (`/finance/accounting`) dan jurnal (`/finance/gl`); memantau aset tetap.
 - **KPI**: dua template aktif sekaligus. "KPI SENIOR ACCOUNTING UPDATE" (3 metrik ceklis, dinilai tanggal 1 sampai 5 oleh Internal Audit untuk laporan dan Supervisor FAT untuk arsip, `bip-erp/services/employee/kpi_sumber_ceklis.go:16-39`) dan template lama 8 metrik manual. Skor terakhir Juli 2026 65,0 (template lama).
 - ⚠️ **Catatan akses**: akun ini juga memegang paket di luar ranah akuntansi (GA admin, penjadwal Host Live). Perlu ditinjau (**TBD**).
+- **Praktik nyata** (*survei 2026-09*):
+  - Pekerjaan yang paling menyita waktu adalah **rekonsiliasi kas toko marketplace**: saldo kas toko disajikan manual dari Accurate, lalu diperbarui berulang kali sampai sama dengan saldo di seller center, sambil menunggu input tim admin penjualan yang masih semi manual. Rantai lintas jabatannya di Alur 2.
+  - Fitur rekonsiliasi di ERP disebut belum cocok **formatnya** dengan kebutuhan kerja rekonsiliasi. Fitur mana yang dimaksud (kandidat: `/integration-accurate/rekonsiliasi`) dan format apa yang dibutuhkan: **TBD**.
+  - Bulanan di luar marketplace: mengawasi stock opname gudang menjelang akhir bulan lalu merekonsiliasi hasilnya dengan stok Accurate, dengan selisih ditelusuri manual dari mutasi stok terhadap kartu stok; dan memeriksa akhir rekap gaji dari sisi pemetaan rekening dan PPh (lihat catatan pemeriksaan ganda di Cost Control).
+  - Data yang tidak cocok antara ERP dan Accurate ditunggu perbaikannya oleh IT.
 
 ### Junior Accountant: pencatat harian
 - **Peran & Divisi**: Junior Accounting, melapor ke Senior Accounting (`erp-frontend/src/features/finance/posisi/data/junior-acc.ts:18-23`). Prod 7 orang dengan dua template KPI: Accounting CV (pembukuan entitas CV) dan Accounting PT.
@@ -59,6 +65,7 @@
 - **Pain point**: belum ada alur maker-checker (siapa memeriksa input, apa yang terjadi pada input yang ditolak), sehingga metrik "dikoreksi" tak bisa dihitung.
 - **Aksi utama**: mencatat transaksi di Accurate; di ERP melihat KPI Saya.
 - **KPI**: seluruh metrik manual. April sampai Juli 2026, 6 sampai 7 orang bernilai 100 (atau 98,2 sampai 100) setiap bulan pada Accounting CV: metriknya belum membedakan kinerja. Nilainya diketik akun HR tanpa catatan maupun bukti (`kpi_evidence` 0 dokumen), dan pencatatan harian mereka di Accurate tidak meninggalkan jejak pembuat di ERP (lihat subbagian "Siapa menilai" di [[HRIS - Matriks KPI per Departemen]]).
+- **Praktik nyata** (*survei 2026-09*): pembayaran CV dicatat berulang di voucher BKK, AppSheet, internet banking, jurnal, dan arsip kertas oleh pemegang sekelompok CV; rinciannya dan rancangan penggantinya di [[Finance - Buku Besar CV]]. Sejak bip-erp #1926 dan erp-frontend #1614 (merge 2026-09-16), pengajuan barang yang dibayar dari kas CV ditransfer pemegang CV itu dari layar CV Saya (lihat Alur 1).
 
 ### AR Leader: pengejar piutang macet
 - **Peran & Divisi**: AR Leader, grade LEADER, melapor ke Supervisor FAT (`erp-frontend/src/features/finance/posisi/data/ar-leader.ts:12-18`).
@@ -76,6 +83,11 @@
 - **Pain point**: faktur, retur, dan penerimaan kini ditarik otomatis dari marketplace ke Accurate ([[Microservices - Integration Service]]), jadi pekerjaannya bergeser ke menangani yang gagal dan memastikan tuntas sebelum tanggal 3 bulan berikutnya (bunyi KPI pencatatan). Status "sudah dihubungi" belum tercatat di sistem.
 - **Aksi utama**: mengulang faktur, penerimaan, atau retur yang gagal sinkron; mengimpor koreksi; mengonfirmasi retur gudang; mengecek uang masuk yang belum dicocokkan.
 - **KPI**: "AR Staff 2026" (3 metrik otomatis: porsi piutang di atas 60, 14, dan 90 hari) bernilai 22,7 pada Agustus 2026; "KPI AR Retur" 2 dari 4 metrik otomatis; "KPI Sales Admin" 1 dari 4.
+- **Praktik nyata** (*survei 2026-09*), per peran:
+  - **Sales admin**: merekap penjualan harian ke basis data kerja sendiri; tiap awal bulan mencocokkan dashboard, ERP, dan Accurate; rekonsiliasi bulanan dengan gudang.
+  - **Piutang**: rekonsiliasi kas toko mingguan (saldo seller center terhadap Accurate) beserta analisis selisih harga, biaya, dan nilai settle; merekap penarikan saldo per CV lewat **alat web terpisah di luar ERP** karena data sistem belum sesuai. Alat itu layak ditelusuri sebelum penjualan marketplace per CV dirancang ([[Finance - Buku Besar CV]]); identitas dan pemiliknya **TBD**.
+  - **Retur**: memvalidasi retur di empat sumber (ERP, marketplace, Accurate, gudang). ⚠️ Retur untuk faktur sejak Juli 2026 dilaporkan **diunggah manual** ke Accurate lalu dilaporkan ke IT, bertentangan dengan pain point di atas yang menyatakan retur ditarik otomatis. Berapa retur sejak Juli yang terbukukan lewat job integrasi dan berapa lewat unggahan manual: **TBD ukur** di prod.
+  - Ketiganya menyebut menunggu perbaikan data atau sistem dari IT, 1 sampai 5 hari per kasus, dan tindak lanjut gudang untuk retur.
 
 ### Account Payable: pembayar
 - **Peran & Divisi**: Accounting Payable, melapor ke Supervisor FAT (`erp-frontend/src/features/finance/posisi/data/ap.ts:12-18`).
@@ -85,6 +97,9 @@
 - **Pain point**: antrean "perlu dibayar" tidak tampil di dashboard AP. Dokumen pembayaran berstatus PENDING tidak punya notifikasi (tak ada kategori inbox di berkas `pembayaran*.go`).
 - **Aksi utama (dirancang kode)**: mentransfer pada tahap `pb_ap_transfer`; mengunggah bukti transfer; menerbitkan faktur pembelian dari hasil QC (izin `budget.ap.bayar`, `bip-erp/services/procurement/pengajuan_barang_gate.go:382-387`); lalu, untuk pengajuan yang punya faktur (UMUM dan RAWMATERIAL), mengirim dokumen pembayaran PENDING ke Accurate secara manual. Pengiriman manual itu **disengaja**: jalurnya menarik sisa utang terkini dari Accurate lebih dulu sebagai penjaga kelebihan bayar (`bip-erp/services/procurement/pembayaran_kirim.go:12-29`), dan rute itu menolak pembayaran tanpa faktur (`:116`), sehingga tipe uang (DANA, IKLAN, KONSUMSI) dibukukan lewat jurnal umum. Rincian alurnya di [[Microservices - Procurement Service]].
 - **KPI**: template aktif 6 metrik manual (Juli 2026 bernilai 100). Konektor `realisasi_ap` (bayar paling lama 30 menit sesudah disetujui, nominal persis, bukti terunggah; `bip-erp/services/employee/kpi_sumber_realisasi_ap.go:16-37`, ambang di `bip-erp/services/procurement/kpi_realisasi_ap.go:114-120`) sudah ada di kode tetapi belum dipasang, dan datanya kosong (koleksi pembayaran 0).
+- **Praktik nyata** (*survei 2026-09*):
+  - Pembayaran rekening PT berjalan **di luar ERP**: tagihan (invoice, nota, PO) masuk, transfer lewat internet banking, BKK/BKM kertas dilengkapi, disetujui Supervisor FAT, diarsip fisik tiap bulan, dan bukti transfer dikirim lewat WhatsApp. Ini sejalan dengan akses prod di atas: rantai yang sama sudah ada di kode (Alur 1), jadi hambatannya **adopsi dan paket izin**, bukan fitur yang belum dibangun.
+  - Menghitung **costing HPP produk**, pekerjaan yang tidak tertulis di aksi utama di atas: formula dari APJ, harga bahan baku dan bahan kemas diminta ke Procurement, kapasitas produksi dimintakan, HPP dihitung di templat Excel, disetujui Supervisor FAT, lalu dibagikan ke SPV Marketing. Alatnya Excel dan WhatsApp, dan yang ditunggu adalah data harga bahan. ERP hanya mengukur hasilnya lewat kartu "Costing HPP valid" (`erp-frontend/src/features/finance/posisi/data/ap.ts:72-78`, `GET /api/integration/profit/costing-ratio`). Apakah hasil hitung Excel itu yang menjadi HPP di [[Finance - Incentive]]: **TBD**.
 
 ### Cost Control: pemburu pemborosan
 - **Peran & Divisi**: Cost Control, melapor ke Supervisor FAT (`erp-frontend/src/features/finance/posisi/data/cost-control.ts:17-23`).
@@ -94,6 +109,11 @@
 - **Pain point**: rekomendasi efisiensi belum dipakai (0 dokumen di prod) dan belum punya siklus penanggung jawab serta status; register penghematan belum ada.
 - **Aksi utama**: membandingkan anggaran OPEX dengan realisasi (233 baris anggaran di prod); memantau akurasi forecast kas mingguan; memverifikasi transaksi kas kecil lalu menjurnalnya ([[Finance - Kas Kecil dan Pengajuan Budget]]; 69 transaksi di prod, terakhir 26 Agustus 2026).
 - **KPI**: 7 metrik, 2 otomatis (`varians_anggaran`, `forecast_kas`). Juli 2026 bernilai 92,0.
+- **Praktik nyata** (*survei 2026-09*):
+  - Angka varians di ERP sulit dipertanggungjawabkan saat ditanya lanjut karena **transaksi pembentuk realisasinya tidak terlihat**. Dicocokkan ke kode: kartu Varians OPEX hanya menyajikan total dan cacah pos lewat anggaran, tanpa daftar baris (`erp-frontend/src/features/finance/anggaran/components/kartu-varians-opex.tsx:65-94`); realisasi per akun memang tampil di breakdown mingguan (`types-mingguan.ts`), tetapi komponen anggaran tidak menaut ke transaksi Accurate mana pun (tautannya hanya ke `/finance/cost-control` dan `/finance/kpi`). Jalan menelusuri realisasi sampai transaksinya belum ada.
+  - Memeriksa rekap gaji dari HRD per orang terhadap lampiran izin, SKS, dan jam absen, mulai sekitar tanggal 26. Rekap yang sama diperiksa lagi Senior Accountant dari sisi rekening dan PPh. Pemisahan tugas yang disengaja atau pemeriksaan ganda: **TBD** konfirmasi Supervisor FAT.
+  - Memakai aplikasi buku besar CV [[APP - Buku Besar Konsolidasi CV FINCON]] sebagai alat kerja.
+  - Meminta proses pengajuan diotomasi. Pengajuan Barang dan kas kecil sudah ada di kode (Alur 1 dan 4), jadi yang kurang adopsinya.
 
 ### Tax Officer: penjaga kepatuhan pajak
 - **Peran & Divisi**: Tax Officer (posisi prod "Tax Staff"), melapor ke Supervisor FAT (`erp-frontend/src/features/finance/posisi/data/tax.ts:20-26`).
@@ -103,6 +123,10 @@
 - **Pain point**: modul pajak di prod masih kosong (master jenis pajak 0, kewajiban 0; seed master belum pernah dijalankan). Dashboard Tax tidak menaut ke Tax Control. Rekonsiliasi pajak, biaya non-deductible, dan temuan pajak belum punya data.
 - **Aksi utama (dirancang kode)**: mencatat pelaporan SPT per masa lalu mengunggah BPE dan bukti bayar; tenggat hanya bisa digeser pemegang `finance.pajak.tenggat`. Rincian di [[API - Finance Service]] dan [[Finance - Rancangan Finance Service]].
 - **KPI**: 8 metrik manual (Juli 2026 bernilai 90,0). Konektor `kinerja_tax` (pelaporan tepat waktu, dokumen terarsip; `bip-erp/services/employee/kpi_sumber_tax.go:12-31`) sudah ada tetapi belum dipasang, dan tak akan berangka sebelum kewajiban pajak tercatat.
+- **Praktik nyata** (*survei 2026-09*):
+  - Pekerjaan pajak berjalan **di luar ERP**, sejalan dengan akses prod di atas; aplikasi buku besar CV (FINCON) ikut dipakai sebagai alat kerja.
+  - Hambatan utamanya menentukan **data acuan dan titik cut-off**. Pos persediaan di laporan hanya tersedia sebagai angka tanpa rincian isinya.
+  - Usulan dari sisi pajak: pembukuan dari **satu data utama** yang ditarik sesuai keperluan tiap pemakai, sejalan dengan arah [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]].
 
 ## Alur
 
@@ -140,6 +164,10 @@ Pembukuan ke Accurate: UMUM dan RAWMATERIAL lewat faktur pembelian yang diterbit
 
 Ambang Direktur bernilai nol berarti parameternya belum diatur, dan tahap Direktur **tidak disisipkan** (`pengajuan_barang_jenjang.go:154-157`).
 
+**Cabang kas CV** (bip-erp #1926 dan #1929, erp-frontend #1614; merge 2026-09-16 dan 17). Pada tahap `pb_finance_setujui_bayar` Supervisor FAT memilih kas CV pembayar; kosong berarti rekening PT. Tahap `pb_ap_transfer` lalu bercabang: kode CV kosong ditindak pemegang `budget.ap.bayar` seperti diagram di atas, sedangkan kode CV terisi hanya bisa ditindak pemegang `budget.cv.transfer` yang ditugaskan ke CV itu dan CV-nya aktif (`bip-erp/services/procurement/pengajuan_barang_gate.go:245-284`), dari antrean di layar CV Saya. Penugasan dibaca dari finance-service, dan bila tak terbaca transfer CV ditolak. Review bukti tetap Senior Accountant. Rinciannya di [[Finance - Buku Besar CV]] dan [[Microservices - Procurement Service]].
+
+*Survei 2026-09*: rantai ini hampir seluruhnya masih dikerjakan di luar ERP, baik untuk rekening PT (lihat Account Payable) maupun kas CV (lihat Junior Accountant).
+
 ### 2. Uang masuk: marketplace
 
 ```
@@ -156,6 +184,21 @@ Supervisor FAT: pantau piutang di atas 60 hari kurang dari 5% dari total AR
 
 Rincian job dan rute di [[Microservices - Integration Service]].
 
+**Praktik nyata** (*survei 2026-09*): rekonsiliasi uang masuk marketplace adalah **beban lintas jabatan**, bukan pekerjaan satu posisi.
+
+```
+AR sales admin : rekap penjualan harian ke basis data kerja sendiri; awal bulan cocokkan dashboard, ERP, Accurate
+AR piutang     : rekon kas toko mingguan (seller center vs Accurate); rekap penarikan per CV di alat web luar ERP
+AR retur       : validasi retur di ERP, marketplace, Accurate, gudang; retur faktur sejak Juli diunggah manual (TBD ukur)
+  ▼  data dikoreksi, sering menunggu perbaikan IT atau gudang
+Senior Accountant : saldo kas toko dari Accurate disajikan manual, diperbarui berulang sampai sama dengan seller center
+```
+
+Dua pelajaran yang berlaku untuk rancangan apa pun di rantai ini:
+
+- **Akar bebannya kepercayaan pada data**, bukan kurangnya layar. Selama data marketplace di ERP belum bisa dipakai untuk rekonsiliasi, tiap jabatan merawat basis data kerjanya sendiri, dan rekonsiliasi berulang karena tiap perbaikan menggeser saldo lagi. Masalahnya ada di kas toko PT maupun CV.
+- **Mutu data dinilai berbeda menurut posisi di rantai.** Sisi yang memeriksa hasil akhir melaporkan data datang salah atau tak lengkap jauh lebih sering daripada sisi yang menyiapkannya, yang lebih banyak merasakan menunggu. Kesimpulan tentang mutu data antar departemen yang hanya diambil dari satu sisi rantai akan keliru.
+
 ### 3. Tutup buku dan kontrol
 
 ```
@@ -169,6 +212,16 @@ Cost Control: anggaran OPEX vs realisasi, akurasi forecast kas mingguan ─► S
 ```
 
 Sumber: `bip-erp/services/employee/kpi_sumber_ceklis.go:16-39`; `bip-erp/services/finance/audit_kertas_kerja.go:133-135`. Proses audit: [[Finance - Audit Internal]], aplikasinya [[APP - Audit Internal]].
+
+**Praktik nyata** (*survei 2026-09*), pekerjaan akhir bulan yang tidak tampak di diagram di atas dan seluruhnya di luar ERP:
+
+```
+sekitar tgl 25-28 : Senior Accountant mengawasi stock opname gudang ─► rekon dengan stok Accurate (selisih ditelusuri manual)
+mulai tgl 26      : Cost Control memeriksa rekap gaji HRD per orang terhadap izin, SKS, jam absen
+sekitar tgl 29-30 : Senior Accountant memeriksa akhir rekap gaji (pemetaan rekening, PPh)
+```
+
+Rekap gaji yang sama diperiksa dua jabatan dari sudut berbeda; disengaja atau ganda **TBD** (lihat Cost Control).
 
 ### 4. Kas kecil
 
@@ -229,4 +282,5 @@ Rincian: [[Finance - Incentive]], [[ADR - 0079 Target Profit Satu Pintu di Insen
 - [[API - Finance Service]] · [[Finance - Rancangan Finance Service]] · [[Finance - Audit Internal]] · [[APP - Audit Internal]]
 - [[Microservices - Integration Service]] · [[Finance - Incentive]] · [[Microservices - Insentive Service]]
 - [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] · [[ADR - 0001 Akuntansi via Accurate]] · [[CORE - RBAC dan Permission Set]]
+- [[Finance - Buku Besar CV]] · [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] · [[APP - Buku Besar Konsolidasi CV FINCON]]
 - [[HRIS - Payroll Persona]] (contoh format persona lintas aktor)
