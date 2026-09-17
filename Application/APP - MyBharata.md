@@ -394,6 +394,74 @@ memang wajib naik lebih dulu: aplikasi yang keluar sebelum itu membuat tombol Am
   tetap menemukannya). Test jendela karena itu menjadikan peringatan hit test fatal
   (`WidgetController.hitTestWarningShouldBeFatal`).
 
+#### Kartu riwayat bergaya Pengajuan dan halaman Rincian Sesi (⚠️ branch `feat/detail-sesi-live-host`, belum di-push per 2026-09-17)
+
+Baris riwayat dulu `InfoCard` hijau berisi satu kalimat seperti `4 jam · Rp 2.456.794`, tanpa
+label. Pemilik produk membaca nominal itu sebagai uang yang diterima host, padahal isinya
+**porsi GMV**: omzet sesi dikali porsi waktu irisan, dibagi rata ke jumlah host, sebelum retur,
+fee marketplace, dan HPP. Di branch ini:
+
+- **`KartuRiwayatSesi` memakai `HistoryTicketCard`**, chrome yang sama dengan riwayat Pengajuan,
+  koreksi, tukar shift, perjalanan dinas, dan pelatihan, **tanpa prop baru** (slot bawah yang
+  di Pengajuan berisi stepper diisi ringkasan angka). Nominalnya wajib berlabel **"Omzet (GMV)
+  porsi Anda"**; "GMV" ikut disebut supaya host bisa mencocokkannya dengan istilah TikTok Seller
+  Center.
+- **Kartu ditekan membuka `/live-shift/detail`** (`LiveShiftDetailPage`), empat blok:
+  ringkas (akun, tanggal, toko, alasan selesai), **Waktu Siaran** (jam mulai dan selesai, durasi
+  total, total jeda, durasi efektif, rincian tiap jeda), **Penjualan** (porsi pemanggil, GMV
+  seluruh sesi, pesanan dibayar, asal datanya), dan **Host Sesi Ini** (seluruh host, status
+  jadwal, porsi masing-masing).
+- **Tanpa endpoint baru.** `RingkasanShift` dari daftar dioper lewat `extra` go_router
+  (`ArgsDetailSesiLive`), karena backend tak punya `GET /live-shifts/:id`. Seluruh isinya sudah
+  dikirim `GET /live-shifts` sejak awal dan selama ini tak pernah sampai ke layar.
+
+Yang mudah terlewat saat menyentuh layar ini:
+
+- ⛔ **`employeeId` DIOPER bersama objeknya, tidak dibaca ulang dari `UserProfileBloc`** di halaman
+  rincian. Profil yang belum termuat menghasilkan `employeeId` kosong, dan layar berbunyi "Porsi
+  Anda tidak tercatat" untuk sesi yang porsinya baik-baik saja, tanpa galat.
+- ⛔ **`extra` yang bukan `ArgsDetailSesiLive` dikembalikan sebagai `NotFoundPage`**, bukan `as`
+  polos seperti rute tetangganya di `misc_pages.dart`. Halaman ini tak bisa memuat ulang datanya
+  sendiri, jadi cast yang gagal (proses di-restore, alamat dibuka langsung) melempar di dalam
+  builder go_router dan memberi host layar merah.
+- **`ada_data` false menyembunyikan GMV sesi, pesanan, dan porsi per host**, bukan menampilkan
+  Rp 0; deretan Rp 0 di samping nama orang terbaca sebagai vonis bahwa mereka tidak berjualan.
+  **Laba kotor tidak dirender** selama `laba_tersedia` false.
+- **Total jeda DITURUNKAN dari durasi total dikurangi durasi efektif**, bukan dijumlah ulang dari
+  daftar jeda: server sudah menggabungkan jeda yang beririsan sebelum menguranginya, dan menjumlah
+  sendiri menghitung irisannya dua kali.
+- **Tarik-untuk-muat-ulang** butuh `AlwaysScrollableScrollPhysics` (tanpa itu diam saja saat isinya
+  lebih pendek dari layar, persis keadaan `ada_data` false) dan snackbar saat galat. Baris yang tak
+  lagi ada di riwayat sesudah refresh jatuh kembali ke objek yang dioper, bukan mengosongkan layar.
+- **Jalan keluar yang ditulis layar diambil dari ADR, bukan dikarang.** Penjelasan perlu-koreksi
+  mengarah ke **tim IT** tanpa menjanjikan koreksinya, karena
+  [[ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift]] menyatakan
+  porsi yang hangus tidak dikoreksi lewat layar dan perbaikannya tulis DB prod oleh manusia. Status
+  jadwal "Tak Diketahui" mengarah ke **pengelola Jadwal Host Live**, pemegang izin menurut
+  [[ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan]].
+- **Satu fakta, satu tempat.** `ambangKoreksiJam` (12, sejajar `batasSesiMenggantung` backend) pindah
+  dari privat `kartu_sesi_berjalan.dart` ke `presentation/utils/ringkasan_tampilan.dart`, bersama
+  `hariRiwayatKeBelakang` (rentang riwayat, dipakai daftar dan refresh rincian) dan keputusan porsi
+  serta alasan selesai sebagai fungsi murni. Kalimatnya di `utils/teks_ringkasan.dart`. Label alasan
+  selesai yang dijelaskan di bullet Riwayat subbagian ambil alih di atas ikut pindah ke sana dari
+  `live_shift_page.dart`; perilakunya tak berubah.
+- ⚠️ **Durasi tidak mengikuti bahasa aplikasi.** `DateFormatter.formatDuration` memilih "jam/menit"
+  atau "hrs/mins" dari `Intl.defaultLocale` global yang tidak pernah diset di mana pun di `lib`, jadi
+  di HP durasi selalu berbahasa Indonesia walau aplikasi English, melanggar
+  [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]. Di `flutter test` nilainya justru `en`, jadi
+  test yang menulis satuan sebagai literal gagal atau lulus untuk alasan yang salah. Tidak diperbaiki
+  di branch ini karena menyentuh banyak layar lain.
+- ⚠️ **Widget test tidak bisa membuktikan layar muat di lebar sempit.** Font `flutter test`
+  menggambar tiap huruf selebar ukuran fontnya: uji 360px sempat gagal 22px pada label 22 karakter
+  yang butuh 310px, tepat 14px per huruf, sementara di font sungguhan sekitar 150px. `Flexible` pada
+  baris status host tetap dipasang sebagai penjaga kelas (panjang label beda antar bahasa dan ukuran
+  huruf pemakai), bukan karena angka piksel dari test.
+
+⛔ **Belum terverifikasi di perangkat**: mode gelap, lebar sekitar 390px, dan bahasa English belum
+pernah dilihat berjalan. Test di branch ini: 388 hijau di folder `live_shift` sesudah perbaikan
+review (2026-09-17); suite penuh 1566 hijau diukur SEBELUM perbaikan review (2026-09-16) dan belum
+dijalankan ulang sesudahnya.
+
 ### Fitur pendukung lain
 - **QR Code**: tampilkan QR pribadi + akses scanner inventory
 - **Guest Book**: tamu eksternal mengisi buku tamu (scan QR, input manual, kategori)

@@ -1323,6 +1323,8 @@
         "API - Marketing Analytics Service",
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
         "ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift",
+        "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "Microservices - Learning Service",
         "HRIS - Training Program",
         "API - Learning Service",
@@ -1330,20 +1332,20 @@
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "dbb2bd9286c8ad28ef436c6fe7715771bd8ab7ab9c12e2c0bf0a7ce2c378b261",
-      "ukuran_kb": 88.6,
-      "ringkasan": "Menjawab: fitur apa saja yang dimiliki aplikasi mobile MyBharata (Flutter) untuk karyawan, mulai attendance, izin dan cuti, lembur, slip gaji, KPI, survei form builder, Kaizen, Booking Ruang, Sesi Live Host, sampai pelatihan, serta bagaimana arsitektur Clean Architecture + BLoC, autentikasi JWT/PIN/biometric, dan jalurnya lewat API gateway disusun. Juga menjawab versi mana yang ada di `dev` dan di rilis GitHub (per 2026-09-15 rilis terbaru `1.14.5+135`, `dev` `1.18.3+165`), bagaimana menu dan konten dibedakan per perusahaan (multi-tenant), serta roadmap dan known issues.",
+      "hash": "04e299f022a335b641a347de732bd370393390675f93a108d09013e8ab46b875",
+      "ukuran_kb": 93.9,
+      "ringkasan": "Menjawab: apa saja fitur aplikasi mobile HRIS MyBharata (attendance, cuti/izin, lembur, slip gaji, KPI, survei, Kaizen, Booking Ruang, Sesi Live Host, pelatihan), versi mana yang terpasang di HP karyawan dibanding yang ada di branch dev, dan bagaimana arsitektur Flutter-nya disusun (Clean Architecture feature-first, BLoC, get_it, dio lewat API gateway). Juga menjelaskan cara login (JWT, biometric, PIN, satu akun satu device), bagaimana konten dan menu dibedakan per perusahaan (multi-tenant BIP vs CV Elit/Sadewa), serta known issues, roadmap, dan integrasi backend-nya.",
       "kata_kunci": [
         "MyBharata",
         "my_bharata",
-        "aplikasi mobile",
+        "aplikasi mobile HRIS",
         "Flutter",
-        "HRIS mobile",
+        "versi rilis",
+        "multi-tenant",
         "absensi",
         "attendance",
         "slip gaji",
-        "payslip",
-        "versi rilis"
+        "payslip"
       ]
     },
     {
