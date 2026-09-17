@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-17",
-  "jumlah_dokumen": 442,
+  "jumlah_dokumen": 443,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1449,6 +1449,7 @@
         "API - Learning Service",
         "Microservices - Calendar Service",
         "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
+        "ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "HRIS - Attrition",
         "Microservices - Attendance Service",
@@ -1523,20 +1524,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "47608ad00af161a0f2f8cd42718847e506e0f01b0f85337fb0554ce8b61adfc8",
-      "ukuran_kb": 499.2,
-      "ringkasan": "Menjawab: bagaimana portal web ERP/HRIS One Bharata (erp-frontend) dibangun, bagaimana login, SSO, dan gating role/menu berdasarkan system_roles bekerja, serta modul/halaman apa saja yang tersedia (HRIS, Pengaturan HRGA, rekrutmen lintas perusahaan, multi-perusahaan, finance, integrasi). Juga menjawab konvensi data-fetching TanStack Query dan konvensi bagan Recharts yang wajib diikuti.",
+      "hash": "4f0f0f3d80cd9affd997bb6ec3238c55920a685672387c30114a6e97fa1de651",
+      "ukuran_kb": 499.7,
+      "ringkasan": "Menjawab: apa itu portal web One Bharata (erp-frontend), stack yang dipakai, bagaimana login, SSO, dan role gating sidebar lewat cookie system_roles bekerja, serta bagaimana menu HRIS dan Pengaturan HRGA dikelompokkan. Juga menjawab fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), konvensi data-fetching TanStack Query dan bagan Recharts, serta modul apa saja yang ada dan belum ada di web ERP.",
       "kata_kunci": [
-        "erp-frontend",
         "web ERP",
+        "erp-frontend",
         "One Bharata",
         "hris-dashboard",
         "SSO",
         "system_roles",
         "sidebar menu",
-        "Next.js",
+        "multi-tenant",
         "TanStack Query",
-        "Recharts chart"
+        "Recharts"
       ]
     },
     {
@@ -5802,22 +5803,23 @@
         "REF - Layout Dashboard erp-frontend",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "HRIS - Alur KPI Otomatis",
-        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem"
+        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
+        "ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi"
       ],
-      "hash": "6f6442ef91f90d3150d9728027990159c01108526c097a6d41ec281e492c7a5f",
-      "ukuran_kb": 7.2,
-      "ringkasan": "Menjawab: dari mana isi dashboard sebuah posisi boleh diturunkan (tiga sumbu: KPI yang dinilai, pekerjaan yang menunggu, dan ambang yang tertulis), apa yang dilarang jadi isi (demografi dan rekap yang tak menuntut tindakan), serta kapan sebuah posisi justru tidak direkomendasikan dibuatkan dashboard sama sekali. Menjelaskan juga kenapa metrik tanpa sumber wajib dirender sebagai panel jujur bernama hook/endpoint-nya, bukan angka nol, dan kenapa ambang lulus/gagal hanya boleh dipasang bila targetnya benar-benar ada di kpi_template atau master data. Memuat sebaran 311 metrik KPI di 10 divisi beserta porsi otomatis vs manual (87,5% manual) yang jadi dasar seluruh keputusannya.",
+      "hash": "4a3bf1e24ca1a2a8558c83be65db6b5f11d34926920ee319e9704634745ea38f",
+      "ukuran_kb": 7.4,
+      "ringkasan": "Menjawab: dari mana isi dashboard per posisi harus diturunkan (KPI yang dinilai, pekerjaan yang menunggu, ambang yang tertulis), kapan lampu lulus/gagal boleh dipasang, dan bagaimana metrik tanpa sumber data ditampilkan sebagai panel jujur, bukan angka nol. Juga menjawab kapan sebuah posisi tidak perlu dibuatkan dashboard sama sekali, berapa posisi/divisi yang sudah punya dashboard, dan porsi metrik KPI yang masih manual.",
       "kata_kunci": [
         "dashboard posisi",
-        "ADR 0076",
-        "KPI",
-        "kpi_template",
-        "panel jujur",
+        "position dashboard",
+        "KPI template",
         "ambang",
         "threshold",
+        "panel menunggu",
         "antrean",
-        "metrik manual",
-        "matriks KPI per departemen"
+        "FAT",
+        "HRGA",
+        "metrik manual"
       ]
     },
     {
@@ -7016,6 +7018,42 @@
         "finance.returselisih",
         "tutup buku",
         "Accurate"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi.md",
+      "judul": "ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan** (2026-09-17). Arah disetujui user; kode belum ada. Membalik konsekuensi \"kehilangan kartu Kehadiran dan Pengumuman\" yang diterima 2026-08-26 dan 2026-09-15.",
+      "publik": true,
+      "tautan": [
+        "APP - Web ERP",
+        "API - Employee Service",
+        "API - Attendance Service",
+        "REF - Layout Dashboard erp-frontend",
+        "Microservices - Calendar Service",
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "APP - MyBharata",
+        "HRIS - Key Performance Index",
+        "REF - Dashboard per Posisi (Indeks Cakupan)"
+      ],
+      "hash": "f345198ce84212b939d1f10568852b9352ddc87867831743743cc334ab0bbdd4",
+      "ukuran_kb": 14.0,
+      "ringkasan": "Menjawab: bagaimana halaman beranda /dashboard web ERP disusun ulang jadi empat zona (kepala saya, perlu tindakan, hari ini, ruang kerja posisi), siapa yang melihat zona mana, dan kenapa beranda menumpuk bagian personal dan dashboard departemen alih-alih memilih salah satunya. Juga menjawab dari mana angka antrean persetujuan diambil (GET /api/employee/pengajuan/ringkasan), jebakan hook bernama sama, apa yang tidak dijanjikan, dan tahapan pembangunannya.",
+      "kata_kunci": [
+        "beranda",
+        "homepage",
+        "/dashboard",
+        "portal",
+        "perlu tindakan",
+        "pending approval",
+        "pengajuan ringkasan",
+        "zona personal",
+        "ruang kerja posisi",
+        "kehadiran hari ini"
       ]
     },
     {
