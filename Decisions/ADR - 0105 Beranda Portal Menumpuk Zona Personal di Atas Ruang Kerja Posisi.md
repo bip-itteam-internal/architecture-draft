@@ -136,7 +136,7 @@ Rancangan awal menaruh zona B sendirian di kolom kiri dan seluruh zona C (agenda
 
 ## Pelaksanaan Irisan 1
 
-- **Branch**: erp-frontend `feat/beranda-portal-zona`, 6 commit di atas `origin/main` `d433207ea`. Belum merge, belum PR per 2026-09-17; ukur ulang sebelum dipakai.
+- **Branch**: erp-frontend `feat/beranda-portal-zona`, PR [#1642](https://github.com/bip-itteam-internal/erp-frontend/pull/1642) dibuka 2026-09-17 (sudah memuat merge `origin/main` dan lolos hook pre-push `tsc`, `lint`, `build`). Belum merge per tanggal itu; ukur ulang sebelum dipakai.
 - **Penyimpangan sadar dari rancangan awal ADR ini**, keempatnya sudah ditulis di keputusannya masing-masing: kehadiran bersyarat tanggal hari ini (§3), catatan kaki kunci `degraded` (§4), isi blok KPI (§5), dan agenda di kolom kiri (§7).
 - **Diverifikasi di layar** (Chrome headless, `next start` atas hasil build, gateway DEV, login sungguhan lewat form) dengan tiga akun uji: staf tanpa dashboard departemen, HRD Supervisor, Direktur. Angka "Perlu tindakan" sama dengan lencana `/portal/pengajuan` untuk akun yang sama; kehadiran tampil untuk catatan bertanggal hari ini dan "belum ada catatan" untuk 404; jumlah metrik KPI sama dengan `menunggu_penilaian`; ringkasan yang diblokir menghasilkan kalimat galat, bukan kalimat kosong; tema terang dan gelap, lebar 1440 dan 390 tanpa luber mendatar, bahasa id dan en.
 - **Test**: aturan murni (`kehadiran-hari-ini`, `baris-tindakan`, `ringkasan-kpi`) dengan kontrol negatif untuk kasus intinya (placeholder, catatan kemarin, catatan besok); komponen `PerluTindakan` dan `AgendaHariIni`; regresi halaman `/dashboard` (gerbang lama tetap, beranda kini ikut tampil bersama dashboard departemen, dashboard di BAWAH beranda, sebelum mount tanpa zona D).
