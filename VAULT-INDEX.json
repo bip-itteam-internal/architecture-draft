@@ -7397,6 +7397,7 @@
         "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
         "REF - Kepemilikan Data",
         "ADR - 0001 Akuntansi via Accurate",
+        "Microservices - Calendar Service",
         "Microservices - Procurement Service",
         "Finance - Kas Kecil dan Pengajuan Budget",
         "Finance - Buku Besar CV",
@@ -7416,9 +7417,9 @@
         "Sales - HPP Master (Plan)",
         "Finance - Big Pictures"
       ],
-      "hash": "27fa9ec8acb0adf540e55196a7f50d7914a2e6a82c4f6757b48becc8aab6cae4",
-      "ukuran_kb": 34.2,
-      "ringkasan": "Panduan membangun sistem per proses bisnis Finance, P1 sampai P11: pengajuan pengeluaran dan persetujuan, pembayaran keluar (rekening PT dan kas CV), penjualan marketplace dan uang masuk, retur dan piutang marketplace, rekonsiliasi kas toko dan bank, pencatatan dan buku besar, gaji dan iuran BPJS, pajak, anggaran dan kas kecil dan dana kegiatan, tutup buku dan stock opname dan laporan, serta costing HPP produk. Menjawab untuk tiap proses: apa tujuannya, siapa perannya, bagaimana dikerjakan hari ini, apa yang sudah ada di ERP, alur target, celah kelompok A (pakai), B (perbaiki), C (bangun), kontrol wajib, dan ukuran efisiensinya. Juga menjawab prinsip rancangan, urutan pengerjaan dan ketergantungan, sambungan dengan departemen lain, pertanyaan wajib sebelum membangun, keputusan yang dibutuhkan, dan yang sengaja tidak dibangun.",
+      "hash": "0055e711100ce67fa5e6454e498fa898790e755c63a5383a18139ac75ff97e2b",
+      "ukuran_kb": 40.6,
+      "ringkasan": "Panduan membangun sistem per proses bisnis Finance, P1 sampai P11: pengajuan pengeluaran dan persetujuan, pembayaran keluar (rekening PT dan kas CV), penjualan marketplace dan uang masuk, retur dan piutang marketplace, rekonsiliasi kas toko dan bank, pencatatan dan buku besar, gaji dan iuran BPJS, pajak, anggaran dan kas kecil dan dana kegiatan, tutup buku dan stock opname dan laporan, serta costing HPP produk. Menjawab untuk tiap proses: apa tujuannya, siapa perannya, bagaimana dikerjakan hari ini, apa yang sudah ada di ERP, alur target, celah kelompok A (pakai), B (perbaiki), C (bangun), kontrol wajib, dan ukuran efisiensinya. Juga menjawab prinsip rancangan, urutan pengerjaan dan ketergantungan, sambungan dengan departemen lain, pertanyaan wajib sebelum membangun, keputusan yang dibutuhkan, dan yang sengaja tidak dibangun. Juga memuat kalender bulanan Finance dan rantai tenggatnya (gaji, kode billing, BPJS, hutang supplier, tutup buku), data yang rutin diminta dari Finance beserta arah layanannya di sistem, risiko pencatatan penjualan ganda, dan cara memulai bertahap dengan memperhitungkan kapasitas IT.",
       "kata_kunci": [
         "proses bisnis finance",
         "kebutuhan sistem finance",
@@ -7429,7 +7430,10 @@
         "buku besar",
         "payroll BPJS",
         "pajak",
-        "costing HPP"
+        "costing HPP",
+        "kalender tenggat finance",
+        "rantai tenggat",
+        "data yang diminta dari finance"
       ]
     },
     {
