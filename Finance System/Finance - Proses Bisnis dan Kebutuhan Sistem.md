@@ -2,7 +2,7 @@
 
 ## Deskripsi
 
-*Pintu masuk panduan membangun sistem yang membantu proses bisnis Finance bekerja lebih efisien. Dok ini memuat peta sebelas proses bisnis Finance, penilaian seberapa jauh ERP sudah mencakup dan sesuai dengan kebutuhan tiap proses, prinsip rancangan, urutan pengerjaan, dan keputusan yang dibutuhkan. Rincian tiap proses ada di dok prosesnya masing-masing; kalender tenggat dan sambungan lintas departemen punya dok sendiri.*
+*Pintu masuk panduan membangun sistem yang membantu proses bisnis Finance bekerja lebih efisien. Dok ini memuat peta empat belas proses bisnis Finance, pemetaan posisi ke prosesnya, penilaian seberapa jauh ERP sudah mencakup dan sesuai dengan kebutuhan tiap proses, prinsip rancangan, urutan pengerjaan, dan keputusan yang dibutuhkan. Rincian tiap proses ada di dok prosesnya masing-masing; kalender tenggat dan sambungan lintas departemen punya dok sendiri.*
 
 - **Status**: ⚠️ **Implemented (ada catatan)**. Sebagian besar proses sudah punya modul di kode tetapi belum dipakai di prod atau belum sesuai kebutuhan; sebagian lain 🟡 direncanakan (buku besar CV, penjualan per CV, mutasi bank, payroll ke bank) atau belum diputuskan. Keadaan kode diperiksa ke `origin/main` 2026-09-17; keadaan prod bertanggal, ukur ulang sebelum dipakai memutuskan.
 - **Sumber**: survei alur kerja Finance (isian mandiri 14 sampai 16 September 2026, pola prosesnya di [[Finance - FAT Persona]]), kode `bip-erp` dan `erp-frontend`, dan dok domain yang ditautkan. Durasi isian survei tidak andal dan tidak dipakai.
@@ -31,6 +31,26 @@
 | P9 | [[Finance - Proses Anggaran, Kas Kecil, dan Dana Kegiatan]] | Cost Control | Semua divisi, GA | Accurate, Excel, kertas |
 | P10 | [[Finance - Proses Tutup Buku, Stock Opname, dan Laporan]] | Senior Accountant, Cost Control | Gudang, Direktur | Excel, Accurate |
 | P11 | [[Finance - Proses Costing HPP Produk]] | AP | APJ, Procurement, PPIC, SPV Marketing | Templat Excel, WhatsApp |
+| P12 | [[Finance - Proses Insentif]] | Supervisor FAT, Cost Control, Junior Accountant | SPV Marketing, Direktur, IT, HR | Dashboard Insentif di ERP; langkah Finance belum dirinci |
+| P13 | [[Finance - Proses Aset Tetap]] | Senior Accountant, Junior Accountant, Cost Control | GA | Accurate; langkah Finance belum dirinci |
+| P14 | [[Finance - Proses Penagihan Piutang]] | AR Leader, AR Staff | Pelanggan B2B, marketplace | Pemantauan umur piutang di ERP; kontak dan janji bayar di luar sistem |
+
+## Posisi dan prosesnya
+
+Setiap posisi Finance tercakup oleh paling sedikit satu dok proses. Tabel ini diturunkan dari kolom Peran Finance di § Peta proses; bila keduanya berbeda, peta yang menang. Pemetaan ini tentang pekerjaan, bukan jumlah pemegang jabatan.
+
+| Posisi | Proses |
+|---|---|
+| Supervisor FAT | P1, P2, P12 |
+| Senior Accountant | P2, P5, P6, P7, P10, P13 |
+| Junior Accountant | P2, P3, P5, P6, P7, P8, P12, P13 |
+| AR Leader | P14 |
+| AR Staff | P3, P4, P5, P14 |
+| Account Payable | P2, P5, P11 |
+| Cost Control | P1, P7, P9, P10, P12, P13 |
+| Tax | P3, P8 |
+
+Pekerjaan yang disentuh posisi Finance tetapi prosesnya dimiliki fungsi lain, sehingga tidak dibuatkan dok proses di sini: penilaian KPI tim ([[HRIS - Matriks KPI per Departemen]]), audit internal oleh Internal Audit di Kesekretariatan dengan Finance sebagai pihak yang diperiksa ([[Finance - Audit Internal]]), dan opname perlengkapan GA ([[ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate]]). Sisi Supervisor FAT belum terwakili di survei dan AR Leader tidak punya pemegang aktif per 2026-09-17, jadi pemetaan keduanya dari [[Finance - FAT Persona]] dan kode; pekerjaan lain yang belum terlihat mungkin ada.
 
 ## Cakupan dan kesesuaian (2026-09-17)
 
@@ -49,8 +69,11 @@ Dua pertanyaan dijawab terpisah: apakah prosesnya **tercover** modul ERP, dan ap
 | P9 | Sebagian | Sebagian | Kas kecil dipakai; varians tidak bisa ditelusuri ke transaksi; pertanggungjawaban dana kegiatan belum ada |
 | P10 | Sebagian | Kurang | Laporan dibaca dari Accurate; daftar periksa tutup buku dan opname digital belum ada |
 | P11 | Belum | Belum | Seluruhnya di Excel dan WhatsApp |
+| P12 | Ada (mesin insentif, Dashboard, Master Target) | Sebagian | Mesin jalan; master data belum lengkap (atribusi toko, beban non-gaji per proyek, HPP), target Leader belum diisi, dan beberapa keputusan hitung masih terbuka |
+| P13 | Sebagian | Belum bisa dinilai | Aktiva tetap dibaca dari Accurate dan aset GA dipadankan; langkah kerja aset tetap di Finance tidak dirinci survei; register aset buku CV direncanakan |
+| P14 | Sebagian | Kurang | Umur piutang terbaca dan dinilai KPI otomatis; kontak, janji bayar, dan hasil penagihan dicatat di luar sistem; pemilik proses belum punya pemegang aktif |
 
-**Ringkasan**: 3 proses sudah ada di kode (P1, P2, P8), 6 tercover sebagian (P3, P4, P5, P7, P9, P10), dan 2 belum (buku CV di P6, dan P11). Tidak ada proses yang sudah sesuai penuh sekaligus dipakai.
+**Ringkasan**: 4 proses sudah ada di kode (P1, P2, P8, P12), 8 tercover sebagian (P3, P4, P5, P7, P9, P10, P13, P14), dan 2 belum (buku CV di P6, dan P11). Tidak ada proses yang sudah sesuai penuh sekaligus dipakai.
 
 **Penilaian pengguna** (*survei 2026-09*, digabung per sisi pekerjaan): peran di sisi data marketplace menilai ERP terbantu; peran di sisi pembayaran, buku CV, pajak, dan kendali anggaran menilai sedikit terbantu atau belum memakai ERP untuk pekerjaan Finance.
 
@@ -78,9 +101,9 @@ Dua pertanyaan dijawab terpisah: apakah prosesnya **tercover** modul ERP, dan ap
 
 | Kelompok | Arti | Isi |
 |---|---|---|
-| **A. Sudah ada, tinggal dipakai** | Tanpa kode baru; butuh keputusan, paket izin, data master, dan keterlibatan departemen lain | Pengajuan Barang dan pembayaran (P1, P2); Tax Control (P8); payroll oleh HR (P7); disiplin scan retur gudang (P4) |
-| **B. Sudah ada, perlu diperbaiki** | Perubahan kecil sampai menengah pada modul yang ada | Pengajuan tersambung pos anggaran (P1, P9); kotak persetujuan memuat pengajuan barang (P1); notifikasi pembayaran PENDING (P2); format rekonsiliasi kas toko dan celah retur (P4, P5); varians yang bisa ditelusuri (P9) |
-| **C. Belum ada, perlu dibangun** | Modul atau alur baru | Payroll ke bank, BPJS, dan jurnal gaji (T7); impor mutasi bank dan rekonsiliasi (T9); penjualan per CV (T8); buku besar CV, laporan, migrasi, jurnal otomatis (T3 sampai T6); daftar periksa tutup buku (T10); pertanggungjawaban dana kegiatan; costing HPP |
+| **A. Sudah ada, tinggal dipakai** | Tanpa kode baru; butuh keputusan, paket izin, data master, dan keterlibatan departemen lain | Pengajuan Barang dan pembayaran (P1, P2); Tax Control (P8); payroll oleh HR (P7); disiplin scan retur gudang (P4); master data insentif (P12); pemilik proses penagihan (P14) |
+| **B. Sudah ada, perlu diperbaiki** | Perubahan kecil sampai menengah pada modul yang ada | Pengajuan tersambung pos anggaran (P1, P9); kotak persetujuan memuat pengajuan barang (P1); notifikasi pembayaran PENDING (P2); format rekonsiliasi kas toko dan celah retur (P4, P5); varians yang bisa ditelusuri (P9); antrean hutang pemasok jatuh tempo (P2); persetujuan dan pembekuan periode insentif (P12) |
+| **C. Belum ada, perlu dibangun** | Modul atau alur baru | Payroll ke bank, BPJS, dan jurnal gaji (T7); impor mutasi bank dan rekonsiliasi (T9); penjualan per CV (T8); buku besar CV, laporan, migrasi, jurnal otomatis (T3 sampai T6); daftar periksa tutup buku (T10); pertanggungjawaban dana kegiatan; costing HPP; laporan keuangan untuk SPT tahunan (P8); register aset dan penyusutan buku CV (P13); log kontak dan janji bayar penagihan (P14) |
 | **D. Sengaja tidak dibangun** | Di luar batas sistem | Lihat § Yang sengaja tidak dibangun |
 
 ## Urutan pengerjaan dan ketergantungan
@@ -120,6 +143,8 @@ Diputuskan Supervisor FAT atau manajemen sebelum kelompok A berjalan:
 - Pemeriksaan rekap gaji dari dua sudut tetap dua langkah atau tidak (P7).
 - Kapan saklar jurnal kas `ACCURATE_KAS_PUSH` dinyalakan (P2).
 - Tanggal di [[Finance - Kalender dan Rantai Tenggat]] dijadikan tenggat resmi atau tidak.
+- Keputusan hitung insentif yang masih terbuka: PPN di dalam profit, target sebelum atau sesudah opex, dan jadwal bayar (P12).
+- Pemilik proses penagihan piutang selama posisi AR Leader belum punya pemegang aktif (P14).
 
 ## Yang sengaja tidak dibangun
 
@@ -137,7 +162,7 @@ Diputuskan Supervisor FAT atau manajemen sebelum kelompok A berjalan:
 
 ## Dokumen Terkait
 
-- Dok proses: [[Finance - Proses Pengajuan Pengeluaran dan Persetujuan]] · [[Finance - Proses Pembayaran Keluar]] · [[Finance - Proses Penjualan Marketplace dan Uang Masuk]] · [[Finance - Proses Retur dan Piutang Marketplace]] · [[Finance - Proses Rekonsiliasi Kas Toko dan Bank]] · [[Finance - Proses Pencatatan dan Buku Besar]] · [[Finance - Proses Gaji dan Iuran BPJS]] · [[Finance - Proses Pajak]] · [[Finance - Proses Anggaran, Kas Kecil, dan Dana Kegiatan]] · [[Finance - Proses Tutup Buku, Stock Opname, dan Laporan]] · [[Finance - Proses Costing HPP Produk]]
+- Dok proses: [[Finance - Proses Pengajuan Pengeluaran dan Persetujuan]] · [[Finance - Proses Pembayaran Keluar]] · [[Finance - Proses Penjualan Marketplace dan Uang Masuk]] · [[Finance - Proses Retur dan Piutang Marketplace]] · [[Finance - Proses Rekonsiliasi Kas Toko dan Bank]] · [[Finance - Proses Pencatatan dan Buku Besar]] · [[Finance - Proses Gaji dan Iuran BPJS]] · [[Finance - Proses Pajak]] · [[Finance - Proses Anggaran, Kas Kecil, dan Dana Kegiatan]] · [[Finance - Proses Tutup Buku, Stock Opname, dan Laporan]] · [[Finance - Proses Costing HPP Produk]] · [[Finance - Proses Insentif]] · [[Finance - Proses Aset Tetap]] · [[Finance - Proses Penagihan Piutang]]
 - Lintas proses: [[Finance - Kalender dan Rantai Tenggat]] · [[Finance - Sambungan dan Permintaan Data Lintas Departemen]]
 - [[Finance - FAT Persona]] (peran dan praktik nyata per posisi) · [[Finance - Big Pictures]] · [[Finance - Dashboard per Posisi (FAT)]]
 - [[Finance - Buku Besar CV]] · [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] · [[ADR - 0001 Akuntansi via Accurate]] · [[REF - Kepemilikan Data]]

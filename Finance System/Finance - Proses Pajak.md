@@ -14,11 +14,11 @@ Kewajiban pajak dihitung dari data acuan yang sama dengan pembukuan, dilaporkan 
 
 ## Hari ini (*survei 2026-09*)
 
-Data transaksi dicek dan dikonfirmasi, catatan perusahaan diekualisasi dengan Coretax, data diinput ke Coretax, kode billing dibuat tanggal 1 sampai 3 (PPh final, PPh 21, PPh 25) dan tanggal 20 (PPh 23, PPN), lalu pajak dibayar Junior Accountant. Hampir semua data diketik ulang; hambatan utamanya menentukan data acuan dan cut-off; pos persediaan hanya tersedia sebagai angka tanpa rincian.
+Data transaksi dicek dan dikonfirmasi, catatan perusahaan diekualisasi dengan Coretax, data diinput ke Coretax, kode billing dibuat tanggal 1 sampai 3 (PPh final, PPh 21, PPh 25) dan tanggal 20 (PPh 23, PPN), lalu pajak dibayar Junior Accountant. Hampir semua data diketik ulang; hambatan utamanya menentukan data acuan dan cut-off; pos persediaan hanya tersedia sebagai angka tanpa rincian. Untuk laporan tahunan, jurnal bentukan tim dicocokkan dengan Coretax untuk menyajikan angka yang wajar, dan laporan keuangan untuk SPT tahunan disebut sebagai kendala.
 
 ## Sudah ada di ERP
 
-Tax Control berisi kewajiban per masa, pengingat jatuh tempo H-7 dan H-3, pencatatan pelaporan, dan unggah BPE serta bukti bayar ([[API - Finance Service]], [[Finance - Rancangan Finance Service]]). Prod 2026-09-12: master jenis pajak dan kewajiban masih 0.
+Tax Control berisi kewajiban per masa, pengingat jatuh tempo H-7 dan H-3, pencatatan pelaporan, dan unggah BPE serta bukti bayar ([[API - Finance Service]], [[Finance - Rancangan Finance Service]]). Prod 2026-09-12: master jenis pajak dan kewajiban masih 0. Master jenis pajak mengenal periodisitas bulanan dan tahunan (`bip-erp/services/finance/pajak_master.go:25`, `:88-91`), dan master bawaannya memuat PPh Badan tahunan yang masanya diwakili bulan terakhir tahun itu (`bip-erp/services/finance/pajak_master_seed.go:52-55`). Jadi kewajiban tahunan bisa dilacak; data laporan keuangan untuk SPT tahunan tidak disediakan modul ini.
 
 ## Alur target
 
@@ -28,6 +28,7 @@ Kewajiban per masa terbit di Tax Control → data penjualan per entitas (P3), pe
 
 - **A** Master jenis pajak diisi, paket `finance_pajak` dipasang.
 - **C** Omzet per entitas dari T8 dan data pembelian/pembayaran dari P2 yang benar-benar dipakai.
+- **C** Laporan keuangan per entitas untuk SPT tahunan diambil dari buku yang sama dengan pembukuan bulanan ([[Finance - Proses Pencatatan dan Buku Besar]], [[Finance - Proses Tutup Buku, Stock Opname, dan Laporan]]), bukan disusun ulang dari jurnal bentukan.
 - **TBD** Rincian pos persediaan dan titik cut-off yang disepakati bersama P10.
 
 ## Kontrol wajib
@@ -36,7 +37,7 @@ Yang menghitung kewajiban bukan satu-satunya yang memeriksa angka laporan.
 
 ## Ukuran efisiensi
 
-Jumlah data yang diketik ulang untuk satu masa pajak; kewajiban yang dilaporkan lewat tenggat.
+Jumlah data yang diketik ulang untuk satu masa pajak; kewajiban yang dilaporkan lewat tenggat; lama menyiapkan laporan keuangan untuk SPT tahunan.
 
 Sumber data baseline: Catatan Tax per masa (data diketik ulang, pelaporan lewat tenggat).
 
@@ -44,6 +45,7 @@ Sumber data baseline: Catatan Tax per masa (data diketik ulang, pelaporan lewat 
 
 - P2: [[Finance - Proses Pembayaran Keluar]]
 - P3: [[Finance - Proses Penjualan Marketplace dan Uang Masuk]]
+- P6: [[Finance - Proses Pencatatan dan Buku Besar]]
 - P7: [[Finance - Proses Gaji dan Iuran BPJS]]
 - P10: [[Finance - Proses Tutup Buku, Stock Opname, dan Laporan]]
 

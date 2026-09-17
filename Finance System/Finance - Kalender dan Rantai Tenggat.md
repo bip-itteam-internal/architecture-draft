@@ -5,7 +5,7 @@
 *Tanggal kerja bulanan Finance dan ketergantungan antarlangkahnya, sebagai dasar merancang tenggat, pengingat, dan daftar periksa tutup buku di sistem. Bagian dari [[Finance - Proses Bisnis dan Kebutuhan Sistem]].*
 
 - **Status**: ⚠️ **Implemented (ada catatan)**. Tenggat pajak sudah dikirim ke kalender terpusat (`bip-erp/services/finance/pajak_calendar_feed.go:156`, rute `bip-erp/services/finance/routes.go:137`, provider `bip-erp/services/calendar/providers.go:38`); tenggat lain di tabel ini belum punya feed maupun pengingat.
-- **Sumber**: isian survei alur kerja Finance 14 sampai 16 September 2026. Tanggal ini **bukan aturan perusahaan**; konfirmasi ke Supervisor FAT sebelum dijadikan tenggat sistem.
+- **Sumber**: isian survei alur kerja Finance 14 sampai 16 September 2026; dua baris insentif (tanggal 1 dan 5, dan tanggal 25) dari SK dan aturan periode di [[Finance - Incentive]]. Tanggal dari survei **bukan aturan perusahaan**; konfirmasi ke Supervisor FAT sebelum dijadikan tenggat sistem.
 
 ## Kalender bulanan
 
@@ -16,6 +16,7 @@ Yang penting bagi rancangan adalah **rantainya**: langkah di kolom kegiatan tida
 | 1 | Pembayaran gaji | P7, P2 | Rekap gaji dari HR tiba dan diperiksa sebelum tanggal 1 |
 | 1 | Unduh rekening koran, rekonsiliasi awal bulan | P5 | Rekening koran baru tersedia tanggal 1 |
 | 1 | Pencocokan penjualan dashboard, ERP, dan Accurate | P3 | Sinkron marketplace bulan lalu lengkap |
+| 1 (SPV Marketing) dan 5 (advertiser) | Pembayaran insentif bulan sebelumnya menurut SK | P12, P2 | Perhitungan profit oleh Finance selesai dan disetujui; lihat baris tanggal 25 |
 | 1 sampai 3 | Kode billing PPh final, PPh 21, PPh 25 | P8 | Omzet per CV dari pengolahan penjualan (P3); gaji (P7) |
 | 1 sampai 3 | Kas kecil GA dan marketing | P9 | Lampiran pengeluaran dari unit |
 | 1 sampai 5 | Tutup buku kas umum, laporan keuangan bulanan | P10 | Seluruh input akhir bulan lengkap |
@@ -24,11 +25,12 @@ Yang penting bagi rancangan adalah **rantainya**: langkah di kolom kegiatan tida
 | 10 | Pembayaran iuran BPJS TK | P7, P2 | Tagihan dan lampiran per badan usaha dari HR |
 | 20 | Kode billing PPh 23 dan PPN | P8 | Data pembelian dan pembayaran |
 | Beberapa tanggal tetap per brand | Pembayaran iklan dan FO | P1, P2 | Permintaan dari marketing; frekuensinya tidak konsisten antar isian (TBD volume) |
+| 25 | Batas uang marketplace cair untuk dihitung insentif bulan sebelumnya; yang cair sesudahnya hangus untuk periode itu | P12 | Pencairan marketplace tersinkron (P3). Jadwal bayar tanggal 1 dan 5 jatuh sebelum batas ini untuk periode yang sama; urutannya keputusan terbuka di P12 |
 | Sekitar 25 sampai 28 | Stock opname gudang dan rekonsiliasi stok | P10 | Hitung fisik tim gudang |
 | Mulai 26, lalu sekitar 29 sampai 30 | Pengecekan rekap gaji (kehadiran dan potongan, lalu rekening dan PPh) | P7 | Rekap dari HR |
 | 30 atau 31 | Penarikan afiliasi, cut-off | P9, P10 | Data afiliasi |
 
-Kode proses: P1 [[Finance - Proses Pengajuan Pengeluaran dan Persetujuan]] · P2 [[Finance - Proses Pembayaran Keluar]] · P3 [[Finance - Proses Penjualan Marketplace dan Uang Masuk]] · P4 [[Finance - Proses Retur dan Piutang Marketplace]] · P5 [[Finance - Proses Rekonsiliasi Kas Toko dan Bank]] · P7 [[Finance - Proses Gaji dan Iuran BPJS]] · P8 [[Finance - Proses Pajak]] · P9 [[Finance - Proses Anggaran, Kas Kecil, dan Dana Kegiatan]] · P10 [[Finance - Proses Tutup Buku, Stock Opname, dan Laporan]].
+Kode proses: P1 [[Finance - Proses Pengajuan Pengeluaran dan Persetujuan]] · P2 [[Finance - Proses Pembayaran Keluar]] · P3 [[Finance - Proses Penjualan Marketplace dan Uang Masuk]] · P4 [[Finance - Proses Retur dan Piutang Marketplace]] · P5 [[Finance - Proses Rekonsiliasi Kas Toko dan Bank]] · P7 [[Finance - Proses Gaji dan Iuran BPJS]] · P8 [[Finance - Proses Pajak]] · P9 [[Finance - Proses Anggaran, Kas Kecil, dan Dana Kegiatan]] · P10 [[Finance - Proses Tutup Buku, Stock Opname, dan Laporan]] · P12 [[Finance - Proses Insentif]].
 
 ## Kebutuhan sistem dari rantai ini
 
@@ -40,6 +42,7 @@ Kode proses: P1 [[Finance - Proses Pengajuan Pengeluaran dan Persetujuan]] · P2
 
 - Tanggal mana yang menjadi tenggat resmi, dan untuk entitas mana saja.
 - Volume dan jadwal pasti pembayaran iklan dan FO per brand.
+- Jadwal bayar insentif tanggal 1 dan 5 terhadap batas pencairan tanggal 25 ([[Finance - Proses Insentif]] § Celah).
 
 ## Dokumen Terkait
 

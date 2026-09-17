@@ -14,11 +14,11 @@ Pengeluaran dikendalikan terhadap anggaran, kas kecil tertib per unit, dan dana 
 
 ## Hari ini (*survei 2026-09*)
 
-Realisasi anggaran dicek di Accurate setiap pagi; pengajuan dari divisi diperiksa kelengkapan dokumen dan anggarannya; dana kegiatan dicairkan lalu laporan pemakaian dan buktinya dicocokkan, dengan penyelesaian berupa input, pengembalian dana, atau reimburse; laporan realisasi RAPB disusun sesudah cut-off akhir bulan. Angka varians di ERP sulit dijelaskan karena transaksi pembentuknya tidak terlihat.
+Realisasi anggaran dicek di Accurate setiap pagi; pengajuan dari divisi diperiksa kelengkapan dokumen dan anggarannya; dana kegiatan dicairkan lalu laporan pemakaian dan buktinya dicocokkan, dengan penyelesaian berupa input, pengembalian dana, atau reimburse; laporan realisasi RAPB disusun sesudah cut-off akhir bulan. Angka varians di ERP sulit dijelaskan karena transaksi pembentuknya tidak terlihat. Forecast kas tercantum sebagai salah satu pekerjaan di sisi ini; langkah kerjanya tidak dirinci (TBD).
 
 ## Sudah ada di ERP
 
-Master anggaran OPEX, kartu Varians OPEX, breakdown mingguan anggaran terhadap realisasi, dan laporan Admin & Non-Ops (`erp-frontend/src/features/finance/anggaran/`, data di integration-service `anggaran_opex`, [[REF - Kepemilikan Data]]); kas kecil dengan verifikasi Finance dan jurnal ke Accurate ([[Finance - Kas Kecil dan Pengajuan Budget]]); rekomendasi efisiensi (0 dokumen di prod 2026-09-12).
+Master anggaran OPEX, kartu Varians OPEX, breakdown mingguan anggaran terhadap realisasi, dan laporan Admin & Non-Ops (`erp-frontend/src/features/finance/anggaran/`, data di integration-service `anggaran_opex`, [[REF - Kepemilikan Data]]); kas kecil dengan verifikasi Finance dan jurnal ke Accurate ([[Finance - Kas Kecil dan Pengajuan Budget]]); rekomendasi efisiensi (0 dokumen di prod 2026-09-12). Forecast kas mingguan: panel proyeksi terhadap realisasi per minggu beserta akurasinya di layar anggaran (`erp-frontend/src/features/finance/anggaran/components/panel-forecast-kas.tsx`); barisnya per akun anggaran (`erp-frontend/src/features/finance/anggaran/types-mingguan.ts:36`), dan akurasinya tidak terdefinisi bila anggaran periode itu belum diunggah (`:27`). KPI `forecast_kas` membaca `GET /accounting/anggaran/mingguan/kpi` untuk metrik "forecast cashflow mingguan" (`bip-erp/services/employee/kpi_sumber_forecast_kas.go:15`, `:31`).
 
 ## Alur target
 
@@ -28,6 +28,7 @@ Pengajuan membawa pos anggaran (P1) → realisasi per pos bisa ditelusuri sampai
 
 - **B** Varians bisa ditelusuri ke transaksi. Kartu Varians OPEX hanya menyajikan total dan cacah pos lewat anggaran (`kartu-varians-opex.tsx:65-94`), dan komponen anggaran tidak menaut ke transaksi Accurate mana pun.
 - **B** Pengajuan tersambung ke pos anggaran (sama dengan P1).
+- **TBD** Cakupan forecast kas. Proyeksinya disusun per akun anggaran, jadi yang terlihat adalah pengeluaran beranggaran; apakah uang masuk (penarikan marketplace, pelunasan piutang) dan pembayaran terjadwal (gaji, pajak, hutang pemasok jatuh tempo) ikut diperhitungkan belum diperiksa di integration-service. Periksa sebelum menjadikannya forecast kas perusahaan.
 - **C** Pertanggungjawaban dana kegiatan. `git grep` 2026-09-17 atas `bip-erp/services` tidak menemukan alur uang muka sampai pertanggungjawaban; perlu `/analisa-kebutuhan` lebih dulu (apakah memperluas tipe DANA atau modul sendiri).
 
 ## Kontrol wajib
@@ -36,7 +37,7 @@ Pengaju bukan pemeriksa anggaran; penerima dana kegiatan bukan yang menyetujui p
 
 ## Ukuran efisiensi
 
-Jumlah pertanyaan varians yang harus ditelusuri manual; umur dana kegiatan yang belum dipertanggungjawabkan.
+Jumlah pertanyaan varians yang harus ditelusuri manual; umur dana kegiatan yang belum dipertanggungjawabkan; akurasi forecast kas mingguan (sudah dihitung KPI `forecast_kas`).
 
 Sumber data baseline: Catatan Cost Control (pertanyaan varians, umur dana kegiatan).
 

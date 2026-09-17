@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-17",
-  "jumlah_dokumen": 438,
+  "jumlah_dokumen": 440,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -434,7 +434,7 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "c83fb5c05707b77c0ee3ea420e224118bf550c8cf981c0ada3f0c79bd7738aef",
+      "hash": "59663e431637ba98add35a07fead5cf24fba568ad2030df40bf26da49a93f5fc",
       "ukuran_kb": 97.7,
       "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service (webhook Shopee/TikTok/Accurate, order terpadu, export order, aging piutang, feed retur untuk WMS, packet tracking, TikTok Shop/Business, Shopee, Accurate, dashboard FAT /accounting, profit insentif, ICC account mapping, kas toko, ulasan, status sinkron toko, worker/jobs), beserta parameter dan bentuk responsnya. Juga menjawab cara menyaring order menurut atribusi afiliasi Shopee (direct/indirect/organic/unknown) dan endpoint mana yang publik vs butuh gateway key.",
       "kata_kunci": [
@@ -1497,7 +1497,6 @@
         "RUN - Import Koreksi Faktur dari Rekap Lengkap",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line",
         "ADR - 0012 Retur Refund-only Push-all",
-        "ADR - 0103 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres",
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
         "ADR - 0097 Kompensasi Shopee Susulan Ditahan dan Dicatat AR lewat Koreksi Manual ERP",
         "ADR - 0052 Status Sinkron per Toko",
@@ -1523,8 +1522,8 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "60a8267c138e7cecc15bb1d41bb63594d4e06be34e38554a59786c12ea9cea7e",
-      "ukuran_kb": 497.6,
+      "hash": "24bf9c32eb05d0ad0c4bc1656deb1ee0d1ba73c22f8fc8f26f945e3a23e18474",
+      "ukuran_kb": 497.0,
       "ringkasan": "Menjawab: apa itu portal web internal ERP (`erp-frontend`, \"One Bharata\"), stack apa yang dipakai, bagaimana login, refresh token, dan SSO Identity Provider bekerja, serta bagaimana `system_roles` menggerbang menu sidebar per modul. Juga menjawab konvensi frontend yang berlaku (data-fetching TanStack Query, bagan Recharts dengan `ChartContainer`), struktur menu HRIS termasuk Pengaturan HRGA terpusat, fitur multi-perusahaan (pemilih perusahaan admin pusat), dan daftar modul yang sudah maupun belum dibangun.",
       "kata_kunci": [
         "web ERP",
@@ -1536,8 +1535,7 @@
         "sidebar menu",
         "TanStack Query",
         "multi-perusahaan",
-        "Pengaturan HRGA",
-        "selisih retur"
+        "Pengaturan HRGA"
       ]
     },
     {
@@ -1840,11 +1838,10 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, **training**, **kpi**, **kaskecil**, **ga**, **formbuilder**, serta **secretary** (Kesekretariatan, peleburan `legal` + `rnd` sejak 2026-08-13 — `legal` sebagai modul tersendiri sudah dipensiunkan). **finance** punya katalog + 5 paket (`finance_view`, `finance_pelaksana`, `finance_admin`, `finance_ar`, `finance_ap`) dan menunya sudah bertanda izin, tetapi **belum ada endpoint yang memeriksanya**. 🟡 [[ADR - 0103 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres]] mengusulkan dua izin baru `finance.returselisih.view` dan `finance.returselisih.tandai` untuk tab Selisih Retur di Auto Sync Retur: ditegakkan di endpoint integration-service yang baru, dan menu harus muncul bagi pemegang izin walau tanpa peran finance/integration. Modul **`menu`** (menu terbatas) **sudah merge** namun **belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
+      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, **training**, **kpi**, **kaskecil**, **ga**, **formbuilder**, serta **secretary** (Kesekretariatan, peleburan `legal` + `rnd` sejak 2026-08-13 — `legal` sebagai modul tersendiri sudah dipensiunkan). **finance** punya katalog + 5 paket (`finance_view`, `finance_pelaksana`, `finance_admin`, `finance_ar`, `finance_ap`) dan menunya sudah bertanda izin, tetapi **belum ada endpoint yang memeriksanya**. Modul **`menu`** (menu terbatas) **sudah merge** namun **belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
-        "ADR - 0103 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres",
         "ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya",
         "ADR - 0051 Pencabutan Tampilan Menu per Posisi",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
@@ -1888,8 +1885,8 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "a8844e74cef9b211b70d739030ef692fb2f69cc2a3fa3485e3f6e47fe174f7d3",
-      "ukuran_kb": 121.8,
+      "hash": "1f5fff3b197c909f722314d959eb88804742b7aa1a0937fa0aac0803ae8bc278",
+      "ukuran_kb": 121.4,
       "ringkasan": "Menjawab: bagaimana hak akses bekerja di seluruh bip-erp lewat tiga sumbu (modul, tingkat aksi, cakupan/reach `own`/`division`/`all`), bagaimana paket hak bernama menempel di posisi/jabatan, dan di mana ia ditegakkan (gateway, middleware service, frontend). Menjelaskan mekanisme katalog per modul (`RegisterCatalog`), validasi paket, resolusi izin efektif saat login ke klaim JWT, cara gateway membuang lalu mengisi ulang header `BIP-*`, serta fallback tier untuk akun yang belum punya paket. Juga menjawab modul apa saja yang sudah berkatalog, endpoint mana yang memasok daftar modul dan katalog ke frontend, dan kenapa laci filter menurunkan opsi dari data yang ada, bukan dari katalog.",
       "kata_kunci": [
         "RBAC",
@@ -1902,8 +1899,7 @@
         "katalog permission",
         "tier fallback",
         "JWT claims",
-        "ADR 0030",
-        "finance.returselisih"
+        "ADR 0030"
       ]
     },
     {
@@ -2479,7 +2475,6 @@
         "ADR - 0016 Retur Grouped per Faktur + Tanggal Retur",
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
         "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
-        "ADR - 0103 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres",
         "ADR - 0056 Penyesuaian Statement TikTok Menambah Payout Order",
         "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
         "ADR - 0017 Tanggal Retur TikTok via order_update_date",
@@ -2516,8 +2511,8 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "67148c99a396333bfc3fa03f5b2b8295f8341e96f6ed8e4af0635bb1f4b163c1",
-      "ukuran_kb": 409.9,
+      "hash": "4f7422b3ebe1050e398994850925e758923ede2f79a0cf3c51e288a320655039",
+      "ukuran_kb": 408.8,
       "ringkasan": "Menjawab: apa peran integration-service sebagai penghubung marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) ke Accurate Online, bagaimana order masuk lewat webhook dan dinormalkan jadi model transaction, serta bagaimana invoice, sales return, dan ringkasan harian dikirim ke Accurate. Juga menjawab detail fitur seperti GMV Max monitoring/overview, rencana Meta Ads, ICC account mapping, shop ACL dan kepemilikan toko per departemen, cron/background worker, status sinkron toko banned, index MongoDB, dan catatan ketahanan Shopee.",
       "kata_kunci": [
         "integration-service",
@@ -2529,8 +2524,7 @@
         "webhook",
         "sales invoice",
         "faktur",
-        "cron worker",
-        "selisih retur"
+        "cron worker"
       ]
     },
     {
@@ -2652,7 +2646,6 @@
         "ADR - 0002 Database-per-Service",
         "APP - Web ERP",
         "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
-        "ADR - 0103 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres",
         "ADR - 0052 Status Sinkron per Toko",
         "ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya",
         "Manufacture - Issue Code Audit 2026-06",
@@ -2664,8 +2657,8 @@
         "DB - Overview and Notes",
         "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace"
       ],
-      "hash": "d97e3f50636223941deb97a955315b290be5c68049cf589a3e3dd4c01b73c27a",
-      "ukuran_kb": 66.7,
+      "hash": "280602cc57a5c9681b4220dcd62c7d62572d876da237a3cd5920b7c0827a2277",
+      "ukuran_kb": 66.4,
       "ringkasan": "Menjawab: bagaimana WMS/manufacture-service mengelola master bahan baku dan produk, stok per gudang, transaksi in/out, formula/BOM, produksi, PO, proposal koreksi, dan audit log. Menjelaskan dari mana master datang sekarang (bahan & angka stok dari Accurate, barang jadi & bundle dari data HPP integration, formula dari import Excel, sync Google Sheets sudah dihapus), cara kerja push pergerakan WMS ke Accurate lewat outbox penyesuaian persediaan beserta kill switch dan akar kegagalan format transDate, serta mekanisme saldo awal/akhir bulanan yang idempoten. Juga menyebut stack, port, database `manufacture_db`, dan tautan ke daftar rute lengkap.",
       "kata_kunci": [
         "manufacture service",
@@ -3083,6 +3076,7 @@
         "External - Desty",
         "WH - Warehouse Sadewa",
         "CORE - RBAC dan Permission Set",
+        "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
         "Microservices - Integration Service",
         "ADR - 0002 Database-per-Service",
@@ -3094,21 +3088,22 @@
         "IT - Background Jobs & Schedulers",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "461a1c06559ab4c795792a75692e22d6c92fb4da07845c8ab72dd63d85b5db15",
-      "ukuran_kb": 38.5,
-      "ringkasan": "Menjawab pertanyaan tentang cara kerja warehouse-service (WMS Tinggarjaya): bagaimana event order dari marketplace masuk dan disinkronkan lewat reconciler 60 detik dan open-order sweep 5 menit, state machine status_wms, operasi gudang harian (approve, pick, pack, RTS, label, dashboard) beserta role guard-nya termasuk pembatasan khusus mitra gudang Sadewa. Juga mencakup register komplain gudang yang jadi bahan KPI packing, endpoint API, model data warehouse_db, dan status implementasi tiap fitur (sudah di prod vs masih di branch).",
+      "hash": "a7721acdc28c1733e87c7d3319da70da73801a1a9b520ae622a25733cd8b1ab9",
+      "ukuran_kb": 40.3,
+      "ringkasan": "Menjawab: bagaimana arsitektur warehouse-service (stack, path repo, port, env, collection MongoDB), bagaimana event order dari marketplace disinkronkan lewat event ingestion, reconciler 60 detik, dan open-order sweep 5 menit, serta apa saja operasi WMS (queue, approve, pick, pack, RTS, label, handover, dashboard) beserta role guard-nya termasuk pembatasan akses mitra gudang Sadewa. Juga menjawab bagaimana register komplain gudang (dari ulasan marketplace) dan notifikasinya bekerja, serta state machine `status_wms`.",
       "kata_kunci": [
         "warehouse-service",
         "WMS",
-        "Tinggarjaya",
         "fulfillment",
         "reconciler",
-        "status_wms",
+        "state machine",
         "picking",
         "packing",
         "RTS",
+        "label resi",
+        "Sadewa",
         "komplain gudang",
-        "Sadewa"
+        "gudang"
       ]
     },
     {
@@ -3847,7 +3842,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "✅",
-      "status_teks": "Implemented (21 Juli 2026) — **lima** menu WMS dipecah dua sub-tab; stempel `created_by_name` aktif di semua jalur tulis manual (termasuk jalur proposal). Verifikasi visual tuntas untuk **Inbound RM**, **Kirim FG**, & **Master Resi**; Keluar FG / Input Gudang FG / Laporan Hasil Produksi menunggu pengecekan dengan role yang sesuai (`admin gudang FG`, `admin produksi`). **Follow-up 22 Juli 2026:** (a) batasan \"PO multi-bahan tak mengisi form penuh\" diselesaikan — form Inbound RM jadi multi-baris (klik baris PO memuat seluruh bahan); (b) **backend gerbang gudang** (retur barang-balik ditahan sampai gudang scan; Decision #8) — cakupan ADR ini diperluas dari log-split FE ke fondasi backend yang membuatnya bermakna; **terbukti end-to-end di prod**; (c) **form retur dilengkapi** (pengaman qty/status, panel konteks, scan dari daftar, retur basi terlipat; Decision #9); (d) **resi paket BALIK** diutamakan di form + scan (sumber Shopee `get_return_detail`), plus **search/filter/export laporan + auto-isi PIC** (Decision #10). **Follow-up 30 Juli 2026 (✅ deployed):** gerbang gudang **PER-ORDER** (fix under-book — konfirmasi 1 member membuka gerbang seluruh grup: 189 grup/1.437 order ~Rp142jt) + status **SEBAGIAN** turunan — lihat amandemen Decision #8. **Follow-up 9 September 2026:** konfirmasi scan dinilai **PER-SKU**, bukan per-order (✅ LIVE, PR #1793 — 56 scan di 54 order hilang permanen, diukur ke ledger WMS; remediasi tuntas 56→15, sisanya order yang finance tambal manual), dan deteksi **komponen paket yang tak pernah discan** ditambahkan ke feed gudang (✅ PR #1804 merged 2026-09-09 — 17 order, dugaan \"form bug\" diuji & gugur). Lihat Consequences.",
+      "status_teks": "Implemented (21 Juli 2026) — **lima** menu WMS dipecah dua sub-tab; stempel `created_by_name` aktif di semua jalur tulis manual (termasuk jalur proposal). Verifikasi visual tuntas untuk **Inbound RM**, **Kirim FG**, & **Master Resi**; Keluar FG / Input Gudang FG / Laporan Hasil Produksi menunggu pengecekan dengan role yang sesuai (`admin gudang FG`, `admin produksi`). **Follow-up 22 Juli 2026:** (a) batasan \"PO multi-bahan tak mengisi form penuh\" diselesaikan — form Inbound RM jadi multi-baris (klik baris PO memuat seluruh bahan); (b) **backend gerbang gudang** (retur barang-balik ditahan sampai gudang scan; Decision #8) — cakupan ADR ini diperluas dari log-split FE ke fondasi backend yang membuatnya bermakna; **terbukti end-to-end di prod**; (c) **form retur dilengkapi** (pengaman qty/status, panel konteks, scan dari daftar, retur basi terlipat; Decision #9); (d) **resi paket BALIK** diutamakan di form + scan (sumber Shopee `get_return_detail`), plus **search/filter/export laporan + auto-isi PIC** (Decision #10). **Follow-up 30 Juli 2026 (✅ deployed):** gerbang gudang **PER-ORDER** (fix under-book — konfirmasi 1 member membuka gerbang seluruh grup: 189 grup/1.437 order ~Rp142jt) + status **SEBAGIAN** turunan — lihat amandemen Decision #8. **Follow-up 9 September 2026:** konfirmasi scan dinilai **PER-SKU**, bukan per-order (✅ LIVE, PR #1793 — 56 scan di 54 order hilang permanen, diukur ke ledger WMS; remediasi tuntas 56→15, sisanya order yang finance tambal manual), dan deteksi **komponen paket yang tak pernah discan** ditambahkan ke feed gudang (🟡 PR #1804 belum merge — 17 order, dugaan \"form bug\" diuji & gugur). Lihat Consequences.",
       "publik": true,
       "tautan": [
         "CORE - API Master Gateway",
@@ -3859,14 +3854,13 @@
         "IT - Background Jobs & Schedulers",
         "ADR - 0016 Retur Grouped per Faktur + Tanggal Retur",
         "ADR - 0002 Database-per-Service",
-        "ADR - 0103 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres",
         "APP - Web ERP",
         "API - Manufacture Service",
         "Manufacture - Stock & Material Management",
         "ADR - 0015 Push Pergerakan WMS ke Accurate"
       ],
-      "hash": "4501f7b83a9cd3afbb3580e2f1802541c416fe404dd6d3fa92216c1ab757a4fc",
-      "ukuran_kb": 96.1,
+      "hash": "b1858d782d4069f5943840dfb79e7c9b7815f75aa5ed35a25487b21430f90bfa",
+      "ukuran_kb": 95.9,
       "ringkasan": "Menjawab: kenapa log tiap menu WMS dipecah jadi dua sub-tab (SUMBER vs INPUT WMS), menu mana saja yang kena, dan apa sumber pembanding tiap menu (feed retur marketplace, resi, Procurement PO, Surat Jalan, Laporan Hasil Produksi). Juga menjawab: kenapa badge status \"sudah/belum dicatat\" hanya ada di tab yang punya kunci join, kenapa tab sumber Keluar FG diagregasi per SKU dengan bundle dipecah ke komponen, kenapa hanya resi COMPLETED + SHIPPED yang dihitung keluar gudang (dan kenapa TO_SHIP dikecualikan), serta kenapa nama penginput distempel server lewat header BIP-Username alih-alih dipercaya dari client. Memuat pula gerbang gudang untuk retur barang-balik (per-order, status SEBAGIAN) dan konfirmasi scan yang dinilai per-SKU.",
       "kata_kunci": [
         "WMS",
@@ -4408,18 +4402,17 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "✅",
-      "status_teks": "**Implemented & Deployed** (2026-08-06, PR #1017 commit `35b1860d`; koreksi data existing Juli+Agustus **SELESAI** hari yang sama lewat **dua gelombang** — 245 + 109 dokumen, sisa temuan **0**, nomor RTR utuh; gelombang 1 sempat bocor 109 dokumen karena detektornya bergantung fetch Accurate yang gagal senyap, lihat Consequences). Menyempurnakan pembentukan baris Retur Penjualan untuk SKU **paket/bundle** — uang mengikuti harga paket di faktur, stok tetap mengikuti pecahan komponen. ⚠️ **Amandemen 2026-09-15** (✅ deployed prod 2026-09-16, bip-erp #1911 + erp-frontend #1598): paket dari order **BATAL** dibukukan UTUH walau komponennya baru sebagian discan — lihat butir terakhir Consequences.",
+      "status_teks": "**Implemented & Deployed** (2026-08-06, PR #1017 commit `35b1860d`; koreksi data existing Juli+Agustus **SELESAI** hari yang sama lewat **dua gelombang** — 245 + 109 dokumen, sisa temuan **0**, nomor RTR utuh; gelombang 1 sempat bocor 109 dokumen karena detektornya bergantung fetch Accurate yang gagal senyap, lihat Consequences). Menyempurnakan pembentukan baris Retur Penjualan untuk SKU **paket/bundle** — uang mengikuti harga paket di faktur, stok tetap mengikuti pecahan komponen. ⚠️ **Amandemen 2026-09-15** (🟡 belum merge): paket dari order **BATAL** dibukukan UTUH walau komponennya baru sebagian discan — lihat butir terakhir Consequences.",
       "publik": true,
       "tautan": [
         "Microservices - Integration Service",
         "ADR - 0016 Retur Grouped per Faktur + Tanggal Retur",
         "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
-        "ADR - 0103 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres",
         "ADR - 0018 Faktur Permanen - Semua Pembalikan via Retur"
       ],
-      "hash": "62141242a10238b8e833738c5e59b6f4ac3605ad51ed3697215b39755d581384",
-      "ukuran_kb": 19.6,
+      "hash": "e7aa7d18dcc4c2d8f1834f9c8fad5df724e0321cf2ecadfe331b7bec7faae518",
+      "ukuran_kb": 18.7,
       "ringkasan": "Menjawab: kenapa retur SKU paket/bundle dibukukan sebagai baris INDUK faktur berharga (bukan dipecah jadi komponen berharga), sehingga uang mengikuti harga paket di faktur sementara stok tetap bergerak lewat sub-baris komponen @Rp0 yang diturunkan Accurate. Menjelaskan akar bug over-reversal \"Ter-book Rp0\" (konteks paket hilang di `buildWarehouseDetailItems`), aturan retur sebagian (alokasi proporsional largest-remainder, bobot all-or-nothing atau rata), bentuk dokumen retur yang berubah, serta kronologi koreksi data lama dua gelombang. Memuat pelajaran metodologis penting: detektor yang bergantung fetch Accurate gagal senyap saat 429 sehingga hasilnya hanya batas bawah, dan pengaman re-book massal lewat cacah `accurate_return_id`.",
       "kata_kunci": [
         "ADR 0040",
@@ -5433,17 +5426,16 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)** — kode selesai & ber-tes (PR #1552, **merged 2026-08-31**; penanda \"belum merge\" lama basi, diverifikasi `gh pr view` 2026-09-16). Ekspor belum dialihkan ke salinan; penjadwalan pemindai belum dipasang. ⚠️ Diverifikasi `git grep` 2026-09-17: pemindai `returndriftscan` (`BEDA_TOTAL`/`DOKUMEN_HILANG`) **tidak ada** di `main` — yang ada hanya salinan + endpoint refresh, terisi 269 dari 7.261 dokumen SENT. Pemindai dan penjadwalannya diambil alih [[ADR - 0103 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres]] Tahap 2. Lihat \"Belum selesai\".",
+      "status_teks": "**Implemented (ada catatan)** — kode selesai & ber-tes (PR #1552, **merged 2026-08-31**; penanda \"belum merge\" lama basi, diverifikasi `gh pr view` 2026-09-16). Ekspor belum dialihkan ke salinan; penjadwalan pemindai belum dipasang. Lihat \"Belum selesai\".",
       "publik": true,
       "tautan": [
-        "ADR - 0103 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres",
         "ADR - 0016 Retur Grouped per Faktur + Tanggal Retur",
         "Microservices - Integration Service",
         "API - Integration Service",
         "APP - Web ERP"
       ],
-      "hash": "1d5069c3ae9020827e6c11b2ee7f3426fca6a9d6d5cef7ac487eda989a005a7d",
-      "ukuran_kb": 6.4,
+      "hash": "a9c73117fdf156b2ad7e58ea1a53c1f18f3b16c86280a6363daaeeaf8bef36f9",
+      "ukuran_kb": 6.1,
       "ringkasan": "Menjawab: kenapa baris retur menyimpan salinan (cermin) dokumen Retur Penjualan Accurate agar layar detail dan ekspor tak menembak API tiap kali, dan kenapa salinan itu wajib datang sepaket dengan pemindai drift `cmd/returndriftscan`. Menjelaskan aturan pemakaiannya — cermin untuk MELIHAT, Accurate untuk MEMUTUSKAN — pengisian lazy saat dipakai (bukan backfill), pembatalan cermin lewat `$unset` di `SetGroupResult`, dua kelas temuan drift (BEDA_TOTAL, DOKUMEN_HILANG), dan perbaikan lewat tombol Segarkan oleh manusia. Juga mencatat batas yang diterima sadar (perbandingan hanya total) dan bagian yang belum selesai: penjadwalan pemindai, pengalihan ekspor ke salinan, dan frontend.",
       "kata_kunci": [
         "ADR 0066",
@@ -5455,8 +5447,7 @@
         "Accurate",
         "ekspor retur",
         "cache",
-        "refresh",
-        "selisih retur"
+        "refresh"
       ]
     },
     {
@@ -6808,6 +6799,7 @@
       "status_teks": "Diterima, sebagian besar diimplementasikan. **Keputusan 1, 2, 3, 4, 5, dan 6 sudah ada di kode** per 2026-09-16 dan **merged ke `main` hari itu juga**, terverifikasi di DEV; belum di PROD. **Keputusan 8 separuh berjalan**: notifikasi register GUDANG merged 2026-09-17 (bip-erp #1940, erp-frontend #1625) dan terverifikasi DEV, belum PROD; notifikasi ulasan bintang rendah ke pemegang toko belum dikerjakan. Sisanya (jalur QC dari ulasan, tujuan tanpa register) masih usulan.",
       "publik": true,
       "tautan": [
+        "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "Microservices - Integration Service",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri",
@@ -6821,20 +6813,20 @@
         "Sales - ICC Account Manager Mapping",
         "ADR - 0060 Cakupan Keterlihatan Tiket Engagement"
       ],
-      "hash": "9b974f1e90651e85b8cb841af484a5542fc7fb7e1f9cce1aed7e629320faa488",
-      "ukuran_kb": 13.6,
-      "ringkasan": "Menjawab pertanyaan kenapa dan bagaimana komplain yang berasal dari ulasan marketplace (Shopee) dirutekan ke register komplain yang SUDAH ADA per departemen tujuan (gudang lewat warehouse_komplain_gudang, QC lewat quality_complaint) alih-alih membangun register ketiga. Menjelaskan data ulasan yang mendasari keputusan (volume kecil per bulan, sebaran tema keluhan, kepemilikan toko diturunkan dari icc_account_mappings bukan dari peran marketing), status implementasi tiap keputusan, serta apa yang sengaja tidak dijanjikan (TikTok, balas otomatis ke pembeli, klasifikasi otomatis, tenggat SLA).",
+      "hash": "ab38747bd7d0aeeea5ec676f04ad5409ba2bd5f34a77d17c60664d440b6cc9ed",
+      "ukuran_kb": 14.7,
+      "ringkasan": "Menjawab: kenapa komplain yang lahir dari ulasan marketplace dirutekan ke register komplain gudang dan QC yang sudah ada alih-alih membangun register ketiga, apa saja bukti pengukuran produksi yang mendasarinya (volume ulasan bintang rendah, kepemilikan toko per Account Specialist, kesiapan data pesanan di fulfillment_orders), dan bagian mana dari keputusan ini yang sudah diimplementasikan/di-deploy DEV vs masih tertunda PROD. Juga menjelaskan keputusan mana yang sudah digantikan ADR 0103.",
       "kata_kunci": [
-        "ADR 0099",
         "komplain",
         "ulasan marketplace",
         "review",
-        "warehouse_komplain_gudang",
-        "quality_complaint",
-        "Shopee",
+        "register komplain",
         "Account Specialist",
-        "icc_account_mappings",
-        "register komplain"
+        "gudang",
+        "QC",
+        "ADR 0099",
+        "Shopee",
+        "icc_account_mappings"
       ]
     },
     {
@@ -6949,39 +6941,45 @@
       ]
     },
     {
-      "path": "Decisions/ADR - 0103 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres.md",
-      "judul": "ADR - 0103 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres",
+      "path": "Decisions/ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori.md",
+      "judul": "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** (2026-09-17) — tab Selisih Retur terjadwal per periode, dua tahap, akses lewat izin finance; kode belum ada.",
+      "status_teks": "**Diusulkan** 2026-09-17, disetujui pemilik proses (opsi A). **Belum ada kodenya.** Menggantikan **keputusan 2** [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] (pengaju memilih tujuan lebih dulu) dan memicu keputusan 12-nya. Keputusan lain ADR 0099 tetap berlaku.",
       "publik": true,
       "tautan": [
-        "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
-        "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
+        "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
+        "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
+        "Microservices - Warehouse Service",
+        "ANALISA - Komplain dari Ulasan Marketplace",
+        "QA - Deviation & CAPA",
         "ADR - 0002 Database-per-Service",
-        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
-        "CORE - RBAC dan Permission Set",
-        "ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri",
+        "ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri",
+        "REF - Kepemilikan Data",
+        "Microservices - Employee Service",
         "Microservices - Integration Service",
-        "Microservices - Manufacture Service",
+        "Microservices - Notification Service",
         "APP - Web ERP",
-        "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput"
+        "APP - MyBharata",
+        "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus"
       ],
-      "hash": "aa59919b86d35f23b48dd8ab219826093d490dd52424844f6f0f5e43134be87c",
-      "ukuran_kb": 16.4,
-      "ringkasan": "Menjawab: bagaimana finance melihat selisih antara pembukuan retur ke Accurate, scan retur gudang di WMS, dan isi dokumen Accurate; kenapa selisih dihitung terjadwal per periode dan disimpan per temuan alih-alih dihitung saat layar dibuka; jenis selisih apa yang dideteksi di tiap tahap, bagaimana temuan ditandai beres dengan alasan, dan izin apa yang mengatur siapa boleh melihat dan menandai. Juga menjelaskan kenapa nilai terdampak tidak boleh dijumlahkan antar jenis.",
+      "hash": "d7be55e12fa1c4b3ef5d38fa969636e661eece528eae87b81b45379f74c68bcc",
+      "ukuran_kb": 16.3,
+      "ringkasan": "Menjawab: kenapa pengajuan komplain produk kini satu formulir saja, bagaimana unit penanggung jawab (gudang atau QC) ditentukan otomatis dari kategori keluhan yang dipilih pengaju tanpa tabel pemetaan, dan bagaimana proses ganti kategori/pengalihan antar unit serta pemilahan keluhan \"Lainnya\" oleh SPV brand berjalan. Juga menjelaskan kenapa komplain gudang yang ditolak atau dialihkan tidak lagi menurunkan skor KPI packer, dan batasan yang belum ditanggung (nomor batch/kedaluwarsa masih manual, belum tersambung CAPA, hanya cakupan Shopee).",
       "kata_kunci": [
-        "selisih retur",
-        "rekonsiliasi retur",
-        "auto sync retur",
-        "WMS retur",
-        "scan gudang",
-        "komponen belum discan",
-        "tandai beres",
-        "finance.returselisih",
-        "tutup buku",
-        "Accurate"
+        "komplain produk",
+        "product complaint",
+        "satu pintu",
+        "single entry point",
+        "ADR 0103",
+        "kategori komplain",
+        "quality complaint",
+        "komplain gudang",
+        "KPI packer",
+        "ganti kategori",
+        "CAPA",
+        "ulasan marketplace"
       ]
     },
     {
@@ -7403,6 +7401,7 @@
       "publik": true,
       "tautan": [
         "Finance - Proses Bisnis dan Kebutuhan Sistem",
+        "Finance - Incentive",
         "Finance - Proses Pengajuan Pengeluaran dan Persetujuan",
         "Finance - Proses Pembayaran Keluar",
         "Finance - Proses Penjualan Marketplace dan Uang Masuk",
@@ -7412,25 +7411,26 @@
         "Finance - Proses Pajak",
         "Finance - Proses Anggaran, Kas Kecil, dan Dana Kegiatan",
         "Finance - Proses Tutup Buku, Stock Opname, dan Laporan",
+        "Finance - Proses Insentif",
         "Microservices - Calendar Service",
         "Finance - Sambungan dan Permintaan Data Lintas Departemen",
         "Finance - FAT Persona",
         "API - Finance Service"
       ],
-      "hash": "1699595df80d8d8d745f8d748ac7afd87aa2bbf73bcbadb07be86ec984f9abc1",
-      "ukuran_kb": 3.8,
-      "ringkasan": "Menjawab: tanggal berapa saja Finance membayar gaji, BPJS TK, hutang supplier, iklan, dan membuat kode billing PPh/PPN setiap bulan, serta langkah mana yang harus selesai lebih dulu sebelum langkah berikutnya bisa dikerjakan (rantai ketergantungan P1 sampai P10). Juga menjawab kebutuhan sistem untuk tenggat Finance: pengingat ke pemilik langkah sebelumnya, feed ke Calendar Service mengikuti pola feed pajak, dan daftar periksa tutup buku.",
+      "hash": "13ea38290f4981d62bd3d0375ee338e6a91e3925cec53786e0bd477dcfad40ad",
+      "ukuran_kb": 4.5,
+      "ringkasan": "Menjawab: tanggal berapa saja Finance membayar gaji, insentif, hutang supplier, BPJS, dan pajak setiap bulan, serta langkah mana yang harus selesai lebih dulu sebelum tenggat itu bisa dikerjakan. Juga menjelaskan batas pencairan marketplace tanggal 25 untuk insentif, jadwal tutup buku dan stock opname, dan kebutuhan sistem seperti pengingat ke pemilik langkah sebelumnya dan feed tenggat ke Calendar Service.",
       "kata_kunci": [
         "kalender Finance",
-        "tenggat bulanan",
+        "tenggat",
         "deadline",
-        "rantai ketergantungan",
+        "rantai tenggat",
         "tutup buku",
         "closing",
         "kode billing pajak",
-        "pengingat",
+        "pembayaran gaji",
         "calendar feed",
-        "jadwal pembayaran"
+        "cut-off insentif tanggal 25"
       ]
     },
     {
@@ -7492,20 +7492,63 @@
         "Finance - Sambungan dan Permintaan Data Lintas Departemen",
         "Finance - FAT Persona"
       ],
-      "hash": "5dd65cc276c8f7c61fedae8250d1b6e901767005fa0b7b524038200f1f92262b",
-      "ukuran_kb": 3.5,
-      "ringkasan": "Menjawab untuk proses P9 (anggaran, kas kecil, dan dana kegiatan): bagaimana Cost Control memeriksa realisasi anggaran dan pengajuan divisi hari ini, apa yang sudah ada di ERP (master anggaran OPEX, kartu Varians OPEX, kas kecil ke Accurate), dan alur target di sistem. Juga menjawab celah yang tersisa (varians tak bisa ditelusuri ke transaksi, pengajuan belum membawa pos anggaran, pertanggungjawaban dana kegiatan belum ada), kontrol pemisahan tugas, dan ukuran efisiensinya.",
+      "hash": "72945a9743006cab937059a8527fc85eaf7307bcc50e3fb4a33edea0d41a8515",
+      "ukuran_kb": 4.6,
+      "ringkasan": "Menjawab: bagaimana Finance mengendalikan pengeluaran terhadap anggaran (RAPB/OPEX), mengelola kas kecil per unit, dan mempertanggungjawabkan dana kegiatan sampai sisa dikembalikan atau kekurangan diganti. Menjelaskan fitur yang sudah ada di ERP (master anggaran, kartu Varians OPEX, forecast kas mingguan dan KPI forecast_kas), celah seperti varians yang tak bisa ditelusuri ke transaksi dan pertanggungjawaban dana kegiatan yang belum ada, serta kontrol dan ukuran efisiensinya.",
       "kata_kunci": [
-        "P9",
         "anggaran",
         "budget",
+        "RAPB",
+        "OPEX",
+        "varians anggaran",
         "kas kecil",
         "petty cash",
         "dana kegiatan",
-        "uang muka",
-        "varians OPEX",
-        "RAPB",
-        "Cost Control"
+        "forecast kas",
+        "cash flow forecast"
+      ]
+    },
+    {
+      "path": "Finance System/Finance - Proses Aset Tetap.md",
+      "judul": "Finance - Proses Aset Tetap",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)**. Aktiva tetap dibaca dari Accurate dan aset GA dipadankan ke Accurate; langkah kerja aset tetap di Finance belum dirinci, dan register aset serta penyusutan buku CV 🟡 direncanakan.",
+      "publik": true,
+      "tautan": [
+        "Finance - Proses Bisnis dan Kebutuhan Sistem",
+        "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI",
+        "REF - Kepemilikan Data",
+        "ADR - 0049 Padanan Aset per-item berbasis nama menggantikan kategori-golongan",
+        "ADR - 0088 Auto-Migrasi Padanan Perlengkapan Lewat ID Internal Accurate, Bukan Konfirmasi Manusia",
+        "Finance - Kas Kecil dan Pengajuan Budget",
+        "Finance - Buku Besar CV",
+        "Finance - Audit Internal",
+        "Finance - Proses Pengajuan Pengeluaran dan Persetujuan",
+        "Finance - Proses Pencatatan dan Buku Besar",
+        "Finance - Proses Tutup Buku, Stock Opname, dan Laporan",
+        "Finance - Kalender dan Rantai Tenggat",
+        "Finance - Sambungan dan Permintaan Data Lintas Departemen",
+        "Finance - FAT Persona",
+        "GA - Inventory Management",
+        "Microservices - Inventory Service",
+        "ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate"
+      ],
+      "hash": "c2da03b07989885578a3f49a27ca941910b4b894bbfaa91f0b3bde3e3c2c9303",
+      "ukuran_kb": 5.1,
+      "ringkasan": "Menjawab: bagaimana aset tetap dicatat, disusutkan, dan dicocokkan dengan keberadaan fisiknya, siapa yang berwenang mencatat ke Accurate (Finance) dan siapa pemegang fisiknya (GA), serta bagaimana pembelian aset lewat pengajuan jalur aset sampai ke register. Juga memuat yang sudah ada di ERP (endpoint fixed-assets dari Accurate, padanan aset GA, rancangan penyusutan buku besar CV, uji audit aset) beserta celah dan ukuran efisiensinya.",
+      "kata_kunci": [
+        "aset tetap",
+        "fixed asset",
+        "aktiva tetap",
+        "penyusutan",
+        "depreciation",
+        "register aset",
+        "padanan aset GA",
+        "opname fisik aset",
+        "kapitalisasi",
+        "Accurate"
       ]
     },
     {
@@ -7532,6 +7575,12 @@
         "Finance - Proses Anggaran, Kas Kecil, dan Dana Kegiatan",
         "Finance - Proses Tutup Buku, Stock Opname, dan Laporan",
         "Finance - Proses Costing HPP Produk",
+        "Finance - Proses Insentif",
+        "Finance - Proses Aset Tetap",
+        "Finance - Proses Penagihan Piutang",
+        "HRIS - Matriks KPI per Departemen",
+        "Finance - Audit Internal",
+        "ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate",
         "REF - Kepemilikan Data",
         "ADR - 0001 Akuntansi via Accurate",
         "Microservices - Calendar Service",
@@ -7539,20 +7588,20 @@
         "Finance - Big Pictures",
         "Finance - Dashboard per Posisi (FAT)"
       ],
-      "hash": "5e1df889172134e84cf2bf6d55e798b7277cc692e2a49579f3863bd678b1d6c4",
-      "ukuran_kb": 15.2,
-      "ringkasan": "Dok induk panduan sistem proses bisnis Finance. Menjawab: apa saja sebelas proses Finance (P1 sampai P11) beserta peran dan departemen yang terlibat, seberapa jauh ERP sudah mencakup dan sesuai kebutuhan tiap proses (matriks cakupan dan kesesuaian 2026-09-17), dan kenapa ERP kuat di sinkron marketplace tapi lemah di pembayaran, buku CV, rekonsiliasi, dan pajak. Juga menjawab prinsip rancangan, kelompok celah A/B/C, urutan pengerjaan T1 sampai T10, pertanyaan wajib sebelum membangun, keputusan yang dibutuhkan, dan yang sengaja tidak dibangun.",
+      "hash": "9f335388771b70e86ca388b663ae755f7cecbc63ae84c58649d4d49fcfe22c34",
+      "ukuran_kb": 18.1,
+      "ringkasan": "Menjawab: apa saja empat belas proses bisnis Finance (P1 sampai P14), posisi Finance mana mengerjakan proses apa, dan seberapa jauh ERP sudah mencakup serta sesuai dengan kebutuhan tiap proses. Ini pintu masuk untuk memilih proses yang akan dibangun, urutan pengerjaan celah (kelompok A, B, C), pertanyaan wajib sebelum membangun, keputusan yang dibutuhkan, dan hal yang sengaja tidak dibangun.",
       "kata_kunci": [
         "proses bisnis Finance",
         "business process",
-        "peta proses",
-        "matriks cakupan",
-        "kesesuaian ERP",
-        "gap analysis",
         "kebutuhan sistem",
+        "peta proses",
         "FAT",
-        "prinsip rancangan",
-        "urutan pengerjaan"
+        "cakupan ERP",
+        "gap analysis",
+        "posisi Finance",
+        "urutan pengerjaan",
+        "Accurate"
       ]
     },
     {
@@ -7622,6 +7671,45 @@
       ]
     },
     {
+      "path": "Finance System/Finance - Proses Insentif.md",
+      "judul": "Finance - Proses Insentif",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)**. Mesin insentif profit, Dashboard Insentif, dan Master Target sudah di kode dan live; yang menahan pemakaian adalah master data yang belum terisi dan keputusan yang masih terbuka ([[Finance - Incentive]] § Yang masih menahan).",
+      "publik": true,
+      "tautan": [
+        "Finance - Proses Bisnis dan Kebutuhan Sistem",
+        "Finance - Incentive",
+        "ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya",
+        "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
+        "Finance - FAT Persona",
+        "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
+        "Finance - Proses Costing HPP Produk",
+        "REF - Kepemilikan Data",
+        "Finance - Proses Pembayaran Keluar",
+        "Finance - Proses Gaji dan Iuran BPJS",
+        "Finance - Kalender dan Rantai Tenggat",
+        "Finance - Sambungan dan Permintaan Data Lintas Departemen",
+        "Microservices - Insentive Service"
+      ],
+      "hash": "49d973405cf270226c3fe0ae7057952644ba84248c2763ed4226c8c0c863eacc",
+      "ukuran_kb": 6.0,
+      "ringkasan": "Menjawab: bagaimana insentif berbasis profit dihitung, ditetapkan targetnya, diperiksa, disetujui, dan dibayarkan, serta siapa yang boleh menetapkan target dan melihat beban karyawan. Menjelaskan fitur yang sudah ada (mesin insentif, Dashboard Insentif, Master Target, slip MyBharata), celah yang menahan pemakaian seperti atribusi toko ke ICC, beban non-gaji per proyek Accurate, dan target Leader, serta keputusan terbuka soal PPN, opex, dan jadwal bayar terhadap cutoff tanggal 25.",
+      "kata_kunci": [
+        "insentif",
+        "incentive",
+        "insentif profit",
+        "target profit",
+        "Dashboard Insentif",
+        "Master Target",
+        "ICC",
+        "approval insentif",
+        "beban operasional",
+        "SK insentif"
+      ]
+    },
+    {
       "path": "Finance System/Finance - Proses Pajak.md",
       "judul": "Finance - Proses Pajak",
       "area": "Finance System",
@@ -7633,26 +7721,27 @@
         "Finance - Proses Bisnis dan Kebutuhan Sistem",
         "API - Finance Service",
         "Finance - Rancangan Finance Service",
+        "Finance - Proses Pencatatan dan Buku Besar",
+        "Finance - Proses Tutup Buku, Stock Opname, dan Laporan",
         "Finance - Proses Pembayaran Keluar",
         "Finance - Proses Penjualan Marketplace dan Uang Masuk",
         "Finance - Proses Gaji dan Iuran BPJS",
-        "Finance - Proses Tutup Buku, Stock Opname, dan Laporan",
         "Finance - Kalender dan Rantai Tenggat",
         "Finance - Sambungan dan Permintaan Data Lintas Departemen",
         "Finance - FAT Persona"
       ],
-      "hash": "b43a6d11ef165b883ad9140acab3202ed0ad581eafc204f51986ea3a668b9d8e",
-      "ukuran_kb": 3.2,
-      "ringkasan": "Menjawab untuk proses P8 (pajak): bagaimana Tax menyiapkan data, mengekualisasi dengan Coretax, membuat kode billing PPh final, PPh 21, PPh 25, PPh 23, dan PPN, lalu membayarnya hari ini, dan apa yang sudah ada di Tax Control ERP (kewajiban per masa, pengingat jatuh tempo, unggah BPE). Juga menjawab alur target dengan data acuan satu sumber, celah yang tersisa (master pajak kosong di prod, omzet per entitas, cut-off dan rincian persediaan), kontrol, dan ukuran efisiensinya.",
+      "hash": "b9b2882a1e412abe5f539ee8367d119d8b4fffafc55b2063cfa8521a1569bdf2",
+      "ukuran_kb": 4.0,
+      "ringkasan": "Menjawab: bagaimana proses pajak (P8) Finance dikerjakan hari ini lewat Coretax, kapan kode billing PPh 21, PPh 23, PPh 25, PPh final, dan PPN dibuat dan dibayar, serta apa yang sudah disediakan Tax Control di ERP (kewajiban per masa, pengingat H-7 dan H-3, unggah BPE). Juga menjawab celah yang harus ditutup: data acuan satu sumber untuk omzet dan pembelian, laporan keuangan untuk SPT tahunan, cut-off persediaan, kontrol pemisahan peran, dan ukuran efisiensinya.",
       "kata_kunci": [
-        "P8",
         "pajak",
         "tax",
         "Tax Control",
         "Coretax",
         "kode billing",
-        "PPh",
+        "PPh 21",
         "PPN",
+        "SPT tahunan",
         "ekualisasi",
         "BPE"
       ]
@@ -7673,20 +7762,55 @@
         "Finance - Kalender dan Rantai Tenggat",
         "Finance - Sambungan dan Permintaan Data Lintas Departemen"
       ],
-      "hash": "2ba14248af842f7fbec7692d4f8ffb62aae5b3ac598b6776b0cf065660eac53c",
-      "ukuran_kb": 4.9,
-      "ringkasan": "Menjawab untuk proses P2 (pembayaran keluar dari rekening PT dan kas CV): bagaimana pembayaran dikerjakan hari ini lewat BKK, AppSheet, Kopra, dan internet banking sampai diketik empat sampai lima kali, termasuk jalur iklan lewat kas iklan, dan apa yang sudah ada di ERP (tahap setujui bayar dan transfer PT/CV, unggah dan pemeriksaan bukti, dokumen pembayaran ke Accurate, saklar ACCURATE_KAS_PUSH). Juga menjawab alur target yang menggantikan BKK dan AppSheet, celah yang tersisa (notifikasi PENDING, jurnal kas, jurnal buku CV T6), kontrol pemisahan tugas, dan ukuran efisiensinya.",
+      "hash": "f668fb78c353e3553a57d923901a24b21d219974b364d12f30c631e1ffbe72ea",
+      "ukuran_kb": 6.0,
+      "ringkasan": "Menjawab: bagaimana pembayaran keluar (P2) dari rekening PT dan kas CV dikerjakan hari ini (BKK Excel, AppSheet, Kopra, internet banking, bukti lewat WhatsApp) dan apa yang sudah ada di ERP (tahap setujui bayar dan transfer AP atau CV, unggah dan pemeriksaan bukti, dokumen pembayaran ke Accurate, saklar jurnal kas, pengingat jatuh tempo hutang pemasok). Juga menjawab alur target satu kali input, celah seperti notifikasi dokumen PENDING dan jurnal otomatis buku CV, pemisahan peran pelaksana transfer dan penyetuju, serta ukuran efisiensi termasuk KPI AP.",
       "kata_kunci": [
-        "P2",
         "pembayaran keluar",
-        "payment",
+        "outgoing payment",
+        "transfer",
+        "kas CV",
+        "BKK",
+        "bukti transfer",
+        "hutang pemasok",
         "accounts payable",
         "AP",
-        "BKK",
-        "kas CV",
-        "transfer bank",
-        "bukti transfer",
-        "AppSheet"
+        "jatuh tempo"
+      ]
+    },
+    {
+      "path": "Finance System/Finance - Proses Penagihan Piutang.md",
+      "judul": "Finance - Proses Penagihan Piutang",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)**. Umur piutang marketplace dan B2B sudah terbaca di ERP dan dinilai KPI otomatis; pencatatan tindak lanjut penagihan (kontak, janji bayar) belum ada.",
+      "publik": true,
+      "tautan": [
+        "Finance - Proses Bisnis dan Kebutuhan Sistem",
+        "Finance - Proses Retur dan Piutang Marketplace",
+        "Finance - FAT Persona",
+        "Finance - Proses Penjualan Marketplace dan Uang Masuk",
+        "Finance - Proses Rekonsiliasi Kas Toko dan Bank",
+        "Finance - Kalender dan Rantai Tenggat",
+        "Finance - Sambungan dan Permintaan Data Lintas Departemen",
+        "Microservices - Integration Service",
+        "Finance - Dashboard per Posisi (FAT)"
+      ],
+      "hash": "fdd254903fe1ea733302e364b71c337ca8eb01e005dfcb429cc81222872460b0",
+      "ukuran_kb": 4.8,
+      "ringkasan": "Menjawab: bagaimana piutang marketplace dan B2B ditagih (P14), endpoint dan layar mana yang sudah menampilkan umur piutang, tren, dan ekspornya, serta bagaimana KPI AR otomatis dihitung. Juga menjawab kenapa porsi piutang lewat 14, 60, dan 90 hari tidak boleh dijumlahkan (himpunan bersarang), celah seperti log kontak dan janji bayar yang belum ada, pemilik proses penagihan yang kosong (AR Leader), dan kontrol agar penagih tidak mengoreksi piutang sendiri.",
+      "kata_kunci": [
+        "penagihan",
+        "piutang",
+        "accounts receivable",
+        "AR",
+        "collection",
+        "umur piutang",
+        "aging",
+        "janji bayar",
+        "KPI AR",
+        "AR Leader"
       ]
     },
     {
@@ -7837,13 +7961,12 @@
         "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
         "Microservices - Integration Service",
-        "ADR - 0103 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres",
         "Finance - Kalender dan Rantai Tenggat",
         "Finance - Sambungan dan Permintaan Data Lintas Departemen",
         "Finance - FAT Persona"
       ],
-      "hash": "7e26cbe91998128895ad0c5df7d1b4ab2fe904344b84f451c44f28f3419adfd3",
-      "ukuran_kb": 3.9,
+      "hash": "badd9206ae1fedd2d28012b14b95c0ce6dbe0d28b896eb8cb64401352edc6717",
+      "ukuran_kb": 3.5,
       "ringkasan": "Menjawab tentang proses P4 Finance, retur dan piutang marketplace: bagaimana retur divalidasi di empat sumber (ERP, marketplace, Accurate, gudang) hari ini, bagaimana sinkron retur ke Accurate memakai gerbang payout dan gerbang scan gudang (status PENDING), dan kenapa piutang bisa minus. Juga menjawab celah retur yang lolos sinkron dan diunggah manual, kebutuhan satu daftar pengecualian retur dan piutang, kontrol agar retur tidak dibukukan dua kali, serta ukuran jumlah unggah manual dan umur retur PENDING.",
       "kata_kunci": [
         "retur",
@@ -7855,8 +7978,7 @@
         "gerbang payout",
         "scan retur gudang",
         "PENDING",
-        "P4",
-        "selisih retur"
+        "P4"
       ]
     },
     {
@@ -7975,27 +8097,31 @@
         "Finance - Proses Anggaran, Kas Kecil, dan Dana Kegiatan",
         "Finance - Proses Tutup Buku, Stock Opname, dan Laporan",
         "Finance - Proses Costing HPP Produk",
+        "Finance - Proses Insentif",
+        "Finance - Proses Aset Tetap",
         "Finance - Kalender dan Rantai Tenggat",
         "Finance - FAT Persona",
         "Microservices - Procurement Service",
         "Microservices - Payroll Service",
         "Microservices - Manufacture Service",
-        "Microservices - Integration Service"
+        "Microservices - Integration Service",
+        "Microservices - Insentive Service",
+        "Microservices - Inventory Service"
       ],
-      "hash": "960c9c6f0d005a7e49fc97e188de421d445e477e6e05272f13cb8530e8eb6dd8",
-      "ukuran_kb": 4.6,
-      "ringkasan": "Menjawab: apa yang dibutuhkan proses Finance dari departemen lain (divisi pemohon, HR, gudang dan manufaktur, procurement, marketing, IT, pihak luar), di modul siapa kebutuhan itu tinggal, dan sejauh mana sambungannya sudah ada. Juga menjawab data apa yang rutin diminta departemen lain dari Finance (bukti transfer, totalan penjualan, retur tertahan, kode billing pajak, realisasi anggaran RAPB, target profit, costing HPP, laporan keuangan), siapa yang melayaninya hari ini, dan arah penyediaannya di ERP beserta TBD hak baca per peran.",
+      "hash": "91fae499ad9a4d7713ad9035c0c4b2bf79da4c1662f61304e5dcbf954a871159",
+      "ukuran_kb": 5.6,
+      "ringkasan": "Menjawab: data apa yang dibutuhkan proses Finance dari HR, gudang, procurement, marketing, GA, dan IT, di modul siapa kebutuhan itu tinggal, dan sejauh mana sambungannya sudah ada di kode. Juga menjawab data apa yang rutin diminta departemen lain dari Finance (bukti transfer, totalan penjualan, retur tertahan, realisasi anggaran, target profit, laporan keuangan), siapa yang melayaninya hari ini, arah penyajiannya di ERP, dan keputusan hak baca yang masih TBD.",
       "kata_kunci": [
         "lintas departemen",
         "cross-department",
+        "sambungan data",
         "permintaan data",
-        "data request",
-        "sambungan modul",
-        "integrasi",
         "kepemilikan data",
-        "bukti transfer",
+        "integrasi modul",
+        "hak akses",
         "realisasi anggaran",
-        "hak akses"
+        "laporan keuangan",
+        "Finance"
       ]
     },
     {
@@ -11672,6 +11798,7 @@
         "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
         "Microservices - Notification Service",
         "APP - MyBharata",
+        "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "Manufacture - Stock & Material Management",
         "CORE - RBAC dan Permission Set",
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
@@ -11680,20 +11807,20 @@
         "APP - Web ERP",
         "QA - Register Perizinan & Sertifikasi"
       ],
-      "hash": "6f1f8bd9a61ceb78ec1f26875421cbacca1fb3f634c32e2bb393f0daef2031ab",
-      "ukuran_kb": 13.4,
-      "ringkasan": "Menjawab: apa saja register kerja operasional divisi Quality (CAPA & temuan audit, incoming inspection bahan/kemasan datang, antrean release/hold batch, dan komplain QC dari marketing), endpoint dan RBAC siapa boleh membuat/mengubah/memvalidasi tiap register, bagaimana alur persetujuan CAPA dua approver (produksi dan warehouse) bekerja, serta bagaimana notifikasi komplain QC menutup loop antara marketing dan QC.",
+      "hash": "cb4b7423f0ca62ace2fbe4cbade1e57382fb75519c7ed57047e3728386e429a7",
+      "ukuran_kb": 15.6,
+      "ringkasan": "Menjawab: bagaimana register CAPA & temuan audit, incoming inspection bahan/kemasan datang, antrean release batch, dan komplain QC dari marketing bekerja di divisi Quality, siapa saja persona dan RBAC yang terlibat (staf/supervisor Quality, approver CAPA dari produksi & warehouse, marketing pengaju komplain), serta bagaimana alur persetujuan CAPA dua approver dan notifikasi komplain QC saling menutup loop. Juga mencatat fitur apa yang belum ada (Dashboard Mutu, IPC/CPPB, checklist GMP).",
       "kata_kunci": [
+        "CAPA",
+        "temuan audit",
+        "incoming inspection",
+        "release batch",
+        "komplain QC",
         "Quality",
         "QA",
-        "QC",
-        "CAPA",
-        "incoming inspection",
-        "batch release",
-        "komplain QC",
-        "RBAC",
-        "temuan audit",
-        "ICC"
+        "BPOM",
+        "approval CAPA",
+        "RBAC quality"
       ]
     },
     {
@@ -14791,21 +14918,23 @@
       "publik": false,
       "tautan": [
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
-        "APP - MyBharata"
+        "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
+        "APP - MyBharata",
+        "REF - Kepemilikan Data"
       ],
-      "hash": "8fb1bce3e75b938a62a100747d119d1f34d0d2c7fefc1c06b5fafc2f09e19171",
-      "ukuran_kb": 5.8,
-      "ringkasan": "Menjawab pertanyaan tentang status pengerjaan fitur komplain dari ulasan marketplace: daftar task backend (buka rute baca register gudang, salinan ulasan ke register, notifikasi ke gudang) dan frontend (layar komplain gudang, tombol ajukan dari baris ulasan) beserta status merged/branch/PROD tiap task per 2026-09-17. Juga mencatat keputusan yang masih menunggu manajemen (tujuan komplain tanpa register seperti ekspedisi/vendor, kewajiban regulatif keluhan efek samping, lima toko Beauty Hacks tanpa CS) dan task yang dibatalkan (master kategori komplain baru).",
+      "hash": "1f39adff26287314de7aa3c88426111989c207ad1c6e96620096ec71ec1155e3",
+      "ukuran_kb": 10.9,
+      "ringkasan": "Menjawab: daftar task backend dan frontend untuk fitur komplain dari ulasan marketplace beserta status pengerjaannya masing-masing (selesai/belum, PR terkait), keputusan apa saja yang masih menunggu orang bukan kode (tujuan yang belum punya register, kewajiban regulatif BPOM, kekosongan CS Beauty Hacks, daftar kategori QC), serta urutan ketergantungan task rancangan satu pintu menurut ADR 0103.",
       "kata_kunci": [
-        "ANALISA komplain",
+        "komplain",
         "ulasan marketplace",
-        "task list",
-        "warehouse komplain",
-        "T1-T8",
-        "analisa-kebutuhan",
-        "Beauty Hacks",
-        "ADR-0099",
-        "register komplain"
+        "task",
+        "analisa kebutuhan",
+        "satu pintu",
+        "gudang",
+        "QC",
+        "backlog",
+        "ANALISA"
       ]
     },
     {
@@ -15026,34 +15155,6 @@
         "redesign ACL",
         "fase contract",
         "ShopACLUseCase"
-      ]
-    },
-    {
-      "path": "Workspace/ANALISA - Selisih Retur.md",
-      "judul": "ANALISA - Selisih Retur",
-      "area": "Workspace",
-      "jenis": "workspace",
-      "status_emoji": null,
-      "status_teks": null,
-      "publik": false,
-      "tautan": [
-        "ADR - 0103 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres",
-        "Microservices - Integration Service",
-        "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift"
-      ],
-      "hash": "d44c5fded20f66e0014a3c2f3e9b97dfd8bf8304bfa426882ceea6f9f9326b50",
-      "ukuran_kb": 6.9,
-      "ringkasan": "Menjawab: pekerjaan apa saja untuk membangun tab Selisih Retur, urutan dan dependensinya, repo mana yang disentuh tiap task, kriteria selesainya, dan perintah start-task siap pakai. Memuat pembagian Tahap 1 (data ERP dan WMS) dan Tahap 2 (catatan ERP vs Accurate) serta sisa yang belum dijadwalkan.",
-      "kata_kunci": [
-        "selisih retur",
-        "daftar task",
-        "analisa kebutuhan",
-        "auto sync retur",
-        "WMS retur",
-        "job terjadwal",
-        "izin finance",
-        "tahap 1",
-        "tahap 2"
       ]
     },
     {
