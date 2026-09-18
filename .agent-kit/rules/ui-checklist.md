@@ -93,6 +93,90 @@ baca); untuk halaman daftar, skill `/migrasi-tabel-hris`; untuk warna bagan, `te
    (legend berlabel, teks di samping lencana). Fokus keyboard terlihat. Semua teks lewat `t()`
    di dua locale (ADR 0010).
 
+## 2a. Sheet: rangka tetap, badan yang menggulir
+
+Berlaku untuk setiap pemakaian `Sheet` di erp-frontend (`src/components/ui/sheet.tsx`).
+Tiga hal WAJIB, dan ketiganya gagal dengan cara yang sama: tak ada galat, layarnya cuma
+terasa salah.
+
+1. **Header TIDAK ikut menggulir.** `SheetHeader` (judul, dan tombol tutup yang dipasang
+   `SheetContent`) harus tetap di tempatnya sampai bawah. Panel yang judulnya hilang saat
+   digulir membuat pembaca kehilangan konteks justru di titik ia paling butuh, yaitu saat
+   isinya panjang.
+2. **Badan punya padding kiri dan kanan.** `SheetContent` sendiri TIDAK berpadding, jadi
+   badan tanpa `px-*` menempelkan isinya ke tepi panel dan ke batang gulir.
+3. **Footer opsional, tetapi WAJIB begitu sheet punya aksi.** Aksi di sini berarti tombol
+   yang menulis, menyetujui, menolak, mengunduh, atau menutup alur. Aksi yang ditaruh di
+   ujung badan ikut tergulir, jadi ia hanya terlihat oleh yang menggulir sampai habis, dan
+   panjang isi menentukan apakah tombolnya terlihat. Sheet yang benar-benar cuma menampilkan
+   informasi tidak perlu footer.
+
+### Mekanismenya (jangan ditebak, ini yang menentukan)
+
+`SheetContent` sudah `flex flex-col`, `h-full` untuk `side` kiri/kanan, dan TANPA padding.
+`SheetHeader` dan `SheetFooter` masing-masing sudah `p-4`, dan `SheetFooter` ber-`mt-auto`.
+Artinya rangkanya sudah benar sejak awal, yang kurang cuma badannya.
+
+```tsx
+<SheetContent className="w-full sm:max-w-xl">   {/* JANGAN overflow-y-auto di sini */}
+  <SheetHeader>
+    <SheetTitle>{t("...")}</SheetTitle>
+  </SheetHeader>
+
+  <div className="flex-1 min-h-0 space-y-4 overflow-y-auto px-4 pb-4">
+    {/* isi panjang */}
+  </div>
+
+  <SheetFooter>            {/* hanya bila ada aksi */}
+    <Button onClick={simpan} disabled={sedangSimpan}>{t("...")}</Button>
+  </SheetFooter>
+</SheetContent>
+```
+
+Acuan kode yang sudah benar: `ga/peminjaman/components/peminjaman-detail-sheet.tsx`,
+`marketing/live-support-sesi/components/sheet-rincian-sesi.tsx`,
+`pengajuan-barang/components/sheet-detail-pengajuan.tsx`.
+
+⛔ **Anti-pola: `overflow-y-auto` ditempel di `SheetContent`.** Seluruh isi jadi satu area
+gulir, jadi header ikut naik dan footer (kalau ada) ikut tenggelam. Bentuknya menyamar
+sebagai penyetelan lebar yang wajar, misalnya `className="w-full overflow-y-auto sm:max-w-xl"`,
+sehingga terbaca seperti keputusan tata letak, bukan seperti header yang dikorbankan.
+
+⚠️ `min-h-0` ditulis bersama `flex-1` walau `overflow-y-auto` pada elemen yang sama sudah
+membuat batas minimum otomatisnya nol. Tanpa itu, memindahkan gulirnya satu tingkat ke
+dalam mengembalikan bug yang sama persis (`team-memory.md` § Jebakan tabel/filter).
+
+⚠️ `side="top"` dan `side="bottom"` memakai `h-auto`, bukan `h-full`. Kolom flex yang
+tingginya tak terikat membuat `flex-1` tak membatasi apa pun, jadi badannya tumbuh setinggi
+isi dan tak ada yang menggulir. Sheet atas/bawah wajib memberi `max-h-*` pada `SheetContent`.
+
+### Keadaan terukur (2026-09-18, `origin/main`)
+
+Dari 24 berkas pemakai `Sheet` (di luar primitifnya sendiri dan `ui/sidebar.tsx`):
+
+| Yang diukur | Hasil |
+|---|---|
+| `overflow-y-auto` di `SheetContent`, jadi header ikut tergulir | **16 dari 24** |
+| badan gulir punya padding mendatar | 13 dari 24 |
+| memakai `SheetFooter` | **0 dari 24** |
+
+Jadi aturan ini menggambarkan tujuan, bukan keadaan sekarang. **Sheet baru dan sheet yang
+sedang disentuh wajib mengikutinya**; menyapu 16 berkas sekaligus adalah task tersendiri,
+bukan sisipan ke perubahan lain. Jangan membaca daftar di atas sebagai izin meniru tetangga:
+mayoritas di sini justru yang salah.
+
+### Membuktikannya
+
+jsdom tak punya mesin layout, jadi test tidak bisa membuktikan sesuatu bisa digulir atau
+tetap di tempat. Yang bisa dikunci test cuma anti-polanya lewat assertion kelas, dan itu
+wajib dibuktikan dengan kontrol negatif (kembalikan bugnya sebentar, pastikan testnya merah
+pada assertion yang diklaimnya). Buktinya tetap layar: buka sheet dengan data yang lebih
+panjang dari tinggi jendela, gulir sampai dasar, lalu pastikan judulnya masih terlihat dan
+tombol aksinya masih terjangkau tanpa menggulir balik.
+
+> MyBharata beda: `CustomBottomSheet` sudah memasang paddingnya sendiri, jadi menambah
+> padding lagi di dalamnya justru ganda. Bagian ini soal `Sheet` erp-frontend.
+
 ## 3. Arah visual boleh dari luar, komponen tetap dari repo
 
 Skill `frontend-design` (plugin opsional per mesin), mockup Figma, atau tangkapan layar aplikasi
