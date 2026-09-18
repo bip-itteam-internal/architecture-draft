@@ -21,8 +21,11 @@
   - `bip-erp/services/warehouse/kpi_komplain.go` (`ditolak` dan `dialihkan` tidak dihitung)
   - `bip-erp/services/warehouse/komplain_alih.go` (**baru**, rute internal menerima dan mengirim komplain yang dialihkan)
   - `bip-erp/services/employee/quality_complaint.go` (kategori tertutup, isian server, `company_id`, race `ReplaceOne`, ganti kategori)
+  - `bip-erp/services/employee/quality_complaint_akses.go` (gerbang kepemilikan toko, filter tenant, daftar putih `$set`, kunci optimistik)
+  - `bip-erp/shared-library/common/toko_icc.go` (resolver kepemilikan toko, dipakai bersama warehouse-service)
   - `bip-erp/services/employee/quality_complaint_alih.go` (**baru**, pasangan rute internal di sisi QC)
   - `bip-erp/shared-library/models/employee/models.go` (`QualityComplaint`: kategori, identitas item, `company_id`, penanda sumber)
+  - `erp-frontend/src/features/quality/complaint/lib/akses-komplain-qc.ts` (cermin gerbang baca, layar terkunci)
   - `bip-erp/shared-library/models/notification/models.go` + `bip-erp/services/notification/webpush.go` (kategori inbox baru dan aturan rute web)
   - `erp-frontend/src/features/komplain/` (**baru**, formulir satu pintu)
   - `erp-frontend/src/features/integration/reviews/components/ajukan-komplain-modal.tsx` dan `erp-frontend/src/features/quality/complaint/components/complaint-form-modal.tsx` (diganti formulir satu pintu)
@@ -82,10 +85,10 @@ Penggolongan manual atas 65 ulasan yang sama: gudang 11, mutu produk 13 (dugaan 
    - *Sisi register gudang (T9, merged 2026-09-17, bip-erp #1957 + erp-frontend #1634, belum PROD):* `GET /wms/komplain/kategori` membalas kode saja, berurutan, tanpa field unit (pemanggil tahu unitnya dari rute yang ia minta). Digerbang **identitas saja**, bukan gerbang baca komplain: kodenya tak rahasia, dan gerbang baca memaksa pemegang toko memanggil integration-service. Label ditulis frontend per kode (`warehouse.komplain.kategoriLabel.<kode>`); kode tanpa terjemahan tampil sebagai kodenya. Rinciannya di [[Microservices - Warehouse Service]].
 
 3. **Register QC mendapat daftar kategori tertutup, dan isinya ditetapkan tim QC.** Usulan awal dari penggolongan ulasan: `dugaan_tidak_asli`, `segel_terbuka`, `isi_tidak_sesuai`, `kedaluwarsa`. **Tingkat keparahan ditentukan QC saat validasi**, bukan ditebak pengaju.
-   - *Irisan kategori merged 2026-09-18 (bip-erp [#1968](https://github.com/bip-itteam-internal/bip-erp/pull/1968), erp-frontend [#1645](https://github.com/bip-itteam-internal/erp-frontend/pull/1645)), terverifikasi DEV lewat gateway dan layar, belum PROD:* keempat kode di atas dipakai apa adanya, `GET /quality/complaints/kategori` digerbang identitas saja, dan kategori **wajib** di POST maupun PUT (PUT karena ia mengganti dokumen utuh lewat `ReplaceOne`). Rinciannya di [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]] dan [[API - Employee Service]].
+   - *Irisan kategori merged 2026-09-18 (bip-erp [#1968](https://github.com/bip-itteam-internal/bip-erp/pull/1968), erp-frontend [#1645](https://github.com/bip-itteam-internal/erp-frontend/pull/1645)), terverifikasi DEV lewat gateway dan layar, belum PROD:* keempat kode di atas dipakai apa adanya, `GET /quality/complaints/kategori` digerbang identitas saja, dan kategori **wajib** di POST maupun PUT. Alasan "wajib di PUT" berubah pada 2026-09-18: dulu karena `ReplaceOne` mengganti dokumen utuh, sekarang karena kategori memang field yang divalidasi di daftar putih `$set` (keputusan 11). Rinciannya di [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]] dan [[API - Employee Service]].
    - ⚠️ **Empat penyimpangan sadar dari keputusan ini dan keputusan lain di bawah**, dicatat supaya tak terbaca sebagai kelalaian:
      1. Daftar disetujui **pemilik proses atas nama tim QC**, bukan ditetapkan tim QC. Itu menutup K4 sementara; QC masih boleh meminta perubahan sebelum naik ke PROD, dan mengubah daftar hari ini masih murah (nol dokumen di PROD maupun DEV).
-     2. **`company_id` dan race `ReplaceOne` DITUNDA**, padahal keputusan 10 di bawah (yang memicu keputusan 12 [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]]) menyuruh keduanya dikerjakan bersama perubahan register. Alasannya irisan ini sengaja sempit; keduanya tetap wajib pada sisa T11, dan register masih nol dokumen sehingga belum ada data yang dirugikan.
+     2. ~~**`company_id` dan race `ReplaceOne` DITUNDA**~~ **DITUTUP 2026-09-18** oleh irisan keamanan dan keutuhan (keputusan 11 di bawah). Penundaannya berlangsung satu hari; keputusan 10 dan keputusan 12 [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] kini terpenuhi.
      3. **Formulir `/icc/komplain-qc` tetap diubah** walau keputusan 8 merencanakan penggantiannya oleh pintu tunggal (T12). Label, hook, dan pembaca keadaan kategorinya dipakai ulang T12, jadi yang terbuang hanya penempatan isiannya.
      4. **`severity` masih diisi pengaju**, belum pindah ke QC seperti kalimat di atas. Menunggu sisa T11.
 
@@ -109,7 +112,21 @@ Penggolongan manual atas 65 ulasan yang sama: gudang 11, mutu produk 13 (dugaan 
 
 9. **Tidak disambungkan ke CAPA sekarang.** CAPA belum pernah terisi di PROD, jadi sambungan otomatis akan dibangun di atas modul yang belum dipakai. QC membuat CAPA sendiri bila perlu. Ditinjau ulang begitu CAPA benar-benar dipakai.
 
-10. **ADR 0099 keputusan 5, 6, 7, 9, 10, dan 11 tetap berlaku**: kategori dipilih manusia, tujuan tanpa register tidak dipaksakan, "tidak mempan" tidak menjadi komplain, tanpa SLA, hanya Shopee, dan kategori efek samping ditahan. **Keputusan 12 terpicu**: `company_id` dan race `ReplaceOne` register QC dikerjakan bersama perubahan register itu.
+10. **ADR 0099 keputusan 5, 6, 7, 9, 10, dan 11 tetap berlaku**: kategori dipilih manusia, tujuan tanpa register tidak dipaksakan, "tidak mempan" tidak menjadi komplain, tanpa SLA, hanya Shopee, dan kategori efek samping ditahan. **Keputusan 12 terpicu**: `company_id` dan race `ReplaceOne` register QC dikerjakan bersama perubahan register itu. *Terpenuhi 2026-09-18, keputusan 11 di bawah.*
+
+11. **Keamanan dan keutuhan register QC** (diputuskan 2026-09-18, dikerjakan di bip-erp `feat/employee-komplain-qc-keamanan` dan erp-frontend `feat/quality-komplain-akses-toko`; per tanggal itu belum push, belum PR, belum PROD, dan merge sengaja ditahan sampai blok deploy PROD gabungan T3 dan T9 mendarat).
+
+    a. **Cakupan BACA komplain QC = seluruh komplain di perusahaan pembaca**, bukan hanya komplain yang ia ajukan sendiri. ⚠️ Ini keputusan BARU, bukan penerapan keputusan lama: sampai hari ini vault mencatat visibilitas register QC sebagai belum pernah diputuskan siapa pun. Alasannya, tabel `/icc/komplain-qc` memang dirancang menampilkan komplain satu tim supaya pengaju tahu masalah yang sama sudah dilaporkan orang lain, dan menyempitkannya ke pengaju sendiri membuat kolom "siapa pengajunya" tak pernah punya alasan untuk ada.
+
+    b. **Kepemilikan toko di register QC dipakai sebagai IZIN MASUK, BUKAN cakupan baris.** ⛔ Ini berbeda dari register gudang, dan bedanya wajib diketahui siapa pun yang memasang paket izin: di gudang `cakupanTokoKomplain` menyempitkan `shop_id` sehingga pemegang tanpa toko melihat nol baris, sementara `QualityComplaint` tak punya `shop_id` sama sekali dan `order_ref`-nya masih teks bebas. Satu-satunya penyempit barisnya `company_id`. Konsekuensinya siapa pun yang lolos gerbang baca melihat seluruh komplain QC perusahaannya, termasuk milik brand lain, dan termasuk bila ia tak memegang satu toko pun. Diterima sadar, dan **wajib ditinjau ulang** begitu keputusan 4 mendarat dan komplain QC punya identitas item yang berasal dari pesanan.
+
+    c. **Izin `akuntoko.komplain.work` membuka BACA komplain QC, tetapi tidak membuka pengajuan.** Mengajukan tetap diturunkan dari kepemilikan toko. Asimetri ini disengaja: yang berhak menuding kesalahan QC adalah orang yang benar-benar memegang tokonya, bukan siapa pun yang kebetulan dipasangi paketnya. Ini memenuhi keputusan 5 [[ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko]], yang menahan menu Komplain ke QC sampai gerbang ini mendarat.
+
+    d. **Tulis memakai `CompanyID`, baca memakai `EffectiveCompanyID`** ([[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]). Daftar adalah satu-satunya jalur yang menghormati `?company=` milik admin pusat; seluruh jalur tulis terkunci ke perusahaan pemanggil tanpa override, kalau tidak `?company=` berubah jadi alat menyunting data tenant lain.
+
+    e. **Penyuntingan memakai daftar putih, bukan penggantian dokumen utuh.** `ReplaceOne` diganti `$set` berisi hanya field yang memang boleh disunting, sehingga `company_id`, `status`, `verdict`, `reason`, `validated_by`, `validated_at`, dan `metadata.created_*` tak bisa disentuh rute sunting sama sekali. Penjaga yang berbentuk ketiadaan tak bisa lupa dijalankan. Daftar lengkapnya, beserta kewajiban memutuskan keanggotaan tiap field baru, ada di [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]].
+
+    f. **Tiga bentrok tulis dijawab 409, bukan ditimpa diam-diam**: validasi QC yang mendarat saat pengaju sedang menyunting, dua penyunting serentak (kunci optimistik `metadata.updated_at`, sebab status saja tidak memisahkan mereka), dan dua staf QC yang memvonis komplain yang sama.
 
 ## Consequences
 
@@ -121,8 +138,10 @@ Penggolongan manual atas 65 ulasan yang sama: gudang 11, mutu produk 13 (dugaan 
 - Gudang kini dapat menolak komplain tanpa dampak KPI, sehingga ada benturan kepentingan. Penyeimbangnya alasan wajib, pengaju dikabari, dan rasio `ditolak` per bulan dapat direkap (T8 di ANALISA).
 - Keluhan "Lainnya" hanya hidup sebagai kabar inbox. Bila SPV tak menindaklanjuti, tak ada antrean yang mengingatkan. Bila volumenya tumbuh, itu alasan meninjau opsi B.
 - Komplain atas pesanan yang tak ada di data sistem tidak dapat diajukan sama sekali.
+- Keputusan 11b: pemegang paket "Marketing: Pemegang Akun Toko" yang belum memegang satu toko pun tetap membaca seluruh komplain QC perusahaannya. Di register gudang orang yang sama melihat nol baris. Dua menu yang digerbang izin yang sama karena itu berbeda cakupan, dan itu ditulis terang di [[CORE - RBAC dan Permission Set]] supaya yang memasang paketnya tahu.
+- Keputusan 11a: pemegang toko membaca komplain brand lain di perusahaannya. Yang dipertukarkan adalah kerahasiaan antar-brand demi tabel yang berguna bagi satu tim; bila brand kelak menuntut pemisahan, penyempitnya sudah tersedia begitu keputusan 4 mendarat.
 
-**Yang tetap terbuka.** Daftar kategori QC menunggu tim QC. Tujuan ekspedisi dan vendor belum punya tempat (ADR 0099 K1). Kewajiban regulatif efek samping menunggu QA/RA.
+**Yang tetap terbuka.** Daftar kategori QC menunggu tim QC. Tujuan ekspedisi dan vendor belum punya tempat (ADR 0099 K1). Kewajiban regulatif efek samping menunggu QA/RA. Komplain QC yang dibuat lewat token layanan tanpa `BIP-Employee-ID` masih berujung `created_by` kosong, dan tabel `/icc/komplain-qc` masih belum menampilkan nama pengajunya; keduanya tak disentuh keputusan 11.
 
 **Konsekuensi deploy.**
 - Kategori inbox baru (komplain dialihkan, keluhan perlu dipilah) masuk `shared-library`, jadi **notification-service naik lebih dulu**, lalu warehouse-service dan employee-service; aturan rute web ditambah di notification-service. Di MyBharata keduanya tampil "Sistem" sampai dipetakan.
@@ -130,5 +149,7 @@ Penggolongan manual atas 65 ulasan yang sama: gudang 11, mutu produk 13 (dugaan 
 - Endpoint kategori dan field kategori QC adalah perubahan kontrak: **backend naik sebelum frontend**. Salinan kategori di frontend baru dihapus setelah endpoint ada di PROD.
 - Perubahan KPI hanya di warehouse-service; bentuk respons yang dibaca employee-service tidak berubah.
 - Salinan nama produk dan SKU dari `transaction_orders` ke register wajib didaftarkan di [[REF - Kepemilikan Data]] saat diimplementasikan.
+- Keputusan 11 menyentuh `shared-library/common` dan `shared-library/models/employee`, jadi **employee-service dan warehouse-service naik bersama**: resolver kepemilikan toko kini dipakai keduanya lewat `common.TokoICCMilik`. Tanpa env baru (diperiksa di container PROD 2026-09-18: `INTEGRATION_MODULE_URL` dan `INTERNAL_GATEWAY_KEY` sudah terisi di Employee-Service), tanpa kategori inbox baru, dan tanpa migrasi data (koleksi `quality_complaint` belum tercipta di PROD, nol dokumen di DEV, diukur 2026-09-18). Indeks `{company_id, status}` dibuat sendiri saat boot dan idempoten.
+- Keputusan 11c mengubah izin yang menggerbangi menu Komplain ke QC, jadi **backend naik sebelum frontend**. Frontend yang naik duluan memunculkan menu bagi pemegang paket dan tiap aksinya berakhir 403, persis keadaan yang dihindari [[ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko]].
 
 **Dokumen terkait**: [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] · [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]] · [[Microservices - Warehouse Service]] · [[Microservices - Employee Service]] · [[Microservices - Integration Service]] · [[Microservices - Notification Service]] · [[APP - Web ERP]] · [[APP - MyBharata]] · [[REF - Kepemilikan Data]] · [[ADR - 0002 Database-per-Service]] · [[ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus]] · [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]]
