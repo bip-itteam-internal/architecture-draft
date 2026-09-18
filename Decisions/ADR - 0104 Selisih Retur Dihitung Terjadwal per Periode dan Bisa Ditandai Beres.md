@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan** (2026-09-17) — tab Selisih Retur terjadwal per periode, dua tahap, akses lewat izin finance; kode belum ada.
+> **Status**: 🟡 **Diusulkan** (2026-09-17) — tab Selisih Retur terjadwal per periode, dua tahap, akses lewat izin `returselisih.*`; T1 (izin + gerbang menu) dibuat 2026-09-18 di branch `feat/izin-selisih-retur` dan belum merge, sisanya belum ada kode.
 
 ## Untuk Manajemen
 
@@ -102,14 +102,18 @@ Detektor memakai ulang aturan yang sudah ada, bukan salinan: `komponenKurangOrde
 
 Tiap perhitungan menyimpan kapan dijalankan, sampai tanggal berapa datanya, berapa unit diperiksa, dan berapa **gagal dibaca**. Bila ada yang gagal, tab menandai angkanya sebagai **batas bawah**, bukan total. Aturan umum ini sudah tertulis di [[ADR - 0040 Retur Paket Utuh via Baris Induk Faktur]]: audit yang bergantung pada fetch pihak ketiga wajib melaporkan fetch yang gagal.
 
-### 6. Akses lewat katalog izin finance, diatur dari /it/hak-akses
+### 6. Akses lewat katalog izin sendiri, diatur dari /it/hak-akses
 
-Dua izin baru di katalog **finance**:
+Dua izin baru di modul **`returselisih`**:
 
 | Izin | Membuka |
 |---|---|
-| `finance.returselisih.view` | tab, daftar, detail, unduh Excel |
-| `finance.returselisih.tandai` | tombol Tandai beres |
+| `returselisih.view` | tab, daftar, detail, unduh Excel |
+| `returselisih.tandai` | tombol Tandai beres |
+
+- ⛔ **Prefiksnya SENDIRI, bukan `finance.`** (diputuskan 2026-09-17 setelah menelusuri kode). Klaim izin sebuah modul MENANG atas cadangan tier modul itu, bukan digabung: memasang paket sempit berprefiks `finance` kepada orang Finance yang aksesnya hari ini lahir dari tier akan memadamkan piutang, utang, dan jurnal mereka tanpa satu pun galat. Preseden yang sama: modul `akuntansicv` (ADR 0096). Menunya tetap tinggal di blok Accurate lewat alias kategori di frontend.
+- **Pemegang izin tanpa peran pembuka Accurate hanya melihat menu Auto Sync Retur.** Prefiks izin ikut membuka kategori sidebar, dan kategori Accurate memuat sebelas menu yang sebagian besar tak bergerbang izin; tanpa penyaring, admin gudang yang diberi paket ikut melihat Sales, Income, dan Auto-Sync Faktur.
+- **Cadangan tier**: finance, integration, integration_accurate, dan IT boleh **melihat**; hanya finance boleh **menandai**. Satu sumber di `common.ReturSelisihTierDefault`, dicerminkan tabel `FALLBACK` frontend dengan matriks uji yang identik.
 
 - Dipasang HR/IT ke **posisi** sebagai paket lewat /it/hak-akses; menambah pembaca baru tidak butuh perubahan kode. Contoh susunan: staf/admin finance = lihat + tandai; admin gudang = lihat; Direktur = lihat.
 - **Aksi di layar ditentukan izin, bukan nama peran**: Tandai beres ← `.tandai`; Buka di WMS Retur ← izin WMS retur yang sudah ada di katalog manufacture; tanpa izin aksi = baca saja.
