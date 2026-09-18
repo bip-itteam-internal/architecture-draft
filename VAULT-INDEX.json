@@ -1547,8 +1547,8 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "3a4d7eba9f9a2d67b569ae15f6c67ce1ff22e4b5bac435ff2b8c56447b4bd21f",
-      "ukuran_kb": 528.3,
+      "hash": "37a1bcff2854ebf98e63b6a9b270ad97647475ac28a65c8f77f77468b9c529fb",
+      "ukuran_kb": 528.6,
       "ringkasan": "Menjawab pertanyaan tentang arsitektur frontend web ERP (hris-dashboard/One Bharata): stack teknologi, cara kerja login & SSO Identity Provider, struktur role dan gating sidebar per modul, pengelompokan menu HRIS (termasuk Pengaturan HRGA terpusat), dan fitur multi-perusahaan (company switcher, kelola perusahaan/departemen/shift/WiFi/rekrutmen lintas perusahaan). Juga menjawab konvensi data-fetching (TanStack Query) dan bagan (Recharts) yang berlaku di seluruh aplikasi.",
       "kata_kunci": [
         "erp-frontend",
@@ -1865,7 +1865,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, **training**, **kpi**, **kaskecil**, **ga**, **formbuilder**, serta **secretary** (Kesekretariatan, peleburan `legal` + `rnd` sejak 2026-08-13 — `legal` sebagai modul tersendiri sudah dipensiunkan). **finance** punya katalog + 5 paket (`finance_view`, `finance_pelaksana`, `finance_admin`, `finance_ar`, `finance_ap`) dan menunya sudah bertanda izin, tetapi **belum ada endpoint yang memeriksanya**. 🟡 [[ADR - 0104 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres]] mengusulkan dua izin baru `finance.returselisih.view` dan `finance.returselisih.tandai` untuk tab Selisih Retur di Auto Sync Retur: ditegakkan di endpoint integration-service yang baru, dan menu harus muncul bagi pemegang izin walau tanpa peran finance/integration. Modul **`menu`** (menu terbatas) **sudah merge** namun **belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
+      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, **training**, **kpi**, **kaskecil**, **ga**, **formbuilder**, serta **secretary** (Kesekretariatan, peleburan `legal` + `rnd` sejak 2026-08-13 — `legal` sebagai modul tersendiri sudah dipensiunkan). **finance** punya katalog + 5 paket (`finance_view`, `finance_pelaksana`, `finance_admin`, `finance_ar`, `finance_ap`) dan menunya sudah bertanda izin, tetapi **belum ada endpoint yang memeriksanya**. 🟡 [[ADR - 0104 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres]] memutuskan dua izin baru untuk tab Selisih Retur di Auto Sync Retur, dan prefiksnya SENGAJA bukan `finance`: `returselisih.view` dan `returselisih.tandai` (alasan sama dengan `akuntansicv` — klaim izin modul menang atas cadangan tier modul itu). Ditegakkan di integration-service lewat `RequireReturSelisih`, dengan cadangan `common.ReturSelisihTierDefault` (finance/integration/integration_accurate/IT boleh melihat; hanya finance boleh menandai) yang dicerminkan tabel `FALLBACK` frontend. Menu Auto Sync Retur muncul bagi pemegang izin walau tanpa peran finance/integration, dan bagi mereka kategori Accurate disaring jadi menu itu saja. Modul **`menu`** (menu terbatas) **sudah merge** namun **belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
@@ -1914,8 +1914,8 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "a20752339ddb977977e99a83149fce511132d75a11896f741e17afcec3ed2495",
-      "ukuran_kb": 126.8,
+      "hash": "61b29681cae35143c676904aa7f0febd51a4ac813a9bece3e9aaf1bda0828d54",
+      "ukuran_kb": 127.2,
       "ringkasan": "Menjawab: bagaimana hak akses bip-erp disusun dalam tiga sumbu (modul, tingkat aksi, cakupan data), apa itu paket hak (permission set) yang menempel pada posisi, dan bagaimana izin efektif di-resolve saat login ke klaim JWT lalu diteruskan gateway lewat BIP-Permissions. Juga menjawab katalog modul mana saja yang terdaftar dan di berkas mana mendaftarkannya, cara penegakan RequirePermission dan gate dengan tier fallback, endpoint katalog untuk frontend, serta riwayat fase dua yang dinyalakan lalu dicabut.",
       "kata_kunci": [
         "RBAC",
@@ -1927,7 +1927,9 @@
         "tier fallback",
         "BIP-Permissions",
         "reach cakupan",
-        "Hak per Posisi"
+        "Hak per Posisi",
+        "returselisih",
+        "selisih retur"
       ]
     },
     {
@@ -2547,8 +2549,8 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "82de9e9654ce4567fc24102a280a8b0ece7efecc98dfe2103f39d882ab5de030",
-      "ukuran_kb": 413.8,
+      "hash": "507a406d91cd5ac492d807163545de16d7944505cfda5dbad74cc412178f72a9",
+      "ukuran_kb": 414.0,
       "ringkasan": "Menjawab: apa peran integration-service sebagai penghubung marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) ke Accurate Online, bagaimana webhook Shopee/TikTok diterima dan diverifikasi, bagaimana order dinormalkan jadi model transaksi terpadu lalu dibukukan jadi Sales Invoice/Sales Return, dan cron/worker apa saja yang berjalan. Juga menjawab laporan GMV Max, ICC account mapping, shop ACL dan kepemilikan toko per departemen, rencana Meta Ads, ulasan marketplace, gross profit per produk, status sinkron toko banned, serta catatan ketahanan dan performa MongoDB.",
       "kata_kunci": [
         "integration service",
@@ -7038,7 +7040,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** (2026-09-17) — tab Selisih Retur terjadwal per periode, dua tahap, akses lewat izin finance; kode belum ada.",
+      "status_teks": "**Diusulkan** (2026-09-17) — tab Selisih Retur terjadwal per periode, dua tahap, akses lewat izin `returselisih.*`; T1 (izin + gerbang menu) dibuat 2026-09-18 di branch `feat/izin-selisih-retur` dan belum merge, sisanya belum ada kode.",
       "publik": true,
       "tautan": [
         "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
@@ -7052,8 +7054,8 @@
         "APP - Web ERP",
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput"
       ],
-      "hash": "aa59919b86d35f23b48dd8ab219826093d490dd52424844f6f0f5e43134be87c",
-      "ukuran_kb": 16.6,
+      "hash": "fdcc44bf5c8854bcf513618b3b9d55da65a98a8ca4d1595145b48ba5a06f3148",
+      "ukuran_kb": 17.5,
       "ringkasan": "Menjawab: bagaimana finance melihat selisih antara pembukuan retur ke Accurate, scan retur gudang di WMS, dan isi dokumen Accurate; kenapa selisih dihitung terjadwal per periode dan disimpan per temuan alih-alih dihitung saat layar dibuka; jenis selisih apa yang dideteksi di tiap tahap, bagaimana temuan ditandai beres dengan alasan, dan izin apa yang mengatur siapa boleh melihat dan menandai. Juga menjelaskan kenapa nilai terdampak tidak boleh dijumlahkan antar jenis.",
       "kata_kunci": [
         "selisih retur",
@@ -7065,7 +7067,8 @@
         "tandai beres",
         "finance.returselisih",
         "tutup buku",
-        "Accurate"
+        "Accurate",
+        "returselisih"
       ]
     },
     {
@@ -15497,8 +15500,8 @@
         "Microservices - Integration Service",
         "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift"
       ],
-      "hash": "acd34b18b981c4130c4c9aaab63c5565d5e8494ecf00513ccee0f57288a6cbf6",
-      "ukuran_kb": 7.0,
+      "hash": "975110dabc0ecc1b14cdee44a9c03740c89a88c6fd6cb48b7bafc50faf676a57",
+      "ukuran_kb": 7.3,
       "ringkasan": "Menjawab: pekerjaan apa saja untuk membangun tab Selisih Retur, urutan dan dependensinya, repo mana yang disentuh tiap task, kriteria selesainya, dan perintah start-task siap pakai. Memuat pembagian Tahap 1 (data ERP dan WMS) dan Tahap 2 (catatan ERP vs Accurate) serta sisa yang belum dijadwalkan.",
       "kata_kunci": [
         "selisih retur",
@@ -15509,7 +15512,8 @@
         "job terjadwal",
         "izin finance",
         "tahap 1",
-        "tahap 2"
+        "tahap 2",
+        "returselisih"
       ]
     },
     {
