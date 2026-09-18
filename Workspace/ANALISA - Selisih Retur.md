@@ -7,11 +7,11 @@ Urutan di bawah mengikuti dependensi. Tiap item ditulis supaya bisa langsung dil
 ## Tahap 1 — selisih dari data ERP dan WMS
 
 ### T1 · Dua izin finance + gerbang akses dua sisi
-- **Isi**: tambah `finance.returselisih.view` dan `finance.returselisih.tandai` ke katalog finance, cadangan tier finance selama transisi, dan gerbang frontend (menu Auto Sync Retur muncul bagi pemegang `.view` walau tanpa peran finance/integration; tab dan tombol mengikuti izin).
+- **Isi**: modul izin `returselisih` (prefiks sendiri, bukan `finance.` — ADR-0104 §6) berisi `returselisih.view` dan `returselisih.tandai`, dua paket bawaan (Lihat, Penanda), cadangan tier, gerbang `RequireReturSelisih` di integration, dan gerbang menu di frontend (menu Auto Sync Retur muncul bagi pemegang `.view` walau tanpa peran finance/integration; pemegang paket tanpa peran itu hanya melihat menu tersebut).
 - **Repo**: bip-erp (shared-library, employee seed paket) · erp-frontend (menu, akses)
 - **Bergantung**: —
-- **Selesai bila**: admin gudang yang hanya memegang `.view` melihat menu dan tab tanpa tombol Tandai beres; akun finance tanpa paket tetap melihat keduanya.
-- `/start-task Tambah izin finance.returselisih.view/.tandai beserta gerbang menu & tab Auto Sync Retur (ADR-0104 §6)`
+- **Selesai bila**: admin gudang yang hanya memegang `.view` melihat menu Auto Sync Retur (dan hanya itu di kategori Accurate); akun finance tanpa paket tak kehilangan satu menu pun; modul `returselisih` dan kedua paketnya muncul di /it/hak-akses. Tombol Tandai beres diverifikasi di T8, sebab tab dan tombolnya baru lahir di sana.
+- ✅ Dikerjakan 2026-09-17/18 di branch `feat/izin-selisih-retur` (bip-erp + erp-frontend), **belum merge**. Verifikasi lewat gateway untuk gerbang backend menyusul di T7 (rutenya belum ada).
 
 ### T2 · Model temuan dan penyimpanannya
 - **Isi**: koleksi temuan per periode (jenis, kunci order/resi, toko, dokumen, sisi order/scan/Accurate, nilai terdampak, umur, status, jejak beres) + catatan tiap perhitungan (kapan, data sampai, diperiksa, gagal dibaca). Aturan tutup otomatis dan buka kembali.
