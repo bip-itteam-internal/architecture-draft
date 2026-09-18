@@ -530,7 +530,7 @@
       "area": "API Reference",
       "jenis": "api",
       "status_emoji": "✅",
-      "status_teks": "Grounded ke kode `bip-erp` `origin/main` (diperiksa 2026-09-15); live di dev + produksi 2026-08-06; pengajuan, evaluasi, dan `/me` **terverifikasi lewat gateway hidup 2026-08-19**; rute post-test ada di biner produksi (diperiksa 2026-09-15); `GET /kpi/pelatihan` dan `GET /internal/calendar-feed` (PR [#1895](https://github.com/bip-itteam-internal/bip-erp/pull/1895)) **live di produksi 2026-09-15** dan diverifikasi dari dalam container, bersama penyaringan `as=reviewed` (PR [#1892](https://github.com/bip-itteam-internal/bip-erp/pull/1892)); DEV belum dideploy. § Rencana Pelatihan Tahunan, § Bahan KPI Rencana, dan § Sertifikat Pelatihan: PR bip-erp #1903 dan #1904 **merged 2026-09-16** (diukur `gh pr view` 2026-09-17); status deploy-nya belum diukur ulang. ✅ **Tahap 3a/3b merged** (pre-test, kelulusan = naik dari pre-test, `passing_score` dibuang, kunci per kelas): PR [#1913](https://github.com/bip-itteam-internal/bip-erp/pull/1913) merged 2026-09-16 (Tahap 3a awal) dan PR [#1934](https://github.com/bip-itteam-internal/bip-erp/pull/1934) **merged 2026-09-17 01:15 UTC** (perbaikan review Tahap 3a dan seluruh Tahap 3b), diukur `gh pr view` 2026-09-17 dan dibuktikan `git grep` ke `origin/main` (rute `/me/pre-test`, `NaikDariPreTest`; `passing_score` tinggal di komentar). Pengukuran deploy prod-nya dicatat di [[HRIS - Matriks KPI per Departemen]]. ✅ **`kesesuaian_materi` dan tambahan kontrak `/kpi/pelatihan`** (T1-T2 [[ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI]]): bip-erp PR [#1945](https://github.com/bip-itteam-internal/bip-erp/pull/1945) **merged 2026-09-17 07:51 UTC**; rujukan baris dicocokkan ke `origin/main` 2026-09-17. **DEV terverifikasi lewat gateway 2026-09-17** sesudah `Learning-Service` dibangun ulang manual (pipeline dev melewatkannya); **PROD belum dideploy** per 2026-09-17. Pemakainya di employee-service (`kesesuaian_materi_skala10`, `kenaikan_kpi_peserta_persen`) merged lewat PR [#1951](https://github.com/bip-itteam-internal/bip-erp/pull/1951) 2026-09-17 08:49 UTC. Ukur ulang status deploy sebelum mengutipnya sebagai perilaku produksi.",
+      "status_teks": "Grounded ke kode `bip-erp` `origin/main` (diperiksa 2026-09-15); live di dev + produksi 2026-08-06; pengajuan, evaluasi, dan `/me` **terverifikasi lewat gateway hidup 2026-08-19**; rute post-test ada di biner produksi (diperiksa 2026-09-15); `GET /kpi/pelatihan` dan `GET /internal/calendar-feed` (PR [#1895](https://github.com/bip-itteam-internal/bip-erp/pull/1895)) **live di produksi 2026-09-15** dan diverifikasi dari dalam container, bersama penyaringan `as=reviewed` (PR [#1892](https://github.com/bip-itteam-internal/bip-erp/pull/1892)); DEV belum dideploy. § Rencana Pelatihan Tahunan, § Bahan KPI Rencana, dan § Sertifikat Pelatihan: PR bip-erp #1903 dan #1904 **merged 2026-09-16** (diukur `gh pr view` 2026-09-17); status deploy-nya belum diukur ulang. ✅ **Tahap 3a/3b merged** (pre-test, kelulusan = naik dari pre-test, `passing_score` dibuang, kunci per kelas): PR [#1913](https://github.com/bip-itteam-internal/bip-erp/pull/1913) merged 2026-09-16 (Tahap 3a awal) dan PR [#1934](https://github.com/bip-itteam-internal/bip-erp/pull/1934) **merged 2026-09-17 01:15 UTC** (perbaikan review Tahap 3a dan seluruh Tahap 3b), diukur `gh pr view` 2026-09-17 dan dibuktikan `git grep` ke `origin/main` (rute `/me/pre-test`, `NaikDariPreTest`; `passing_score` tinggal di komentar). Pengukuran deploy prod-nya dicatat di [[HRIS - Matriks KPI per Departemen]]. ✅ **`kesesuaian_materi` dan tambahan kontrak `/kpi/pelatihan`** (T1-T2 [[ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI]]): bip-erp PR [#1945](https://github.com/bip-itteam-internal/bip-erp/pull/1945) **merged 2026-09-17 07:51 UTC**; rujukan baris dicocokkan ke `origin/main` 2026-09-17. **DEV terverifikasi lewat gateway 2026-09-17** sesudah `Learning-Service` dibangun ulang manual (pipeline dev melewatkannya); **PROD belum dideploy** per 2026-09-17. Pemakainya di employee-service (`kesesuaian_materi_skala10`, `kenaikan_kpi_peserta_persen`) merged lewat PR [#1951](https://github.com/bip-itteam-internal/bip-erp/pull/1951) 2026-09-17 08:49 UTC. Ukur ulang status deploy sebelum mengutipnya sebagai perilaku produksi. 🟡 **Penugasan peserta massal (`POST /training/:id/participants/batch`) BELUM di `origin/main`**: branch `feat/learning-peserta-massal`, **belum di-push, belum merge, belum deploy** (diukur 2026-09-18); lihat [[#Peserta & Kehadiran]].",
       "publik": true,
       "tautan": [
         "Microservices - Employee Service",
@@ -544,20 +544,20 @@
         "API - Index",
         "CORE - API Master Gateway"
       ],
-      "hash": "105577b905d2d8d1b1fd07d39315c4be16eb9e57defee2c57069d5bf4cef03b2",
-      "ukuran_kb": 46.8,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di learning-service (`/api/learning/*`) untuk master jenis pelatihan dan trainer, event pelatihan, peserta dan kehadiran, pengajuan pelatihan, layar karyawan `/me`, course dan bank soal, pre-test dan post-test, sertifikat, rencana pelatihan tahunan, bahan KPI, dan feed kalender. Juga menjelaskan gerbang izin `training.view`/`training.work`/`training.manage` beserta kill-switch dan fallback tier, perilaku full-replace `PUT /training/:id` yang bisa menghapus `course_id`, serta kode status verifikasi `department_key` ke employee-service.",
+      "hash": "1efc4f7221de4ba069f1fe8ace074ab8f9cd2de3db772a79551e3480acafc0d0",
+      "ukuran_kb": 58.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di service learning (`/api/learning/*`, port 6987) untuk master jenis pelatihan, trainer, event pelatihan, peserta dan kehadiran, pengajuan, evaluasi trainer, course dan bank soal, pre-test/post-test, sertifikat, rencana pelatihan tahunan, bahan KPI, serta feed kalender. Menjelaskan juga izin apa yang dibutuhkan tiap rute (`training.view` / `training.work` / `training.manage`), bagaimana fallback tier `system_roles[\"hris\"]` dan kill-switch `TRAINING_PERMISSION_ENFORCEMENT` bekerja, dan bentuk payload beserta kode status tiap rute. Berguna saat mencari tahu path persis sesudah modul Training dipindah dari employee-service, aturan urutan registrasi rute Fiber, perilaku full-replace `PUT`, dan kode penolakan penugasan peserta massal.",
       "kata_kunci": [
         "learning service",
-        "pelatihan",
-        "training",
-        "API endpoint",
+        "API pelatihan",
+        "training endpoint",
+        "training.view training.work training.manage",
+        "RBAC pelatihan",
         "post-test",
         "pre-test",
+        "peserta massal batch",
         "sertifikat pelatihan",
-        "RBAC training",
-        "kpi/pelatihan",
-        "LMS"
+        "calendar-feed"
       ]
     },
     {
@@ -1466,6 +1466,7 @@
         "ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget",
         "API - Learning Service",
         "ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI",
+        "ADR - 0109 Penyelenggara Pelatihan Internal atau Eksternal dengan Master Vendor Milik HR dan Bank Sertifikat Dua Sumber",
         "Microservices - Calendar Service",
         "ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi",
         "ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance",
@@ -1547,22 +1548,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "3a4d7eba9f9a2d67b569ae15f6c67ce1ff22e4b5bac435ff2b8c56447b4bd21f",
-      "ukuran_kb": 528.3,
-      "ringkasan": "Menjawab pertanyaan tentang arsitektur frontend web ERP (hris-dashboard/One Bharata): stack teknologi, cara kerja login & SSO Identity Provider, struktur role dan gating sidebar per modul, pengelompokan menu HRIS (termasuk Pengaturan HRGA terpusat), dan fitur multi-perusahaan (company switcher, kelola perusahaan/departemen/shift/WiFi/rekrutmen lintas perusahaan). Juga menjawab konvensi data-fetching (TanStack Query) dan bagan (Recharts) yang berlaku di seluruh aplikasi.",
+      "hash": "96901f2e6c474ef6aaf624227589795724521f6917a30ef12bcbd9ffcede1872",
+      "ukuran_kb": 535.5,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal `hris-dashboard` (\"One Bharata\"), stack teknologinya, bagaimana login dan SSO bekerja, dan bagaimana sidebar serta halaman digerbang oleh `system_roles` per modul. Menjelaskan juga dukungan multi-perusahaan (CompanySwitcher, departemen, shift, WiFi, rekrutmen lintas perusahaan), pengelompokan menu HRIS lewat menu induk bersarang, dan halaman Pengaturan HRGA terpusat beserta sub-menu dan tabnya. Memuat konvensi wajib data-fetching TanStack Query (hook sidebar ber-`enabled`, badge pakai `refetchOnWindowFocus`, pencacah membalas angka) dan konvensi bagan Recharts dengan `ChartContainer`.",
       "kata_kunci": [
-        "erp-frontend",
+        "web ERP",
         "hris-dashboard",
         "One Bharata",
+        "erp-frontend",
         "SSO",
-        "Next.js",
         "system_roles",
-        "sidebar",
-        "multi-tenant",
-        "CompanySwitcher",
+        "sidebar role gating",
+        "multi-perusahaan",
         "TanStack Query",
-        "Recharts",
-        "Pengaturan HRGA"
+        "Recharts ChartContainer"
       ]
     },
     {
@@ -2623,13 +2622,14 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)** — service **live di dev + produksi 2026-08-06** (bip-erp PR [#1020](https://github.com/bip-itteam-internal/bip-erp/pull/1020), frontend [erp-frontend#814](https://github.com/bip-itteam-internal/erp-frontend/pull/814)), data 4 koleksi dipindah di kedua lingkungan dengan jumlah terverifikasi cocok, dan pengajuan + evaluasi + `/me` **terverifikasi lewat gateway hidup 2026-08-19**. Post-test berskor (PR [#1321](https://github.com/bip-itteam-internal/bip-erp/pull/1321), merged 2026-08-20) **ada di biner produksi** (diperiksa 2026-09-15). **Catatannya bukan di service melainkan di pemakaiannya**: per 2026-09-15 `training_request`, `trainer_evaluation`, dan `quiz_attempt` di produksi masih **0**, post-test belum punya layar di web maupun MyBharata. ✅ **Sejak 2026-09-15 service ini melayani mesin KPI dan kalender terpusat** (bip-erp PR [#1895](https://github.com/bip-itteam-internal/bip-erp/pull/1895), image produksi 13:20 WIB, diverifikasi dari dalam container; DEV belum dideploy): `GET /kpi/pelatihan` berkunci `LEARNING_SERVICE_KEY` dan `GET /internal/calendar-feed`, lihat bagian masing-masing di bawah. Materi, kurikulum, dan Talent Pool **belum ada** di `main`. Konsep & rencana lanjutan: [[HRIS - Training Program]] ✅ **Tahap 2 (Training & Performance Officer) — rencana pelatihan tahunan dan sertifikat otomatis** — PR bip-erp #1903 dan #1904 **merged 2026-09-16** (diukur `gh pr view` 2026-09-17; status deploy belum diukur ulang); rincian di dua bagian di bawah. ✅ **Tahap 3a/3b merged**: PR #1913 merged 2026-09-16 (Tahap 3a awal), lalu [#1934](https://github.com/bip-itteam-internal/bip-erp/pull/1934) **merged 2026-09-17 01:15 UTC** (diukur `gh pr view` 2026-09-17) membawa perbaikan review Tahap 3a (percobaan hangus tetap memakan kuota, penanda post-test hanya untuk kelas `Completed`, `is_active` dipertahankan saat menyunting materi) dan seluruh Tahap 3b; pengukuran deploy prod-nya dicatat di [[HRIS - Matriks KPI per Departemen]] (bab Training & Perfomance Officer). ✅ **Kesesuaian materi dan bahan kenaikan skor KPI peserta** (T1-T2 [[ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI]]): bip-erp PR [#1945](https://github.com/bip-itteam-internal/bip-erp/pull/1945) **merged 2026-09-17 07:51 UTC**, pemakainya di employee-service lewat PR [#1951](https://github.com/bip-itteam-internal/bip-erp/pull/1951) merged 08:49 UTC hari yang sama. **DEV terverifikasi lewat gateway 2026-09-17** sesudah `Learning-Service` dibangun ulang manual (pipeline dev melewatkannya, lihat Catatan); **PROD belum dideploy** per 2026-09-17; layar web merged lewat erp-frontend PR #1631 2026-09-17 09:19 UTC. Rincian di bagian Evaluasi dan Bahan KPI di bawah.",
+      "status_teks": "**Implemented (ada catatan)**: service **live di dev + produksi 2026-08-06** (bip-erp PR [#1020](https://github.com/bip-itteam-internal/bip-erp/pull/1020), frontend [erp-frontend#814](https://github.com/bip-itteam-internal/erp-frontend/pull/814)), data 4 koleksi dipindah di kedua lingkungan dengan jumlah terverifikasi cocok, dan pengajuan + evaluasi + `/me` **terverifikasi lewat gateway hidup 2026-08-19**. Post-test berskor (PR [#1321](https://github.com/bip-itteam-internal/bip-erp/pull/1321), merged 2026-08-20) **ada di biner produksi** (diperiksa 2026-09-15). **Catatannya bukan di service melainkan di pemakaiannya**: per 2026-09-15 `training_request`, `trainer_evaluation`, dan `quiz_attempt` di produksi masih **0**, post-test belum punya layar di web maupun MyBharata. ✅ **Sejak 2026-09-15 service ini melayani mesin KPI dan kalender terpusat** (bip-erp PR [#1895](https://github.com/bip-itteam-internal/bip-erp/pull/1895), image produksi 13:20 WIB, diverifikasi dari dalam container; DEV belum dideploy): `GET /kpi/pelatihan` berkunci `LEARNING_SERVICE_KEY` dan `GET /internal/calendar-feed`, lihat bagian masing-masing di bawah. Materi, kurikulum, dan Talent Pool **belum ada** di `main`. Konsep & rencana lanjutan: [[HRIS - Training Program]] ✅ **Tahap 2 (Training & Performance Officer), rencana pelatihan tahunan dan sertifikat otomatis**: PR bip-erp #1903 dan #1904 **merged 2026-09-16** (diukur `gh pr view` 2026-09-17; status deploy belum diukur ulang); rincian di dua bagian di bawah. ✅ **Tahap 3a/3b merged**: PR #1913 merged 2026-09-16 (Tahap 3a awal), lalu [#1934](https://github.com/bip-itteam-internal/bip-erp/pull/1934) **merged 2026-09-17 01:15 UTC** (diukur `gh pr view` 2026-09-17) membawa perbaikan review Tahap 3a (percobaan hangus tetap memakan kuota, penanda post-test hanya untuk kelas `Completed`, `is_active` dipertahankan saat menyunting materi) dan seluruh Tahap 3b; pengukuran deploy prod-nya dicatat di [[HRIS - Matriks KPI per Departemen]] (bab Training & Perfomance Officer). ✅ **Kesesuaian materi dan bahan kenaikan skor KPI peserta** (T1-T2 [[ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI]]): bip-erp PR [#1945](https://github.com/bip-itteam-internal/bip-erp/pull/1945) **merged 2026-09-17 07:51 UTC**, pemakainya di employee-service lewat PR [#1951](https://github.com/bip-itteam-internal/bip-erp/pull/1951) merged 08:49 UTC hari yang sama. **DEV terverifikasi lewat gateway 2026-09-17** sesudah `Learning-Service` dibangun ulang manual (pipeline dev melewatkannya, lihat Catatan); **PROD belum dideploy** per 2026-09-17; layar web merged lewat erp-frontend PR #1631 2026-09-17 09:19 UTC. Rincian di bagian Evaluasi dan Bahan KPI di bawah. 🟡 **Penugasan peserta massal (T1 [[ADR - 0109 Penyelenggara Pelatihan Internal atau Eksternal dengan Master Vendor Milik HR dan Bank Sertifikat Dua Sumber]]) ada DI BRANCH `feat/learning-peserta-massal`, belum di-push, belum PR, belum merge, belum deploy** (diukur 2026-09-18: branch tanpa satu pun ref remote tercatat; ADR-nya menyatakan hal yang sama): rute `POST /training/:id/participants/batch` (`training.go:865`), aturan duplikat dan kuota pindah ke `PilihYangBolehMasuk` (`models_participant.go:125`), dan `CanEnroll` **dihapus** (`models_training.go:186-198`). Lihat bagian Penugasan peserta massal di bawah.",
       "publik": true,
       "tautan": [
         "Microservices - Employee Service",
         "HRIS - Training Program",
         "HRIS - Matriks KPI per Departemen",
         "ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI",
+        "ADR - 0109 Penyelenggara Pelatihan Internal atau Eksternal dengan Master Vendor Milik HR dan Bank Sertifikat Dua Sumber",
         "ADR - 0002 Database-per-Service",
         "API - Learning Service",
         "Microservices - Form Builder Service",
@@ -2645,20 +2645,20 @@
         "API - Index",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id"
       ],
-      "hash": "4ef5bbed01c4a7a0d61a1b89ac9e6074aeb5c1754d48fbaa627a2c946ec54aa9",
-      "ukuran_kb": 67.1,
-      "ringkasan": "Menjawab: kenapa modul pelatihan dipisah dari employee-service menjadi learning-service sendiri (LMS Fase 0, database-per-service), fitur apa saja yang dilayaninya (master, event, peserta, pengajuan SPV ke HR, evaluasi trainer dan kesesuaian materi, post-test dan pre-test, rencana tahunan, sertifikat, bahan KPI, feed kalender), dan bagian LMS mana yang belum ada (materi, kurikulum jabatan, Talent Pool). Juga menjelaskan verifikasi departemen lewat panggilan internal ke employee-service beserta pemetaan galatnya (404 menjadi 400, gangguan menjadi 502).",
+      "hash": "f209de0141998a3e03045f44b36df700bb64e1b5ea455b362d285f0cbd75a160",
+      "ukuran_kb": 76.3,
+      "ringkasan": "Menjawab: kenapa modul Training dipindah dari employee-service jadi service sendiri, apa isi `learning_db`, dan fitur apa saja yang sudah ada di kode (event, peserta, pengajuan SPV ke HR, evaluasi trainer, course, pre-test/post-test, rencana tahunan, sertifikat, bahan KPI, feed kalender). Menjelaskan gerbang RBAC-nya, verifikasi departemen lewat panggilan internal ke employee-service, aturan kuota dan duplikat peserta (`PilihYangBolehMasuk`, `CanEnroll` yang sudah dihapus), serta rencana penugasan peserta massal yang masih di branch. Berguna untuk tahu bagian mana LMS yang belum ada sama sekali (materi, kurikulum jabatan, Talent Pool) dan di berkas Go mana tiap aturan tinggal.",
       "kata_kunci": [
         "learning service",
         "learning_db",
-        "LMS",
-        "pelatihan",
-        "training",
+        "microservice pelatihan",
+        "LMS Fase 0",
+        "training participant",
+        "kuota peserta",
         "evaluasi trainer",
         "kesesuaian materi",
-        "pre-test post-test",
-        "EMPLOYEE_MODULE_URL",
-        "People Development"
+        "KPI pelatihan",
+        "Go Fiber MongoDB"
       ]
     },
     {
@@ -7216,7 +7216,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** 2026-09-18, disetujui pemilik proses (Opsi B: catatan dan bukti dulu, berkas besar menyusul). **Belum ada kode sama sekali** untuk seluruh keputusan di bawah.",
+      "status_teks": "**Diusulkan** 2026-09-18, disetujui pemilik proses (Opsi B: catatan dan bukti dulu, berkas besar menyusul). **Keputusan 1 (data peserta lebih dulu) sudah dikodekan**, di branch dan belum di-push: bip-erp `feat/learning-peserta-massal`, erp-frontend `feat/peserta-massal-laporan`, rencana `.task-plans/2026-09-18-peserta-massal-pelatihan.md`. Keputusan 2 sampai 11 **belum ada kodenya sama sekali**.",
       "publik": true,
       "tautan": [
         "HRIS - Training Program",
@@ -7234,20 +7234,20 @@
         "ADR - 0001 Akuntansi via Accurate",
         "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan"
       ],
-      "hash": "2b6acb054d5442199b06ff1d50795443c1faee130e752ff7f36eec2a6e9e0d00",
-      "ukuran_kb": 27.8,
-      "ringkasan": "Menjawab: bagaimana penyelenggara pelatihan dicatat (Internal per departemen atau Eksternal per vendor), kenapa master vendor pelatihan dibuat sendiri di learning-service alih-alih memakai master Pemasok Procurement yang terikat Accurate, dan bagaimana vendor pada trainer diperlakukan sebagai afiliasi bukan penentu penyelenggara. Menjelaskan juga saklar e-sertifikat per kelas yang disimpan terbalik supaya form lama tidak mematikannya, bank sertifikat dua sumber (sertifikat internal yang terbit sendiri plus sertifikat pihak luar yang diunggah HR), penghidupan spesimen tanda tangan, stempel, dan logo di PDF, prefix `learning/` di file-service, serta riwayat pelatihan per karyawan. Menjawab pula apa yang sengaja tidak dijanjikan: upload materi PPT dipisah jadi keputusan sendiri karena batas unggah 4 MB, ikatan dinas dan ganti rugi biaya pelatihan tetap dihitung manual HR, dan masa berlaku sertifikat dicatat tanpa pengingat otomatis.",
+      "hash": "6eae7a219ca84ad089058c326dff12f07b680e174547359ac3420eab453830f2",
+      "ukuran_kb": 29.9,
+      "ringkasan": "Menjawab: kenapa penyelenggara pelatihan dicatat eksplisit sebagai Internal (departemen) atau Eksternal (vendor), kenapa master vendor pelatihan dibuat milik learning-service alih-alih memakai master Pemasok Procurement yang terikat Accurate, dan kenapa vendor pada trainer hanya afiliasi bukan penentu penyelenggara. Menjelaskan saklar e-sertifikat per kelas yang sengaja disimpan terbalik (`tanpa_sertifikat`) supaya form lama tidak mematikannya diam-diam, bank sertifikat dua sumber (terbit internal plus unggahan pihak luar), dihidupkannya spesimen tanda tangan/stempel/logo, dan prefix `learning/` di file-service. Memuat juga apa yang sengaja TIDAK dijanjikan: upload materi PPT dipisah karena batas unggah 4 MB, ikatan dinas dan ganti rugi tetap dihitung manual, dan masa berlaku sertifikat tanpa pengingat otomatis.",
       "kata_kunci": [
+        "ADR 0109",
         "penyelenggara pelatihan",
-        "training organizer",
         "vendor pelatihan",
-        "master vendor",
-        "e-sertifikat",
+        "training vendor",
         "bank sertifikat",
         "sertifikat eksternal",
-        "riwayat pelatihan",
-        "learning-service",
-        "tanda tangan stempel logo"
+        "e-sertifikat",
+        "riwayat pelatihan karyawan",
+        "file-service upload",
+        "ikatan dinas"
       ]
     },
     {
@@ -10611,25 +10611,26 @@
         "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
         "HRIS - Kepatuhan Peraturan Perusahaan",
         "APP - Web ERP",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "HRIS - Work Review",
         "Microservices - Calendar Service",
         "HRIS - Big Pictures",
         "HRIS - Analysis"
       ],
-      "hash": "79362aede7c86c0924555d819c5ec9235add17a2c690101514126b2072737b18",
-      "ukuran_kb": 59.1,
-      "ringkasan": "Menjawab: bagaimana modul pelatihan dan pengembangan karyawan dirancang di ERP Bharata, entitas apa saja yang dipakai (jenis pelatihan, trainer internal atau eksternal, kelas pelatihan, peserta dan kehadiran), dan bagian mana dari modul Training ERPGo yang diambil, disesuaikan, atau dibuang. Menjelaskan alur pengajuan pelatihan beserta rantai persetujuan SPV lalu HR, penilaian trainer empat aspek dengan ambang tiga responden, alur ujian e-learning pre-test dan post-test, serta rencana pelatihan tahunan dan sertifikat. Menjawab juga di mana modul ini tinggal secara arsitektur (learning-service, `/api/learning/*`, UI `/hris/training`) dan bagaimana rollout bertahapnya menuju LMS People Development dan Talent Pool.",
+      "hash": "19742da8b855a147519288ca54444245113898b00290f340a26d07c81e2f7248",
+      "ukuran_kb": 67.5,
+      "ringkasan": "Menjawab: bagaimana modul pelatihan dan pengembangan karyawan dirancang, entitas apa saja di MVP-nya (jenis pelatihan, trainer, event, peserta dan kehadiran), dan bagian mana dari referensi ERPGo yang diambil, disesuaikan, atau dibuang beserta alasannya. Menjelaskan alur bisnis pelatihan dari pengajuan dengan rantai SPV ke HR, penilaian trainer empat aspek berambang tiga responden, alur ujian pre-test dan post-test, sampai rencana tahunan dan sertifikat, plus aktor dan persona yang terlibat. Berguna juga untuk tahu di mana alur karyawan biasa masih terputus (menu self-service web dicabut, penggantinya di MyBharata belum masuk rilis) dan apa isi rollout bertahap LMS berikutnya.",
       "kata_kunci": [
-        "pelatihan",
-        "training",
         "training program",
-        "trainer",
+        "pelatihan karyawan",
+        "people development",
         "LMS",
-        "e-learning",
         "pengajuan pelatihan",
-        "training request",
         "evaluasi trainer",
-        "sertifikat pelatihan"
+        "pre-test post-test",
+        "trainer internal eksternal",
+        "ERPGo",
+        "rencana pelatihan tahunan"
       ]
     },
     {
@@ -15378,20 +15379,20 @@
         "HRIS - Kepatuhan Peraturan Perusahaan",
         "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan"
       ],
-      "hash": "4d36def16893314f0170e7399aec08e8a5cebc6a03ce49773964f27fdac5f636",
-      "ukuran_kb": 14.8,
-      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk mewujudkan ADR 0109 dan dalam urutan apa, mulai dari mengukur isi `learning_db` prod, menambah peserta beberapa orang sekaligus, master vendor pelatihan, penyelenggara pada kelas dan pada butir rencana, vendor pada trainer, saklar e-sertifikat, prefix `learning/` di file-service, sertifikat eksternal, spesimen tanda tangan, sampai riwayat pelatihan per karyawan. Menyebut dependensi antar task, jebakan kode yang wajib dihindari (PUT memakai `ReplaceOne` yang menghapus field baru, whitelist input butir rencana yang mengabaikan field tak terdaftar, rute statis yang tertelan rute ber-parameter), serta test dan kontrol yang wajib menyertainya. Menjelaskan juga syarat deploy-nya: file-service dan learning-service naik bersama dengan `--force-recreate` karena env dibaca saat container dibuat, dan PROD dijalankan manusia.",
+      "hash": "5a53e84a19ce6d25fea8a4e9f4e938e72f6dd9218ef72b0e7c9e2fc9a2221bca",
+      "ukuran_kb": 16.7,
+      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk mewujudkan ADR 0109, dalam urutan apa, dan kenapa urutannya mengikat (data peserta lebih dulu, prefix `learning/` di file-service mendahului sertifikat, backend sebelum frontend, rilis MyBharata paling belakang). Tiap task memuat definisi selesai, jebakan kode yang sudah dipetakan (`ReplaceOne` pada PUT kelas dan trainer, whitelist input butir rencana yang mengabaikan field baru diam-diam), dan test yang wajib menyertainya. Memuat juga hasil pengukuran prod `learning_db` 2026-09-17 sebagai dasar perencanaan dan catatan deploy dua container `--force-recreate` karena env dibaca saat container dibuat.",
       "kata_kunci": [
-        "daftar task pelatihan",
         "analisa kebutuhan",
-        "training_vendor",
-        "training_participant",
-        "sertifikat eksternal",
-        "prefix learning file-service",
+        "daftar task pelatihan",
+        "penyelenggara pelatihan",
+        "master vendor",
+        "bank sertifikat",
+        "peserta massal",
+        "learning_db prod",
+        "file-service prefix learning",
         "force-recreate",
-        "penyelenggara internal eksternal",
-        "saklar e-sertifikat",
-        "rencana pelatihan"
+        "rollout pelatihan"
       ]
     },
     {
