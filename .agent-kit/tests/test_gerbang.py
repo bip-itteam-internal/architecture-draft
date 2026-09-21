@@ -250,6 +250,29 @@ def test_gerbang_kit_hanya_putuskan_menyala_untuk_kit():
     assert "menyala" in rc.stdout.lower()
 
 
+def test_gerbang_kit_paksa_menyala_walau_berkas_tak_relevan():
+    # Daftar berkas yang tak bisa ditentukan harus MENYALAKAN gerbang, bukan mematikannya.
+    # Terukur 2026-09-21: `$rsha` di pre-push bisa menunjuk commit yang belum ada di sini, lalu
+    # `git diff` gagal diam-diam dan push ber-perubahan .agent-kit/ dilaporkan "DILEWATI".
+    rc = subprocess.run(
+        [sys.executable, str(HOOKS / "gerbang-kit.py"), "--hanya-putuskan", "--paksa",
+         "--berkas", "HRIS/x.md"],
+        capture_output=True, text=True)
+    assert rc.returncode == 0
+    assert "dinyalakan" in rc.stdout.lower()
+
+
+def test_pre_push_memeriksa_basis_diff_ada_sebelum_memakainya():
+    # Dijaga di sumber karena pre-push adalah skrip sh yang tak punya harness test sendiri di
+    # sini; yang dikunci adalah keberadaan pemeriksaan objek dan penerusan --paksa.
+    teks = (HOOKS / "githooks" / "pre-push").read_text(encoding="utf-8")
+    assert "git cat-file -e" in teks
+    assert "tak_tentu=1" in teks
+    assert "--paksa" in teks
+    # Go: daftar yang tak bisa ditentukan harus membangun SEMUA service, bukan melewatinya
+    assert '[ "$tak_tentu" -eq 1 ] || printf' in teks
+
+
 def test_gerbang_kit_menolak_rekursi():
     # Bila gerbangnya dipicu dari dalam test kit yang sedang berjalan, ia berhenti, bukan berputar.
     env = dict(os.environ, AGENTKIT_KIT_TESTS_RUNNING="1")

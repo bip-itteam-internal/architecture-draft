@@ -20,6 +20,14 @@ cd "$top" || exit 0
 
 zero="0000000000000000000000000000000000000000"
 touched=""
+# ⛔ Daftar berkas yang TIDAK BISA ditentukan harus menyalakan gerbang, bukan mematikannya.
+# `$rsha` adalah tip remote yang sesungguhnya, dan itu bisa commit yang BELUM kita punya (remote
+# sudah maju dan belum di-fetch). `git diff <commit asing> <lsha>` lalu gagal diam-diam, daftar
+# berkasnya kosong, dan tiap cabang di bawah membaca kosong itu sebagai "tidak ada yang
+# tersentuh" lalu melewati pemeriksaannya. Terukur 2026-09-21: push yang memuat perubahan
+# .agent-kit/ dilaporkan "gerbang test kit DILEWATI". Kelas yang sama dengan nol-gerbang-lolos
+# yang sedang ditutup rilis ini, cuma satu lapis lebih awal.
+tak_tentu=0
 while read -r lref lsha rref rsha; do
   [ "$lsha" = "$zero" ] && continue                      # hapus branch remote: tak ada yang diperiksa
   if [ "$rsha" = "$zero" ]; then
@@ -27,14 +35,18 @@ while read -r lref lsha rref rsha; do
   else
     base="$rsha"
   fi
-  if [ -n "$base" ]; then
+  if [ -n "$base" ] && git cat-file -e "${base}^{commit}" 2>/dev/null; then
     touched="$touched
 $(git diff --name-only "$base" "$lsha" 2>/dev/null)"
   else
+    tak_tentu=1
     touched="$touched
 $(git show --name-only --format= "$lsha" 2>/dev/null)"
   fi
 done
+if [ "$tak_tentu" -eq 1 ]; then
+  echo "[agent-kit pre-push] daftar berkas tersentuh tidak bisa ditentukan sepenuhnya (basis diff tidak ada di sini): memeriksa SEMUA, bukan melewati"
+fi
 
 gagal=0
 echo "[agent-kit pre-push] repo: $top"
@@ -60,7 +72,7 @@ fi
 # ---- Go multi-modul (bip-erp) ----
 if [ -d services ] && ls services/*/go.mod >/dev/null 2>&1; then
   svcs=""
-  if printf '%s\n' "$touched" | grep -q '^shared-library/'; then
+  if [ "$tak_tentu" -eq 1 ] || printf '%s\n' "$touched" | grep -q '^shared-library/'; then
     svcs="$(ls -d services/*/ | sed 's#services/##; s#/$##')"
     echo "[agent-kit pre-push] shared-library tersentuh: build SEMUA service"
   else
@@ -94,7 +106,9 @@ if [ -f .agent-kit/hooks/gerbang-kit.py ]; then
   else
     daftar="$(mktemp 2>/dev/null || echo "${TMPDIR:-/tmp}/agentkit-push-$$")"
     printf '%s\n' "$touched" > "$daftar"
-    if ! "$py" .agent-kit/hooks/gerbang-kit.py --vault "$top" --berkas-file "$daftar"; then gagal=1; fi
+    paksa=""
+    [ "$tak_tentu" -eq 1 ] && paksa="--paksa"
+    if ! "$py" .agent-kit/hooks/gerbang-kit.py --vault "$top" --berkas-file "$daftar" $paksa; then gagal=1; fi
     rm -f "$daftar"
   fi
 fi

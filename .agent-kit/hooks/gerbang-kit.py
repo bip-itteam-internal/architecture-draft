@@ -106,11 +106,12 @@ def jalankan(judul, cmd, cwd, batas):
 
 
 def main(argv):
-    vault, berkas, hanya_putuskan = None, [], False
+    vault, berkas, hanya_putuskan, paksa = None, [], False, False
     i = 0
     while i < len(argv):
         a = argv[i]
-        if a == "--vault": vault = argv[i + 1]; i += 2
+        if a == "--paksa": paksa = True; i += 1
+        elif a == "--vault": vault = argv[i + 1]; i += 2
         elif a == "--berkas": berkas.append(argv[i + 1]); i += 2
         elif a == "--berkas-file":
             # nama berkas dok vault berisi spasi; daftar lewat berkas, bukan argumen yang terpecah
@@ -121,7 +122,11 @@ def main(argv):
         else: i += 1
     vault = vault or os.getcwd()
 
-    if not perlu_gerbang(berkas):
+    # --paksa: pemanggil tidak bisa menentukan daftar berkasnya, jadi saringan path tak boleh
+    # dipercaya. Gagal-tertutup, sama seperti nol gerbang yang dihitung gagal.
+    if paksa:
+        print("[agent-kit gerbang-kit] daftar berkas tidak bisa dipercaya (--paksa): gerbang test kit DINYALAKAN")
+    elif not perlu_gerbang(berkas):
         print("[agent-kit gerbang-kit] tidak ada perubahan di %s: gerbang test kit DILEWATI"
               % " / ".join(f + "/" for f in FOLDER_KIT))
         return 0
