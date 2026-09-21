@@ -241,6 +241,76 @@ DIJAGA test adalah bentuk hasilnya per persona (`live-support-persona.test.ts`,
 `sidebar-pekerjaan-saya.test.ts`), dan itu tetap wajib untuk induk baru: kunci apa yang
 TERLIHAT oleh tiap persona, bukan sekadar bahwa induknya ada.
 
+## 2c. Bentuk layar yang diambil dari ingatan, bukan dari pekerjaannya
+
+Tujuh bentuk yang otomatis diraih begitu layarnya dashboard, panel admin, atau apa pun yang
+dibuka sesudah login. Semuanya gagal dengan cara yang sama, dan itu yang membuatnya mahal:
+tak ada galat, layarnya terlihat profesional, dan ia tidak menjawab pertanyaan siapa pun.
+Dipungut dan diterjemahkan dari antislop (MIT, `github.com/miqdadbadjuber/anti-slop`)
+§App & Dashboard, diperiksa 2026-09-21; yang sudah diatur §2 tidak disalin ulang ke sini.
+
+1. **Shell dashboard bawaan.** Sidebar kiri, bilah atas, empat stat card, satu bagan, satu
+   tabel, dipilih sebelum ada yang bertanya layar ini untuk apa. Tukar labelnya dan ia cocok
+   untuk faktur, pasien, atau server. **Yang benar**: sebut dulu pekerjaan layar itu dan SATU
+   keputusan yang diambil pemakainya, baru susun hierarkinya ke situ. Kalau pekerjaannya
+   "temukan sesi yang gagal lalu ulangi", daftar sesi gagal ADALAH halamannya dan baris stat
+   jadi catatan kaki. Bagian yang bertahan hanya karena "dashboard biasanya punya" dibuang.
+   Komposisinya di [[REF - Layout Dashboard erp-frontend]] (satu insight dominan).
+2. **Stat card berangka karangan, dan delta tanpa deret.** Empat kartu setara berarti
+   hierarkinya sudah gagal sejak awal, karena layar nyata selalu punya metrik yang menentukan
+   dan metrik yang tidak. Deltanya lebih buruk: "+12% minggu ini" adalah klaim tren tanpa
+   deret di belakangnya. **Yang benar**: angka nyata atau tidak sama sekali, dan delta hanya
+   muncul bila periode pembandingnya nyata dan tertulis (§2 no. 5).
+3. **Feed aktivitas karangan.** Nama dan peristiwa yang tak pernah terjadi, dipasang supaya
+   layar tak terlihat sepi. **Yang benar**: feed menampilkan peristiwa nyata atau tidak ikut
+   rilis. Keadaan kosong yang jujur mengalahkan feed palsu, dan ia sekaligus memberi tahu
+   langkah pertama (§2 no. 2).
+4. **Bagan tanpa pertanyaan.** Bagan dipasang karena ruangnya terasa kosong, berjudul
+   "Ringkasan" atau "Performa", tanpa sumbu yang bisa ditindaklanjuti. **Yang benar**: tulis
+   dulu pertanyaan yang dijawabnya, lalu taruh pertanyaan itu di judulnya ("Sesi gagal per
+   jam, 24 jam terakhir"). Bila satu kalimat menjawabnya lebih baik, tulis kalimatnya.
+   Bersambung ke `team-memory.md` § Bagan/chart: deret KOSONG tetap menggambar sumbu dan kisi,
+   jadi panel rapi itu terbaca "datanya nol" padahal artinya "belum ada yang dinilai".
+5. **Kolom tabel datang dari komponennya, bukan dari keputusannya.** Nama, Status, Tanggal,
+   Aksi, apa pun isi barisnya, plus menu tiga titik di tiap baris. Pemakainya memindai kolom
+   yang menentukan langkah berikutnya dan kolom itu tidak ada. **Yang benar**: kolom dipilih
+   dari keputusan yang diambil di tabel ini, dan kolom penentunya ditaruh di awal. Menu baris
+   hanya berisi aksi yang benar-benar ada.
+6. **Isian palsu yang masuk akal.** `John Doe`, `johndoe@example.com`, nomor telepon dan
+   tanggal milik siapa-siapa, dipasang di sel kosong dan field kosong. Ia terbaca wajar di
+   mockup dan runtuh begitu pemakai nyata membacanya: namanya bukan pelanggan, emailnya bukan
+   prospek. **Yang benar**: sel kosong dibiarkan kosong, dan placeholder menyebut apa yang
+   harus diisi (`email@perusahaan.co.id`). Nilai yang belum ada ditandai, bukan ditebak.
+7. **Navigasi dan kontrol mati.** Item menu tanpa tujuan, tombol yang tidak melakukan apa-apa.
+   **Yang benar**: tiap item punya tujuan nyata, atau label "Segera hadir" yang terlihat.
+
+### Keadaan terukur (2026-09-21, `origin/main` `8058bf60d`)
+
+Dua dari tujuh di atas bisa diukur perintah, dan hasilnya dipakai berbeda:
+
+- **Isian palsu: nol di layar.** Enam berkas memuat `example.com` dan **seluruhnya fixture**
+  `*.test.*` (`finance/opex-manual`, `hris/contract`, `i18n`), bukan yang dirender. Jadi no. 6
+  di sini gerbang pencegah, bukan perbaikan yang tertunda. `John Doe`, `Jane Doe`, dan `lorem`
+  nol di seluruh `src/`.
+- **Grid mati: 5 baris di 4 berkas.** `grid-cols-4` tanpa prefiks breakpoint, melanggar §2
+  no. 6: `marketing-insight/page.tsx:85`, `finance/incentive/components/result-card.tsx:287`,
+  `integration/transactions/components/detail/order-information.tsx:34`, dan
+  `procurement/budget/components/DashboardBudget.tsx:219,256`. Yang terakhir sekaligus memakai
+  jarak di luar token (`gap-[14px]`, `gap-[10px]`).
+- Menu tiga titik ada di 9 berkas. Angka ini **tidak menuduh**: menu baris sah selama isinya
+  aksi yang benar-benar ada. Yang diperiksa isinya, bukan keberadaannya.
+
+**Membuktikannya** (dari dalam `erp-frontend`, `git grep` karena `Grep` melewati berkas biner):
+
+```
+git -c core.fsmonitor=false grep -nE '[^:]grid-cols-4' origin/main -- 'src/*'
+git -c core.fsmonitor=false grep -n -e 'John Doe' -e 'example\.com' -e lorem origin/main -- 'src/*'
+```
+
+**Yang TIDAK bisa diukur perintah**: stat card berangka karangan, delta tanpa periode
+pembanding, dan judul bagan yang tak memuat pertanyaan. Ketiganya sah menurut tipe dan lolos
+lint, jadi satu-satunya gerbangnya `/review` dan mata orang yang membuka layarnya.
+
 ## 3. Arah visual boleh dari luar, komponen tetap dari repo
 
 Skill `frontend-design` (plugin opsional per mesin), mockup Figma, atau tangkapan layar aplikasi
@@ -248,6 +318,13 @@ lain boleh dipakai untuk **arah**: hierarki, ritme, detail yang membuat layar te
 **Komponen, token warna, dan jarak tetap dari repo.** Bila sarannya menuntut komponen atau palet
 baru, repo yang menang, dan sarannya diterjemahkan ke komponen yang ada, persis seperti
 [[REF - Layout Dashboard erp-frontend]] menerjemahkan enam aturan layout ke komponen kita.
+
+⚠️ Berlaku juga untuk aturan luar yang menuntut berkas arahnya sendiri. antislop (sumber §2c)
+menuntut `DESIGN.md` dan melabeli hasil tanpa itu "draft without direction"; kita tidak punya
+`DESIGN.md` dan tidak perlu membuatnya, karena arah visual kita sudah tertulis di
+[[REF - Layout Dashboard erp-frontend]] dan token tema repo. Yang dipungut dari sumber semacam
+itu bentuk kegagalan yang perlu dihindari, **bukan** perintah membangun kosakata visual baru.
+Sumber luar yang menyarankan komponen atau palet sendiri dikalahkan §1.
 
 ## 4. Bukti sebelum menyebut selesai
 
