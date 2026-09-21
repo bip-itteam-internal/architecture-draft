@@ -3,7 +3,7 @@
 *Sistem ronda (patroli) berjadwal untuk posisi Security: petugas mengirim satu putaran ronda per jendela waktu lewat [[APP - MyBharata]], lengkap dengan koordinat, jam, area yang dicek, dan foto temuan. Temuan naik jadi tiket ke Building Maintenance yang sudah berjalan. Angka KPI ketepatan ronda lahir sebagai produk sampingan dari pekerjaan yang tercatat, bukan sebagai tujuan pertamanya.*
 
 - **Status**: 🟡 Konsep / Direncanakan. Belum ada kode. Rancangan disetujui 2026-09-21, implementasi belum dimulai.
-- **Path di repo**: TBD (rencananya `bip-erp/services/attendance`, lihat [[ADR - 0111 Ronda Security di Attendance Service, GPS Membuktikan Lokasi Bukan Titik]])
+- **Path di repo**: TBD (rencananya `bip-erp/services/attendance`, lihat [[ADR - 0112 Ronda Security di Attendance Service, GPS Membuktikan Lokasi Bukan Titik]])
 - **Pemilik**: GA Security. Atasan penilai: SPV HRGA.
 
 ## Latar Belakang
@@ -50,7 +50,7 @@ Tiga bentuk dipertimbangkan 2026-09-21: ronda terjadwal plus temuan, buku jaga d
 
 ### Tempat tinggal
 
-Modul tinggal di `attendance-service`, **bukan service baru**. Alasannya di [[ADR - 0111 Ronda Security di Attendance Service, GPS Membuktikan Lokasi Bukan Titik]]; ringkasnya, resolusi shift di sini berlapis tiga dan wajib dipanggil bukan disalin.
+Modul tinggal di `attendance-service`, **bukan service baru**. Alasannya di [[ADR - 0112 Ronda Security di Attendance Service, GPS Membuktikan Lokasi Bukan Titik]]; ringkasnya, resolusi shift di sini berlapis tiga dan wajib dipanggil bukan disalin.
 
 ### Model data
 
@@ -114,7 +114,7 @@ Hampir seluruh bahannya sudah ada. Tabel ini yang membuat irisan pertamanya keci
 
 ## Dokumen Terkait
 
-- [[ADR - 0111 Ronda Security di Attendance Service, GPS Membuktikan Lokasi Bukan Titik]] — keputusan yang mengikat rancangan ini
+- [[ADR - 0112 Ronda Security di Attendance Service, GPS Membuktikan Lokasi Bukan Titik]] — keputusan yang mengikat rancangan ini
 - [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]] — kenapa alat kerja dibangun lebih dulu
 - [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] — yang sudah menjawab metrik pos jaga
 - [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] — batas pengumpul metrik
