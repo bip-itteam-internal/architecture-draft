@@ -122,7 +122,7 @@ footer li{margin:2px 0}
   <h1>KANTOR AGENT</h1>
   <span class="info" id="info">menunggu penulis</span>
   <span class="status" id="status"></span>
-  <button type="button" class="saklar" id="saklar-panel" aria-controls="sisi" aria-expanded="true">sembunyikan panel</button>
+  <button type="button" class="saklar" id="zoom-keluar" title="perkecil">&minus;</button><button type="button" class="saklar" id="zoom-pas" title="muat seluruh denah">pas</button><button type="button" class="saklar" id="zoom-masuk" title="perbesar">+</button><button type="button" class="saklar" id="saklar-panel" aria-controls="sisi" aria-expanded="true">sembunyikan panel</button>
 </header>
 <div class="banner" id="banner" role="status" hidden></div>
 <p class="legenda"><b>Perpustakaan</b> baca &amp; cari · <b>Meja</b> edit &amp; berpikir · <b>Ruang server</b> PowerShell, test, build, git, tugas latar · <b>Ruang rapat</b> menunggu subagent · <b>Lounge</b> menunggu Anda · <b>!</b> minta izin Anda</p>
@@ -130,7 +130,7 @@ footer li{margin:2px 0}
 
 <main>
   <div class="panggung" id="panggung">
-    <svg id="denah" viewBox="-450 -150 1000 640" role="img" aria-label="Denah kantor agent"></svg>
+    <svg id="denah" viewBox="-740 -90 1480 830" role="img" aria-label="Denah kantor agent"></svg>
     <p class="kosong-panggung" id="kosong">Menunggu penulis...</p>
     <p class="lepas-sorot" id="lepas-sorot" hidden>kamera mengikuti sesi ini &middot; klik robotnya lagi atau tekan <b>Esc</b> untuk keluar</p>
   </div>
@@ -153,7 +153,7 @@ footer li{margin:2px 0}
 (function () {
   'use strict';
   var NS = 'http://www.w3.org/2000/svg';
-  var HW = 20, HH = 10, HZ = 22, W = 26, D = 20;
+  var HW = 20, HH = 10, HZ = 22, W = 36, D = 36;
   var INTERVAL_MUAT = 2000, BASI_MS = 10000, BERPIKIR_KE_MEJA_MS = 20000;
   var IZIN_MUNGKIN_DETIK = 60;                                    // tool selama ini tanpa hasil: mungkin menunggu prompt izin
   var JALAN_MIN_MS = 400, JALAN_MAKS_MS = 3000, KECEPATAN = 7;   // unit lantai per detik
@@ -254,64 +254,141 @@ footer li{margin:2px 0}
     return out;
   }
 
-  // ---------------- geometri: pod, slot, koridor ----------------
-  var POD = [[1.4, 8.7], [5.4, 8.7], [9.4, 8.7], [13.4, 8.7], [1.4, 11.9], [5.4, 11.9], [9.4, 11.9], [13.4, 11.9]];
+  // ---------------- geometri: pos departemen, slot, koridor ----------------
+  // Denah dibagi jadi POS PER DEPARTEMEN (keputusan pemilik 2026-09-21). Tiap pos punya rak
+  // bukunya sendiri dan mejanya sendiri; RUANG SERVER hanya ada di pos Tech Development, jadi
+  // sesi dari pos lain yang menjalankan perintah benar-benar berjalan ke sana.
+  //
+  // ⚠️ Daftar nama di POS_DENAH WAJIB sama persis dengan `POS` di hooks/kantor-agent.py, yang
+  // menjadi sumbernya (dan yang sendiri grounded ke `deptKeyToNames` di bip-erp). Dua tempat
+  // karena penulis data dan penggambar denah memang dua berkas; kesamaannya dijaga test-init.
+  // Tata letak: gedung PERSEGI dengan koridor PEREMPATAN di tengah (keputusan pemilik 2026-09-21).
+  // Perempatan membagi gedung jadi empat blok; tiap blok berisi tiga ruangan berbentuk L yang
+  // semuanya menghadap koridor, dan pojok terjauhnya jadi taman dalam. Pojok itu tidak dijadikan
+  // ruangan karena satu-satunya cara memberinya pintu adalah menembus ruangan tetangga, dan itu
+  // bertentangan dengan aturan keluar-masuk hanya lewat pintu.
+  //
+  // Pintu tiap ruangan menghadap koridor terdekatnya, jadi sisinya BERBEDA-BEDA (utara, selatan,
+  // timur, barat). Proyeksi ini hanya memperlihatkan sisi selatan dan timur, sehingga pintu di
+  // sisi utara dan barat jatuh pada dinding jauh; itu justru menguntungkan, karena dinding jauh
+  // digambar setinggi ruangan sehingga bukaannya lebih tegas. Isi ruangan yang membelakangi
+  // penonton diterima sadar (pemilik menyatakannya eksplisit).
+  //
+  // ⚠️ Nama di sini WAJIB sama persis dengan POS di hooks/kantor-agent.py, yang jadi sumbernya.
+  var POS_LEBAR = 7.4, POS_DALAM = 7.2;
+  var LORONG_X = 17.7, LORONG_Y = 17.7, LORONG_LEBAR = 2.6;
+  var KX = [0.6, 8.4, 19.4, 27.8], KY = [0.6, 8.2, 19.4, 27.0];
+  // Ruangan boleh MEMANJANG menelan lebih dari satu sel. `zona` menandai bagian mana dari
+  // ruangan yang dipakai perabot kerjanya; sisanya untuk isi lain (rak server). Tanpa `zona`,
+  // meja dan rak buku mendarat di ujung terjauh ruangan, menumpuk dengan isi itu.
+  function ruang(nama, ix, iy, sisi, lebar, dalam, zona) {
+    return { nama: nama, x: KX[ix], y: KY[iy], sisi: sisi,
+      w: lebar || POS_LEBAR, d: dalam || POS_DALAM, zona: zona || null };
+  }
+  function zonaSel(ix, iy, sisi) { return { x: KX[ix], y: KY[iy], sisi: sisi }; }
+  function rw(r) { return r.w || POS_LEBAR; }
+  function rd(r) { return r.d || POS_DALAM; }
+  function rzona(r) { return r.zona || r; }
+  // Ruang server TIDAK berdiri sendiri: ia satu ruangan dengan Tech Development, yang karena itu
+  // memanjang dua sel ke utara (keputusan pemilik 2026-09-21). Rak server menempati sel utara,
+  // meja kerjanya sel selatan, dan pintunya tetap SATU di selatan menghadap koridor mendatar.
+  // Bekas sel ruang server jadi taman dalam, jadi blok timur laut tetap punya pojok hijaunya.
+  var POS_DENAH = [
+    ruang('Marketing', 1, 0, 'timur'), ruang('Finance', 1, 1, 'selatan'), ruang('HRGA', 0, 1, 'selatan'),
+    ruang('Procurement', 2, 0, 'barat'),
+    ruang('Tech Development', 3, 0, 'selatan', POS_LEBAR, KY[1] + POS_DALAM - KY[0], zonaSel(3, 1, 'selatan')),
+    ruang('Kesekretariatan', 0, 2, 'utara'), ruang('Quality', 1, 2, 'utara'),
+    ruang('Warehouse', 2, 2, 'utara'), ruang('Manufaktur', 3, 2, 'utara')
+  ];
+  var POS_UMUM = 'Umum';
+  var RUANG_IT = POS_DENAH[4];
+  // Zona rak server DI DALAM ruangan Tech Development: bukan ruangan sendiri, jadi ia tak punya
+  // sekat, lantai, maupun pintu sendiri. Yang tersisa cuma tempat rak dan slot robotnya, dan
+  // jalan masuknya memakai pintu ruangan induknya.
+  var RUANG_SERVER = ruang('server', 3, 0, 'selatan');
+  var RUANG_RAPAT = ruang('rapat', 2, 3, 'barat');
+  var TAMAN = [[KX[0], KY[0]], [KX[2], KY[1]], [KX[3], KY[3]]];
+  // Lounge memanjang ke bekas pos Printing (keputusan pemilik 2026-09-21). Ia tetap area TERBUKA
+  // tanpa sekat, tetapi karena kini menyentuh koridor tegak, jalan masuknya dari koridor itu,
+  // bukan lagi menembus ruangan Kesekretariatan seperti saat ia masih satu sel.
+  var RUANG_LOUNGE = { nama: 'lounge', x: KX[0], y: KY[3], sisi: 'timur',
+    w: KX[1] + POS_LEBAR - KX[0], d: POS_DALAM };
+
   var KURSI_RAPAT = [];
-  for (var kr = 0; kr < 8; kr++) { var sud = Math.PI / 8 + kr * Math.PI / 4; KURSI_RAPAT.push([22 + 2.55 * Math.cos(sud), 11.5 + 2.55 * Math.sin(sud)]); }
-  var H1 = 7.0, H2 = 16.6, V1 = 17.4;
-  function s1(x) { return { x: x, y: H1, seg: 'H1' }; }
-  function s2(x) { return { x: x, y: H2, seg: 'H2' }; }
-  function sv(y) { return { x: V1, y: y, seg: 'V1' }; }
+  var PUSAT_RAPAT = [RUANG_RAPAT.x + POS_LEBAR / 2, RUANG_RAPAT.y + POS_DALAM / 2];
+  for (var kr = 0; kr < 8; kr++) { var sud = Math.PI / 8 + kr * Math.PI / 4; KURSI_RAPAT.push([PUSAT_RAPAT[0] + 2.2 * Math.cos(sud), PUSAT_RAPAT[1] + 2.2 * Math.sin(sud)]); }
+  var SIMPANG = { x: LORONG_X, y: LORONG_Y, seg: 'H0' };
+  function sh(baris, x) { return { x: x, y: LORONG_Y, seg: 'H0' }; }
+  function sv(y) { return { x: LORONG_X, y: y, seg: 'V0' }; }
   function spot(grup, x, y, dz, sambung, masuk, arah) {
     return { grup: grup, x: x, y: y, dz: dz == null ? null : dz, sambung: sambung, arah: arah || 'selatan',
       masuk: (masuk || []).map(function (p) { return { x: p[0], y: p[1] }; }) };
   }
-  var PINTU = spot('pintu', 0.55, 18.5, null, s2(1.2), [[1.2, 18.5]], 'timur');
+  var PINTU = spot('pintu', 0.2, LORONG_Y, null, sh(0, 1.2), [[1.2, LORONG_Y]], 'timur');
+  // Jalan masuk tiap ruangan diturunkan dari SISI pintunya: dari koridor ke ambang, lalu ke dalam.
+  function masukRuang(r) {
+    var lw = rw(r), ld = rd(r);
+    var mx = r.x + lw / 2, my = r.y + ld / 2;
+    if (r.sisi === 'selatan') return { sambung: sh(0, mx), masuk: [[mx, r.y + ld + 0.3], [mx, r.y + ld - 1.4]] };
+    if (r.sisi === 'utara') return { sambung: sh(0, mx), masuk: [[mx, r.y - 0.3], [mx, r.y + 1.4]] };
+    if (r.sisi === 'timur') return { sambung: sv(my), masuk: [[r.x + lw + 0.3, my], [r.x + lw - 1.4, my]] };
+    return { sambung: sv(my), masuk: [[r.x - 0.3, my], [r.x + 1.4, my]] };
+  }
+  // Server memakai pintu ruangan INDUKNYA; ia tak punya pintu sendiri untuk dituju.
+  var JALAN_SERVER = masukRuang(RUANG_IT), JALAN_RAPAT = masukRuang(RUANG_RAPAT);
+  var JALAN_LOUNGE = masukRuang(RUANG_LOUNGE);
+  var SX = RUANG_SERVER.x, SY = RUANG_SERVER.y, LX = RUANG_LOUNGE.x, LY = RUANG_LOUNGE.y;
   var SPOT = {
-    perpustakaan: [[1.65, 1.6], [4.35, 1.6], [7.55, 1.6], [10.25, 1.6], [3.2, 4.75], [4.6, 4.75], [8.0, 4.75], [9.4, 4.75], [1.2, 3.3], [11.0, 3.3]]
-      .map(function (p) { return spot('perpustakaan', p[0], p[1], null, s1(6), [[6, 6.0], [6, 5.3]], 'utara'); }),
-    server: [[13.55, 1.8, null, 'utara'], [14.95, 1.8, null, 'utara'], [16.35, 1.8, null, 'utara'], [17.75, 1.8, null, 'utara'],
-      [19.15, 1.8, null, 'utara'], [20.55, 1.8, null, 'utara'], [21.95, 5.0, 0.47, 'utara'], [23.05, 5.0, 0.47, 'utara'], [24.2, 3.6, null, 'timur']]
-      .map(function (p) { return spot('server', p[0], p[1], p[2], s1(15), [[15, 6.0], [15, 5.3]], p[3]); }),
-    rapat: KURSI_RAPAT.map(function (p) { return spot('rapat', p[0], p[1], 0.42, sv(11.25), [[18.0, 11.25], [19.3, 11.25]],
-      arahDari(22 - p[0], 11.5 - p[1])); }),
-    lounge: [[18.8, 19.3, 0.42], [21.2, 19.3, 0.42], [20.0, 19.3, 0.42], [20.5, 16.95, 0.45], [21.8, 16.95, 0.45], [12.45, 17.65, 0.5], [14.05, 17.95, 0.5], [23.6, 18.2]]
-      .map(function (p) { return spot('lounge', p[0], p[1], p[2], s2(Math.min(25, p[0])), [], 'selatan'); }),
+    server: [[SX + 0.9, SY + 2.6, null, 'utara'], [SX + 2.1, SY + 2.6, null, 'utara'], [SX + 3.3, SY + 2.6, null, 'utara'],
+      [SX + 4.5, SY + 2.6, null, 'utara'], [SX + 2.3, SY + 5.2, 0.47, 'utara'], [SX + 3.4, SY + 5.2, 0.47, 'utara'],
+      [SX + 6.2, SY + 4.2, null, 'timur']]
+      .map(function (p) { return spot('server', p[0], p[1], p[2], JALAN_SERVER.sambung, JALAN_SERVER.masuk, p[3]); }),
+    rapat: KURSI_RAPAT.map(function (p) { return spot('rapat', p[0], p[1], 0.42, JALAN_RAPAT.sambung, JALAN_RAPAT.masuk,
+      arahDari(PUSAT_RAPAT[0] - p[0], PUSAT_RAPAT[1] - p[1])); }),
+    lounge: [[LX + 1.4, LY + 4.6, 0.42], [LX + 2.8, LY + 4.6, 0.42], [LX + 4.2, LY + 4.6, 0.42],
+      [LX + 1.8, LY + 1.8, 0.45], [LX + 3.2, LY + 1.8, 0.45], [LX + 5.8, LY + 3.2],
+      [LX + 9.4, LY + 4.6, 0.42], [LX + 10.8, LY + 4.6, 0.42], [LX + 12.2, LY + 4.6, 0.42],
+      [LX + 9.8, LY + 1.8, 0.45], [LX + 11.2, LY + 1.8, 0.45], [LX + 13.6, LY + 3.2]]
+      // Arah hadap tetap SELATAN: yang duduk duduk di sofa, dan sofanya bermuka selatan. Yang
+      // berubah karena lounge memanjang cuma JALAN MASUKNYA, bukan cara orang duduk di dalamnya.
+      .map(function (p) { return spot('lounge', p[0], p[1], p[2], JALAN_LOUNGE.sambung, JALAN_LOUNGE.masuk, 'selatan'); }),
     koridor: [],
     cadangan: []
   };
-  for (var kk = 0; kk < 16; kk++) SPOT.koridor.push(spot('koridor', 2 + kk * 1.45, H1, null, s1(2 + kk * 1.45), [], 'selatan'));
-  for (var kc = 0; kc < 6; kc++) SPOT.cadangan.push(spot('cadangan', 2.8 + kc * 2.1, 14.6, 0.42, s2(1.4), [[1.4, 14.6]], 'selatan'));
-  var SPOT_LEAD_POD = POD.map(function (p, n) { return spot('pod' + n, p[0] + 0.8, p[1] + 0.45, 0.47, s1(p[0] - 0.8), [[p[0] - 0.8, p[1] + 0.45]], 'selatan'); });
-  POD.forEach(function (p, n) {
-    var px = p[0], py = p[1];
-    SPOT['pod' + n] = [
-      spot('pod' + n, px - 0.45, py + 1.5, 0.42, s1(px - 0.8), [[px - 0.8, py + 1.5]], 'timur'),
-      spot('pod' + n, px + 2.85, py + 1.5, 0.42, s1(px + 3.2), [[px + 3.2, py + 1.5]], 'barat'),
-      spot('pod' + n, px + 0.9, py + 2.6, null, s1(px - 0.8), [[px - 0.8, py + 2.6]], 'utara'),
-      spot('pod' + n, px + 1.8, py + 2.6, null, s1(px - 0.8), [[px - 0.8, py + 2.6]], 'utara')
+  for (var kk = 0; kk < 10; kk++) SPOT.koridor.push(spot('koridor', 2.0 + kk * 3.3, LORONG_Y, null, sh(0, 2.0 + kk * 3.3), [], 'selatan'));
+  for (var kv = 0; kv < 8; kv++) SPOT.koridor.push(spot('koridor', LORONG_X, 2.0 + kv * 4.0, null, sv(2.0 + kv * 4.0), [], 'timur'));
+  // Bangku lorong dekat pintu masuk: tempat sesi yang posnya belum diketahui (pos Umum).
+  for (var kc = 0; kc < 6; kc++) SPOT.cadangan.push(spot('cadangan', 2.2 + kc * 1.7, LORONG_Y + 0.85, 0.42, sh(0, 2.2 + kc * 1.7), [[2.2 + kc * 1.7, LORONG_Y + 0.85]], 'selatan'));
+
+  var SPOT_LEAD_POS = {};
+  POS_DENAH.forEach(function (p, n) {
+    // Posisi diukur dari ZONA kerja (bisa cuma sebagian ruangan), pintunya dari RUANGAN.
+    var z = rzona(p), px = z.x, py = z.y, jalan = masukRuang(p);
+    var masuk = jalan.masuk, k = 'pos' + n;
+    SPOT[k] = [
+      // di depan rak buku, menghadap rak (utara)
+      spot(k, px + 1.1, py + 1.55, null, jalan.sambung, masuk, 'utara'),
+      spot(k, px + 2.6, py + 1.55, null, jalan.sambung, masuk, 'utara'),
+      // di meja: satu di sisi selatan menghadap meja, satu di sisi timur
+      spot(k, px + 1.7, py + 4.6, 0.42, jalan.sambung, masuk, 'utara'),
+      spot(k, px + 4.1, py + 3.7, 0.42, jalan.sambung, masuk, 'barat')
     ];
+    // Lead duduk di kepala meja; penanda warnanya lampu meja, sama seperti pod lama.
+    SPOT_LEAD_POS[k] = spot(k, px + 1.7, py + 3.0, 0.47, jalan.sambung, masuk, 'selatan');
   });
   var slotMilik = {};
   Object.keys(SPOT).forEach(function (k) { slotMilik[k] = []; });
-  var J1 = { x: V1, y: H1, seg: 'V1' }, J2 = { x: V1, y: H2, seg: 'V1' };
+  // Dua ruas koridor yang berpotongan di perempatan. Rute antar-ruas selalu lewat titik potong;
+  // tak ada jalan pintas, dan memang tak boleh ada, karena di gedung sungguhan juga tidak ada.
   function jalurKoridor(a, b) {
     if (a.seg === b.seg) return [b];
-    var ke = { H1: J1, H2: J2 };
-    if (a.seg === 'V1') return [ke[b.seg], b];
-    if (b.seg === 'V1') return [ke[a.seg], b];
-    return [ke[a.seg], ke[b.seg], b];
+    return [SIMPANG, b];
   }
   function proyeksiKoridor(x, y) {
-    var c = [
-      { x: Math.max(0.8, Math.min(25.2, x)), y: H1, seg: 'H1' },
-      { x: Math.max(0.8, Math.min(25.2, x)), y: H2, seg: 'H2' },
-      { x: V1, y: Math.max(H1, Math.min(H2, y)), seg: 'V1' }
-    ];
-    c.sort(function (a, b) { return Math.hypot(a.x - x, a.y - y) - Math.hypot(b.x - x, b.y - y); });
-    return c[0];
+    var h = { x: Math.max(0.8, Math.min(W - 0.8, x)), y: LORONG_Y, seg: 'H0' };
+    var v = { x: LORONG_X, y: Math.max(0.8, Math.min(D - 0.8, y)), seg: 'V0' };
+    return Math.hypot(h.x - x, h.y - y) <= Math.hypot(v.x - x, v.y - y) ? h : v;
   }
-
   // ---------------- denah statis, dirender sekali ke kelompok kedalaman ----------------
   var KELOMPOK_MIN = -2, KELOMPOK_MAKS = 60, KELOMPOK_DEPAN = 99;
   function idxKelompok(k) { return k >= 1000 ? KELOMPOK_DEPAN : Math.max(KELOMPOK_MIN, Math.min(KELOMPOK_MAKS, Math.floor(k))); }
@@ -319,7 +396,7 @@ footer li{margin:2px 0}
   var ledPod = [];
   var PAPAN_KOTAK = [];
   var elPapanTeks = {};
-  var TEKS_PAPAN = { perpustakaan: 'PERPUSTAKAAN', server: 'RUANG SERVER', meja: 'AREA MEJA · ' + POD.length + ' POD', rapat: 'RUANG RAPAT', lounge: 'LOUNGE', pintu: 'PINTU MASUK' };
+  var TEKS_PAPAN = { server: 'RUANG SERVER', rapat: 'RUANG RAPAT', lounge: 'LOUNGE', pintu: 'PINTU MASUK' };
   var lapisLabel = null;
 
   function bangunDenah() {
@@ -328,13 +405,19 @@ footer li{margin:2px 0}
 
     lapisLantai.push(box(0, 0, -0.45, W, D, 0.45, '#6f685c'));
     lapisLantai.push(lantai(0, 0, W, D, '#dccfb4'));
-    lapisLantai.push(lantai(0, 0, 12, 6, '#c2a47c'));
-    lapisLantai.push(lantai(12, 0, 14, 6, '#aab1ba'));
-    lapisLantai.push(lantai(0, 6, 26, 2, '#e6dcc6'));
-    lapisLantai.push(lantai(18, 8, 8, 7, '#9c9fbf'));
-    lapisLantai.push(lantai(0, 16.9, 9, 3.1, '#cdbf9f'));
-    lapisLantai.push(lantai(17, 16.3, 8.6, 3.5, '#8fa07e'));
-    lapisLantai.push(lantai(0.25, 17.8, 1.6, 1.4, '#3b3f46'));
+    // Lantai tiap pos diberi rona bergantian supaya batas posnya terbaca tanpa dinding penuh;
+    // dinding penuh akan menutup robot di baris belakang dari sudut pandang isometrik ini.
+    POS_DENAH.forEach(function (p, n) {
+      lapisLantai.push(lantai(p.x - 0.3, p.y - 0.3, rw(p) + 0.6, rd(p) + 0.6, n % 2 ? '#cbbd9e' : '#d3c6a8'));
+    });
+    // Zona server: rona sendiri DI DALAM lantai ruangan Tech Development, tanpa batas dinding.
+    lapisLantai.push(lantai(RUANG_SERVER.x - 0.1, RUANG_SERVER.y - 0.1, POS_LEBAR + 0.2, POS_DALAM + 0.2, '#aab1ba'));
+    lapisLantai.push(lantai(RUANG_RAPAT.x - 0.3, RUANG_RAPAT.y - 0.3, POS_LEBAR + 0.6, POS_DALAM + 0.6, '#9c9fbf'));
+    lapisLantai.push(lantai(RUANG_LOUNGE.x - 0.3, RUANG_LOUNGE.y - 0.3, rw(RUANG_LOUNGE) + 0.6, rd(RUANG_LOUNGE) + 0.6, '#8fa07e'));
+    TAMAN.forEach(function (g) { lapisLantai.push(lantai(g[0] - 0.3, g[1] - 0.3, POS_LEBAR + 0.6, POS_DALAM + 0.6, '#7f9a6a')); });
+    // Koridor perempatan: dua pita yang berpotongan di tengah gedung.
+    lapisLantai.push(lantai(0, LORONG_Y - LORONG_LEBAR / 2, W, LORONG_LEBAR, '#efe6d2'));
+    lapisLantai.push(lantai(LORONG_X - LORONG_LEBAR / 2, 0, LORONG_LEBAR, D, '#efe6d2'));
     var grid = '';
     for (var i = 1; i < W; i++) { var a = P(i, 0), b = P(i, D); grid += '<line x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '"/>'; }
     for (var j = 1; j < D; j++) { var c = P(0, j), e = P(W, j); grid += '<line x1="' + c[0] + '" y1="' + c[1] + '" x2="' + e[0] + '" y2="' + e[1] + '"/>'; }
@@ -362,12 +445,8 @@ footer li{margin:2px 0}
         taruh((s[0] + s[1]) / 2 + tetap, bx);
       });
     }
-    kaca('y', 12, 0, 6);
-    kaca('x', 6, 0, 12, [[5, 7]]);
-    kaca('x', 6, 12, 26, [[14, 16]]);
-    kaca('y', 18, 8, 15, [[10.5, 12]]);
-    kaca('x', 8, 18, 26);
-    kaca('x', 15, 18, 26);
+    // Kaca hanya mengurung tiga ruangan bersama di kolom kanan; pos departemen sengaja terbuka,
+    // karena dinding penuh akan menutup robot di baris belakang dari sudut pandang ini.
 
     function tanaman(x, y) {
       taruh(x + y, box(x - 0.2, y - 0.2, 0, 0.4, 0.4, 0.4, '#b56b45') + box(x - 0.3, y - 0.3, 0.4, 0.6, 0.6, 0.55, '#3f8f52') + box(x - 0.18, y - 0.18, 0.95, 0.36, 0.36, 0.3, '#4fa862'));
@@ -426,23 +505,136 @@ footer li{margin:2px 0}
       segmen(x, x + w).forEach(function (s) { taruh((s[0] + s[1]) / 2 + y - 0.1, box(s[0], y, 0, s[1] - s[0], 0.9, 0.42, '#4d5a8a') + box(s[0], y, 0.42, s[1] - s[0], 0.25, 0.52, '#44507c')); });
       taruh(x + w + y + 0.95, box(x + w, y, 0, 0.2, 0.9, 0.62, '#3f4a73'));
     }
-    function pod(n) {
-      var px = POD[n][0], py = POD[n][1], dx = px, dy = py + 0.9, s = '';
-      [[0.1, 0.1], [2.18, 0.1], [0.1, 0.98], [2.18, 0.98]].forEach(function (p) { s += box(dx + p[0], dy + p[1], 0, 0.12, 0.12, 0.7, '#4a3a28'); });
-      s += box(dx, dy, 0.7, 2.4, 1.2, 0.08, '#b08a5f');
-      s += box(dx + 0.35, dy + 0.3, 0.78, 0.7, 0.25, 0.03, '#d9d6cf');
-      s += box(dx + 1.55, dy + 0.85, 0.78, 0.12, 0.12, 0.22, '#2a2d33');
-      // Monitor di sisi utara meja, layarnya menghadap robot; penonton melihat punggung monitor. Penanda warna Lead
-      // pindah jadi lampu meja, tetap ber-id led-pod-<n> supaya logika identitas tak berubah. Ia ditaruh di sisi
-      // SELATAN monitor, bukan di sisi layarnya: meja di sisi utara tertutup badan monitor dari sudut pandang ini,
-      // jadi penanda di sana hanya terlihat karena tergambar belakangan, bukan karena benar-benar kelihatan.
-      s += box(dx + 1.15, dy + 0.35, 0.78, 0.9, 0.1, 0.5, '#23262d');
-      s += '<polygon id="led-pod-' + n + '" points="' + pts([P(dx + 1.15, dy + 0.52, 0.781), P(dx + 2.05, dy + 0.52, 0.781),
-        P(dx + 2.05, dy + 0.8, 0.781), P(dx + 1.15, dy + 0.8, 0.781)]) + '" fill="' + LED_KOSONG + '" fill-opacity=".9"/>';
-      taruh(dx + 1.2 + dy + 0.6, s);
-      kursi(px + 0.8, py + 0.45, '#5a5f6b', 'selatan');
-      bangku(px - 0.45, py + 1.5);
-      bangku(px + 2.85, py + 1.5);
+    // Satu pos departemen: rak buku di sisi utara, meja kerja di sisi selatan, dan lampu meja
+    // berwarna sesi sebagai penanda Lead. Dibangkitkan dari SATU fungsi untuk dua belas pos;
+    // menempatkannya tangan berarti dua belas tempat yang harus dijaga sama.
+    // Tiap pos adalah RUANGAN, bukan sekadar petak lantai: berdinding, dan keluar-masuknya HANYA
+    // lewat satu pintu yang menghadap koridor. Tinggi dindingnya sengaja tidak seragam, dan itu
+    // konvensi potongan isometrik, bukan kelalaian: dinding UTARA dan BARAT jauh dari kamera
+    // sehingga boleh setinggi ruangan, sedangkan dinding SELATAN dan TIMUR ada di antara kamera
+    // dan isi ruangan sehingga dibuat setinggi pinggang. Menyeragamkannya setinggi ruangan akan
+    // menyembunyikan seluruh isi pos dari sudut pandang ini.
+    // Sekat ruangan KACA (permintaan pemilik 2026-09-21), bukan dinding masif. Dua alasan yang
+    // kebetulan sejalan: kaca memperlihatkan isi ruangan dari koridor, dan ia menghapus masalah
+    // lama bahwa dinding tinggi di sisi dekat kamera menyembunyikan isinya. Karena itu keempat
+    // sisinya kini boleh sama tinggi. Rangka bawah dan tiang sudut tetap masif supaya kacanya
+    // terbaca sebagai sekat yang dipasang, bukan bidang melayang.
+    var DINDING_TINGGI = 2.45, PINTU_LEBAR = 1.8;
+    var RANGKA = '#cfc7b6', KACA_SEKAT = '#b9d3e6';
+    function kacaLurus(sumbu, tetap, dari, sampai, celah, k0) {
+      segmen(dari, sampai, celah).forEach(function (s) {
+        var bx = sumbu === 'x'
+          ? box(s[0], tetap, 0.18, s[1] - s[0], 0.1, DINDING_TINGGI - 0.18, KACA_SEKAT, { opacity: 0.3, garis: '#e8f3fb' })
+            + box(s[0], tetap - 0.02, 0, s[1] - s[0], 0.14, 0.18, RANGKA)
+          : box(tetap, s[0], 0.18, 0.1, s[1] - s[0], DINDING_TINGGI - 0.18, KACA_SEKAT, { opacity: 0.3, garis: '#e8f3fb' })
+            + box(tetap - 0.02, s[0], 0, 0.14, s[1] - s[0], 0.18, RANGKA);
+        taruh((s[0] + s[1]) / 2 + tetap + k0, bx);
+      });
+    }
+    function sekatRuang(rx, ry, sisi, rlebar, rdalam) {
+      rlebar = rlebar || POS_LEBAR; rdalam = rdalam || POS_DALAM;
+      var x0 = rx - 0.3, y0 = ry - 0.3, w = rlebar + 0.6, d = rdalam + 0.6;
+      var mx = rx + rlebar / 2, my = ry + rdalam / 2;
+      var celahX = [[mx - PINTU_LEBAR / 2, mx + PINTU_LEBAR / 2]];
+      var celahY = [[my - PINTU_LEBAR / 2, my + PINTU_LEBAR / 2]];
+      kacaLurus('x', y0, x0, x0 + w, sisi === 'utara' ? celahX : null, 0);
+      kacaLurus('x', y0 + d - 0.1, x0, x0 + w, sisi === 'selatan' ? celahX : null, 0.02);
+      kacaLurus('y', x0, y0, y0 + d, sisi === 'barat' ? celahY : null, 0);
+      kacaLurus('y', x0 + w - 0.1, y0, y0 + d, sisi === 'timur' ? celahY : null, 0.02);
+      // Kusen dan daun pintu. Daun digambar TERBUKA 90 derajat ke dalam ruangan: box() hanya bisa
+      // sejajar sumbu, jadi daun setengah terbuka mustahil tanpa memutar poligon sendiri.
+      var kusen = '#8a6a47', tegak = (sisi === 'utara' || sisi === 'selatan');
+      var a = tegak ? mx - PINTU_LEBAR / 2 : my - PINTU_LEBAR / 2;
+      var t = sisi === 'utara' ? y0 : sisi === 'selatan' ? y0 + d - 0.12 : sisi === 'barat' ? x0 : x0 + w - 0.12;
+      [a - 0.12, a + PINTU_LEBAR].forEach(function (q) {
+        var bx = tegak ? box(q, t, 0, 0.12, 0.16, DINDING_TINGGI, kusen) : box(t, q, 0, 0.16, 0.12, DINDING_TINGGI, kusen);
+        taruh((tegak ? q + t : t + q) + 0.03, bx);
+      });
+      var dalam = (sisi === 'utara' || sisi === 'barat') ? 1 : -1;
+      var daun = tegak
+        ? box(a, t + (dalam > 0 ? 0.16 : -1.5), 0.02, 0.09, 1.5, DINDING_TINGGI - 0.3, '#a8814f')
+        : box(t + (dalam > 0 ? 0.16 : -1.5), a, 0.02, 1.5, 0.09, DINDING_TINGGI - 0.3, '#a8814f');
+      taruh((tegak ? a + t : t + a) + 1.6, daun);
+    }
+
+    // ⛔ Isi ruangan dinyatakan dalam koordinat LOKAL (u, v), bukan koordinat lantai: u menyusuri
+    // dinding pintu, v diukur dari dinding SEBERANG pintu menuju pintu. Dengan begitu rak selalu
+    // menempel di dinding seberang dan yang duduk selalu menghadap pintunya, apa pun sisi pintu
+    // ruangan itu. Versi sebelumnya menaruh semua perabot menghadap penonton, sehingga ruangan
+    // yang pintunya di utara atau barat terbaca terbalik: raknya menghalangi pintunya sendiri.
+    function lokalKotak(r, u, v, lu, lv) {
+      var s = r.sisi;
+      if (s === 'utara') return [r.x + POS_LEBAR - u - lu, r.y + POS_DALAM - v - lv, lu, lv];
+      if (s === 'timur') return [r.x + v, r.y + u, lv, lu];
+      if (s === 'barat') return [r.x + POS_LEBAR - v - lv, r.y + POS_DALAM - u - lu, lv, lu];
+      return [r.x + u, r.y + v, lu, lv];
+    }
+    // ⛔ Rak dan perabot berpunggung TIDAK boleh diletakkan di dinding seberang pintu begitu saja.
+    // Proyeksi ini hanya menggambar bidang SELATAN dan TIMUR, jadi rak yang mukanya menghadap
+    // utara atau barat kehilangan mukanya sama sekali dan terbaca membelakangi pintu, persis
+    // keluhan yang muncul di ruang Quality (pintu utara).
+    //
+    // Aturannya: muka perabot selalu SELATAN atau TIMUR, dan dindingnya dipilih supaya muka itu
+    // tak pernah membelakangi pintu. Pintu selatan atau barat -> rak di dinding utara (muka ke
+    // selatan). Pintu utara atau timur -> rak di dinding barat (muka ke timur). Dengan begitu
+    // muka rak selalu tergambar, dan sudutnya terhadap pintu paling buruk 90 derajat, tak pernah
+    // 180 derajat.
+    function mukaTampak(sisi) { return (sisi === 'selatan' || sisi === 'barat') ? 'selatan' : 'timur'; }
+    function kotakRak(r, panjang, tebal) {
+      return mukaTampak(r.sisi) === 'selatan'
+        ? [r.x + 0.5, r.y + 0.25, panjang, tebal]
+        : [r.x + 0.25, r.y + 0.5, tebal, panjang];
+    }
+    var WARNA_KURSI = ['#5a5f6b', '#4d5a6b', '#5f5a52', '#55606b'];
+    function rakBukuKotak(x, y, w, d, mukaKe) {
+      var mendatar = w >= d, s = box(x, y, 0, w, d, 2.5, '#7a5a36');
+      [0.2, 0.95, 1.7].forEach(function (z, rr) {
+        var c = (mendatar ? x : y) + 0.12, n = 0, batas = (mendatar ? x + w : y + d) - 0.25;
+        while (c < batas) {
+          var bw = 0.12 + ((n * 7 + rr * 3) % 4) * 0.04, bh = 0.45 + ((n * 5 + rr) % 3) * 0.08;
+          // Muka buku di sisi yang MENGHADAP PINTU, bukan selalu sisi selatan/timur. Untuk ruangan
+          // berpintu utara atau barat, muka itu jatuh di bidang yang tak tergambar proyeksi ini, jadi
+          // raknya tampil sebagai kotak polos. Itu ongkos yang disadari dari aturan menghadap pintu.
+          var mv = mukaKe === 'selatan' ? y + d - 0.12 : mukaKe === 'utara' ? y : null;
+          var mh = mukaKe === 'timur' ? x + w - 0.12 : mukaKe === 'barat' ? x : null;
+          s += mendatar ? box(c, mv, z, bw, 0.12, bh, BUKU[(n + rr * 2) % BUKU.length])
+                        : box(mh, c, z, 0.12, bw, bh, BUKU[(n + rr * 2) % BUKU.length]);
+          c += bw + 0.02; n++;
+        }
+      });
+      taruh(x + w / 2 + y + d / 2, s);
+    }
+    function mejaKotak(x, y, w, d) {
+      var s = '';
+      [[0.1, 0.1], [w - 0.22, 0.1], [0.1, d - 0.22], [w - 0.22, d - 0.22]].forEach(function (q) {
+        s += box(x + q[0], y + q[1], 0, 0.12, 0.12, 0.7, '#4a3a28');
+      });
+      s += box(x, y, 0.7, w, d, 0.08, '#b08a5f');
+      taruh(x + w / 2 + y + d / 2, s);
+    }
+    function lemariKotak(x, y, w, d, warna) {
+      taruh(x + w / 2 + y + d / 2, box(x, y, 0, w, d, 1.6, warna || '#8d7350'));
+    }
+    function perabotPos(n) {
+      var p = rzona(POS_DENAH[n]), v = n % 4, q;
+      q = lokalKotak(p, 0.6, 2.6, POS_LEBAR - 1.2, 2.8);
+      lapisLantai.push(lantai(q[0], q[1], q[2], q[3], v % 2 ? '#c9bda4' : '#c4b9a6'));
+      q = kotakRak(p, 3.2, 0.7); rakBukuKotak(q[0], q[1], q[2], q[3], mukaTampak(p.sisi));
+      q = mukaTampak(p.sisi) === 'selatan' ? [p.x + 4.4, p.y + 0.3, 1.4, 0.6] : [p.x + 0.3, p.y + 4.4, 0.6, 1.4];
+      lemariKotak(q[0], q[1], q[2], q[3], v === 1 ? '#7d6a4e' : '#8d7350');
+      q = lokalKotak(p, 0.7, 2.9, 2.4, 1.2); mejaKotak(q[0], q[1], q[2], q[3]);
+      // Lampu meja = penanda warna Lead, id led-pos-<n>; di tepi meja pada sisi pintunya.
+      var l = lokalKotak(p, 1.3, 4.0, 1.1, 0.28);
+      taruh(l[0] + l[2] / 2 + l[1] + 0.9, '<polygon id="led-pos-' + n + '" points="' +
+        pts([P(l[0], l[1], 0.781), P(l[0] + l[2], l[1], 0.781),
+          P(l[0] + l[2], l[1] + l[3], 0.781), P(l[0], l[1] + l[3], 0.781)]) +
+        '" fill="' + LED_KOSONG + '" fill-opacity=".9"/>');
+      q = lokalKotak(p, 4.2, 3.0, 2.2, 1.1); mejaKotak(q[0], q[1], q[2], q[3]);
+      // Kursi menghadap PINTU, bukan menghadap penonton.
+      q = lokalKotak(p, 1.9, 4.5, 0.1, 0.1); kursi(q[0], q[1], WARNA_KURSI[v], p.sisi);
+      q = lokalKotak(p, 5.3, 4.4, 0.1, 0.1); kursi(q[0], q[1], WARNA_KURSI[(v + 2) % 4], p.sisi);
+      q = lokalKotak(p, 3.2, 5.6, 0.1, 0.1); bangku(q[0], q[1]);
+      q = lokalKotak(p, 6.4, 1.0, 0.1, 0.1); tanaman(q[0], q[1]);
     }
     function mejaBundar(cx, cy, r) {
       var atas = P(cx, cy, 0.76), bawah = P(cx, cy, 0.66), rx = r * HW * Math.SQRT2, ry = r * HH * Math.SQRT2;
@@ -452,43 +644,50 @@ footer li{margin:2px 0}
       taruh(cx + cy, s);
     }
 
-    [0.4, 3.1, 6.3, 9.0].forEach(function (x) { rakBuku(x, 0.05, 2.5); });
-    mejaBaca(2.4, 3.0); mejaBaca(7.2, 3.0);
-    tanaman(11.4, 5.4);
-    [13.0, 14.4, 15.8, 17.2, 18.6, 20.0].forEach(function (x) { rakServer(x, 0.15); });
-    rakServer(24.7, 0.4); rakServer(24.7, 1.8);
-    mejaKonsol(21.2, 3.6);
-    kursi(21.95, 5.0, '#5a5f6b', 'utara'); kursi(23.05, 5.0, '#5a5f6b', 'utara');
-    POD.forEach(function (_, n) { pod(n); });
-    segmen(2.0, 14.0).forEach(function (s) { taruh((s[0] + s[1]) / 2 + 15.55, box(s[0] + 0.44, 15.5, 0, 0.12, 0.12, 0.7, '#4a3a28') + box(s[0], 15.1, 0.7, s[1] - s[0], 0.9, 0.08, '#c2a57c')); });
+    POS_DENAH.forEach(function (p, n) { sekatRuang(p.x, p.y, p.sisi, rw(p), rd(p)); perabotPos(n); });
+    sekatRuang(RUANG_RAPAT.x, RUANG_RAPAT.y, RUANG_RAPAT.sisi);   // lounge sengaja TERBUKA; server menyatu dengan ruangan IT
+    // Rak server menempel di dinding SEBERANG pintu, jadi yang berdiri di depannya menghadap pintu.
+    [0.9, 2.1, 3.3, 4.5].forEach(function (dx) { rakServer(SX + dx - 0.55, SY + 1.5); });
+    rakServer(SX + 5.9, SY + 3.4); rakServer(SX + 5.9, SY + 4.8);
+    mejaKonsol(SX + 1.5, SY + 4.0);
+    kursi(SX + 2.3, SY + 5.2, '#5a5f6b', 'utara'); kursi(SX + 3.4, SY + 5.2, '#5a5f6b', 'utara');
+    mejaBundar(PUSAT_RAPAT[0], PUSAT_RAPAT[1], 1.55);
+    sofa(LX + 1.0, LY + 4.15, 3.4);
+    kursiSantai(LX + 1.8, LY + 1.8); kursiSantai(LX + 3.2, LY + 1.8);
+    // Separuh timur lounge (bekas pos Printing): kelompok duduk kedua, bukan ruang kosong yang
+    // cuma memperlebar lantai.
+    sofa(LX + 9.0, LY + 4.15, 3.4);
+    kursiSantai(LX + 9.8, LY + 1.8); kursiSantai(LX + 11.2, LY + 1.8);
+    mejaBundar(LX + 10.5, LY + 3.1, 1.05);
+    tanaman(LX + 7.6, LY + 1.2); tanaman(LX + 13.9, LY + 5.9);
+    TAMAN.forEach(function (g) {
+      [[1.6, 1.8], [3.7, 2.6], [2.4, 4.6], [5.2, 4.0], [4.4, 5.8]].forEach(function (q) { tanaman(g[0] + q[0], g[1] + q[1]); });
+      taruh(g[0] + 2.6 + g[1] + 3.4, box(g[0] + 2.2, g[1] + 3.2, 0, 1.7, 0.6, 0.38, '#8a6a47'));
+    });
     SPOT.cadangan.forEach(function (sp) { bangku(sp.x, sp.y); });
-    tanaman(0.6, 7.3); tanaman(17.4, 7.3); tanaman(17.4, 16.0); tanaman(25.4, 7.5);
-    mejaBundar(22, 11.5, 1.8);
-    KURSI_RAPAT.forEach(function (p) { bangku(p[0], p[1], '#5a5f6b'); });
-    sofa(18.2, 18.85, 3.6);
-    kursiSantai(20.5, 16.95); kursiSantai(21.8, 16.95);
-    taruh(20.2 + 0.9 + 17.9 + 0.4, box(20.2, 17.9, 0, 1.8, 0.7, 0.36, '#8a6a47'));
-    taruh(12.45 + 17.65, box(12.1, 17.3, 0, 0.7, 0.7, 0.35, '#d98a4a') + box(12.2, 17.4, 0.35, 0.5, 0.5, 0.15, '#e39a5c'));
-    taruh(14.05 + 17.95, box(13.7, 17.6, 0, 0.7, 0.7, 0.35, '#c65a7a') + box(13.8, 17.7, 0.35, 0.5, 0.5, 0.15, '#d06c8a'));
-    segmen(10.6, 15.2).forEach(function (s) { taruh((s[0] + s[1]) / 2 + 19.45, box(s[0], 19.15, 0, s[1] - s[0], 0.65, 0.95, '#d9d3c7')); });
-    taruh(11.2 + 19.45 + 0.1, box(11.0, 19.25, 0.95, 0.45, 0.4, 0.5, '#2f333a'));
-    taruh(15.8 + 19.4, box(15.4, 19.0, 0, 0.8, 0.8, 1.9, '#dfe3e8'));
-    tanaman(9.6, 19.4); tanaman(25.5, 15.6);
-    segmen(3.0, 6.4).forEach(function (s) { taruh((s[0] + s[1]) / 2 + 17.7, box(s[0], 17.3, 0, s[1] - s[0], 0.8, 1.0, '#e2d8c5')); });
-    tanaman(8.4, 17.4);
-
-    function tandaArea(area, x, y, z) {
-      var teks = TEKS_PAPAN[area], p = P(x, y, z), w = (teks.length + 3) * 5.6 + 14;
-      papan.push('<g class="papan" transform="translate(' + p[0].toFixed(1) + ',' + p[1].toFixed(1) + ')"><rect x="' + (-w / 2) + '" y="-10" width="' + w + '" height="14" rx="2"/><text id="papan-' + area + '" text-anchor="middle" y="0.5">' + teks + '</text></g>');
+    function papanTeks(id, teks, x, y, z) {
+      var p = P(x, y, z), w = (teks.length + 3) * 5.6 + 14;
+      papan.push('<g class="papan" transform="translate(' + p[0].toFixed(1) + ',' + p[1].toFixed(1) + ')"><rect x="' + (-w / 2) + '" y="-10" width="' + w + '" height="14" rx="2"/><text id="papan-' + id + '" text-anchor="middle" y="0.5">' + teks + '</text></g>');
       PAPAN_KOTAK.push([p[0] - w / 2, p[1] - 10, p[0] + w / 2, p[1] + 4]);
     }
-    tandaArea('perpustakaan', 6, 3, 3.3);
-    tandaArea('server', 19, 3, 3.3);
-    tandaArea('meja', 8.5, 8.2, 2.3);
-    tandaArea('rapat', 22, 8.6, 2.9);
-    tandaArea('lounge', 23.2, 16.3, 2.2);
-    tandaArea('pintu', 1.6, 18.5, 3.1);
-
+    function tandaArea(area, x, y, z) { papanTeks(area, TEKS_PAPAN[area], x, y, z); }
+    // Papan nama tiap pos: tanpa ini denahnya cuma dua belas kotak yang mirip, dan pertanyaan
+    // yang justru ingin dijawab pemilik (departemen mana) tak terjawab sama sekali.
+    // Papan nama menempel DI ATAS PINTU tiap ruangan, bukan mengambang di atas rak: di render
+    // sebelumnya ia menumpuk dengan rak buku, dan di atas pintu itulah tempat orang membacanya
+    // saat menyusuri koridor.
+    function papanRuang(id, teks, r) {
+      var lw = rw(r), ld = rd(r);
+      var x = r.x + lw / 2, y = r.y + ld / 2;
+      if (r.sisi === 'selatan') y = r.y + ld + 0.35; else if (r.sisi === 'utara') y = r.y - 0.35;
+      else if (r.sisi === 'timur') x = r.x + lw + 0.35; else if (r.sisi === 'barat') x = r.x - 0.35;
+      papanTeks(id, teks, x, y, 2.75);
+    }
+    POS_DENAH.forEach(function (p, n) { papanRuang('pos' + n, p.nama.toUpperCase(), p); });
+    papanRuang('server', TEKS_PAPAN.server, RUANG_SERVER);
+    papanRuang('rapat', TEKS_PAPAN.rapat, RUANG_RAPAT);
+    papanRuang('lounge', TEKS_PAPAN.lounge, RUANG_LOUNGE);
+    tandaArea('pintu', 1.7, 24.6, 3.1);
     item.sort(function (a, b) { return a.k - b.k; });
     var isi = new Map();
     item.forEach(function (it) { var k = idxKelompok(it.k); isi.set(k, (isi.get(k) || '') + it.s); });
@@ -497,7 +696,7 @@ footer li{margin:2px 0}
     dunia += '<g data-k="' + KELOMPOK_DEPAN + '">' + (isi.get(KELOMPOK_DEPAN) || '') + '</g>';
     svg.innerHTML = '<g id="lantai">' + lapisLantai.join('') + '</g><g id="dunia">' + dunia + '</g><g id="papan-area">' + papan.join('') + '</g><g id="label"></g>';
     svg.querySelectorAll('#dunia > g').forEach(function (g) { kelompokEl.set(Number(g.getAttribute('data-k')), g); });
-    POD.forEach(function (_, n) { ledPod.push(document.getElementById('led-pod-' + n)); });
+    POS_DENAH.forEach(function (_, n) { ledPod.push(document.getElementById('led-pos-' + n)); });
     Object.keys(TEKS_PAPAN).forEach(function (a) { elPapanTeks[a] = document.getElementById('papan-' + a); });
     lapisLabel = document.getElementById('label');
   }
@@ -592,7 +791,7 @@ footer li{margin:2px 0}
   }
 
   var robots = new Map();
-  var podMilik = POD.map(function () { return null; });
+  var podMilik = POS_DENAH.map(function () { return null; });
   var warnaMilik = WARNA.map(function () { return null; });
   var dataTerakhir = null, sorotId = null, labelKotor = true, tabTanda = '', panelTerakhir = '', salinStatus = null;
   var feed = [];
@@ -631,9 +830,14 @@ footer li{margin:2px 0}
       if (r.warnaIdx >= 0 && warnaMilik[r.warnaIdx] == null) warnaMilik[r.warnaIdx] = r.key;
       else { r.warnaIdx = warnaMilik.indexOf(null); if (r.warnaIdx >= 0) warnaMilik[r.warnaIdx] = r.key; }
     }
-    if (!(r.pod >= 0 && podMilik[r.pod] === r.key)) {
-      if (r.pod >= 0 && podMilik[r.pod] == null) podMilik[r.pod] = r.key;
-      else { r.pod = podMilik.indexOf(null); if (r.pod >= 0) podMilik[r.pod] = r.key; }
+    // Pos ditentukan DEPARTEMEN sesi ini, bukan kursi kosong mana pun: itulah seluruh gunanya.
+    // Departemen yang sama dipegang dua sesi berarti yang kedua tak mendapat kursi kepala; ia
+    // tetap di pos yang sama lewat slot biasa, bukan dipindah ke departemen orang lain.
+    var mau = indeksPos(r.pos);
+    if (!(r.pod >= 0 && podMilik[r.pod] === r.key && r.pod === mau)) {
+      if (r.pod >= 0 && podMilik[r.pod] === r.key) { podMilik[r.pod] = null; ledPod[r.pod].setAttribute('fill', LED_KOSONG); }
+      r.pod = (mau >= 0 && podMilik[mau] == null) ? mau : -1;
+      if (r.pod >= 0) podMilik[r.pod] = r.key;
     }
     if (r.pod >= 0) ledPod[r.pod].setAttribute('fill', warnaRobot(r));
     r.kunciBadan = '';
@@ -670,7 +874,25 @@ footer li{margin:2px 0}
     if (daftar && daftar[r.slot.i] === r.key) daftar[r.slot.i] = null;
     r.slot = null;
   }
-  function ambilSlot(r, area) {
+  // Pos departemen sesi ini. 'perpustakaan' dan 'meja' kini ada DI DALAM pos, bukan sebagai
+  // ruangan bersama, jadi keduanya diterjemahkan ke grup posnya. Sesi yang posnya belum
+  // diketahui duduk di bangku cadangan dekat pintu; kartunyalah yang menjelaskan sebabnya,
+  // bukan robot yang diam-diam dititipkan ke pos departemen orang lain.
+  var NAMA_POS = POS_DENAH.map(function (p) { return p.nama; });
+  function indeksPos(nama) { return NAMA_POS.indexOf(nama || POS_UMUM); }
+  function grupPos(r) {
+    // Kursi kepala boleh tak kebagian, tetapi POSNYA tetap posnya sendiri. Memakai r.pod saja
+    // akan memindahkan sesi kedua sebuah departemen ke bangku cadangan, padahal ia jelas
+    // sedang mengerjakan departemen itu.
+    var induk = r.tipe === 'sub' && r.indukKey ? robots.get(r.indukKey) : null;
+    var i = indeksPos((induk || r).pos);
+    return i >= 0 ? 'pos' + i : 'cadangan';
+  }
+  function grupUntuk(r, area) {
+    return (area === 'perpustakaan' || area === 'meja') ? grupPos(r) : area;
+  }
+  function ambilSlot(r, areaMinta) {
+    var area = grupUntuk(r, areaMinta);
     if (r.slot && r.slot.area === area) return SPOT[area][r.slot.i];
     if (r.slot && r.slot.luapan === area) {   // sedang antre: masuk begitu ada slot kosong
       var daftarArea = slotMilik[area], bebas = -1;
@@ -686,11 +908,11 @@ footer li{margin:2px 0}
   }
   function spotMeja(r) {
     if (r.tipe === 'lead') {
-      if (r.pod >= 0) { lepasSlot(r); return SPOT_LEAD_POD[r.pod]; }
+      if (r.pod >= 0) { lepasSlot(r); return SPOT_LEAD_POS['pos' + r.pod]; }   // kursi kepala di pos departemennya
       return ambilSlot(r, 'cadangan');
     }
     var induk = robots.get(r.indukKey);
-    if (induk && induk.pod >= 0) return ambilSlot(r, 'pod' + induk.pod);
+    return ambilSlot(r, grupPos(r));
     return ambilSlot(r, 'koridor');
   }
   function areaTujuan(r, sekarang) {
@@ -777,9 +999,29 @@ footer li{margin:2px 0}
   var kamera = { x: VIEW_AWAL.x, y: VIEW_AWAL.y, w: VIEW_AWAL.w, h: VIEW_AWAL.h };
   var kameraDiam = true;
 
+  // Zoom manual. Denah pos departemen jauh lebih besar daripada denah lama, jadi 'muat semua'
+  // saja tidak cukup: pemilik perlu bisa mendekat ke satu pos. Roda tetikus memperbesar ke arah
+  // KURSOR, bukan ke tengah layar, karena memperbesar ke tengah membuat yang sedang dilihat
+  // orang justru keluar dari layar.
+  var ZOOM_MIN = 1, ZOOM_MAKS = 5, zoomManual = 1, pusatManual = null;
+  function tampilanManual() {
+    var w = VIEW_AWAL.w / zoomManual, h = VIEW_AWAL.h / zoomManual;
+    var c = pusatManual || { x: VIEW_AWAL.x + VIEW_AWAL.w / 2, y: VIEW_AWAL.y + VIEW_AWAL.h / 2 };
+    var cx = Math.min(Math.max(c.x, VIEW_AWAL.x + w / 2), VIEW_AWAL.x + VIEW_AWAL.w - w / 2);
+    var cy = Math.min(Math.max(c.y, VIEW_AWAL.y + h / 2), VIEW_AWAL.y + VIEW_AWAL.h - h / 2);
+    return { x: cx - w / 2, y: cy - h / 2, w: w, h: h };
+  }
+  function setZoom(z, fx, fy) {
+    var titik = { x: kamera.x + fx * kamera.w, y: kamera.y + fy * kamera.h };
+    zoomManual = Math.min(ZOOM_MAKS, Math.max(ZOOM_MIN, z));
+    if (zoomManual <= ZOOM_MIN + 1e-6) { pusatManual = null; return; }
+    var w = VIEW_AWAL.w / zoomManual, h = VIEW_AWAL.h / zoomManual;
+    pusatManual = { x: titik.x + (0.5 - fx) * w, y: titik.y + (0.5 - fy) * h };
+  }
+
   function targetKamera() {
     var r = sorotId ? robots.get(sorotId) : null;
-    if (!r) return VIEW_AWAL;        // sesi yang sudah pergi juga mengembalikan kamera, bukan membeku
+    if (!r) return tampilanManual();   // sesi yang sudah pergi juga mengembalikan kamera, bukan membeku
     var w = VIEW_AWAL.w / ZOOM_SOROT, h = VIEW_AWAL.h / ZOOM_SOROT;
     var p = P(r.x, r.y);
     // titik acuan robot ada di LANTAI, jadi pusat dinaikkan setengah tingginya supaya badannya,
@@ -918,10 +1160,19 @@ footer li{margin:2px 0}
   }
 
   // ---------------- data ----------------
+  // ⛔ `pos` WAJIB ada di daftar ini. Ia dibaca grupPos() dan klaimIdentitas(), tetapi tak pernah
+  // diisi di tempat lain, jadi menghapusnya dari sini tidak melempar apa pun: SELURUH robot jatuh
+  // ke bangku cadangan seolah posnya belum diketahui, ruangan departemen berdiri kosong, dan
+  // denahnya tetap terlihat masuk akal. Persis itu yang terjadi sampai uji browser 2b menangkapnya.
   function salin(r, s) {
+    var posLama = r.pos;
     ['judul', 'tahap', 'pr', 'area', 'keadaan', 'alat', 'detail', 'durasi_detik', 'diam_detik', 'jenis', 'peran', 'deskripsi',
-      'asal', 'nama', 'pid'].forEach(function (k) { r[k] = s[k]; });
+      'asal', 'nama', 'pid', 'pos'].forEach(function (k) { r[k] = s[k]; });
     r.jumlahSub = (s.subagent || []).length;
+    // Pos menentukan kursi kepala dan lampu mejanya, dan pos sebuah sesi BISA berganti di tengah
+    // jalan begitu ia menyentuh berkas departemen lain. Tanpa klaim ulang, Lead tetap memegang
+    // lampu meja pos lamanya dan pos barunya tak pernah menyala.
+    if (r.tipe === 'lead' && r.pos !== posLama) klaimIdentitas(r);
   }
   function catatFeed(r, dari, ke) {
     var teks;
@@ -1124,6 +1375,23 @@ footer li{margin:2px 0}
     if (!g) return;
     setSorot(sorotId === g.getAttribute('data-lead') ? null : g.getAttribute('data-lead'));
   });
+  // Roda tetikus dan tombol. Menggulir di atas denah MENOLAK perilaku bawaan halaman supaya
+  // halamannya tidak ikut bergulir; karena itu listener-nya wajib { passive: false }.
+  panggung.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    var kotak = svg.getBoundingClientRect();
+    if (!kotak.width || !kotak.height) return;
+    if (sorotId) setSorot(null);   // kamera pengikut dan zoom manual tak boleh berebut kendali
+    setZoom(zoomManual * (e.deltaY < 0 ? 1.18 : 1 / 1.18),
+      (e.clientX - kotak.left) / kotak.width, (e.clientY - kotak.top) / kotak.height);
+  }, { passive: false });
+  function tombolZoom(id, f) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('click', function () { if (sorotId) setSorot(null); f(); });
+  }
+  tombolZoom('zoom-masuk', function () { setZoom(zoomManual * 1.4, 0.5, 0.5); });
+  tombolZoom('zoom-keluar', function () { setZoom(zoomManual / 1.4, 0.5, 0.5); });
+  tombolZoom('zoom-pas', function () { zoomManual = ZOOM_MIN; pusatManual = null; });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && sorotId) setSorot(null);
   });
@@ -1170,6 +1438,17 @@ footer li{margin:2px 0}
     layar: function () {
       return { ada_data: !!dataTerakhir, dibuat: dataTerakhir && dataTerakhir.dibuat, basi: panggung.classList.contains('basi'),
         banner: elBanner.hidden ? '' : elBanner.textContent, kosong: elKosong.hidden ? '' : elKosong.textContent };
+    },
+    // Geometri dipaparkan supaya uji browser MEMBACA denah, bukan mengetik ulang koordinatnya.
+    // Patokan yang diketik ulang gagal senyap begitu denahnya digeser: pusat meja rapat sempat
+    // tertinggal di koordinat tata letak lama, dan check-nya lalu menuduh kursi yang sudah benar.
+    geometri: function () {
+      function kotakUji(r) { return { x: r.x, y: r.y, w: rw(r), d: rd(r) }; }
+      var out = { pos: {}, zona: {}, server: kotakUji(RUANG_SERVER), rapat: kotakUji(RUANG_RAPAT),
+        lounge: kotakUji(RUANG_LOUNGE), pusat_rapat: { x: PUSAT_RAPAT[0], y: PUSAT_RAPAT[1] },
+        cadangan: SPOT.cadangan.map(function (s) { return { x: s.x, y: s.y }; }) };
+      POS_DENAH.forEach(function (p) { out.pos[p.nama] = kotakUji(p); out.zona[p.nama] = kotakUji(rzona(p)); });
+      return out;
     }
   };
 

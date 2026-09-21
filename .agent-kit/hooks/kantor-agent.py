@@ -53,10 +53,21 @@ EKOR_MAKS = 2 * 1024 * 1024
 EKOR_LATAR = 8 * 1024 * 1024
 LATAR_TUNDA_MAKS = 256  # tool_use yang hasilnya belum terlihat oleh pelacak; hasil selalu datang jauh sebelum batas ini
 LATAR_MAKS = 32
+# ⛔ Pos departemen TIDAK bisa diambil dari ekor 64 KB. Ekor itu cuma memuat 26 sampai 46 kejadian,
+# dan yang terakhir hampir tak pernah berupa path berkas departemen. Diukur 2026-09-21 atas 8
+# transkrip hidup: dari ekor, 8 DARI 8 sesi jatuh ke `Umum`, padahal kedelapannya punya departemen
+# yang jelas bila dibaca lebih dalam. Gagalnya senyap sempurna -- tiap robot duduk di bangku
+# cadangan, denahnya tetap masuk akal, dan pos departemen jadi hiasan.
+# Kedalaman yang diperlukan diukur pada transkrip yang sama: 6 dari 8 ketemu dalam 1 MB, 2 sisanya
+# dalam 2 MB, seluruhnya 3 sampai 13 ms. Batas 4 MB memberi ruang dua kali lipat yang terukur dan
+# tetap separuh dari jendela tugas latar yang sudah dijalankan tiap tick.
+EKOR_POS = 4 * 1024 * 1024
+POS_POTONGAN = 1024 * 1024
 # prasaring daftar direktori, sengaja longgar (lihat _daftar_jsonl)
 PRASARING_UTAMA_DETIK = 6 * 3600
 PRASARING_SUB_DETIK = 30 * 60
 _CACHE = {}  # path -> ((ukuran, mtime_ns), (hasil urai, baris_diurai, baris_rusak))
+_POS_DALAM = {}  # path -> (ukuran saat dipindai, pos atau None): hasil pindai dalam, supaya tak diulang tiap tick
 _LOKASI = {}  # sessionId -> path transkrip terakhir ditemukan, supaya tak mencari ulang di tiap folder proyek
 _LATAR = {}  # path -> {"offset", "tunda", "latar"}: pelacak tugas shell latar bertahap per transkrip
 # transkrip sependek ini tanpa user/assistant = sesi yang baru lahir, bukan tanda format berubah
@@ -85,7 +96,7 @@ PERAN = {
     "general-purpose": "Generalis", "Explore": "Peneliti", "Plan": "Arsitek", "loop-fix": "Engineer",
     "loop-test": "QA", "loop-refactor": "Refactor", "loop-judge": "Juri", "loop-docs": "Penulis",
     "claude-code-guide": "Pemandu",
-    "loop-fe": "FE", "loop-be": "BE", "loop-mobile": "Mobile", "loop-devops": "DevOps",
+    "loop-fe": "Frontend Dev", "loop-be": "Backend Dev", "loop-mobile": "Mobile Dev", "loop-devops": "DevOps",
     "loop-supervisor": "Supervisor", "loop-ekstrak-skill": "Ekstraktor",
 }
 
@@ -99,9 +110,14 @@ PERAN = {
 #     punya key sama sekali (dicatat komentar di berkas itu sendiri sebagai lubang yang hidup
 #     di produksi). `Warehouse` juga tak punya key di sana padahal modulnya besar di dua repo;
 #     memasukkannya adalah keputusan kit ini, bukan turunan dari peta itu.
+# Legal dan R&D Regulatory DIGABUNG ke Kesekretariatan (keputusan pemilik 2026-09-21): ketiganya
+# berbagi satu pos di denah. Penggabungan ada DI SINI saja, bukan di peta path, supaya kalau
+# kelak dipisah lagi cukup satu baris yang berubah.
+# `Printing` DIHAPUS 2026-09-21 (keputusan pemilik): selnya di denah jadi perluasan lounge. Ia
+# memang tak pernah punya potongan path di PETA_POS, jadi tak ada sesi yang kehilangan posnya.
 POS = (
     "HRGA", "Marketing", "Tech Development", "Kesekretariatan", "Finance", "Procurement",
-    "Warehouse", "Manufaktur", "Quality", "Legal", "R&D Regulatory", "Printing",
+    "Warehouse", "Manufaktur", "Quality",
 )
 POS_UMUM = "Umum"
 
@@ -125,7 +141,7 @@ PETA_POS = (
     ("finance", "Finance"), ("kas-kecil", "Finance"), ("pembukuan-pengajuan", "Finance"),
     ("procurement", "Procurement"), ("pengajuan-barang", "Procurement"),
     ("warehouse-sadewa", "Warehouse"), ("warehouse", "Warehouse"), ("inventory", "Warehouse"),
-    ("manufacture", "Manufaktur"), ("quality", "Quality"), ("legal", "Legal"), ("rnd", "R&D Regulatory"),
+    ("manufacture", "Manufaktur"), ("quality", "Quality"), ("legal", "Kesekretariatan"), ("rnd", "Kesekretariatan"),
 )
 
 
@@ -689,6 +705,54 @@ def _latar_berkas(path, ukuran):
     return s["latar"]
 
 
+def pos_dari_pindai_dalam(path, ukuran, batas=EKOR_POS):
+    """Pos departemen dari pemindaian MUNDUR transkrip, berhenti di path dikenali yang pertama ketemu.
+
+    Ini jalur cadangan untuk apa yang tak muat di ekor pendek, bukan pengganti `urai`: ia hanya
+    mencari `pos`, dan hanya dipanggil saat ekor maupun cache tak punya. Mundur, karena yang dicari
+    adalah departemen TERAKHIR yang disentuh; memindai maju akan mengembalikan yang pertama, dan
+    sesi panjang biasanya berpindah modul beberapa kali.
+
+    Mengembalikan None bila sampai batas tak ada yang cocok. None tetap berarti "belum tahu", bukan
+    "bukan departemen apa pun": menebak akan mendudukkan robot di departemen orang lain tanpa tanda.
+    """
+    sisa = ""
+    ujung = ukuran
+    dasar = max(0, ukuran - batas)
+    while ujung > dasar:
+        mulai = max(dasar, ujung - POS_POTONGAN)
+        try:
+            with open(path, "rb") as f:
+                f.seek(mulai)
+                blok = f.read(ujung - mulai).decode("utf-8", "replace")
+        except OSError:
+            return None
+        baris = (blok + sisa).splitlines()
+        # Potongan dipotong di tengah baris, jadi baris pertama disimpan untuk disambung ke
+        # potongan BERIKUTNYA (yang letaknya lebih awal di berkas). Tanpa ini satu kejadian
+        # terbelah dua dan hilang dari kedua potongan, senyap.
+        if mulai > dasar and baris:
+            sisa, baris = baris[0], baris[1:]
+        else:
+            sisa = ""
+        for b in reversed(baris):
+            if not b.strip():
+                continue
+            try:
+                o = json.loads(b)
+            except Exception:
+                continue
+            if not isinstance(o, dict) or o.get("type") != "assistant":
+                continue
+            for blok_isi in (o.get("message") or {}).get("content") or []:
+                if isinstance(blok_isi, dict) and blok_isi.get("type") == "tool_use":
+                    pos = pos_dari_masukan(blok_isi.get("input"))
+                    if pos:
+                        return pos
+        ujung = mulai
+    return None
+
+
 def _urai_berkas(path, st, awal, terlihat):
     """urai() atas ekor berkas, di-cache per (ukuran, mtime): hanya transkrip yang berubah yang diurai ulang.
     `latar` diganti hasil pelacak bertahap: ekor terlalu pendek untuk tugas latar (lihat EKOR_LATAR)."""
@@ -707,6 +771,16 @@ def _urai_berkas(path, st, awal, terlihat):
             u["pr"] = lama[1][0]["pr"]
         if u["pos"] is None:
             u["pos"] = lama[1][0].get("pos")
+    if u["pos"] is None:
+        # Pindai dalam dipakai SESUDAH ekor dan cache, dan hasilnya diingat supaya tak diulang tiap
+        # tick. Yang negatif pun diingat, dengan ukuran saat itu: ia baru dipindai ulang setelah
+        # transkrip tumbuh sepanjang satu ekor penuh, yaitu saat memang mungkin ada yang baru.
+        memo = _POS_DALAM.get(path)
+        if memo and memo[1] is None and st.st_size - memo[0] < EKOR_UTAMA:
+            u["pos"] = None
+        else:
+            u["pos"] = pos_dari_pindai_dalam(path, st.st_size)
+            _POS_DALAM[path] = (st.st_size, u["pos"])
     _CACHE[path] = (kunci, (u, d, r))
     return u, d, r
 

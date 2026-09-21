@@ -137,7 +137,7 @@ def test_peta_area_alat(nama, area):
     ("loop-test", "QA"), ("loop-refactor", "Refactor"), ("loop-judge", "Juri"), ("loop-docs", "Penulis"),
     ("claude-code-guide", "Pemandu"), ("agen-baru-tim", "agen-baru-tim"), (None, "subagent"),
     # peran per lapisan tim IT (kit 1.24.0) dan dua agen kit yang sebelumnya tampil sebagai nama mentah
-    ("loop-fe", "FE"), ("loop-be", "BE"), ("loop-mobile", "Mobile"), ("loop-devops", "DevOps"),
+    ("loop-fe", "Frontend Dev"), ("loop-be", "Backend Dev"), ("loop-mobile", "Mobile Dev"), ("loop-devops", "DevOps"),
     ("loop-supervisor", "Supervisor"), ("loop-ekstrak-skill", "Ekstraktor"),
 ])
 def test_peran_dari_agent_type(jenis, hasil):
@@ -991,8 +991,8 @@ def test_loop_keluar_4_bila_penulis_lain_memegang_kunci(lingkungan):
     ("bip-erp/services/inventory/opname.go", "Warehouse"),
     ("bip-erp/services/procurement/po.go", "Procurement"),
     ("erp-frontend/src/features/quality/x.tsx", "Quality"),
-    ("erp-frontend/src/features/legal/x.tsx", "Legal"),
-    ("erp-frontend/src/features/rnd/x.tsx", "R&D Regulatory"),
+    ("erp-frontend/src/features/legal/x.tsx", "Kesekretariatan"),
+    ("erp-frontend/src/features/rnd/x.tsx", "Kesekretariatan"),
     ("bip-erp/services/manufacture/x.go", "Manufaktur"),
     ("erp-frontend/src/app/(main)/secretary/x.tsx", "Kesekretariatan"),
 ])
@@ -1039,7 +1039,7 @@ def test_pos_potongan_lebih_spesifik_selalu_ditulis_lebih_dulu():
 @pytest.mark.parametrize("masukan,harapan", [
     ({"file_path": "bip-erp/services/finance/x.go"}, "Finance"),
     ({"notebook_path": "x/features/hris/a.ipynb"}, "HRGA"),
-    ({"path": "erp-frontend/src/features/legal"}, "Legal"),
+    ({"path": "erp-frontend/src/features/legal"}, "Kesekretariatan"),
     ({"command": "cd bip-erp/services/finance && go build"}, None),  # isi shell sengaja tak diurai
     ({"pattern": "finance"}, None),
     ({}, None),
@@ -1053,3 +1053,79 @@ def test_pos_semua_nilai_peta_ada_di_daftar_pos():
     # Pos yang tak terdaftar tak akan punya tempat di denah, dan robotnya hilang tanpa galat.
     for _, pos in ka.PETA_POS:
         assert pos in ka.POS
+
+
+def _baris_tool(path_berkas, isian=""):
+    """Satu kejadian assistant ber-tool_use, plus isian untuk menggemukkan barisnya."""
+    return json.dumps({
+        "type": "assistant",
+        "message": {"content": [{"type": "tool_use", "id": "t1", "name": "Edit",
+                                 "input": {"file_path": path_berkas, "isian": isian}}]},
+    })
+
+
+def _tulis_transkrip(path, baris):
+    path.write_text("\n".join(baris) + "\n", encoding="utf-8")
+    return path.stat().st_size
+
+
+def test_pindai_dalam_mengambil_departemen_TERAKHIR_bukan_yang_pertama(tmp_path):
+    # Sesi panjang berpindah modul beberapa kali; yang ingin dilihat pemilik adalah yang SEDANG
+    # dikerjakan, jadi pemindaiannya mundur dari ekor.
+    p = tmp_path / "s.jsonl"
+    n = _tulis_transkrip(p, [
+        _baris_tool("bip-erp/services/finance/a.go"),
+        _baris_tool("erp-frontend/src/features/warehouse/b.tsx"),
+    ])
+    assert ka.pos_dari_pindai_dalam(p, n) == "Warehouse"
+
+
+def test_pindai_dalam_tanpa_path_dikenali_mengembalikan_none(tmp_path):
+    # None berarti "belum tahu" dan mendaratkan sesi di pos Umum yang menyatakan dirinya sendiri.
+    # Menebak akan mendudukkan robot di departemen orang lain tanpa satu pun tanda.
+    p = tmp_path / "s.jsonl"
+    n = _tulis_transkrip(p, [_baris_tool("C:/Temp/scratch/catatan.txt")])
+    assert ka.pos_dari_pindai_dalam(p, n) is None
+
+
+def test_pindai_dalam_berhenti_di_batas(tmp_path):
+    # Batasnya nyata, bukan hiasan: transkrip di sini terukur sampai 90 MB, dan memindainya utuh
+    # tiap tick akan membuat penulis tak selesai dalam satu interval.
+    p = tmp_path / "s.jsonl"
+    n = _tulis_transkrip(p, [
+        _baris_tool("bip-erp/services/finance/a.go"),
+        _baris_tool("C:/Temp/scratch/x.txt", "x" * 5000),
+    ])
+    assert ka.pos_dari_pindai_dalam(p, n, batas=2000) is None
+    assert ka.pos_dari_pindai_dalam(p, n, batas=n) == "Finance"
+
+
+def test_pindai_dalam_menyambung_baris_yang_terbelah_potongan(tmp_path, monkeypatch):
+    # Potongan dipotong di tengah baris. Tanpa penyambungan, kejadian yang terbelah hilang dari
+    # KEDUA potongan, dan hilangnya senyap: hasilnya cuma "Umum" yang terlihat wajar.
+    monkeypatch.setattr(ka, "POS_POTONGAN", 64)
+    p = tmp_path / "s.jsonl"
+    n = _tulis_transkrip(p, [
+        _baris_tool("bip-erp/services/quality/a.go", "y" * 400),
+        _baris_tool("C:/Temp/scratch/x.txt", "z" * 400),
+    ])
+    assert ka.pos_dari_pindai_dalam(p, n) == "Quality"
+
+
+def test_pos_denah_template_sama_dengan_daftar_pos_penulis():
+    # Nama departemen hidup di DUA berkas: POS di penulis data (berkas ini mengimpornya) dan
+    # POS_DENAH di template penggambar denah. Kalau keduanya menyimpang, gagalnya SENYAP: pos
+    # yang cuma ada di penulis membuat robotnya jatuh ke bangku cadangan seolah posnya belum
+    # diketahui, dan pos yang cuma ada di denah berdiri kosong selamanya.
+    #
+    # Dibandingkan sebagai HIMPUNAN, bukan urutan: urutan di denah menentukan letak ruangan,
+    # urutan di penulis cuma urutan daftar, dan memaksa keduanya sama akan mengunci tata letak
+    # ke hal yang tak ada hubungannya.
+    import re
+    teks = (HERE.parent / "hooks" / "kantor-agent.template.html").read_text(encoding="utf-8")
+    blok = re.search(r"var POS_DENAH = \[(.*?)\n  \];", teks, re.S)
+    assert blok is not None, "blok POS_DENAH tidak ditemukan di template"
+    nama = re.findall(r"ruang\('([^']+)'", blok.group(1))
+    assert len(nama) >= 5, f"blok POS_DENAH terbaca cuma {len(nama)} ruangan, pemindainya patah"
+    assert len(nama) == len(set(nama)), "ada nama pos kembar di POS_DENAH"
+    assert set(nama) == set(ka.POS)
