@@ -60,8 +60,26 @@ Manajemen ingin budaya kepatuhan ringan di kantor benar-benar dijalankan, dengan
 - Masa berlaku catatan sebelum "hangus" (analog `ExpiresAt` SP).
 - Apakah kelak perlu jalur eksplisit "pelanggaran ringan berulang → usulan SP" (butuh ADR tersendiri; **tidak** otomatis).
 
+## Perluasan: Inspeksi 5R Area per Department (ADR 0111, 🟡 diusulkan)
+
+Track **ketiga** di payung Satgas/Industrial Relation, petugas yang sama (**Culture & Industrial**), tetapi objeknya **ruangan/area sebuah department**, bukan karyawan. Untuk **membedakannya** dari dua track lain:
+
+| Track | Objek | KPI? | Sumber |
+|---|---|---|---|
+| Satgas per-PIC | Office Boy/Security (orang) | **Ya** (KPI individual) | [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] |
+| Catatan Kepatuhan | Karyawan (atribut) | Tidak | [[ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI]] (dok ini di atas) |
+| **5R Area** | **Ruangan department** | **Tidak** (catatan + peringatan SPV) | [[ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor]] |
+
+- **Cara kerja (rencana)**: entitas baru `area_inspection` di employee-service (bukan `compliance_note` yang per-orang, bukan form-builder yang per-PIC/KPI). Petugas melihat **daftar department**, mengisi "Ada temuan?" + **≤15 foto** per department per periode bulanan. **Non-KPI**: tak menulis `kpi_score`/`employee_warning`/payroll.
+- **Visibilitas dua-arah** (bukan tiga): petugas Culture & Industrial se-perusahaan + **supervisor department** ybs (`SupervisedDepartmentsStrict`). Tak ada "diri sendiri" karena objeknya ruangan.
+- **Peringatan SPV** = rekap saat menu dibuka (irisan-1); push ditunda (kategori inbox baru = deploy 2 container + ADR).
+- **Meminjam POLA** modul Catatan Kepatuhan (§Cara Kerja di atas): gerbang petugas server-side, resolusi supervisor, foto bukti, rekap per-department. **Bukan** memakai koleksinya.
+- **Daftar task**: `Workspace/ANALISA - Inspeksi 5R Area per Department.md`.
+
 ## Dokumen Terkait
 
+- [[ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor]] — track 5R area (di atas)
+- [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] — track per-PIC ber-KPI
 - [[ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI]] — keputusan & alasan (daftar task: `Workspace/ANALISA - Industrial Relation.md`)
 - [[HRIS - Disciplinary (Surat Peringatan)]] · [[HRIS - Key Performance Index]] · [[HRIS - Conflict Management]]
 - [[HRIS - Kepatuhan Peraturan Perusahaan]] · [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]
