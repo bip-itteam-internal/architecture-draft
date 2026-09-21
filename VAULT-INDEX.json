@@ -9827,25 +9827,27 @@
         "CORE - RBAC dan Permission Set",
         "Microservices - Notification Service",
         "APP - Web ERP",
+        "REF - Alur Persetujuan",
+        "RUN - Deploy Microservices bip-erp",
         "HRIS - Big Pictures",
         "HRIS - Attendance System",
         "Microservices - Employee Service",
         "APP - MyBharata"
       ],
-      "hash": "71dc0a17bbcaf1c5946f300bf27e7989b2b044340d5007078b3276263e25e285",
-      "ukuran_kb": 14.3,
-      "ringkasan": "Menjawab: jenis pengajuan karyawan apa saja yang ada (Izin/Cuti/Sakit, Dinas, Koreksi absen, Tukar jadwal, Lembur menyusul), siapa reviewer tiap tahap (SPV lalu HRD), dan bagaimana infrastruktur review bersama di attendance service bekerja (koleksi, endpoint, model ReviewData/ReviewStatus, resolusi status, penentuan reviewer, notifikasi, apply-to-attendance). Menjawab juga: siapa yang berhak melihat dan memutuskan semua pengajuan lewat endpoint admin HR (izin hris.pengajuan.view dan hris.pengajuan.approve beserta fallback union departemen Human Resource dan posisi Cost Control), serta kenapa tahap HRD kadang duduk di slot spv_status. Berisi pula aturan penunjukan pengganti saat atasan menyetujui (siapa kandidatnya, kapan disimpan, kapan pemberitahuan dikirim, dan kenapa karyawan bershift belum didukung) plus temuan pengajuan yang mati karena didiamkan.",
+      "hash": "928f304d3b681881280073eafd3a05ca359d4ca05862893af9b94d3152c7eaa3",
+      "ukuran_kb": 16.6,
+      "ringkasan": "Menjawab: jenis pengajuan HR apa saja yang ada (Izin/Cuti/Sakit, Dinas, Koreksi clock-in/out, Tukar jadwal, dan Lembur yang belum mengikuti pola ini), siapa yang meninjau di tiap tahap (SPV lalu HRD), serta izin apa yang dibutuhkan untuk melihat dan memutuskan pengajuan lewat endpoint admin GET /hr/requests. Juga menjawab bagaimana atasan menunjuk rekan pengganti saat menyetujui cuti atau dinas, siapa yang sah jadi kandidat pengganti, dan komponen bersama di attendance service (ReviewData, resolusi status, getSupervisorData, notifikasi, apply-to-attendance) yang dipakai semua jenis request. Memuat pula temuan pengukuran kenapa sebagian pengajuan mati karena didiamkan: jalur Direktur tanpa penerima, notifikasi yang tak bisa diklik, dan pengajuan yang jatuh di hari Sabtu.",
       "kata_kunci": [
         "pengajuan karyawan",
         "employee request",
-        "approval",
-        "persetujuan berjenjang",
+        "approval berjenjang",
         "SPV",
         "HRD",
-        "reviewer",
-        "hr/requests",
+        "hris.pengajuan.approve",
         "pengganti",
-        "replacement"
+        "replacement",
+        "tukar jadwal",
+        "koreksi absen"
       ]
     },
     {
