@@ -27,9 +27,9 @@ Dua keputusan yang diambil saat mengerjakannya dan layak diingat:
 - **Nama `divisi` dipertahankan** walau kata itu sudah dipakai untuk arti lain di kode (`common.ReachDivision` dan `space.division`, keduanya berisi NAMA DEPARTEMEN), karena itulah istilah HRD. Perbedaannya ditulis di kode dan di [[REF - Kepemilikan Data]] supaya tak jadi arti ketiga yang menyesatkan.
 - **Seed hanya mengisi perusahaan yang belum punya satu pun divisi.** Bentuk pertamanya (upsert per-key) menghidupkan kembali divisi yang sengaja dihapus HRD tiap service naik — tombol Hapus yang dibatalkan sendiri oleh deploy berikutnya, tanpa galat.
 
-## T3. Perhitungan Actual per periode di employee-service — 🔜 berkode, belum merge & belum deploy
+## T3. Perhitungan Actual per periode di employee-service — ⚠️ merged, belum deploy
 
-Branch: bip-erp `feat/employee-headcount-periode` (2026-09-21). Rencana & gerbang verifikasinya: `.task-plans/2026-09-21-headcount-periode.md`.
+PR bip-erp [#1993](https://github.com/bip-itteam-internal/bip-erp/pull/1993), merged 2026-09-22 WIB (`a6e26941`). ⛔ **Ketujuh gerbang verifikasinya belum satu pun dijalankan** — endpoint belum sekali pun dipanggil lewat gateway maupun jaringan docker. Rencana & daftar gerbangnya: `.task-plans/2026-09-21-headcount-periode.md`.
 
 - Fungsi dan rute agregat: jumlah karyawan aktif pada akhir bulan, per (perusahaan, departemen, posisi). ✅ Ada (`GET /kpi/headcount-periode`).
 - Bulan berjalan memakai status akun; bulan lampau memakai `employee_movement` lewat pola `posisiSaatPeriode`, bukan `work_data` apa adanya. ✅ Ada.

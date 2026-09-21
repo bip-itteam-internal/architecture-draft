@@ -46,7 +46,7 @@ Tiga keterbatasan yang menempel pada angkanya, dan semuanya berasal dari bentuk 
 
 ### ⛔ Ada MESIN KEDUA yang menghitung headcount, dan metodenya berbeda
 
-T3 [[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]] (🔜 branch bip-erp `feat/employee-headcount-periode`, belum merge per 2026-09-21) menambahkan `GET /kpi/headcount-periode` yang menjawab pertanyaan yang **terdengar sama** tetapi dihitung dengan cara lain. Siapa pun yang membandingkan kedua angka perlu tahu ini lebih dulu, sebab selisihnya bukan bug.
+T3 [[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]] (⚠️ merged ke `main` 2026-09-22 WIB, PR [#1993](https://github.com/bip-itteam-internal/bip-erp/pull/1993) merge `a6e26941`; belum deploy) menambahkan `GET /kpi/headcount-periode` yang menjawab pertanyaan yang **terdengar sama** tetapi dihitung dengan cara lain. Siapa pun yang membandingkan kedua angka perlu tahu ini lebih dulu, sebab selisihnya bukan bug.
 
 - Rekonstruksi di halaman ini memakai **selisih**: kurangi yang keluar, tambah yang masuk, mundur dari keadaan sekarang. Itu sah untuk **perusahaan utuh** saja, dan penolakannya untuk cakupan di bawah perusahaan sudah dikunci uji — mutasi antar departemen tak tercatat sebagai keluar maupun masuk, jadi per departemen ia menghitung mutasi sebagai pengunduran diri.
 - Mesin T3 merekonstruksi **per orang** lewat `employee_movement`, sehingga mutasi memindahkan orangnya antar sel tanpa mengubah total. Itulah satu-satunya cara memecah headcount per departemen dan posisi.
