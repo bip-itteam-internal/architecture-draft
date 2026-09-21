@@ -11379,11 +11379,11 @@
         "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
         "IT - SOP Dokumentasi Vault"
       ],
-      "hash": "dcf0b2d24a094657b2168d4d63556d6a5bf4e15baf4715abf8a69b6e399445b9",
-      "ukuran_kb": 34.2,
-      "ringkasan": "Menjawab: gerbang otomatis apa saja yang menahan commit dan push di mesin developer (hook pre-commit yang menolak commit di branch utama repo kode, pre-push yang menjalankan tsc/lint/build untuk repo Node atau go build per service untuk bip-erp), bagaimana agent-kit menggerbangi dirinya sendiri lewat pre-push vault, dan mengapa gerbang GitHub Actions tidak diandalkan. Menjawab juga: bagaimana melihat sesi kerja mana sedang mengerjakan apa lewat papan sesi, dashboard, dan Kantor Agent, serta bagaimana loop otonom /brief ke /kerjakan berjalan lewat agen domain dan penilaian dua lapis sampai berhenti di PR dengan merge tetap di tangan manusia. Termasuk jebakan lingkungan git hook yang mewariskan GIT_DIR sehingga skrip test mengenai repo yang sedang di-push.",
+      "hash": "25078a8dd55544f596f9addd22088f38316fc8b8dd0ec522901dbc584d729433",
+      "ukuran_kb": 35.1,
+      "ringkasan": "Menjawab: gerbang otomatis apa yang menolak commit di branch utama repo kode dan menahan push yang gagal tsc/lint/build atau go build, bagaimana gerbang itu dipasang lewat hook Claude Code dan git pre-push oleh agent-kit init, serta mengapa gerbang GitHub Actions ditinggalkan dan diganti hook lokal di mesin developer. Menjelaskan juga loop otonom /brief ke /kerjakan yang dinilai /judge dan berhenti di PR dengan merge tetap dikerjakan manusia, plus cara kerja papan sesi, dashboard, dan Kantor Agent yang menampilkan sesi Claude Code yang sedang hidup. Memuat batas dan jebakannya, termasuk mengapa lingkungan GIT_* wajib dibuang sebelum hook memanggil skrip yang menyentuh git.",
       "kata_kunci": [
-        "gerbang lokal",
+        "gerbang repo",
         "pre-commit",
         "pre-push",
         "git hook",
