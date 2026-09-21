@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-18",
-  "jumlah_dokumen": 448,
+  "digenerate": "2026-09-21",
+  "jumlah_dokumen": 449,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -805,23 +805,28 @@
         "Sales - Engagement Team (Modul)",
         "ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri",
         "ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama",
+        "ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS",
         "ADR - 0060 Cakupan Keterlihatan Tiket Engagement",
+        "ADR - 0110 Realisasi Engagement Dilaporkan Pengerja per URL per Jenis Pekerjaan sampai Akhir Bulan KPI",
         "APP - Dynamic Task Tracker"
       ],
-      "hash": "5739484acecc068f16b3318e5eb54f30b2164af9ba853a26e6e11f4a647941d8",
-      "ukuran_kb": 26.2,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan task-management-service (space, task, assign/approve/reject, CSAT, attachment, report, KPI engagement, WebSocket, komentar dan checklist) beserta path gateway-nya. Menjelaskan siapa yang boleh mengubah, menghapus space, dan menugaskan tiket (supervisor divisi, admin, admin space), bagaimana visibilitas space restricted disaring, bagaimana pertanyaan per tipe permintaan (types[].fields) divalidasi, dan bagaimana server mengisi nama serta nomor telepon pemohon bila klien tak mengirimnya.",
+      "hash": "f6109eb236fb17a7f9348147eb242be825e54e7760491a6b76a128d91cb4c6fc",
+      "ukuran_kb": 30.6,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di task-management-service lewat gateway `/api/task-management/*` (spaces, tasks, attachments, reports, KPI, Engagement Tim, WebSocket, comments/checklist/notifications), method dan path-nya, serta siapa yang boleh memanggil. Juga menjawab bagaimana kontrak `admins` per space, pertanyaan per tipe permintaan (`types[].fields`), pengisian otomatis `requestor_name` dan `phone` pada `POST /tasks`, dan endpoint CSAT bekerja, termasuk semantik field absen vs array kosong.",
       "kata_kunci": [
         "task management",
-        "ticketing",
-        "helpdesk",
-        "tiket",
+        "API",
+        "endpoint",
         "space",
+        "tiket",
+        "ticket",
+        "helpdesk",
         "admin space",
-        "assign",
-        "approval",
+        "types fields",
         "CSAT",
-        "WebSocket"
+        "engagement",
+        "WebSocket",
+        "gateway"
       ]
     },
     {
@@ -2648,7 +2653,7 @@
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id"
       ],
       "hash": "f209de0141998a3e03045f44b36df700bb64e1b5ea455b362d285f0cbd75a160",
-      "ukuran_kb": 76.3,
+      "ukuran_kb": 76.6,
       "ringkasan": "Menjawab: kenapa modul Training berdiri sebagai service sendiri (Go + Fiber + learning_db, port 6987, modul gateway learning), apa saja kelompok fitur di dalamnya, dan bagaimana masing-masing bekerja di tingkat kode beserta rujukan berkas dan barisnya. Mencakup pemindahan LMS Fase 0 dari Employee Service, verifikasi departemen lewat panggilan internal, pengajuan pelatihan berantai SPV ke HR, evaluasi trainer dan kesesuaian materi, post-test dan pre-test beserta kelulusan dari kenaikan skor, rencana pelatihan tahunan, sertifikat otomatis, bahan KPI pelatihan, feed kalender, dan penugasan peserta massal. Juga menjelaskan di mana aturan duplikat serta kuota peserta sekarang tinggal (PilihYangBolehMasuk di models_participant.go) dan kenapa CanEnroll tidak lagi dicari di tempat lamanya.",
       "kata_kunci": [
         "learning service",
@@ -3031,6 +3036,7 @@
         "CORE - API Master Gateway",
         "Microservices - Employee Service",
         "Sales - Engagement Team (Modul)",
+        "ADR - 0110 Realisasi Engagement Dilaporkan Pengerja per URL per Jenis Pekerjaan sampai Akhir Bulan KPI",
         "ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri",
         "ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama",
         "ADR - 0060 Cakupan Keterlihatan Tiket Engagement",
@@ -3042,18 +3048,21 @@
         "APP - Dynamic Task Tracker",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "6646413d0b307ac4dd334373e1a8d62926d3e9db8e86b8781aedff5a392e6500",
-      "ukuran_kb": 42.6,
-      "ringkasan": "Menjawab: bagaimana IT Helpdesk internal bekerja dari tiket masuk sampai selesai, siapa yang boleh triase, assign, dan meninjau, serta bagaimana SLA dua dimensi, automation auto-assign/auto-close, CSAT, WebSocket, dan notifikasi dirangkai. Menjelaskan pula kontrol akses space (visibility, allowed_divisions, admin space), cakupan divisi supervisor lewat header BIP-Supervised-Departments, kelompok KPI per space, dan modul Engagement Tim yang datanya terpisah total. Dipakai saat mengubah alur ticketing atau menelusuri kenapa seseorang tidak melihat atau tidak boleh menindak sebuah tiket.",
+      "hash": "7c09d7cb05cde1092cbbb84608587a1710b582ba550a4789c536a0e6e4d2915c",
+      "ukuran_kb": 44.0,
+      "ringkasan": "Menjawab: bagaimana task-management-service bekerja sebagai IT Helpdesk/ticketing berbasis Kanban (stack, workflow status, approval, SLA dua dimensi, CSAT, auto-assign/auto-close, WebSocket) dan bagaimana hak akses ditentukan (visibility space, admin space, cakupan divisi supervisor lewat `BIP-Supervised-Departments`). Juga menjawab apa yang sudah diimplementasikan, apa yang belum, dan bagaimana modul Engagement Tim, kelompok KPI space, serta tipe permintaan per space menempel di service ini.",
       "kata_kunci": [
         "task management service",
         "helpdesk",
-        "tiket",
-        "ticket",
-        "kanban",
+        "ticketing",
+        "Kanban",
         "SLA",
-        "space",
+        "CSAT",
         "admin space",
+        "space",
+        "supervisor",
+        "approval",
+        "auto-assign",
         "WebSocket",
         "engagement"
       ]
@@ -3636,7 +3645,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "076b1a4fb212adebd3801ec7b3443d492438a6a76da2345516b17d06f0ada9bb",
-      "ukuran_kb": 4.9,
+      "ukuran_kb": 4.8,
       "ringkasan": "Menjawab sumber tanggal yang dipakai untuk membukukan retur TikTok ke Accurate: kenapa update_time menyesatkan (ikut mundur karena settle refund) dan kenapa order_update_date dipilih sebagai gantinya, serta perbaikan zona waktu WIB untuk penomoran dokumen retur (RTR).",
       "kata_kunci": [
         "tanggal retur",
@@ -4362,7 +4371,7 @@
         "RUN - Menambah Metrik KPI Otomatis"
       ],
       "hash": "ddca0201da7959b033620b4d876a8b18d58d146a1dd721bf9d3f6b75c917f3ec",
-      "ukuran_kb": 15.2,
+      "ukuran_kb": 15.1,
       "ringkasan": "Menjawab: bagaimana aset GA di ERP direkonsiliasi terhadap Aktiva Tetap di Accurate untuk menghasilkan skor KPI akurasi input aset staff GA, dan kenapa pencocokannya per-item lewat ceklis manual berbantuan (bukan agregat per-golongan) dengan `accurate_asset_no` disimpan agar periode berikutnya cocok otomatis. Menjelaskan pula kenapa aset yang belum ada di Accurate dihitung 100% (antrean tanggung jawab Finance, bukan GA) sementara Cakupan wajib tampil berdampingan dengan Akurasi, tiga tab modul Aset, penempatan yang menghormati batas service (inventory menyimpan nomor Accurate, feed KPI lewat employee-service), serta bagian mana yang di-supersede ADR-0049.",
       "kata_kunci": [
         "rekonsiliasi aset",
@@ -5521,7 +5530,7 @@
         "External - Accurate"
       ],
       "hash": "140f2789e531f6209bfdfc17bceca336e6f6048522951825a418bd4a22e2da22",
-      "ukuran_kb": 10.5,
+      "ukuran_kb": 10.4,
       "ringkasan": "Menjawab: mengapa opname perlengkapan GA dibuat sebagai perluasan tab Data Accurate (lewat pemilih tipe Aset Tetap/Perlengkapan) alih-alih modul baru, bagaimana perlengkapan dicocokkan per-KUANTITAS (hitung fisik GA vs qty Accurate) bukan per-unit, dan bagaimana skor akurasi opname dihitung untuk KPI staff GA. Menjelaskan juga koleksi ga_opname + endpoint /perlengkapan-opname, penangkapan kategori item Accurate saat sync, serta amandemen 2026-09-02 yang mengubah tab FE dari form opname jadi explorer padanan read-only (BE dibiarkan dormant).",
       "kata_kunci": [
         "opname perlengkapan",
@@ -6373,7 +6382,7 @@
         "Microservices - Inventory Service"
       ],
       "hash": "2ce5d71a739740e936dd4bb22b59415e9cfe7003830f8ada60faa1aae6f91235",
-      "ukuran_kb": 10.3,
+      "ukuran_kb": 10.2,
       "ringkasan": "Menjawab: kenapa barang perlengkapan yang sama bisa tampil dobel di explorer GA saat Accurate mengganti nomor item, dan bagaimana sistem memindahkan padanan (accurate_item_no) secara otomatis lewat ID internal Accurate tanpa konfirmasi manusia. Menjelaskan juga syarat aman migrasi otomatis (tepat satu kandidat cocok via AccurateID, masa tenggang 3 jam sebelum dianggap rename, audit trail) serta limitasinya (item yang benar-benar terhapus di Accurate tetap jadi baris stale, kandidat ambigu tak ditindak).",
       "kata_kunci": [
         "auto-migrasi padanan",
@@ -7254,6 +7263,42 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0110 Realisasi Engagement Dilaporkan Pengerja per URL per Jenis Pekerjaan sampai Akhir Bulan KPI.md",
+      "judul": "ADR - 0110 Realisasi Engagement Dilaporkan Pengerja per URL per Jenis Pekerjaan sampai Akhir Bulan KPI",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "⚠️",
+      "status_teks": "**Kode selesai di branch `feat/engagement-realisasi-per-jenis` (bip-erp dan erp-frontend), belum merge, belum deploy, belum diverifikasi lewat gateway.** Test backend hijau (paket `task-management` seluruhnya, paket `employee` hanya gagal di satu test yang sama-sama gagal di `origin/main`).",
+      "publik": true,
+      "tautan": [
+        "ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri",
+        "Sales - Engagement Team (Modul)",
+        "Microservices - Task Management Service",
+        "API - Task Management Service",
+        "Microservices - Employee Service",
+        "HRIS - Otomasi Skor KPI",
+        "ADR - 0060 Cakupan Keterlihatan Tiket Engagement",
+        "APP - Web ERP"
+      ],
+      "hash": "60b8e6fa4d983f19ee006721bcea55ecf3bff37124f8058bd7054dede12e39b9",
+      "ukuran_kb": 10.0,
+      "ringkasan": "Menjawab: mengapa metrik KPI Engagement Quantity selalu 0 (`volume_realisasi` tak punya penulis) dan keputusan apa yang diambil untuk memperbaikinya: rincian jenis dan target per URL, endpoint pelaporan realisasi, siapa yang berwenang mengisi, dan sampai kapan angka boleh diperbarui (akhir bulan KPI, walau tiket sudah ditutup). Juga menjawab bagaimana tiket yang realisasinya belum dilaporkan diperlakukan di KPI (cakupan, bukan nol) dan apa dampaknya ke layar, deploy, serta tiket lama.",
+      "kata_kunci": [
+        "ADR 0110",
+        "engagement",
+        "realisasi",
+        "volume_realisasi",
+        "KPI",
+        "quantity",
+        "jenis pekerjaan",
+        "URL",
+        "boosting",
+        "tiket engagement",
+        "task management",
+        "Account Specialist"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -7413,7 +7458,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "ee317d4d8664cf3c5227bcf8d3d018f9648ff0b9fdc9228e35cc31d4144a5c89",
-      "ukuran_kb": 16.3,
+      "ukuran_kb": 15.9,
       "ringkasan": "Menjawab endpoint dan alur kerja Finance Bridging versi Golang (penulisan ulang dari sistem Java): bagaimana membuat dan mengirim ringkasan transaksi Sales/Income/Return ke Accurate, halaman FE terkait per channel, status ringkasan, serta setting toko dan mapping produk.",
       "kata_kunci": [
         "Finance Bridging Golang",
@@ -7440,7 +7485,7 @@
         "Finance - Incentive"
       ],
       "hash": "8a3dba53269a5104fd1106064d8ed8159f96a7207b2c5a97ffc4a66f7a399504",
-      "ukuran_kb": 19.6,
+      "ukuran_kb": 19.5,
       "ringkasan": "Menjawab fitur dan struktur sistem Finance lama (Java/PostgreSQL/ReactJS) sebagai jembatan antara Accurate dan marketplace: master data, upload Excel per platform (TikTok/Shopee/Lazada/Tokopedia/KiriminAja), sinkronisasi ke Accurate, dan lokasi repositori kodenya.",
       "kata_kunci": [
         "Finance Bridging lama",
@@ -10621,7 +10666,7 @@
         "HRIS - Analysis"
       ],
       "hash": "19742da8b855a147519288ca54444245113898b00290f340a26d07c81e2f7248",
-      "ukuran_kb": 67.5,
+      "ukuran_kb": 67.7,
       "ringkasan": "Menjawab: apa cakupan MVP program pelatihan dan pengembangan karyawan, entitas apa saja yang dipakai (jenis pelatihan, trainer internal maupun eksternal, event pelatihan, peserta dan kehadiran), dan bagaimana alur proses bisnis beserta aktor dan personanya. Menjelaskan adaptasi selektif dari modul Training ERPGo (mana yang diambil, disesuaikan, dan dibuang), penempatan arsitekturnya di learning-service, model data di learning_db, alur ujian e-learning pre-test dan post-test, penugasan peserta massal beserta laporan per orang dan isian kuota, rollout bertahap menuju LMS People Development, serta daftar hal yang belum diputuskan. Dipakai untuk memahami konsep dan keputusan produk pelatihan, bukan sebagai daftar endpoint.",
       "kata_kunci": [
         "training program",
@@ -13175,7 +13220,7 @@
         "APP - Web ERP"
       ],
       "hash": "0115ceffe21b522769faac6e9286fe16c1737ff46d15d0f58ff2e9333c9cd7f0",
-      "ukuran_kb": 14.2,
+      "ukuran_kb": 14.0,
       "ringkasan": "Menjawab: bagaimana menerbitkan akun ERP untuk vendor, mitra, atau kontraktor tanpa menjadikannya karyawan, lalu memberinya akses ke modul tertentu. Menjelaskan cara memilih antara dua sumbu hak akses yang paling sering tertukar (Paket Hak vs Role Modul), cara memperpanjang dan menutup akses beserta batasnya, serta gejala umum saat vendor sudah dibuat tapi tetap tak bisa masuk.",
       "kata_kunci": [
         "akun eksternal",
@@ -13564,6 +13609,7 @@
         "Microservices - Employee Service",
         "ADR - 0060 Cakupan Keterlihatan Tiket Engagement",
         "ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS",
+        "ADR - 0110 Realisasi Engagement Dilaporkan Pengerja per URL per Jenis Pekerjaan sampai Akhir Bulan KPI",
         "API - Task Management Service",
         "APP - Web ERP",
         "ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri",
@@ -13577,20 +13623,21 @@
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "Sales - Big Pictures"
       ],
-      "hash": "63578abeeae59bf7a3412e5bb819b16279fb9178d59ef81c2549de81e09bd8d3",
-      "ukuran_kb": 20.6,
-      "ringkasan": "Menjawab: apa itu modul Engagement Team, bagaimana siklus hidup satu tiket boosting media sosial dari pembuatan permintaan Account Specialist sampai verifikasi dan penutupan, siapa saja persona penggunanya beserta wewenangnya, dan cacat apa saja yang pernah ditemukan serta status perbaikannya. Juga menjelaskan perbedaan tiket Engagement dari tiket IT di service yang sama dan sejarah rename tim dari Buzzer menjadi Engagement Team.",
+      "hash": "d78da9678a05addbc42b95304e3bf27c30cd0d1d4514eb02abd79e6e7d6b2e44",
+      "ukuran_kb": 25.5,
+      "ringkasan": "Menjawab: bagaimana alur tiket boosting media sosial modul Engagement Tim berjalan dari Account Specialist membuat permintaan, alokasi otomatis round-robin, pengerja melaporkan realisasi, sampai verifikasi dan penutupan, beserta status dan transisinya. Juga menjawab apa bedanya dengan tiket IT, siapa saja penggunanya, bagaimana data tiket menjadi sumber KPI `kinerja_engagement`, cacat yang diketahui, dan riwayat rename Buzzer menjadi Engagement Team.",
       "kata_kunci": [
         "engagement team",
         "buzzer",
         "boosting",
         "tiket engagement",
-        "engagement ticket",
-        "account specialist",
-        "task-management service",
-        "kpi engagement",
-        "sosial media",
-        "eskalasi tiket"
+        "Account Specialist",
+        "round-robin",
+        "KPI kinerja_engagement",
+        "realisasi",
+        "marketing engagement",
+        "task management",
+        "sales"
       ]
     },
     {
@@ -14707,7 +14754,7 @@
         "APP - Web ERP"
       ],
       "hash": "c4637f8509f5c1a5a4144b1a335e575e34704efa5110b9829b98aa991eb3b130",
-      "ukuran_kb": 8.5,
+      "ukuran_kb": 8.4,
       "ringkasan": "Menjawab: apa rencana penyatuan menu-menu gudang yang kini terpecah per-tahap (Perlu Diproses, Antrian Pesanan, Pengambilan, Pengemasan, Riwayat Cetak Resi, Serah Terima) menjadi satu layar omnichannel \"Kelola Pesanan\" ala Desty tanpa mengubah backend, dan apa beda pratinjau Beta FE-only (data dummy, aksi mati) dengan menu produksi yang sudah wired ke endpoint nyata. Juga menjelaskan pemetaan tiap tab/sub-tab \"Siap Dikirim\" ke endpoint warehouse/integration, rencana mutasi bertahap fase 0-5 sampai cutover, gerbang dan nuansa yang wajib dipertahankan saat \"cuma ganti UI\" (gerbang rekon `exported_at`, kode packer T1/T2, guard TikTok `package_id` kosong, batch cap 100), persona pengguna dan RBAC-nya, serta hal yang belum diputuskan (tab Belum Dibayar, cakupan Sadewa, nasib menu lama).",
       "kata_kunci": [
         "Kelola Pesanan",
@@ -15471,7 +15518,7 @@
         "API - Integration Service"
       ],
       "hash": "15311d96ce19afd582bf5609ce8312b1a5433f1db782391b9b5f1d1bfe023c1f",
-      "ukuran_kb": 15.9,
+      "ukuran_kb": 15.8,
       "ringkasan": "Menjawab: bagaimana mekanisme ACL yang membatasi daftar toko marketplace yang boleh dilihat staf marketing (AllowedShops di endpoint GET /transactions/master/shops, integration-service) bekerja, kenapa sumber datanya bisa dipindah dari team_members/team_shops ke department_shops + work_data.department, dan bug apa yang sempat membuat staf non-marketing menerima daftar toko kosong. Mencatat status FINAL: redesign merge+deploy+live (PR #1727, 2026-09-05) DAN Fase Contract-nya SENDIRI SUDAH SELESAI (2026-09-15, bip-erp PR #1888 + erp-frontend PR #1579) — team_shops/team_members/menu Teams/CRUD-nya sudah dicabut fisik dari kode. Juga mencatat batas lingkup keputusan yang sengaja tidak diubah (gate rute RequireIntegrationStaff, exemption admin/supervisor integration).",
       "kata_kunci": [
         "AllowedShops",
@@ -15919,7 +15966,7 @@
         "WH - Warehouse Sadewa"
       ],
       "hash": "256b39d712a784b9ff443d528747ca065ab9eb8bbe91a08ffc13607cc07cb67a",
-      "ukuran_kb": 17.9,
+      "ukuran_kb": 17.7,
       "ringkasan": "Menjawab kenapa sidebar erp-frontend memicu request polling 30 detik ke endpoint warehouse/sadewa/accurate untuk semua karyawan tanpa peduli role atau halaman yang dibuka, dan rencana perbaikannya lewat gerbang enabled yang diturunkan dari menu yang benar-benar tampil. Memuat dua pembaruan 2026-08-29 yang menandai sebagian rencana ini usang lalu sebagian lagi sudah dikerjakan lewat jalan lain: branch fix/badge-sidebar-per-halaman memilih gerbang HALAMAN, sehingga Task 4 (kuartet refetch) gugur karena keduanya alternatif bukan pelengkap, Task 1 dan 3 turun prioritas, dan Task 5 tetap berdiri sendiri.",
       "kata_kunci": [
         "sidebar",
