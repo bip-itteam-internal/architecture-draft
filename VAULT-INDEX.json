@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-21",
-  "jumlah_dokumen": 455,
+  "jumlah_dokumen": 456,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -15439,6 +15439,32 @@
         "MCP backend",
         "tindak lanjut",
         "audit kepatuhan"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Kesenjangan Alat Kerja dan KPI HRGA.md",
+      "judul": "ANALISA - Kesenjangan Alat Kerja dan KPI HRGA",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [],
+      "hash": "a6ab1a4490355f8f0468cd8332444b1e0b3b3840d359ba3405d1a9bc264ce95b",
+      "ukuran_kb": 6.9,
+      "ringkasan": "Papan kerja yang menjawab: alat pendukung kerja dan penilaian KPI apa saja di HRGA yang belum ada, dan siapa yang mengerjakannya. Memisahkan yang belum ada kodenya (dev), yang kodenya sudah ada tetapi datanya kosong (HR dan GA), dan yang cuma menunggu keputusan pemilik KPI, termasuk dua metrik Staff Inventory berbobot 0,6 yang tersambung ke data iklan TikTok. Memuat juga koreksi dok yang sudah usang dan daftar jebakan pencarian yang hampir menerbitkan temuan palsu.",
+      "kata_kunci": [
+        "HRGA",
+        "kesenjangan",
+        "gap",
+        "backlog",
+        "KPI",
+        "General Affair",
+        "Procurement",
+        "Security",
+        "jobdesk",
+        "master anggaran",
+        "salah petak"
       ]
     },
     {
