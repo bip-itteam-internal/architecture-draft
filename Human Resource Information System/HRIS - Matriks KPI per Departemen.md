@@ -937,18 +937,23 @@ Template `Recruitment`, 5 metrik. Dipegang **1 orang** (`BIP-0123-11-24`, aktif)
 kelimanya masih diketik tangan. Skor terakhir orangnya `2026-07` = 87,5, seluruhnya manual
 dan masih memakai snapshot template yang kini arsip; periode `2026-08` belum dinilai.
 
-> ⚠️ **Dicatat 2026-09-18: empat dari lima metrik ini SUDAH punya sumber otomatis di kode,
-> tetapi belum dipasang ke template mana pun dan belum ter-deploy.** Sumber KPI **`rekrutmen`**
+> ⚠️ **Dicatat 2026-09-18, diukur ulang 2026-09-21: empat dari lima metrik ini SUDAH punya sumber
+> otomatis yang kini LIVE di produksi, tetapi belum dipasang ke template mana pun.** Sumber KPI **`rekrutmen`**
 > (grup `sdm`, cakupan hanya `perusahaan`, reduksi `rata_rata`) ditulis di
 > `services/employee/kpi_sumber_rekrutmen.go`; bahannya ditarik lewat HTTP dari
 > recruitment-service (`GET /kpi/rekrutmen` dan `GET /kpi/review-evaluasi`,
 > `services/recruitment/kpi_rekrutmen.go`, digerbang kunci layanan `RECRUITMENT_SERVICE_KEY`).
 > bip-erp PR [#1967](https://github.com/bip-itteam-internal/bip-erp/pull/1967) dan erp-frontend PR
 > [#1644](https://github.com/bip-itteam-internal/erp-frontend/pull/1644) **merged 2026-09-18**;
-> **belum di-deploy ke DEV maupun PROD**, env-nya belum diisi di lingkungan mana pun (langkah
-> deploy + gerbang verifikasinya di [[RUN - Deploy Microservices bip-erp]] §3d), dan **nol
-> metrik di template ini yang memakainya** — memasangnya tindakan data HR sesudah HRD melihat
-> pratinjau. Karena itu kolom-kolom di bawah **tidak berubah klasifikasinya**, dan skor manual
+> **live DEV 2026-09-18 dan PROD 2026-09-21** (kunci terisi, rute terverifikasi 200 dengan kunci dan
+> 401 tanpa kunci; langkah deploy + gerbangnya di [[RUN - Deploy Microservices bip-erp]] §3d), tetapi
+> **nol metrik di template ini yang memakainya** — memasangnya tindakan data HR sesudah HRD melihat
+> angkanya. ⛔ **Diukur PROD 2026-09-21 sebelum dipasang: angkanya akan 0%, bukan mendekati skor manual.**
+> Agustus 3 requisisi / 3 slot dan September 8 requisisi / 8 slot, **nol** di antaranya punya kandidat
+> Hired yang tertaut lewat lowongan; kandidat berstatus Buffer **nol** atas 6 rencana MPP (kritikal 0 dari 3).
+> Jadi pemenuhan dan buffer sama-sama 0% di tempat lembar HRD menulis 83,3 dan 70. Selisihnya soal DATA
+> yang belum terisi di modul Recruitment, bukan rumusnya. Karena itu kolom-kolom di bawah **tidak berubah
+> klasifikasinya**, dan skor manual
 > yang tercatat di bab ini tetap berlaku.
 >
 > | Metrik di template ini | Metrik sumber `rekrutmen` | Dihitung dari |
@@ -993,8 +998,8 @@ recruitment-service belum punya rute `/internal/` untuk dikonsumsi employee-serv
 > recruitment-service sudah punya rute bahan KPI — bukan berprefiks `/internal/` melainkan
 > `GET /kpi/rekrutmen` + `GET /kpi/review-evaluasi` yang digerbang kunci layanan, sesuai
 > [[ADR - 0031 Prefix internal Bukan Batas Keamanan]]. Yang **tidak** berubah: datanya tetap
-> perlu diisi (kandidat, review onboarding), kodenya belum ter-deploy, dan metriknya belum
-> dipasang ke template. Skor per metrik di kolom-kolom di atas tak boleh dianggap otomatis.
+> perlu diisi (kandidat, review onboarding) dan metriknya belum dipasang ke template; kodenya sendiri
+> sudah live di produksi sejak 2026-09-21. Skor per metrik di kolom-kolom di atas tak boleh dianggap otomatis.
 
 **Pergeseran klasifikasi akibat pembaruan ini**, supaya angka bab dan ringkasan bisa
 ditelusuri: metrik 1, 2, 3 tetap *modul ada tapi datanya kosong*; metrik 4 pindah dari

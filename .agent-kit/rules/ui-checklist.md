@@ -177,6 +177,70 @@ tombol aksinya masih terjangkau tanpa menggulir balik.
 > MyBharata beda: `CustomBottomSheet` sudah memasang paddingnya sendiri, jadi menambah
 > padding lagi di dalamnya justru ganda. Bagian ini soal `Sheet` erp-frontend.
 
+## 2b. Menu sidebar: induk tidak dinamai jabatan
+
+Berlaku untuk setiap induk (item ber-`items[]` tanpa `url`) di
+`components/layout/sidebar-menus.tsx`.
+
+**Induk menamai URUSAN yang dibagi anak-anaknya, atau HUBUNGAN halaman itu dengan
+pembacanya (milik saya vs milik tim). Yang dilarang adalah menjadikan JABATAN sebagai
+sumbu: satu induk per posisi, diisi apa pun yang posisi itu kerjakan.**
+
+Ujinya satu pertanyaan, dijawab sebelum menambah induk atau memindahkan menu ke dalamnya:
+kalau nanti ada halaman baru yang dikerjakan posisi itu tetapi urusannya lain, apakah ia
+masuk ke induk ini? Jawaban "iya, kan orangnya sama" berarti sumbunya jabatan, tolak.
+Jawaban "tidak, urusannya beda" berarti sumbunya urusan, aman.
+
+Nama induk yang KEBETULAN sama dengan nama jabatan tidak melanggar apa pun, selama yang
+dinamainya memang urusannya. "Personalia" dan "Live Support" keduanya begitu.
+
+### Kenapa sumbu jabatan rusak
+
+1. **Satu orang satu posisi.** Tiap pembaca melihat tepat satu induk yang relevan dan
+   sisanya tersaring izin, jadi induk itu cuma menambah satu klik tanpa menyembunyikan apa
+   pun. `ratakanIndukTipis` malah membubarkannya di bawah `AMBANG_SARANG` (3) anak
+   TERLIHAT, jadi ia bubar justru bagi orang yang dinamainya. Induk yang audiens aslinya
+   berhak atas dua anak menyetel `ambangSarang: 2` sendiri, seperti "Live Support".
+2. **Halaman dipakai lintas posisi.** Halaman yang dibaca SPV, Leader, dan staf pemegang
+   paket tak punya rumah tunggal di sumbu jabatan, jadi ia harus diduplikasi. Dua entri ke
+   URL yang sama sudah ada satu di kategori MARKETING ("Komplain ke Gudang" bagi pemegang
+   peran marketing DAN warehouse), dan komentarnya sendiri mencatatnya sebagai cacat yang
+   belum dibereskan, bukan sebagai pola yang boleh ditiru.
+3. **Nama jabatan berubah lewat master data, dan sudah terbukti berubah.** "ICC" jadi
+   "Account Specialist" (2026-08-25). Induk bernama jabatan menjadi sumber kebenaran kedua
+   untuk nama jabatan, dan menyimpangnya tanpa satu pun galat (`team-memory.md`
+   § Prinsip kode: satu fakta satu tempat).
+4. **Sumbu jabatan SUDAH dikerjakan `perm` dan paket Hak per Posisi.** Memasangnya lagi
+   sebagai sumbu bentuk menu mengulang `menu_hidden` yang dicabut ADR 0051, yang aturannya
+   `tampil = boleh DAN tidak disembunyikan` membuat permission set yang sudah dipasang tak
+   pernah terlihat. `sidebar-menu-shape.ts` sudah menuliskan prinsipnya: menyandarkan
+   bentuk sidebar pada nama role akan salah persis di kasus yang paling penting.
+
+### Keadaan terukur (2026-09-21, `origin/main`)
+
+29 induk di seluruh sidebar, dan tak satu pun memakai jabatan sebagai sumbu. 27 menamai
+urusan atau bidang kerja (Personalia, Program Culture, People Development, Recruitment,
+Operasional Gudang, Order & Dokumen, Pengawasan, Pembelian, Master & Referensi, Task
+Management, Live Support, Laba per Level, Analisis, dan seterusnya); 2 menamai hubungan
+dengan pembacanya ("Pekerjaan Saya", "Kelola Tim").
+
+**"Live Support" satu-satunya yang namanya juga nama jabatan**, dan ia lolos uji di atas:
+keempat anaknya urusan siaran live, dan audiensnya justru empat yang berbeda (penjadwal
+shift, pemantau sesi, penyetor, penyetuju departemen). Jadi ia bukan preseden
+induk-per-posisi, dan komentarnya di `sidebar-menus.tsx` menyebutkan itu.
+
+Arahnya sudah pernah diputuskan sekali di kode: induk "Kelola Tim" sengaja menggantikan
+induk "ICC" (2026-09-17) dengan alasan tertulis "menyebut jabatan lama alih-alih
+pekerjaannya".
+
+### Yang TIDAK dijaga test
+
+Aturan ini tak bisa dicek mesin tanpa daftar nama jabatan, dan daftar itu sendiri berubah
+lewat master data, yaitu masalah nomor 3 di atas. Penjaganya review, bukan test. Yang
+DIJAGA test adalah bentuk hasilnya per persona (`live-support-persona.test.ts`,
+`sidebar-pekerjaan-saya.test.ts`), dan itu tetap wajib untuk induk baru: kunci apa yang
+TERLIHAT oleh tiap persona, bukan sekadar bahwa induknya ada.
+
 ## 3. Arah visual boleh dari luar, komponen tetap dari repo
 
 Skill `frontend-design` (plugin opsional per mesin), mockup Figma, atau tangkapan layar aplikasi
