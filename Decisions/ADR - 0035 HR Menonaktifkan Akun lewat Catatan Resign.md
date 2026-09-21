@@ -39,7 +39,7 @@ Aturan turunannya:
 - **Dua pintu ke satu saklar.** [[IT - Employee System]] tidak lagi menggambarkan keadaan sebenarnya bila dibaca sebagai "hanya IT", dan dokumen itu diperbarui bersamaan dengan ADR ini. Bahwa keduanya menulis lewat satu fungsi membuat perbedaan perilaku antar-pintu tidak mungkin muncul diam-diam.
 - **Staf HR bisa menonaktifkan siapa pun di perusahaannya, termasuk direksi.** Tidak ada perlindungan berbasis jabatan. Yang membatasi hanya tenant: `POST /resign` menolak karyawan yang `work_data.company_id`-nya berbeda dari `EffectiveCompanyID` pemanggil.
 - **Tanpa maker-checker.** Satu staf HR cukup untuk mematikan akses seseorang. Ini sejalan dengan jalur IT yang juga tak menuntut persetujuan kedua, dan dengan tingkat gerbang `RequireHRISStaff` yang dipilih mengikuti alur HR lain (kontrak, bank detail).
-- **Jejaknya cuma sebagian.** `system_authentication` masih tanpa `updated_at`/`updated_by` dan tanpa koleksi riwayat ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]), jadi "siapa mematikan akun ini" hanya terjawab untuk jalur HR — lewat `employee_resign.metadata` — dan tetap **tak terjawab** untuk jalur IT.
+- **Jejaknya cuma sebagian.** `system_authentication` masih tanpa `updated_at`/`updated_by` dan tanpa koleksi riwayat ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]), jadi "siapa mematikan akun ini" hanya terjawab untuk jalur HR — lewat `employee_resign.metadata` — dan tetap **tak terjawab** untuk jalur IT. ⚠️ **Konsekuensi ini DIBATALKAN 2026-09-21**, lihat catatan perluasan di bawah.
 - **Akses tidak putus seketika.** Penonaktifan memblokir keempat jalur login dan `GET /auth/refresh`, tapi JWT yang sudah beredar tetap sah sampai TTL 72 jam habis karena revoke masih placeholder ([[CORE - SSO Flow]]). Peringatan di form HR **tidak** menyebut jeda ini (dihapus atas permintaan user, erp-frontend PR #804), jadi HR akan menganggap aksesnya putus seketika — selisih itu perlu diingat saat menangani kasus yang menuntut pemutusan segera.
 
 **Yang belum dikerjakan (menyusul):**
@@ -55,6 +55,25 @@ Aturan turunannya:
 - Apakah jabatan tertentu (mis. direksi) perlu dilindungi sehingga hanya bisa dinonaktifkan admin pusat.
 - Apakah pembatalan yang menghidupkan kembali akses perlu naik ke `RequireHRISSupervisor`, mengingat itu satu-satunya operasi HR yang **memberi** akses.
 
+## Perluasan 2026-09-21 — jejak jalur IT tidak lagi kosong
+
+> Keputusan pokok ADR ini **tidak berubah**: pencatatan resign tetap milik HR, `is_active` tetap ditulis satu fungsi, jalur IT tetap ada dan tetap `RequireITStaff`. Yang dibatalkan hanya konsekuensi "jejaknya cuma sebagian" di atas. Pemicunya [[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]]: angka headcount bulan lampau dipakai menilai kerja tim rekrutmen, dan angka itu tak bisa dipercaya selama ada penonaktifan yang tak bertanggal.
+
+Yang diukur lebih dulu (PROD 2026-09-21): **35 akun non-aktif, hanya 11 punya catatan resign**, jadi **24 kepergian tak punya tanggal sama sekali**. Rekonstruksi headcount akhir Juni karena itu terbaca 188 sementara lembar HRD menulis 158.
+
+Yang berubah:
+
+1. **Tiap perubahan `is_active` meninggalkan baris `account_status_log`** berisi nilai sebelum & sesudah, alasan, sumber pintu, pelaku, dan id catatan resign bila ada. Jejaknya ditulis **di dalam** `terapkanStatusAkun`, bukan di pemanggilnya — menaruhnya di pemanggil akan mengembalikan lubang yang sama pada pintu berikutnya yang lahir.
+2. **Pintunya ternyata empat, bukan dua.** Selain jalur IT dan jalur resign, pemindai sumber menemukan `DELETE /external-accounts/:employeeID` menulis `is_active` langsung (kini lewat `terapkanStatusAkun`, sumber `akun_luar`), dan review menemukan `PUT /update/:employee_id/system-auth` meneruskan map bebas ke `$set` sehingga bisa mematikan akun tanpa jejak — pintu itu kini **menolak 400** dan menunjuk `PATCH /account/active-status`. Keputusan menolak (bukan membuang diam-diam) diambil user 2026-09-21: yang bermaksud mematikan akun harus tahu maksudnya tidak terlaksana.
+3. **Alasan wajib di layar IT, opsional di kontrak** selama masa transisi tiga tahap (BE menerima opsional → FE mewajibkan → BE menolak kosong), supaya layar IT lama tak patah di jeda deploy. Baris tanpa alasan tersimpan bertanda `(tidak disebutkan)`.
+4. **Penjaga backlog** `GET /resign/non-aktif-tanpa-catatan` menampilkan akun mati yang belum punya catatan keluar, dipasang di halaman HRIS → Resign. Nol baris di sana adalah ambang ADR 0113.
+
+Yang **tetap** sebagai konsekuensi yang diterima:
+
+- Poin 4 keputusan di atas tak berubah: HR tetap tak punya saklar telanjang, dan jejak status akun **bukan** pengganti catatan resign. Jejak menjawab "kapan saklarnya ditekan"; catatan resign menjawab "orang ini berhenti, karena apa". Akun bisa mati tanpa orangnya berhenti (skorsing, akun luar), jadi baris berjejak pun tetap masuk backlog sampai HR mencatat kepergiannya.
+- 24 kepergian lama tetap tak bertanggal sampai HRD menambalnya lewat menu Resign; tanggal usulannya diturunkan dari absensi terakhir dan **HRD yang memutuskan**, bukan sistem.
+- ⚠️ **Masih terbuka**: `terapkanStatusAkun` menyaring `employee_id` saja tanpa `company_id`, jadi staf IT satu tenant secara teknis bisa mematikan akun tenant lain. Ini **pre-existing**, bukan lahir dari perluasan ini, dan pantas jadi keputusan tersendiri.
+
 ## Terkait
 
 - [[Microservices - Employee Service]] (koleksi, rute, cron) · [[API - Employee Service]] (daftar endpoint)
@@ -62,4 +81,5 @@ Aturan turunannya:
 - [[IT - Employee System]] · [[CORE - IT Orchestrator]] (jalur IT yang tetap ada)
 - [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] (jejak audit yang belum ada) · [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]
 - [[CORE - SSO Flow]] (TTL token & revoke placeholder) · [[Microservices - File Service]] (dokumen pendukung)
+- [[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]] (pemicu perluasan 2026-09-21) · [[ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id]] (kenapa kueri backlog menyaring tenant)
 - [[APP - Web ERP]] (halaman HRIS → Personalia → Resign) · [[HRIS - Adaptasi ERPGo HRM]] (Tier 3 Resignations/Terminations)

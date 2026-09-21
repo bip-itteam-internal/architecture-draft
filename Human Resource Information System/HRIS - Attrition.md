@@ -24,6 +24,8 @@ Yang berubah dengan adanya catatan resign adalah **prasyarat datanya terpenuhi**
 
 ⚠️ **Datanya masih kosong.** Verifikasi produksi 2026-08-06: `employee_resign` **0 dokumen**, akun aktif **183**. Angka apa pun yang dihitung darinya akan nol sampai HR benar-benar memakai menunya.
 
+⚠️ **Dipakai sebagian, dan itu bentuk kekosongan yang lebih menipu.** Diukur ulang PROD 2026-09-21: `employee_resign` **12 dokumen**, akun aktif **182**, akun non-aktif **35** — tetapi hanya **11** dari yang non-aktif itu punya catatan, jadi **24 kepergian tak punya tanggal sama sekali**. Angka turnover karena itu bukan nol melainkan **terlalu kecil**, dan tampak wajar. Menambal 24 itu akan mengubah turnover bulan-bulan lampau dari 11 menjadi 35 orang keluar. Penjaganya: panel "akun nonaktif tanpa catatan keluar" di halaman Resign (🔜 belum merge; [[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]]), dan sejak itu hidup tiap penonaktifan meninggalkan jejak bertanggal sehingga kekurangan ini tak bisa tumbuh diam-diam lagi.
+
 ### Kartu turnover bulan berjalan — ✅ live di produksi
 
 Cicilan pertama Dashboard: empat kartu di halaman Resign ([[APP - Web ERP]]) yang disuplai `GET /resign/summary`, kini juga tampil sebagai `KartuAmbang` di tab **Ringkasan** dan **HRD Supervisor** Dashboard HRGA.

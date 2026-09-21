@@ -12,7 +12,7 @@ Besaran kerja: tiga bagian berurutan. Merapikan jejak keluar dan membuat master 
 
 *Kolom Actual pada lembar MPP dihitung sistem dari data karyawan, bukan diketik HRD. Rencana MPP mendapat sumbu waktu berupa bulan berlaku, bukan satu angka per tahun. Divisi lahir sebagai master data tersendiri supaya bisa dipakai modul mana pun. Riwayat bulan lampau baru dibuka setelah setiap penonaktifan karyawan punya tanggal, sebab angka ini menilai orang.*
 
-- **Status**: 🟡 **Diusulkan**, disetujui user 2026-09-21, kode belum ada.
+- **Status**: 🟡 **Diusulkan**, disetujui user 2026-09-21. **T1 (jejak keluar bertanggal) sudah berkode, 🔜 belum merge & belum deploy** — branch bip-erp `feat/employee-status-akun-bertanggal` + erp-frontend `feat/hris-backlog-catatan-keluar`, lihat keputusan 3 & 4 dan catatan perluasan [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]. Irisan lain (master Divisi, sumbu bulan rencana, layar Aktual vs Rencana, riwayat bulan lampau) belum ada kodenya.
 - **Path di repo**: `bip-erp/services/employee/headcount_periode.go` (baru) · `bip-erp/services/employee/master_divisi.go` (baru) · `bip-erp/shared-library/models/employee/divisi.go` (baru) · `bip-erp/services/recruitment/models_mpp.go` (sumbu bulan) · `bip-erp/services/recruitment/mpp_actual.go` (baru) · `erp-frontend/src/app/(main)/hris/recruitment/manpower-plans/page.tsx` · `erp-frontend/src/features/hris/recruitment/mpp/` (baru: tabel aktual vs rencana)
 - **Tanggal**: 2026-09-21
 
@@ -58,7 +58,11 @@ Kebutaan kedua yang lebih halus: `work_data.department` dan `position` **ditimpa
 
 3. **Riwayat bulan lampau TIDAK dibuka sebelum jejak keluar bertanggal.** Selama masih ada akun non-aktif tanpa catatan resign, layar hanya menyajikan **bulan berjalan**, dan bulan lampau ditandai "belum dapat dihitung" beserta alasannya, bukan diisi angka yang keliru. Ambangnya eksplisit: nol akun non-aktif tanpa tanggal keluar untuk perusahaan yang dilihat.
 
+   **Cara mengukurnya** (T1, 🔜 belum merge & belum deploy — branch bip-erp `feat/employee-status-akun-bertanggal` + erp-frontend `feat/hris-backlog-catatan-keluar`): `GET /api/employee/resign/non-aktif-tanpa-catatan` membalas `{data, total}`; **`total` nol = ambang terpenuhi**. Angkanya juga tampil sebagai panel di halaman HRIS → Resign, tempat HRD menambalnya satu per satu lewat formulir yang sudah ter-prefill. Diukur PROD 2026-09-21: **24** (dari 35 akun non-aktif, 11 sudah punya catatan). Sejak T1 hidup, tiap perubahan `is_active` meninggalkan baris `account_status_log`, jadi backlog baru tak bisa lahir tanpa tanggal — rinciannya di catatan perluasan [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]].
+
 4. **Penonaktifan karyawan wajib lewat menu Resign.** Penonaktifan langsung oleh IT tanpa catatan keluar diperlakukan sebagai kesalahan data, bukan jalur yang sah. Dua puluh empat kejadian yang sudah terjadi ditambal sebagai data, dengan tanggal dari HRD.
+
+   ⚠️ **Jalur IT tetap ada dan tidak ditutup** (keputusan user 2026-09-21: IT perlu memutus akses saat insiden keamanan, dan itu memang bukan peristiwa HR). Yang berubah, jalur itu tak lagi senyap: layar IT mewajibkan alasan, dan backend mencatat pintu, pelaku, serta waktunya. Penonaktifan yang bukan kepergian karyawan (akun ganda, akun titipan, salah buat) karena itu tetap sah lewat jalur IT — ia hanya akan muncul di panel backlog sampai HR memastikan orangnya memang tidak keluar.
 
 5. **Rencana MPP mendapat bulan berlaku**, bukan dua belas baris per posisi. Satu baris rencana berlaku sejak bulan tertentu sampai digantikan baris berikutnya, sehingga HRD mengisi sekali setahun dan merevisi hanya saat berubah. Bulan yang tak direvisi mewarisi angka bulan sebelumnya.
 
