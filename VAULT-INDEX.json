@@ -7390,8 +7390,19 @@
       ],
       "hash": "70f0ecefc41991538bce44cb7f5c5f5011bcc4a2b3f6935aa857a0688bc134e1",
       "ukuran_kb": 10.7,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: kenapa kolom Actual pada lembar MPP HRD dihitung sistem dari data karyawan dan tidak lagi diketik manual, bagaimana Actual didefinisikan (karyawan aktif pada hari terakhir bulan per perusahaan, departemen, dan posisi), dan kenapa bulan lampau harus dibaca lewat employee_movement, bukan work_data hari ini. Menjelaskan pula syarat keras sebelum riwayat bulan lampau boleh dibuka: setiap penonaktifan karyawan wajib punya tanggal keluar lewat menu Resign, karena akun non-aktif tanpa jejak keluar membuat headcount bulan lampau menggelembung sementara angkanya dipakai menilai tim rekrutmen. Menjawab juga kenapa Rencana MPP mendapat sumbu bulan berlaku, kenapa Divisi lahir sebagai master data tersendiri, dan siapa yang boleh melihat layar Aktual vs Rencana.",
+      "kata_kunci": [
+        "MPP",
+        "manpower planning",
+        "actual vs planning",
+        "headcount",
+        "rencana tenaga kerja",
+        "master divisi",
+        "resign",
+        "employee_movement",
+        "recruitment",
+        "HRGA"
+      ]
     },
     {
       "path": "DEVELOPER GUIDE.md",
@@ -10180,8 +10191,19 @@
       ],
       "hash": "b1270a0a53705b2b4937bea397fdeca10ee03bf168638c6bea0a1e92c6604176",
       "ukuran_kb": 58.3,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: di mana departemen dan posisi disimpan (master data `master_department` dengan CRUD endpoint dan layar admin), apa beda `positions[]` dari `position_items[]` beserta `position_key` yang membuat paket hak tidak lepas saat jabatan di-rename, dan bagaimana jenjang jabatan (job level) bekerja termasuk kenapa ia penanda organisasi dan bukan sumbu hak akses. Menjawab pula siapa penyetuju pengajuan per departemen lewat `work_data.is_supervisor`, apa bedanya dari Atasan Langsung, dan bagaimana cakupan supervisi antar-departemen (`supervised_by`, `supervision_label` seperti HRGA) memengaruhi filter departemen serta urutan pencarian atasan. Berisi juga bukti verifikasi produksi untuk org chart, jenjang jabatan, dan penyetuju per departemen.",
+      "kata_kunci": [
+        "struktur organisasi",
+        "organization structure",
+        "master_department",
+        "jabatan",
+        "position_key",
+        "jenjang jabatan",
+        "job level",
+        "org chart",
+        "supervisor",
+        "HRGA"
+      ]
     },
     {
       "path": "Human Resource Information System/HRIS - Otomasi Skor KPI.md",
@@ -10677,8 +10699,19 @@
       ],
       "hash": "37079684dcdccd32d5089f99b293ce22eac1c5a76e3579ed5a4356bf1dffef45",
       "ukuran_kb": 65.2,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: bagaimana alur rekrutmen berjalan dari permintaan posisi (job requisition) sampai kandidat jadi karyawan aktif, siapa yang menyetujui requisition (SPV HRD sebagai persetujuan final satu tahap, tanpa cap kuota), dan dari kanal mana pelamar masuk termasuk portal karir publik dan Glints. Menjawab pula bagaimana interview multi-tahap dijadwalkan dari menu Interviews, bagaimana pewawancara mengisi feedback lewat tautan email login-gated, dan bagaimana psikotes serta technical test direkam sebagai babak bertipe tes yang memindahkan progress kandidat. Memuat juga model data pipeline (`progress` vs `status`), masa evaluasi onboarding, rekrutmen lintas perusahaan, dan Rencana Tenaga Kerja (MPP).",
+      "kata_kunci": [
+        "rekrutmen",
+        "recruitment",
+        "requisition",
+        "lowongan",
+        "kandidat",
+        "interview",
+        "psikotes",
+        "onboarding",
+        "portal karir",
+        "MPP"
+      ]
     },
     {
       "path": "Human Resource Information System/HRIS - Retention.md",
@@ -14994,8 +15027,19 @@
       ],
       "hash": "568f0e238229ce4ad3f63f2127fac57952dec561906c7aded5730b8901ca3eb7",
       "ukuran_kb": 3.7,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dikerjakan untuk mewujudkan ADR 0113 dan dalam urutan mana, dipecah jadi enam butir siap dilempar ke `/start-task` (menambal jejak keluar bertanggal, master Divisi, perhitungan Actual per periode di employee-service, Rencana MPP bersumbu bulan, layar Aktual vs Rencana, dan pengisian MPP 2026 oleh HRD). Menjawab pula apa definisi selesai tiap butir, butir mana yang menyentuh data produksi sehingga dikerjakan manusia, dan ketergantungan mengikat bahwa layar Aktual vs Rencana tidak sah sebelum jejak keluar tuntas. Menyebut secara eksplisit apa yang di luar lingkup, yaitu metrik KPI baru dari Selisih dan perbaikan pipeline rekrutmen.",
+      "kata_kunci": [
+        "MPP",
+        "actual vs planning",
+        "manpower planning",
+        "pecahan task",
+        "master divisi",
+        "jejak keluar",
+        "resign",
+        "headcount",
+        "employee_movement",
+        "rekrutmen"
+      ]
     },
     {
       "path": "Workspace/ANALISA - Akrual Cuti Tahunan Otomatis.md",
@@ -16459,10 +16503,5 @@
       ]
     }
   ],
-  "gagal": [
-    "Decisions/ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal.md",
-    "Human Resource Information System/HRIS - Organization Structure.md",
-    "Human Resource Information System/HRIS - Recruitment.md",
-    "Workspace/ANALISA - Actual vs Planning MPP.md"
-  ]
+  "gagal": []
 }
