@@ -29,6 +29,32 @@ Diukur ke `origin/main` `bip-erp` commit `6ef719e3`. **Sebagian dokumentasi lama
 
 ⛔ **Yang benar-benar tidak bisa menumpang apa pun adalah ronda tiap 3 jam.** Recurrence form-builder hanya mengenal `monthly` dan `weekly` (`services/form-builder/models_period.go:13-14`), tidak ada harian apalagi per-tiga-jam. Menambahkan satuan sub-harian ke sana berarti mengubah model periode yang dipakai bersama Kaizen, Satgas, dan `ceklis_kpi`, yaitu mengubah satu fakta yang dipegang banyak konsumen demi satu pemakai baru.
 
+## Inventaris Alat Kerja Security
+
+Diukur 2026-09-21 ke `origin/main` `bip-erp` `6ef719e3`, menjawab pertanyaan "alat kerja Security sudah terkover semua atau belum". **Jawabannya belum, dan bab ini juga menjelaskan kenapa pertanyaan itu tidak bisa dijawab sistem.**
+
+### Yang sudah ada
+
+| Alat | Keadaan | Catatan |
+|---|---|---|
+| Buku tamu (Guestbook) | ✅ live | 8 berkas di `services/attendance` plus repo Astro terpisah. Kategori `personal` dan `group` lewat web tamu; kategori `internal` (verifikasi karyawan terlambat) lewat scan QR di [[APP - MyBharata]] |
+| Presensi dirinya sendiri | ✅ live | sebagai karyawan biasa: absen, tukar shift, koreksi |
+| Inspeksi Satgas 5R | ✅ ada | Security adalah **objek** yang dinilai (metrik pos jaga), **bukan** operatornya |
+
+### Yang nol di `origin/main`
+
+Serah terima shift · catatan insiden keamanan · keluar-masuk barang, surat jalan, atau gate pass · kunci dan akses fisik · CCTV · ronda (dokumen ini, belum ada kode) · pemeriksaan APAR berkala.
+
+⚠️ **Tiga false positive yang hampir menerbitkan temuan palsu**, dicatat supaya tidak diulang: pencarian `incident` mengembalikan **93 berkas** yang seluruhnya integration dan monitoring (insiden marketplace dan sistem, bukan keamanan); `apar` mengembalikan **84 berkas** yang mayoritas kata "pemadaman"; `plat` mengena "GoogleCloudPlatform". Satu-satunya APAR sungguhan adalah **butir form Satgas** (`apar_ada`, "APAR tersedia?" di `services/form-builder/metric_satgas_test.go`), bukan modul pemeriksaan berkala. Pola pencarian untuk kelas ini wajib memakai batas kata dan diperiksa isinya, bukan dihitung jumlah berkasnya.
+
+### ⛔ Kenapa daftar di atas tidak bisa disebut lengkap
+
+**Tidak ada penyimpanan jobdesk per posisi di sistem mana pun.** Satu-satunya kecocokan `jobdesk` di seluruh repo adalah `QJobdesk` (`services/recruitment/models_candidate.go:63`), yaitu pertanyaan yang diajukan kepada **kandidat** saat melamar, bukan uraian tugas tersimpan untuk posisi yang sudah ada. Ketiadaan ini sudah tercatat sebagai kebutuhan backend nomor 5 di [[HRIS - Dashboard per Posisi]] dan turut mengunci metrik di Recruitment & Onboarding, bukan hanya Security.
+
+Konsekuensinya: **daftar di atas disusun dari akal sehat, bukan dari sumber otoritatif.** Yang paling mendekati otoritatif hanyalah empat metrik template `Security Team`, dan itu **menilai** pekerjaan, bukan **menguraikannya**. Buktinya keduanya tidak sama ada di dokumen ini sendiri: buku tamu jelas pekerjaan nyata Security yang sudah tercatat rapi, tetapi tidak muncul di satu pun dari empat metrik itu.
+
+**Yang melengkapinya bukan pencarian kode lagi, melainkan bertanya ke SPV HRGA** satu shift Security isinya apa saja, lalu mencocokkannya dengan tabel di atas. Itu sekaligus jalan tercepat menutup metrik "rating pelayanan dan keamanan" berbobot 0,3 yang sampai sekarang belum dipetakan.
+
 ## Apa yang GPS Boleh dan Tidak Boleh Klaim
 
 **Bagian terpenting dokumen ini.** Bukti lokasi di sini sengaja dibatasi, dan batas itu wajib ikut ke layar.
@@ -98,6 +124,7 @@ Hampir seluruh bahannya sudah ada. Tabel ini yang membuat irisan pertamanya keci
 
 ## Belum Diputuskan (TBD)
 
+- **Satu shift Security sebenarnya berisi apa saja.** Belum pernah diuraikan di mana pun, dan tanpa itu tak ada yang bisa menyatakan alat kerjanya sudah terkover atau belum (lihat bab Inventaris Alat Kerja Security). Dijawab dengan bertanya ke SPV HRGA, bukan dengan mencari di kode.
 - **Rating pelayanan dan keamanan (bobot 0,3)** diukur dari apa. Belum dipetakan, dan ini keputusan pemilik KPI, bukan tebakan yang boleh diambil dari dokumen ini.
 - **Kepatuhan SOP security (bobot 0,2)**: apakah cukup lewat `ceklis_kpi` dengan penilai SPV, atau menuntut bentuk lain.
 - **Apakah Guestbook layak masuk KPI Security.** Ia pekerjaan nyata yang sudah tercatat rapi, tetapi ketidakhadirannya di KPI adalah pertanyaan untuk HR, bukan celah yang boleh ditambal frontend.
