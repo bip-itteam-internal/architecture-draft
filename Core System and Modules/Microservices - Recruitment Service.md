@@ -499,3 +499,16 @@ Rutenya **sengaja terpisah** dari rute HR yang digerbang izin modul, dan berkas 
 - [[CORE - API Master Gateway]] · [[CORE - SSO Flow]]
 - [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]] (rekrutmen lintas perusahaan, live prod 2026-09-12) · [[ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen]] · [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]]
 - [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] (kunci layanan untuk panggilan mesin) · [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] (batas antara pengumpul bahan dan penghitung skor)
+
+## Increment: Pemenuhan Requisisi untuk Layar (2026-09-22 — 🟡 branch, belum merged)
+
+> 🟡 **Status**: branch `feat/dashboard-posisi-recruitment`, belum merged dan belum deploy. Ukur ulang sebelum mengandalkannya.
+
+`GET /requisitions/pemenuhan?dari=YYYY-MM&sampai=YYYY-MM`, digerbang identitas pemakai (`isHR` atau `recruitment.view`), menyajikan requisisi yang sudah disetujui beserta `disetujui_pada`, `diterima_pada[]`, dan `tenggat_hari`. Bahan kartu tenggat dan bagan tren di tab Recruitment & Onboarding `/hris` ([[HRIS - Dashboard per Posisi]]).
+
+- ⛔ **Bukan rute kedua yang menghitung hal yang sama.** Ia memanggil `ambilBahanKPIRekrutmen` dan `rakitKPIRekrutmen` yang sudah ada; yang berbeda hanya gerbangnya. `GET /kpi/rekrutmen` digerbang **kunci layanan** karena ia panggilan mesin dari employee-service, dan layar tak boleh memegang kunci itu.
+- **`BarisRequisisiKPI` menerima `department`** (aditif). Ia tidak dipakai perhitungan KPI mana pun dan sengaja **tidak** dicerminkan di employee-service: field yang tak dibaca siapa pun akan terbaca sebagai sesuatu yang ikut menentukan skor.
+- ⛔ **`TenggatPemenuhanHari = 30` naik ke `shared-library/common`.** Sebelumnya ia hidup hanya di employee-service, dan itu benar selama satu-satunya pembacanya perhitungan skor. Begitu layar ikut membacanya, pembacanya jadi dua, dan dua tempat yang harus sejalan menyimpang senyap: kartu di dashboard mengabarkan sebuah requisisi masih aman sementara sumber KPI sudah menghitungnya terlambat. `kpi_rekrutmen.go` tetap tidak boleh mendefinisikan tenggat; ia hanya meneruskannya.
+- ⛔ **Rute literal terdaftar DI ATAS `GET /requisitions/:id`.** Fiber mencocokkan sesuai urutan pendaftaran, dan yang tertelan membalas bentuk lain yang masuk akal alih-alih 404. Dijaga test regresi yang memeriksa **bentuk respons**, bukan status.
+
+Kontrak lengkap: [[API - Recruitment Service]] §Pemenuhan requisisi (layar).

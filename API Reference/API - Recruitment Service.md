@@ -35,12 +35,31 @@
 |---|---|---|---|
 | POST | `/requisitions` | Ajukan permintaan posisi. **`department` diambil dari identitas pengaju, bukan body** (anti-spoof, PR #478). **PENGECUALIAN: jabatan berJENJANG direktur** (`position_items[].level_key` = `direktur`) boleh mengajukan untuk posisi di departemen **mana pun** — departemen diambil dari body. Jenjang ditanyakan ke employee-service `GET /master/departments` **hanya bila** departemen yang diminta berbeda dari departemen pengaju; gagal memastikan → **503**, bukan diam-diam memakai departemen pengaju. ⚠️ Corporate Secretary **TIDAK** termasuk (`common.SetaraDirektur` sempat dipakai sebagai sumbu tapi diganti — [[ADR - 0062 Jenjang Jabatan Menggerbangi Pengajuan Requisition Lintas-Departemen]]). **(2026-09-11, live prod 2026-09-12)** Pemegang izin `recruitment.cross_company` boleh mengirim `company_id` untuk mengajukan atas nama **perusahaan lain** (lihat bagian **Perusahaan** di atas): mengajukan untuk perusahaan lain otomatis dihitung lintas-departemen (departemen pengaju tak berlaku di perusahaan lain), jalur jenjang-direktur di atas tak ikut dipanggil untuk kasus ini | supervisor **ATAU pemegang `recruitment.cross_company`/admin pusat** |
 | GET | `/requisitions` · `/requisitions/:id` | List (HR semua / pengaju sendiri) / detail. **`?scope=department`** → SPV lihat requisition **se-departemen** (departemen dari identitas gateway; detail juga izinkan SPV se-departemen) — PR #470. Filter kini `$or[{department∈cakupan},{requested_by=pengaju}]`: pengaju SELALU melihat pengajuannya sendiri, termasuk yang dibuat Direktur untuk departemen LAIN (tanpa ini requisition lintas-departemen lenyap dari daftar portalnya). **(2026-09-11, live prod 2026-09-12)** Cakupan **perusahaan** (lintas vs non-lintas) dan perilaku `scope=department` untuk recruiter lintas: lihat bagian **Perusahaan** di atas | auth |
+| GET | `/requisitions/pemenuhan?dari=YYYY-MM&sampai=YYYY-MM` | Requisisi yang sudah disetujui beserta `disetujui_pada`, `diterima_pada[]`, dan `tenggat_hari`. Bahan kartu tenggat & bagan tren di tab Recruitment `/hris`. **Perhitungannya sama dengan `/kpi/rekrutmen`** (memanggil `ambilBahanKPIRekrutmen` + `rakitKPIRekrutmen` yang sama); yang berbeda hanya gerbangnya — lihat **Pemenuhan requisisi (layar)** di bawah | `isHR` **atau** `recruitment.view` |
 | PUT | `/requisitions/:id` | Edit (saat Submitted/Revision). Departemen **dipertahankan** (edit tak memindahkan requisition) | pengaju |
 | POST | `/requisitions/:id/resubmit` | Kirim ulang setelah revisi | pengaju |
 | POST | `/requisitions/:id/hr-review` | Review kualifikasi. `action=approve` → **langsung `Approved`** (persetujuan final); `action=revision` → `Revision`. Menerima status sumber `Submitted` **maupun** `HR Reviewed` (agar requisition lama yang menggantung bisa diselesaikan) — PR #609 | HR supervisor |
 | POST | `/requisitions/:id/reject` | Tolak. Alasan disimpan di `hr_note` (dulu `director_note`) | HR supervisor |
 
 > **`POST /requisitions/:id/director-approve` DIHAPUS** (PR #609, 2026-07-22) bersama tahap persetujuan Direktur. Respons juga **tidak lagi memuat `can_director_approve`**; `can_hr_review` kini bernilai `true` untuk status `Submitted` maupun `HR Reviewed`.
+
+### Pemenuhan requisisi (layar)
+
+> 🟡 **Merged di branch, belum di-deploy** (2026-09-22). Ukur ulang sebelum mengandalkannya.
+
+`GET /requisitions/pemenuhan?dari=YYYY-MM&sampai=YYYY-MM` →
+`{"data": {company_id, dari, sampai, tenggat_hari, requisisi[], requisisi_tanpa_jejak_persetujuan, diterima_tanpa_posting}}`.
+
+`requisisi[]` berbentuk sama dengan `/kpi/rekrutmen` (lihat **Muatan `/kpi/rekrutmen`**), dan memang baris yang sama: rute ini memanggil `ambilBahanKPIRekrutmen` + `rakitKPIRekrutmen` tanpa menulis ulang perhitungan apa pun.
+
+- ⛔ **Kenapa rute tersendiri, bukan memakai `/kpi/rekrutmen`**: yang itu digerbang **kunci layanan** karena ia panggilan mesin dari employee-service, dan layar tak boleh memegang kunci itu. Rute ini digerbang identitas pemakai (`isHR` atau `recruitment.view`), menjawab pertanyaan yang berbeda: "apa yang boleh dilihat orang ini". Pemakai tanpa hak baca pipeline ditolak **403**, bukan diberi daftar kosong — daftar kosong terbaca "belum ada requisisi".
+- **Satu tarikan untuk seluruh rentang, bukan per bulan.** `ambilBahanKPIRekrutmen` memakai `[dari, sampai)` hanya untuk mencacah hire tanpa lowongan dan memuat coverage; requisisi, jejak persetujuan, lowongan, dan kandidat diterima ditarik **tanpa saringan tanggal**. Memanggilnya per bulan mengulang bacaan penuh sebanyak jumlah bulan tanpa hasil berbeda. Pengelompokan per bulan dikerjakan layar.
+- **Rentang maksimum 12 bulan** (`maksBulanPemenuhan`), dihitung dari komponen tahun+bulan bukan selisih hari (panjang bulan berbeda-beda). Rentang cacat atau terbalik → **400** beserta `maks_bulan`.
+- ⛔ **`tenggat_hari` DITERUSKAN, bukan dihitung di sini.** Sumbernya `common.TenggatPemenuhanHari` di `shared-library`, satu-satunya tempat angka 30 hidup. Ia naik ke sana justru karena layar ikut membacanya: dua salinan akan menyimpang senyap, dan gejalanya kartu di dashboard mengabarkan sebuah requisisi masih aman sementara sumber KPI sudah menghitungnya terlambat. Lolos/gagalnya tetap dihitung sumber KPI di employee-service.
+- ⛔ **Rute literal ini WAJIB terdaftar di atas `GET /requisitions/:id`.** Fiber mencocokkan sesuai urutan pendaftaran, dan yang tertelan membalas bentuk lain yang masuk akal alih-alih 404. Dijaga `TestPemenuhanRequisisiTidakTertelanRuteParamID`, yang memeriksa **bentuk respons**, bukan status.
+- **Perusahaan**: mengikuti cakupan biasa; pemegang izin lintas yang tak mengirim `?company=` dijatuhkan ke perusahaannya **sendiri** (bukan dibiarkan kosong, yang akan diam-diam terbaca BIP), dan perusahaan yang benar-benar dipakai ikut di respons.
+
+**Konsumen**: tab Recruitment & Onboarding di `/hris` ([[APP - Web ERP]]), lihat [[HRIS - Dashboard per Posisi]].
 
 ## Job Posting
 | Method | Path | Fungsi | Role |
@@ -91,7 +110,7 @@
 
 | Field | Isi |
 |---|---|
-| `requisisi[]` | `id`, `posisi`, `jumlah_dibutuhkan`, `disetujui_pada`, `kritikal` (bool), `diterima_pada[]` (waktu kandidat `Hired` yang tertaut lewat lowongan requisition itu, urut waktu). Urut `disetujui_pada` lalu `id` |
+| `requisisi[]` | `id`, `posisi`, `department`, `jumlah_dibutuhkan`, `disetujui_pada`, `kritikal` (bool), `diterima_pada[]` (waktu kandidat `Hired` yang tertaut lewat lowongan requisition itu, urut waktu). Urut `disetujui_pada` lalu `id`. ⚠️ `department` **tidak dipakai perhitungan KPI mana pun** — ia ada untuk layar (nama posisi tidak unik lintas departemen), dan cermin di employee-service sengaja TIDAK memuatnya |
 | `requisisi_tanpa_jejak_persetujuan` | Cacah requisition `Approved`/`Posted` **tanpa** audit persetujuan yang mungkin berpengaruh ke periode ini |
 | `diterima_tanpa_posting` | Cacah kandidat `Hired` di periode ini yang tak punya lowongan, jadi tak tertaut ke requisition mana pun |
 | `coverage` | Cakupan buffer MPP **sudah jadi** (lihat di bawah) |

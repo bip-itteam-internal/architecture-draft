@@ -2,8 +2,8 @@
 
 *Rancangan isi dashboard per posisi untuk divisi **Human Resource**, lima posisi. Diturunkan mengikuti [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]]. Berbeda dari divisi lain, kelima posisi ini **sudah punya lembarnya** di `/hris`, jadi dokumen ini membandingkan yang tampil hari ini dengan yang seharusnya, bukan merancang dari nol.*
 
-- **Status**: ⚠️ **Sebagian sudah ada**. Kelima tab hidup di `/hris` (Ringkasan Divisi HRGA), tetapi tiga di antaranya nyaris kosong dan sebabnya bukan tata letak melainkan ketiadaan data.
-- **Angka KPI diukur 2026-08-28**, bab Recruitment disegarkan **2026-09-02**, bab Training & Performance Officer disegarkan **2026-09-15** (sumber: [[HRIS - Matriks KPI per Departemen]]). **Ukur ulang sebelum dipakai mengambil keputusan.**
+- **Status**: ⚠️ **Sebagian sudah ada**. Kelima tab hidup di `/hris` (Ringkasan Divisi HRGA); **dua** di antaranya nyaris kosong dan sebabnya bukan tata letak melainkan ketiadaan data. Recruitment & Onboarding keluar dari golongan itu 2026-09-22.
+- **Angka KPI diukur 2026-08-28**, bab Recruitment disegarkan **2026-09-22**, bab Training & Performance Officer disegarkan **2026-09-15** (sumber: [[HRIS - Matriks KPI per Departemen]]). **Ukur ulang sebelum dipakai mengambil keputusan.**
 - **Path di repo**: `erp-frontend/src/features/hris/dashboard/kartu/isi/`
 
 > Divisi **General Affair** berbagi rute yang sama (`/hris`) karena keduanya satu grup supervisi HRGA, tetapi posisinya dirancang di [[GA - Dashboard per Posisi]]. Lihat § HRGA bukan nama departemen di bawah.
@@ -15,10 +15,12 @@
 | HRD Supervisor | `hrd-supervisor` | 10 | 4 | 7 kartu, tab terkaya di divisi |
 | Personalia | `personalia` | 5 | 3 | 2 antrean + 2 kartu pelengkap |
 | Culture & Industrial | `org-dev` | 6 | 1 | 1 sebaran + 1 panel belum-bersumber |
-| Recruitment & Onboarding | `recruitment` | 5 | 0 | 1 kartu tenggat |
+| Recruitment & Onboarding | `recruitment` | 5 | **4** | 2 antrean + 2 kartu tenggat + bagan tren + panel jujur |
 | Training & Performance Officer | `people-dev` | 6 | 0 | 1 antrean + 3 kartu angka umum + 1 sebaran |
 
-Tiga tab terbawah tampak kosong **bukan karena belum dirapikan**, melainkan karena metrik yang menilai orangnya tidak punya angka di sistem. Merapikan tata letaknya tidak akan mengubah apa pun.
+Tab yang tampak kosong **bukan karena belum dirapikan**, melainkan karena metrik yang menilai orangnya tidak punya angka di sistem. Merapikan tata letaknya tidak akan mengubah apa pun.
+
+⚠️ **Recruitment & Onboarding sudah keluar dari golongan itu** sejak sumber KPI `rekrutmen` mendarat 2026-09-21: empat dari lima metriknya kini bersumber, dan tabnya terisi. Yang tersisa kosong adalah Culture & Industrial dan Training & Performance Officer. Ini contoh langsung dari sifat yang diperingatkan [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]]: dok ini bersandar pada salinan bertanggal, jadi baris mana pun di tabel atas bisa basi tanpa ada yang berbunyi.
 
 **Di bawah isi setiap tab posisi selalu ada matriks KPI posisinya.** `IsiTab` merender `MatriksKpi` untuk tiap tab berposisi (`kartu/isi-tab.tsx:45`), berisi label, bobot, dan status otomasi dari `GET /kpi/auto-overview` (`hooks/use-matriks-kpi-hrga.ts:100-101`) plus kolom **Kelayakan** yang disalin di frontend (`lib/kpi-hrga/kelayakan.ts`). Kolom "Yang tampil hari ini" di atas menghitung isi khusus tab di atas matriks itu, bukan matriksnya. ⚠️ Kolom Kelayakan dikunci **nama template + label** (`kunciMetrik`, `kelayakan.ts:140`), jadi template yang berganti nama tak punya entri dan barisnya tampil "belum dinilai" sampai daftar itu diperbarui.
 
@@ -30,7 +32,7 @@ Tiga tab terbawah tampak kosong **bukan karena belum dirapikan**, melainkan kare
 |---:|---|---|---|
 | 0,2 | Seluruh karyawan berskor KPI min. 70 | `skor_tim`, reduksi **`rasio_ambang`** (ambang 70, target 100) | ✅ ada sumber |
 | 0,2 | Rata-rata KPI tim HRGA min. 70 | `skor_tim`, `rata_rata`, scope `department` | ✅ mesin siap, tinggal konfigurasi |
-| 0,15 | Time to recruitment < 30 hari posisi kritikal | koleksi `candidate` belum pernah terbentuk | ❌ |
+| 0,15 | Time to recruitment < 30 hari posisi kritikal | `pemenuhan_tepat_waktu_kritikal` di `kpi_sumber_rekrutmen.go` | ✅ (sejak 2026-09-21) |
 | 0,1 | Turnover 5% per tahun | `turnover_karyawan` / `turnover_persen` | ✅ ada sumber |
 | 0,1 | Implementasi training | koleksi `training` kosong di prod | ❌ |
 | 0,05 | Efisiensi biaya operasional GA | `GET /accounting/anggaran/varians` | ⚠️ perlu master anggaran GA |
@@ -88,21 +90,32 @@ Tiga tab terbawah tampak kosong **bukan karena belum dirapikan**, melainkan kare
 
 ## Recruitment & Onboarding
 
-**Dinilai dari** (template `Recruitment`, 5 metrik, disegarkan 2026-09-02):
+**Dinilai dari** (template `Recruitment`, 5 metrik, disegarkan **2026-09-22**):
 
 | Bobot | Metrik | Sumber | Keadaan |
 |---:|---|---|---|
-| 0,25 | Time to fulfilment < 30 hari | sisi buka ada (`job_requisition` 6, `job_posting` 1), sisi terpenuhi hilang | ❌ |
+| 0,25 | Time to fulfilment < 30 hari | `pemenuhan_tepat_waktu` (+ varian kritikal) di `kpi_sumber_rekrutmen.go` | ✅ |
 | 0,25 | Ketersediaan dokumen jobdesk seluruh posisi | tidak ada tempat menyimpan jobdesk per posisi | ❌ |
-| 0,2 | Jadwal & pelaksanaan onboarding masa percobaan | fitur lengkap dan ter-deploy, **datanya nol** | ❌ |
-| 0,2 | Database buffer kebutuhan MPP | `GET /manpower-plans/coverage?tahun=YYYY` | 🟡 paling dekat siap |
-| 0,1 | Turnover masa probation 0% | sumber terdaftar menjawab pertanyaan LAIN | ❌ |
+| 0,2 | Jadwal & pelaksanaan onboarding masa percobaan | `review_evaluasi_tepat_waktu` | ✅ mesin siap, data prod masih tipis |
+| 0,2 | Database buffer kebutuhan MPP | `buffer_mpp_persen` (+ varian kritikal), lewat `GET /manpower-plans/coverage` | ✅ |
+| 0,1 | Turnover masa probation 0% | `retensi_masa_probation` | ✅ |
 
-**Bisa ditampilkan sekarang.** Satu kartu, offer yang menunggu. Itu saja, dan itu memang seluruh yang bisa dipertanggungjawabkan.
+⚠️ **Catatan sebelumnya di bagian ini SUDAH USANG dan dicabut.** Ia berbunyi "0 dari 5 bersumber" dan "jangan menambah kartu di tab ini sampai minimal satu metrik punya angka", diukur 2026-09-02. Premisnya kedaluwarsa pada 2026-09-21 ketika sumber KPI `rekrutmen` mendarat: empat dari lima metrik kini punya angka, dan yang tersisa tanpa sumber cuma jobdesk.
 
-⛔ **Posisi ini paling parah di seluruh divisi, dan sebabnya bukan satu hal melainkan lima yang berbeda.** Time to fulfilment kehilangan ujung pengukurannya karena koleksi `candidate` belum pernah terbentuk. Onboarding punya fitur lengkap yang sudah ter-deploy tetapi nol data. Jobdesk tidak punya tempat penyimpanan di sistem mana pun. Dan metrik turnover probation memakai sumber yang menghitung resign sukarela **seluruh perusahaan** serta menolak cakupan selain `perusahaan` secara eksplisit, jadi ia bukan sekadar belum tersambung melainkan **salah pertanyaan**.
+**Yang tampil sekarang.** Baris "yang menunggu Anda" berisi empat kartu — kandidat dalam proses, interview pekan ini, **requisisi menuju tenggat**, dan offer menunggu jawaban — lalu ringkasan cakupan buffer MPP, bagan **slot requisisi dibuka vs terpenuhi**, funnel rekrutmen, dan panel jujur untuk metrik jobdesk.
 
-**Rekomendasi rancangan.** Jangan menambah kartu di tab ini sampai minimal satu metrik punya angka. Yang paling dekat: coverage MPP, penyebutnya sudah terisi dan rumus lembar KPI HRD sudah diimplementasikan persis. Satu kartu bermakna lebih berguna daripada lima panel menunggu yang mengajari pemakainya bahwa layar ini memang kosong.
+- **Visual utama**: kartu tenggat requisisi, bukan bagan. Metrik terberat posisi ini adalah pemenuhan kurang dari 30 hari, jadi keputusan hariannya "requisisi mana yang akan lewat tenggat". `KartuTenggat` menaruh yang SUDAH lewat di paling atas dengan warna paling keras, dan requisisi yang menggantung berbulan-bulan memang yang paling mendesak justru karena ia tak lagi muncul di daftar "akan datang" mana pun.
+- ⛔ **Kartu tenggat menarik 12 bulan, bagan menggambar 6.** Jendela yang sama untuk keduanya membuang requisisi tertua lebih dulu, dan ketiadaannya terbaca sebagai "tak ada yang terlambat".
+- ⛔ **Dua hitungan pengecualian WAJIB ikut tampil** (`requisisi_tanpa_jejak_persetujuan`, `diterima_tanpa_posting`). Keduanya berarti ada requisisi atau hire yang tak terwakili, dan arah salahnya **selalu** membuat tim rekrutmen tampak lebih baik daripada kenyataan — untuk angka yang dipakai menilai orang.
+- **Tenggat 30 hari dibaca dari respons**, bukan konstanta frontend. Satu-satunya tempat angka itu hidup `common.TenggatPemenuhanHari` di `shared-library`.
+
+**Yang menunggu backend.** Tinggal jobdesk (bobot 0,25): tak ada tempat menyimpannya di sistem mana pun, jadi ia dirender sebagai panel `BelumBersumber`, bukan angka nol ([[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]] §3).
+
+**Yang TIDAK ditampilkan, dan alasannya.**
+
+- **Aktual vs Rencana MPP per departemen.** Faktanya dimiliki [[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]], layarnya Manpower Planning, dan gerbangnya HRD + Direktur (§8) — lebih sempit daripada tab ini.
+- **Tren headcount bulanan.** Dilarang [[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]] §3 selama masih ada akun non-aktif tanpa tanggal keluar. Bagan di tab ini menggambar **requisisi**, bukan headcount, sehingga tak kena larangan itu.
+- **Kartu ambang per metrik KPI.** Satu-satunya sumber angka per metrik yang ber-RBAC pemakai adalah `/me/kpi-score`, dan itu skor **pembaca** — supervisor yang membuka tab ini akan melihat angkanya sendiri berlabel Recruitment. Menghitung ulang persentasenya di frontend juga ditolak: itu menyalin rumus KPI ke tempat kedua. Menghidupkannya menuntut agregat per-posisi yang belum ada.
 
 ## Training & Performance Officer
 
@@ -136,7 +149,7 @@ Konsekuensinya untuk dashboard: layar yang menyaring anggota per orang wajib mem
 3. **Perbaiki metrik turnover probation.** Bukan penyambungan melainkan **koreksi pertanyaan**: sumber yang terdaftar mengukur resign sukarela seluruh perusahaan.
 4. **Perbaiki metrik aset HRD Supervisor.** Sumbernya data retur, deskripsinya monitoring aset. Salah petak yang menghasilkan angka masuk akal.
 5. **Tempat menyimpan jobdesk per posisi.** Belum ada di sistem mana pun, mengunci metrik berbobot 0,25 di Recruitment & Onboarding dan 0,15 di Training & Performance Officer (yang juga menunggu materi LMS).
-6. **Koleksi `candidate`** supaya time to fulfilment punya ujung pengukuran.
+6. ~~**Koleksi `candidate`** supaya time to fulfilment punya ujung pengukuran.~~ ✅ **Selesai 2026-09-21**: `kpi_sumber_rekrutmen.go` menurunkan pemenuhan dari jejak audit persetujuan requisition dan waktu kandidat `Hired`, tanpa menunggu koleksi baru.
 7. **Master anggaran departemen GA** untuk metrik efisiensi biaya.
 
 ## Dokumen Terkait
