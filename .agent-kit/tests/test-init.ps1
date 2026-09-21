@@ -107,6 +107,71 @@ try {
   }
   Check ((Test-Path $devopsMd) -and $devopsTools -and $devopsTools -notmatch 'PowerShell' -and $devopsTools -notmatch 'Bash') "loop-devops penyiap: tools tanpa shell ('$devopsTools')"
 
+  # ---- v1.25.0: dua lubang gerbang ----
+  $errf = Join-Path $tmp 'hook.err'
+  # Lubang 1: kit tidak menundukkan dirinya pada disiplinnya sendiri. init SENGAJA mengecualikan
+  # vault saat memasang core.hooksPath, jadi test milik kit tak pernah digerbang (ADR 0077 par 4).
+  $hpVault = (git -C $svVault config --get core.hooksPath)
+  Check ($hpVault -eq $hpExpected) "core.hooksPath architecture-draft = githooks kit (vault ikut digerbang)"
+  $prePush = Get-Content (Join-Path $claude 'hooks/githooks/pre-push') -Raw -Encoding UTF8
+  Check ($prePush -match 'gerbang-kit\.py') 'pre-push memanggil gerbang-kit.py untuk vault'
+  Check ($prePush -match '--berkas-file') 'pre-push mengoper daftar berkas lewat BERKAS (nama dok vault berisi spasi)'
+  Check (Test-Path (Join-Path $claude 'hooks/gerbang-kit.py')) 'gerbang-kit.py ikut tersalin init'
+
+  # Lubang 2: nol gerbang dihitung LULUS. Diuji lewat gerbang.ps1 sungguhan, bukan lewat fungsinya
+  # saja: yang rusak dulu adalah baris penghitung `$lolos` di gerbang.ps1, bukan pustakanya.
+  . (Join-Path $kitRoot 'hooks/gerbang-lib.ps1')
+  $fx = Join-Path $tmp 'fx'
+  function New-Fx([string]$nama, [string[]]$berkas) {
+    $d = Join-Path $fx $nama
+    foreach ($b in $berkas) {
+      $p = Join-Path $d $b
+      New-Item -ItemType Directory -Force -Path (Split-Path $p -Parent) | Out-Null
+      Set-Content -LiteralPath $p -Value '{}' -Encoding UTF8
+    }
+    return $d
+  }
+  Check ((Get-JenisRepo (New-Fx 'fl' @('pubspec.yaml'))) -eq 'flutter') 'Get-JenisRepo: pubspec.yaml = flutter'
+  Check ((Get-JenisRepo (New-Fx 'npm' @('package.json', 'package-lock.json'))) -eq 'node') 'Get-JenisRepo: package-lock.json juga node (bukan pnpm saja)'
+  Check ((Get-JenisRepo (New-Fx 'nolock' @('package.json'))) -eq 'lain') 'Get-JenisRepo: package.json tanpa lockfile BUKAN node (pelaksana tak bisa dibaca)'
+  # erp-frontend NYATA memegang keduanya; urutannya menentukan resolver mana yang dipakai
+  Check ((Get-PmNode (New-Fx 'dua' @('package.json', 'pnpm-lock.yaml', 'package-lock.json'))).nama -eq 'pnpm') 'Get-PmNode: pnpm menang saat dua lockfile hidup berdampingan'
+  Check ((Get-PmNode (New-Fx 'npm2' @('package.json', 'package-lock.json'))).jalan -eq 'npm run') 'Get-PmNode: skrip npm dijalankan lewat `npm run`, bukan `npm`'
+
+  $gerbangPs1 = Join-Path $kitRoot 'hooks/gerbang.ps1'
+  $outJson = Join-Path $tmp 'gerbang-lain.json'
+  $rc = Invoke-Ps $gerbangPs1 @('-Path', $proj, '-Keluaran', $outJson) $null $errf
+  $gj = Read-Json $outJson
+  Check ($rc -eq 1 -and $null -ne $gj -and $gj.lolos -eq $false) "nol gerbang = GAGAL, bukan lolos (exit $rc, lolos=$($gj.lolos))"
+  Check ($null -ne $gj -and (($gj.catatan -join ' ') -match 'daftar-izin')) 'catatan nol gerbang menyebut jalan keluarnya, bukan cuma "gagal"'
+
+  # Vault sengaja TIDAK punya suite mesin; lubangnya diberi nama supaya terbaca sebagai keputusan.
+  $outVault = Join-Path $tmp 'gerbang-vault.json'
+  $rcV = Invoke-Ps $gerbangPs1 @('-Path', $svVault, '-Keluaran', $outVault) $null $errf
+  $gv = Read-Json $outVault
+  Check ($rcV -eq 0 -and $null -ne $gv -and $gv.lolos -eq $true) "architecture-draft lolos lewat daftar-izin (exit $rcV)"
+  Check ($null -ne $gv -and (($gv.catatan -join ' ') -match 'daftar-izin')) 'lolosnya vault DICATAT, tidak senyap'
+
+  # Alat yang tidak terpasang tidak boleh membuat pemeriksaannya ikut hilang: itu persis lubang
+  # yang sedang ditutup. PATH dipangkas ke yang dibutuhkan saja supaya dart/flutter PASTI tak ada
+  # (menyaring nama folder tidak cukup, dan salah sedikit berarti `flutter test` sungguhan jalan).
+  $fdir = New-Fx 'flutterproj' @('pubspec.yaml')
+  git -C $fdir init -q; git -C $fdir config user.email 'test@example.invalid'; git -C $fdir config user.name 'test'
+  git -C $fdir checkout -q -b main; git -C $fdir add -A 2>$null; git -C $fdir commit -q -m init 2>$null
+  $pathAsli = $env:PATH
+  try {
+    $env:PATH = @(
+      (Split-Path (Get-Command powershell).Source -Parent),
+      (Split-Path (Get-Command git).Source -Parent),
+      (Join-Path $env:SystemRoot 'System32')
+    ) -join ';'
+    $outFl = Join-Path $tmp 'gerbang-flutter.json'
+    $rcF = Invoke-Ps $gerbangPs1 @('-Path', $fdir, '-Keluaran', $outFl) $null $errf
+  } finally { $env:PATH = $pathAsli }
+  $gf = Read-Json $outFl
+  Check ($null -ne $gf -and $gf.jenis -eq 'flutter') "repo pubspec.yaml terbaca jenis flutter ($($gf.jenis))"
+  Check ($rcF -eq 1 -and $null -ne $gf -and @($gf.gerbang | Where-Object { $_.nama -eq 'alat' }).Count -eq 1) "alat flutter hilang = gerbang GAGAL bernama 'alat' (exit $rcF)"
+
   # session-start.ps1 harus mengeluarkan JSON sah di stdout DAN menulis berkas sesi.
   # $PWD diset ke $tmp supaya hook menemukan 'architecture-draft' untuk cek staleness.
   $errf = Join-Path $tmp 'hook.err'
@@ -314,20 +379,24 @@ try {
   Check ($rc -eq 2) "KONTROL POSITIF: 'git status' + 'git commit' baris baru, tetap DITOLAK (exit $rc)"
 
   # ---- loop-kirim: BEST-EFFORT, tidak pernah menahan ----
+  # Ambangnya sengaja LONGGAR (20 dan 25 detik). Yang dijaga adalah "tidak menggantung", bukan
+  # kecepatan spawn: terukur 5,07 dan 9 detik saat mesin sepi, 11,4 dan 16 detik saat sibuk, dan
+  # sejak 1.25.0 test ini ikut jalan di pre-push (mesin justru sedang sibuk). Ambang ketat membuat
+  # gerbangnya kadang merah tanpa sebab, dan gerbang yang begitu dimatikan orang dalam sepekan.
   $lk = Join-Path $claude 'hooks/loop-kirim.ps1'
   # JSON dilewatkan lewat berkas: argumen ber-kutip ke proses baru dilucuti Windows (lihat komentar di skrip)
   $dataFile = Join-Path $tmp 'loop-data.json'; [IO.File]::WriteAllText($dataFile, '{"id":"s"}')
   $konfigTidakAda = Join-Path $tmp 'tidak-ada\loop-ingest.json'
   $sw = [Diagnostics.Stopwatch]::StartNew()
   $rc = Invoke-Ps $lk @('-Jenis', 'sesi.mulai', '-DataFile', $dataFile, '-Konfig', $konfigTidakAda) $null $errf
-  Check ($rc -eq 0 -and $sw.Elapsed.TotalSeconds -lt 5) "loop-kirim tanpa konfigurasi: no-op, exit 0 ($([int]$sw.Elapsed.TotalMilliseconds) ms)"
+  Check ($rc -eq 0 -and $sw.Elapsed.TotalSeconds -lt 20) "loop-kirim tanpa konfigurasi: no-op, exit 0 ($([int]$sw.Elapsed.TotalMilliseconds) ms)"
   $konfigMati = Join-Path $tmp 'loop-ingest.json'
   [IO.File]::WriteAllText($konfigMati, '{"url":"http://127.0.0.1:9/loop/ingest","secret":"x","mesin":"UJI"}')
   [IO.File]::WriteAllText((Join-Path $tmp 'gh-login.txt'), 'uji')   # cegah panggilan gh sungguhan
   $sw = [Diagnostics.Stopwatch]::StartNew()
   $rc = Invoke-Ps $lk @('-Jenis', 'sesi.mulai', '-DataFile', $dataFile, '-Konfig', $konfigMati) $null $errf
   $gagalFile = Join-Path $tmp 'loop-ingest.gagal'
-  Check ($rc -eq 0 -and $sw.Elapsed.TotalSeconds -lt 8) "loop-kirim ke URL mati: tetap exit 0 dalam $([int]$sw.Elapsed.TotalSeconds) detik"
+  Check ($rc -eq 0 -and $sw.Elapsed.TotalSeconds -lt 25) "loop-kirim ke URL mati: tetap exit 0 dalam $([int]$sw.Elapsed.TotalSeconds) detik"
   Check (Test-Path $gagalFile) 'loop-kirim mencatat kegagalan ke loop-ingest.gagal (tidak senyap)'
   $idOut = [IO.Path]::GetTempFileName()
   $p = Start-Process powershell -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',('"' + $lk + '"'),'-Jenis','brief.dibuat','-BriefSlug','Hapus-PR-Notification','-HanyaId') -RedirectStandardOutput $idOut -Wait -PassThru -NoNewWindow

@@ -1,5 +1,5 @@
 #!/bin/sh
-# pre-push — gerbang lokal agent-kit untuk repo KODE. Dipasang lewat `git config core.hooksPath`
+# pre-push — gerbang lokal agent-kit untuk repo kode DAN vault. Dipasang lewat `git config core.hooksPath`
 # oleh init (path absolut, berlaku untuk seluruh worktree repo itu). Dijalankan oleh sh bawaan
 # git, termasuk di Windows (Git for Windows), jadi satu skrip untuk semua OS.
 #
@@ -8,6 +8,9 @@
 #       (build dilewati bila AGENTKIT_SKIP_BUILD=1, dan itu DICETAK supaya tidak senyap)
 #   - repo Go multi-modul (services/<x>/go.mod): `go build ./...` per service yang tersentuh
 #       oleh commit yang dipush; semua service bila shared-library tersentuh
+#   - vault agent-kit (.agent-kit/ di akar): test MILIK KIT SENDIRI, tetapi HANYA bila push-nya
+#       menyentuh .agent-kit/ atau Tools/ (ADR 0077 par 4; aturannya di hooks/gerbang-kit.py).
+#       Push dokumentasi biasa keluar seketika. Lewati sadar: AGENTKIT_SKIP_KIT_TESTS=1
 # Test vs baseline SENGAJA tidak di sini (menit-menitan); itu urusan /judge.
 # Melewati dengan sadar: `git push --no-verify` (jejaknya tetap ada di riwayat shell Anda).
 
@@ -71,6 +74,29 @@ if [ -d services ] && ls services/*/go.mod >/dev/null 2>&1; then
     echo "[agent-kit pre-push] go build services/$s ..."
     if ! (cd "services/$s" && go build ./...); then echo "[agent-kit pre-push] GAGAL: go build services/$s"; gagal=1; fi
   done
+fi
+
+# ---- vault agent-kit (architecture-draft): test milik kit sendiri ----
+# Nama berkas dok vault berisi SPASI, jadi daftarnya dioper lewat berkas, bukan argumen: kata
+# yang terpecah di sini membuat saringan path meleset dan gerbangnya menyala untuk push dok.
+if [ -f .agent-kit/hooks/gerbang-kit.py ]; then
+  py=""
+  for c in "Tools/.venv/Scripts/python.exe" "Tools/.venv/bin/python"; do
+    [ -x "$c" ] && py="$c" && break
+  done
+  [ -z "$py" ] && for c in py python3 python; do
+    command -v "$c" >/dev/null 2>&1 && py="$c" && break
+  done
+  if [ -z "$py" ]; then
+    echo "[agent-kit pre-push] TIDAK ADA python untuk menjalankan gerbang test kit. Gerbang GAGAL, bukan dilewati."
+    echo "[agent-kit pre-push] Lewati sadar: AGENTKIT_SKIP_KIT_TESTS=1 git push"
+    gagal=1
+  else
+    daftar="$(mktemp 2>/dev/null || echo "${TMPDIR:-/tmp}/agentkit-push-$$")"
+    printf '%s\n' "$touched" > "$daftar"
+    if ! "$py" .agent-kit/hooks/gerbang-kit.py --vault "$top" --berkas-file "$daftar"; then gagal=1; fi
+    rm -f "$daftar"
+  fi
 fi
 
 if [ "$gagal" -ne 0 ]; then
