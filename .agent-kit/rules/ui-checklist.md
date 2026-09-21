@@ -333,3 +333,22 @@ Sumber luar yang menyarankan komponen atau palet sendiri dikalahkan §1.
   mesin layout, jadi test tidak membuktikan apa pun tentang tampilan.
 - **Laporkan komponen yang dipakai ulang**, dan komponen baru (bila ada) beserta alasannya.
   Komponen baru tanpa alasan tertulis diperlakukan sebagai temuan review.
+- **Kontras token diukur perintah, bukan dikira-kira**: `pnpm contrast` di erp-frontend
+  (`scripts/check-contrast.mjs`, erp-frontend
+  [#1662](https://github.com/bip-itteam-internal/erp-frontend/pull/1662))
+  memeriksa 23 pasangan yang benar-benar dirender di tema terang **dan** gelap (tiap `--x`
+  yang punya `--x-foreground`, `--muted-foreground` di atas halaman/kartu/popover, dan
+  `--ring` untuk cincin fokus), lalu keluar dengan status gagal bila ada yang di bawah 4.5:1
+  (3:1 untuk non-teks). Wajib dijalankan bila perubahanmu **menyentuh token tema**; untuk
+  perubahan layar biasa ia tak perlu, karena tokennya tak berubah.
+
+  ⚠️ **Ia mengukur TOKEN, bukan layar.** Kelas yang paling sering lolos justru warna yang
+  ditulis langsung di komponen (`text-white` di atas latar terang, hex mentah, `bg-white`
+  mati), dan tak satu pun tersentuh gerbang ini. Itu tetap urusan mata di butir pertama.
+
+  Per 2026-09-21 (`origin/main` `180dab689`) ada **8 pasangan yang gagal** dan semuanya sudah
+  ada sebelum gerbangnya ditulis, terberat `--integration-success-foreground` di atas
+  `--integration-success` pada 2.28:1 di tema terang. Karena itu gerbangnya **belum dipasang
+  di pre-push**: memperbaikinya keputusan warna yang mengubah tampilan, bukan pekerjaan
+  skrip. Jangan membaca exit 1 hari ini sebagai "perubahanku merusak sesuatu"; bandingkan
+  dulu dengan keluaran di `origin/main`.
