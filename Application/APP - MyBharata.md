@@ -185,6 +185,24 @@ Grid hijau di atasnya (`home_menu_grid.dart`) bukan daftar menu umum: isinya emp
 - **Lembur** (`RouteNames.overtime`) punya `GoRoute` dan halaman sah, tapi **nol pintu masuk** untuk pemakai biasa sejak Februari 2026. Hanya ada di menu developer.
 - **`/inbox`** dideklarasikan di `names.dart` **tanpa `GoRoute` maupun halaman**. Halaman notifikasi yang asli adalah `/notifications`.
 
+⚠️ **Warna per-menu di daftar itu MATI di Akses Cepat, dan sudah lama begitu.** Tiap
+`MenuItemModel` membawa `color` sendiri (`deptHRGA` oranye, `deptIT` ungu, `redAccent` untuk
+Sesi Live), tetapi kedua permukaan yang merendernya — grid beranda dan sheet "Semua Menu" —
+merakit ulang modelnya **tanpa** `color`. Membaca daftarnya orang akan mengira gridnya
+warna-warni; mengubah warna di daftar itu tidak mengubah apa pun di layar. Yang menentukan
+ada di dua titik render itu, bukan di daftarnya.
+
+✅ **Sejak my-bharata #161 (merged ke `dev` 2026-09-21) latar ikon bukan lagi kotak berwarna**
+melainkan `SurfaceCard` netral, dan warnanya pindah ke glyph. Sebelumnya glyph putih di atas
+kotak, dan karena `color` dibuang di atas, kotak itu hijau seragam — belasan petak hijau pekat
+memenuhi beranda sementara ikon yang membedakan tiap menu jadi bagian yang paling tidak
+terlihat. Perubahannya di `GridMenuItem` sehingga menyentuh **seluruh** pemakainya: grid Akses
+Cepat, sheet "Semua Menu", sheet atur favorit, dan **grid tipe Pengajuan**. Yang terakhir ikut
+berubah dengan sengaja — ia memang meniru gaya Akses Cepat lewat komponen yang sama, dan di
+sana warnanya nyata per tipe sehingga glyph-nya warna-warni di atas kartu netral. Pola
+gelombang `shapes3.png` dihapus, bukan dipindah. ⚠️ Kontras hijau `#00AA13` di atas
+`surfaceContainerHighest` beropasitas 0.3 pada **mode gelap** belum dilihat di perangkat.
+
 ⚠️ **PR #114 merged tapi BELUM pernah dijalankan di aplikasi.** Bukti yang ada baru 727 test hijau plus `dart analyze` bersih, dan justru bug inilah yang membuktikan keduanya bukan bukti fitur terjangkau. Yang masih harus dilakukan sekali: buka flavor dev → **Semua Menu** → pastikan Kaizen dan Learning terlihat → tekan keduanya sampai halamannya benar-benar terbuka. **Halaman Pelatihan yang tampil kosong adalah pertanyaan, bukan kabar baik** — `learning-service` di dev harus sudah naik, dan `/me/trainings` tercatat belum pernah dipanggil siapa pun.
 
 ### Kaizen (menu tersendiri)
@@ -261,9 +279,16 @@ Petugas Satgas mencatat temuan 5R & K3 atas Office Boy dan Security, lalu mengec
 ### Sesi Live Host (`/live-shift`): ⚠️ live di `dev`, satu-satunya klien pencatatan sejak 2026-09-11
 
 Host live mencatat sendiri siaran TikTok-nya dari HP: Mulai (toko + akun), Jeda/Lanjutkan,
-Akhiri, plus riwayat 7 hari terakhir dengan porsi GMV-nya sendiri. Ini catatan yang ditulis
-**host**, bukan hasil sync TikTok — sync datang terpisah sebagai `RingkasanShift`, dan
+Akhiri, plus riwayat **satu bulan kalender** dengan porsi GMV-nya sendiri. Ini catatan yang
+ditulis **host**, bukan hasil sync TikTok — sync datang terpisah sebagai `RingkasanShift`, dan
 keduanya dijodohkan lewat toko **dan** akun.
+
+✅ **Riwayatnya per BULAN sejak my-bharata #161** (merged ke `dev` 2026-09-21), menggantikan
+jendela bergulir 7 hari: porsi GMV host dicocokkan dengan periode insentif yang memang bulanan,
+dan jendela yang memotong di tengah bulan tak pernah bisa dijumlahkan jadi angka yang berarti.
+Bulan lain dipilih lewat halaman daftar 12 bulan bergaya daftar bulan Slip Gaji. Backend tidak
+disentuh — `GET /live-shifts` sudah menerima `dari`/`sampai` bebas dengan batas 92 hari, jadi
+satu bulan jauh di bawah batas. Rinciannya di [[#Riwayat per bulan kalender]].
 
 Menunya digerbang **host saja** (`isHostLive`), sengaja tanpa leader marketing: tombol
 Mulai/Akhiri di kartu tidak digerbang peran, jadi memberi leader akses menu berarti memberi
@@ -287,9 +312,9 @@ masing-masing. **Beranda semula tetap satu kartu** supaya tak berubah jadi dafta
 dengan penanda "Lihat N sesi lainnya" yang **bisa ditekan** menuju halaman penuh — sebagai
 teks mati, sesi kedua akan tak terjangkau dari beranda sama sekali.
 
-⚠️ **Beranda kini menggulir mendatar saat sesinya lebih dari satu**, menggantikan penanda itu
-— my-bharata [#157](https://github.com/bip-itteam-internal/my-bharata/pull/157), **open ke
-`dev`** per 2026-09-21, jadi `origin/dev` masih memuat bentuk lama sampai ia merged. Irama dan
+✅ **Beranda kini menggulir mendatar saat sesinya lebih dari satu**, menggantikan penanda itu
+— my-bharata [#161](https://github.com/bip-itteam-internal/my-bharata/pull/161), **merged ke
+`dev` 2026-09-21** (1.21.0+168). Irama dan
 angkanya menyalin carousel "Aktivitas Saya" tepat di atasnya (lebar kartu 75% layar, jarak 8,
 padding di dalam scroll view supaya kartu terakhir bisa digulir sampai menyentuh tepi); **satu
 sesi tetap selebar layar**, karena kartu sempit yang berdiri sendiri terbaca sebagai tata letak
@@ -314,6 +339,15 @@ Yang mudah terlewat saat menyentuh layar ini:
   sudah host-saja sehingga nilainya selalu `true` dan gerbang berbasis field itu akan jadi
   logika mati. Default **`true`** saat field-nya absen: backend sebelum 2026-08-30 tidak
   mengirimnya, dan `false` akan mencabut tombol host atas sesinya sendiri.
+- ⚠️ **`CustomFormField` berpadding 16 SEGALA SISI, dan itu mengasumsikan ia di dalam
+  `Card`.** Field di sheet Mulai Live tidak, dan `CustomBottomSheet` sudah memasang padding
+  sheet sendiri, jadi jaraknya menumpuk jadi 32 dan isiannya terlihat menjorok jauh
+  dibanding sisa sheet. Sejak my-bharata #161 field di luar kartu memakai
+  `CustomFormField.paddingTanpaKartu` (vertikal 16, mendatar 0). Diukur saat itu: dari **44
+  pemakaian di 15 berkas**, cuma **7 yang di luar kartu** (5 di sheet ini, 2 di
+  `ruang_tanggal_fields.dart` milik Booking Ruang). ⛔ Keanggotaan itu **tak bisa
+  disimpulkan dari isi satu berkas**: kebanyakan field dibungkus `Card` oleh widget INDUK di
+  berkas lain — field pengajuan, misalnya, dibungkus di `hr_submission_page.dart`.
 - **Pembagiannya: `CustomDialog` untuk keputusan ya/tidak, `CustomBottomSheet` untuk
   formulir.** Konfirmasi Akhiri Sesi dan konfirmasi toko-tanpa-akun memakai `CustomDialog`
   (yang sudah membawa ikon tipe, tata letak tombol, jaraknya, dan menutup dirinya sendiri
@@ -336,8 +370,8 @@ Yang mudah terlewat saat menyentuh layar ini:
   ada galat — cuma satu kartu yang terlihat lebih lebar, dan itu ditemukan dari layar, bukan
   dari test. Nilainya **literal 16**, bukan `AppDimens.paddingM` (= `16.w`, responsif):
   kedua tetangga itu memakai 16 mati, dan nilai yang ikut lebar layar akan meleset beberapa
-  piksel dari mereka di HP yang lebarnya bukan 360 (my-bharata #157).
-- **Durasi sesi berjalan dibaca sebagai jam : menit**, bukan total menit (my-bharata #157,
+  piksel dari mereka di HP yang lebarnya bukan 360 (my-bharata #161).
+- **Durasi sesi berjalan dibaca sebagai jam : menit**, bukan total menit (my-bharata #161,
   pola `presence_real_time_clock.dart`): sesi di sini rutin berjalan berjam-jam dan ambang
   koreksinya 12 jam, jadi "184 menit berjalan" menuntut pembacanya membagi sendiri untuk tahu
   jaraknya ke ambang itu — padahal angka itulah yang menentukan hangus-tidaknya porsi GMV-nya.
@@ -349,9 +383,44 @@ Yang mudah terlewat saat menyentuh layar ini:
   malah sempat tercatat sebagai komentar di `live_shift_detail_page_test.dart` sebelum
   diperbaiki. Helper-nya kini menerima `locale` dan **keempat** pemanggilnya mengopernya:
   `KartuRiwayatSesi` (Durasi Efektif) dan tiga durasi di `LiveShiftDetailPage` (Durasi Total,
-  Total Jeda, Durasi Efektif) — my-bharata #157. ⚠️ Repo ini masih punya helper KEDUA
+  Total Jeda, Durasi Efektif) — my-bharata #161. ⚠️ Repo ini masih punya helper KEDUA
   bernama sama, `TimeFormatter.formatDuration` (`lib/src/core/utils/time_formatter.dart`);
   penyatuannya belum dikerjakan.
+
+#### Riwayat per bulan kalender
+
+Rentangnya satu bulan kalender **WIB**, menggantikan jendela bergulir 7 hari
+(`hariRiwayatKeBelakang = 6`) — my-bharata #161, merged ke `dev` 2026-09-21. Bulan lain
+dipilih lewat halaman daftar 12 bulan (`pilih_bulan_riwayat_page.dart`, rute
+`/live-shift/pilih-bulan`) yang meniru bentuk daftar bulan Slip Gaji.
+
+- ⛔ **Bulan aktif tinggal di `LiveShiftState.bulanRiwayat`, bukan dihitung ulang di tiap
+  pemanggil.** Riwayat di bloc cuma SATU daftar yang dipakai bersama halaman Sesi Live dan
+  tarik-untuk-muat-ulang di halaman detail; kalau keduanya menyimpulkan bulannya
+  sendiri-sendiri, refresh dari detail menarik rentang yang tak memuat baris yang sedang
+  dibuka, lalu halaman itu diam-diam jatuh ke salinan lamanya. Invarian ini sebelumnya
+  dijaga sebuah konstanta bersama, dan konstanta tak lagi cukup begitu bulannya bisa dipilih.
+  Karena itu pula halaman daftar bulan **tidak memuat datanya sendiri**: ia hanya
+  memulangkan bulan terpilih lewat `pop`.
+- ⛔ **Tanggal rentang dipatok TENGAH HARI, bukan tengah malam.** Datasource mengirimnya
+  lewat `_tanggalWib` (`toUtc()` + 7 jam), jadi tengah malam di perangkat WITA (+8) atau WIT
+  (+9) mundur jadi pukul 23:00 hari terakhir bulan SEBELUMNYA dalam WIB: awal bulan terkirim
+  sebagai hari terakhir bulan lalu, dan gagalnya senyap karena tanggalnya tetap sah. Tengah
+  hari menyisakan margin 10 jam untuk seluruh zona Indonesia.
+- ⛔ **Bulan berjalan diturunkan dari WIB, bukan zona perangkat.** Host di WIT yang membuka
+  aplikasi pukul 00:30 tanggal 1 masih berada di bulan sebelumnya menurut server (backend
+  memparsing `dari`/`sampai` dengan `time.ParseInLocation(..., zonaWIB)`); memakai zona
+  perangkat melemparnya ke bulan baru yang kosong tepat setelah ia selesai siaran.
+- **Tanggal 1 hampir selalu kosong**, dan itu harga dari bulan kalender. Empty state bulan
+  berjalan karena itu menyebut bulannya dan menawarkan "Lihat bulan lalu"; di bulan yang
+  sudah lewat tombol itu sengaja TIDAK muncul, karena kosongnya sudah final.
+- ⚠️ **Daftar bulannya dikarang KLIEN** (12 bulan), dan itu bedanya dari daftar bulan Slip
+  Gaji yang ditiru bentuknya: di sana server memberi tahu bulan mana yang slipnya sudah
+  terbit, di sini tak ada endpoint semacam itu untuk sesi live. Bulan tanpa sesi tetap
+  tampil dan kosongnya baru ketahuan setelah dibuka. Jangan menuliskan 12 sebagai janji
+  "riwayat tersedia 12 bulan"; yang dijamin cuma bahwa 12 bulan itu boleh DIMINTA.
+- **Backend tidak disentuh.** `GET /live-shifts` sudah menerima `dari`/`sampai` bebas dengan
+  batas `rentangDaftarShiftMaksimal` = 92 hari, jadi satu bulan jauh di bawah batas.
 
 ⛔ **Belum terverifikasi di perangkat sungguhan.** ~~`live_shifts` produksi masih 0
 dokumen~~: tidak berlaku lagi, terukur 74 sesi per 2026-09-11; dari klien mana tidak terukur

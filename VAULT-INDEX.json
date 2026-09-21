@@ -1354,20 +1354,20 @@
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "855d72623f61f5dfb38dc1f2cde3adede15bfc23cfec9f4b671a4012882f7dc4",
-      "ukuran_kb": 99.0,
-      "ringkasan": "Menjawab: apa saja fitur aplikasi mobile HRIS MyBharata untuk karyawan (attendance dengan biometric/geofencing/QR, pengajuan cuti-izin, lembur, slip gaji berbentang PIN, KPI, survei Form Builder, Kaizen, Pelatihan, Sesi Live Host, Booking Ruang) dan bagaimana arsitektur Flutter-nya disusun (Clean Architecture feature-first, bloc, get_it, dio + fpdart Either, go_router, Firebase dua flavor dev/prod, CI Codemagic). Juga menjawab bagaimana autentikasi bekerja (JWT + silent refresh, biometric, PIN, 1 akun = 1 device) dan bagaimana aplikasi di-scope multi-perusahaan lewat company_id di JWT beserta gerbang konten mana yang sengaja masih dikunci untuk BIP. Berisi pula peta versi build/rilis, roadmap, known issues, dan peringatan bahwa versi yang beredar di HP pemakai tidak bisa disimpulkan dari tag git atau GitHub Release.",
+      "hash": "b29795c347029298feeeb7b2e477e0545c5f3b8410a2cf8e02a00685389fad4f",
+      "ukuran_kb": 104.3,
+      "ringkasan": "Menjawab: aplikasi mobile MyBharata itu apa, fitur HRIS apa saja yang ada di dalamnya (attendance, pengajuan izin/cuti, lembur, slip gaji, KPI & task, survei/form builder, Kaizen, pelatihan, Sesi Live Host, booking ruang), dan bagaimana struktur menu berandanya. Menjawab juga: tech stack dan arsitektur Flutter yang dipakai (Clean Architecture feature-first, bloc, get_it, dio, go_router, Firebase, Codemagic), cara karyawan login dan diamankan (JWT, biometric, PIN, kebijakan 1 akun 1 device), serta bagaimana aplikasi di-scope per perusahaan dan konten mana yang masih khusus BIP. Selain itu memuat riwayat versi build vs versi rilis di toko, known issues, roadmap, fitur developer/admin, dan integrasi ke service backend.",
       "kata_kunci": [
         "MyBharata",
-        "my_bharata",
-        "aplikasi mobile",
-        "mobile app",
+        "my-bharata",
+        "aplikasi mobile karyawan",
         "Flutter",
         "HRIS mobile",
-        "absensi karyawan",
-        "attendance geofencing biometric",
-        "multi-tenant company_id",
-        "slip gaji mobile"
+        "absensi",
+        "attendance",
+        "slip gaji",
+        "geofencing biometric",
+        "multi-tenant company_id"
       ]
     },
     {
