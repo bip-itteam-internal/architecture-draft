@@ -278,8 +278,17 @@ try {
   $sumbuX = @($rapatSemua | Where-Object { $_.arah -eq 'timur' -or $_.arah -eq 'barat' }).Count
   $sumbuY = @($rapatSemua | Where-Object { $_.arah -eq 'utara' -or $_.arah -eq 'selatan' }).Count
   Check ($rapatSemua.Count -ge 4 -and $salah.Count -eq 0 -and $sumbuX -ge 1 -and $sumbuY -ge 1) "3f arah: $($rapatSemua.Count) kursi ruang rapat menghadap pusat meja, dibulatkan empat arah, kedua sumbu terwakili ($sumbuX timur/barat, $sumbuY utara/selatan; salah: $($salah -join '; '))"
-  $mata = Eval '(function () { var g = document.querySelector("[data-lead=eeeeeeee-5555] .badan"); return g ? (g.innerHTML.match(/88ffff/g) || []).length : -1; })()'
-  Check ($mata -eq 0) "3f arah: robot yang menghadap utara digambar dari punggung, tanpa mata ($mata mata)"
+  # Mata dihitung lewat KELAS, bukan lewat warnanya: sejak robot modern (1.26.0) warna mata =
+  # warna sesi, jadi mematok '88ffff' akan hijau untuk implementasi apa pun dan check-nya vakum.
+  # Kontrol positifnya wajib ada di baris yang sama: 0 mata tanpa pembanding tak membuktikan
+  # bahwa yang menghadap kamera MEMANG bermata.
+  $mataUtara = Eval '(function () { var g = document.querySelector("[data-lead=eeeeeeee-5555] .badan"); return g ? g.querySelectorAll(".mata").length : -1; })()'
+  $mataDepan = Eval '(function () { var g = document.querySelector("[data-lead=dddddddd-4444] .badan"); return g ? g.querySelectorAll(".mata").length : -1; })()'
+  $senyumDepan = Eval '(function () { var g = document.querySelector("[data-lead=dddddddd-4444] .badan"); return g ? g.querySelectorAll(".senyum").length : -1; })()'
+  Check ($mataUtara -eq 0 -and $mataDepan -eq 2 -and $senyumDepan -eq 1) "3f arah: yang menghadap utara digambar dari punggung tanpa mata ($mataUtara), yang menghadap selatan bermata dua dan bersenyum ($mataDepan mata, $senyumDepan senyum)"
+  # Identitas sesi pindah ke cahaya visor, jadi warna mata WAJIB ikut warna sesi, bukan tetap cyan
+  $warnaMata = Eval '(function () { var g = document.querySelector("[data-lead=dddddddd-4444] .badan .mata"); return g ? g.getAttribute("fill") : ""; })()'
+  Check ($warnaMata -and $warnaMata -ne '#88ffff' -and $warnaMata -match '^#') "3f identitas: mata memakai warna sesi, bukan cyan tetap (dapat '$warnaMata')"
   $ledOk = Eval '(function () { var e = document.getElementById("led-pod-0"); return !!e && !!e.getAttribute("fill"); })()'
   Check ($ledOk -eq $true) '3f pod: penanda warna Lead tetap ada sesudah layar monitor diputar menghadap robot'
   Foto '3f-arah'
@@ -330,6 +339,36 @@ try {
   })()'
   Check ($kembali.tampil -eq $true -and $kembali.teks -eq 'sembunyikan panel' -and $kembali.aria -eq 'true' -and $kembali.kartu -gt 0) "3h panel: saklar mengembalikannya lengkap dengan kartunya ($($kembali.kartu) kartu)"
   Foto '3h-panel'
+
+  # 3i. menyorot sebuah sesi memperbesar denah ke robotnya, dan kameranya mengikutinya berjalan.
+  # Yang diukur viewBox SUNGGUHAN, bukan sekadar kelas .sorot: kelas bisa terpasang sementara
+  # kameranya tak bergerak sama sekali, dan check yang cuma melihat kelas akan hijau untuk itu.
+  function ViewBox { $v = Eval '(function () { return document.getElementById("denah").getAttribute("viewBox"); })()'; return @($v -split '\s+' | ForEach-Object { [double]$_ }) }
+  $vAwal = ViewBox
+  # id sesi yang hidup berganti antar langkah, jadi yang diklik robot mana pun yang sedang ada;
+  # mematok id membuat check-nya gagal bukan karena kameranya, melainkan karena robotnya tak ada
+  $adaRobot = Eval '(function () { var g = document.querySelector("#dunia .robot[data-lead]"); if (!g) return 0; g.dispatchEvent(new MouseEvent("click", { bubbles: true })); return 1; })()'
+  $okZoom = Tunggu { $v = ViewBox; $v[2] -lt ($vAwal[2] * 0.6) } 8
+  $vZoom = ViewBox
+  Check ($adaRobot -eq 1 -and $okZoom -and $vZoom[2] -lt $vAwal[2]) "3i kamera: menyorot sesi memperbesar denah (lebar viewBox $([int]$vAwal[2]) -> $([int]$vZoom[2]))"
+  # pusat kamera benar-benar mendarat di robotnya, bukan sekadar mengecil di tempat
+  $dekat = Eval '(function () {
+    var v = document.getElementById("denah").getAttribute("viewBox").trim().split(/\s+/).map(Number);
+    var g = document.querySelector("#dunia .robot.sorot");
+    if (!g) return -1;
+    var m = /translate\(([-0-9.]+),([-0-9.]+)\)/.exec(g.getAttribute("transform") || "");
+    if (!m) return -1;
+    return Math.abs((v[0] + v[2] / 2) - parseFloat(m[1]));
+  })()'
+  Check ($dekat -ge 0 -and $dekat -lt 40) "3i kamera: pusatnya mendarat di robot yang disorot (selisih $([int]$dekat)px)"
+  $chipZoom = Eval '(function () { var e = document.getElementById("lepas-sorot"); return !!e && !e.hidden; })()'
+  Check ($chipZoom -eq $true) '3i kamera: petunjuk cara keluar tampil selagi kamera mengikuti'
+  Foto '3i-kamera'
+  Eval '(function () { document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true })); return 1; })()' | Out-Null
+  $okLepas = Tunggu { $v = ViewBox; [Math]::Abs($v[2] - $vAwal[2]) -lt 1 } 8
+  $chipLepas = Eval '(function () { var e = document.getElementById("lepas-sorot"); return !!e && e.hidden; })()'
+  $vAkhir = ViewBox
+  Check ($okLepas -and $chipLepas -eq $true) "3i kamera: Esc melepas sorotan dan kamera kembali ke denah penuh (lebar $([int]$vAkhir[2]))"
 
   # 4. ramai: enam Lead di ruang server -> label ringkas
   Tulis-Data (1..6 | ForEach-Object { Sesi ('cccccccc-000' + $_) ('Lead ramai ' + $_) 'server' 'alat' 'PowerShell' 'pnpm test' })

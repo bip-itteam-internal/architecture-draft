@@ -50,6 +50,7 @@ main.tanpa-panel{grid-template-columns:minmax(0,1fr)}
 .panggung svg{display:block;width:100%;height:auto}
 .panggung.basi #dunia .robot,.panggung.basi #label{opacity:.4}
 .kosong-panggung{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);margin:0;padding:10px 14px;max-width:80%;text-align:center;background:rgba(13,13,13,.88);border:1px solid var(--border);border-radius:4px;color:var(--ink-2)}
+.lepas-sorot{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);margin:0;padding:5px 10px;max-width:90%;text-align:center;background:rgba(13,13,13,.9);border:1px solid var(--border);border-radius:4px;color:var(--ink-2);font-size:12px}
 svg text{font-family:var(--mono)}
 .papan rect{fill:rgba(13,13,13,.82);stroke:rgba(255,255,255,.2)}
 .papan text{fill:#fff;font-size:8.5px;letter-spacing:.12em;font-weight:700}
@@ -131,6 +132,7 @@ footer li{margin:2px 0}
   <div class="panggung" id="panggung">
     <svg id="denah" viewBox="-450 -150 1000 640" role="img" aria-label="Denah kantor agent"></svg>
     <p class="kosong-panggung" id="kosong">Menunggu penulis...</p>
+    <p class="lepas-sorot" id="lepas-sorot" hidden>kamera mengikuti sesi ini &middot; klik robotnya lagi atau tekan <b>Esc</b> untuk keluar</p>
   </div>
   <aside id="sisi">
     <h2>LEAD HIDUP</h2>
@@ -176,6 +178,7 @@ footer li{margin:2px 0}
   var elMain = document.querySelector('main');
   var elSisi = document.getElementById('sisi');
   var elSaklar = document.getElementById('saklar-panel');
+  var elLepas = document.getElementById('lepas-sorot');
 
   // Saklar panel samping. Pilihannya diingat lewat localStorage, yang terukur bisa dipakai di file:// pada
   // Chrome; pembungkus try tetap ada karena sebagian peramban dan konfigurasi menolak penyimpanan di file://,
@@ -503,41 +506,89 @@ footer li{margin:2px 0}
   // Arah hadap: badan dirotasi 90 derajat per langkah di koordinat lantai. Wajah hanya tergambar bila sisi depannya
   // jatuh di selatan atau timur; yang membelakangi mendapat garis engsel di punggung supaya tak terbaca rusak.
   var PUTAR = { selatan: 0, timur: 1, utara: 2, barat: 3 };
+  // Robot digambar BULAT (elips dan sudut membulat) sementara perabot tetap kotak isometrik.
+  // Keputusan pemilik 2026-09-21, mengikuti referensi yang ia berikan: badan melayang tanpa kaki,
+  // warnanya putih untuk SEMUA sesi, dan identitas sesi pindah ke cahaya visor (mata dan senyum).
+  // Konsekuensi yang diterima sadar: dua sesi berwarna mirip lebih sulit dibedakan dari jauh
+  // daripada saat badannya sendiri yang berwarna. Penanda warna di daftar sesi dan lampu pod
+  // tidak berubah, dan punggung tetap memakai satu indikator kecil supaya warnanya tak hilang
+  // total ketika robot membelakangi kamera.
+  var ROBOT_PUTIH = '#f3f6fb', ROBOT_BAYANG = '#d9e0ea', ROBOT_VISOR = '#141922';
   function gambarRobot(warna, kecil, dudukZ, arah) {
-    var s = kecil ? 1.0 : 1.4, z0 = dudukZ != null ? dudukZ : 0.32 * s, putar = PUTAR[arah] || 0;
-    function R(x, y, w, d) {
-      if (putar === 1) return [y, -(x + w), d, w];
-      if (putar === 2) return [-(x + w), -(y + d), w, d];
-      if (putar === 3) return [-(y + d), x, d, w];
-      return [x, y, w, d];
+    var s = kecil ? 1.0 : 1.4, putar = PUTAR[arah] || 0;
+    var zb = dudukZ != null ? dudukZ : 0.34 * s;         // dasar badan; tanpa kaki ia melayang
+    function Y(z) { return -(zb + z * s) * HZ; }         // layar-y untuk tinggi z di atas dasar
+    function X(x) { return x * s * HW; }                 // layar-x, mengikuti satuan lantai
+    function pt(x, z) { return X(x).toFixed(1) + ' ' + Y(z).toFixed(1); }
+    function el(cx, cy, rx, ry, c, ek) {
+      return '<ellipse cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" rx="' + rx.toFixed(1) +
+        '" ry="' + ry.toFixed(1) + '" fill="' + c + '"' + (ek || '') + '/>';
     }
-    function B(x, y, z, w, d, h, c) { var r = R(x, y, w, d); return box(r[0] * s, r[1] * s, z0 + z * s, r[2] * s, r[3] * s, h * s, c); }
-    function K(x, y, z, w, d, h, c) { var r = R(x, y, w, d); return box(r[0] * s, r[1] * s, z, r[2] * s, r[3] * s, h * s, c); }
-    // bidang y = yb di koordinat badan, digambar hanya bila sesudah rotasi ia jatuh di sisi yang terlihat
-    function sisi(yb, x0, x1, za, zb, c, ekstra) {
-      if (putar === 0) return yb > 0 ? mukaSelatan(yb * s, x0 * s, x1 * s, za, zb, c, ekstra) : '';
-      if (putar === 1) return yb > 0 ? mukaTimur(yb * s, -x1 * s, -x0 * s, za, zb, c, ekstra) : '';
-      if (putar === 2) return yb < 0 ? mukaSelatan(-yb * s, -x1 * s, -x0 * s, za, zb, c, ekstra) : '';
-      return yb < 0 ? mukaTimur(-yb * s, x0 * s, x1 * s, za, zb, c, ekstra) : '';
+    function rr(x, y, w, h, r, c, ek) {
+      return '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1) +
+        '" height="' + h.toFixed(1) + '" rx="' + r.toFixed(1) + '" fill="' + c + '"' + (ek || '') + '/>';
     }
-    var gelap = campur(warna, -0.35), terang = campur(warna, 0.25), out = '';
-    if (dudukZ == null) out += K(-0.2, -0.08, 0, 0.14, 0.16, 0.32, '#2b2e35') + K(0.06, -0.08, 0, 0.14, 0.16, 0.32, '#2b2e35');
-    // Rotasi menukar lengan mana yang lebih dekat kamera, jadi urutan gambarnya ikut ditukar; tanpa ini
-    // robot yang menghadap timur atau utara kehilangan satu lengan di balik badannya.
-    var lenganA = B(-0.36, -0.07, 0.1, 0.1, 0.14, 0.34, gelap), lenganB = B(0.26, -0.07, 0.1, 0.1, 0.14, 0.34, gelap);
+    function kapsul(x1, y1, x2, y2, w, c) {
+      return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) +
+        '" y2="' + y2.toFixed(1) + '" stroke="' + c + '" stroke-width="' + w.toFixed(1) + '" stroke-linecap="round"/>';
+    }
+    // ⚠️ Di SVG sumbu y menghadap ke BAWAH, jadi sweep-flag 1 melengkungkan busur ke ATAS dan 0 ke
+    // bawah -- kebalikan dari dugaan yang wajar. Versi pertama memakai kebalikannya dan wajahnya
+    // tergambar CEMBERUT, lengkap dengan mata berbentuk mangkuk. Mata = kubah (sweep 1), senyum =
+    // busur terbuka ke atas (sweep 0). Keduanya diberi kelas supaya test bisa menghitungnya tanpa
+    // bergantung pada nilai warnanya, yang kini berbeda tiap sesi.
+    // rx lebih kecil dari ry: setengah cakram bundar (rx = ry) melebar jadi mirip kacamata, dan
+    // berpasangan dengan senyum di bawahnya seluruh wajahnya terbaca sebagai kumis.
+    function mata(cx, cy, rx, ry, c) {
+      return '<path class="mata" d="M ' + (cx - rx).toFixed(1) + ' ' + cy.toFixed(1) + ' A ' + rx.toFixed(1) +
+        ' ' + ry.toFixed(1) + ' 0 0 1 ' + (cx + rx).toFixed(1) + ' ' + cy.toFixed(1) + ' Z" fill="' + c + '"/>';
+    }
+    var depan = putar === 0 || putar === 1;              // visor hanya terlihat di selatan dan timur
+    var geser = X(0.06) * ((putar === 1 || putar === 2) ? 1 : -1);   // kepala menoleh ke arah hadapnya
+    var out = '';
+    // Lingkaran di lantai memproyeksi jadi elips 2:1, jadi ry memakai HH bukan HZ.
+    if (dudukZ == null) out += el(0, 0, X(0.34), 0.34 * s * HH, '#0b0e13', ' fill-opacity=".22"');
+    // Rotasi menukar lengan mana yang lebih dekat kamera, jadi urutan gambarnya ikut ditukar; tanpa
+    // ini robot yang menghadap timur atau utara kehilangan satu lengan di balik badannya.
+    var lebarLengan = 0.14 * s * HZ;
+    var lenganKiri = kapsul(X(-0.31), Y(0.52), X(-0.42), Y(0.14), lebarLengan, ROBOT_BAYANG);
+    var lenganKanan = kapsul(X(0.31), Y(0.52), X(0.42), Y(0.14), lebarLengan, ROBOT_BAYANG);
     var tukarLengan = putar === 1 || putar === 2;
-    out += tukarLengan ? lenganB : lenganA;
-    out += B(-0.25, -0.17, 0, 0.5, 0.34, 0.5, warna);
-    out += sisi(0.17, -0.08, 0.08, z0 + 0.25 * s, z0 + 0.37 * s, '#ffffff', ' fill-opacity=".7"');
-    out += tukarLengan ? lenganA : lenganB;
-    out += B(-0.27, -0.22, 0.54, 0.54, 0.44, 0.38, terang);
-    out += sisi(0.22, -0.2, 0.2, z0 + 0.64 * s, z0 + 0.82 * s, '#11151b');
-    out += sisi(0.22, -0.13, -0.05, z0 + 0.7 * s, z0 + 0.76 * s, '#88ffff');
-    out += sisi(0.22, 0.05, 0.13, z0 + 0.7 * s, z0 + 0.76 * s, '#88ffff');
-    out += sisi(-0.22, -0.16, 0.16, z0 + 0.72 * s, z0 + 0.745 * s, campur(terang, -0.35));   // engsel punggung
-    out += B(-0.03, -0.03, 0.92, 0.06, 0.06, 0.18, '#c9ced6');
-    out += B(-0.06, -0.06, 1.1, 0.12, 0.12, 0.1, warna);
-    return { svg: out, puncak: z0 + 1.22 * s };
+    out += tukarLengan ? lenganKanan : lenganKiri;
+    out += el(0, Y(0.36), X(0.33), 0.38 * s * HZ, ROBOT_BAYANG);
+    out += el(0, Y(0.39), X(0.29), 0.33 * s * HZ, ROBOT_PUTIH);
+    out += el(X(-0.10), Y(0.50), X(0.10), 0.12 * s * HZ, '#ffffff', ' fill-opacity=".6"');
+    out += '<path d="M ' + pt(-0.21, 0.26) + ' L ' + pt(-0.07, 0.26) + ' L ' + pt(-0.07, 0.32) +
+      ' L ' + pt(0.07, 0.32) + ' L ' + pt(0.07, 0.26) + ' L ' + pt(0.21, 0.26) +
+      '" fill="none" stroke="' + campur(ROBOT_BAYANG, -0.22) + '" stroke-width="' + (0.045 * s * HZ).toFixed(1) + '"/>';
+    out += tukarLengan ? lenganKiri : lenganKanan;
+    // Kepala tinggi dan hampir menyentuh badan, visor mengisi hampir seluruh mukanya. Versi pertama
+    // memakai kepala pipih yang melayang jauh di atas badan dan terbaca sebagai piring terbang.
+    var kepalaX = X(-0.40), kepalaW = X(0.80), kepalaY = Y(1.34), kepalaH = 0.58 * s * HZ;
+    out += rr(X(-0.50), Y(1.14), X(0.12), 0.22 * s * HZ, 0.06 * s * HZ, ROBOT_BAYANG);
+    out += rr(X(0.38), Y(1.14), X(0.12), 0.22 * s * HZ, 0.06 * s * HZ, ROBOT_BAYANG);
+    out += '<path d="M ' + pt(-0.12, 1.33) + ' Q ' + pt(0, 1.45) + ' ' + pt(0.12, 1.33) +
+      '" fill="none" stroke="' + ROBOT_BAYANG + '" stroke-width="' + (0.055 * s * HZ).toFixed(1) + '" stroke-linecap="round"/>';
+    out += rr(kepalaX, kepalaY, kepalaW, kepalaH, 0.24 * s * HZ, ROBOT_PUTIH);
+    out += rr(kepalaX + X(0.10), kepalaY + 0.03 * s * HZ, kepalaW * 0.40, 0.045 * s * HZ, 0.022 * s * HZ, '#ffffff', ' fill-opacity=".8"');
+    if (depan) {
+      var vX = kepalaX + X(0.055) + geser, vW = kepalaW - X(0.11), vY = kepalaY + 0.06 * s * HZ, vH = kepalaH - 0.13 * s * HZ;
+      out += rr(vX, vY, vW, vH, 0.17 * s * HZ, ROBOT_VISOR);
+      out += rr(vX + vW * 0.10, vY + vH * 0.13, vW * 0.30, vH * 0.20, 0.04 * s * HZ, '#ffffff', ' fill-opacity=".10"');
+      var cxm = vX + vW / 2, mY = vY + vH * 0.40, mR = 0.10 * s * HZ, mDx = vW * 0.27;
+      out += mata(cxm - mDx, mY, mR * 0.72, mR * 1.25, warna) + mata(cxm + mDx, mY, mR * 0.72, mR * 1.25, warna);
+      // Busur senyum menonjol ke bawah sejauh sR dari kedua ujungnya; tanpa memperhitungkan itu
+      // ujung bawahnya menembus bibir visor.
+      var sR = mR * 0.85, sY = mY + mR * 1.25;
+      out += '<path class="senyum" d="M ' + (cxm - sR).toFixed(1) + ' ' + sY.toFixed(1) +
+        ' A ' + sR.toFixed(1) + ' ' + sR.toFixed(1) + ' 0 0 0 ' + (cxm + sR).toFixed(1) +
+        ' ' + sY.toFixed(1) + '" fill="none" stroke="' + warna + '" stroke-width="' +
+        (mR * 0.42).toFixed(1) + '" stroke-linecap="round"/>';
+    } else {
+      out += rr(kepalaX + X(0.09) + geser * 0.5, kepalaY + kepalaH * 0.38, kepalaW - X(0.18), 0.05 * s * HZ, 0.025 * s * HZ, campur(ROBOT_BAYANG, -0.28));
+      out += rr(kepalaX + kepalaW / 2 - X(0.08) + geser * 0.5, kepalaY + kepalaH * 0.58, X(0.16), 0.08 * s * HZ, 0.04 * s * HZ, warna);
+    }
+    return { svg: out, puncak: zb + 1.50 * s };
   }
 
   var robots = new Map();
@@ -712,6 +763,51 @@ footer li{margin:2px 0}
     perbaruiKelas(r);
     labelKotor = true;
   }
+  // ---------------- kamera ----------------
+  // Menyorot sebuah sesi memperbesar denah ke robotnya dan MENGIKUTINYA selagi ia berjalan.
+  // Yang dianimasikan adalah viewBox, bukan transform pada satu grup: label, gelembung, dan
+  // papan ruangan hidup di koordinat yang sama, jadi semuanya ikut membesar tanpa perhitungan
+  // terpisah. VIEW_AWAL dibaca dari atributnya sendiri supaya angkanya tidak hidup di dua tempat.
+  var VIEW_AWAL = (function () {
+    var v = (svg.getAttribute('viewBox') || '').trim().split(/\s+/).map(Number);
+    return { x: v[0], y: v[1], w: v[2], h: v[3] };
+  })();
+  var ZOOM_SOROT = 2.6;              // seberapa dekat kamera mendekat saat menyorot
+  var KAMERA_LEMBUT = 0.12;          // bagian jarak yang ditempuh per bingkai; kecil = lebih lambat
+  var kamera = { x: VIEW_AWAL.x, y: VIEW_AWAL.y, w: VIEW_AWAL.w, h: VIEW_AWAL.h };
+  var kameraDiam = true;
+
+  function targetKamera() {
+    var r = sorotId ? robots.get(sorotId) : null;
+    if (!r) return VIEW_AWAL;        // sesi yang sudah pergi juga mengembalikan kamera, bukan membeku
+    var w = VIEW_AWAL.w / ZOOM_SOROT, h = VIEW_AWAL.h / ZOOM_SOROT;
+    var p = P(r.x, r.y);
+    // titik acuan robot ada di LANTAI, jadi pusat dinaikkan setengah tingginya supaya badannya,
+    // bukan bayangannya, yang berada di tengah layar
+    var cx = p[0], cy = p[1] - (r.puncak || 1.5) * HZ * 0.5;
+    // dijepit ke kotak denah: tanpa ini menyorot robot di pinggir memperlihatkan latar kosong
+    cx = Math.min(Math.max(cx, VIEW_AWAL.x + w / 2), VIEW_AWAL.x + VIEW_AWAL.w - w / 2);
+    cy = Math.min(Math.max(cy, VIEW_AWAL.y + h / 2), VIEW_AWAL.y + VIEW_AWAL.h - h / 2);
+    return { x: cx - w / 2, y: cy - h / 2, w: w, h: h };
+  }
+  function langkahKamera() {
+    var t = targetKamera();
+    var jauh = Math.abs(t.x - kamera.x) + Math.abs(t.y - kamera.y) + Math.abs(t.w - kamera.w);
+    if (jauh < 0.35) {
+      if (kameraDiam) return;        // sudah sampai dan tak ada yang bergerak: jangan menulis atribut tiap bingkai
+      kamera.x = t.x; kamera.y = t.y; kamera.w = t.w; kamera.h = t.h;
+      kameraDiam = true;
+    } else {
+      kamera.x += (t.x - kamera.x) * KAMERA_LEMBUT;
+      kamera.y += (t.y - kamera.y) * KAMERA_LEMBUT;
+      kamera.w += (t.w - kamera.w) * KAMERA_LEMBUT;
+      kamera.h += (t.h - kamera.h) * KAMERA_LEMBUT;
+      kameraDiam = false;
+    }
+    svg.setAttribute('viewBox', kamera.x.toFixed(1) + ' ' + kamera.y.toFixed(1) + ' ' +
+      kamera.w.toFixed(1) + ' ' + kamera.h.toFixed(1));
+  }
+
   function bingkai(now) {
     var ada = false;
     robots.forEach(function (r) {
@@ -726,6 +822,7 @@ footer li{margin:2px 0}
       if (t >= 1) tiba(r); else letakkan(r);
     });
     if (ada || labelKotor) { tataLabel(); labelKotor = false; }
+    langkahKamera();                 // sesudah posisi robot diperbarui, supaya ia mengikuti di bingkai yang sama
     requestAnimationFrame(bingkai);
   }
 
@@ -1006,24 +1103,29 @@ footer li{margin:2px 0}
     perbaruiStatus();
   }
 
+  // Satu pintu untuk mengubah sorotan: tiga pemanggil di bawah dulu menyalin empat baris yang
+  // sama, dan sejak kamera ikut menempel pada sorotan salinan itu jadi tempat perbedaan lahir.
+  function setSorot(id) {
+    sorotId = id;
+    robots.forEach(perbaruiKelas);
+    tabTanda = '';
+    renderPanel();
+    elLepas.hidden = !sorotId;
+  }
   elTab.addEventListener('click', function (e) {
     var b = e.target.closest('button');
     if (!b) return;
     var id = b.getAttribute('data-id');
-    sorotId = sorotId === id ? null : id;
-    robots.forEach(perbaruiKelas);
-    tabTanda = '';
-    renderPanel();
+    setSorot(sorotId === id ? null : id);
     if (sorotId) { var k = document.getElementById('k-' + sorotId); if (k) k.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
   });
   svg.addEventListener('click', function (e) {
     var g = e.target.closest('.robot');
     if (!g) return;
-    var id = g.getAttribute('data-lead');
-    sorotId = sorotId === id ? null : id;
-    robots.forEach(perbaruiKelas);
-    tabTanda = '';
-    renderPanel();
+    setSorot(sorotId === g.getAttribute('data-lead') ? null : g.getAttribute('data-lead'));
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && sorotId) setSorot(null);
   });
 
   // Salin id: navigator.clipboard lebih dulu (bisa ditolak tanpa izin atau di file://), lalu execCommand, lalu kolom

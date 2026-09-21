@@ -140,11 +140,17 @@ Ditinjau memakai dasbor sistem rujukan sebagai daftar panel. Saat itu diputuskan
 
 Yang perlu diingat saat meninjau ulang: **panel yang paling dibutuhkan justru tidak ada di dasbor rujukan itu.** Dasbor itu menghitung PR yang sudah jadi, sedangkan kebutuhan di sini adalah sesi yang sedang berjalan dan belum menghasilkan PR apa pun.
 
-## Kantor Agent (kit 1.20.0; v2 di 1.21.0; arah hadap robot di 1.22.0; panel bisa disembunyikan di 1.23.0, 2026-09-16)
+## Kantor Agent (kit 1.20.0; v2 di 1.21.0; arah hadap robot di 1.22.0; panel bisa disembunyikan di 1.23.0; karakter robot baru dan kamera pengikut di 1.26.0, 2026-09-21)
 
 `/kantor-agent` menjawab pertanyaan yang tak bisa dijawab papan sesi: sesi mana **sedang melakukan apa sekarang**. Papan sesi hanya tahu `tahap`, yang berubah lewat slash command (61 dari 72 sesi aktif masih `mulai`), dan status `aktif`, yang terukur tak bisa dipercaya (72 dari 99 berkas aktif, hanya 7 transkripnya ditulis dalam 10 menit terakhir; keduanya diukur 2026-09-15). Karena itu sumbernya bukan berkas sesi, melainkan **registri sesi Claude Code** (sejak 1.21.0) untuk sesi mana yang terbuka dan apakah ia sedang bekerja, ditambah **ekor transkrip** untuk tool yang sedang dipakai. Desain dan keputusannya: `architecture-draft/.agent-kit/docs/2026-09-15-kantor-agent-design.md` (§ v2 untuk 1.21.0).
 
-**Bentuknya.** Tiap sesi hidup tampil sebagai robot **Lead** di denah kantor isometrik (SVG, tanpa library), dan tiap subagent hidup sebagai robot kecil berperan menurut `agentType` (`general-purpose` Generalis, `Explore` Peneliti, `Plan` Arsitek, agen `loop-*` sesuai perannya, jenis lain dengan nama aslinya). Robot berjalan lewat koridor ke area sesuai tool yang sedang dipakai:
+**Bentuknya.** Tiap sesi hidup tampil sebagai robot **Lead** di denah kantor isometrik (SVG, tanpa library), dan tiap subagent hidup sebagai robot kecil berperan menurut `agentType` (`general-purpose` Generalis, `Explore` Peneliti, `Plan` Arsitek, agen `loop-*` sesuai perannya, jenis lain dengan nama aslinya).
+
+Sejak **1.26.0** robotnya **bulat dan melayang tanpa kaki**, berbadan **putih untuk semua sesi**, dengan visor gelap berisi dua mata dan senyum; perabot sengaja dibiarkan kotak supaya robot menonjol dari latarnya. ⚠️ **Identitas sesi ada di cahaya visor, bukan di badan**: mata dan senyum memakai warna sesi. Dua konsekuensi yang diterima sadar oleh pemilik saat memilihnya: sesi berwarna mirip lebih sulit dibedakan dari jauh, dan badan putih di atas lantai terang menyandarkan pemisahannya pada bayangan di bawahnya. Proyeksi ini hanya memperlihatkan sisi selatan dan timur, jadi robot yang menghadap utara atau barat memang **tanpa wajah**; punggungnya membawa satu indikator kecil berwarna supaya identitasnya tak hilang total.
+
+**Menyorot sebuah sesi memperbesar denah ke robotnya dan mengikutinya berjalan** (1.26.0). Sorotan dipasang lewat kartu di panel samping maupun dengan mengklik robotnya langsung, dilepas lewat **Esc** atau klik lagi, dan selama kamera mengikuti ada petunjuk cara keluarnya di bawah denah. Yang dianimasikan `viewBox`, jadi label dan gelembung ikut membesar; kamera dijepit ke kotak denah supaya robot di pinggir tak memperlihatkan latar kosong.
+
+Robot berjalan lewat koridor ke area sesuai tool yang sedang dipakai:
 
 | Tool yang tertunda | Area |
 |---|---|
