@@ -131,20 +131,20 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "715bdd876d4f20dc85bc9e3a02bb4e49c17dbbff874a0627eb7807c48929d8ee",
-      "ukuran_kb": 83.9,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service lewat gateway `/api/employee/*`, siapa yang boleh memanggilnya (RBAC per rute), dan aturan kontrak tiap rute. Mencakup login/PIN/biometrik dan onboarding, CRUD personal & work data, kelola akun (active-status, forget-device, reset, roles), master data departemen, divisi, system role dan job level, plus KPI, kontrak kerja, resign, promosi/mutasi, surat peringatan, dan rute internal antar-service. Berguna saat mencari path persis, parameter seperti `grouped=true` atau `all=true`, dan kode galat yang dibalas (400, 409, 404).",
+      "hash": "23ec241836ea67de7c254a319e1975083c185da72d8459e8cb3d84095e98cc95",
+      "ukuran_kb": 84.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang dilayani employee-service lewat gateway /api/employee/*, path dan gerbang RBAC mana yang menjaga tiap grup rute (login dan onboarding, personal dan work data, akun sistem, master departemen/divisi/system role, KPI, kontrak, resign, promosi dan mutasi, surat peringatan, komplain QC), serta bentuk body dan kode galat yang dikembalikan. Dipakai saat perlu memanggil atau mengubah rute HRIS inti, mencari rute master data (/data-type/*, /master/*), atau memastikan peran mana yang boleh memanggil sebuah endpoint.",
       "kata_kunci": [
         "employee-service",
-        "endpoint karyawan",
-        "API reference",
-        "auth login PIN biometrik",
-        "master departemen",
-        "master divisi",
-        "system roles",
-        "RBAC gerbang rute",
-        "account active-status",
-        "onboarding"
+        "API endpoint",
+        "HRIS",
+        "RBAC",
+        "master data",
+        "data-type",
+        "master departments",
+        "work_data",
+        "auth login",
+        "gateway"
       ]
     },
     {
@@ -2295,20 +2295,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "4a448e1a8bff4f94c3a2c5158cc66c2eac212571384151f8e8c57bfd67284abe",
-      "ukuran_kb": 221.9,
-      "ringkasan": "Menjawab: apa saja yang ditangani employee-service sebagai sumber kebenaran autentikasi, onboarding, dan master data karyawan, fitur mana yang sudah live dan mana yang masih di branch, serta bagaimana service lain mengonsumsinya. Menerangkan koleksi yang dipegangnya (work_data, system_authentication, master_department, master_divisi, employee_resign, employee_movement), scoping multi-perusahaan (tenant), akun pihak luar vendor/mitra, dan jejak status akun. Memuat juga alasan di balik keputusan teknis yang mudah salah ditiru, misalnya seed divisi yang hanya mengisi perusahaan kosong dan field yang wajib dipertahankan saat `PUT` memakai ReplaceOne.",
+      "hash": "8cfe7d2dbc772deb274744f01b2c3db71ea840b06586a66b363d07adfa4a7815",
+      "ukuran_kb": 222.0,
+      "ringkasan": "Menjawab: apa tanggung jawab employee-service sebagai sumber kebenaran autentikasi dan master data karyawan, fitur apa saja yang dilayaninya (login/SSO, onboarding, account admin, master departemen dan divisi, KPI, kontrak, resign, jadwal kerja), dan jebakan implementasi apa yang menempel pada tiap bagian. Juga menjawab stack dan path repo-nya, service lain mana yang bergantung padanya, dan bagian mana yang masih berupa catatan terbuka.",
       "kata_kunci": [
         "employee-service",
-        "HRIS",
+        "microservice",
+        "Go Fiber MongoDB",
         "autentikasi SSO",
         "onboarding",
         "master divisi",
         "master_department",
-        "multi-tenant perusahaan",
-        "resign non-aktif",
-        "headcount periode",
-        "Go Fiber MongoDB"
+        "account admin",
+        "multi-tenant",
+        "source of truth"
       ]
     },
     {
@@ -7382,7 +7382,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, disetujui user 2026-09-21. **T1 (jejak keluar bertanggal) MERGED 2026-09-21** — bip-erp PR [#1984](https://github.com/bip-itteam-internal/bip-erp/pull/1984) (merge `3b32b03f`) + erp-frontend PR [#1670](https://github.com/bip-itteam-internal/erp-frontend/pull/1670) (merge `4ba0b2c72`); **belum deploy dan belum diverifikasi lewat gateway** (enam gerbangnya di `.task-plans/2026-09-21-jejak-keluar-bertanggal.md`). Lihat keputusan 3 & 4 dan catatan perluasan [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]. **T2 (master Divisi) MERGED 2026-09-21** — bip-erp PR [#1989](https://github.com/bip-itteam-internal/bip-erp/pull/1989) (merge `3d3fd08b`) + erp-frontend PR [#1990](https://github.com/bip-itteam-internal/erp-frontend/pull/1990); belum deploy, dan **pemetaan departemen→divisi masih kosong** (pekerjaan HRD, lihat keputusan 6). **T3 (perhitungan Actual per periode) sudah berkode 2026-09-21, belum merge & belum deploy** (branch bip-erp `feat/employee-headcount-periode`; rute `GET /kpi/headcount-periode`, gerbang bulan lampau, dan kelima cacahan diagnostiknya di [[Microservices - Employee Service]] dan [[API - Employee Service]]). **T4–T6 belum ada kodenya** — diperiksa ke `origin/main` 2026-09-21: `mpp_actual` dan `bulan_berlaku` nol berkas di `services/` maupun `shared-library/`. ⚠️ Status deploy bergerak; ukur ulang sebelum mengandalkannya.",
+      "status_teks": "**Diusulkan**, disetujui user 2026-09-21. **T1 (jejak keluar bertanggal) MERGED 2026-09-21** — bip-erp PR [#1984](https://github.com/bip-itteam-internal/bip-erp/pull/1984) (merge `3b32b03f`) + erp-frontend PR [#1670](https://github.com/bip-itteam-internal/erp-frontend/pull/1670) (merge `4ba0b2c72`); **belum deploy dan belum diverifikasi lewat gateway** (enam gerbangnya di `.task-plans/2026-09-21-jejak-keluar-bertanggal.md`). Lihat keputusan 3 & 4 dan catatan perluasan [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]. **T2 (master Divisi) MERGED 2026-09-21** — bip-erp PR [#1989](https://github.com/bip-itteam-internal/bip-erp/pull/1989) (merge `3d3fd08b`) + erp-frontend PR [#1990](https://github.com/bip-itteam-internal/erp-frontend/pull/1990); belum deploy, dan **pemetaan departemen→divisi masih kosong** (pekerjaan HRD, lihat keputusan 6). **T3 (perhitungan Actual per periode) MERGED 2026-09-22 WIB** — bip-erp PR [#1993](https://github.com/bip-itteam-internal/bip-erp/pull/1993) (merge `a6e26941`); **belum deploy, dan endpoint-nya belum SEKALI PUN dipanggil lewat gateway maupun jaringan docker** (ketujuh gerbangnya di `.task-plans/2026-09-21-headcount-periode.md`). Rute `GET /kpi/headcount-periode`, gerbang bulan lampau lintas tenant, dan kelima cacahan diagnostiknya di [[Microservices - Employee Service]] dan [[API - Employee Service]]. ⚠️ Bulan lampau akan **menolak** sampai T1 tuntas di data, dan itu perilaku yang dirancang. **T4–T6 belum ada kodenya** — diperiksa ke `origin/main` 2026-09-21: `mpp_actual` dan `bulan_berlaku` nol berkas di `services/` maupun `shared-library/`. ⚠️ Status deploy bergerak; ukur ulang sebelum mengandalkannya.",
       "publik": true,
       "tautan": [
         "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
@@ -7398,20 +7398,20 @@
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "ANALISA - Actual vs Planning MPP"
       ],
-      "hash": "455e34ade62173053b6df39cb3ebdb5193e6bbf2a689db20848f191485620c7a",
-      "ukuran_kb": 14.4,
-      "ringkasan": "Menjawab: kenapa kolom Actual pada lembar MPP dihitung sistem dan tidak lagi diketik HRD, bagaimana Actual didefinisikan (karyawan aktif pada hari terakhir bulan, per perusahaan, departemen, dan posisi), dan kenapa riwayat bulan lampau ditahan sampai setiap penonaktifan karyawan punya tanggal keluar. Menjelaskan pula keputusan melahirkan Divisi sebagai master data tersendiri, keharusan memakai `employee_movement` agar jabatan lampau tidak tertimpa jabatan hari ini, serta pemecahan kerja T1 sampai T6 beserta konsekuensinya. Memuat angka pengukuran produksi 2026-09-21 yang membalik rancangan awal.",
+      "hash": "91c74f8d98fb2dea90cdf163c1383b46bb0963fc9ef6c38f86708ec7881faff2",
+      "ukuran_kb": 14.7,
+      "ringkasan": "Menjawab: kenapa kolom Actual pada lembar MPP diputuskan dihitung sistem alih-alih diketik HRD tiap bulan, bagaimana jumlah karyawan akhir bulan didefinisikan dan direkonstruksi per orang lewat employee_movement, dan kenapa bulan lampau menolak menjawab selama masih ada akun non-aktif tanpa tanggal keluar. Juga menjawab kenapa Divisi lahir sebagai master data tersendiri, apa akibatnya bagi rencana MPP bersumbu bulan, dan bagaimana pekerjaannya dipecah berurutan dari T1 sampai T6.",
       "kata_kunci": [
         "MPP",
         "manpower planning",
         "actual vs planning",
         "headcount",
-        "divisi",
-        "jejak keluar resign",
-        "employee_movement",
-        "rekrutmen",
         "ADR 0113",
-        "attrition"
+        "divisi",
+        "master_divisi",
+        "employee_movement",
+        "jejak keluar resign",
+        "rekrutmen"
       ]
     },
     {
@@ -9496,20 +9496,20 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "68d5fbee12b78a6c04cc8f78d82371d7162629fa93b35ecc46c8b489a30067c9",
-      "ukuran_kb": 7.2,
-      "ringkasan": "Menjawab: bagaimana kepergian karyawan (attrition/turnover) dicatat lewat koleksi `employee_resign`, rumus turnover yang dipakai kartu bulan berjalan (keluar dibagi rata-rata headcount, target 5% bulanan dari server), dan kenapa hanya bulan berjalan yang disajikan. Menerangkan keterbatasan datanya: headcount awal bulan direkonstruksi karena tidak ada riwayat, dan penonaktifan yang tidak lewat menu Resign membuat angka turnover terlalu kecil meski tampak wajar. Menjelaskan juga bahwa ada dua mesin headcount dengan metode berbeda (selisih versus rekonstruksi per orang) sehingga angkanya sengaja tidak sama, dan bahwa tanggal yang dipercaya adalah `effective_date` bukan `applied_at`.",
+      "hash": "fc66567532535d8b47b9893e93626c472a572003da4b0b0c27a9359f00763b62",
+      "ukuran_kb": 7.3,
+      "ringkasan": "Menjawab: bagaimana attrition dan turnover karyawan dilaporkan, apa rumus turnover bulanan (keluar dibagi rata-rata headcount) beserta targetnya dan dari mana angkanya diambil, serta kenapa hanya bulan berjalan yang disajikan. Juga menjawab keterbatasan data yang menempel pada angka itu (penonaktifan akun tanpa catatan resign, tak ada riwayat headcount, effective_date lawan applied_at) dan kenapa ada dua mesin penghitung headcount yang hasilnya tidak akan sama persis.",
       "kata_kunci": [
         "attrition",
         "turnover",
         "resign",
-        "terminasi",
-        "headcount",
         "employee_resign",
+        "headcount",
+        "terminasi",
+        "offboarding",
+        "retention",
         "dashboard HRGA",
-        "demografi kepergian",
-        "kartu turnover",
-        "retensi"
+        "demografi"
       ]
     },
     {
@@ -12729,20 +12729,20 @@
         "Microservices - Inventory Service",
         "Microservices - Marketing Analytics Service"
       ],
-      "hash": "51d7e4f2c5ea47fb20c5324bd7467408fe972a88057338398eb50857d88f6034",
+      "hash": "1241314259d411ed6917d11a1e391aaa4e83e19d3c94a82b91ad800d427d783e",
       "ukuran_kb": 65.9,
-      "ringkasan": "Menjawab: fakta bisnis mana dimiliki service dan koleksi mana, siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Dipakai sebagai tempat mencari sebelum membangun penyimpanan baru atas fakta yang mungkin sudah dimiliki departemen lain, dan memuat empat aturan kepemilikan, syarat sebuah salinan disebut sah beserta arah dan penjaganya, pengecualian ADR 0002 yang masih hidup di kode, duplikasi yang belum diputuskan, dan service yang belum dipetakan.",
+      "ringkasan": "Menjawab: siapa pemilik tiap fakta bisnis di ERP Bharata (service dan koleksi mana yang memegangnya), siapa yang boleh menulisnya, lewat jalan mana service lain boleh membacanya, salinan mana yang sah beserta arah dan penjaganya, serta duplikasi dan pengecualian database-per-service mana yang masih hidup. Dipakai sebelum membangun penyimpanan atau fitur atas fakta yang mungkin sudah dimiliki modul lain, supaya satu fakta tidak lahir di dua tempat lalu menyimpang diam-diam.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "sumber kebenaran",
         "source of truth",
-        "duplikasi data",
-        "salinan data",
         "database-per-service",
+        "duplikasi data",
+        "salinan sinkron",
         "SyncCollection",
-        "satu fakta satu tempat",
-        "peta pemilik fakta"
+        "fakta bisnis",
+        "ADR 0002",
+        "koleksi"
       ]
     },
     {
@@ -13349,20 +13349,20 @@
         "RUN - Deploy Task Management Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "5750f7cd73c43d9a71cd39a9761449b02decc9e355d747d382549015c22f7f33",
-      "ukuran_kb": 38.8,
-      "ringkasan": "Menjawab: bagaimana cara men-deploy ulang satu microservice bip-erp ke produksi tanpa menyentuh dependensinya, kenapa `--no-deps` wajib di jam rawan, dan bagaimana membuktikan biner baru benar-benar melayani permintaan (umur image, sebab `docker ps`, `/health`, dan build sukses bukan bukti). Menerangkan pula keharusan `git fetch`/`reset --hard` lebih dulu karena `--build` membangun dari disk, urutan aman antar-service yang saling bergantung, aturan bahwa perubahan `shared-library` menuntut semua service pembaca ikut naik (kasus kategori inbox notifikasi), TTL index yang tidak bisa diubah lewat deploy, dan troubleshooting gejala ke akar.",
+      "hash": "708e3253e33ec723ebef2b8dd66f026d5496105a856bff1fffd8aa6d3574c499",
+      "ukuran_kb": 38.9,
+      "ringkasan": "Menjawab: bagaimana men-deploy ulang satu microservice bip-erp ke produksi tanpa menyentuh dependensinya, kenapa --no-deps wajib di jam rawan, dan bagaimana membuktikan biner yang sedang melayani benar-benar yang baru (umur image, bukan docker ps atau /health). Juga menjawab kapan service pembaca wajib ikut naik saat shared-library berubah, urutan aman antar-service yang saling bergantung, dan gejala apa yang muncul saat container atau checkout basi.",
       "kata_kunci": [
         "deploy",
         "docker compose",
         "no-deps",
-        "produksi prod",
+        "runbook",
         "rebuild image",
         "shared-library",
         "notification-service",
-        "runbook",
-        "verifikasi pasca-deploy",
-        "troubleshooting 502"
+        "verifikasi deploy",
+        "produksi",
+        "troubleshooting"
       ]
     },
     {
@@ -15161,20 +15161,20 @@
         "ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal",
         "REF - Kepemilikan Data"
       ],
-      "hash": "cb315430942717b4116e1770e766516d6d3ddef718bf613d93d42190475ba5cf",
-      "ukuran_kb": 7.6,
-      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dilakukan untuk mewujudkan lembar Actual vs Planning MPP, dalam urutan mengikat T1 sampai T6, beserta kriteria selesai tiap butir dan mana yang pekerjaan data oleh HRD ketimbang pekerjaan kode. Merekam keputusan yang diambil selagi mengerjakannya dan layak diingat: nama `divisi` dipertahankan walau kata itu sudah dipakai untuk arti lain, seed divisi hanya mengisi perusahaan yang belum punya satu pun, gerbang bulan lampau dibuat lintas tenant, jebakan rehire, dan `company_id` salah ketik yang semula dijawab nol yang meyakinkan. Menyebut juga apa yang sengaja di luar lingkup.",
+      "hash": "2d00a49173147cbf736e56fdcc4db3764bcb76fbbc66bf2060cee3f89ea7e65a",
+      "ukuran_kb": 7.7,
+      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dikerjakan untuk mewujudkan lembar Actual vs Planning MPP, dipecah jadi enam butir berurutan (jejak keluar bertanggal, master Divisi, perhitungan Actual per periode, rencana MPP bersumbu bulan, layar Aktual vs Rencana, pengisian data MPP 2026) beserta kriteria selesai tiap butir dan urutan yang mengikat di antaranya. Juga merekam keputusan teknis yang diambil saat mengerjakannya (metode rekonstruksi per orang, gerbang lintas tenant, rehire, seed divisi) dan apa yang sengaja ditaruh di luar lingkup.",
       "kata_kunci": [
         "MPP",
         "manpower planning",
         "actual vs planning",
-        "divisi",
+        "pecahan task",
+        "master divisi",
         "headcount periode",
-        "jejak keluar bertanggal",
-        "pecahan task T1 T6",
+        "jejak keluar",
+        "resign",
         "rekrutmen",
-        "master_divisi",
-        "ADR 0113"
+        "ANALISA"
       ]
     },
     {
