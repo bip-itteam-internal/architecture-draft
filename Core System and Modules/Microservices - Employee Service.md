@@ -4,7 +4,7 @@
 
 - **Stack:** Go + Fiber v2 + MongoDB (replica set)
 - **Path:** `services/employee`
-- **Status**: ✅ Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti · ✅ **multi-perusahaan (tenant)**: fondasi + direktori/agregat karyawan sudah ter-scope (F2-A, PR #659); sisa catatan kecil di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · ⚠️ **akun pihak luar (vendor/mitra)**: fondasi data, gerbang masa berlaku, pemberian hak (2 sumbu), dan UI **lengkap & live**; sisa catatan: PR #972 (`/me` akun luar) belum ikut ter-deploy (lihat grup Akun pihak luar) · ✅ **resign / non-aktif karyawan**: live di produksi 2026-08-05 ([[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]), tapi ⚠️ koleksinya masih **0 dokumen** — sudah live, belum dipakai
+- **Status**: ✅ Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti · ✅ **multi-perusahaan (tenant)**: fondasi + direktori/agregat karyawan sudah ter-scope (F2-A, PR #659); sisa catatan kecil di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · ⚠️ **akun pihak luar (vendor/mitra)**: fondasi data, gerbang masa berlaku, pemberian hak (2 sumbu), dan UI **lengkap & live**; sisa catatan: PR #972 (`/me` akun luar) belum ikut ter-deploy (lihat grup Akun pihak luar) · ✅ **resign / non-aktif karyawan**: live di produksi 2026-08-05 ([[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]); ⚠️ diukur ulang 2026-09-21: **12 dokumen resign**, tetapi dari **35 akun non-aktif hanya 11** yang punya catatan — 24 kepergian tanpa tanggal, dijaga penjaga backlog yang merged 2026-09-21 (belum deploy). Catatan lama "0 dokumen, belum dipakai" sudah usang
 
 ## Endpoint / Fitur (Sudah Diimplementasikan)
 

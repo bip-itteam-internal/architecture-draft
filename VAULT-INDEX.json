@@ -2221,7 +2221,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "✅",
-      "status_teks": "Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti · ✅ **multi-perusahaan (tenant)**: fondasi + direktori/agregat karyawan sudah ter-scope (F2-A, PR #659); sisa catatan kecil di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · ⚠️ **akun pihak luar (vendor/mitra)**: fondasi data, gerbang masa berlaku, pemberian hak (2 sumbu), dan UI **lengkap & live**; sisa catatan: PR #972 (`/me` akun luar) belum ikut ter-deploy (lihat grup Akun pihak luar) · ✅ **resign / non-aktif karyawan**: live di produksi 2026-08-05 ([[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]), tapi ⚠️ koleksinya masih **0 dokumen** — sudah live, belum dipakai",
+      "status_teks": "Implemented penuh — service terbesar & paling lengkap, tanpa stub berarti · ✅ **multi-perusahaan (tenant)**: fondasi + direktori/agregat karyawan sudah ter-scope (F2-A, PR #659); sisa catatan kecil di bawah & [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]] · ⚠️ **akun pihak luar (vendor/mitra)**: fondasi data, gerbang masa berlaku, pemberian hak (2 sumbu), dan UI **lengkap & live**; sisa catatan: PR #972 (`/me` akun luar) belum ikut ter-deploy (lihat grup Akun pihak luar) · ✅ **resign / non-aktif karyawan**: live di produksi 2026-08-05 ([[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]); ⚠️ diukur ulang 2026-09-21: **12 dokumen resign**, tetapi dari **35 akun non-aktif hanya 11** yang punya catatan — 24 kepergian tanpa tanggal, dijaga penjaga backlog yang merged 2026-09-21 (belum deploy). Catatan lama \"0 dokumen, belum dipakai\" sudah usang",
       "publik": true,
       "tautan": [
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
@@ -2299,20 +2299,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "0c7d82f16220db25629c5d33955faa8e76a342e3d037a58d28d26120315503db",
-      "ukuran_kb": 210.9,
-      "ringkasan": "Menjawab: apa saja yang ditangani employee-service sebagai master data karyawan sekaligus sumber kebenaran autentikasi dan onboarding, fitur apa yang sudah ada, dan bagaimana operasi akun (login, PIN, biometric, reset, forget-device, roles) bekerja. Juga menjawab kenapa workspace Legal, R&D Regulatory, dan Quality dititipkan di service ini alih-alih dibuat service sendiri, bagaimana master departemen dan system role dikelola, serta bagaimana jalur resign dan jejak status akun menulis is_active lewat satu fungsi.",
+      "hash": "23db8f2121837b6e57b1db8155ed8ab218a1fa7fdd6b035a2da298bbe442476a",
+      "ukuran_kb": 211.1,
+      "ringkasan": "Menjawab: di mana master data karyawan dan autentikasi berada, endpoint apa saja yang disediakan (login via username/employee_id, PIN, biometric, refresh token, onboarding register), dan bagaimana tim IT mengelola akun lewat grup /account (set status aktif, forget-device, hard reset, baca/tulis system_roles). Juga menjawab dari mana master department dan system role dibaca beserta gerbang RBAC tiap rute CRUD-nya, dan mengapa workspace Legal, R&D Regulatory, serta Quality di-host di service ini alih-alih service baru. Dipakai saat mencari sumber kebenaran SSO, titik tunggal penulisan is_active, atau feed data karyawan yang dikonsumsi service lain.",
       "kata_kunci": [
         "employee service",
-        "microservice karyawan",
-        "autentikasi",
+        "master data karyawan",
         "login",
-        "onboarding",
-        "master data",
-        "system_authentication",
-        "account status",
-        "Legal RnD Quality",
-        "Go Fiber"
+        "SSO",
+        "autentikasi",
+        "PIN",
+        "biometric",
+        "system_roles",
+        "master department",
+        "akun karyawan"
       ]
     },
     {
@@ -2972,10 +2972,11 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (BE)** — Fase 1-3 + adopsi ERPGo (A–F) + portal publik (browse/apply/track), **sudah di `main`** & jalan di dev. Belum: AI CV screening, psikotes online, WhatsApp kandidat, Glints sync, FE internal (erp-frontend Candidate Pipeline berjalan terpisah). Di belakang [[CORE - API Master Gateway]], auth **SSO** ([[CORE - SSO Flow]]), role `system_roles[\"hris\"]`. Port `6979`, mongo `recruitment-mongo-db`. · ✅ **Multi-perusahaan: ter-scope** (bip-erp [#1853](https://github.com/bip-itteam-internal/bip-erp/pull/1853), merged dan live prod 2026-09-12): enam koleksi proses diberi `company_id` (backfill prod mengisi BIP ke 30 dokumen lama), ditambah `GET /companies` dan `?company=`. Portal karir publik (`/public/postings`, `/apply`) tetap satu untuk semua tenant; perusahaan kandidat diturunkan dari lowongan. Paket izin belum dipasang di prod (per 2026-09-12). Lihat bagian **Increment: Rekrutmen Lintas Perusahaan** di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]. Fase lanjut yang lebih tua: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].",
+      "status_teks": "**Implemented (BE)** — Fase 1-3 + adopsi ERPGo (A–F) + portal publik (browse/apply/track), **sudah di `main`** & jalan di dev. ✅ **Koreksi 2026-09-21** (diperiksa ke `origin/main` `3b32b03f`): **AI CV screening sudah ada** (`cv_screening.go` + `ai_prompt_cv.go`, hasil menempel di `candidate.cv_screening`) dan **psikotes online sudah ada** serta multi-jenis ([[HRIS - Bank Soal dan Paket Psikotes]]). Yang benar-benar belum: **WhatsApp kandidat** (nol berkas di `services/recruitment`) dan **Glints sync** (Glints hanya label sumber di `seed_lookups.go`, bukan integrasi). FE internal berjalan terpisah di erp-frontend. Di belakang [[CORE - API Master Gateway]], auth **SSO** ([[CORE - SSO Flow]]), role `system_roles[\"hris\"]`. Port `6979`, mongo `recruitment-mongo-db`. · ✅ **Multi-perusahaan: ter-scope** (bip-erp [#1853](https://github.com/bip-itteam-internal/bip-erp/pull/1853), merged dan live prod 2026-09-12): enam koleksi proses diberi `company_id` (backfill prod mengisi BIP ke 30 dokumen lama), ditambah `GET /companies` dan `?company=`. Portal karir publik (`/public/postings`, `/apply`) tetap satu untuk semua tenant; perusahaan kandidat diturunkan dari lowongan. Paket izin belum dipasang di prod (per 2026-09-12). Lihat bagian **Increment: Rekrutmen Lintas Perusahaan** di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]. Fase lanjut yang lebih tua: [[ADR - 0029 Multi-Tenant Presensi Row-Level company_id]].",
       "publik": true,
       "tautan": [
         "HRIS - Recruitment",
+        "HRIS - Bank Soal dan Paket Psikotes",
         "CORE - API Master Gateway",
         "CORE - SSO Flow",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin",
@@ -2987,7 +2988,6 @@
         "Microservices - Employee Service",
         "APP - MyBharata",
         "Microservices - Notification Service",
-        "HRIS - Bank Soal dan Paket Psikotes",
         "HRIS - Recruitment Pipeline Redesign",
         "DB - Overview and Notes",
         "CORE - OCR Document Service",
@@ -3004,20 +3004,20 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "7bfa98eff30e097364079ec03b6f36dab382a71a4ca943da26329881af3eb689",
-      "ukuran_kb": 100.0,
-      "ringkasan": "Menjawab: bagaimana alur rekrutmen dari permintaan posisi (job requisition) hingga onboarding karyawan berjalan di recruitment-service, bagaimana babak seleksi (interview, psikotes, technical test, background check) dicatat dan menggerakkan status kandidat lewat SP-Wiring, dan bagaimana rekrutmen lintas perusahaan (multi-tenant company_id), portal karir publik, serta fitur turunan terbaru (MPP posisi kosong, status siklus sesi interview, bahan KPI rekrutmen) diimplementasikan dan status deploy-nya.",
+      "hash": "708c8e6212ded2c952e260351029e63997acd890f426160d0ccbb9bf9c5ecefe",
+      "ukuran_kb": 100.4,
+      "ringkasan": "Menjawab: bagaimana pipeline rekrutmen berjalan di backend, mulai job requisition dan alur approval SPV HRD (termasuk kenapa tahap Direktur dihapus), job posting dan sumber pelamar, manajemen kandidat, babak seleksi, sampai offer dan handoff onboarding. Menjelaskan babak seleksi sebagai katalog global interview_round dengan form_type yang menentukan bentuk form penilaian, cara hasil tes menggerakkan progress dan status kandidat (SP-Wiring), dan cara psikotes online menyimpan hasilnya. Juga menjawab bagaimana rekrutmen di-scope per perusahaan lewat company_id, port dan database yang dipakai, cara deploy service ini, serta riwayat tiap increment fiturnya.",
       "kata_kunci": [
         "recruitment service",
         "rekrutmen",
         "job requisition",
-        "psikotes",
-        "Kraepelin",
+        "job posting",
+        "kandidat",
         "interview",
+        "psikotes",
         "background check",
-        "onboarding",
-        "portal karir",
-        "multi-perusahaan"
+        "offer",
+        "portal karir"
       ]
     },
     {
@@ -4270,7 +4270,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "✅",
-      "status_teks": "Implemented. Diputuskan dan dijalankan 2026-08-05, **live di dev dan produksi** (PR bip-erp [#1009](https://github.com/bip-itteam-internal/bip-erp/pull/1009), erp-frontend [#803](https://github.com/bip-itteam-internal/erp-frontend/pull/803)). ⚠️ **Sudah live tapi belum dipakai**: verifikasi produksi 2026-08-06 menunjukkan `employee_resign` **0 dokumen** dengan 183 akun aktif, jadi seluruh konsekuensi di bawah baru akan terasa setelah HR mulai mencatat.",
+      "status_teks": "Implemented. Diputuskan dan dijalankan 2026-08-05, **live di dev dan produksi** (PR bip-erp [#1009](https://github.com/bip-itteam-internal/bip-erp/pull/1009), erp-frontend [#803](https://github.com/bip-itteam-internal/erp-frontend/pull/803)). ⚠️ **Dipakai SEBAGIAN, dan itu bentuk yang lebih menipu daripada kosong.** Verifikasi lama (2026-08-06) menunjukkan `employee_resign` **0 dokumen**; diukur ulang **2026-09-21**: **12 dokumen resign, 182 akun aktif, 35 akun non-aktif — tetapi hanya 11 dari yang non-aktif itu punya catatan**, jadi 24 kepergian tak punya tanggal sama sekali. Angka turnover karena itu bukan nol melainkan **terlalu kecil dan tampak wajar**. Penjaganya ditambahkan lewat catatan perluasan di bawah. Status ini bergerak; ukur ulang sebelum mengandalkannya.",
       "publik": true,
       "tautan": [
         "Microservices - Employee Service",
@@ -4289,20 +4289,20 @@
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "HRIS - Adaptasi ERPGo HRM"
       ],
-      "hash": "93aae82156aa31d97d4d6accbeb2833193a240978c64898a5c9b6edf6affd89b",
-      "ukuran_kb": 11.2,
-      "ringkasan": "Menjawab: siapa yang berhak menonaktifkan akun karyawan dan kenapa pencatatan resign dipindah jadi milik HR, bukan permintaan yang dikirim ke IT. Menjelaskan aturan turunannya: koleksi employee_resign terpisah, satu-satunya fungsi penulis is_active, tanggal efektif sebagai hari pertama non-aktif beserta cron 00:10 WIB, dan kenapa pembatalan hanya menghidupkan akun yang dimatikan catatan itu sendiri. Juga menjawab konsekuensi yang diterima (tanpa maker-checker, akses tidak putus seketika karena JWT masih berlaku) dan perluasan jejak jalur IT.",
+      "hash": "ee057da202016bf0d7b30b828e3316bad6cc7904f67543072000fb4c5ed4c80c",
+      "ukuran_kb": 11.5,
+      "ringkasan": "Menjawab: siapa yang boleh menonaktifkan akun karyawan dan mengapa pencatatan resign menjadi milik HR alih-alih dikirim sebagai permintaan ke IT. Menjelaskan koleksi employee_resign (kategori, tanggal efektif, alasan) sebagai penjelas mengapa akun mati, aturan satu tempat penulisan is_active lewat terapkanStatusAkun, cron harian yang menerapkan resign jatuh tempo, serta mengapa pembatalan hanya menghidupkan akun yang dimatikan catatan itu sendiri. Juga menjawab konsekuensi yang sengaja diterima: tanpa maker-checker, staf HR bisa menonaktifkan siapa pun di perusahaannya, karyawan non-aktif lenyap dari sejumlah kueri, dan JWT yang sudah beredar tetap sah sampai TTL habis.",
       "kata_kunci": [
         "resign",
         "off-boarding",
-        "nonaktif akun",
+        "akun non-aktif",
+        "deactivate account",
         "is_active",
         "employee_resign",
         "terminasi",
-        "ADR 0035",
-        "HR vs IT",
-        "deactivate account",
-        "account_status_log"
+        "attrition",
+        "turnover",
+        "exit clearance"
       ]
     },
     {
@@ -7382,7 +7382,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, disetujui user 2026-09-21. **T1 (jejak keluar bertanggal) sudah berkode, 🔜 belum merge & belum deploy** — branch bip-erp `feat/employee-status-akun-bertanggal` + erp-frontend `feat/hris-backlog-catatan-keluar`, lihat keputusan 3 & 4 dan catatan perluasan [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]. Irisan lain (master Divisi, sumbu bulan rencana, layar Aktual vs Rencana, riwayat bulan lampau) belum ada kodenya.",
+      "status_teks": "**Diusulkan**, disetujui user 2026-09-21. **T1 (jejak keluar bertanggal) MERGED 2026-09-21** — bip-erp PR [#1984](https://github.com/bip-itteam-internal/bip-erp/pull/1984) (merge `3b32b03f`) + erp-frontend PR [#1670](https://github.com/bip-itteam-internal/erp-frontend/pull/1670) (merge `4ba0b2c72`); **belum deploy dan belum diverifikasi lewat gateway** (enam gerbangnya di `.task-plans/2026-09-21-jejak-keluar-bertanggal.md`). Lihat keputusan 3 & 4 dan catatan perluasan [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]. **T2–T5 belum ada kodenya** — diperiksa ke `origin/main` 2026-09-21: `master_divisi`, `headcount_periode`, `mpp_actual`, dan `bulan_berlaku` nol berkas di `services/` maupun `shared-library/`. ⚠️ Status deploy bergerak; ukur ulang sebelum mengandalkannya.",
       "publik": true,
       "tautan": [
         "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
@@ -7396,20 +7396,20 @@
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "ANALISA - Actual vs Planning MPP"
       ],
-      "hash": "f1e683c6b93ad6568f41f7931423fc18879dae87e5886bdbb73c10e8b71d050a",
-      "ukuran_kb": 12.3,
-      "ringkasan": "Menjawab: bagaimana kolom Actual pada lembar MPP dihitung sistem dari data karyawan alih-alih diketik HRD, bagaimana rencana MPP mendapat sumbu waktu bulan berlaku, dan kenapa Divisi dibuat sebagai master data tersendiri. Menjawab pula kenapa riwayat headcount bulan lampau sengaja ditahan sampai setiap penonaktifan karyawan punya tanggal keluar, apa ambang pembukanya, dan kenapa perhitungan bulan lampau wajib melewati employee_movement supaya jabatan hari ini tak ditempelkan ke bulan lampau.",
+      "hash": "b4521f3dc5be426b289488cacc713d0d623befe9c679097deef5939d951ab723",
+      "ukuran_kb": 12.5,
+      "ringkasan": "Menjawab: bagaimana kolom Actual pada lembar Actual vs Planning MPP dihitung sistem (jumlah karyawan aktif pada hari terakhir bulan, per perusahaan, departemen, dan posisi) alih-alih diketik HRD tiap bulan, dan mengapa rencana MPP mendapat sumbu bulan berlaku dengan bulan tak-direvisi mewarisi angka bulan sebelumnya. Menjelaskan mengapa riwayat bulan lampau ditahan sampai setiap akun non-aktif punya catatan keluar bertanggal, cara ambang itu diukur, dan mengapa headcount lampau wajib membaca jabatan dari employee_movement alih-alih work_data yang sudah tertimpa mutasi. Juga menjawab dari mana Divisi berasal sebagai master data baru, siapa yang melihat layarnya, dan urutan pengerjaan T1 sampai T5.",
       "kata_kunci": [
         "MPP",
         "manpower planning",
         "actual vs planning",
         "headcount",
-        "rekrutmen",
-        "recruitment",
         "divisi",
-        "master data divisi",
-        "ADR 0113",
-        "jejak keluar"
+        "master divisi",
+        "employee_movement",
+        "jejak keluar",
+        "turnover",
+        "rekrutmen"
       ]
     },
     {
@@ -10716,28 +10716,29 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**BE sebagian diimplementasi** — Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]] — pelamar melamar sendiri + kirim berkas; **cek status lamaran DIHAPUS** 2026-07-24). **psikotes online (Kraepelin) sudah dibangun** — [[HRIS - Psikotes Kraepelin]]. Menyusul: AI CV screening, WhatsApp kandidat, integrasi job board. ⚠️ **Rekrutmen lintas perusahaan: merged 2026-09-12, backend, Web ERP, dan portal karir live di prod, paket belum dipasang** (diukur 2026-09-12, lihat bagian \"Rekrutmen Lintas Perusahaan\" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]) · 🟡 **Alur kerja HR (titik putus dibuka, kotak Langkah berikutnya, tombol Setujui offer dari `can_approve`): kode lengkap di branch, BELUM merge maupun deploy** (2026-09-12, lihat bagian \"Alur Kerja HR\" di bawah) · 🔜 **Form Penilaian Masa Onboarding (20 butir + keputusan status kepegawaian HRD): kode lengkap di branch, BELUM merged maupun deploy** (2026-09-17, lihat §Masa Evaluasi & Performance Review Onboarding) · ⚠️ **MPP: Posisi Kosong per resign (resign batal tak lagi tampil) + hak tulis MPP hanya SPV HRD dan staf rekrutmen: merged 2026-09-17 (bip-erp #1961, erp-frontend #1637), deploy dan paket posisi belum diverifikasi** (lihat §Rencana Tenaga Kerja (MPP))",
+      "status_teks": "**Sebagian besar sudah diimplementasi; yang menahan bukan fitur, melainkan alur yang belum pernah ditutup sampai `Hired`** (diukur PROD 2026-09-21, lihat §Pemakaian Nyata di Produksi). Fase 1-3 + adopsi struktur ERPGo (Fase A–F) live di [[Microservices - Recruitment Service]]; **portal karir publik sudah ada** ([[APP - Portal Karir Bharata]]); **psikotes online sudah dibangun dan kini multi-jenis** ([[HRIS - Psikotes Kraepelin]], [[HRIS - Bank Soal dan Paket Psikotes]]); ✅ **AI CV screening SUDAH ADA di kode** (`services/recruitment/cv_screening.go` + `ai_prompt_cv.go`, hasil disimpan di `candidate.cv_screening`; terpakai 1 kandidat di prod per 2026-09-21) — catatan lama \"menyusul\" sudah tidak berlaku. Yang **benar-benar belum**: WhatsApp kandidat (nol berkas di `services/recruitment`) dan sinkronisasi job board (Glints hanya label sumber di `seed_lookups.go`, bukan integrasi). ⚠️ **Rekrutmen lintas perusahaan: merged 2026-09-12, backend, Web ERP, dan portal karir live di prod, paket belum dipasang** (diukur 2026-09-12, lihat bagian \"Rekrutmen Lintas Perusahaan\" di bawah dan [[ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin]]) · ✅ **Alur kerja HR (titik putus dibuka, kotak Langkah berikutnya, tombol Setujui offer dari `can_approve`): SUDAH di `origin/main`** (diperiksa 2026-09-21: `can_approve` di `services/recruitment/offer_setujui.go`; `dari_kandidat`, `Kirim Psikotes`, `mintaRevisi` ada di erp-frontend) — catatan \"belum merge\" 2026-09-12 sudah usang · 🔜 **Form Penilaian Masa Onboarding (20 butir + keputusan status kepegawaian HRD): kode ada di branch LOKAL `feat/recruitment-form-penilaian-onboarding-v2` yang belum pernah di-push**, jadi belum ada di remote mana pun (diperiksa 2026-09-21; lihat §Masa Evaluasi & Performance Review Onboarding) · ⚠️ **MPP: Posisi Kosong per resign + hak tulis MPP hanya SPV HRD dan staf rekrutmen: merged 2026-09-17 (bip-erp #1961, erp-frontend #1637), deploy dan paket posisi belum diverifikasi** (lihat §Rencana Tenaga Kerja (MPP)) · 🔜 **Lembar Actual vs Planning MPP belum bisa dihasilkan sistem**: [[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]] T1 merged 2026-09-21, T2–T5 belum ada kodenya",
       "publik": true,
       "tautan": [
         "HRIS - Analysis",
         "Microservices - Recruitment Service",
         "APP - Portal Karir Bharata",
         "HRIS - Psikotes Kraepelin",
+        "HRIS - Bank Soal dan Paket Psikotes",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin",
+        "ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal",
         "Microservices - Employee Service",
         "ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode",
-        "HRIS - Bank Soal dan Paket Psikotes",
         "APP - MyBharata",
+        "HRIS - Matriks KPI per Departemen",
         "Microservices - File Service",
-        "CORE - OCR Document Service",
-        "Sales - Veo (Gemini) Implementation",
+        "ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library",
         "API - Recruitment Service",
         "CORE - API Master Gateway",
         "CORE - SSO Flow",
         "Microservices - Notification Service",
+        "CORE - OCR Document Service",
+        "Sales - Veo (Gemini) Implementation",
         "APP - Web ERP",
-        "HRIS - Matriks KPI per Departemen",
-        "ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal",
         "ANALISA - Actual vs Planning MPP",
         "HRIS - Attrition",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
@@ -10750,20 +10751,20 @@
         "HRIS - Big Pictures",
         "HRIS - Recruitment Roadmap (Adopsi ERPGo)"
       ],
-      "hash": "37079684dcdccd32d5089f99b293ce22eac1c5a76e3579ed5a4356bf1dffef45",
-      "ukuran_kb": 65.2,
-      "ringkasan": "Menjawab: bagaimana alur rekrutmen berjalan dari permintaan posisi (job requisition) sampai kandidat jadi karyawan aktif, siapa yang menyetujui requisition (SPV HRD sebagai persetujuan final satu tahap, tanpa cap kuota), dan dari kanal mana pelamar masuk termasuk portal karir publik dan Glints. Menjawab pula bagaimana interview multi-tahap dijadwalkan dari menu Interviews, bagaimana pewawancara mengisi feedback lewat tautan email login-gated, dan bagaimana psikotes serta technical test direkam sebagai babak bertipe tes yang memindahkan progress kandidat. Memuat juga model data pipeline (`progress` vs `status`), masa evaluasi onboarding, rekrutmen lintas perusahaan, dan Rencana Tenaga Kerja (MPP).",
+      "hash": "9e8c82ffb84d580ec109182be9a516122e28f24b6fa9a8e5a78dd4f8f2e24eda",
+      "ukuran_kb": 69.0,
+      "ringkasan": "Menjawab: bagaimana subsistem rekrutmen dirancang dari sisi bisnis, langkah demi langkah dari permintaan posisi (Form Permintaan Karyawan dan persetujuan SPV HRD) ke sourcing, manajemen pelamar, screening, interview multi-tahap, psikotes, offer, sampai onboarding jadi karyawan aktif. Menjelaskan siapa aktor dan rolenya, bagaimana pewawancara mengisi feedback lewat tautan email dan bagaimana bentuk formnya ditentukan, serta bagaimana masa evaluasi dan performance review onboarding dirancang. Juga menjawab apa isi Rencana Tenaga Kerja (MPP), bagaimana rekrutmen lintas perusahaan dan portal karir publik diposisikan, dan keputusan mana yang sudah disepakati HRD versus yang masih terbuka.",
       "kata_kunci": [
-        "rekrutmen",
         "recruitment",
-        "requisition",
-        "lowongan",
-        "kandidat",
-        "interview",
+        "rekrutmen",
+        "talent acquisition",
+        "screening CV",
+        "interview feedback",
         "psikotes",
         "onboarding",
-        "portal karir",
-        "MPP"
+        "MPP",
+        "job requisition",
+        "portal karir"
       ]
     },
     {
