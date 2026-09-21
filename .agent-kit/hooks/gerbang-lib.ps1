@@ -23,7 +23,10 @@ function Get-NamaRepo([string]$path) {
 
 # Batas waktu (detik). `dart analyze` atas SELURUH repo sudah terbukti menggantung di mesin tim,
 # jadi ia dijalankan atas folder tersentuh saja DAN berbatas waktu, terpisah dari `flutter test`.
-$script:BatasAnalyze = 300
+# Angkanya menjaga GANTUNG, bukan lambat: diukur 2026-09-21 di mybharata-app, `dart analyze lib
+# test` selesai 37,2 detik saat sepi. Batas 300 detik sempat KENA sekali ketika mesin sibuk
+# menjalankan suite lain, dan gerbang yang kadang merah karena beban akan dimatikan orang.
+$script:BatasAnalyze = 600
 $script:BatasTestFlutter = 1200
 
 # Lockfile -> pelaksana. URUTAN PENTING: erp-frontend memegang `pnpm-lock.yaml` DAN
@@ -95,13 +98,34 @@ function Get-GerbangAlat([string[]]$alat) {
   }
 }
 
-function Get-FolderDart([string[]]$berkas, [int]$batas = 20) {
+$script:BatasFolderDart = 20
+
+function Get-FolderDart([string[]]$berkas, [int]$batas = 0) {
   # `dart analyze` seluruh repo menggantung; yang dianalisis cuma folder yang tersentuh.
+  # `terpotong` WAJIB diteruskan sebagai catatan: pemotongan diam-diam berarti sebagian
+  # perubahan tak dianalisis sementara gerbangnya tetap hijau, persis kelas kegagalan yang
+  # sedang ditutup rilis ini.
+  # Folder yang sudah TERCAKUP induknya dibuang: `dart analyze` menganalisis satu folder secara
+  # rekursif, jadi mengirim `lib` bersama `lib/src/core/api` menganalisis subpohon yang sama
+  # berkali-kali tanpa menambah satu pun pemeriksaan. Diukur di mybharata-app: 21 folder jadi 1.
+  if ($batas -le 0) { $batas = $script:BatasFolderDart }
   $d = @($berkas | Where-Object { $_ -like '*.dart' } | ForEach-Object {
     $p = Split-Path $_ -Parent
     if ($p) { $p -replace '\\', '/' } else { '.' }
   } | Sort-Object -Unique)
-  return @($d | Select-Object -First $batas)
+  $akar = @()
+  foreach ($x in $d) {
+    $tercakup = $false
+    foreach ($a in $akar) { if ($x -eq $a -or $x.StartsWith($a + '/')) { $tercakup = $true; break } }
+    if (-not $tercakup) { $akar += $x }
+  }
+  if ($akar.Count -gt $batas) {
+    # Terlalu banyak folder daun yang tidak bersarang (mis. 20+ folder di bawah `test/`).
+    # Diruntuhkan ke segmen pertama, bukan dipotong: `dart analyze test` mencakup SELURUH
+    # anaknya, jadi ini menambah cakupan sekaligus memendekkan baris perintah.
+    $akar = @($akar | ForEach-Object { ($_ -split '/')[0] } | Sort-Object -Unique)
+  }
+  return @{ folder = @($akar | Select-Object -First $batas); terpotong = ($akar.Count -gt $batas) }
 }
 
 function Get-BerkasTersentuh([string]$top, [string]$base) {

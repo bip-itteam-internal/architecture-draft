@@ -105,6 +105,42 @@ def test_pm_node_tanpa_lockfile_none(tmp_path):
     assert gl.pm_node(buat(tmp_path, "package.json")) is None
 
 
+def test_folder_dart_menandai_saat_terpotong():
+    # Pemotongan diam-diam = sebagian perubahan tak dianalisis sementara gerbangnya hijau.
+    banyak = ["f%02d/x.dart" % i for i in range(gl.BATAS_FOLDER_DART + 3)]
+    folder, terpotong = gl.folder_dart(banyak)
+    assert terpotong is True and len(folder) == gl.BATAS_FOLDER_DART
+    folder, terpotong = gl.folder_dart(["lib/a/x.dart", "lib/b/y.dart", "README.md"])
+    assert terpotong is False and folder == ["lib/a", "lib/b"]
+
+
+def test_folder_dart_membuang_yang_sudah_tercakup_induknya():
+    # `dart analyze lib lib/src/core/api` menganalisis subpohon yang sama dua kali. Diukur di
+    # mybharata-app: 21 folder menyusut jadi 1, dan pemotongan 20-folder pun jadi tak terpicu.
+    folder, terpotong = gl.folder_dart([
+        "lib/app_root.dart", "lib/src/core/api/api.dart", "lib/l10n/app_localizations.dart",
+        "test/unit/x.dart",
+    ])
+    assert folder == ["lib", "test/unit"]
+    assert terpotong is False
+
+
+def test_folder_dart_meruntuhkan_ke_akar_alih_alih_memotong():
+    # Kasus nyata mybharata-app: 20+ folder daun di bawah `test/` yang tidak bersarang satu sama
+    # lain. Memotongnya membuang pemeriksaan diam-diam; meruntuhkannya ke `test` justru MENAMBAH
+    # cakupan karena dart analyze bekerja rekursif.
+    banyak = ["test/features/f%02d/x.dart" % i for i in range(30)] + ["lib/a.dart"]
+    folder, terpotong = gl.folder_dart(banyak)
+    assert folder == ["lib", "test"]
+    assert terpotong is False
+
+
+def test_folder_dart_tidak_tertipu_prefiks_mirip():
+    # 'libx' bukan anak 'lib'; pencocokan prefiks telanjang akan membuangnya tanpa dianalisis.
+    folder, _ = gl.folder_dart(["lib/a.dart", "libx/b.dart"])
+    assert folder == ["lib", "libx"]
+
+
 def test_pm_node_menjalankan_skrip_lewat_run_untuk_npm(tmp_path):
     # `npm tsc` bukan perintah; `npm run tsc` yang menjalankan skrip package.json.
     pm = gl.pm_node(buat(tmp_path, "package.json", "package-lock.json"))
@@ -306,3 +342,35 @@ def test_paritas_jenis_repo_ps_vs_py(tmp_path, berkas, harapan):
     r = subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", cmd],
                        capture_output=True, text=True)
     assert r.stdout.strip() == harapan == gl.jenis_repo(top)
+
+
+@pytest.mark.skipif(shutil.which("powershell") is None, reason="butuh PowerShell")
+def test_paritas_konstanta_ps_vs_py():
+    """Batas waktu, peta lockfile, dan daftar-izin hidup di DUA berkas.
+
+    `jenis_repo` saja tidak cukup: nilai yang cuma diubah di satu sisi (mis. `BATAS_ANALYZE`
+    dinaikkan di Python tapi tidak di PowerShell, atau lockfile baru ditambahkan di satu peta)
+    menyimpang tanpa satu pun test merah, dan yang memakainya di OS lain tidak akan tahu.
+    """
+    lib = (HOOKS / "gerbang-lib.ps1").as_posix()
+    cmd = (". '%s'; @{ batas_analyze = $script:BatasAnalyze; batas_test_flutter = "
+           "$script:BatasTestFlutter; batas_folder_dart = $script:BatasFolderDart; "
+           "repo_tanpa_gerbang = @($script:RepoTanpaGerbang); pm_node = @($script:PmNode | "
+           "ForEach-Object { ,@($_.berkas, $_.nama, $_.jalan, $_.exec) }) } | "
+           "ConvertTo-Json -Depth 5 -Compress") % lib
+    r = subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", cmd],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
+    ps = json.loads(r.stdout)
+
+    rp = subprocess.run([sys.executable, str(HOOKS / "gerbang-lib.py"), "konstanta"],
+                        capture_output=True, text=True)
+    assert rp.returncode == 0, rp.stderr
+    py = json.loads(rp.stdout)
+
+    assert ps["batas_analyze"] == py["batas_analyze"]
+    assert ps["batas_test_flutter"] == py["batas_test_flutter"]
+    assert ps["batas_folder_dart"] == py["batas_folder_dart"]
+    assert list(ps["repo_tanpa_gerbang"]) == list(py["repo_tanpa_gerbang"])
+    # urutan ikut dibandingkan: itulah yang menentukan pnpm menang atas npm di erp-frontend
+    assert [list(x) for x in ps["pm_node"]] == [list(x) for x in py["pm_node"]]
