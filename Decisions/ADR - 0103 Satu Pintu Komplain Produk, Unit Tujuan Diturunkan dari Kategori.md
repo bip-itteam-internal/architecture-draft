@@ -1,8 +1,8 @@
-> **Status**: ⚠️ **Sebagian diimplementasikan**, diputuskan 2026-09-17 dan disetujui pemilik proses (opsi A). **Sudah mendarat dan sudah PROD** (diukur 2026-09-21 lewat gerbang biner, bukan `docker ps` maupun `/health`): **keputusan 2** sisi register gudang (T9, bip-erp #1957 + erp-frontend #1634, merged 2026-09-17); **keputusan 7** bagian `ditolak` (T10, bip-erp #1965 + erp-frontend #1641, merged 2026-09-17), bagian `dialihkan` menunggu T13; **keputusan 3** daftar kategori tertutup QC (bip-erp #1968 + erp-frontend #1645, merged 2026-09-18); dan **keputusan 11** keamanan serta keutuhan register QC (bip-erp [#1976](https://github.com/bip-itteam-internal/bip-erp/pull/1976) merge `c2e2a1bf` + erp-frontend [#1659](https://github.com/bip-itteam-internal/erp-frontend/pull/1659) merge `b4363d97`, merged 2026-09-18). **Belum ada kodenya**: keputusan 1 dan 8 (pintu tunggal, T12), keputusan 4 (produk, SKU, dan pesanan diisi server; sisa T11), keputusan 5 (ganti kategori dan alihkan unit, T13), keputusan 6 ("Lainnya" ke SPV, T14). ⚠️ Status PROD bergerak dan tak dijaga apa pun; ukur ulang sebelum dipakai memutuskan. Menggantikan **keputusan 2** [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] (pengaju memilih tujuan lebih dulu) dan memicu keputusan 12-nya. Keputusan lain ADR 0099 tetap berlaku.
+> **Status**: ⚠️ **Sebagian diimplementasikan**, diputuskan 2026-09-17 dan disetujui pemilik proses (opsi A). **Sudah mendarat dan sudah PROD** (diukur 2026-09-21 lewat gerbang biner, bukan `docker ps` maupun `/health`): **keputusan 2** sisi register gudang (T9, bip-erp #1957 + erp-frontend #1634, merged 2026-09-17); **keputusan 7** bagian `ditolak` (T10, bip-erp #1965 + erp-frontend #1641, merged 2026-09-17), bagian `dialihkan` menunggu T13; **keputusan 3** daftar kategori tertutup QC (bip-erp #1968 + erp-frontend #1645, merged 2026-09-18); dan **keputusan 11** keamanan serta keutuhan register QC (bip-erp [#1976](https://github.com/bip-itteam-internal/bip-erp/pull/1976) merge `c2e2a1bf` + erp-frontend [#1659](https://github.com/bip-itteam-internal/erp-frontend/pull/1659) merge `b4363d97`, merged 2026-09-18). **Belum ada kodenya**: keputusan 1 dan 8 (pintu tunggal, T12), keputusan 4 (produk, SKU, dan pesanan diisi server; sisa T11), keputusan 6 ("Lainnya" ke SPV, T14). **Keputusan 5 DIREVISI 2026-09-21**: ganti kategori tinggal dalam unit sendiri, pemindahan lintas unit dibatalkan, dan T13 dicoret. Opsi C (satu register gabungan) ditimbang ULANG hari itu atas permintaan pemilik proses dan **tetap ditolak**; pengukuran dan alasannya di Context. ⚠️ Status PROD bergerak dan tak dijaga apa pun; ukur ulang sebelum dipakai memutuskan. Menggantikan **keputusan 2** [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] (pengaju memilih tujuan lebih dulu) dan memicu keputusan 12-nya. Keputusan lain ADR 0099 tetap berlaku.
 
 ## Untuk Manajemen
 
-- **Yang berubah di layar**: semua keluhan produk diajukan lewat SATU formulir, baik dari baris ulasan marketplace maupun tanpa ulasan. Pengaju cukup memilih jenis keluhannya; unit yang akan menangani tampil sendiri dan tidak bisa diubah pengaju. Nama produk dan SKU diisi sistem dari pesanannya, jadi pengaju hanya menulis cerita keluhan dan melampirkan foto. Formulir lama "Komplain ke QC" diganti formulir ini. Bila jenis keluhannya ternyata keliru, unit penerima menekan "Ganti kategori" dan komplain pindah sendiri ke unit yang benar, pengaju dikabari. Keluhan yang tidak cocok dengan jenis mana pun diteruskan ke supervisor brand pemilik toko untuk dipilah. Komplain gudang yang ditolak tidak lagi menurunkan skor packer.
+- **Yang berubah di layar**: semua keluhan produk diajukan lewat SATU formulir, baik dari baris ulasan marketplace maupun tanpa ulasan. Pengaju cukup memilih jenis keluhannya; unit yang akan menangani tampil sendiri dan tidak bisa diubah pengaju. Nama produk dan SKU diisi sistem dari pesanannya, jadi pengaju hanya menulis cerita keluhan dan melampirkan foto. Formulir lama "Komplain ke QC" diganti formulir ini. Bila jenis keluhannya ternyata keliru, unit penerima menolaknya dengan alasan dan pengaju mengajukan ulang lewat pintu yang sama; pemindahan otomatis antar unit tidak dibuat, sebab kejadiannya terlalu jarang untuk mesin sebesar itu. Keluhan yang tidak cocok dengan jenis mana pun diteruskan ke supervisor brand pemilik toko untuk dipilah. Komplain gudang yang ditolak tidak lagi menurunkan skor packer.
 - **Siapa terdampak**: pemegang toko dan staf marketing Kyura dan Beauty Hacks (pengaju), SPV Kyura dan SPV Beauty Hacks (memilah keluhan "Lainnya"), tim gudang packing (aturan skor KPI berubah), staf QC (mendapat daftar jenis keluhan dan kini menentukan tingkat keparahan sendiri).
 - **Tidak dijanjikan**:
   - Nomor batch dan tanggal kedaluwarsa **tidak** terisi otomatis. Keduanya tidak tercatat di data pesanan mana pun, jadi tetap dibaca dari foto kemasan.
@@ -10,20 +10,20 @@
   - Tidak tersambung otomatis ke CAPA.
   - Pengaju tetap melihat nasib komplainnya di dua halaman, gudang dan QC.
   - Tetap hanya Shopee, dan keluhan untuk ekspedisi atau vendor tetap belum punya tempat.
-- **Besaran kerja**: sedang. Enam task, menyentuh warehouse-service, employee-service, notification-service, dan web ERP. Bagian QC menunggu tim QC menetapkan daftar jenis keluhannya; bagian gudang bisa berjalan lebih dulu.
+- **Besaran kerja**: sedang, dan **berkurang satu task sejak 2026-09-21** (pemindahan lintas unit dibatalkan). Menyentuh warehouse-service, employee-service, notification-service, dan web ERP. Bagian QC menunggu tim QC menetapkan daftar jenis keluhannya; bagian gudang bisa berjalan lebih dulu.
 
 ## Deskripsi
 
-*Satu pintu pengajuan untuk semua komplain produk. Pengaju memilih kategori, bukan unit; unit tujuan diturunkan dari register mana yang memiliki kategori itu, tanpa tabel pemetaan dan tanpa register ketiga. Produk, SKU, dan pesanan diisi server dari data pesanan. Unit penerima dapat mengalihkan komplain ke unit lain, keluhan tanpa kategori dipilah SPV brand, dan komplain gudang yang ditolak atau dialihkan tidak lagi dihitung ke KPI packer.*
+*Satu pintu pengajuan untuk semua komplain produk. Pengaju memilih kategori, bukan unit; unit tujuan diturunkan dari register mana yang memiliki kategori itu, tanpa tabel pemetaan dan tanpa register ketiga. Produk, SKU, dan pesanan diisi server dari data pesanan. Salah unit ditangani dengan tolak lalu ajukan ulang, keluhan tanpa kategori dipilah SPV brand, dan komplain gudang yang ditolak atau dialihkan tidak lagi dihitung ke KPI packer.*
 
 - **Path di repo**:
-  - `bip-erp/services/warehouse/komplain.go` (daftar kategori diterbitkan, status `dialihkan`, ganti kategori)
-  - `bip-erp/services/warehouse/kpi_komplain.go` (`ditolak` dan `dialihkan` tidak dihitung)
-  - `bip-erp/services/warehouse/komplain_alih.go` (**baru**, rute internal menerima dan mengirim komplain yang dialihkan)
+  - `bip-erp/services/warehouse/komplain.go` (daftar kategori diterbitkan, ganti kategori dalam unit; ~~status `dialihkan`~~ dibatalkan 2026-09-21)
+  - `bip-erp/services/warehouse/kpi_komplain.go` (`ditolak` tidak dihitung; `dialihkan` tak jadi ada)
+  - ~~`bip-erp/services/warehouse/komplain_alih.go`~~ **DIBATALKAN 2026-09-21** (keputusan 5)
   - `bip-erp/services/employee/quality_complaint.go` (kategori tertutup, isian server, `company_id`, race `ReplaceOne`, ganti kategori)
   - `bip-erp/services/employee/quality_complaint_akses.go` (gerbang kepemilikan toko, filter tenant, daftar putih `$set`, kunci optimistik)
   - `bip-erp/shared-library/common/toko_icc.go` (resolver kepemilikan toko, dipakai bersama warehouse-service)
-  - `bip-erp/services/employee/quality_complaint_alih.go` (**baru**, pasangan rute internal di sisi QC)
+  - ~~`bip-erp/services/employee/quality_complaint_alih.go`~~ **DIBATALKAN 2026-09-21** (keputusan 5)
   - `bip-erp/shared-library/models/employee/models.go` (`QualityComplaint`: kategori, identitas item, `company_id`, penanda sumber)
   - `erp-frontend/src/features/quality/complaint/lib/akses-komplain-qc.ts` (cermin gerbang baca, layar terkunci)
   - `bip-erp/shared-library/models/notification/models.go` + `bip-erp/services/notification/webpush.go` (kategori inbox baru dan aturan rute web)
@@ -77,6 +77,51 @@ Penggolongan manual atas 65 ulasan yang sama: gudang 11, mutu produk 13 (dugaan 
 | Kelebihan | Permukaan baru terkecil, tunduk [[ADR - 0002 Database-per-Service]], tanpa tabel pemetaan | Satu daftar bagi pengaju; "Lainnya" punya antrean tercatat | Tanpa migrasi, keduanya nol dokumen |
 | Kekurangan | Pengaju tetap melihat dua halaman daftar; pemindahan lintas service butuh idempotensi | Status hidup di dua tempat dan wajib disinkronkan, berat untuk 1,5 per bulan | Kosakata dan wewenang gudang dan QC berbeda, memenuhi kriteria pemisahan [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]]; KPI packer ditulis ulang |
 
+### Opsi C ditimbang ULANG 2026-09-21, dan tetap ditolak
+
+Pemilik proses menanyakannya lagi dengan alasan yang sah: satu fitur hari ini dibayar di dua
+service, dua kontrak, dua daur hidup, dua halaman. Ditimbang ulang dengan pengukuran baru,
+bukan dengan mengulang alasan lama.
+
+**Satu dari dua alasan penolakan TERBUKTI JAUH LEBIH LEMAH dari yang tertulis di atas.**
+"KPI packer ditulis ulang" ternyata berarti menulis ulang kemampuan yang belum pernah menilai
+siapa pun. Diukur PROD 2026-09-21: sumber `komplain_gudang_packing` terdaftar di kode tetapi
+dipakai **nol dari 119 template KPI**; ketiga metrik yang seharusnya memakainya
+(`akurasi-dan-kualitas-packing` bobot 0,10 di *Koordinator Warehouse Packing*;
+`akurasi-pengiriman-produk` bobot 0,20 di *Admin Warehouse Tinggarjaya*;
+`complain-rejection-maksimal-5` bobot 0,15 di *Quality Control Staff*) masih dinilai MANUAL.
+Kontrol positif: 100 metrik lain di vault template memang punya blok `auto`. Ditambah tiga hal
+yang melemahkannya lagi: atribusi packer **sudah didenormalisasi saat tulis** sehingga pembilang
+tak lagi terikat warehouse, employee-service berbicara ke **endpoint HTTP** `/kpi/komplain-gudang`
+dan bukan ke koleksinya, dan cron finalisasi malam membekukan skor sehingga pembacaan lintas
+service hanya perlu hidup untuk bulan berjalan.
+
+**Alasan kedua berdiri utuh, dan justru menguat.** Kosakata kedua register memang berbeda, dan
+bentuk konkretnya baru terlihat saat diukur: gudang menyimpan kode huruf kecil
+(`baru`/`diproses`/`selesai`/`ditolak`) yang dipetakan lewat i18n, sementara QC menyimpan
+**kalimat Indonesia sebagai nilai status** (`"Menunggu Validasi"`) lalu merendernya mentah. Satu
+koleksi gabungan memaksa salah satunya berubah, dan itu merambat ke backend. Wewenangnya juga
+berbeda: gudang punya `bolehTindakLanjut` dan pengawas WMS, QC punya `bolehUbahKomplain` milik
+pengaju, dan `it: staff` membuka register gudang tetapi DITOLAK di QC. Lima perbedaan cermin
+akses itu masing-masing dipatok uji.
+
+**Ongkos yang hendak dihemat ternyata kecil.** Diukur di erp-frontend: dari 1.426 baris di kedua
+fitur, yang ada semata-mata karena belahan hanya **190 sampai 440 baris** (13 sampai 29 persen),
+bergantung berapa banyak cakupan uji yang rela dilepas. Sisanya dua kebijakan yang memang
+berbeda. Duplikasi antar-konteks yang berbeda bukan utang; penyatuan dini yang jadi utang.
+
+**Yang benar-benar mahal bukan registernya, melainkan keputusan 5** (lihat revisinya di bawah).
+
+⚠️ Keluhan yang mendasarinya tetap sah dan tidak dijawab ADR ini: `employee-service` memuat
+Quality, Legal, R&D, Procurement, Kepatuhan, kontrak, dan mesin KPI seluruh perusahaan dalam satu
+deployable (182 berkas Go non-test, 87 di antaranya `kpi_*`, diukur 2026-09-21). Bila kepemilikan
+mau dirapikan, langkahnya **memberi Quality service sendiri** dengan metode
+[[ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri]] (ukur rasio kopling
+dulu), BUKAN menggabungkan dua register. Menggabungkan justru menambah satu domain lagi ke
+service yang sudah kelebihan muatan. Tidak diputuskan di sini dan tidak perlu diputuskan
+sekarang; pemicunya harus terukur (tim berbeda, atau deploy saling menahan), bukan "terasa
+berantakan".
+
 ## Decision
 
 1. **Satu pintu untuk semua komplain produk; pengaju memilih KATEGORI, bukan unit.** Kategori ditampilkan berkelompok per unit, dan sesudah dipilih unit tujuannya tampil sebagai keterangan yang tak bisa diubah. Pintu yang sama dipakai dari baris ulasan maupun tanpa ulasan.
@@ -97,15 +142,19 @@ Penggolongan manual atas 65 ulasan yang sama: gudang 11, mutu produk 13 (dugaan 
    - ⛔ Data pesanan diambil **server ke server**, tidak lewat layar pengaju, karena memuat data pembeli yang tidak dibutuhkan untuk mengajukan komplain. Endpoint pilih-produk untuk pengaju hanya mengembalikan item.
    - Gerbang tulis register QC mengikuti register gudang: pemegang toko atas tokonya sendiri, atau staf marketing. Ini meneruskan koreksi ADR 0099 bahwa hak mengajukan diturunkan dari kepemilikan toko.
 
-5. **Unit penerima dapat mengganti kategori.** Dalam unit yang sama, kategorinya cukup diubah. Ke unit lain:
-   - service asal membuat komplain di register tujuan lewat rute internal berkunci layanan, **idempoten atas id komplain asal** (register tujuan menolak salinan kedua);
-   - baru sesudah itu komplain asal ditandai **`dialihkan`**, status akhir yang merujuk komplain tujuan. Bila penandaan gagal, mengulang aman karena langkah pertama idempoten;
-   - alasan wajib diisi; pengaju dan unit tujuan dikabari;
-   - tidak menunggu persetujuan pengaju.
+5. **Unit penerima dapat mengganti kategori DALAM UNITNYA SENDIRI.** Kategorinya cukup diubah, dan register gudang menjaga indeks unik `(order_id, kategori)` sehingga bentrok wajib berbunyi 409 bersebab.
+
+   ⛔ **Pemindahan LINTAS unit DIBATALKAN 2026-09-21.** Rancangan aslinya (dipertahankan di bawah sebagai catatan, jangan dikerjakan) berbunyi: service asal membuat komplain di register tujuan lewat rute internal berkunci layanan, idempoten atas id komplain asal; baru sesudah itu komplain asal ditandai `dialihkan`, status akhir yang merujuk komplain tujuan; alasan wajib; pengaju dan unit tujuan dikabari; tanpa persetujuan pengaju.
+
+   **Kenapa dibatalkan.** Ia mesin yang mahal untuk kejadian yang jarang. Volumenya **1,5 komplain per bulan** yang dapat ditindak unit yang ada (terukur, lihat Context), dan salah unit adalah bagian kecil dari itu. Yang harus dibangun: rute internal di KEDUA service, idempotensi atas id lintas register, status akhir baru, dua kategori inbox baru berikut urutan deploy notification-service, plus **dua penulisan di dua service tanpa transaksi** yang sudah diakui sendiri di Consequences. Alasan yang sama persis dipakai ADR ini untuk menolak opsi B: "berat untuk 1,5 per bulan". Alasan itu berlaku untuk keputusan ini juga, dan tidak diterapkan pada dirinya sendiri saat ditulis.
+
+   **Yang dipakai sebagai gantinya**: unit penerima **menolak** dengan alasan, pengaju mengajukan ulang lewat pintu yang sama dengan kategori yang benar. Jalur tolak sudah ada, sudah PROD, dan penolakan tanpa alasan sudah dibalas 400 oleh backend (keputusan 7). Ongkosnya satu tindakan manusia beberapa kali setahun.
+
+   ⚠️ **Yang dipertukarkan, diterima sadar**: komplain yang salah alamat kehilangan jejaknya sebagai satu perkara, sebab yang diajukan ulang adalah dokumen baru. Bila kelak volumenya naik atau rekap lintas unit menuntut jejak itu, keputusan ini ditinjau ulang; rancangannya sudah tertulis di atas dan tinggal dikerjakan. **Status `dialihkan` karena itu TIDAK dibuat**, dan keputusan 7 di bawah yang menyebutnya menjadi bersyarat pada peninjauan itu.
 
 6. **Keluhan "Lainnya" tidak disimpan di register mana pun.** Formulir mengirim kabar inbox kepada SPV brand pemilik toko, ditemukan lewat resolver atasan yang sudah ada, berisi tautan ke ulasan atau pesanannya. SPV mengajukan ulang lewat pintu yang sama dengan kategori yang benar. Bila tak ada SPV yang ditemukan, pengaju diberi tahu di layar, bukan dibiarkan senyap.
 
-7. **KPI gudang packing: `ditolak` dan `dialihkan` TIDAK dihitung ke `KomplainPacking`.** `ditolak` wajib disertai alasan tindak lanjut; pengaju sudah dikabari saat komplain ditutup (ADR 0099 keputusan 8). Ini perubahan aturan angka penilaian orang, jadi tim gudang diberi tahu sebelum naik ke PROD.
+7. **KPI gudang packing: `ditolak` TIDAK dihitung ke `KomplainPacking`.** `ditolak` wajib disertai alasan tindak lanjut; pengaju sudah dikabari saat komplain ditutup (ADR 0099 keputusan 8). Ini perubahan aturan angka penilaian orang, jadi tim gudang diberi tahu sebelum naik ke PROD. ⚠️ **Bagian `dialihkan` gugur 2026-09-21** bersama keputusan 5: statusnya tak jadi dibuat, jadi tak ada yang perlu dikecualikan. ⛔ **Utang yang belum dibayar dan jatuh tempo**: aturan ini sudah PROD sejak 2026-09-21, dan kalimat "tim gudang diberi tahu sebelum naik ke PROD" di atas belum terbukti dijalankan.
    - *Bagian `ditolak` (T10, merged 2026-09-17, bip-erp #1965, PROD 2026-09-21):* yang ditolak dikeluarkan dari pembilang, dari cacah per kategori, dan dari cacah per packer. Penolakan tanpa alasan dibalas 400 oleh backend, bukan hanya dicegah layar, karena begitu yang ditolak tak dihitung, penolakan tanpa alasan menjadi jalan menghapus komplain dari penilaian tanpa jejak. Cacah yang ditolak diterbitkan terpisah sebagai `komplain_ditolak` dan ditulis di catatan penilaian, supaya gudang yang menolak semua komplain tetap terlihat; field itu **bukan** komponen akurasi dan tidak boleh dijumlahkan ke `komplain_packing` (kontraknya di [[API - Warehouse Service]]). Skor periode yang sudah tersimpan tidak dihitung ulang.
 
 8. **Formulir `/icc/komplain-qc` diganti pintu tunggal.** Halaman daftar tetap per unit: `/warehouse/komplain` dan `/quality/komplain`.
@@ -134,7 +183,7 @@ Penggolongan manual atas 65 ulasan yang sama: gudang 11, mutu produk 13 (dugaan 
 
 **Yang memburuk, dan diterima sadar.**
 - Pengaju masih punya dua halaman daftar. Satu daftar gabungan menuntut register pintu (opsi B) beserta sinkronisasi status, tidak sepadan untuk 1,5 komplain per bulan.
-- Pemindahan lintas unit adalah dua penulisan di dua service tanpa transaksi. Idempotensi atas id komplain asal membuatnya aman diulang, bukan atomik.
+- ~~Pemindahan lintas unit adalah dua penulisan di dua service tanpa transaksi.~~ **Tidak jadi dibayar**: keputusan 5 direvisi 2026-09-21, salah unit ditangani dengan tolak lalu ajukan ulang. Konsekuensinya berpindah: komplain salah alamat kehilangan jejaknya sebagai satu perkara.
 - Gudang kini dapat menolak komplain tanpa dampak KPI, sehingga ada benturan kepentingan. Penyeimbangnya alasan wajib, pengaju dikabari, dan rasio `ditolak` per bulan dapat direkap (T8 di ANALISA).
 - Keluhan "Lainnya" hanya hidup sebagai kabar inbox. Bila SPV tak menindaklanjuti, tak ada antrean yang mengingatkan. Bila volumenya tumbuh, itu alasan meninjau opsi B.
 - Komplain atas pesanan yang tak ada di data sistem tidak dapat diajukan sama sekali.
@@ -144,7 +193,7 @@ Penggolongan manual atas 65 ulasan yang sama: gudang 11, mutu produk 13 (dugaan 
 **Yang tetap terbuka.** Daftar kategori QC menunggu tim QC. Tujuan ekspedisi dan vendor belum punya tempat (ADR 0099 K1). Kewajiban regulatif efek samping menunggu QA/RA. Komplain QC yang dibuat lewat token layanan tanpa `BIP-Employee-ID` masih berujung `created_by` kosong, dan tabel `/icc/komplain-qc` masih belum menampilkan nama pengajunya; keduanya tak disentuh keputusan 11.
 
 **Konsekuensi deploy.**
-- Kategori inbox baru (komplain dialihkan, keluhan perlu dipilah) masuk `shared-library`, jadi **notification-service naik lebih dulu**, lalu warehouse-service dan employee-service; aturan rute web ditambah di notification-service. Di MyBharata keduanya tampil "Sistem" sampai dipetakan.
+- Kategori inbox baru tinggal SATU (keluhan perlu dipilah, keputusan 6); yang untuk komplain dialihkan gugur bersama keputusan 5 pada 2026-09-21. Ia masuk `shared-library`, jadi **notification-service naik lebih dulu**, lalu service pengirimnya; aturan rute web ditambah di notification-service. Di MyBharata ia tampil "Sistem" sampai dipetakan.
 - Rute internal warehouse ke employee dan sebaliknya, serta employee ke integration, kemungkinan menuntut env kunci layanan dan URL baru, jadi container terkait **dibuat ulang** (`--force-recreate`), bukan di-restart. Kepastiannya di `/plan`.
 - Endpoint kategori dan field kategori QC adalah perubahan kontrak: **backend naik sebelum frontend**. Salinan kategori di frontend baru dihapus setelah endpoint ada di PROD.
 - Perubahan KPI hanya di warehouse-service; bentuk respons yang dibaca employee-service tidak berubah.
