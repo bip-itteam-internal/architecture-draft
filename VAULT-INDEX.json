@@ -6178,8 +6178,8 @@
       "judul": "ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, disetujui pemilik produk 2026-09-09, kode belum ada. Artefak daftar task: `Workspace/ANALISA - Program Culture Scan Kehadiran & Master Program.md`.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)**. Disetujui pemilik produk 2026-09-09. ⚠️ **Kalimat lama \"kode belum ada\" SUDAH TIDAK BERLAKU** (diukur 2026-09-21 ke `origin/main` `bip-erp` `6ef719e3`): kehadiran via scan ada di `services/form-builder/culture_attendance.go` yang merujuk ADR ini secara eksplisit (`culture_attendance` dengan `hadir` + `scanned_at`), dipakai daftar program dan partisipasi KPI (`culture_metrics.go`: partisipasi 30% = jumlah scan ÷ target diundang); master program ada lewat `terapkanMaster` di `culture_programs.go`. Jejak commit 2026-09-09 sampai 2026-09-14, antara lain `1b0e278a`, `8ae71e10` dan `ffa5896d` (modul Kelola Club, ADR 0084) serta `4d0ac808` (master program simpan default jenis/target/PIC). ⚠️ **Status deploy PROD belum diukur.** Artefak daftar task: `Workspace/ANALISA - Program Culture Scan Kehadiran & Master Program.md`.",
       "publik": true,
       "tautan": [
         "ADR - 0066 Modul Kelola Program Culture",
@@ -6193,8 +6193,8 @@
         "APP - MyBharata",
         "HRIS - Matriks KPI per Departemen"
       ],
-      "hash": "ddd8211509695cc32e30ccaa08b6a00f19702f7f0cbadf6be3a93d9c89920515",
-      "ukuran_kb": 14.2,
+      "hash": "8724fa2dc9e11bee874bcd26519f8441f1f84b609d18a1a9ca8717e362ef0780",
+      "ukuran_kb": 14.9,
       "ringkasan": "Menjawab: bagaimana kehadiran Program Culture kini didefinisikan (scan QR fisik, bukan pengisi feedback), bagaimana metrik partisipasi/antusiasme/implementasi KPI Culture & Industrial dihitung setelah perubahan ini, dan bagaimana alur scan token + rating persisten berjalan di MyBharata. Menjelaskan juga peran master program untuk mengisi form pembuatan program otomatis, bagaimana walk-in tak diundang tetap dihitung hadir, serta koleksi/endpoint baru di form-builder dan repo mana saja yang tersentuh.",
       "kata_kunci": [
         "Program Culture",
@@ -6591,8 +6591,8 @@
       "judul": "ADR - 0093 Tipe Program Culture Non-Event Dinilai Terlaksana dengan Approval SPV HR, plus Jadwal di Master",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** (2026-09-12). Kodenya belum ada. Meng-amend [[ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program]] (yang meng-amend [[ADR - 0066 Modul Kelola Program Culture]]). Daftar task: `Workspace/ANALISA - Tipe Non-Event dan Jadwal Master Program Culture.md`.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)** (diputuskan 2026-09-12). ⚠️ **Kalimat lama \"Kodenya belum ada\" SUDAH TIDAK BERLAKU** (diukur 2026-09-21 ke `origin/main` `bip-erp` `6ef719e3`): tipe `event | non_event` dipakai di empat berkas form-builder yang menyebut ADR ini di komentarnya, yaitu `culture_detail.go`, `culture_events.go`, `culture_metrics.go`, dan `culture_programs.go`, plus `culture_jadwal_test.go` untuk jadwal berulang di master (T2). Tipe diisi dari master lewat `terapkanMaster`, bukan dipercaya dari klien. Jejak commit sampai `378701a3` (2026-09-14, kecualikan non-event dari pic/programs mobile, guard T10). ⚠️ **Status deploy PROD belum diukur.** Meng-amend [[ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program]] (yang meng-amend [[ADR - 0066 Modul Kelola Program Culture]]). Daftar task: `Workspace/ANALISA - Tipe Non-Event dan Jadwal Master Program Culture.md`.",
       "publik": true,
       "tautan": [
         "ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)",
@@ -6605,8 +6605,8 @@
         "Microservices - Employee Service",
         "APP - MyBharata"
       ],
-      "hash": "de6bb52f1e5f4d1e9b377c63fdf9770d088cebfcb6361869052ba23725a3c210",
-      "ukuran_kb": 13.4,
+      "hash": "e7bc731666eaf417cac2bbdc2bd2c6022994a2edb321efb1144461a5c0a77a7e",
+      "ukuran_kb": 14.0,
       "ringkasan": "Menjawab: bagaimana program Culture yang bukan acara (non-event, mis. Kamis Batik) dinilai tanpa daftar hadir/scan/rating, yaitu lewat tanda \"terlaksana\" yang disetujui SPV HR (100 bila disetujui, else 0) dan masuk array komposit yang sama sehingga KPI officer dan bentuk GET /internal/culture/metrics tidak berubah. Menjelaskan penambahan field tipe (event/non_event) pada program dan master, serta jadwal hari/tanggal berulang di master yang mem-pra-isi tanggal saat program dibuat. Merekam alasan keputusan: KPI diatur SK (tak boleh didesain ulang) dan self-report harus ditahan gerbang approval.",
       "kata_kunci": [
         "ADR 0093",
@@ -6966,8 +6966,8 @@
       "judul": "ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** 2026-09-17, disetujui pemilik proses (opsi A1 + K1). ⚠️ **Backend sudah MERGED, belum di prod** (per 2026-09-17, ukur ulang sebelum dipakai): T1-T2 (jawaban `kesesuaian_materi` 1-10 opsional di evaluasi pasca-pelatihan, agregat per kelas, kontrak `GET /kpi/pelatihan` bertambah `kesesuaian` serta `bulan_mulai`/`bulan_selesai`) lewat bip-erp [#1945](https://github.com/bip-itteam-internal/bip-erp/pull/1945), merged 2026-09-17 07:51 UTC; T3-T4 (metrik `kesesuaian_materi_skala10` dan `kenaikan_kpi_peserta_persen`) lewat [#1951](https://github.com/bip-itteam-internal/bip-erp/pull/1951), merged 2026-09-17 08:49 UTC. T5-T6 (layar web) merged lewat erp-frontend [#1631](https://github.com/bip-itteam-internal/erp-frontend/pull/1631) 2026-09-17 09:19 UTC; ⚠️ halaman web Pelatihan Saya tak punya menu sidebar sejak 2026-08-13, jadi peserta hanya menjangkaunya lewat tautan langsung. T7 (MyBharata): MyBharata 1.20.0 (dibangun dari `dev`, tanpa tag maupun GitHub Release) sudah beredar menurut pemilik proses 2026-09-17, jadi peserta sudah bisa menilai trainer lewat aplikasi, tetapi versi itu belum menanyakan kesesuaian; pertanyaannya merged ke `dev` lewat my-bharata [#156](https://github.com/bip-itteam-internal/my-bharata/pull/156) 2026-09-17 dan menunggu rilis store berikutnya (sebaiknya sesudah learning-service PROD memuat #1945). **DEV terverifikasi sebagian** (penyimpanan, validasi, agregat per kelas, dan katalog 6 metrik lewat gateway; perhitungan kedua metrik lewat template belum). **PROD belum deploy** (T8, dijalankan manusia) dan HR belum memasang sumbernya di Atur Target (T9). Rujukan baris kode di Context dibaca dari `origin/main` sebelum #1945.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)**. Diputuskan 2026-09-17, disetujui pemilik proses (opsi A1 + K1). ⚠️ **Penanda statusnya diperbaiki 2026-09-21 dari 🟡 ke ⚠️**: uraian di bawah sudah menyatakan backend merged sejak ditulis, jadi yang keliru hanya emoji-nya, dan akibatnya dokumen ini terbaca sebagai \"belum dikerjakan\" di `VAULT-INDEX.json` dan `/ask`. Isi uraiannya tidak diubah. ⚠️ **Backend sudah MERGED, belum di prod** (per 2026-09-17, ukur ulang sebelum dipakai): T1-T2 (jawaban `kesesuaian_materi` 1-10 opsional di evaluasi pasca-pelatihan, agregat per kelas, kontrak `GET /kpi/pelatihan` bertambah `kesesuaian` serta `bulan_mulai`/`bulan_selesai`) lewat bip-erp [#1945](https://github.com/bip-itteam-internal/bip-erp/pull/1945), merged 2026-09-17 07:51 UTC; T3-T4 (metrik `kesesuaian_materi_skala10` dan `kenaikan_kpi_peserta_persen`) lewat [#1951](https://github.com/bip-itteam-internal/bip-erp/pull/1951), merged 2026-09-17 08:49 UTC. T5-T6 (layar web) merged lewat erp-frontend [#1631](https://github.com/bip-itteam-internal/erp-frontend/pull/1631) 2026-09-17 09:19 UTC; ⚠️ halaman web Pelatihan Saya tak punya menu sidebar sejak 2026-08-13, jadi peserta hanya menjangkaunya lewat tautan langsung. T7 (MyBharata): MyBharata 1.20.0 (dibangun dari `dev`, tanpa tag maupun GitHub Release) sudah beredar menurut pemilik proses 2026-09-17, jadi peserta sudah bisa menilai trainer lewat aplikasi, tetapi versi itu belum menanyakan kesesuaian; pertanyaannya merged ke `dev` lewat my-bharata [#156](https://github.com/bip-itteam-internal/my-bharata/pull/156) 2026-09-17 dan menunggu rilis store berikutnya (sebaiknya sesudah learning-service PROD memuat #1945). **DEV terverifikasi sebagian** (penyimpanan, validasi, agregat per kelas, dan katalog 6 metrik lewat gateway; perhitungan kedua metrik lewat template belum). **PROD belum deploy** (T8, dijalankan manusia) dan HR belum memasang sumbernya di Atur Target (T9). Rujukan baris kode di Context dibaca dari `origin/main` sebelum #1945.",
       "publik": true,
       "tautan": [
         "HRIS - Training Program",
@@ -6982,8 +6982,8 @@
         "HRIS - HRD Documents",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "1d7f5ee16c1b482e9667f9871e9c73ecc6ec37ecc72cced501f3c317ab0b28c7",
-      "ukuran_kb": 16.6,
+      "hash": "02d171d5701a9e69a3076d29bde98b90df8135f3993bf5331e5b15b6c33ec6a6",
+      "ukuran_kb": 16.9,
       "ringkasan": "Menjawab: bagaimana metrik KPI Training & Performance Officer `Kesesuaian materi LMS dengan jobdesk` dan `Skor Penilaian Training All Karyawan > 70` diisi sistem, yaitu lewat pertanyaan kesesuaian 1-10 kepada peserta yang disimpan terpisah dari penilaian trainer, dan lewat kenaikan skor KPI peserta dari bulan sebelum ke bulan sesudah pelatihan dengan jeda dua bulan. Juga menjelaskan alternatif yang ditolak (aspek `manfaat`, aspek kelima penilaian trainer, sumber `ceklis_kpi`, Form Builder per kelas), kenapa jobdesk dan kurikulum per jabatan dipisah jadi keputusan lain, serta konsekuensi urutan deploy.",
       "kata_kunci": [
         "ADR 0102",
@@ -7304,8 +7304,8 @@
       "judul": "ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** — disetujui 2026-09-21, kode belum ada. Menambah track KETIGA di payung Satgas/Industrial Relation; **tidak** mengubah track per-PIC (ADR 0090) maupun catatan per-orang (ADR 0085). Rincian di `## Deskripsi`.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented sebagian** — disetujui 2026-09-21, dan **T2 mendarat di `origin/main` hari itu juga pukul 14:11 WIB** lewat `services/employee/area_inspection.go` (commit `6d5f4634`, \"endpoint tulis + gerbang + upload foto area_inspection (ADR 0111 T2)\"), terdaftar di `main.go`. ⚠️ Kalimat lama \"kode belum ada\" benar saat ditulis pagi itu dan **basi dalam hitungan jam**; diukur ulang 2026-09-21 ke `bip-erp` `6ef719e3`. T lain dan status deploy **belum diukur**. Menambah track KETIGA di payung Satgas/Industrial Relation; **tidak** mengubah track per-PIC (ADR 0090) maupun catatan per-orang (ADR 0085). Rincian di `## Deskripsi`.",
       "publik": true,
       "tautan": [
         "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI",
@@ -7321,8 +7321,8 @@
         "APP - MyBharata",
         "APP - Web ERP"
       ],
-      "hash": "e5766e1b0028d92851b30278f225e1891c70afa3203d881925762763c221c818",
-      "ukuran_kb": 13.5,
+      "hash": "1a02fb108c5fb0227b601ea30388c116b3f896f7a3f0f2e2367d59e821f5e060",
+      "ukuran_kb": 13.9,
       "ringkasan": "Menjawab: bagaimana inspeksi 5R per ruangan/area department dicatat (petugas, jumlah foto, periode), kenapa ia bukan KPI/SP/potongan gaji, siapa yang boleh mencatat dan siapa yang bisa membaca temuannya, serta bagaimana track ini berbeda dari inspeksi Satgas per-PIC (ADR 0090) dan Catatan Kepatuhan per-orang (ADR 0085).",
       "kata_kunci": [
         "5R",
@@ -8923,8 +8923,8 @@
       "judul": "GA - Inventory Management",
       "area": "General Affairs",
       "jenis": "domain",
-      "status_emoji": "🟡",
-      "status_teks": "Konsep / Draft",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)**. ⚠️ **Diperbaiki 2026-09-21 dari 🟡 Konsep / Draft**, yang sudah lama bertentangan dengan isi dokumen ini sendiri: butir-butir di bawah menandai modul Aset, serah-terima, lokasi dan penyusutan, riwayat perbaikan berikut bukti nota, serta opname perlengkapan sebagai ✅ Implemented, sebagian live di produksi. Diukur ke `origin/main` `bip-erp` `6ef719e3`: `services/inventory` berisi 77 berkas `.go`. Yang masih terbuka tetap tertulis per butir, terutama **feed skor rekonsiliasi ke KPI (Fase 2) yang belum jalan** dan beberapa layar yang belum merge. Penanda lama membuat dokumen ini terbaca \"belum ada sistemnya\" di `VAULT-INDEX.json` dan `/ask`, padahal modulnya dipakai sehari-hari.",
       "publik": true,
       "tautan": [
         "Microservices - Inventory Service",
@@ -8945,8 +8945,8 @@
         "CORE - OCR Document Service",
         "Form Permintaan Barang GA.pdf"
       ],
-      "hash": "a920f60967689319d7bfccc459e8f645eeee6acb88d979a787761cc196b5224a",
-      "ukuran_kb": 20.6,
+      "hash": "79cb3e8459ddc4a8a03b2f9979402e95db1e8059d479ab64292aaa2d089f21d4",
+      "ukuran_kb": 21.3,
       "ringkasan": "Menjawab: bagaimana sistem inventory GA memberi tag/nomor aset, bagaimana alur serah-terima aset antar-karyawan berikut persetujuan SPV, dan bagaimana nilai buku/penyusutan aset ditaksir. Menjelaskan juga bagaimana rekonsiliasi aset tetap dan perlengkapan dengan Accurate menghasilkan skor untuk KPI, serta fitur soft-delete aset, riwayat perbaikan dengan bukti nota, dan cakupan Gudang Utama untuk kuantitas/biaya perlengkapan.",
       "kata_kunci": [
         "inventory GA",

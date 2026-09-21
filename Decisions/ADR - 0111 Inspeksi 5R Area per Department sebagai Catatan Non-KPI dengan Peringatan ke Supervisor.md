@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan** — disetujui 2026-09-21, kode belum ada. Menambah track KETIGA di payung Satgas/Industrial Relation; **tidak** mengubah track per-PIC (ADR 0090) maupun catatan per-orang (ADR 0085). Rincian di `## Deskripsi`.
+> **Status**: ⚠️ **Implemented sebagian** — disetujui 2026-09-21, dan **T2 mendarat di `origin/main` hari itu juga pukul 14:11 WIB** lewat `services/employee/area_inspection.go` (commit `6d5f4634`, "endpoint tulis + gerbang + upload foto area_inspection (ADR 0111 T2)"), terdaftar di `main.go`. ⚠️ Kalimat lama "kode belum ada" benar saat ditulis pagi itu dan **basi dalam hitungan jam**; diukur ulang 2026-09-21 ke `bip-erp` `6ef719e3`. T lain dan status deploy **belum diukur**. Menambah track KETIGA di payung Satgas/Industrial Relation; **tidak** mengubah track per-PIC (ADR 0090) maupun catatan per-orang (ADR 0085). Rincian di `## Deskripsi`.
 
 ## Untuk Manajemen
 
