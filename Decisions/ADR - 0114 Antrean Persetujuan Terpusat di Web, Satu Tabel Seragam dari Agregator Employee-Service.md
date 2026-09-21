@@ -12,7 +12,7 @@ Penyetuju di web mendapat **satu halaman berisi semua yang menunggu keputusannya
 
 *Penyetuju di web mendapat satu tabel seragam berisi seluruh antrean keputusan miliknya, dirakit oleh satu endpoint agregat di employee-service yang memungut endpoint antrean tiap modul apa adanya, meneruskan identitas pemanggil sehingga gerbang tiap baris tetap milik service asalnya, dan membedakan "bukan urusan saya" dari "sumber gagal".*
 
-- **Status**: 🟡 **Diusulkan** — kode belum ada.
+- **Status**: ⚠️ **Diterima, irisan 1 terimplementasi dan BELUM merge** — erp-frontend [#1665](https://github.com/bip-itteam-internal/erp-frontend/pull/1665), 2026-09-21. Irisan 1 tidak menyentuh backend sama sekali. Irisan 2 (agregator `GET /pengajuan/antrean` dan enam kategori sisanya) belum dikerjakan. **Empat butir Decision di bawah ditandai menyimpang saat implementasi**; penyimpangannya diberi tanda di tempatnya masing-masing, bukan dengan menulis ulang keputusannya.
 - **Path di repo**: `bip-erp/services/employee/antrean_persetujuan.go` (baru) · `bip-erp/services/employee/ringkasan_pengajuan.go` (pola yang dipakai ulang) · `erp-frontend/src/app/(main)/portal/persetujuan/` (baru) · `erp-frontend/src/features/persetujuan/` (baru) · `erp-frontend/src/components/layout/sidebar-menus.tsx` · `erp-frontend/src/features/direktur/components/antrean-persetujuan.tsx`
 - **Tanggal**: 2026-09-21
 
@@ -72,13 +72,23 @@ Pijakan utama ADR ini adalah dua dokumen ✅ Implemented ([[REF - Alur Persetuju
 
 **1. Satu halaman `/portal/persetujuan`, satu tabel, tanpa sub-tab.** Kolom sama untuk semua kategori: Kategori, Perihal, Pemohon, Nilai, Menunggu sejak, Tahap. Urut dari yang paling lama menunggu, bukan per kategori. Kategori dan Tahap jadi penyaring di toolbar.
 
+> ⚠️ **Irisan 1 menyimpang: kolom Nilai TIDAK dibangun.** `HRRequestSummary` (`services/attendance/hr_admin.go:56-75`) tak membawa field nominal apa pun, jadi kolomnya akan kosong untuk **ketujuh** kategori irisan ini, bukan sebagian. Premis keputusan awal keliru: `Budget` pada perjalanan dinas ada di model mentahnya, bukan di bentuk ringkas yang dikirim endpoint. Kolomnya masuk di irisan 2 bersama Pengajuan Barang (`Nominal`), Permintaan ERP (`TotalEstimasi`), dan Pesanan ERP (`Total`), yang ketiganya memang berangka.
+
 **2. Kolom "Perihal" diisi satu kalimat jadi dari agregator**, bukan dirakit frontend dari field tiap modul. Layar tidak boleh tahu apa itu `leave_type` atau nomor PO.
 
 **3. Kolom "Tahap", bukan "Status".** Antrean menurut definisi berisi yang menunggu, jadi status hampir selalu bernilai sama. Yang membedakan baris adalah menunggu siapa. Untuk absensi diambil dari `steps[]` yang sudah dihitung backend; untuk sumber lain dipetakan agregator ke kosakata yang sama.
 
 **4. Baris yang bisa dilihat tetapi bukan pembaca yang memutus TETAP TAMPIL, bertanda jelas.** Tahapnya jujur ("Menunggu Direktur", "Pantauan modul"), tanpa tombol keputusan, dan hitungan di judul memisahkan **menunggu Anda** dari **pantauan**. Ini mempertahankan kegunaan yang hari ini dipakai staf Kesekretariatan, dan tidak mengubah siapa yang berwenang.
 
+> ⚠️ **Irisan 1 menyimpang: hitungannya SATU angka, bukan dua.** `ReviewStep` (`hr_admin.go:79-85`) hanya membawa `{key, name, status, at, notes}` — **tanpa `employee_id`** — jadi dari payload daftar saja layar tak bisa menentukan baris mana yang benar-benar menunggu pembacanya. Dipakai kalimat netral "menunggu keputusan", tanpa kata "Anda", supaya tidak mengklaim lebih dari yang bisa dibuktikan. Pemisahannya menuntut penanda **per baris** dari server, dan polanya sudah ada: antrean Tinjau Setoran Live Support mengirim `boleh_putus` per baris. Itu jadi syarat irisan 2.
+
 **5. Detail dibuka lewat `Sheet`, aksinya di FOOTER sheet, bukan di baris tabel.** Rangkanya satu (header tetap, badan menggulir ber-padding, footer aksi), badannya berganti menurut kategori. Tabel karena itu tidak punya kolom Aksi, dan seluruh barisnya jadi satu sasaran klik. Pola `aksi` yang dirender pemanggil sudah ada di `sheet-detail-pengajuan.tsx`, lahir dari kebuntuan yang sama.
+
+> ⛔ **TIDAK setiap kategori boleh membuka Sheet, dan ini ditemukan saat review, bukan saat merancang.** `handleHRRequestDetail` (`hr_admin.go:351-352`) punya cabang `default` yang membalas **400** untuk `type` di luar enam jenis absensi; `JenisBooking` hanya dikenal jalur DAFTAR (`pengajuan_booking.go`), tak pernah jalur detail. Baris Booking yang masuk lewat `?include=booking` karena itu akan membuka panel galat berikut tombol "Coba lagi" yang tak akan pernah berhasil — jalan buntu yang terbaca sebagai data rusak, bukan sebagai batas fitur.
+>
+> Aturannya sekarang: kategori yang detailnya dilayani endpoint membuka Sheet; yang tidak, mengantar ke layar keputusannya sendiri (Booking → `/ga/peminjaman`, hidup di prod sejak 2026-09-15 lewat [[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]]); yang tak dikenal keduanya tidak membuka apa pun, sebab baris yang diam lebih baik daripada panel yang dijamin 400. Daftarnya **diturunkan** dari `REQUEST_TYPES`, bukan diketik ulang, supaya tak lahir salinan kedua dari `switch` di handler. Lihat `features/persetujuan/lib/tujuan.ts`.
+>
+> ⚠️ Ini juga syarat yang mengikat irisan 2: tiap kategori baru wajib menyatakan **di mana detailnya dibuka** sebelum barisnya boleh masuk tabel.
 
 **6. Agregatornya di employee-service, BUKAN di attendance.** `/hr/requests` sudah menggabungkan enam jenis, tetapi ia milik domain absensi; menumpangkan baris payroll dan procurement ke sana membuat satu service memiliki bentuk data enam modul lain. Employee-service sudah memegang registri lintas modul dan bukan pemilik antrean mana pun, jadi ia tempat yang benar. Endpoint baru `GET /pengajuan/antrean` bersaudara dengan `/pengajuan/ringkasan` dan memakai ulang seluruh mekanismenya.
 
@@ -87,6 +97,12 @@ Pijakan utama ADR ini adalah dua dokumen ✅ Implemented ([[REF - Alur Persetuju
 **8. Tidak ada sumber kebenaran ketiga.** Zona B beranda portal ([[ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi]]) tetap hanya angka dan tautan, dan tautannya menunjuk ke halaman ini. Ruang Direktur menyematkan komponen tabel yang sama alih-alih memelihara enam panelnya sendiri.
 
 **9. Dikerjakan beririsan.** Irisan 1 memakai `/hr/requests?as=reviewer&include=booking` apa adanya: tujuh kategori, nol perubahan backend, dan bentuk tabelnya terbukti di layar lebih dulu. Irisan 2 dan seterusnya memindahkan pemanggilan ke agregator baru sambil menambah sumber.
+
+**10. Menu "Persetujuan" digerbang DATA, bukan peran.** Ia tampil bila antrean pembacanya tidak kosong, meniru kartu "Perlu Review" di MyBharata yang dirender tanpa satu pun cek peran dan menyembunyikan dirinya saat hitungannya nol. Menurunkannya dari peran mengulang cacat yang dicatat [[ADR - 0106 Tema dan Teaser Live Support Disetor dan Diputus Penyetuju Departemen sebagai Dasar KPI]]: penyetuju yang ditunjuk master data tanpa peran yang bersangkutan tak melihat menunya walau server mengizinkannya memutus.
+
+> ⚠️ **Butir ini ditambahkan 2026-09-21 saat sinkronisasi, dan perlu dicatat kenapa.** Aturannya semula hanya hidup di daftar task ([[ANALISA - Antrean Persetujuan Terpusat di Web]] T5), sementara kode dan artefak rencananya merujuknya sebagai "ADR 0114 butir 5" — padahal butir 5 soal Sheet. Rujukan yang salah lebih buruk daripada tidak ada rujukan: ia mengirim pembaca berikutnya ke paragraf yang keliru dan membuat ADR ini seolah menyatakan sesuatu yang tak pernah ditulisnya.
+>
+> ⛔ **Irisan 1 menyimpang: menunya tampil untuk semua, tanpa gerbang.** Sebabnya harga, bukan prinsip. `handleHRRequestsList` (`hr_admin.go:279`) memotong halaman di MEMORI **sesudah** keempat koleksi ditarik penuh, jadi `?as=reviewer&limit=1` hemat di kabel tetapi tidak di server, dan gerbangnya akan berjalan pada setiap pemuatan sidebar oleh seluruh karyawan. Halamannya sendiri berkata jujur saat antreannya kosong, dan membalas keadaan Terkunci bagi yang memang tak berhak. Gerbang datanya masuk bersama agregator irisan 2, yang bisa memberi angka murah.
 
 ## Consequences
 
