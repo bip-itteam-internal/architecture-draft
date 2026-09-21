@@ -96,6 +96,8 @@ Penelusuran menyeluruh atas seluruh service (nama koleksi dan tipe struct yang m
 
 12. **Dua utang register QC ditutup hanya bila jalur QC benar-benar disentuh**: `company_id` yang belum ada, dan race `ReplaceOne` berfilter `_id` saja. Keduanya sudah tercatat di [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]].
    - *Terpicu 2026-09-17*: ADR 0103 menyentuh register QC (kategori tertutup, isian server), jadi kedua utang ini masuk task yang sama.
+   - *DITUTUP 2026-09-18* lewat [[ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori]] keputusan 11. `company_id` kini disimpan dan menyaring seluruh rute register itu, dan race `ReplaceOne` ditutup dengan memasukkan status ke filter lalu menjawab 409. Dua race lain yang belum pernah tercatat ikut ditemukan dan ditutup bersamaan: lost-update dua penyunting serentak, dan vonis ganda saat validasi.
+   - ⚠️ Pelajaran keputusan 5 tetap berlaku dan justru menguat: gerbang register QC pun akhirnya diturunkan dari kepemilikan toko, bukan dari daftar peran. Jangan merancang gerbang berikutnya di atas asumsi bahwa peran mewakili kepemilikan toko.
 
 ## Consequences
 
