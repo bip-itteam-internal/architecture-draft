@@ -14,6 +14,52 @@ Dipisah menurut **siapa yang mengerjakan**, bukan menurut besarnya, karena itu y
 - Sebelum mengambil item dari **B**, **ukur ulang ke database**. Angkanya berasal dari dok vault bertanggal 2026-08-26 sampai 2026-09-18 dan tidak diverifikasi ulang saat papan ini dibuat.
 - Sebelum mengambil item dari **A**, ulangi pencariannya. Beberapa klaim "belum ada" di dok lama sudah terbukti usang dalam satu sesi ini (lihat bab terakhir).
 
+## Rencana dan urutan pengerjaan
+
+Disepakati 2026-09-21. Diurutkan menurut **bobot metrik yang dibuka per satuan usaha**, bukan menurut besar pekerjaannya. Hasilnya: **dua tingkat teratas tidak butuh satu baris kode pun.**
+
+**Urutan yang dipilih: Tingkat 0 dan Tingkat 1 dikerjakan lebih dulu, serentak.** Keduanya tidak memakai waktu dev sama sekali, jadi tidak saling menunggu. Dev baru masuk di Tingkat 2.
+
+### Tingkat 0 — nol baris kode (pemilik KPI)
+
+Lembar keputusan untuk dibawa ke rapat. Tiap baris adalah satu keputusan, bukan satu tugas dev.
+
+| ☐ | Metrik | Keadaan sekarang | Yang perlu diputuskan |
+|---|---|---|---|
+| ☐ | Staff Inventory, 2 metrik bobot **0,6** | menunjuk `tt_business_gmv_max_performance_reports` (data iklan TikTok) | sumber benarnya apa. Kandidat kuat data penerimaan dan PO di procurement, tetapi **menetapkannya hak pemilik KPI**, bukan tebakan dari papan ini |
+| ☐ | Recruitment & Onboarding, **0 dari 5** | sumber `rekrutmen` sudah merged tapi belum dipasang ke template mana pun | metrik mana dipasang ke baris mana. Yang tersedia: `pemenuhan_tepat_waktu`, `pemenuhan_tepat_waktu_kritikal`, `buffer_mpp_persen`, `buffer_mpp_kritikal_persen`, `review_evaluasi_tepat_waktu`, `retensi_masa_probation` |
+| ☐ | Turnover probation | sumber terdaftar mengukur resign sukarela seluruh perusahaan | ⚠️ **periksa `retensi_masa_probation`** dari sumber `rekrutmen` di atas. Ia mungkin sudah menjawab persis pertanyaan ini, sehingga perbaikannya tinggal memasang, bukan membangun. Perlu dikonfirmasi semantiknya lebih dulu |
+| ☐ | Procurement Leader, metrik rebate 0,1 | menunjuk kontrak **karyawan** (`work_data.contract_ending`) | sumber kontrak **vendor** yang benar |
+| ☐ | HRD Supervisor, metrik aset | sumbernya data retur, deskripsinya monitoring aset | apa yang sebenarnya diukur |
+| ☐ | Security, rating pelayanan **0,3** | belum dipetakan sama sekali | diukur dari apa |
+| ☐ | Security, kepatuhan SOP **0,2** | belum dipetakan | apakah cukup lewat `ceklis_kpi` dengan penilai SPV. Bila ya, **nol modul baru** |
+
+⛔ **Baris pertama paling mendesak dan bukan karena bobotnya.** Metrik kosong terlihat kosong; metrik salah petak terlihat berfungsi. Sumbernya ratusan ribu baris sehingga angkanya mulus, stabil, dan sepenuhnya keliru, dan ia **sedang menilai orang sekarang**.
+
+### Tingkat 1 — isi data ke modul yang sudah berdiri (HR)
+
+**Modul Training sudah ter-deploy dan kosong.** Mengisinya membuka **1,30 bobot di tiga posisi sekaligus**: 0,75 di Training & Performance Officer (0,55 langsung, 0,2 menunggu definisi "rencana"), 0,4 di Culture & Industrial, dan 0,15 di HRD Supervisor. **Tidak ada pekerjaan lain di seluruh HRGA yang mendekati daya ungkit ini.**
+
+| ☐ | Yang diisi | Menyalakan metrik |
+|---|---|---|
+| ☐ | pelatihan, peserta, kehadiran | `kehadiran_peserta_persen` |
+| ☐ | post-test berskor | `skor_post_test_persen`, `peningkatan_post_test_persen` |
+| ☐ | evaluasi | `kenaikan_kpi_peserta_persen` |
+
+⚠️ Sumber `pelatihan` sudah live di produksi, jadi yang menahan **memang cuma datanya**. Sisi dev yang tersisa hanya layar post-test yang belum ada.
+
+### Tingkat 2 — penyimpanan kecil yang mengunci banyak (dev)
+
+Jobdesk per posisi (0,25 Recruitment + 0,15 Training) · master anggaran departemen GA (3 metrik) · stok opname aset (0,15). Ketiganya penyimpanan sederhana, bukan modul besar, dan rasio dampak terhadap usahanya paling baik di antara pekerjaan dev.
+
+### Tingkat 3 — modul baru (dev)
+
+Inspeksi berjadwal lebih rapat dari mingguan. Irisan pertamanya sudah dirancang: `GA - Ronda Security` + ADR 0112. Selain membuka metrik patroli 0,3, ia memberi Office Boy dan Security **antrean pertamanya**, yang menurut ADR 0076 adalah syarat posisi itu layak punya dashboard sama sekali.
+
+### Tingkat 4 — besar, sempit, terakhir
+
+Modul MRP untuk Procurement Leader, bobot 0,2. Pekerjaan terbesar, cakupan tersempit di seluruh papan ini.
+
 ## A. Belum ada kodenya (dev)
 
 | ☐ | Item | Mengunci | Catatan |

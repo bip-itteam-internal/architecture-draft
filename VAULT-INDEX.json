@@ -15520,21 +15520,23 @@
       "status_teks": null,
       "publik": false,
       "tautan": [],
-      "hash": "a6ab1a4490355f8f0468cd8332444b1e0b3b3840d359ba3405d1a9bc264ce95b",
-      "ukuran_kb": 6.9,
-      "ringkasan": "Papan kerja yang menjawab: alat pendukung kerja dan penilaian KPI apa saja di HRGA yang belum ada, dan siapa yang mengerjakannya. Memisahkan yang belum ada kodenya (dev), yang kodenya sudah ada tetapi datanya kosong (HR dan GA), dan yang cuma menunggu keputusan pemilik KPI, termasuk dua metrik Staff Inventory berbobot 0,6 yang tersambung ke data iklan TikTok. Memuat juga koreksi dok yang sudah usang dan daftar jebakan pencarian yang hampir menerbitkan temuan palsu.",
+      "hash": "a623fee4eb38735a0850b74fd226e9dcd7015aed81ff2f3ec1ff626b8a93cd8b",
+      "ukuran_kb": 10.8,
+      "ringkasan": "Papan kerja yang menjawab: alat pendukung kerja dan penilaian KPI apa saja di HRGA yang belum ada, siapa yang mengerjakannya, dan dikerjakan dengan urutan apa. Memuat rencana lima tingkat yang diurutkan menurut bobot metrik yang dibuka per satuan usaha, dengan dua tingkat teratas yang tidak butuh satu baris kode pun, lembar keputusan per metrik untuk rapat pemilik KPI, dan daftar data yang harus diisi HR ke modul Training. Memuat juga koreksi dok yang sudah usang dan jebakan pencarian yang hampir menerbitkan temuan palsu.",
       "kata_kunci": [
         "HRGA",
         "kesenjangan",
         "gap",
         "backlog",
+        "rencana",
+        "prioritas",
         "KPI",
         "General Affair",
         "Procurement",
         "Security",
         "jobdesk",
-        "master anggaran",
-        "salah petak"
+        "salah petak",
+        "Training"
       ]
     },
     {
