@@ -11379,9 +11379,9 @@
         "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
         "IT - SOP Dokumentasi Vault"
       ],
-      "hash": "25078a8dd55544f596f9addd22088f38316fc8b8dd0ec522901dbc584d729433",
-      "ukuran_kb": 35.1,
-      "ringkasan": "Menjawab: gerbang otomatis apa yang menolak commit di branch utama repo kode dan menahan push yang gagal tsc/lint/build atau go build, bagaimana gerbang itu dipasang lewat hook Claude Code dan git pre-push oleh agent-kit init, serta mengapa gerbang GitHub Actions ditinggalkan dan diganti hook lokal di mesin developer. Menjelaskan juga loop otonom /brief ke /kerjakan yang dinilai /judge dan berhenti di PR dengan merge tetap dikerjakan manusia, plus cara kerja papan sesi, dashboard, dan Kantor Agent yang menampilkan sesi Claude Code yang sedang hidup. Memuat batas dan jebakannya, termasuk mengapa lingkungan GIT_* wajib dibuang sebelum hook memanggil skrip yang menyentuh git.",
+      "hash": "10af850fe6ea147cc31324d831525be9f3c7614a53a347d9ab1e64fffa8da6d6",
+      "ukuran_kb": 35.5,
+      "ringkasan": "Menjawab: gerbang otomatis apa saja yang menjaga repo bip-erp, erp-frontend, dan vault di mesin developer (hook pre-commit Claude Code yang menolak commit di branch utama lewat exit 2, git hook pre-push yang menjalankan tsc/lint/build atau go build, dan gerbang kit atas dirinya sendiri), bagaimana memasangnya lewat init, serta cara melewatinya secara sadar (--no-verify, AGENTKIT_SKIP_BUILD, AGENTKIT_SKIP_KIT_TESTS). Menjawab juga bagaimana loop otonom /brief ke /kerjakan berjalan sampai PR dengan penilaian dua lapis dan mengapa merge tetap manusia, serta apa yang ditampilkan papan sesi, dashboard, dan Kantor Agent untuk melihat sesi kerja mana sedang mengerjakan apa. Memuat jebakan yang sudah terbukti, antara lain lingkungan GIT_* yang diwariskan git hook sehingga skrip test mengubah repo nyata alih-alih sandbox.",
       "kata_kunci": [
         "gerbang repo",
         "pre-commit",
@@ -11391,7 +11391,7 @@
         "papan sesi",
         "Kantor Agent",
         "AI Engineering Loop",
-        "loop otonom",
+        "kerjakan judge PR",
         "ADR 0077"
       ]
     },
