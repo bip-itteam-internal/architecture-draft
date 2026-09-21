@@ -50,6 +50,9 @@ panjang membuat vitest mati diam-diam (team-memory).
 Untuk `architecture-draft` (domain docs): **tanpa worktree**, kerja langsung di vault di `main`
 (konvensi vault: push langsung, tanpa PR).
 
+Dua brief berarti **dua worktree**, satu per repo, dibuat lebih dulu sebelum §2. Keduanya berdiri
+sendiri, jadi tak ada berkas yang diperebutkan dan tak ada stash yang perlu dipakai bersama.
+
 ## 2. Eksekutor
 
 Dispatch `Agent` dengan `subagent_type` = peran hasil §0, `run_in_background: false`. Prompt wajib
@@ -63,11 +66,14 @@ Skill yang relevan untuk dibaca dulu: <daftar .claude/skills/<x>/SKILL.md yang c
 Percobaan: 1 dari 3
 ```
 
-**Bila `Agent` menjawab "Agent type 'loop-<domain>' not found"**: daftar agen kustom dibaca saat sesi
-mulai, jadi sesi ini lahir sebelum kit 1.15.0 di-init. Jalan yang benar: **restart sesi**. Jalan
-darurat satu kali: dispatch `general-purpose` dengan seluruh isi `.claude/agents/loop-<domain>.md`
-(tanpa frontmatter) sebagai pembuka prompt, lalu catat `agen` di log judge sebagai
-`general-purpose(loop-<domain>)`; jangan jadikan ini kebiasaan, model dan batas tools-nya berbeda.
+**Bila `Agent` menjawab "Agent type '<peran>' not found"**: daftar agen kustom dibaca saat sesi
+mulai, jadi sesi ini lahir sebelum kit yang memperkenalkan peran itu di-init (peran per lapisan
+masuk di 1.24.0, agen loop pertama di 1.15.0). Jalan yang benar: **restart sesi**. Jalan darurat
+satu kali: dispatch `general-purpose` dengan seluruh isi `.claude/agents/<peran>.md` (tanpa
+frontmatter) sebagai pembuka prompt, lalu catat `agen` di log judge sebagai
+`general-purpose(<peran>)`; jangan jadikan ini kebiasaan, model dan batas tools-nya berbeda.
+⚠️ Untuk `loop-devops` jalan darurat ini **tidak sah**: `general-purpose` punya shell, sementara
+seluruh gerbang peran itu justru terletak pada ketiadaan shell. Restart sesi, atau kerjakan manual.
 
 Pilih skill relevan dari `.claude/skills/`: `migrasi-tabel-hris` untuk halaman daftar erp-frontend,
 `deploy-bip-erp` hanya untuk `loop-devops`, `audit-keamanan` bila brief menyebut auth/RBAC/izin.
@@ -84,6 +90,8 @@ dan bila satu saja tidak terpenuhi, jalankan berurutan sesuai urutan yang dituli
 
 1. **Repo-nya berbeda.** Dua brief di repo yang sama selalu satu per satu.
 2. **Tiap brief menulis `Paralel: aman`.** Ragu berarti `tidak`, dan `tidak` berarti berurutan.
+   Brief lama yang ditulis sebelum kit 1.24.0 **tidak punya field ini sama sekali**; itu dibaca
+   sebagai `tidak`, bukan sebagai izin. Jangan menambahkan fieldnya sendiri demi meloloskan.
 3. **Bila keduanya menyentuh satu endpoint yang sama**, kedua brief memuat blok `## Kontrak`
    dengan isi identik. Tanpa blok itu, pasangan BE dan FE dijalankan berurutan, BE dulu.
 
@@ -97,6 +105,10 @@ Paralel di sini soal waktu MENGETIK, bukan waktu deploy. Untuk perubahan kontrak
 di-deploy sebelum FE, dan itu ditulis di badan PR (§5).
 
 ## 3. Judge
+
+**Bila dua brief dijalankan paralel, §3 sampai §6 dikerjakan PER BRIEF**, berurutan dan terpisah:
+satu judge, satu loop perbaikan, satu commit, dan satu PR untuk masing-masing. Yang paralel hanya
+eksekutornya di §2. Brief yang gagal tidak menahan pasangannya yang lolos.
 
 Jalankan prosedur `/judge` (baca `.claude/commands/judge.md` dan lakukan) atas worktree itu dengan
 brief yang sama. Hasilnya `lolos` (gerbang deterministik **dan** agen judge sama-sama lolos) dan
@@ -113,12 +125,16 @@ Tulis log `.task-plans/judge/<slug>-<n>.json`:
 ```json
 { "brief": "<path>", "worktree": "<path>", "branch": "...", "percobaan": n, "waktu": "<UTC ISO>",
   "gerbang": <hasil gerbang.ps1>, "verdict": <JSON judge>, "lolos": true|false,
-  "skills_dibaca": ["..."], "agen": "loop-<domain>" }
+  "skills_dibaca": ["..."], "agen": "<peran hasil §0, mis. loop-fe>" }
 ```
+
+Field `agen` ditulis apa adanya karena ia yang membuat angka pengulangan bisa dibandingkan
+antar-peran nanti: apakah spesialis lapisan benar-benar lebih jarang ditolak judge daripada
+eksekutor domain generik. Tanpa field itu, klaim "peran spesialis mempercepat" tak bisa diukur.
 
 ## 4. Loop perbaikan
 
-Bila **gagal** dan percobaan < 3: dispatch ulang `loop-<domain>` dengan prompt yang sama plus
+Bila **gagal** dan percobaan < 3: dispatch ulang **peran yang sama** dengan prompt yang sama plus
 bagian **"Yang harus diperbaiki (dari judge)"** berisi temuan `kritis`, kriteria yang tidak
 terpenuhi, dan `gagal_baru` gerbang, apa adanya. Lalu kembali ke §3 dengan `percobaan+1`.
 
@@ -156,6 +172,10 @@ Repo kode, di dalam worktree:
    - Kriteria lolos + bukti (dari verdict)
    - Ringkasan judge + gerbang yang dijalankan (nama, durasi, lolos)
    - `Brief: <path>` · `Log: .task-plans/judge/<slug>-<n>.json`
+   - **Urutan deploy**, wajib ditulis bila brief ini separuh dari pasangan yang berbagi blok
+     `## Kontrak`: sebut PR pasangannya dan tegaskan **BE di-deploy sebelum FE**. Paralel di §2
+     hanya soal waktu mengetik; yang menentukan aman atau tidaknya di produksi adalah urutan ini,
+     dan ia harus terbaca oleh yang menekan tombol merge.
    - Baris penutup: *Dibuat oleh AI Engineering Loop (agent-kit). Merge tetap keputusan manusia (ADR 0077 §1).*
 5. Cetak URL PR. Tambahkan `## Hasil` di brief: percobaan, verdict, URL PR. Kirim ke papan tim:
    ```
