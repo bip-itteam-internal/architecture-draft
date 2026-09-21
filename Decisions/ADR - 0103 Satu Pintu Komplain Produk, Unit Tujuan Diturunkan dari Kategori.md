@@ -27,8 +27,10 @@
   - `bip-erp/shared-library/models/employee/models.go` (`QualityComplaint`: kategori, identitas item, `company_id`, penanda sumber)
   - `erp-frontend/src/features/quality/complaint/lib/akses-komplain-qc.ts` (cermin gerbang baca, layar terkunci)
   - `bip-erp/shared-library/models/notification/models.go` + `bip-erp/services/notification/webpush.go` (kategori inbox baru dan aturan rute web)
-  - `erp-frontend/src/features/komplain/` (**baru**, formulir satu pintu)
-  - `erp-frontend/src/features/integration/reviews/components/ajukan-komplain-modal.tsx` dan `erp-frontend/src/features/quality/complaint/components/complaint-form-modal.tsx` (diganti formulir satu pintu)
+  - `erp-frontend/src/features/komplain/lib/pintu.ts` (**baru** T12; fungsi murni pintu tunggal — pemetaan kategori ke unit, penurunan `title`, penyusun muatan dua kontrak. ⚠️ Komponennya TETAP di `features/integration/reviews`, lihat keputusan 8e)
+  - `erp-frontend/src/features/integration/reviews/components/ajukan-komplain-modal.tsx` (jadi pintu tunggal T12) dan `erp-frontend/src/features/quality/complaint/components/complaint-form-modal.tsx` (**tidak dihapus**; mode UBAH tetap dipakai, mode BUAT jadi kode mati, lihat keputusan 8d)
+  - `erp-frontend/src/features/quality/complaint/lib/rute-lama.ts` (**baru** T12, peta redirect `/icc/komplain-qc` → `/quality/komplain`) dan `erp-frontend/src/app/(main)/quality/komplain/page.tsx` (halaman gabungan dua audiens, gerbang halaman + gerbang per aksi)
+  - `erp-frontend/src/features/quality/complaint/components/bukti-ulasan.tsx` (**baru** T12, bukti ulasan di dialog validasi QC — keputusan 13)
   - `erp-frontend/src/features/warehouse/komplain/types.ts` (salinan tangan daftar kategori dihapus)
   - `erp-frontend/src/components/layout/sidebar-menus.tsx`, `erp-frontend/src/features/erp/notification/inbox/kategori.ts`, `src/i18n/locales/{id,en}.ts`
 - **Tanggal**: 2026-09-17
@@ -134,8 +136,11 @@ berantakan".
    - ⚠️ **Empat penyimpangan sadar dari keputusan ini dan keputusan lain di bawah**, dicatat supaya tak terbaca sebagai kelalaian:
      1. Daftar disetujui **pemilik proses atas nama tim QC**, bukan ditetapkan tim QC. Itu menutup K4 sementara; QC masih boleh meminta perubahan. ⚠️ **Batasnya bukan lagi "sebelum naik ke PROD"**, sebab kategori sudah PROD 2026-09-21. Yang membuatnya masih murah adalah registernya masih kosong (diukur PROD 2026-09-21: koleksi `quality_complaint` sudah tercipta, **0 dokumen**, kontrol positif `work_data` 215). Jendela ini akan tertutup oleh komplain pertama yang masuk, bukan oleh deploy.
      2. ~~**`company_id` dan race `ReplaceOne` DITUNDA**~~ **DITUTUP 2026-09-18** oleh irisan keamanan dan keutuhan (keputusan 11 di bawah). Penundaannya berlangsung satu hari; keputusan 10 dan keputusan 12 [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] kini terpenuhi.
-     3. **Formulir `/icc/komplain-qc` tetap diubah** walau keputusan 8 merencanakan penggantiannya oleh pintu tunggal (T12). Label, hook, dan pembaca keadaan kategorinya dipakai ulang T12, jadi yang terbuang hanya penempatan isiannya.
-     4. **`severity` masih diisi pengaju**, belum pindah ke QC seperti kalimat di atas. Menunggu sisa T11.
+     3. **Formulir `/icc/komplain-qc` tetap diubah** walau keputusan 8 merencanakan penggantiannya oleh pintu tunggal (T12). Label, hook, dan pembaca keadaan kategorinya dipakai ulang T12, jadi yang terbuang hanya penempatan isiannya. *Terbukti benar: T12 memakai ulang ketiganya, dan komponennya sendiri tetap hidup untuk mode UBAH (lihat keputusan 8).*
+     4. ~~**`severity` masih diisi pengaju**, belum pindah ke QC seperti kalimat di atas. Menunggu sisa T11.~~ **DITUTUP 2026-09-21 oleh T12.** Tingkat keparahan kini ditentukan QC di dialog validasi, dan backend menutup jalur pengaju dari DUA sisi sekaligus: `severity` dicabut dari daftar putih sunting **dan** dikosongkan paksa saat POST. Mencabutnya dari PUT saja tidak cukup, sebab pengaju masih bisa menentukannya sekali di saat mengajukan sehingga gerbang di rute sunting jadi penjaga pintu yang jendelanya terbuka.
+        - **Nilainya ikut dikodekan** (`ringan`/`sedang`/`berat`, sebelumnya kalimat berkapital). Ini melebihi yang semula disetujui, disebut lebih dulu, dan disetujui: alasannya persis sama dengan status di keputusan 8a di bawah, dan memindahkan kepemilikan field tanpa sekalian mengkodekannya berarti menanam ulang cacat yang baru saja dicabut, di dokumen yang sama.
+        - **Rute `validate` satu-satunya penulisnya**, dan ia difilter `menunggu_validasi`. Konsekuensi yang diterima sadar: **sesudah divalidasi, tingkat keparahan tak bisa dikoreksi lewat endpoint mana pun**; satu-satunya jalan keluar menghapus komplainnya. Belum ada yang menuntut koreksi, jadi tidak dibangun.
+        - Nilai kosong berarti "tidak diubah", bukan "kosongkan", supaya klien lama tetap bisa memvalidasi tanpa diam-diam menghapus tingkat yang sudah diisi QC lain.
 
 4. **Produk, SKU, dan pesanan diisi SERVER.** Pengaju hanya mengirim nomor pesanan dan identitas item, yang dari baris ulasan sudah terbawa. Register mengambil nama produk dan SKU dari data pesanan integration-service lalu menyalinnya; nilai serupa dari klien diabaikan. Pesanan yang tak ditemukan ditolak dengan pesan yang menjelaskan sebabnya. Tanpa ulasan, pengaju memasukkan nomor pesanan, server mengeceknya, lalu pengaju memilih produk dari isi pesanan itu. Salinan ini bertanggal dan tak berubah bila datanya kelak disunting, prinsip yang sama dengan ADR 0099 keputusan 4.
    - Register gudang tetap per **pesanan**, tidak per item, dan tetap memverifikasi ke `fulfillment_orders` seperti sekarang. Register QC per **item**.
@@ -159,6 +164,20 @@ berantakan".
 
 8. **Formulir `/icc/komplain-qc` diganti pintu tunggal.** Halaman daftar tetap per unit: `/warehouse/komplain` dan `/quality/komplain`.
 
+   ✅ **Dikerjakan T12 2026-09-21** (kode selesai dan terverifikasi lokal; **belum push, belum PR, belum merge, belum DEV, belum PROD** — jangan dibaca sebagai sudah mendarat). Lima penyimpangan sadar, dicatat supaya tak terbaca sebagai kelalaian:
+
+   a. ⛔ **Rute lama diberi REDIRECT permanen, bukan dibiarkan 404**, walau keputusan ini menulis "diganti". Alasannya bukan kesopanan: redirect ke halaman yang tak ada **gagal SENYAP** di Next.js App Router (200, bukan 404) karena rute dinamis menangkap segmen apa pun, jadi tujuannya dikunci peta teruji `features/quality/complaint/lib/rute-lama.ts` yang memeriksa ke berkas di disk berikut kontrol negatif, bukan URL yang diketik di `page.tsx`.
+
+   b. **`/quality/komplain` jadi halaman GABUNGAN dua audiens**, bukan sekadar halaman QC yang tetap. Keputusan ini tidak menyebut ke mana marketing memantau nasib komplainnya sesudah halamannya hilang, dan jawabannya: entri menu KEDUA berjudul "Komplain ke QC" di Marketing › Pekerjaan Saya menunjuk ke halaman yang sama, pola yang sudah dipakai `/warehouse/komplain`. Konsekuensinya halaman itu WAJIB menggerbangi dirinya sendiri dan tiap aksinya, dan itulah yang menutup butir pertama T15.
+
+   c. ⛔ **Rute itu SENGAJA tidak dimasukkan ke `qualityPrivateRoutes` milik proxy.** Daftar itu mengalihkan siapa pun TANPA peran `quality` ke `/dashboard`, jadi menambahkannya justru akan mengunci marketing dari halaman yang baru saja dijadikan rumahnya — kebalikan dari yang dikerjakan T12. Preseden yang diikuti `/warehouse/komplain`, yang juga dibaca dua audiens dan juga nol kemunculan di `proxy.ts`. Halaman bersama digerbang cerminnya sendiri plus backend, bukan oleh daftar rute per departemen.
+
+   d. **`ComplaintFormModal` TIDAK dihapus** walau keputusan ini menyebutnya diganti, sebab mode UBAH-nya satu-satunya cara mengoreksi komplain yang sudah diajukan dan pintu tunggal tak punya mode itu. ⚠️ Konsekuensinya mode BUAT komponen itu kini **kode mati**: satu-satunya pemanggilnya berkas ujinya sendiri. Dibiarkan menunggu keputusan 4 (pintu tanpa ulasan), bukan dicabut sekarang.
+
+   e. **Komponen pintunya tetap di `features/integration/reviews`**, hanya fungsi murninya yang pindah ke `features/komplain/lib/pintu.ts`. Path di repo di atas menulis `features/komplain/` sebagai rumah formulirnya; yang benar-benar tinggal di sana cuma logika yang bisa diuji tanpa merender Radix.
+
+   ⚠️ **Yang TIDAK ikut mendarat**: pintu **tanpa ulasan** (nomor pesanan dicek server lalu pilih produk) tetap ditunda menunggu endpoint pilih-produk di keputusan 4, jadi T12 melayani pengajuan dari baris ulasan saja. Akibat yang perlu diketahui: sejak tombol buat hilang dari halaman daftar, **tak ada jalan mengajukan komplain QC yang tidak bersumber dari baris ulasan marketplace**, dan tak satu pun layar memberi tahu ke mana harus pergi.
+
 9. **Tidak disambungkan ke CAPA sekarang.** CAPA belum pernah terisi di PROD, jadi sambungan otomatis akan dibangun di atas modul yang belum dipakai. QC membuat CAPA sendiri bila perlu. Ditinjau ulang begitu CAPA benar-benar dipakai.
 
 10. **ADR 0099 keputusan 5, 6, 7, 9, 10, dan 11 tetap berlaku**: kategori dipilih manusia, tujuan tanpa register tidak dipaksakan, "tidak mempan" tidak menjadi komplain, tanpa SLA, hanya Shopee, dan kategori efek samping ditahan. **Keputusan 12 terpicu**: `company_id` dan race `ReplaceOne` register QC dikerjakan bersama perubahan register itu. *Terpenuhi 2026-09-18, keputusan 11 di bawah.*
@@ -177,6 +196,24 @@ berantakan".
 
     f. **Tiga bentrok tulis dijawab 409, bukan ditimpa diam-diam**: validasi QC yang mendarat saat pengaju sedang menyunting, dua penyunting serentak (kunci optimistik `metadata.updated_at`, sebab status saja tidak memisahkan mereka), dan dua staf QC yang memvonis komplain yang sama.
 
+12. **Kosakata status, verdict, dan tingkat keparahan register QC jadi KODE, bukan kalimat** (diputuskan 2026-09-21 saat `/plan` T12, opsi B dari dua yang disajikan; kode selesai, **belum merge**).
+
+    Nilai tersimpan berubah dari `"Menunggu Validasi"` · `"Valid"` · `"Ditolak"` jadi `menunggu_validasi` · `valid` · `ditolak`, dan tingkat keparahan dari `"Ringan"`/`"Sedang"`/`"Berat"` jadi `ringan`/`sedang`/`berat`.
+
+    **Kenapa nilainya, bukan tampilannya saja.** Kolom Status kedua layar QC tak pernah bisa ikut bahasa aktif, sebab yang dirender adalah kalimat Indonesia yang tersimpan di dokumen ([[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]). Register komplain gudang tetangga menyimpan kode huruf kecil lalu memetakannya lewat i18n sejak awal. Membetulkan tampilannya saja berarti memasang peta kalimat-ke-label yang harus dijaga sama dengan disiplin, di dua register yang sudah berbeda kosakata. **Waktunya yang menentukan**: registernya masih **nol dokumen** di PROD (diukur 2026-09-21), jadi perubahan ini tak pernah semurah ini lagi. Begitu komplain pertama masuk, yang sama menjadi migrasi data.
+
+    ⛔ **Ongkosnya: tidak ada urutan deploy yang aman.** Ini pecah-kontrak, bukan penambahan field, jadi konvensi tim "BE sebelum FE, FE fallback aman bila field baru belum ada" **tidak berlaku**. Kedua sisi memeriksa `verdict` KETAT, sehingga jendela rusaknya dua arah: klien lama mengirim `"Valid"` ke backend baru dibalas **400** `verdict harus valid atau ditolak`, dan klien baru mengirim `"valid"` ke backend lama dibalas **400** `verdict harus 'Valid' atau 'Ditolak'`. Kerusakan turunannya senyap: `bolehUbahKomplain` membandingkan status sehingga tombol Ubah hilang untuk semua baris, dan label status jatuh ke kode mentah yang terbaca "memang begitu tampilannya".
+
+    **Yang diputuskan sebagai gantinya** (2026-09-21): tidak ada jendela transisi di backend dan tidak ada migrasi data. Sebelum deploy, **jumlah dokumen `quality_complaint` di PROD diukur ulang tepat saat itu**, bukan dikutip dari catatan; bila masih nol, employee-service dan frontend dinaikkan berdekatan dan jendela rusaknya diterima. ⚠️ Bila ternyata sudah ada dokumen, dokumen berkalimat lama tak cocok filter `menunggu_validasi` sehingga barisnya mustahil disunting (PUT) maupun divonis (validate, 409) dan tombolnya ikut hilang di layar; saat itu keputusan ini menuntut skrip migrasi lebih dulu.
+
+    ⚠️ **Penjaganya hanya dari satu ujung.** Frontend mengunci ketiga nilai sebagai literal di test; sisi Go mengunci status tetapi belum mengunci daftar `severity`. Kontrak lintas-repo yang dijaga satu ujung akan menyimpang diam-diam.
+
+13. **Salinan ulasan di register QC adalah klaim KLIEN, bukan data berprovenans server** (T12, 2026-09-21). Kelima field (`bukti_foto`, `ulasan_comment_id`, `ulasan_channel`, `ulasan_teks`, `ulasan_bintang`) dinamai **persis** seperti register gudang supaya kedua register bisa dibaca dengan kebiasaan yang sama, dan itu memenuhi [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] keputusan 4 untuk jalur QC.
+
+    ⛔ **Tapi aturan isinya TIDAK sama, dan justru kesamaan nama itu yang menyesatkan.** Register gudang membersihkan di server: `bintangUlasanWaras` memaksa nilai di luar 1..5 jadi 0, ketiga string di-`TrimSpace`, dan `sumber` diturunkan dari isinya. Jalur QC mem-`BodyParser` langsung ke model, jadi `ulasan_bintang: 99` tersimpan apa adanya dan tak ada yang memverifikasi bahwa ulasannya ada atau bahwa ia milik toko pengaju. Satu nama, dua domain nilai yang sah — **jangan merata-ratakan kedua register jadi satu angka**. Untuk sekarang rentangnya dijepit di LAYAR (bintang di luar 1..5 tidak digambar), dan menambal di sumbernya masih utang.
+
+    Yang sudah aman: kelimanya **tak pernah masuk daftar putih sunting**, jadi bukti tak bisa berubah sesudah QC mulai memeriksa. Dan sejak T12 buktinya benar-benar **dirender** di dialog validasi; sebelum itu kelima field disimpan tanpa pernah tampil di satu titik pun, sehingga QC memvonis tanpa melihat dasar tudingannya dan pemeriksaan basis data tetap berkata semuanya benar.
+
 ## Consequences
 
 **Yang membaik.** Pengaju tak perlu tahu struktur organisasi, dan keluhan yang salah jenis tidak lagi menghukum packer. Nama produk dan SKU di komplain QC dapat dipercaya karena berasal dari pesanan. Salinan tangan kategori di frontend hilang, sehingga menambah kategori di backend langsung terlihat di pintu.
@@ -189,6 +226,10 @@ berantakan".
 - Komplain atas pesanan yang tak ada di data sistem tidak dapat diajukan sama sekali.
 - Keputusan 11b: pemegang paket "Marketing: Pemegang Akun Toko" yang belum memegang satu toko pun tetap membaca seluruh komplain QC perusahaannya. Di register gudang orang yang sama melihat nol baris. Dua menu yang digerbang izin yang sama karena itu berbeda cakupan, dan itu ditulis terang di [[CORE - RBAC dan Permission Set]] supaya yang memasang paketnya tahu.
 - Keputusan 11a: pemegang toko membaca komplain brand lain di perusahaannya. Yang dipertukarkan adalah kerahasiaan antar-brand demi tabel yang berguna bagi satu tim; bila brand kelak menuntut pemisahan, penyempitnya sudah tersedia begitu keputusan 4 mendarat.
+
+- Keputusan 12: mengubah kosakata nilai membeli layar yang bisa berbahasa dengan harga **jendela deploy yang rusak dua arah** pada rute validate. Dibayar sekarang justru karena registernya masih kosong; menundanya berarti membayar migrasi data untuk keuntungan yang sama.
+- Keputusan 8d: mode BUAT `ComplaintFormModal` jadi kode mati, dan **tak ada jalan mengajukan komplain QC di luar baris ulasan marketplace** sampai keputusan 4 mendarat. Tak satu pun layar memberi tahu itu, jadi orang yang membuka menu "Komplain ke QC" melihat tabel tanpa cara mengisinya.
+- Keputusan 3 (severity): salah pilih tingkat keparahan **permanen**, sebab satu-satunya penulisnya rute validate yang hanya jalan sekali. Belum ada yang menuntut koreksi, jadi tidak dibangun; bila kelak dituntut, itu menuntut rute baru, bukan pelonggaran filter.
 
 **Yang tetap terbuka.** Daftar kategori QC menunggu tim QC. Tujuan ekspedisi dan vendor belum punya tempat (ADR 0099 K1). Kewajiban regulatif efek samping menunggu QA/RA. Komplain QC yang dibuat lewat token layanan tanpa `BIP-Employee-ID` masih berujung `created_by` kosong, dan tabel `/icc/komplain-qc` masih belum menampilkan nama pengajunya; keduanya tak disentuh keputusan 11.
 

@@ -94,8 +94,9 @@ elseif ($jenis -eq 'flutter') {
   $alat = Get-GerbangAlat @('dart', 'flutter')
   if ($alat) { $gerbang += $alat }
   else {
-    $folder = Get-FolderDart $berkas
-    if ($folder.Count -gt 0) { $gerbang += (Invoke-GerbangBatas 'analyze' $top ('dart analyze ' + ($folder -join ' ')) $script:BatasAnalyze) }
+    $fd = Get-FolderDart $berkas
+    if ($fd.terpotong) { $catatan += ("folder .dart tersentuh lebih dari {0}: hanya {0} pertama yang dianalisis, sisanya TIDAK diperiksa" -f $script:BatasFolderDart) }
+    if ($fd.folder.Count -gt 0) { $gerbang += (Invoke-GerbangBatas 'analyze' $top ('dart analyze ' + ($fd.folder -join ' ')) $script:BatasAnalyze) }
     else { $catatan += 'tidak ada berkas .dart tersentuh: dart analyze dilewati' }
     if (-not $TanpaTest) {
       $bl = Read-Baseline $KitRoot $nama

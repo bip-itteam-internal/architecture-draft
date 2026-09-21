@@ -302,6 +302,44 @@ pemakaian dari komentar ke dok.
 
 ---
 
+### G3. Pemeriksaan yang tak bisa dijalankan dihitung LULUS
+
+Kelas saudara §G, tetapi mekanismenya berbeda: bukan satu fakta di dua tempat, melainkan
+**sebuah pemeriksaan yang menghilang lalu ketiadaannya dibaca sebagai hasil baik**. Gagalnya
+selalu senyap dan kalimatnya selalu terdengar benar — "tidak ada yang perlu diperiksa" dan
+"tidak bisa menentukan apa yang perlu diperiksa" tampil sama di layar.
+
+Empat bentuk yang sudah terbukti, semuanya di agent-kit 1.25.0 dan tiga di antaranya baru
+ketahuan saat gerbangnya sendiri dijalankan sungguhan:
+
+- **Daftar pemeriksaan KOSONG dihitung lolos.** `lolos` ditulis sebagai "tak ada yang gagal",
+  dan himpunan kosong memenuhi syarat itu. Empat repo lewat tanpa satu pemeriksaan pun.
+  Yang benar: keputusannya bertumpu pada **apakah kita tahu cara memeriksanya**, bukan pada
+  jumlah pemeriksaan. Tak tahu = GAGAL; tahu tapi memang tak ada yang tersentuh = lolos
+  dengan catatan bahwa lolos itu tidak membuktikan apa pun.
+- **Alat tidak terpasang lalu langkahnya dilewati.** `dart`/`flutter`/`python` yang tak ada di
+  PATH harus menghasilkan pemeriksaan GAGAL bernama, bukan pemeriksaan yang lenyap.
+- **Daftar masukan gagal dihitung, hasilnya himpunan kosong.** `git diff <commit yang tidak
+  kita punya> <lsha>` gagal diam-diam, `touched` kosong, dan tiap cabang membacanya sebagai
+  "tidak ada yang tersentuh". Pastikan masukannya benar-benar ada (`git cat-file -e`); bila
+  tidak bisa dipastikan, **periksa semua**.
+- **Daftar dipotong diam-diam.** Batas jumlah (mis. 20 folder) yang memotong tanpa catatan
+  membuat sebagian perubahan tak diperiksa sementara gerbangnya hijau. Bila memang perlu
+  dibatasi, **ringkas ke atas** (folder induk mencakup anaknya) alih-alih membuang, dan
+  catat sisanya bila masih terpotong.
+
+**Yang dicari saat review**: tiap `if` yang berakhir "lewati", "skip", atau "tidak ada yang
+perlu diperiksa" — tanyakan apakah cabang itu bisa tercapai karena *informasinya hilang*,
+bukan karena *memang tak ada pekerjaan*. Dan tiap `try/except` atau `2>/dev/null` di sekitar
+perintah yang **menentukan apa yang akan diperiksa**.
+
+⚠️ **Test tidak menangkap kelas ini**, dan itu bagian dari definisinya: jalur yang salah
+mengembalikan nilai yang sah, cuma kosong. Yang menangkapnya adalah menjalankan gerbangnya
+sungguhan lalu **membandingkan hasilnya dengan yang Anda tahu benar** ("push ini jelas memuat
+perubahan X, kenapa ia bilang tidak ada?").
+
+---
+
 ## Pass 2 — INFORMASIONAL
 
 ### H. Nama field & tag bson/json
@@ -458,7 +496,8 @@ KRITIS                              INFORMASIONAL
 ├─ Konkurensi & keutuhan data       ├─ Celah test
 ├─ Batas kepercayaan input          ├─ Deploy & konfigurasi
 ├─ Alur pengguna terputus           ├─ Kode mati & konsistensi
-└─ Satu fakta dua tempat (§G)       └─ Abstraksi kelewat dini (§N)
+├─ Satu fakta dua tempat (§G)       └─ Abstraksi kelewat dini (§N)
+└─ Pemeriksaan gagal-terbuka (§G3)
 ```
 
 ---

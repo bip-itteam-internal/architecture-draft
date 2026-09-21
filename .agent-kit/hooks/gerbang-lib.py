@@ -20,7 +20,10 @@ import time
 
 # Batas waktu (detik). `dart analyze` atas SELURUH repo sudah terbukti menggantung di mesin tim,
 # jadi ia dijalankan atas folder tersentuh saja DAN berbatas waktu, terpisah dari `flutter test`.
-BATAS_ANALYZE = 300
+# Angkanya menjaga GANTUNG, bukan lambat: diukur 2026-09-21 di mybharata-app, `dart analyze lib
+# test` selesai 37,2 detik saat sepi. Batas 300 detik sempat KENA sekali ketika mesin sibuk
+# menjalankan suite lain, dan gerbang yang kadang merah karena beban akan dimatikan orang.
+BATAS_ANALYZE = 600
 BATAS_TEST_FLUTTER = 1200
 
 # Lockfile -> pelaksana. URUTAN PENTING: erp-frontend memegang `pnpm-lock.yaml` DAN
@@ -121,9 +124,33 @@ def gerbang_alat(alat):
                      "terpasang tidak boleh membuat pemeriksaannya ikut hilang." % ", ".join(hilang)]}
 
 
-def folder_dart(berkas, batas=20):
-    """Folder yang memuat berkas .dart tersentuh. `dart analyze` seluruh repo menggantung."""
-    return sorted({os.path.dirname(b) or "." for b in berkas if b.endswith(".dart")})[:batas]
+BATAS_FOLDER_DART = 20
+
+
+def folder_dart(berkas, batas=BATAS_FOLDER_DART):
+    """Folder yang memuat berkas .dart tersentuh. `dart analyze` seluruh repo menggantung.
+
+    Folder yang sudah TERCAKUP induknya dibuang: `dart analyze` menganalisis satu folder
+    secara rekursif, jadi mengirim `lib` bersama `lib/src/core/api` menganalisis subpohon yang
+    sama berkali-kali dan memanjangkan baris perintah tanpa menambah satu pun pemeriksaan.
+    Diukur 2026-09-21 di mybharata-app: 21 folder menyusut jadi 1 (`lib`).
+
+    Kembalikan (folder, terpotong). `terpotong` WAJIB diteruskan sebagai catatan: pemotongan
+    diam-diam berarti sebagian perubahan tak dianalisis sementara gerbangnya tetap hijau, yang
+    persis kelas kegagalan yang sedang ditutup rilis ini.
+    """
+    semua = sorted({(os.path.dirname(b) or ".").replace("\\", "/") for b in berkas if b.endswith(".dart")})
+    akar = []
+    for d in semua:
+        if not any(d == a or d.startswith(a + "/") for a in akar):
+            akar.append(d)
+    if len(akar) > batas:
+        # Terlalu banyak folder daun yang tidak bersarang (mis. 20+ folder di bawah `test/`).
+        # Diruntuhkan ke segmen pertama, bukan dipotong: `dart analyze test` mencakup SELURUH
+        # anaknya, jadi ini menambah cakupan sekaligus memendekkan baris perintah. Memotong
+        # justru membuang pemeriksaan diam-diam, yang persis kelas kegagalan rilis ini.
+        akar = sorted({a.split("/")[0] for a in akar})
+    return akar[:batas], len(akar) > batas
 
 
 def berkas_tersentuh(top, base):
@@ -326,7 +353,9 @@ def cmd_gerbang(argv):
         if g:
             gerbang.append(g)
         else:
-            folder = folder_dart(berkas)
+            folder, terpotong = folder_dart(berkas)
+            if terpotong:
+                catatan.append("folder .dart tersentuh lebih dari %d: hanya %d pertama yang dianalisis, sisanya TIDAK diperiksa" % (BATAS_FOLDER_DART, BATAS_FOLDER_DART))
             if folder:
                 gerbang.append(jalankan("analyze", top, "dart analyze " + " ".join(folder), batas=BATAS_ANALYZE))
             else:
@@ -397,6 +426,15 @@ if __name__ == "__main__":
     sub = sys.argv[1] if len(sys.argv) > 1 else ""
     if sub == "gerbang": sys.exit(cmd_gerbang(sys.argv[2:]))
     if sub == "baseline": sys.exit(cmd_baseline(sys.argv[2:]))
-    # `jenis` dipakai test paritas untuk membandingkan kedua implementasi atas fixture yang sama
+    # `jenis` dan `konstanta` dipakai test paritas untuk membandingkan KEDUA implementasi.
+    # Tanpa `konstanta`, nilai yang cuma diubah di satu berkas (batas waktu, peta lockfile,
+    # daftar-izin) menyimpang tanpa satu pun test merah.
     if sub == "jenis": print(jenis_repo(sys.argv[2])); sys.exit(0)
-    print("pakai: gerbang-lib.py gerbang|baseline|jenis ...", file=sys.stderr); sys.exit(2)
+    if sub == "konstanta":
+        print(json.dumps({
+            "batas_analyze": BATAS_ANALYZE, "batas_test_flutter": BATAS_TEST_FLUTTER,
+            "batas_folder_dart": BATAS_FOLDER_DART,
+            "repo_tanpa_gerbang": list(REPO_TANPA_GERBANG),
+            "pm_node": [[b, pm["nama"], pm["jalan"], pm["exec"]] for b, pm in PM_NODE],
+        }, ensure_ascii=False)); sys.exit(0)
+    print("pakai: gerbang-lib.py gerbang|baseline|jenis|konstanta ...", file=sys.stderr); sys.exit(2)
