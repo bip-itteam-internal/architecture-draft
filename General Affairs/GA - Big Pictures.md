@@ -31,6 +31,8 @@ General Affairs ingin punya dashboard untuk menejemen semua aset perusahaan dari
 17. Implementasi Audit Internal System
 18. Implementasi Asset Loan & Room Booking System (peminjaman ruang/aset/kendaraan)
 
+> **Catatan vault (2026-09-21), bukan bagian dari daftar permintaan GA di atas.** [[GA - Ronda Security]] adalah pecahan dari butir 11: ia berangkat dari kebutuhan checklist, tetapi dipisahkan jadi dokumen sendiri karena frekuensinya (tiap 3 jam) tidak muat di mekanisme periode yang dipakai butir 11, dan karena pemiliknya posisi Security, bukan fungsi peralatan.
+
 ## Dependencies
 
 - [ ] [[GA - Accident Prevention]]
@@ -42,6 +44,7 @@ General Affairs ingin punya dashboard untuk menejemen semua aset perusahaan dari
 - [ ] [[GA - Machine & Utility Maintenance]]
 - [ ] [[GA - Procurement System]]
 - [ ] [[GA - Risk Management]]
+- [ ] [[GA - Ronda Security]]
 - [ ] [[GA - Waste Management]]
 - [ ] [[CORE - OCR Document Service]]
 - [ ] [[GA - Guestbook System (Complete)]]
