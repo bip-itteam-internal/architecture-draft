@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-21",
+  "digenerate": "2026-09-22",
   "jumlah_dokumen": 461,
   "dokumen": [
     {
@@ -481,20 +481,20 @@
         "Microservices - Calendar Service",
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI"
       ],
-      "hash": "5c1a686aead9a025e5a3166c83132a93c2053f5804c14baa43f72876c919ce95",
-      "ukuran_kb": 23.5,
-      "ringkasan": "Menjawab: endpoint inventory-service untuk aset GA (item inventaris, kategori, pemetaan kategori ke golongan Accurate, serah-terima dan persetujuan SPV, riwayat perbaikan, upload dokumen presigned) serta opname dan padanan perlengkapan Accurate. Merinci kontrak Booking Ruang `/peminjaman*` (master ruang, slot 30 menit, ajukan, ubah, batal, setujui, tolak, penunjukan penyetuju), lapisan gerbangnya, bentuk data, validasi, kode status aksi, notifikasi, dan feed kalender. Juga memuat kontrak request dan validasi rinci untuk buat, update, dan list item.",
+      "hash": "42d74029290edb1e872c84acc7d2d8ac02a43d3852ce1eaa38c732844c325155",
+      "ukuran_kb": 26.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan inventory-service untuk aset dan inventaris GA, siapa yang boleh memanggil tiap rute, dan bagaimana bentuk request serta validasinya. Mencakup master item dan data-type, CRUD item termasuk serah-terima yang disetujui SPV penaung, repair history, opname perlengkapan per periode (ADR-0067), padanan item Accurate lewat accurate_item_no (ADR-0069), serta seluruh rute Booking Ruang /peminjaman berikut lapisan gerbangnya dan feed kalender.",
       "kata_kunci": [
         "inventory-service",
-        "aset GA",
         "inventaris",
-        "asset tracking",
-        "booking ruang",
-        "peminjaman ruang",
-        "room booking",
+        "aset GA",
         "opname perlengkapan",
-        "serah-terima aset",
-        "repair history"
+        "booking ruang",
+        "peminjaman",
+        "room booking",
+        "repair history",
+        "category-mapping",
+        "endpoint GA"
       ]
     },
     {
@@ -755,6 +755,8 @@
         "APP - Portal Karir Bharata",
         "API - Index",
         "ADR - 0062 Jenjang Jabatan Menggerbangi Pengajuan Requisition Lintas-Departemen",
+        "APP - Web ERP",
+        "HRIS - Dashboard per Posisi",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "API - Employee Service",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
@@ -764,24 +766,20 @@
         "HRIS - Recruitment",
         "CORE - API Master Gateway"
       ],
-      "hash": "9d5fdcd8ecc719de7d03722e37403ad3e6503069ecc4c4fd835cae4220c77fa0",
-      "ukuran_kb": 53.4,
-      "ringkasan": "Menjawab pertanyaan seputar endpoint recruitment-service: alur job requisition, job posting, manpower planning, kandidat, tahapan seleksi (psikotes, interview, offer), dan onboarding, termasuk rekrutmen lintas perusahaan (cross-company) dan endpoint KPI untuk konsumsi mesin. Juga menjelaskan role/RBAC tiap endpoint, portal karir publik, dan status implementasi/deploy per bagian fitur.",
+      "hash": "b97e5fe0aeb10942b76c99e419cff9a3862f015158b986548a1195b78cb20d2e",
+      "ukuran_kb": 56.7,
+      "ringkasan": "Menjawab: endpoint apa saja yang dipakai modul rekrutmen (ATS), role mana yang boleh memanggil tiap rute, dan bagaimana cakupan data dibatasi per perusahaan. Mencakup job requisition beserta pengecualian jenjang direktur dan pengajuan lintas perusahaan, job posting, manpower planning, kandidat, interview dan feedback, offer, onboarding review dan checklist, portal karir publik tanpa JWT, serta rute bahan KPI yang digerbang kunci layanan.",
       "kata_kunci": [
         "recruitment-service",
-        "API",
-        "endpoint",
+        "ATS",
+        "rekrutmen",
         "job requisition",
         "job posting",
-        "manpower planning",
         "candidate",
-        "kandidat",
         "interview",
-        "offer",
-        "onboarding",
+        "manpower planning",
         "portal karir",
-        "rekrutmen lintas perusahaan",
-        "KPI rekrutmen"
+        "lintas perusahaan"
       ]
     },
     {
@@ -1352,20 +1350,20 @@
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "18df906ff5146c74299061cc5ccc51fc6747543966128a36bea887d3f673d57c",
-      "ukuran_kb": 106.5,
-      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata (portal HRIS karyawan PT Bharata, Flutter satu codebase Android/iOS) dan fitur apa saja yang ada di dalamnya — attendance dengan biometric, geofencing dan QR, pengajuan izin/cuti, lembur, slip gaji bergerbang PIN, KPI & task, survei form builder, Kaizen, Pelatihan, Sesi Live Host, Booking Ruang, serta bagaimana menu beranda disusun. Menjawab juga pertanyaan teknis: tech stack dan arsitekturnya (Clean Architecture feature-first, BLoC, get_it, dio + fpdart Either/Failure, go_router, Firebase flavor dev/prod, CI Codemagic), cara autentikasi bekerja (JWT + silent refresh, biometric, PIN, kebijakan 1 akun 1 device), dan bagaimana dukungan multi-perusahaan (tenant) memengaruhi konten dan menu yang tampil per company. Berguna pula untuk menelusuri di mana versi build dan versi rilis aplikasi dicatat (pubspec, tag, GitHub Release, toko) dan mengapa versi yang beredar di HP pemakai harus dikonfirmasi ke pemilik proses, bukan disimpulkan dari repo.",
+      "hash": "6d0bd855cd62d9a04450510a09f22461e10c6a4d721bd1969f4cd60878ad653e",
+      "ukuran_kb": 108.5,
+      "ringkasan": "Menjawab: aplikasi mobile MyBharata itu apa dan fitur HRIS apa saja yang sudah hidup di dalamnya, mulai dari attendance, pengajuan cuti dan izin, lembur, payroll dan slip gaji, KPI dan task, survei form builder, Sesi Live Host, Booking Ruang, sampai pelatihan. Juga menjawab bagaimana arsitektur Clean Architecture feature-first serta tech stack Flutter-nya disusun, bagaimana autentikasi bekerja (JWT, biometric, PIN, satu akun satu device), bagaimana konten dibatasi per perusahaan, dan versi mana yang beredar di HP pemakai dibanding yang ada di branch dev.",
       "kata_kunci": [
         "MyBharata",
-        "my-bharata",
-        "aplikasi mobile karyawan",
-        "mobile app HRIS",
+        "aplikasi mobile",
         "Flutter",
-        "BLoC clean architecture",
-        "absensi mobile",
-        "attendance geofencing biometric QR",
-        "multi-tenant company_id",
-        "versi rilis versionCode"
+        "HRIS mobile",
+        "absensi",
+        "attendance",
+        "pengajuan cuti",
+        "slip gaji",
+        "multi-perusahaan",
+        "versi rilis"
       ]
     },
     {
@@ -2997,22 +2995,28 @@
         "ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen",
         "ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
-        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "HRIS - Dashboard per Posisi"
       ],
-      "hash": "708c8e6212ded2c952e260351029e63997acd890f426160d0ccbb9bf9c5ecefe",
-      "ukuran_kb": 100.4,
-      "ringkasan": "Menjawab: bagaimana pipeline rekrutmen berjalan di backend, mulai job requisition dan alur approval SPV HRD (termasuk kenapa tahap Direktur dihapus), job posting dan sumber pelamar, manajemen kandidat, babak seleksi, sampai offer dan handoff onboarding. Menjelaskan babak seleksi sebagai katalog global interview_round dengan form_type yang menentukan bentuk form penilaian, cara hasil tes menggerakkan progress dan status kandidat (SP-Wiring), dan cara psikotes online menyimpan hasilnya. Juga menjawab bagaimana rekrutmen di-scope per perusahaan lewat company_id, port dan database yang dipakai, cara deploy service ini, serta riwayat tiap increment fiturnya.",
+      "hash": "02c53b9949cf202a330825aae1bec632bc7d85e0e4d4e1a579c919ab3d3ae34b",
+      "ukuran_kb": 102.2,
+      "ringkasan": "Menjawab: bagaimana siklus rekrutmen berjalan di sistem, dari permintaan posisi (job requisition) dan approval-nya, pembukaan lowongan, apply publik kandidat, babak seleksi (interview, psikotes, technical test, background check), sampai offer dan handoff onboarding. Menjelaskan juga bentuk data di `recruitment_db`, bagaimana hasil tes menggerakkan progress/status kandidat (SP-Wiring), peran `form_type` babak dalam menentukan form penilaian di frontend, scoping multi-perusahaan lewat `company_id` dan paket izin, serta bahan KPI rekrutmen. Memuat catatan operasional penting: deploy dev manual (merge bukan berarti deploy) dan urutan BE sebelum FE untuk perubahan kontrak.",
       "kata_kunci": [
-        "recruitment service",
+        "recruitment",
         "rekrutmen",
         "job requisition",
+        "permintaan karyawan",
         "job posting",
+        "lowongan",
         "kandidat",
+        "candidate",
         "interview",
         "psikotes",
         "background check",
         "offer",
-        "portal karir"
+        "onboarding",
+        "portal karir",
+        "recruitment_db"
       ]
     },
     {
@@ -6636,29 +6640,29 @@
         "Microservices - Calendar Service",
         "API - Inventory Service",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
+        "REF - Kepemilikan Data",
         "CORE - RBAC dan Permission Set",
         "RUN - Deploy Microservices bip-erp",
         "Microservices - Inventory Service",
         "Microservices - Notification Service",
         "APP - Web ERP",
         "APP - MyBharata",
-        "REF - Kepemilikan Data",
         "REF - Alur Persetujuan"
       ],
-      "hash": "7ddc4d1678a77030c5ac69f95110566b8f06d4514a91fbddae7e3b51aee2cccd",
-      "ukuran_kb": 12.9,
-      "ringkasan": "Menjawab: kenapa booking ruang rapat dibangun di inventory-service dengan kontrak `/peminjaman`, siapa yang mengajukan dan menyetujui (penyetuju ditunjuk HR per perusahaan, bukan GA atau atasan pemohon), dan kenapa checklist kebersihan serta status Selesai dari desain lama dihapus. Menjelaskan alur status booking, cara mencegah bentrok tanpa transaksi Mongo (kunci sewa per ruang, tulis berpenjaga, cek ulang), dua kategori notifikasi, feed kalender milik pembaca, rencana Booking Ruang sebagai satu sumber ruang kantor dan booking berulang, serta konsekuensi yang diterima.",
+      "hash": "7a11210c6953a079ea67e173bd9fe9b7eb81e54e66351b98feeceeda91390ba7",
+      "ukuran_kb": 13.6,
+      "ringkasan": "Menjawab: kenapa booking ruang rapat dibangun di inventory-service dengan kontrak /peminjaman, siapa yang menyetujui (daftar penyetuju yang ditunjuk HR per perusahaan, bukan tim GA dan bukan atasan pemohon), dan lewat kanal mana pengajuan serta keputusan dilakukan. Juga menjawab status apa saja yang berlaku (tanpa Selesai dan tanpa checklist kebersihan), bagaimana bentrok slot ditahan tanpa transaksi Mongo, kategori notifikasi mana yang dipakai, kenapa kalender memakai feed milik pembaca, dan bagian mana yang sudah diamandemen ADR 0095.",
       "kata_kunci": [
-        "ADR 0094",
         "booking ruang",
         "room booking",
-        "peminjaman ruang",
-        "penyetuju booking",
-        "anti-bentrok",
-        "ga_peminjaman",
-        "PJR",
-        "satu sumber ruang kantor",
-        "MyBharata"
+        "peminjaman",
+        "ADR 0094",
+        "penyetuju ditunjuk HR",
+        "approval",
+        "ruang rapat",
+        "inventory-service",
+        "anti-bentrok slot",
+        "feed kalender"
       ]
     },
     {
@@ -9727,13 +9731,14 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Sebagian sudah ada**. Kelima tab hidup di `/hris` (Ringkasan Divisi HRGA), tetapi tiga di antaranya nyaris kosong dan sebabnya bukan tata letak melainkan ketiadaan data.",
+      "status_teks": "**Sebagian sudah ada**. Kelima tab hidup di `/hris` (Ringkasan Divisi HRGA); **dua** di antaranya nyaris kosong dan sebabnya bukan tata letak melainkan ketiadaan data. Recruitment & Onboarding keluar dari golongan itu 2026-09-22.",
       "publik": true,
       "tautan": [
         "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
         "HRIS - Matriks KPI per Departemen",
         "GA - Dashboard per Posisi",
         "ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI",
+        "ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal",
         "REF - Layout Dashboard erp-frontend",
         "HRIS - Training Program",
         "Microservices - Learning Service",
@@ -9742,20 +9747,23 @@
         "HRIS - Pengembangan Organisasi (Community of Interest)",
         "HRIS - Key Performance Index"
       ],
-      "hash": "fc93348e9ec04cbaef07fc0fdbae2c732af3f71bde03fd173cb97d345ddca187",
-      "ukuran_kb": 14.3,
-      "ringkasan": "Menjawab: apa yang seharusnya tampil di tab dashboard `/hris` untuk tiap posisi Human Resource (HRD Supervisor, Personalia, Culture & Industrial, Recruitment & Onboarding, Training & Performance Officer) dibanding yang tampil hari ini, diturunkan dari metrik KPI, antrean, dan ambang sesuai ADR 0076. Juga menjawab metrik KPI mana per posisi yang sudah punya sumber data dan mana yang belum, kenapa beberapa tab tampak kosong, visual utama apa yang tepat (mis. sebaran skor terhadap ambang 70, bukan rata-rata), kebutuhan backend yang harus didahulukan, serta kenapa HRGA bukan nama departemen.",
+      "hash": "619f2f7d7ccab0dcf9d70cf7c938b87887c32dc938ffef18e8d3ad3e1cc0ef33",
+      "ukuran_kb": 17.1,
+      "ringkasan": "Menjawab: apa yang seharusnya tampil di dashboard `/hris` untuk tiap posisi divisi Human Resource (HRD Supervisor, Personalia, Culture & Industrial, Recruitment & Onboarding, Training & Performance Officer), dan kenapa sebagian tab tampak kosong. Untuk tiap posisi ia memetakan metrik KPI beserta bobot, sumber datanya, dan apakah sumber itu sudah ada, lalu menyimpulkan visual utama yang layak ditampilkan sekarang versus yang masih menunggu backend. Memuat juga alasan kenapa HRGA adalah label grup supervisi dan bukan nama departemen, serta urutan kebutuhan backend.",
       "kata_kunci": [
+        "dashboard",
         "dashboard per posisi",
-        "position dashboard",
-        "/hris",
+        "HRIS",
         "HRGA",
+        "KPI",
         "matriks KPI",
-        "sumber KPI",
         "HRD Supervisor",
         "Personalia",
         "Culture & Industrial",
-        "ADR 0076"
+        "Recruitment & Onboarding",
+        "Training & Performance Officer",
+        "bobot metrik",
+        "kelayakan"
       ]
     },
     {
@@ -12720,20 +12728,20 @@
         "Microservices - Inventory Service",
         "Microservices - Marketing Analytics Service"
       ],
-      "hash": "7bb011713b2e995e984c1e597c0ac071953903ab4a09842107cea56ed202e8ca",
-      "ukuran_kb": 65.6,
-      "ringkasan": "Menjawab: siapa pemilik tiap fakta bisnis di ERP (service dan koleksi mana yang memegangnya), siapa yang boleh menulisnya, lewat jalan mana service lain boleh membacanya, salinan mana yang sah beserta arah dan penjaganya, dan duplikasi mana yang belum diputuskan. Dipakai sebelum membangun penyimpanan atau fitur atas fakta yang mungkin sudah dimiliki modul lain, agar tidak lahir sumber kebenaran kedua. Memuat empat aturan kepemilikan, tabel peta fakta ke pemilik, daftar pengecualian ADR 0002 yang masih hidup di kode, dan bagian yang belum dipetakan.",
+      "hash": "51d7e4f2c5ea47fb20c5324bd7467408fe972a88057338398eb50857d88f6034",
+      "ukuran_kb": 65.9,
+      "ringkasan": "Menjawab: fakta bisnis mana dimiliki service dan koleksi mana, siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Dipakai sebagai tempat mencari sebelum membangun penyimpanan baru atas fakta yang mungkin sudah dimiliki departemen lain, dan memuat empat aturan kepemilikan, syarat sebuah salinan disebut sah beserta arah dan penjaganya, pengecualian ADR 0002 yang masih hidup di kode, duplikasi yang belum diputuskan, dan service yang belum dipetakan.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
+        "sumber kebenaran",
         "source of truth",
+        "duplikasi data",
+        "salinan data",
         "database-per-service",
-        "duplikasi fakta",
-        "salinan data SyncCollection",
-        "ADR 0002",
-        "MODULE_URL internal",
-        "master data",
-        "satu fakta satu tempat"
+        "SyncCollection",
+        "satu fakta satu tempat",
+        "peta pemilik fakta"
       ]
     },
     {
