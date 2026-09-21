@@ -90,12 +90,14 @@ kit_ver="$(tr -d '[:space:]' < "$kit_root/VERSION")"
 sed -e "s/__KIT_VERSION__/$kit_ver/g" -e "s/__ACTIVE_PROJECT__/$active/g" \
   "$kit_root/templates/workspace-CLAUDE.md" > "$claude/CLAUDE.md"
 
-# git hooks lokal (pre-push) lewat core.hooksPath ABSOLUT per repo kode; yang sudah punya
-# hooksPath lain (mis. husky) dilewati, bukan ditimpa.
+# git hooks lokal (pre-push) lewat core.hooksPath ABSOLUT per repo kode DAN vault; yang sudah
+# punya hooksPath lain (mis. husky) dilewati, bukan ditimpa.
+# VAULT IKUT sejak 1.25.0 (ADR 0077 par 4); push dokumentasi tetap seketika karena gerbangnya
+# menyaring path lebih dulu (hooks/gerbang-kit.py).
 githooks="$claude/hooks/githooks"
 dipasang=""; dilewati=""
 if [ "$no_githooks" -eq 0 ]; then
-  for p in "${projects[@]}"; do
+  for p in "${projects[@]}" architecture-draft; do
     dir="$ws/$p"
     existing="$(git -C "$dir" config --get core.hooksPath 2>/dev/null || true)"
     if [ -n "$existing" ] && [ "$existing" != "$githooks" ]; then dilewati="$dilewati $p(sudah:$existing)"; continue; fi

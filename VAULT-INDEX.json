@@ -5931,20 +5931,20 @@
         "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
         "DEVELOPER GUIDE"
       ],
-      "hash": "c595c7bb712f2c58deab02edcca89126e7f82b93566a4928751cf8d634e1f2cd",
-      "ukuran_kb": 22.3,
-      "ringkasan": "Menjawab: kenapa agent tidak diberi wewenang merge ke branch utama dan berhenti di PR, gerbang apa yang dipasang LOKAL sebagai gantinya (pre-commit hook, pre-push, judge dua lapis), dan syarat apa yang harus dipenuhi sebelum batas otonomi itu ditinjau ulang, yaitu adanya mekanisme yang benar-benar bisa menolak dengan exit code, bukan kalimat di dalam prosa. Memuat juga tabel substitusi dari dokumen rujukan yang diusulkan ke apa yang benar-benar dibangun di agent-kit, termasuk peran eksekutor per lapisan tim IT dan eksekusi paralel dua brief yang ditambahkan 2026-09-21.",
+      "hash": "daca9b96f4663c86b7c311c72af4ab9c0e461fc8dd0f4ff87ac2e31e4b305bbd",
+      "ukuran_kb": 23.0,
+      "ringkasan": "Menjawab: kenapa agent AI berhenti di PR dan tidak diberi wewenang merge ke branch utama, gerbang apa yang harus berdiri lebih dulu supaya ada mekanisme yang benar-benar bisa menolak (gerbang lokal ber-exit code, bukan GitHub Actions yang seluruh workflow-nya mati), dan syarat apa yang harus dipenuhi sebelum wewenang itu dilepas. Juga menjawab bagian mana dari usulan AI Engineering Loop yang ditolak atau disubstitusi beserta alasannya, yaitu orkestrasi Trigger.dev diganti agen Claude Code plus papan sesi berkas, mix model multi-vendor diganti tingkatan Claude sonnet/opus/fable, judge dijadikan dua lapis mesin plus penilai, dan supervisor hanya menulis draft tanpa auto-apply.",
       "kata_kunci": [
         "ADR 0077",
         "otonomi agent",
-        "merge",
-        "gerbang",
-        "pre-push",
-        "judge",
+        "wewenang merge",
         "AI Engineering Loop",
+        "gerbang repo",
+        "pre-commit",
+        "pre-push",
         "agent-kit",
-        "exit code",
-        "loop-devops"
+        "judge",
+        "supervisor"
       ]
     },
     {
@@ -9830,25 +9830,27 @@
         "CORE - RBAC dan Permission Set",
         "Microservices - Notification Service",
         "APP - Web ERP",
+        "REF - Alur Persetujuan",
+        "RUN - Deploy Microservices bip-erp",
         "HRIS - Big Pictures",
         "HRIS - Attendance System",
         "Microservices - Employee Service",
         "APP - MyBharata"
       ],
-      "hash": "71dc0a17bbcaf1c5946f300bf27e7989b2b044340d5007078b3276263e25e285",
-      "ukuran_kb": 14.3,
-      "ringkasan": "Menjawab: jenis pengajuan karyawan apa saja yang ada (Izin/Cuti/Sakit, Dinas, Koreksi absen, Tukar jadwal, Lembur menyusul), siapa reviewer tiap tahap (SPV lalu HRD), dan bagaimana infrastruktur review bersama di attendance service bekerja (koleksi, endpoint, model ReviewData/ReviewStatus, resolusi status, penentuan reviewer, notifikasi, apply-to-attendance). Menjawab juga: siapa yang berhak melihat dan memutuskan semua pengajuan lewat endpoint admin HR (izin hris.pengajuan.view dan hris.pengajuan.approve beserta fallback union departemen Human Resource dan posisi Cost Control), serta kenapa tahap HRD kadang duduk di slot spv_status. Berisi pula aturan penunjukan pengganti saat atasan menyetujui (siapa kandidatnya, kapan disimpan, kapan pemberitahuan dikirim, dan kenapa karyawan bershift belum didukung) plus temuan pengajuan yang mati karena didiamkan.",
+      "hash": "928f304d3b681881280073eafd3a05ca359d4ca05862893af9b94d3152c7eaa3",
+      "ukuran_kb": 16.6,
+      "ringkasan": "Menjawab: jenis pengajuan HR apa saja yang ada (Izin/Cuti/Sakit, Dinas, Koreksi clock-in/out, Tukar jadwal, dan Lembur yang belum mengikuti pola ini), siapa yang meninjau di tiap tahap (SPV lalu HRD), serta izin apa yang dibutuhkan untuk melihat dan memutuskan pengajuan lewat endpoint admin GET /hr/requests. Juga menjawab bagaimana atasan menunjuk rekan pengganti saat menyetujui cuti atau dinas, siapa yang sah jadi kandidat pengganti, dan komponen bersama di attendance service (ReviewData, resolusi status, getSupervisorData, notifikasi, apply-to-attendance) yang dipakai semua jenis request. Memuat pula temuan pengukuran kenapa sebagian pengajuan mati karena didiamkan: jalur Direktur tanpa penerima, notifikasi yang tak bisa diklik, dan pengajuan yang jatuh di hari Sabtu.",
       "kata_kunci": [
         "pengajuan karyawan",
         "employee request",
-        "approval",
-        "persetujuan berjenjang",
+        "approval berjenjang",
         "SPV",
         "HRD",
-        "reviewer",
-        "hr/requests",
+        "hris.pengajuan.approve",
         "pengganti",
-        "replacement"
+        "replacement",
+        "tukar jadwal",
+        "koreksi absen"
       ]
     },
     {
@@ -11367,7 +11369,7 @@
       "area": "IT",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)**, agent-kit **1.15.0** (2026-09-06), terakhir berubah di **1.24.0** (2026-09-21, peran agent per lapisan tim IT dan eksekusi paralel); bagian lain diperiksa ulang ke kit 1.19.0 pada 2026-09-15. Sumber: `architecture-draft/.agent-kit/` (`agents/`, `commands/`, `hooks/`, `baseline/`), disebar lewat `init` + restart sesi. Catatan: (1) gerbang lokal bisa dilewati `--no-verify`, disadari; (2) papan sesi berkas satu mesin; (3) baseline test diukur sekali 2026-09-06 dan wajib diukur ulang saat `main` bergerak jauh; (4) `/supervise` menulis draft, tidak pernah auto-apply; (5) agent berhenti di PR, merge tetap manusia; (6) **gerbang kit atas dirinya sendiri belum berjalan**, tak ada yang otomatis menjalankan `tests/test-init.ps1` maupun pytest `Tools/`; (7) **repo selain Node dan Go (mis. `mybharata-app`) tidak punya gerbang deterministik**, jadi lapis mesin `/judge` lolos tanpa memeriksa apa pun di sana; (8) **Kantor Agent membaca dua format internal Claude Code**, registri sesi `~/.claude/sessions` dan transkrip, jadi bisa patah di rilis mana pun; kerusakannya tampil sebagai banner (registri dicocokkan dengan `claude agents --json` yang terdokumentasi), bukan kantor kosong.",
+      "status_teks": "**Implemented (ada catatan)**, agent-kit **1.15.0** (2026-09-06), terakhir berubah di **1.25.0** (2026-09-21, dua lubang gerbang ditutup); bagian lain diperiksa ulang ke kit 1.19.0 pada 2026-09-15. Sumber: `architecture-draft/.agent-kit/` (`agents/`, `commands/`, `hooks/`, `baseline/`), disebar lewat `init` + restart sesi. Catatan: (1) gerbang lokal bisa dilewati `--no-verify`, disadari; (2) papan sesi berkas satu mesin; (3) baseline test diukur sekali 2026-09-06 dan wajib diukur ulang saat `main` bergerak jauh; (4) `/supervise` menulis draft, tidak pernah auto-apply; (5) agent berhenti di PR, merge tetap manusia; (6) ✅ gerbang kit atas dirinya sendiri **berjalan sejak 1.25.0** lewat `pre-push` vault, tetapi ia menyala hanya bila push menyentuh `.agent-kit/` atau `Tools/` dan bisa dilewati sadar lewat `AGENTKIT_SKIP_KIT_TESTS=1`; `tests/kantor-agent-browser.ps1` sengaja tetap manual; (7) ✅ **nol gerbang tidak lagi dihitung lulus sejak 1.25.0**, jenis `flutter` dikenali dan `node` menerima lockfile apa pun, tetapi logikanya masih punya **dua implementasi** (`.ps1` untuk Windows, `.py` untuk mac/linux) yang dijaga test paritas alih-alih disatukan; (8) **Kantor Agent membaca dua format internal Claude Code**, registri sesi `~/.claude/sessions` dan transkrip, jadi bisa patah di rilis mana pun; kerusakannya tampil sebagai banner (registri dicocokkan dengan `claude agents --json` yang terdokumentasi), bukan kantor kosong.",
       "publik": false,
       "tautan": [
         "ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak",
@@ -11380,20 +11382,20 @@
         "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
         "IT - SOP Dokumentasi Vault"
       ],
-      "hash": "8b92a3c6e53ffbfadc31f0a4b9c4bb97b198d7df526658dd114327114d3c118e",
-      "ukuran_kb": 29.5,
-      "ringkasan": "Menjawab: gerbang apa yang menolak commit di branch utama repo kode dan push yang gagal pemeriksaan dasar, bagaimana papan sesi dan Kantor Agent memperlihatkan sesi Claude Code mana sedang mengerjakan apa, peran apa saja yang dipakai eksekutor loop (FE, BE, Mobile, DevOps, QA, Penulis) dan bagaimana eksekutornya dipilih dari domain kali repo, serta kapan dua brief boleh dikerjakan paralel. Menjelaskan juga batas tiap mekanisme: gerbang yang masih bisa dilewati --no-verify, repo selain Node dan Go yang tak punya gerbang deterministik, dan format internal Claude Code yang dibaca Kantor Agent sehingga bisa patah di rilis mana pun.",
+      "hash": "10af850fe6ea147cc31324d831525be9f3c7614a53a347d9ab1e64fffa8da6d6",
+      "ukuran_kb": 35.5,
+      "ringkasan": "Menjawab: gerbang otomatis apa saja yang menjaga repo bip-erp, erp-frontend, dan vault di mesin developer (hook pre-commit Claude Code yang menolak commit di branch utama lewat exit 2, git hook pre-push yang menjalankan tsc/lint/build atau go build, dan gerbang kit atas dirinya sendiri), bagaimana memasangnya lewat init, serta cara melewatinya secara sadar (--no-verify, AGENTKIT_SKIP_BUILD, AGENTKIT_SKIP_KIT_TESTS). Menjawab juga bagaimana loop otonom /brief ke /kerjakan berjalan sampai PR dengan penilaian dua lapis dan mengapa merge tetap manusia, serta apa yang ditampilkan papan sesi, dashboard, dan Kantor Agent untuk melihat sesi kerja mana sedang mengerjakan apa. Memuat jebakan yang sudah terbukti, antara lain lingkungan GIT_* yang diwariskan git hook sehingga skrip test mengubah repo nyata alih-alih sandbox.",
       "kata_kunci": [
         "gerbang repo",
         "pre-commit",
         "pre-push",
+        "git hook",
+        "agent-kit",
         "papan sesi",
         "Kantor Agent",
-        "loop otonom",
-        "peran agent",
-        "paralel",
-        "brief",
-        "agent-kit"
+        "AI Engineering Loop",
+        "kerjakan judge PR",
+        "ADR 0077"
       ]
     },
     {

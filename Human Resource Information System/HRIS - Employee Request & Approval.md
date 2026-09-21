@@ -102,6 +102,18 @@ Pemberitahuannya ditujukan ke `SpvReview.EmployeeID` yang baru saja dikosongkan 
 
 Terukur: **15 pengajuan pernah masuk jalur ini (8 cuti + 7 dinas), 15-15nya mati, nol disetujui.** ⚠️ **Tujuh di antaranya SESUDAH [[APP - Web ERP]] §Ruang Direktur hidup (2026-08-10)**, yang terbaru **2026-09-19** — jadi layar itu tidak menyembuhkannya, dan memang tak bisa: ia hanya menolong orang yang datang melihat, sementara tak ada apa pun yang memanggilnya. Yang terkena lapisan pimpinan sendiri (Kyura Supervisor 3×, HRD Supervisor 3×, Leader 3×, Quality Supervisor 2×, dan lainnya).
 
+#### ⚠️ Perbaikannya: siaran departemen, dan siapa yang benar-benar menerimanya
+
+Diperbaiki di dua jalur terpisah yang berbagi sebab yang sama, keduanya merged 2026-09-21: bip-erp [#1985](https://github.com/bip-itteam-internal/bip-erp/pull/1985) untuk jalur **pembuatan**, dan [#1986](https://github.com/bip-itteam-internal/bip-erp/pull/1986) untuk **pengingat T+18 jam** (`cron.go`, tiap jam tepat) — kesempatan terakhir sebelum sistem menandai `Diabaikan`. Memperbaiki yang pertama saja tidak cukup, dan itu tidak terlihat dari jalur pertama.
+
+Keduanya memakai `sendDepartmentNotification` ke `Kesekretariatan` dengan kategori `request-waiting-review` yang **sudah** terdaftar, jadi tak ada kategori inbox baru dan tak ada perubahan di MyBharata maupun erp-frontend.
+
+⚠️ **Penerimanya lebih luas daripada yang berwenang memutus, dan itu disengaja.** Siaran pergi ke seluruh anggota Kesekretariatan yang punya perangkat mobile aktif ber-token, sementara yang boleh memutus hanya dua nama jabatan (`common.SetaraDirektur`: `direktur`, `corporate secretary`) — sejalan dengan catatan di [[REF - Alur Persetujuan]] bahwa staf Kesekretariatan memang sudah MELIHAT antrean ini lewat pencocokan departemen.
+
+Diukur prod 2026-09-21 (meniru filter `/list?type=fcm-token&platform=mobile` persis): departemen itu berisi **11** orang, **8** punya perangkat aktif ber-token, dan **kedua** yang berwenang termasuk di dalamnya. ⛔ Angka itu **keadaan, bukan aturan** — ukur ulang sebelum dipakai. Risikonya nyata: daftar penerima ditarik dari perangkat mobile, jadi bila yang berwenang berhenti memakai MyBharata daftarnya kosong dan kegagalannya **identik** dengan bug yang baru saja ditambal. #1986 karena itu menambahkan log `tak punya anggota berperangkat aktif` supaya kejadian berikutnya berbunyi alih-alih diam.
+
+🟡 **Status per 2026-09-21: merged, PROD BELUM.** Gerbang biner di `Attendance-Service` (`grep -c berperangkat /service`) masih **0**, dengan kontrol positif 11 dan kontrol negatif 0. Perintah deploy dan gerbang verifikasi lapangannya ada di `.task-plans/2026-09-21-deploy-notif-direktur.md`; prosedur induknya [[RUN - Deploy Microservices bip-erp]]. ⛔ **Status 200 tidak membuktikan apa pun di kelas ini** — buktinya dokumen `notification_db.inbox` yang bertambah untuk penerima yang berwenang, dan baseline pembandingnya sudah diambil.
+
 ### ⛔ 2. Notifikasi "menunggu persetujuan" tak bisa diklik ke mana pun
 
 **2.312 dari 2.312** dokumen `notification_db.inbox` berkategori `request-waiting-review` punya `action` **kosong**: tanpa `app_route`, tanpa `web_route`. Bandingkan kategori lain yang membawanya: `form-submitted` (1.051) dan `form-published` (950) ber-`app_route`, `task-created` 712 ber-`app_route` dan 545 bahkan ber-`web_route`.

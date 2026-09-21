@@ -5,16 +5,42 @@ Dipanggil oleh gerbang.sh dan baseline-test.sh. Alasan desain ada di berkas .ps1
 Bentuk nama test yang disimpan di baseline dan dibandingkan gerbang HARUS sama dengan versi .ps1:
   vitest : '<path relatif>/<file> > <fullName>'   dan '<file> > (gagal dimuat)'
   go     : 'services/<svc>:<Package>.<Test>'        dan 'services/<svc>:<Package>.(paket gagal)'
+  flutter: '<path relatif>/<file> > <nama test>'
 Baseline yang ditulis di Windows harus bisa dibaca di mac dan sebaliknya.
 """
 import datetime
 import glob
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
 import time
+
+# Batas waktu (detik). `dart analyze` atas SELURUH repo sudah terbukti menggantung di mesin tim,
+# jadi ia dijalankan atas folder tersentuh saja DAN berbatas waktu, terpisah dari `flutter test`.
+# Angkanya menjaga GANTUNG, bukan lambat: diukur 2026-09-21 di mybharata-app, `dart analyze lib
+# test` selesai 37,2 detik saat sepi. Batas 300 detik sempat KENA sekali ketika mesin sibuk
+# menjalankan suite lain, dan gerbang yang kadang merah karena beban akan dimatikan orang.
+BATAS_ANALYZE = 600
+BATAS_TEST_FLUTTER = 1200
+
+# Lockfile -> pelaksana. URUTAN PENTING: erp-frontend memegang `pnpm-lock.yaml` DAN
+# `package-lock.json` sekaligus (diukur 2026-09-21), jadi menebak dari keberadaan salah satunya
+# memakai resolver yang salah. Gagalnya bukan "perintah tidak ada", melainkan dependensi berversi
+# lain yang tetap jalan.
+PM_NODE = (
+    ("pnpm-lock.yaml", {"nama": "pnpm", "jalan": "pnpm", "exec": "pnpm exec"}),
+    ("package-lock.json", {"nama": "npm", "jalan": "npm run", "exec": "npx --no-install"}),
+    ("yarn.lock", {"nama": "yarn", "jalan": "yarn", "exec": "yarn"}),
+    ("bun.lockb", {"nama": "bun", "jalan": "bun run", "exec": "bunx"}),
+    ("bun.lock", {"nama": "bun", "jalan": "bun run", "exec": "bunx"}),
+)
+
+# Repo yang memang TIDAK punya suite mesin. Lubang yang disengaja dan diberi nama, supaya ia
+# terbaca sebagai keputusan alih-alih kelalaian. Repo KODE tidak boleh masuk sini.
+REPO_TANPA_GERBANG = ("architecture-draft",)
 
 
 def git(top, *args):
@@ -38,12 +64,93 @@ def nama_repo(path):
     return os.path.basename(os.path.dirname(c)) if c else None
 
 
+def pm_node(top):
+    """Pelaksana Node dibaca dari LOCKFILE, tidak pernah ditebak. None = tak ada lockfile dikenali."""
+    for berkas, pm in PM_NODE:
+        if os.path.exists(os.path.join(top, berkas)):
+            return pm
+    return None
+
+
 def jenis_repo(top):
-    if os.path.exists(os.path.join(top, "package.json")) and os.path.exists(os.path.join(top, "pnpm-lock.yaml")):
+    if os.path.exists(os.path.join(top, "pubspec.yaml")):
+        return "flutter"
+    if os.path.exists(os.path.join(top, "package.json")) and pm_node(top):
         return "node"
     if glob.glob(os.path.join(top, "services", "*", "go.mod")):
         return "go"
     return "lain"
+
+
+def putuskan_lolos(gerbang, nama, jenis):
+    """Nol gerbang BUKAN lulus. Kembalikan (lolos, catatan-atau-None).
+
+    Sampai 1.24.0 `lolos` dihitung sebagai "tak ada gerbang yang gagal", dan daftar KOSONG
+    memenuhi syarat itu. Akibatnya repo yang jenisnya tak dikenali dinyatakan lolos tanpa satu
+    pemeriksaan pun, lalu /judge mengalikannya dengan verdict agen seolah lapis mesin sudah
+    bekerja. Diukur 2026-09-21: empat repo lewat begitu.
+
+    Yang menentukan adalah JENIS repo, bukan jumlah gerbang. Keduanya sama-sama berakhir "nol
+    gerbang", tetapi artinya berlawanan: jenis 'lain' berarti kita TIDAK TAHU cara memeriksanya,
+    sedangkan repo Go yang branch-nya cuma menyentuh README berarti memang tidak ada yang perlu
+    diperiksa. Menolak yang kedua membuat gerbangnya berbunyi untuk pekerjaan yang benar, dan
+    gerbang yang begitu dimatikan orang.
+    """
+    # Gerbang yang BENAR-BENAR berjalan selalu menang. Daftar-izin di bawah hanya menjawab
+    # pertanyaan "tidak ada yang berjalan, lalu apa"; ia bukan kekebalan terhadap gerbang merah.
+    if gerbang:
+        return all(g["lolos"] for g in gerbang), None
+    if jenis == "lain":
+        if nama in REPO_TANPA_GERBANG:
+            return True, ("repo '%s' ada di daftar-izin REPO_TANPA_GERBANG: nol gerbang diterima "
+                          "SADAR karena repo ini tidak punya suite mesin" % nama)
+        return False, ("JENIS REPO TIDAK DIKENALI untuk '%s', jadi tidak ada satu pun gerbang yang "
+                       "bisa dijalankan: itu dihitung GAGAL, bukan lolos. Dua jalan keluar yang "
+                       "sah: tambah cabang jenis repo di gerbang-lib (.ps1 DAN .py), atau "
+                       "masukkan repo ini ke daftar-izin REPO_TANPA_GERBANG dengan alasan "
+                       "tertulis." % nama)
+    return True, ("jenis repo '%s' dikenali, tetapi tidak ada satu pun pemeriksaan yang perlu "
+                  "dijalankan (tidak ada yang tersentuh, atau dilewati lewat flag). Lolos ini "
+                  "TIDAK membuktikan apa pun tentang kode." % jenis)
+
+
+def gerbang_alat(alat):
+    """Alat yang tidak terpasang menghasilkan gerbang GAGAL, bukan gerbang yang lenyap."""
+    hilang = [a for a in alat if not shutil.which(a)]
+    if not hilang:
+        return None
+    return {"nama": "alat", "lolos": False, "exit": 127, "durasi_detik": 0.0,
+            "ekor": ["alat tidak ada di PATH: %s. Gerbang GAGAL, bukan dilewati: alat yang tak "
+                     "terpasang tidak boleh membuat pemeriksaannya ikut hilang." % ", ".join(hilang)]}
+
+
+BATAS_FOLDER_DART = 20
+
+
+def folder_dart(berkas, batas=BATAS_FOLDER_DART):
+    """Folder yang memuat berkas .dart tersentuh. `dart analyze` seluruh repo menggantung.
+
+    Folder yang sudah TERCAKUP induknya dibuang: `dart analyze` menganalisis satu folder
+    secara rekursif, jadi mengirim `lib` bersama `lib/src/core/api` menganalisis subpohon yang
+    sama berkali-kali dan memanjangkan baris perintah tanpa menambah satu pun pemeriksaan.
+    Diukur 2026-09-21 di mybharata-app: 21 folder menyusut jadi 1 (`lib`).
+
+    Kembalikan (folder, terpotong). `terpotong` WAJIB diteruskan sebagai catatan: pemotongan
+    diam-diam berarti sebagian perubahan tak dianalisis sementara gerbangnya tetap hijau, yang
+    persis kelas kegagalan yang sedang ditutup rilis ini.
+    """
+    semua = sorted({(os.path.dirname(b) or ".").replace("\\", "/") for b in berkas if b.endswith(".dart")})
+    akar = []
+    for d in semua:
+        if not any(d == a or d.startswith(a + "/") for a in akar):
+            akar.append(d)
+    if len(akar) > batas:
+        # Terlalu banyak folder daun yang tidak bersarang (mis. 20+ folder di bawah `test/`).
+        # Diruntuhkan ke segmen pertama, bukan dipotong: `dart analyze test` mencakup SELURUH
+        # anaknya, jadi ini menambah cakupan sekaligus memendekkan baris perintah. Memotong
+        # justru membuang pemeriksaan diam-diam, yang persis kelas kegagalan rilis ini.
+        akar = sorted({a.split("/")[0] for a in akar})
+    return akar[:batas], len(akar) > batas
 
 
 def berkas_tersentuh(top, base):
@@ -70,17 +177,23 @@ def services_tersentuh(top, berkas):
     return sorted(s)
 
 
-def jalankan(nama, cwd, cmd):
+def jalankan(nama, cwd, cmd, batas=None):
     t = time.time()
-    r = subprocess.run(cmd, cwd=cwd, shell=True, capture_output=True, text=True)
-    out = (r.stdout + r.stderr).splitlines()
-    return {"nama": nama, "lolos": r.returncode == 0, "exit": r.returncode,
+    try:
+        r = subprocess.run(cmd, cwd=cwd, shell=True, capture_output=True, text=True, timeout=batas)
+        out = (r.stdout + r.stderr).splitlines()
+        rc = r.returncode
+    except subprocess.TimeoutExpired as e:
+        out = ((e.stdout or "") + (e.stderr or "")).splitlines() if isinstance(e.stdout, str) else []
+        out.append("LEWAT BATAS WAKTU %s detik: proses dihentikan, gerbang dianggap GAGAL." % batas)
+        rc = 124
+    return {"nama": nama, "lolos": rc == 0, "exit": rc,
             "durasi_detik": round(time.time() - t, 1), "ekor": out[-25:], "semua": out}
 
 
-def vitest_json(top):
+def vitest_json(top, pm):
     tmp = os.path.join(tempfile.gettempdir(), "vitest-%d.json" % os.getpid())
-    g = jalankan("test", top, 'pnpm exec vitest run --reporter=json --outputFile="%s"' % tmp)
+    g = jalankan("test", top, '%s vitest run --reporter=json --outputFile="%s"' % (pm["exec"], tmp))
     gagal, jumlah, terurai = [], 0, False
     if os.path.exists(tmp):
         try:
@@ -123,6 +236,38 @@ def gotest_json(top, svc):
                 gagal.append("services/%s:%s.%s" % (svc, e.get("Package", ""), e.get("Test", "")))
         elif e.get("Action") == "fail" and e.get("Package"):
             gagal.append("services/%s:%s.(paket gagal)" % (svc, e.get("Package", "")))
+    return {"gerbang": g, "jumlah": jumlah, "gagal": sorted(set(gagal)), "terurai": terurai}
+
+
+def fluttertest_json(top):
+    """`flutter test --machine`: satu JSON per baris, nama test hanya ada di event testStart."""
+    g = jalankan("test", top, "flutter test --machine", batas=BATAS_TEST_FLUTTER)
+    nama_test, gagal, jumlah, terurai = {}, [], 0, False
+    tl = top.replace("\\", "/").rstrip("/")
+    for line in g["semua"]:
+        line = line.strip()
+        if not line.startswith("{"):
+            continue
+        try:
+            e = json.loads(line)
+        except Exception:
+            continue
+        terurai = True
+        if e.get("type") == "testStart":
+            t = e.get("test", {})
+            rel = (t.get("url") or t.get("root_url") or "").replace("\\", "/")
+            if rel.startswith("file:///"):
+                rel = rel[len("file:///"):]
+            if rel.lower().startswith(tl.lower()):
+                rel = rel[len(tl):].lstrip("/")
+            nama_test[t.get("id")] = "%s > %s" % (rel, t.get("name", ""))
+        elif e.get("type") == "testDone":
+            # `hidden` menandai test sintetis milik runner (loading berkas), bukan test yang ditulis
+            if e.get("hidden"):
+                continue
+            jumlah += 1
+            if e.get("result") != "success":
+                gagal.append(nama_test.get(e.get("testID"), "(test %s)" % e.get("testID")))
     return {"gerbang": g, "jumlah": jumlah, "gagal": sorted(set(gagal)), "terurai": terurai}
 
 
@@ -180,16 +325,18 @@ def cmd_gerbang(argv):
     berkas = berkas_tersentuh(top, base)
     gerbang, catatan = [], []
     if jenis == "node":
+        pm = pm_node(top)
+        catatan.append("pelaksana Node dari lockfile: %s" % pm["nama"])
         pkg = json.load(open(os.path.join(top, "package.json"), encoding="utf-8"))
         scripts = pkg.get("scripts", {})
         for s in ("tsc", "lint"):
-            if s in scripts: gerbang.append(jalankan(s, top, "pnpm " + s))
+            if s in scripts: gerbang.append(jalankan(s, top, "%s %s" % (pm["jalan"], s)))
             else: catatan.append("skrip '%s' tidak ada di package.json" % s)
         if "build" in scripts:
             if tanpa_build: catatan.append("BUILD DILEWATI atas permintaan (--tanpa-build); jalankan sebelum merge")
-            else: gerbang.append(jalankan("build", top, "pnpm build"))
+            else: gerbang.append(jalankan("build", top, "%s build" % pm["jalan"]))
         if not tanpa_test:
-            t = vitest_json(top); bl = read_baseline(kit, nama)
+            t = vitest_json(top, pm); bl = read_baseline(kit, nama)
             if bl is None: catatan.append("TIDAK ADA BASELINE untuk '%s' di %s/baseline; kegagalan test TIDAK dibandingkan dengan apa pun. Buat dengan baseline-test.sh." % (nama, kit))
             gerbang.append(gerbang_test("test", t, bl))
             if not t["terurai"]: catatan.append("keluaran vitest JSON tidak terurai; gerbang test dianggap GAGAL")
@@ -201,10 +348,31 @@ def cmd_gerbang(argv):
         for s in svcs:
             gerbang.append(jalankan("build:" + s, os.path.join(top, "services", s), "go build ./..."))
             if not tanpa_test: gerbang.append(gerbang_test("test:" + s, gotest_json(top, s), bl))
+    elif jenis == "flutter":
+        g = gerbang_alat(["dart", "flutter"])
+        if g:
+            gerbang.append(g)
+        else:
+            folder, terpotong = folder_dart(berkas)
+            if terpotong:
+                catatan.append("folder .dart tersentuh lebih dari %d: hanya %d pertama yang dianalisis, sisanya TIDAK diperiksa" % (BATAS_FOLDER_DART, BATAS_FOLDER_DART))
+            if folder:
+                gerbang.append(jalankan("analyze", top, "dart analyze " + " ".join(folder), batas=BATAS_ANALYZE))
+            else:
+                catatan.append("tidak ada berkas .dart tersentuh: dart analyze dilewati")
+            if not tanpa_test:
+                bl = read_baseline(kit, nama)
+                if bl is None: catatan.append("TIDAK ADA BASELINE untuk '%s'; kegagalan test TIDAK dibandingkan dengan apa pun." % nama)
+                t = fluttertest_json(top)
+                gerbang.append(gerbang_test("test", t, bl))
+                if not t["terurai"]: catatan.append("keluaran flutter test --machine tidak terurai; gerbang test dianggap GAGAL")
     else:
+        if os.path.exists(os.path.join(top, "package.json")):
+            catatan.append("package.json ada tetapi tidak ada lockfile yang dikenali (pnpm/npm/yarn/bun): pelaksana tidak bisa dibaca, dan menebaknya memakai resolver yang salah")
         catatan.append("jenis repo 'lain': tidak ada gerbang deterministik")
     keluar = [tanpa_semua(g) for g in gerbang]
-    lolos = all(g["lolos"] for g in keluar)
+    lolos, catatan_lolos = putuskan_lolos(keluar, nama, jenis)
+    if catatan_lolos: catatan.append(catatan_lolos)
     hasil = {"repo": nama, "jenis": jenis, "path": top, "branch": git(top, "symbolic-ref", "--short", "HEAD"),
              "commit": git(top, "rev-parse", "--short", "HEAD"), "base": base, "waktu": now_iso(),
              "berkas_tersentuh": berkas, "gerbang": keluar, "catatan": catatan, "lolos": lolos}
@@ -230,7 +398,9 @@ def cmd_baseline(argv):
     nama, jenis = nama_repo(top), jenis_repo(top)
     t0 = time.time(); gagal, jumlah, terurai, catatan = [], 0, False, []
     if jenis == "node":
-        t = vitest_json(top); gagal, jumlah, terurai = t["gagal"], t["jumlah"], t["terurai"]
+        t = vitest_json(top, pm_node(top)); gagal, jumlah, terurai = t["gagal"], t["jumlah"], t["terurai"]
+    elif jenis == "flutter":
+        t = fluttertest_json(top); gagal, jumlah, terurai = t["gagal"], t["jumlah"], t["terurai"]
     elif jenis == "go":
         for s in (services or semua_service(top)):
             print("  go test services/%s ..." % s)
@@ -256,4 +426,15 @@ if __name__ == "__main__":
     sub = sys.argv[1] if len(sys.argv) > 1 else ""
     if sub == "gerbang": sys.exit(cmd_gerbang(sys.argv[2:]))
     if sub == "baseline": sys.exit(cmd_baseline(sys.argv[2:]))
-    print("pakai: gerbang-lib.py gerbang|baseline ...", file=sys.stderr); sys.exit(2)
+    # `jenis` dan `konstanta` dipakai test paritas untuk membandingkan KEDUA implementasi.
+    # Tanpa `konstanta`, nilai yang cuma diubah di satu berkas (batas waktu, peta lockfile,
+    # daftar-izin) menyimpang tanpa satu pun test merah.
+    if sub == "jenis": print(jenis_repo(sys.argv[2])); sys.exit(0)
+    if sub == "konstanta":
+        print(json.dumps({
+            "batas_analyze": BATAS_ANALYZE, "batas_test_flutter": BATAS_TEST_FLUTTER,
+            "batas_folder_dart": BATAS_FOLDER_DART,
+            "repo_tanpa_gerbang": list(REPO_TANPA_GERBANG),
+            "pm_node": [[b, pm["nama"], pm["jalan"], pm["exec"]] for b, pm in PM_NODE],
+        }, ensure_ascii=False)); sys.exit(0)
+    print("pakai: gerbang-lib.py gerbang|baseline|jenis|konstanta ...", file=sys.stderr); sys.exit(2)
