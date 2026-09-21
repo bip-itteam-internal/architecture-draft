@@ -44,6 +44,15 @@ Tiga keterbatasan yang menempel pada angkanya, dan semuanya berasal dari bentuk 
 
 ⚠️ Saat dashboard penuh dibangun nanti: **tanggal keluar yang dipercaya adalah `effective_date`, bukan `applied_at`.** Keduanya bisa berbeda bila catatan dibuat mundur atau cron sempat tak jalan.
 
+### ⛔ Ada MESIN KEDUA yang menghitung headcount, dan metodenya berbeda
+
+T3 [[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]] (🔜 branch bip-erp `feat/employee-headcount-periode`, belum merge per 2026-09-21) menambahkan `GET /kpi/headcount-periode` yang menjawab pertanyaan yang **terdengar sama** tetapi dihitung dengan cara lain. Siapa pun yang membandingkan kedua angka perlu tahu ini lebih dulu, sebab selisihnya bukan bug.
+
+- Rekonstruksi di halaman ini memakai **selisih**: kurangi yang keluar, tambah yang masuk, mundur dari keadaan sekarang. Itu sah untuk **perusahaan utuh** saja, dan penolakannya untuk cakupan di bawah perusahaan sudah dikunci uji — mutasi antar departemen tak tercatat sebagai keluar maupun masuk, jadi per departemen ia menghitung mutasi sebagai pengunduran diri.
+- Mesin T3 merekonstruksi **per orang** lewat `employee_movement`, sehingga mutasi memindahkan orangnya antar sel tanpa mengubah total. Itulah satu-satunya cara memecah headcount per departemen dan posisi.
+- **Konsekuensinya kedua angka tidak akan sama persis**, dan itu diterima sadar. Mengalihkan `/resign/summary/riwayat` ke mesin T3 adalah pekerjaan tersendiri (keputusan 2026-09-21): perubahan angka yang sudah dilihat HR di kartu turnover tidak boleh menyelinap bersama fitur baru.
+- Keterbatasan kedua di atas ("buta terhadap penonaktifan yang tak lewat menu Resign") **tidak hilang** di mesin T3; ia justru diangkat jadi gerbang. Bulan lampau **menolak menjawab** selama masih ada akun non-aktif tanpa catatan keluar (24 per 2026-09-21), dan penolakan itu mencabut dirinya sendiri begitu HRD menambal. Rincian: [[Microservices - Employee Service]].
+
 ## Dokumen Terkait
 
 - [[HRIS - Retention]] — counterpart (yang bertahan)

@@ -199,6 +199,21 @@ Kopling ini berbeda lagi dari §3 dan §3a: bukan urutan panggilan, bukan isi bi
 >
 > Keenam metrik yang bergantung pada pasangan env ini didaftar di [[HRIS - Matriks KPI per Departemen]] §Recruitment & Onboarding; cara menambah kunci semacam ini beserta rutenya di [[RUN - Menambah Metrik KPI Otomatis]]. Batas baca recruitment (12 detik, `batasBacaKPIRekrutmen`) sengaja lebih pendek daripada batas klien employee (15 detik) supaya pemanggil tak menyerah lebih dulu tanpa sebab; keduanya dijaga test pemindai lintas service, jangan dinaikkan sendiri-sendiri.
 
+> 🔜 **`EMPLOYEE_SERVICE_KEY`** (kolom Aktual lembar MPP, T3 [[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]]; branch bip-erp `feat/employee-headcount-periode`, **belum merge & belum deploy** per 2026-09-21) membalik arah pasangan `RECRUITMENT_SERVICE_KEY` di atas: kali ini **penerima**-nya `employee-service` (`GET /kpi/headcount-periode`, digerbang `GerbangKunciHeadcount` **sesudah** `ValidateGateway`, jadi header `BIP-Gateway-ID` tetap wajib di samping `key`; kunci kosong **menutup** rute dengan 401 dan service menuliskannya ke log saat boot). **Pengirimnya recruitment-service menyusul di T5**, jadi hari ini env-nya dipasang di **SATU blok saja** — `employee-service` di `docker-compose.yml` dan `docker-compose.dev.yml`. Blok `recruitment-service` sudah punya `EMPLOYEE_MODULE_URL`, jadi nanti benar-benar cuma menambah satu baris.
+>
+> ```bash
+> docker compose up -d --build --force-recreate employee-service --no-deps
+> ```
+>
+> Gerbangnya, dan **`docker ps` maupun `/health` tidak diterima sebagai bukti**:
+>
+> 1. **Env-nya ada dan BUKAN hash string kosong.** `docker inspect Employee-Service`: hash `EMPLOYEE_SERVICE_KEY` bukan `e3b0c44298fc…` (pelajaran `FINANCE_SERVICE_KEY` di atas — compose cuma memperingatkan "variable is not set. Defaulting to a blank string"). Isi `.env` **sebelum** pipeline menaikkan containernya; kalau terlewat, containernya naik berkunci kosong dan harus dibuat ulang.
+> 2. **Rutenya membaca, dan tertutup tanpa kunci.** Dari dalam jaringan docker, dengan header `BIP-Gateway-ID`: `GET http://employee-service:<port>/kpi/headcount-periode?periode=<bulan berjalan>&company_id=BIP&key=<kunci>` harus **200** ber-`dapat_dihitung:true` dan `sumber:"status_akun"`. Permintaan yang sama **tanpa `key=`** harus **401**.
+> 3. ⚠️ **Bulan LAMPAU akan membalas `dapat_dihitung:false` dan itu BENAR**, bukan kegagalan deploy: gerbangnya menolak selama masih ada akun non-aktif tanpa catatan keluar (24 per 2026-09-21, lintas seluruh tenant). Ia mencabut dirinya sendiri begitu HRD menambal, **tanpa deploy ulang** — jadi jangan menjadwalkan rilis kedua untuk itu. Bandingkan `akun_tanpa_catatan_keluar` di responsnya dengan `total` milik `GET /resign/non-aktif-tanpa-catatan`.
+> 4. **Bandingkan dua sel acak** dengan `GET /data-type/headcount?department=..&position=..`. Harus sama persis; selisih berarti definisi "aktif" sudah bercabang.
+>
+> ⚠️ Lewat gateway rutenya **ikut di-cache Redis** (modul `employee` tak ada di `noCacheModules`, dan path ini belum terdaftar di `noCacheRoutes` bersama empat rute `/api/employee/kpi/*` lain yang sudah dikecualikan). Verifikasi yang dijalankan lewat gateway karena itu bisa dilayani dari cache dan membaca biner lama sebagai baru; **ukur dari dalam jaringan docker**, sama seperti pasangan kunci layanan lainnya.
+
 | Container | Perannya | Bila env-nya kosong |
 |---|---|---|
 | `form-builder-service` | penerima: `GET /internal/satgas/metrics` memeriksa `key` | rute menolak **semua** pemanggil dengan 401 (gagal tertutup) |
