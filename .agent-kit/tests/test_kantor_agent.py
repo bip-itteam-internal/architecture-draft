@@ -969,3 +969,87 @@ def test_loop_keluar_4_bila_penulis_lain_memegang_kunci(lingkungan):
         assert not (ws / ".task-plans" / "kantor-agent-data.js").exists()
     finally:
         kunci.close()
+
+
+# ---------------------------------------------------------------- pos departemen (1.27.0)
+
+@pytest.mark.parametrize("path,harapan", [
+    (r"c:\ws\bip-erp\services\finance\ar.go", "Finance"),
+    ("erp-frontend/src/features/finance/piutang/page.tsx", "Finance"),
+    ("erp-frontend/src/app/(main)/kas-kecil/page.tsx", "Finance"),
+    ("bip-erp/services/employee/kpi_auto.go", "HRGA"),
+    ("erp-frontend/src/features/hris/dashboard/kartu.tsx", "HRGA"),
+    ("erp-frontend/src/features/ga/aset/page.tsx", "HRGA"),
+    ("mybharata-app/lib/src/core/api/api.dart", "HRGA"),
+    ("erp-frontend/src/features/marketing/toko.tsx", "Marketing"),
+    ("bip-erp/services/marketing-analytics/main.go", "Marketing"),
+    ("erp-frontend/src/app/(main)/icc/page.tsx", "Marketing"),
+    ("architecture-draft/.agent-kit/hooks/kantor-agent.py", "Tech Development"),
+    ("erp-frontend/src/features/it/menu.tsx", "Tech Development"),
+    ("bip-erp/services/warehouse/komplain.go", "Warehouse"),
+    ("erp-frontend/src/features/warehouse-sadewa/x.tsx", "Warehouse"),
+    ("bip-erp/services/inventory/opname.go", "Warehouse"),
+    ("bip-erp/services/procurement/po.go", "Procurement"),
+    ("erp-frontend/src/features/quality/x.tsx", "Quality"),
+    ("erp-frontend/src/features/legal/x.tsx", "Legal"),
+    ("erp-frontend/src/features/rnd/x.tsx", "R&D Regulatory"),
+    ("bip-erp/services/manufacture/x.go", "Manufaktur"),
+    ("erp-frontend/src/app/(main)/secretary/x.tsx", "Kesekretariatan"),
+])
+def test_pos_dari_path(path, harapan):
+    assert ka.pos_dari_path(path) == harapan
+
+
+@pytest.mark.parametrize("path", [
+    "bip-erp/services/insentive/hitung.go",      # bisa dibaca Finance maupun Marketing
+    "bip-erp/services/integration/accurate.go",  # sama
+    "bip-erp/services/calendar/providers.go",    # lintas departemen
+    "README.md",
+    "",
+])
+def test_pos_dari_path_yang_ambigu_tidak_ditebak(path):
+    # None = "belum tahu", dan pemanggil menaruhnya di pos Umum yang menyatakan dirinya sendiri.
+    # Menebak akan mendudukkan robot di departemen orang lain tanpa satu pun tanda.
+    assert ka.pos_dari_path(path) is None
+
+
+def test_pos_potongan_dipagari_pemisah_bukan_substring():
+    # 'it' tak boleh mencomot 'audit', dan 'ga' tak boleh mencomot 'manga'.
+    assert ka.pos_dari_path("repo/audit/laporan.go") is None
+    assert ka.pos_dari_path("repo/manga/x.ts") is None
+
+
+def test_pos_potongan_lebih_spesifik_selalu_ditulis_lebih_dulu():
+    """Invariannya yang dijaga, bukan gejalanya.
+
+    Hari ini SETIAP pasangan generik/spesifik yang ada kebetulan jatuh ke pos yang sama
+    (`warehouse` dan `warehouse-sadewa`, `marketing` dan `marketing-analytics`), jadi salah
+    urut belum bergejala dan test yang memeriksa hasil pemetaan akan hijau untuk urutan apa
+    pun. Yang bisa merah adalah invariannya, dan itulah yang menjaga entri BERIKUTNYA tidak
+    lahir di urutan yang salah diam-diam.
+    """
+    for i, (generik, _) in enumerate(ka.PETA_POS):
+        for j, (spesifik, _) in enumerate(ka.PETA_POS):
+            if i < j and spesifik != generik and spesifik.startswith(generik):
+                raise AssertionError(
+                    "'%s' lebih spesifik daripada '%s' tetapi ditulis SESUDAHnya, jadi tak akan "
+                    "pernah tercapai" % (spesifik, generik))
+
+
+@pytest.mark.parametrize("masukan,harapan", [
+    ({"file_path": "bip-erp/services/finance/x.go"}, "Finance"),
+    ({"notebook_path": "x/features/hris/a.ipynb"}, "HRGA"),
+    ({"path": "erp-frontend/src/features/legal"}, "Legal"),
+    ({"command": "cd bip-erp/services/finance && go build"}, None),  # isi shell sengaja tak diurai
+    ({"pattern": "finance"}, None),
+    ({}, None),
+    (None, None),
+])
+def test_pos_dari_masukan(masukan, harapan):
+    assert ka.pos_dari_masukan(masukan) == harapan
+
+
+def test_pos_semua_nilai_peta_ada_di_daftar_pos():
+    # Pos yang tak terdaftar tak akan punya tempat di denah, dan robotnya hilang tanpa galat.
+    for _, pos in ka.PETA_POS:
+        assert pos in ka.POS

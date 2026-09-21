@@ -90,6 +90,75 @@ PERAN = {
 }
 
 
+# Pos departemen di denah. Nama dan pengelompokannya keputusan pemilik 2026-09-21, dan namanya
+# GROUNDED ke `deptKeyToNames` (bip-erp `shared-library/common/roles.go`), bukan dikarang.
+# Dua penyimpangan yang disengaja dan dicatat:
+#   - `Human Resource` + `General Affair` digabung jadi `HRGA`, dan itu justru selaras dengan
+#     master data: HRGA adalah `supervision_label` keduanya, bukan departemen tersendiri.
+#   - `Beauty Hacks` + `Kyura` digabung jadi `Marketing`, yang di `deptKeyToNames` memang TIDAK
+#     punya key sama sekali (dicatat komentar di berkas itu sendiri sebagai lubang yang hidup
+#     di produksi). `Warehouse` juga tak punya key di sana padahal modulnya besar di dua repo;
+#     memasukkannya adalah keputusan kit ini, bukan turunan dari peta itu.
+POS = (
+    "HRGA", "Marketing", "Tech Development", "Kesekretariatan", "Finance", "Procurement",
+    "Warehouse", "Manufaktur", "Quality", "Legal", "R&D Regulatory", "Printing",
+)
+POS_UMUM = "Umum"
+
+# Potongan path -> pos. Dicocokkan pada path yang sudah dinormalkan (pemisah `/`, huruf kecil,
+# berpagar `/` di kedua ujung), dan yang PERTAMA cocok menang.
+#
+# ⛔ Yang ambigu sengaja TIDAK dipetakan. `services/insentive` dan `services/integration` bisa
+# dibaca Finance maupun Marketing, dan robot yang duduk di pos KELIRU tidak berbunyi apa pun,
+# sementara robot di pos `Umum` menyatakan dirinya sendiri. Salah-petak lebih buruk daripada
+# tidak memetakan.
+PETA_POS = (
+    ("marketing-analytics", "Marketing"), ("marketing-insight", "Marketing"),
+    ("marketing-po", "Marketing"), ("marketing", "Marketing"),
+    ("tiktok-shop-service", "Marketing"), ("icc", "Marketing"),
+    ("hris", "HRGA"), ("ga", "HRGA"), ("employee", "HRGA"), ("attendance", "HRGA"),
+    ("payroll", "HRGA"), ("recruitment", "HRGA"), ("learning", "HRGA"),
+    ("hrd-document", "HRGA"), ("psikotes", "HRGA"), ("mybharata-app", "HRGA"),
+    (".agent-kit", "Tech Development"), ("architecture-draft", "Tech Development"),
+    ("it", "Tech Development"), ("monitoring", "Tech Development"), ("vault-mcp", "Tech Development"),
+    ("secretary", "Kesekretariatan"),
+    ("finance", "Finance"), ("kas-kecil", "Finance"), ("pembukuan-pengajuan", "Finance"),
+    ("procurement", "Procurement"), ("pengajuan-barang", "Procurement"),
+    ("warehouse-sadewa", "Warehouse"), ("warehouse", "Warehouse"), ("inventory", "Warehouse"),
+    ("manufacture", "Manufaktur"), ("quality", "Quality"), ("legal", "Legal"), ("rnd", "R&D Regulatory"),
+)
+
+
+def pos_dari_path(p):
+    """Pos departemen dari sebuah path berkas, atau None bila tak ada yang cocok.
+
+    None BUKAN kegagalan: ia berarti "belum tahu", dan pemanggil menaruhnya di pos Umum yang
+    menyatakan dirinya sendiri. Menebak akan mendudukkan robot di departemen orang lain tanpa
+    satu pun tanda.
+    """
+    s = "/" + str(p or "").replace("\\", "/").strip("/").lower() + "/"
+    for potongan, pos in PETA_POS:
+        if ("/" + potongan + "/") in s:
+            return pos
+    return None
+
+
+def pos_dari_masukan(masukan):
+    """Pos dari input sebuah tool. Hanya field yang MEMANG path yang dibaca.
+
+    Isi perintah shell sengaja tidak diurai: path di dalamnya bercampur argumen dan pola, dan
+    menebaknya mengembalikan kelas salah-petak yang PETA_POS justru dibuat untuk menghindarinya.
+    """
+    m = masukan if isinstance(masukan, dict) else {}
+    for kunci in ("file_path", "notebook_path", "path"):
+        nilai = m.get(kunci)
+        if isinstance(nilai, str) and nilai:
+            pos = pos_dari_path(nilai)
+            if pos:
+                return pos
+    return None
+
+
 def area_alat(nama):
     # tool MCP dan tool yang tak dikenal: ruang server dengan nama aslinya, TIDAK ditebak dari namanya
     return AREA_ALAT.get(str(nama or ""), "server")
@@ -217,7 +286,7 @@ def urai(kejadian):
     Aturan `latar` ada di `lacak_latar`, bersama pelacak bertahap per berkas.
     Tipe selain user/assistant/queue-operation (attachment, ...) tidak mengubah keadaan; ai-title
     dan pr-link hanya dibaca sebagai label."""
-    judul = pr = cwd = None
+    judul = pr = cwd = pos = None
     tertunda = OrderedDict()
     tunda_latar = OrderedDict()
     latar = OrderedDict()
@@ -241,6 +310,10 @@ def urai(kejadian):
             for b in pesan.get("content") or []:
                 if isinstance(b, dict) and b.get("type") == "tool_use":
                     tertunda[b.get("id")] = (b.get("name"), b.get("input"), o.get("timestamp"))
+                    # Pos hanya BERGANTI bila ada path yang dikenali; path tak dikenali tidak
+                    # menariknya kembali ke Umum, kalau tidak sesi akan bolak-balik tiap kali
+                    # membaca satu berkas di luar modulnya.
+                    pos = pos_dari_masukan(b.get("input")) or pos
             if pesan.get("stop_reason") == "end_turn":
                 tertunda.clear()
             akhir = o
@@ -258,8 +331,8 @@ def urai(kejadian):
             if not ada_hasil:
                 tertunda.clear()  # prompt baru dari user
             akhir = o
-    return {"judul": judul, "pr": pr, "cwd": cwd, "tertunda": tertunda, "latar": latar, "akhir": akhir,
-            "dikenal": dikenal}
+    return {"judul": judul, "pr": pr, "cwd": cwd, "pos": pos, "tertunda": tertunda, "latar": latar,
+            "akhir": akhir, "dikenal": dikenal}
 
 
 _PECAHAN_LEBIH = re.compile(r"(\.\d{6})\d+")
@@ -627,11 +700,13 @@ def _urai_berkas(path, st, awal, terlihat):
     kejadian, d, r = baca_ekor(path, awal)
     u = urai(kejadian)
     u["latar"] = OrderedDict(_latar_berkas(path, st.st_size))
-    if lama:  # judul dan PR bisa jatuh di luar ekor yang pendek: pertahankan yang terakhir terlihat
+    if lama:  # judul, PR, dan pos bisa jatuh di luar ekor yang pendek: pertahankan yang terakhir terlihat
         if u["judul"] is None:
             u["judul"] = lama[1][0]["judul"]
         if u["pr"] is None:
             u["pr"] = lama[1][0]["pr"]
+        if u["pos"] is None:
+            u["pos"] = lama[1][0].get("pos")
     _CACHE[path] = (kunci, (u, d, r))
     return u, d, r
 
@@ -714,6 +789,7 @@ def kumpulkan(proyek_dir, workspace, sekarang, registri_dir=None, hidup=None):
         rusak += r2
         mulai = kit.get("mulai") or (_iso(e.get("mulai")) if e else None) or "~"
         sesi.append(dict(id=sid, judul=_potong(u["judul"] or kit.get("task") or "", 90), tahap=kit.get("tahap") or "",
+                         pos=u.get("pos") or POS_UMUM,
                          pr=u["pr"], asal=e.get("asal") if e else None, nama=e.get("nama") if e else None,
                          pid=e.get("pid") if e else None, status_proses=e.get("status") if e else None,
                          menunggu=e.get("menunggu") if e else None,
