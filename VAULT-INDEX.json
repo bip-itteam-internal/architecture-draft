@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-21",
+  "digenerate": "2026-09-22",
   "jumlah_dokumen": 461,
   "dokumen": [
     {
@@ -11362,7 +11362,7 @@
       "area": "IT",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)**, agent-kit **1.15.0** (2026-09-06), terakhir berubah di **1.25.0** (2026-09-21, dua lubang gerbang ditutup); bagian lain diperiksa ulang ke kit 1.19.0 pada 2026-09-15. Sumber: `architecture-draft/.agent-kit/` (`agents/`, `commands/`, `hooks/`, `baseline/`), disebar lewat `init` + restart sesi. Catatan: (1) gerbang lokal bisa dilewati `--no-verify`, disadari; (2) papan sesi berkas satu mesin; (3) baseline test diukur sekali 2026-09-06 dan wajib diukur ulang saat `main` bergerak jauh; (4) `/supervise` menulis draft, tidak pernah auto-apply; (5) agent berhenti di PR, merge tetap manusia; (6) ✅ gerbang kit atas dirinya sendiri **berjalan sejak 1.25.0** lewat `pre-push` vault, tetapi ia menyala hanya bila push menyentuh `.agent-kit/` atau `Tools/` dan bisa dilewati sadar lewat `AGENTKIT_SKIP_KIT_TESTS=1`; `tests/kantor-agent-browser.ps1` sengaja tetap manual; (7) ✅ **nol gerbang tidak lagi dihitung lulus sejak 1.25.0**, jenis `flutter` dikenali dan `node` menerima lockfile apa pun, tetapi logikanya masih punya **dua implementasi** (`.ps1` untuk Windows, `.py` untuk mac/linux) yang dijaga test paritas alih-alih disatukan; (8) **Kantor Agent membaca dua format internal Claude Code**, registri sesi `~/.claude/sessions` dan transkrip, jadi bisa patah di rilis mana pun; kerusakannya tampil sebagai banner (registri dicocokkan dengan `claude agents --json` yang terdokumentasi), bukan kantor kosong.",
+      "status_teks": "**Implemented (ada catatan)**, agent-kit **1.15.0** (2026-09-06), terakhir berubah di **1.27.0** (2026-09-21, Kantor Agent dibagi jadi pos per departemen); bagian lain diperiksa ulang ke kit 1.19.0 pada 2026-09-15. Sumber: `architecture-draft/.agent-kit/` (`agents/`, `commands/`, `hooks/`, `baseline/`), disebar lewat `init` + restart sesi. Catatan: (1) gerbang lokal bisa dilewati `--no-verify`, disadari; (2) papan sesi berkas satu mesin; (3) baseline test diukur sekali 2026-09-06 dan wajib diukur ulang saat `main` bergerak jauh; (4) `/supervise` menulis draft, tidak pernah auto-apply; (5) agent berhenti di PR, merge tetap manusia; (6) ✅ gerbang kit atas dirinya sendiri **berjalan sejak 1.25.0** lewat `pre-push` vault, tetapi ia menyala hanya bila push menyentuh `.agent-kit/` atau `Tools/` dan bisa dilewati sadar lewat `AGENTKIT_SKIP_KIT_TESTS=1`; `tests/kantor-agent-browser.ps1` sengaja tetap manual; (7) ✅ **nol gerbang tidak lagi dihitung lulus sejak 1.25.0**, jenis `flutter` dikenali dan `node` menerima lockfile apa pun, tetapi logikanya masih punya **dua implementasi** (`.ps1` untuk Windows, `.py` untuk mac/linux) yang dijaga test paritas alih-alih disatukan; (8) **Kantor Agent membaca dua format internal Claude Code**, registri sesi `~/.claude/sessions` dan transkrip, jadi bisa patah di rilis mana pun; kerusakannya tampil sebagai banner (registri dicocokkan dengan `claude agents --json` yang terdokumentasi), bukan kantor kosong.",
       "publik": false,
       "tautan": [
         "ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak",
@@ -11372,23 +11372,24 @@
         "RUN - Onboarding Developer Baru",
         "IT - Development Apps and Tools",
         "IT - Papan Aktivitas Developer",
+        "Microservices - Employee Service",
         "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
         "IT - SOP Dokumentasi Vault"
       ],
-      "hash": "2f697e79f8c1e7cdeb61e508753e30150fafa2ff078eb31a45bd20cbf1d2fb9c",
-      "ukuran_kb": 36.7,
-      "ringkasan": "Menjawab: gerbang otomatis apa saja yang menjaga repo kode di mesin developer (hook pre-commit Claude Code yang menolak commit di branch utama lewat exit 2, dan git hook pre-push yang menjalankan tsc/lint/build untuk repo Node atau go build per service untuk bip-erp), bagaimana cara melewatinya secara sadar (AGENTKIT_SKIP_BUILD, AGENTKIT_SKIP_KIT_TESTS, --no-verify), dan kenapa vault architecture-draft dikecualikan dari larangan commit di main. Menjawab juga: bagaimana loop otonom /brief ke /kerjakan berjalan lewat worktree dan agen domain, dinilai dua lapis oleh gerbang mesin dan agen /judge, lalu berhenti di PR karena merge tetap manusia; serta apa itu papan sesi, dashboard, dan Kantor Agent yang menampilkan sesi Claude Code hidup sebagai robot di denah kantor. Memuat jebakan yang sudah terbukti menggigit, misalnya lingkungan GIT_* yang diwariskan git ke hook-nya sehingga skrip test mengenai repo yang sedang di-push alih-alih sandbox, dan matcher hook yang cuma Bash sehingga tak pernah menyala untuk git lewat PowerShell.",
+      "hash": "700cf66052397e5c38258bcac661824fee2e4528894fd039d26ca33456d242e0",
+      "ukuran_kb": 40.6,
+      "ringkasan": "Menjawab: gerbang otomatis apa yang menahan commit dan push di repo kode ERP (hook pre-commit Claude Code dan git pre-push lewat core.hooksPath), kenapa gerbangnya dipasang lokal di mesin developer alih-alih di GitHub Actions, dan bagaimana cara melewatinya secara sadar (AGENTKIT_SKIP_BUILD, AGENTKIT_SKIP_KIT_TESTS, --no-verify). Menjawab juga: bagaimana loop otonom /brief ke /kerjakan berjalan sampai PR dengan merge tetap di tangan manusia, serta bagaimana papan sesi, dashboard, dan Kantor Agent menampilkan sesi Claude Code yang sedang hidup beserta alat yang sedang dipakainya. Memuat jebakan yang sudah terbukti menggigit, antara lain lingkungan GIT_* yang diwariskan git hook sehingga skrip test sandbox justru mengubah repo nyata, dan daftar berkas yang tak bisa ditentukan harus menyalakan gerbang, bukan mematikannya.",
       "kata_kunci": [
         "agent-kit",
-        "gerbang repo",
+        "gerbang lokal",
         "pre-commit hook",
-        "pre-push",
-        "core.hooksPath",
+        "pre-push hook",
+        "git hook",
         "papan sesi",
         "Kantor Agent",
         "AI Engineering Loop",
-        "/kerjakan",
-        "/judge"
+        "loop otonom /brief /kerjakan",
+        "ADR 0077"
       ]
     },
     {
