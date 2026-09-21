@@ -7027,8 +7027,8 @@
         "APP - MyBharata",
         "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus"
       ],
-      "hash": "1de0d2ccaad8a05f13a2db0c8a46f568f0e9a3e86aa62d2fdbd5f763d7164863",
-      "ukuran_kb": 25.7,
+      "hash": "9325937fb5f4503e19cd1c3e26dc63678fec19597485df26a73a0090f051be36",
+      "ukuran_kb": 26.0,
       "ringkasan": "Menjawab: kenapa semua komplain produk diajukan lewat satu formulir di mana pengaju memilih kategori keluhan dan unit tujuannya diturunkan dari register pemilik kategori itu, bukan dipilih sendiri oleh pengaju, dan kenapa itu dilakukan tanpa tabel pemetaan maupun register ketiga. Juga menjawab kenapa nama produk, SKU, dan pesanan diisi server dari data pesanan, bagaimana unit penerima mengalihkan komplain yang salah alamat, siapa memilah keluhan \"Lainnya\", dan kenapa komplain gudang yang ditolak atau dialihkan tidak lagi dihitung ke KPI packer.",
       "kata_kunci": [
         "satu pintu komplain",
@@ -15587,8 +15587,8 @@
         "REF - Kepemilikan Data",
         "ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko"
       ],
-      "hash": "d8af73769ad9554217ba55ca54ee2f2dda3040c12780a281ba9a8ef937284c9e",
-      "ukuran_kb": 21.5,
+      "hash": "95c6a31bfcc658148ed259a7a07437959db7dd483c6696dd311263a1187682f5",
+      "ukuran_kb": 22.0,
       "ringkasan": "Menjawab: task apa saja yang lahir dari analisa kebutuhan komplain dari ulasan marketplace, mana yang sudah dikerjakan beserta PR-nya, dan urutan pengerjaan yang harus diikuti (T1 sampai T14, termasuk irisan \"satu pintu\"). Juga menjawab keputusan apa yang masih menunggu orang bukan kode: tujuan komplain yang belum punya register (ekspedisi, vendor, tim brand), kewajiban regulatif untuk dugaan efek tidak diinginkan, daftar kategori komplain QC, toko tanpa CS, dan pengisian peran warehouse di PROD. Papan kerja, bukan dokumen arsitektur.",
       "kata_kunci": [
         "komplain",
