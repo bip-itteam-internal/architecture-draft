@@ -103,6 +103,21 @@ Sepuluh paket bawaan: delapan cermin keadaan hari ini (`wms_gudang_rm`, `wms_gud
 
 ⚠️ Nama modulnya `manufacture`, **bukan** `wms` seperti sebutan [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] — prefiks izin menentukan kategori sidebar lewat `kunciModulAktif`, dan key kategorinya `manufacture`. Modul bernama `wms` menghasilkan paket yang tersimpan & ter-assign rapi tetapi kategorinya tak pernah muncul di sidebar pemegangnya, tanpa satu pun galat.
 
+### Gerbang di LAYAR: cermin backend, jangan lebih ketat
+
+Aturan ini sebelumnya hanya hidup sebagai komentar di satu berkas TypeScript, sehingga tiap layar baru menemukannya sendiri, atau tidak menemukannya sama sekali.
+
+**Layar yang punya tombol tulis wajib menggerbangnya**, dan gerbangnya wajib memakai `can(permissions, "<modul>.<aksi>", <fallback tier>)` (`erp-frontend/src/utils/access.ts`) dengan fallback tier yang **sama persis** dengan yang dipakai service-nya. Bukan predikat rakitan sendiri.
+
+⛔ **Menebak LEBIH KETAT daripada backend tidak menghasilkan galat apa pun.** Ia menyembunyikan pekerjaan dari orang yang backend-nya masih mengizinkan, lalu orang itu menagih akses yang sudah dia punya. Karena sakelar fallback tier masih menyala di hampir semua modul, yang terdampak justru mayoritas pemakai yang tokennya belum punya klaim modul itu. Kegagalannya senyap di kedua arah: yang kelewat longgar menghasilkan tombol yang dibalas **403**, yang kelewat ketat menghasilkan tombol yang hilang tanpa sebab.
+
+**Bentuk keadaan Terkunci** diatur `.agent-kit/rules/ui-checklist.md` §2 no. 2: satu kalimat yang menyebut siapa yang boleh dan apa yang harus diminta, bukan galat merah dan bukan blok kosong. Kalimat itu sebaiknya menyebut **nama paket persis seperti yang HR lihat** di Hak per Posisi, supaya permintaannya bisa langsung ditindaklanjuti; nama paket karena itu tidak diterjemahkan ke locale `en`.
+
+**403 yang tetap datang** berarti gerbang layar dan gerbang server berbeda pendapat, dan ia diperlakukan sama dengan tak berhak, bukan sebagai kegagalan yang bisa diulang. `galatTakBerhak` (`erp-frontend/src/lib/pesan-galat.ts`) memisahkannya dari galat lain. Menawarkan "Coba lagi" untuk 403 menyuruh orang mengulangi sesuatu yang pasti gagal lagi, dan itu cara tercepat membuat pesan galat berhenti dibaca.
+
+⚠️ **`useMounted` wajib menyertai gerbang layar**: hook auth sengaja kosong saat hidrasi, jadi menilai hak sebelum mount menampilkan "terkunci" sekejap kepada orang yang berhak penuh. Membiarkan tombolnya hidup selama jendela itu aman, sebab React belum memasang `onClick`.
+
+Contoh yang sudah memakai pola ini: `app/(main)/hris/training/requests/page.tsx` (halaman Persetujuan Pelatihan) dan `features/hris/training/list/lib/izin-pelatihan.ts` (🟡 branch `fix/gerbang-izin-pelatihan`, belum merge per 2026-09-21). Bentuk kalimat Terkuncinya: `features/marketing-analytics/components/analisis-live/blok-kinerja-host.tsx`.
 ## Fase dua
 
 Tiap modul berkatalog melewati dua fase. **Fase satu** memasang gerbang tanpa mencabut apa pun: akun yang belum punya paket jatuh ke tier `system_roles`-nya. **Fase dua** mematikan fallback itu, dan sejak saat itu hanya pemegang paket yang boleh — inilah yang membuat "posisi X boleh menu Y" benar-benar berlaku.
