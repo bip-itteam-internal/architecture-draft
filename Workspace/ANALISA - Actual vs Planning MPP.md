@@ -27,13 +27,23 @@ Dua keputusan yang diambil saat mengerjakannya dan layak diingat:
 - **Nama `divisi` dipertahankan** walau kata itu sudah dipakai untuk arti lain di kode (`common.ReachDivision` dan `space.division`, keduanya berisi NAMA DEPARTEMEN), karena itulah istilah HRD. Perbedaannya ditulis di kode dan di [[REF - Kepemilikan Data]] supaya tak jadi arti ketiga yang menyesatkan.
 - **Seed hanya mengisi perusahaan yang belum punya satu pun divisi.** Bentuk pertamanya (upsert per-key) menghidupkan kembali divisi yang sengaja dihapus HRD tiap service naik — tombol Hapus yang dibatalkan sendiri oleh deploy berikutnya, tanpa galat.
 
-## T3. Perhitungan Actual per periode di employee-service
+## T3. Perhitungan Actual per periode di employee-service — 🔜 berkode, belum merge & belum deploy
 
-- Fungsi dan rute agregat: jumlah karyawan aktif pada akhir bulan, per (perusahaan, departemen, posisi).
-- Bulan berjalan memakai status akun; bulan lampau memakai `employee_movement` lewat pola `posisiSaatPeriode`, bukan `work_data` apa adanya.
-- Menolak menjawab bulan lampau selama T1 belum tuntas, dengan alasan yang terbaca, bukan angka.
-- Rute berkunci layanan (pola bahan KPI rekrutmen), bukan bersandar pada prefix.
-- Test wajib: karyawan yang mutasi di tengah tahun tidak menggeser dua sel sekaligus; karyawan non-aktif tanpa tanggal keluar membuat bulan lampau ditolak, bukan dihitung.
+Branch: bip-erp `feat/employee-headcount-periode` (2026-09-21). Rencana & gerbang verifikasinya: `.task-plans/2026-09-21-headcount-periode.md`.
+
+- Fungsi dan rute agregat: jumlah karyawan aktif pada akhir bulan, per (perusahaan, departemen, posisi). ✅ Ada (`GET /kpi/headcount-periode`).
+- Bulan berjalan memakai status akun; bulan lampau memakai `employee_movement` lewat pola `posisiSaatPeriode`, bukan `work_data` apa adanya. ✅ Ada.
+- Menolak menjawab bulan lampau selama T1 belum tuntas, dengan alasan yang terbaca, bukan angka. ✅ Ada — 200 ber-`dapat_dihitung:false`, **tanpa** `baris` dan `total` sama sekali.
+- Rute berkunci layanan (pola bahan KPI rekrutmen), bukan bersandar pada prefix. ✅ Ada (`EMPLOYEE_SERVICE_KEY`).
+- Test wajib: karyawan yang mutasi di tengah tahun tidak menggeser dua sel sekaligus; karyawan non-aktif tanpa tanggal keluar membuat bulan lampau ditolak, bukan dihitung. ✅ Keduanya ada.
+- **Selesai bila**: dipanggil sekali lewat jaringan docker dan membalas bentuk kontraknya, lalu T5 memakainya. Bulan lampau **masih akan menolak** sampai T1 dan T6 (data) tuntas, dan itu memang yang diinginkan.
+
+Empat keputusan yang diambil saat mengerjakannya dan layak diingat:
+
+- **Metode selisih tidak bisa dipakai sama sekali, dan itu ditemukan saat `/plan`, bukan saat kode.** `/resign/summary/riwayat` merekonstruksi dengan mengurangi yang keluar dan menambah yang masuk; metode itu sudah ditolak untuk cakupan di bawah perusahaan, dikunci uji, karena mutasi antar departemen terhitung sebagai pengunduran diri. T3 karena itu merekonstruksi **per orang**. ⚠️ Konsekuensinya angka T3 tak akan sama persis dengan endpoint itu, dan pengalihannya ke mesin T3 jadi **PR terpisah** supaya perubahan angka yang sudah dilihat HR tak menyelinap bersama fitur baru.
+- **Gerbang bulan lampau dibuat LINTAS TENANT**, bukan per perusahaan. Cakupan gerbang wajib sama dengan cakupan yang dihitung; gerbang yang cuma melihat `work_data.company_id` hari ini akan berkata "bersih" untuk orang yang pada bulan itu milik perusahaan lain. Ongkosnya: kebersihan data satu tenant menyandera tenant lain.
+- **Rehire hampir lolos.** Penanda "sudah keluar" semula mengeluarkan siapa pun yang punya catatan resign berlaku sebelum akhir periode, sehingga orang yang direkrut ulang lenyap dari setiap bulan lampau sesudah kepergian pertamanya — padahal bulan berjalan tetap menghitungnya, dan gerbang backlog tak melihatnya karena akunnya aktif. Aturan penjaganya ternyata **sudah ada** di `kpi_sumber_rekrutmen.go`; satu fakta yang hidup di satu tempat dan hilang di tempat kedua.
+- **`company_id` yang salah ketik semula dijawab nol yang meyakinkan.** Kueri gerbang mencocokkan persis, jadi perusahaan tak dikenal menghasilkan backlog kosong, gerbang lolos diam-diam, dan responsnya `dapat_dihitung:true` dengan `total:0` — gerbangnya tidak menyala justru karena perusahaannya salah. Kini divalidasi ke master perusahaan dan dibalas 400.
 
 ## T4. Rencana MPP bersumbu bulan
 
