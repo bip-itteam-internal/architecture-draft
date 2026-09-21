@@ -283,9 +283,22 @@ mencatat sesi.
 
 **Siaran serentak** (T2, my-bharata #128, merged ke `dev` 2026-08-31): host memegang beberapa akun sekaligus, jadi sesi berjalan adalah **daftar**, bukan
 satu. Halaman penuh merender satu kartu per sesi dengan timer dan peringatan ambangnya
-masing-masing. **Beranda tetap satu kartu** supaya tak berubah jadi daftar panjang, dengan
-penanda "Lihat N sesi lainnya" yang **bisa ditekan** menuju halaman penuh — sebagai teks
-mati, sesi kedua akan tak terjangkau dari beranda sama sekali.
+masing-masing. **Beranda semula tetap satu kartu** supaya tak berubah jadi daftar panjang,
+dengan penanda "Lihat N sesi lainnya" yang **bisa ditekan** menuju halaman penuh — sebagai
+teks mati, sesi kedua akan tak terjangkau dari beranda sama sekali.
+
+⚠️ **Beranda kini menggulir mendatar saat sesinya lebih dari satu**, menggantikan penanda itu
+— my-bharata [#157](https://github.com/bip-itteam-internal/my-bharata/pull/157), **open ke
+`dev`** per 2026-09-21, jadi `origin/dev` masih memuat bentuk lama sampai ia merged. Irama dan
+angkanya menyalin carousel "Aktivitas Saya" tepat di atasnya (lebar kartu 75% layar, jarak 8,
+padding di dalam scroll view supaya kartu terakhir bisa digulir sampai menyentuh tepi); **satu
+sesi tetap selebar layar**, karena kartu sempit yang berdiri sendiri terbaca sebagai tata letak
+yang salah, bukan isyarat "geser". Yang berubah bukan cuma tampilan: dengan penanda, sesi kedua
+di beranda tak punya timer, tak punya peringatan jam ke-11, dan tak bisa dijeda atau diakhiri
+tanpa pindah halaman — padahal
+[[ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun]] par.5 meminta setiap sesi
+berjalan punya kartunya sendiri. Jalan ke halaman penuh tetap ada lewat menu Sesi Live di Akses
+Cepat, yang bahkan default favorit untuk host.
 
 Yang mudah terlewat saat menyentuh layar ini:
 
@@ -317,6 +330,28 @@ Yang mudah terlewat saat menyentuh layar ini:
   panjang atau skala teks naik — terlihat di kartu sesi live (Jeda + Akhiri Sesi) pada
   lebar HP yang lazim. Tak pernah tertangkap test karena permukaan test bawaan 800 px.
   Diperbaiki di komponennya; ini menyentuh **seluruh** pemakai `CustomButton`.
+- ⛔ **Section beranda membawa jarak tepinya SENDIRI.** `SliverList` di `home_page.dart`
+  tidak memberi padding mendatar apa pun, jadi kartu Sesi Live sempat menempel ke tepi layar
+  sementara `AttendanceActivityCard` di atasnya dan `HomeQuickAccess` di bawahnya tidak. Tak
+  ada galat — cuma satu kartu yang terlihat lebih lebar, dan itu ditemukan dari layar, bukan
+  dari test. Nilainya **literal 16**, bukan `AppDimens.paddingM` (= `16.w`, responsif):
+  kedua tetangga itu memakai 16 mati, dan nilai yang ikut lebar layar akan meleset beberapa
+  piksel dari mereka di HP yang lebarnya bukan 360 (my-bharata #157).
+- **Durasi sesi berjalan dibaca sebagai jam : menit**, bukan total menit (my-bharata #157,
+  pola `presence_real_time_clock.dart`): sesi di sini rutin berjalan berjam-jam dan ambang
+  koreksinya 12 jam, jadi "184 menit berjalan" menuntut pembacanya membagi sendiri untuk tahu
+  jaraknya ke ambang itu — padahal angka itulah yang menentukan hangus-tidaknya porsi GMV-nya.
+- ⛔ **`DateFormatter.formatDuration` dulu tak pernah mengikuti bahasa aktif.** Ia hanya
+  membaca `Intl.defaultLocale`, dan aplikasi ini **tak pernah menyetelnya di mana pun**,
+  sehingga cabang Inggrisnya tak sekali pun terpakai di produksi: pemakai berbahasa Inggris
+  tetap membaca "jam"/"menit" di layar yang seluruhnya berbahasa Inggris. Tak ada galat, dan
+  seluruh test buta terhadapnya karena semuanya dipompa dengan locale Indonesia — cacatnya
+  malah sempat tercatat sebagai komentar di `live_shift_detail_page_test.dart` sebelum
+  diperbaiki. Helper-nya kini menerima `locale` dan **keempat** pemanggilnya mengopernya:
+  `KartuRiwayatSesi` (Durasi Efektif) dan tiga durasi di `LiveShiftDetailPage` (Durasi Total,
+  Total Jeda, Durasi Efektif) — my-bharata #157. ⚠️ Repo ini masih punya helper KEDUA
+  bernama sama, `TimeFormatter.formatDuration` (`lib/src/core/utils/time_formatter.dart`);
+  penyatuannya belum dikerjakan.
 
 ⛔ **Belum terverifikasi di perangkat sungguhan.** ~~`live_shifts` produksi masih 0
 dokumen~~: tidak berlaku lagi, terukur 74 sesi per 2026-09-11; dari klien mana tidak terukur

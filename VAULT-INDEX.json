@@ -1357,20 +1357,20 @@
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "e419b68109cf59445d6e5115037262aa65e11688061acf7c37f4f205ec7ab269",
-      "ukuran_kb": 96.0,
-      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, stack Flutter dan arsitekturnya (Clean Architecture feature-first, BLoC, get_it, dio), cara autentikasi (JWT, biometric, PIN, satu akun satu device), dan fitur apa saja yang dimilikinya (attendance, cuti/izin, lembur, slip gaji, KPI, survei, Booking Ruang, Sesi Live Host, pelatihan). Juga menjawab versi build di `dev` dibanding rilis, kenapa versi yang beredar di HP pemakai tidak bisa dibaca dari tag atau GitHub Release, serta perilaku multi-perusahaan (menu dan konten per tenant).",
+      "hash": "855d72623f61f5dfb38dc1f2cde3adede15bfc23cfec9f4b671a4012882f7dc4",
+      "ukuran_kb": 99.0,
+      "ringkasan": "Menjawab: apa saja fitur aplikasi mobile HRIS MyBharata untuk karyawan (attendance dengan biometric/geofencing/QR, pengajuan cuti-izin, lembur, slip gaji berbentang PIN, KPI, survei Form Builder, Kaizen, Pelatihan, Sesi Live Host, Booking Ruang) dan bagaimana arsitektur Flutter-nya disusun (Clean Architecture feature-first, bloc, get_it, dio + fpdart Either, go_router, Firebase dua flavor dev/prod, CI Codemagic). Juga menjawab bagaimana autentikasi bekerja (JWT + silent refresh, biometric, PIN, 1 akun = 1 device) dan bagaimana aplikasi di-scope multi-perusahaan lewat company_id di JWT beserta gerbang konten mana yang sengaja masih dikunci untuk BIP. Berisi pula peta versi build/rilis, roadmap, known issues, dan peringatan bahwa versi yang beredar di HP pemakai tidak bisa disimpulkan dari tag git atau GitHub Release.",
       "kata_kunci": [
         "MyBharata",
         "my_bharata",
         "aplikasi mobile",
+        "mobile app",
         "Flutter",
         "HRIS mobile",
-        "presensi",
-        "attendance",
-        "slip gaji",
-        "versi rilis",
-        "multi-tenant"
+        "absensi karyawan",
+        "attendance geofencing biometric",
+        "multi-tenant company_id",
+        "slip gaji mobile"
       ]
     },
     {
