@@ -257,7 +257,9 @@ Staf HR lain, Direktur, developer:
 
 ⚠️ **Titik putus yang diketahui**: paket yang baru dipasang baru berlaku sesudah **login ulang**; sebelum itu tombolnya tak muncul. Pemegang paket "Rekrutmen: Lihat"/"Penyetuju" saja (tanpa `recruitment.work`) membuka halaman ini tetapi membaca "Daftar posisi kosong tidak bisa dimuat", karena daftarnya digerbang `recruitment.work` (sudah begitu sebelum perubahan ini).
 
-**Belum di sistem (TBD)**: lembar HRD "Actual vs Planning MPP" memakai rencana **per bulan** per Divisi > Departemen > Posisi dengan kolom Actual, Gap, Keterangan, dan Deadline; sistem hanya menyimpan rencana **per tahun** tanpa Actual/Gap. Menyamakannya kebutuhan baru (lewat `/analisa-kebutuhan` bila HRD setuju), bukan bagian perubahan di atas.
+**Sudah diputuskan, belum ada kodenya** (2026-09-21): lembar HRD "Actual vs Planning MPP" memakai rencana **per bulan** per Divisi > Departemen > Posisi dengan kolom Actual, Gap, Keterangan, dan Deadline; sistem hari ini hanya menyimpan rencana **per tahun** tanpa Actual/Gap. Arahnya dikunci [[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]]: Actual dihitung sistem (bukan diketik), rencana mendapat bulan berlaku, Divisi jadi master data tersendiri, dan **riwayat bulan lampau tidak dibuka sebelum tiap penonaktifan karyawan punya tanggal keluar**. Pecahan tugasnya di [[ANALISA - Actual vs Planning MPP]].
+
+⛔ **Angka bulan lampau hari ini SALAH ke arah yang menguntungkan tim rekrutmen, dan itu terukur.** Diukur PROD 2026-09-21: 35 akun non-aktif tetapi hanya 11 punya catatan resign, jadi 24 penonaktifan tak punya tanggal keluar. Rekonstruksi mundur menghitung mereka seolah masih bekerja, sehingga akhir Juni terbaca **188** sementara lembar HRD menulis **158** (Mei: sistem 177 lawan lembar 162). Karyawan aktif hari ini 180 dari 182 akun aktif. Selama selisih ini hidup, jangan memakai rekonstruksi headcount per bulan sebagai dasar penilaian siapa pun; sebabnya dicatat juga di [[HRIS - Attrition]].
 
 ## Rekrutmen Lintas Perusahaan
 

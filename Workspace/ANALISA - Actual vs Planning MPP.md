@@ -1,0 +1,52 @@
+# ANALISA - Actual vs Planning MPP
+
+Pecahan kerja dari [[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]] (disetujui user 2026-09-21). Tiap butir cukup jelas untuk dilempar ke `/start-task`. Urutannya mengikat: T1 dan T2 mendahului sisanya, dan T5 tidak sah sebelum T1 tuntas.
+
+## T1. Jejak keluar bertanggal (DATA, dikerjakan manusia)
+
+**Kenapa pertama.** Selama masih ada akun non-aktif tanpa catatan keluar, seluruh angka bulan lampau salah, dan angkanya menilai orang.
+
+- Ukur ulang: akun `is_active:false` dibanding catatan resign berstatus `applied` (per 2026-09-21: 35 lawan 11).
+- HRD menyediakan tanggal keluar untuk 24 orang yang tak punya catatan. Tanggal dari HRD, bukan tebakan sistem.
+- Tambal sebagai catatan resign lewat menu, atau skrip bergerbang dengan backup dan dry run bila terlalu banyak. **Tulis produksi dijalankan manusia.**
+- Selesai bila: nol akun non-aktif tanpa tanggal keluar untuk perusahaan BIP, dan rekonstruksi akhir Juni mendekati angka lembar HRD. Bila masih meleset, hentikan dan cari sebab berikutnya di definisi karyawan versi HRD, jangan menyesuaikan angka.
+
+## T2. Master Divisi
+
+- Koleksi `master_divisi` di employee-service beserta CRUD dan layar master data, mengikuti pola master departemen yang sudah ada.
+- Departemen menunjuk divisinya. Isi awal: Commercial, Operational, Supporting, Management, dipetakan ke 12 departemen BIP yang ada.
+- Dipakai lintas modul, bukan milik layar MPP saja.
+- Selesai bila: tiap departemen aktif punya divisi, dan daftar divisi bisa dibaca modul lain lewat master data.
+
+## T3. Perhitungan Actual per periode di employee-service
+
+- Fungsi dan rute agregat: jumlah karyawan aktif pada akhir bulan, per (perusahaan, departemen, posisi).
+- Bulan berjalan memakai status akun; bulan lampau memakai `employee_movement` lewat pola `posisiSaatPeriode`, bukan `work_data` apa adanya.
+- Menolak menjawab bulan lampau selama T1 belum tuntas, dengan alasan yang terbaca, bukan angka.
+- Rute berkunci layanan (pola bahan KPI rekrutmen), bukan bersandar pada prefix.
+- Test wajib: karyawan yang mutasi di tengah tahun tidak menggeser dua sel sekaligus; karyawan non-aktif tanpa tanggal keluar membuat bulan lampau ditolak, bukan dihitung.
+
+## T4. Rencana MPP bersumbu bulan
+
+- Baris rencana mendapat bulan berlaku; berlaku sampai digantikan baris berikutnya. HRD mengisi sekali setahun, merevisi saat berubah.
+- Tambah Keterangan dan Deadline per baris.
+- Migrasi baris 2026 yang sudah ada (6 baris) ke bentuk baru tanpa mengubah artinya.
+- Jaga agar cakupan buffer yang sudah live tidak berubah angkanya: penyebutnya tetap rencana yang berlaku.
+
+## T5. Layar Aktual vs Rencana
+
+- Kolom Aktual, Rencana, Selisih, Keterangan, Deadline; kelompok Divisi lalu Departemen lalu Posisi dengan subtotal, plus baris JUMLAH ALL TEAM.
+- HRGA tampil sebagai pengelompokan lewat `supervision_label` yang sudah ada, bukan departemen baru.
+- Gerbang: pemegang izin penyusun MPP ditambah Direktur. Lebih sempit daripada tabel MPP sekarang.
+- Ekspor Excel (halaman MPP sekarang belum punya).
+- Bulan lampau tampil sebagai keadaan "belum dapat dihitung" beserta alasannya selama T1 belum tuntas.
+
+## T6. Isi MPP 2026 yang sebenarnya (DATA, HRD)
+
+- Hari ini 6 baris untuk 2026, lembar HRD memuat sekitar 174.
+- Tanpa ini, kolom Rencana kosong untuk hampir semua posisi dan cakupan buffer tetap 0%.
+
+## Di luar lingkup
+
+- **Metrik KPI baru dari Selisih.** Sumber KPI `rekrutmen` yang live 2026-09-21 tetap apa adanya; memasang metrik baru adalah keputusan tersendiri dan tidak sah sebelum T1 tuntas.
+- **Memperbaiki pipeline rekrutmen** (kandidat lewat lowongan, status Buffer terisi). Itu sebab angka KPI rekrutmen 0%, dan ditangani terpisah dari lembar ini.
