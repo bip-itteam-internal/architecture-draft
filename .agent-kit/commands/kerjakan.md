@@ -66,9 +66,12 @@ Skill yang relevan untuk dibaca dulu: <daftar .claude/skills/<x>/SKILL.md yang c
 Percobaan: 1 dari 3
 ```
 
-**Bila `Agent` menjawab "Agent type '<peran>' not found"**: daftar agen kustom dibaca saat sesi
-mulai, jadi sesi ini lahir sebelum kit yang memperkenalkan peran itu di-init (peran per lapisan
-masuk di 1.24.0, agen loop pertama di 1.15.0). Jalan yang benar: **restart sesi**. Jalan darurat
+**Bila `Agent` menjawab "Agent type '<peran>' not found"**: sesi ini lahir sebelum kit yang
+memperkenalkan peran itu di-init (peran per lapisan masuk di 1.24.0, agen loop pertama di 1.15.0).
+⚠️ **Coba sekali lagi di giliran berikutnya sebelum memutuskan restart.** Diukur 2026-09-21:
+sesudah `init` dijalankan di tengah sesi, `loop-fe` ditolak "not found" pada giliran yang sama,
+lalu **terbaca sendiri pada giliran berikutnya tanpa restart apa pun**. Bila giliran berikutnya
+masih menolak, barulah **restart sesi**. Jalan darurat
 satu kali: dispatch `general-purpose` dengan seluruh isi `.claude/agents/<peran>.md` (tanpa
 frontmatter) sebagai pembuka prompt, lalu catat `agen` di log judge sebagai
 `general-purpose(<peran>)`; jangan jadikan ini kebiasaan, model dan batas tools-nya berbeda.
