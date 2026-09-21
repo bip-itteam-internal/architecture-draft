@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-21",
-  "jumlah_dokumen": 456,
+  "jumlah_dokumen": 458,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1546,6 +1546,8 @@
         "CORE - API Master Gateway",
         "RUN - Deploy Microservices bip-erp",
         "REF - Alur Persetujuan",
+        "ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service",
+        "ANALISA - Antrean Persetujuan Terpusat di Web",
         "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus",
         "BASE - Enterance Point",
         "Finance - Incentive",
@@ -1553,20 +1555,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "7aad9097e8bf83828586f979c67c8b30f4ff1d05e60dde3f283f792b282cd258",
-      "ukuran_kb": 541.8,
-      "ringkasan": "Menjawab: apa itu portal web ERP internal `hris-dashboard` (One Bharata), stack yang dipakainya, dan bagaimana login, refresh token, serta perannya sebagai SSO Identity Provider bekerja. Menjelaskan bagaimana sidebar digerbang cookie `system_roles` per modul, bagaimana menu HRIS dikelompokkan lewat menu induk bersarang, dan bagaimana halaman Pengaturan HRGA terpusat disusun dari satu tabel section. Juga menjawab konvensi data-fetching TanStack Query, konvensi bagan Recharts (`ChartContainer`), dan bagaimana dukungan multi-perusahaan tampil di layar.",
+      "hash": "664f3443bfa5383c5f8d7ea73a0854f6d55f298318baea32f9ec1f154f3b80e9",
+      "ukuran_kb": 545.1,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS \"One Bharata\" (repo erp-frontend), stack dan pustaka apa yang dipakai, bagaimana login serta perannya sebagai SSO Identity Provider bekerja, dan bagaimana cookie `system_roles` menggerbang modul, sidebar, dan menu. Menjelaskan juga pengelompokan menu HRIS (termasuk Pengaturan HRGA terpusat beserta sub-menu dan tabnya), dukungan multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), serta konvensi wajib untuk data-fetching TanStack Query dan bagan Recharts/ChartContainer. Dipakai saat mencari tahu di mana sebuah fitur web ERP tinggal, siapa yang bisa melihatnya, dan aturan apa yang harus diikuti saat menambah halaman atau grafik.",
       "kata_kunci": [
         "erp-frontend",
-        "hris-dashboard",
         "One Bharata",
-        "SSO",
+        "hris-dashboard",
+        "web ERP",
         "system_roles",
-        "sidebar",
+        "SSO",
         "role gating",
-        "TanStack Query",
-        "Recharts",
-        "multi-perusahaan"
+        "sidebar menu",
+        "multi-perusahaan",
+        "TanStack Query"
       ]
     },
     {
@@ -7402,6 +7404,42 @@
         "employee_movement",
         "recruitment",
         "HRGA"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service.md",
+      "judul": "ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan** — kode belum ada.",
+      "publik": true,
+      "tautan": [
+        "REF - Alur Persetujuan",
+        "HRIS - Employee Request & Approval",
+        "REF - Rantai Pengajuan Lintas Modul",
+        "ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi",
+        "ADR - 0106 Tema dan Teaser Live Support Disetor dan Diputus Penyetuju Departemen sebagai Dasar KPI",
+        "ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web",
+        "ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor",
+        "APP - Web ERP",
+        "APP - MyBharata",
+        "Microservices - Employee Service"
+      ],
+      "hash": "8ce34a9f97e9a5b2acc9aedf0305ef5419167467b53e9a76468cba2610c6ebd9",
+      "ukuran_kb": 12.2,
+      "ringkasan": "Menjawab: kenapa seluruh antrean keputusan seorang penyetuju digabung jadi satu halaman web `/portal/persetujuan` dengan satu tabel berkolom sama, dan kenapa penggabungannya dikerjakan agregator di employee-service alih-alih di layar. Memuat pemetaan 13 kategori pengajuan ke 11 endpoint antrean di 7 service beserta cara masing-masing menyaring, enam kosakata status berbeda yang harus diseragamkan, keputusan memakai kolom \"Tahap\" bukan \"Status\", perlakuan baris yang boleh dilihat tapi bukan pembaca yang memutus, dan detail lewat Sheet dengan aksi di footer. Juga menyatakan apa yang TIDAK dijanjikan, termasuk bahwa layar ini tidak menyembuhkan pengajuan yang mati karena didiamkan.",
+      "kata_kunci": [
+        "antrean persetujuan",
+        "approval queue",
+        "portal persetujuan",
+        "penyetuju",
+        "reviewer",
+        "agregator",
+        "employee-service",
+        "Ruang Direktur",
+        "ADR 0114",
+        "degraded"
       ]
     },
     {
@@ -15099,6 +15137,38 @@
         "rilis MyBharata",
         "ADR 0088",
         "verifikasi lapangan"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Antrean Persetujuan Terpusat di Web.md",
+      "judul": "ANALISA - Antrean Persetujuan Terpusat di Web",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": "🟡",
+      "status_teks": "Daftar kerja, belum ada yang dikerjakan.",
+      "publik": false,
+      "tautan": [
+        "ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service",
+        "ADR - 0106 Tema dan Teaser Live Support Disetor dan Diputus Penyetuju Departemen sebagai Dasar KPI",
+        "REF - Alur Persetujuan",
+        "HRIS - Employee Request & Approval",
+        "APP - Web ERP",
+        "Microservices - Employee Service"
+      ],
+      "hash": "19a98d52731d7e240f221660757cd16eed47d8dd08ef4ddba145addbb937c8d7",
+      "ukuran_kb": 6.1,
+      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dilakukan untuk mewujudkan ADR 0114, dibagi jadi butir task siap dilempar ke `/start-task` (T1 sampai T13) beserta ketergantungan antar butirnya. Irisan 1 menayangkan halaman dan tabel seragam tanpa menyentuh backend sama sekali (memakai `/hr/requests?as=reviewer&include=booking`), lengkap dengan aturan Sheet berangka tiga, endpoint keputusan per modul, gerbang menu berdasarkan isi antrean bukan peran, dan penggantian panel Ruang Direktur; irisan 2 menambah endpoint agregat `/pengajuan/antrean` di employee-service plus adapter tiap sumber dan test kontraknya. Memuat juga dua task yang sengaja dipisah dari ADR: mengukur sebab pengajuan berakhir diabaikan sistem, dan membuktikan apakah kartu pembelian di beranda portal selamanya degraded.",
+      "kata_kunci": [
+        "antrean persetujuan",
+        "approval queue",
+        "daftar kerja",
+        "irisan",
+        "portal persetujuan",
+        "pengajuan/antrean",
+        "adapter sumber",
+        "test kontrak",
+        "employee-service",
+        "ADR 0114"
       ]
     },
     {
