@@ -41,10 +41,32 @@ def perlu_gerbang(berkas):
     return False
 
 
+def env_bersih(**tambahan):
+    """⛔ Buang SELURUH `GIT_*` sebelum memanggil anak.
+
+    Git mewariskan `GIT_DIR`, `GIT_WORK_TREE`, `GIT_INDEX_FILE`, dan `GIT_QUARANTINE_PATH` ke
+    hook-nya, dan variabel itu MENANG atas penemuan repo biasa: `git -C <folder lain> <perintah>`
+    tetap mengenai repo yang sedang di-push. Terukur 2026-09-21 pada push pertama yang memicu
+    gerbang ini: `test-init.ps1` membuat repo sandbox di `%TEMP%`, lalu seluruh perintah gitnya
+    mendarat di worktree vault yang sedang di-push — dua commit kosong bertambah di atas branch
+    kerja, branch `feat/uji` lahir di repo nyata, HEAD berpindah ke `main`, dan
+    `user.email=test@example.invalid` tertulis ke config repo. Tak satu pun terbaca sebagai galat;
+    yang terlihat cuma test-init merah yang hijau bila dijalankan langsung.
+
+    Dibuang semuanya, bukan daftar tertentu: yang diwariskan git bertambah antar versi, dan test
+    kit tidak membutuhkan satu pun di antaranya (termasuk `GIT_EXEC_PATH`, yang ditemukan sendiri
+    oleh git).
+    """
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    env.update(tambahan)
+    return env
+
+
 def akar_utama(vault):
     """Worktree tertaut tidak punya Tools/.venv; venv-nya ada di worktree UTAMA repo itu."""
     r = subprocess.run(["git", "-C", vault, "-c", "core.fsmonitor=false", "rev-parse",
-                        "--path-format=absolute", "--git-common-dir"], capture_output=True, text=True)
+                        "--path-format=absolute", "--git-common-dir"],
+                       capture_output=True, text=True, env=env_bersih())
     if r.returncode != 0 or not r.stdout.strip():
         return vault
     return os.path.dirname(r.stdout.strip().rstrip("/\\"))
@@ -63,7 +85,7 @@ def cari_python(kandidat_akar):
         if p:
             kandidat.append(p)
     for p in kandidat:
-        r = subprocess.run([p, "-c", "import pytest"], capture_output=True, text=True)
+        r = subprocess.run([p, "-c", "import pytest"], capture_output=True, text=True, env=env_bersih())
         if r.returncode == 0:
             return p
     return None
@@ -71,7 +93,7 @@ def cari_python(kandidat_akar):
 
 def jalankan(judul, cmd, cwd, batas):
     print("[agent-kit gerbang-kit] %s ..." % judul, flush=True)
-    env = dict(os.environ, AGENTKIT_KIT_TESTS_RUNNING="1", PYTHONDONTWRITEBYTECODE="1")
+    env = env_bersih(AGENTKIT_KIT_TESTS_RUNNING="1", PYTHONDONTWRITEBYTECODE="1")
     try:
         r = subprocess.run(cmd, cwd=cwd, env=env, timeout=batas)
         rc = r.returncode

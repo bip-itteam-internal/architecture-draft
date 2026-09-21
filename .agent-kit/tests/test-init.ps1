@@ -1,5 +1,26 @@
 # test-init.ps1 — integrasi: jalankan init di sandbox, assert artefak generate + hook nyata
 $ErrorActionPreference = 'Stop'
+
+# ⛔ BERHENTI bila lingkungan git hook masih terwarisi. Test ini membuat repo sandbox di %TEMP%
+# lalu menjalankan puluhan perintah git atasnya; `GIT_DIR` MENANG atas penemuan repo, jadi
+# `git -C <sandbox>` akan mendarat di repo yang sedang di-push. Terukur 2026-09-21: dua commit
+# kosong bertambah di atas branch kerja repo nyata, branch `feat/uji` lahir di sana, HEAD
+# berpindah, dan user.email uji tertulis ke config. Yang membersihkan lingkungannya adalah
+# hooks/gerbang-kit.py; penjaga ini ada supaya test yang dijalankan tangan dari konteks hook
+# berhenti alih-alih mengubah repo orang.
+# Yang diperiksa hanya variabel yang MENGALIHKAN repo, index, atau objek. `GIT_EDITOR`,
+# `GIT_ASKPASS`, dan kawannya tidak berbahaya dan memang sering terpasang di sesi biasa;
+# memblokirnya membuat test menolak jalan di mesin yang sehat. gerbang-kit.py tetap membuang
+# SELURUH `GIT_*` sebelum memanggil test, karena di sana tak satu pun dibutuhkan.
+$gitBerbahaya = @('GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR',
+  'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_QUARANTINE_PATH',
+  'GIT_PREFIX', 'GIT_NAMESPACE')
+$gitWarisan = @($gitBerbahaya | Where-Object { Test-Path ('Env:' + $_) })
+if ($gitWarisan.Count -gt 0) {
+  Write-Host ("FAIL lingkungan git hook terwarisi (" + ($gitWarisan -join ', ') + "): test-init MENOLAK jalan supaya perintah gitnya tidak mengenai repo nyata.")
+  exit 1
+}
+
 $kitRoot = Split-Path -Parent (Split-Path -Parent $PSCommandPath)  # .agent-kit
 $tmp = Join-Path $env:TEMP ("agentkit-test-" + [guid]::NewGuid().ToString('N').Substring(0,8))
 $fail = 0

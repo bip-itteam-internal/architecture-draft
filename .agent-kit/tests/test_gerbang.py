@@ -199,6 +199,37 @@ def test_perlu_gerbang_kit_tidak_tertipu_prefiks_mirip():
     assert gk.perlu_gerbang(["Toolsmith/catatan.md", ".agent-kit-lama/x"]) is False
 
 
+def test_env_bersih_membuang_seluruh_git(monkeypatch):
+    # Git mewariskan GIT_DIR dan kawannya ke hook-nya, dan variabel itu MENANG atas penemuan repo:
+    # `git -C <folder lain>` tetap mengenai repo yang sedang di-push. Terukur 2026-09-21, test kit
+    # yang berjalan di bawah hook menulis dua commit kosong dan sebuah branch ke repo NYATA.
+    for k in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_QUARANTINE_PATH", "GIT_EXEC_PATH"):
+        monkeypatch.setenv(k, "x")
+    monkeypatch.setenv("PENANDA_UJI", "tetap")
+    env = gk.env_bersih(AGENTKIT_KIT_TESTS_RUNNING="1")
+    assert not [k for k in env if k.startswith("GIT_")]
+    assert env["PENANDA_UJI"] == "tetap"
+    assert env["AGENTKIT_KIT_TESTS_RUNNING"] == "1"
+
+
+def test_env_bersih_tidak_mengubah_environ_proses(monkeypatch):
+    monkeypatch.setenv("GIT_DIR", "x")
+    gk.env_bersih()
+    assert os.environ.get("GIT_DIR") == "x"
+
+
+@pytest.mark.skipif(shutil.which("powershell") is None, reason="butuh PowerShell")
+def test_test_init_menolak_jalan_saat_git_dir_terwarisi(tmp_path):
+    # Penjaga lapis kedua, dijalankan sungguhan: test-init membuat repo sandbox, jadi ia tidak
+    # boleh jalan sama sekali bila lingkungan hook masih menempel.
+    env = dict(os.environ, GIT_DIR=str(tmp_path))
+    r = subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
+                        "-File", str(HERE / "test-init.ps1")],
+                       capture_output=True, text=True, env=env, timeout=180)
+    assert r.returncode == 1
+    assert "MENOLAK jalan" in r.stdout
+
+
 def test_gerbang_kit_hanya_putuskan_tidak_menjalankan_apa_pun(tmp_path):
     # Gerbang yang MENJALANKAN test-init dari dalam test-init akan berputar tanpa henti.
     # Mode putuskan-saja memisahkan keputusan (yang diuji) dari eksekusi (yang tidak).
