@@ -11,12 +11,21 @@ Pecahan kerja dari [[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan
 - Tambal sebagai catatan resign lewat menu, atau skrip bergerbang dengan backup dan dry run bila terlalu banyak. **Tulis produksi dijalankan manusia.**
 - Selesai bila: nol akun non-aktif tanpa tanggal keluar untuk perusahaan BIP, dan rekonstruksi akhir Juni mendekati angka lembar HRD. Bila masih meleset, hentikan dan cari sebab berikutnya di definisi karyawan versi HRD, jangan menyesuaikan angka.
 
-## T2. Master Divisi
+## T2. Master Divisi — 🔜 berkode, belum merge & belum deploy
 
-- Koleksi `master_divisi` di employee-service beserta CRUD dan layar master data, mengikuti pola master departemen yang sudah ada.
-- Departemen menunjuk divisinya. Isi awal: Commercial, Operational, Supporting, Management, dipetakan ke 12 departemen BIP yang ada.
-- Dipakai lintas modul, bukan milik layar MPP saja.
-- Selesai bila: tiap departemen aktif punya divisi, dan daftar divisi bisa dibaca modul lain lewat master data.
+Branch: bip-erp `feat/employee-master-divisi` · erp-frontend `feat/hris-master-divisi` (2026-09-21). Rencana & gerbang verifikasinya: `.task-plans/2026-09-21-master-divisi.md`.
+
+- Koleksi `master_divisi` di employee-service beserta CRUD dan layar master data, mengikuti pola master departemen yang sudah ada. ✅ Ada.
+- Departemen menunjuk divisinya lewat `master_department.divisi_key`. ✅ Ada.
+- Isi awal: Commercial, Operational, Supporting, Management. ✅ Di-seed, **tanpa pemetaan** — keputusan user 2026-09-21: memetakan departemen ke divisi pekerjaan HRD, bukan tebakan sistem. Departemen tanpa divisi tampil bertanda "Belum berdivisi" beserta hitungannya, jadi sisa pekerjaan menagih dirinya sendiri.
+- ⚠️ **Koreksi angka**: bukan "12 departemen BIP". Diukur PROD 2026-09-21 ada **13 dokumen** `master_department` — 12 BIP + 1 ELT (`pct` Percetakan, 13 karyawan aktif) — dan departemen `printing` milik BIP punya **nol** karyawan aktif. Karena itu divisi ter-scope **per perusahaan**, bukan satu daftar global.
+- Dipakai lintas modul: dibaca lewat `GET /data-type/divisi`, jalur yang sudah dipakai modul lain (`useDataTypes`), bukan endpoint baca baru. ✅ Ada.
+- **Selesai bila**: tiap departemen aktif punya divisi (pekerjaan HRD, belum), dan daftar divisi bisa dibaca modul lain lewat master data (✅ sudah, menunggu deploy).
+
+Dua keputusan yang diambil saat mengerjakannya dan layak diingat:
+
+- **Nama `divisi` dipertahankan** walau kata itu sudah dipakai untuk arti lain di kode (`common.ReachDivision` dan `space.division`, keduanya berisi NAMA DEPARTEMEN), karena itulah istilah HRD. Perbedaannya ditulis di kode dan di [[REF - Kepemilikan Data]] supaya tak jadi arti ketiga yang menyesatkan.
+- **Seed hanya mengisi perusahaan yang belum punya satu pun divisi.** Bentuk pertamanya (upsert per-key) menghidupkan kembali divisi yang sengaja dihapus HRD tiap service naik — tombol Hapus yang dibatalkan sendiri oleh deploy berikutnya, tanpa galat.
 
 ## T3. Perhitungan Actual per periode di employee-service
 
