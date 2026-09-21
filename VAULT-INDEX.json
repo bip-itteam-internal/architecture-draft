@@ -11377,20 +11377,20 @@
         "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
         "IT - SOP Dokumentasi Vault"
       ],
-      "hash": "a2a8950d88a8f5f62a95ef70f792e76a0e84b3259272572e0ce4584064f713f2",
-      "ukuran_kb": 33.0,
-      "ringkasan": "Menjawab: gerbang apa saja yang berjalan di mesin developer dan bagaimana cara kerjanya, yaitu hook Claude Code yang menolak git commit di branch default repo kode lewat exit 2, git hook pre-push yang menjalankan tsc/lint/build untuk repo Node atau go build per service untuk bip-erp, dan gerbang kit atas dirinya sendiri lewat pre-push vault. Juga menjawab bagaimana papan sesi dan Kantor Agent mengetahui sesi kerja mana sedang mengerjakan apa, serta bagaimana loop otonom /brief lalu /kerjakan memilih repo, domain, dan worktree sampai berhenti di PR. Memuat pula jalan keluar sadar yang tersedia (--no-verify, AGENTKIT_SKIP_BUILD, AGENTKIT_SKIP_KIT_TESTS) dan batas yang sudah diketahui.",
+      "hash": "dcf0b2d24a094657b2168d4d63556d6a5bf4e15baf4715abf8a69b6e399445b9",
+      "ukuran_kb": 34.2,
+      "ringkasan": "Menjawab: gerbang otomatis apa saja yang menahan commit dan push di mesin developer (hook pre-commit yang menolak commit di branch utama repo kode, pre-push yang menjalankan tsc/lint/build untuk repo Node atau go build per service untuk bip-erp), bagaimana agent-kit menggerbangi dirinya sendiri lewat pre-push vault, dan mengapa gerbang GitHub Actions tidak diandalkan. Menjawab juga: bagaimana melihat sesi kerja mana sedang mengerjakan apa lewat papan sesi, dashboard, dan Kantor Agent, serta bagaimana loop otonom /brief ke /kerjakan berjalan lewat agen domain dan penilaian dua lapis sampai berhenti di PR dengan merge tetap di tangan manusia. Termasuk jebakan lingkungan git hook yang mewariskan GIT_DIR sehingga skrip test mengenai repo yang sedang di-push.",
       "kata_kunci": [
-        "gerbang repo",
-        "pre-commit hook",
+        "gerbang lokal",
+        "pre-commit",
         "pre-push",
-        "core.hooksPath",
+        "git hook",
+        "agent-kit",
         "papan sesi",
         "Kantor Agent",
+        "AI Engineering Loop",
         "loop otonom",
-        "brief",
-        "agent-kit",
-        "baseline test"
+        "ADR 0077"
       ]
     },
     {
