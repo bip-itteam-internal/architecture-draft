@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-21",
-  "jumlah_dokumen": 449,
+  "jumlah_dokumen": 451,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -2653,7 +2653,7 @@
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id"
       ],
       "hash": "ffcd7be998d8f0a14478b00dfda3bb895787e300e258e497332eff4370449800",
-      "ukuran_kb": 79.7,
+      "ukuran_kb": 80.0,
       "ringkasan": "Menjawab: kenapa modul pelatihan dipisah dari Employee Service jadi service sendiri (`services/learning`, `learning_db`, port 6987) dan apa saja kelompok fitur yang dilayaninya. Menjelaskan mekanisme di balik pengajuan pelatihan (rantai SPV ke HR), evaluasi trainer dan kesesuaian materi, course dan bank soal, pre-test/post-test beserta kuota percobaan, rencana pelatihan tahunan, sertifikat otomatis, dan penugasan peserta massal. Juga menjawab bagaimana service ini membaca master karyawan/departemen lewat panggilan internal dan endpoint mana yang dipakai mesin KPI serta kalender terpusat.",
       "kata_kunci": [
         "learning-service",
@@ -7298,6 +7298,40 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0111 Ronda Security di Attendance Service, GPS Membuktikan Lokasi Bukan Titik.md",
+      "judul": "ADR - 0111 Ronda Security di Attendance Service, GPS Membuktikan Lokasi Bukan Titik",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "Diputuskan 2026-09-21, **belum ada kode**. Rancangan lengkapnya di [[GA - Ronda Security]]. Diukur ke `origin/main` `bip-erp` commit `6ef719e3`; kata `patroli` nol hasil di seluruh repo pada saat keputusan ini diambil.",
+      "publik": true,
+      "tautan": [
+        "GA - Ronda Security",
+        "GA - Guestbook System (Complete)",
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "Microservices - Attendance Service",
+        "GA - Dashboard per Posisi",
+        "REF - Kepemilikan Data"
+      ],
+      "hash": "fdf58f74d8d735a0415a4351c00100f4175d80bfaa88b45986dcb93904cce3db",
+      "ukuran_kb": 5.0,
+      "ringkasan": "Menjawab: kenapa modul ronda security tinggal di attendance-service dan bukan service baru, apa yang boleh dan tidak boleh diklaim dari bukti GPS, dan kenapa ronda yang diharapkan diturunkan saat baca alih-alih disimpan. Memuat alasan radius geofence 800m membuat verifikasi per-titik mustahil, serta pemicu kapan pemisahan jadi modul GA tersendiri layak ditinjau ulang.",
+      "kata_kunci": [
+        "ronda",
+        "patroli",
+        "patrol",
+        "security",
+        "satpam",
+        "GPS",
+        "geofence",
+        "radius",
+        "attendance-service",
+        "roster"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -8562,6 +8596,7 @@
       "status_teks": "Konsep / Overview — peta domain GA; mayoritas subsistem masih rencana.",
       "publik": true,
       "tautan": [
+        "GA - Ronda Security",
         "GA - Accident Prevention",
         "GA - Asset Loan & Room Booking",
         "GA - Audit Internal System",
@@ -8576,19 +8611,20 @@
         "GA - Guestbook System (Complete)",
         "BASE - Enterance Point"
       ],
-      "hash": "e2b4ef0c481215bc11ea2eb5f3d71d27e2c13d9c84447bc26ef99e1ed265b3ae",
-      "ukuran_kb": 3.0,
-      "ringkasan": "Menjawab pertanyaan tentang peta menyeluruh domain General Affairs (GA) -- daftar 18 subsistem yang direncanakan (inventory, procurement, K3, checklist, risk management, waste management, building & machine maintenance, audit internal, asset loan & room booking, dll) beserta latar belakang kebutuhan dashboard aset & program paperless GA.",
+      "hash": "854c23f0ae664fb8cdce2c41b1763ecd6fd039a289e9994a743bcb0adca87f3b",
+      "ukuran_kb": 3.4,
+      "ringkasan": "Menjawab: subsistem apa saja yang diminta General Affairs untuk dibangun, dan dokumen mana yang memuat rinciannya. Daftar 18 butir mulai dari inventory, e-procurement, APD dan K3, checklist per peralatan, sampai audit internal dan peminjaman ruang, masing-masing tertaut ke dokumen domainnya.",
       "kata_kunci": [
         "General Affairs",
         "GA",
-        "big picture",
-        "overview GA",
-        "K3",
+        "peta domain",
         "inventory",
         "procurement",
-        "paperless",
-        "dashboard aset"
+        "K3",
+        "APD",
+        "checklist",
+        "audit internal",
+        "aset"
       ]
     },
     {
@@ -8632,10 +8668,13 @@
       "area": "General Affairs",
       "jenis": "domain",
       "status_emoji": "🟡",
-      "status_teks": "Draft / Direncanakan",
+      "status_teks": "Draft / Direncanakan **untuk inspeksi berjadwal per peralatan**. ⚠️ Dua bagian dari lingkup yang dulu dianggap tercakup dokumen ini **sudah berdiri sendiri**, lihat bab di bawah. Diukur 2026-09-21 ke `origin/main` `bip-erp` `6ef719e3`.",
       "publik": true,
       "tautan": [
         "GA - Big Pictures",
+        "GA - Dashboard per Posisi",
+        "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
+        "GA - Ronda Security",
         "APP - Dynamic Task Tracker",
         "GA - Machine & Utility Maintenance",
         "GA - Building Maintenance",
@@ -8643,19 +8682,20 @@
         "GA - Audit Internal System",
         "GA - Risk Management"
       ],
-      "hash": "afcd8d5718fc10667d2efaf73b7aa1dbb71860278920ef9831c416e6a4f84895",
-      "ukuran_kb": 1.5,
-      "ringkasan": "Menjawab pertanyaan tentang bagaimana inspeksi berkala per peralatan GA (Ladder, Excavator, Diesel Generator, Panel Board, APAR) dijadwalkan dan dicatat lewat template checklist, serta perbedaannya dengan Dynamic Task Tracker (checklist = inspeksi terstruktur periodik per aset, bukan tugas ad-hoc).",
+      "hash": "46b6bb29a91046e001d069672c9a78b1007a5c8ed111097bdac3478e2818ddbb",
+      "ukuran_kb": 3.3,
+      "ringkasan": "Menjawab: bagian mana dari kebutuhan checklist GA yang sudah terjawab mekanisme yang ada dan bagian mana yang benar-benar masih kosong. Menjelaskan bahwa nilai_inspeksi_satgas dan ceklis_kpi sudah menutup sebagian lingkup, sehingga yang tersisa hanya inspeksi berjadwal lebih rapat dari mingguan, dan kenapa menambah satuan sub-harian ke form-builder bukan jalan keluarnya.",
       "kata_kunci": [
         "checklist",
-        "inspeksi berkala",
-        "APAR",
-        "diesel generator",
-        "panel board",
-        "excavator",
-        "ladder",
-        "GA",
-        "task tracker"
+        "ceklis",
+        "inspeksi",
+        "Satgas",
+        "5R",
+        "preventive maintenance",
+        "form-builder",
+        "recurrence",
+        "ceklis_kpi",
+        "peralatan"
       ]
     },
     {
@@ -8670,6 +8710,8 @@
         "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
         "HRIS - Matriks KPI per Departemen",
         "GA - Checklist Management",
+        "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
+        "GA - Ronda Security",
         "GA - Guestbook System (Complete)",
         "Microservices - Procurement Service",
         "REF - Layout Dashboard erp-frontend",
@@ -8678,20 +8720,20 @@
         "GA - Procurement System",
         "GA - Building Maintenance"
       ],
-      "hash": "1e2ed2aaaba7edeeb2b14cb53a211264904d3bce11087af7ceb438dfc36e1ecc",
-      "ukuran_kb": 11.7,
-      "ringkasan": "Menjawab: apa isi dashboard yang layak untuk tiap posisi General Affair (Admin General Service, GA Staff, Office Boy, Security) dan Procurement (Leader, Staff Inventory), metrik KPI mana yang sudah punya sumber data dan mana yang terkunci, serta visual utama apa yang disarankan per posisi. Menjelaskan kenapa Office Boy dan Security tidak direkomendasikan dibuatkan dashboard, kenapa nama posisi GA Staff dipakai dua peran, dan kebutuhan backend mana (terutama modul checklist berjadwal) yang membuka metrik paling banyak.",
+      "hash": "ba5820b81d88bce8da89e26ca0f626f4a822219d5fa44286db21902842168dee",
+      "ukuran_kb": 13.9,
+      "ringkasan": "Menjawab: tiap posisi General Affair dan Procurement dinilai dari metrik apa, metrik mana yang sudah punya sumber data, dan posisi mana yang belum layak dibuatkan dashboard beserta alasannya. Memuat peringatan metrik yang tersambung ke sumber keliru, termasuk dua metrik Staff Inventory berbobot 0,6 yang menunjuk data iklan TikTok dan metrik rebate yang menunjuk kontrak karyawan alih-alih kontrak vendor.",
       "kata_kunci": [
-        "dashboard posisi",
+        "dashboard",
+        "KPI",
         "General Affair",
-        "GA",
         "Procurement",
         "Office Boy",
         "Security",
+        "Admin",
         "GA Staff",
-        "KPI",
-        "modul checklist",
-        "ADR 0076"
+        "metrik",
+        "salah petak"
       ]
     },
     {
@@ -8891,6 +8933,48 @@
         "register risiko",
         "bahaya kerja",
         "GA"
+      ]
+    },
+    {
+      "path": "General Affairs/GA - Ronda Security.md",
+      "judul": "GA - Ronda Security",
+      "area": "General Affairs",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "Konsep / Direncanakan. Belum ada kode. Rancangan disetujui 2026-09-21, implementasi belum dimulai.",
+      "publik": true,
+      "tautan": [
+        "APP - MyBharata",
+        "ADR - 0111 Ronda Security di Attendance Service, GPS Membuktikan Lokasi Bukan Titik",
+        "GA - Dashboard per Posisi",
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
+        "GA - Guestbook System (Complete)",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "Microservices - Task Management Service",
+        "Microservices - Attendance Service",
+        "Microservices - Employee Service",
+        "APP - Web ERP",
+        "GA - Big Pictures",
+        "GA - Checklist Management",
+        "GA - Building Maintenance",
+        "HRIS - Matriks KPI per Departemen",
+        "REF - Kepemilikan Data"
+      ],
+      "hash": "857fbb1d24ab14177a0507393c8a6925e5e292f284d48c71430161e5dd319dd8",
+      "ukuran_kb": 10.7,
+      "ringkasan": "Menjawab: bagaimana ronda security dicatat, dibuktikan, dan diubah jadi angka KPI, serta metrik Security mana yang sudah punya sumber dan mana yang belum. Memuat model data dua koleksi, batas tegas apa yang GPS boleh klaim, inventaris bagian yang dipakai ulang dari attendance dan task-management, serta daftar hal yang sengaja ditinggal di luar irisan pertama.",
+      "kata_kunci": [
+        "ronda",
+        "patroli",
+        "patrol",
+        "security",
+        "satpam",
+        "pos jaga",
+        "temuan",
+        "GPS",
+        "shift",
+        "KPI Security"
       ]
     },
     {
@@ -10668,7 +10752,7 @@
         "HRIS - Analysis"
       ],
       "hash": "8c03b1987bcb1e6412064ace5c0839aacda86e5376948d863295482c42332069",
-      "ukuran_kb": 70.0,
+      "ukuran_kb": 70.3,
       "ringkasan": "Menjawab: bagaimana modul pelatihan dan pengembangan karyawan dirancang, entitas apa saja di lingkup MVP (jenis pelatihan, trainer internal/eksternal, event pelatihan, peserta dan kehadiran), serta bagian mana dari modul Training ERPGo yang diambil, disesuaikan, atau dibuang beserta alasannya. Menjelaskan model data, alur proses bisnis termasuk alur ujian e-learning pre-test dan post-test, aktor dan persona, serta kenapa modul ini ditempatkan di service `learning` sendiri. Juga menjawab apa isi tiap tahap rollout dan apa yang masih TBD, misalnya materi, kurikulum per jabatan, dan Talent Pool yang dicatat di dokumen karier.",
       "kata_kunci": [
         "training program",
