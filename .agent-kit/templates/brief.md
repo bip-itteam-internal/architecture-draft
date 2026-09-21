@@ -4,6 +4,7 @@
 - Repo: __REPO__
 - Domain: __DOMAIN__
 - Ukuran: __UKURAN__ (S = satu putaran eksekutor · M = mungkin 2 sampai 3 putaran · L = pecah dulu jadi beberapa brief)
+- Paralel: __PARALEL__ (aman = boleh jalan bersamaan dengan brief di repo LAIN · tidak = berurutan; ragu berarti tidak)
 - Sumber: __SUMBER__
 
 ## Tujuan
@@ -18,6 +19,12 @@ __TUJUAN__
 ## Batas (jangan disentuh)
 
 - __BATAS__
+
+## Kontrak (WAJIB dan IDENTIK di kedua brief bila sepasang brief menyentuh satu endpoint yang sama; hapus bagian ini bila tidak ada)
+
+```
+__KONTRAK__
+```
 
 ## Konteks yang diketahui (grounded, kosongkan bila tidak ada; jangan mengarang)
 

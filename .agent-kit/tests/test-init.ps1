@@ -85,6 +85,28 @@ try {
   Check ($null -ne $st.hooks.UserPromptSubmit) 'settings punya UserPromptSubmit (walau NoPreCommitHook)'
   Check ($null -ne $st.hooks.SessionEnd) 'settings punya SessionEnd (walau NoPreCommitHook)'
 
+  # ---- v1.24.0: peran per lapisan tim IT ----
+  # Penjaga peta peran. Tiap agen kit WAJIB punya entri di PERAN (hooks/kantor-agent.py), kalau tidak
+  # robotnya tampil di Kantor Agent sebagai nama mentah `loop-xxx`. Gagalnya senyap dan kosmetik,
+  # jadi ia hanya tertangkap oleh penjaga seperti ini, bukan oleh mata.
+  $peranPy = Get-Content (Join-Path $kitRoot 'hooks/kantor-agent.py') -Raw -Encoding UTF8
+  $blokPeran = [regex]::Match($peranPy, '(?s)PERAN\s*=\s*\{(.*?)\}').Groups[1].Value
+  $tanpaPeran = @(Get-ChildItem (Join-Path $kitRoot 'agents') -Filter *.md |
+    Where-Object { $blokPeran -notmatch ('"' + [regex]::Escape($_.BaseName) + '"') } |
+    ForEach-Object { $_.BaseName })
+  Check ($blokPeran.Length -gt 0 -and $tanpaPeran.Count -eq 0) ("tiap agen kit punya entri PERAN (tanpa entri: " + (($tanpaPeran -join ', ')) + ")")
+
+  # loop-devops adalah peran PENYIAP: ia menulis compose, workflow, skrip, dan urutan deploy, tetapi
+  # tidak boleh memegang alat untuk menjalankannya. Dijaga di frontmatter `tools`, bukan di prosa,
+  # karena kalimat "jangan eksekusi prod" di dalam berkas agen bukan gerbang (ADR 0077 par 3).
+  $devopsMd = Join-Path $kitRoot 'agents/loop-devops.md'
+  $devopsTools = ''
+  if (Test-Path $devopsMd) {
+    $barisTools = Select-String -LiteralPath $devopsMd -Pattern '^tools:' | Select-Object -First 1
+    if ($barisTools) { $devopsTools = $barisTools.Line }
+  }
+  Check ((Test-Path $devopsMd) -and $devopsTools -and $devopsTools -notmatch 'PowerShell' -and $devopsTools -notmatch 'Bash') "loop-devops penyiap: tools tanpa shell ('$devopsTools')"
+
   # session-start.ps1 harus mengeluarkan JSON sah di stdout DAN menulis berkas sesi.
   # $PWD diset ke $tmp supaya hook menemukan 'architecture-draft' untuk cek staleness.
   $errf = Join-Path $tmp 'hook.err'

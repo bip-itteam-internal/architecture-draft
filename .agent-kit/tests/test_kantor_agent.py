@@ -136,9 +136,24 @@ def test_peta_area_alat(nama, area):
     ("general-purpose", "Generalis"), ("Explore", "Peneliti"), ("Plan", "Arsitek"), ("loop-fix", "Engineer"),
     ("loop-test", "QA"), ("loop-refactor", "Refactor"), ("loop-judge", "Juri"), ("loop-docs", "Penulis"),
     ("claude-code-guide", "Pemandu"), ("agen-baru-tim", "agen-baru-tim"), (None, "subagent"),
+    # peran per lapisan tim IT (kit 1.24.0) dan dua agen kit yang sebelumnya tampil sebagai nama mentah
+    ("loop-fe", "FE"), ("loop-be", "BE"), ("loop-mobile", "Mobile"), ("loop-devops", "DevOps"),
+    ("loop-supervisor", "Supervisor"), ("loop-ekstrak-skill", "Ekstraktor"),
 ])
 def test_peran_dari_agent_type(jenis, hasil):
     assert ka.peran(jenis) == hasil
+
+
+def test_peta_peran_menutupi_seluruh_agen_kit():
+    """Penjaga kedua atas fakta yang sama dengan tests/test-init.ps1, dari sisi penulis.
+
+    Agen kit yang tak punya entri PERAN tetap bekerja, tetapi robotnya tampil sebagai `loop-xxx`
+    dan tak terbaca sebagai peran. Kegagalannya senyap, jadi ia butuh penjaga, bukan kewaspadaan.
+    """
+    agen = sorted(p.stem for p in (Path(ka.__file__).resolve().parent.parent / "agents").glob("*.md"))
+    assert agen, "folder agents kit kosong; penjaga ini jadi vakum"
+    tanpa_peran = [a for a in agen if a not in ka.PERAN]
+    assert tanpa_peran == [], f"agen tanpa entri PERAN: {tanpa_peran}"
 
 
 # ---------- penurunan keadaan (fungsi murni) ----------

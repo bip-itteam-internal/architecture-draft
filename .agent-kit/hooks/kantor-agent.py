@@ -79,10 +79,14 @@ AREA_ALAT = {
     "Agent": "rapat", "Workflow": "rapat", "SendMessage": "rapat",
     "AskUserQuestion": "lounge", "ExitPlanMode": "lounge",
 }
+# Tiap agen kit WAJIB punya entri di sini, dijaga tests/test-init.ps1. Tanpa entri, robotnya tampil
+# dengan nama mentah `loop-xxx`: tidak salah, tetapi tak terbaca sebagai peran, dan gagalnya senyap.
 PERAN = {
     "general-purpose": "Generalis", "Explore": "Peneliti", "Plan": "Arsitek", "loop-fix": "Engineer",
     "loop-test": "QA", "loop-refactor": "Refactor", "loop-judge": "Juri", "loop-docs": "Penulis",
     "claude-code-guide": "Pemandu",
+    "loop-fe": "FE", "loop-be": "BE", "loop-mobile": "Mobile", "loop-devops": "DevOps",
+    "loop-supervisor": "Supervisor", "loop-ekstrak-skill": "Ekstraktor",
 }
 
 
