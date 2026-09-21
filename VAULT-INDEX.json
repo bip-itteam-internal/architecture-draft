@@ -1556,29 +1556,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "75c7be2b787b0566051aa736c2eb8483d07a3e27684805b4a9a2a111e97fbb5e",
-      "ukuran_kb": 547.9,
-      "ringkasan": "Menjawab: apa itu portal web ERP internal \"One Bharata\" (`erp-frontend`), stack dan library apa yang dipakai (Next.js App Router, shadcn/Radix/Tailwind, TanStack Query, recharts, react-i18next), serta bagaimana login, refresh token, dan peran SSO Identity Provider untuk aplikasi lain bekerja. Menjelaskan juga cara kerja role gating sidebar dari cookie `system_roles` (daftar module dan role yang sah, termasuk pengecualian `legal`/`rnd` dan modul `audit` yang murni dari paket izin), pengelompokan menu bersarang, halaman Pengaturan HRGA terpusat beserta sub-menu dan tab-nya, serta dukungan multi-perusahaan (CompanySwitcher, departemen, shift, WiFi, rekrutmen lintas perusahaan). Berisi konvensi wajib yang harus diikuti saat menambah fitur: aturan data-fetching TanStack Query (hook sidebar ber-`enabled`, badge pakai `refetchOnWindowFocus`, pencacah membalas angka) dan konvensi bagan Recharts lewat `ChartContainer`.",
+      "hash": "c7bf6ab115b14e34712776bbbad91dfc0fff6ca0c8067a011917ba0829522965",
+      "ukuran_kb": 553.1,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal Bharata (erp-frontend / \"One Bharata\"), stack teknologinya, dan modul apa saja yang ada di dalamnya. Menjelaskan cara login dan alur SSO (ERP sebagai Identity Provider untuk aplikasi lain seperti Task Manager), bagaimana sidebar dan menu digerbang oleh system_roles serta paket izin, dan bagaimana dukungan multi-perusahaan bekerja (CompanySwitcher, kelola perusahaan/departemen/shift/WiFi per-perusahaan, rekrutmen lintas perusahaan). Juga memuat konvensi wajib frontend: pola data-fetching TanStack Query (hook sidebar ber-enabled, badge pakai refetchOnWindowFocus, pencacah membalas angka) dan konvensi bagan Recharts lewat ChartContainer.",
       "kata_kunci": [
-        "web ERP",
         "erp-frontend",
-        "hris-dashboard",
+        "web ERP",
         "One Bharata",
-        "frontend",
-        "Next.js",
         "SSO",
-        "identity provider",
         "system_roles",
         "role gating",
         "sidebar menu",
         "multi-perusahaan",
-        "multi-tenant",
-        "CompanySwitcher",
         "TanStack Query",
-        "recharts",
-        "ChartContainer",
-        "i18n",
-        "Pengaturan HRGA"
+        "Next.js"
       ]
     },
     {
@@ -1931,19 +1922,19 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "ec187b3ce10410f7d7509f4523ff15590742c59856a7d66d8995ae6962d38426",
-      "ukuran_kb": 130.2,
-      "ringkasan": "Menjawab: bagaimana hak akses seluruh bip-erp disusun lewat tiga sumbu (modul, tingkat aksi, cakupan/reach), bagaimana paket izin bernama menempel pada posisi/jabatan, dan di mana izin ditegakkan (gateway, service Go, cermin di frontend). Juga menjawab modul mana saja yang sudah punya katalog izin, bagaimana izin efektif diresolusi saat login lalu dibawa sebagai klaim JWT dan header `BIP-*`, serta kapan tier `system_roles` lama masih dipakai sebagai fallback dan kenapa klaim modul menang atas fallback itu.",
+      "hash": "0cc2a9cb8e397b2b1f54e07600e6fc8ef13f251ec7d4fde0df88abe4c9402a8e",
+      "ukuran_kb": 132.6,
+      "ringkasan": "Menjawab: bagaimana hak akses di seluruh bip-erp ditentukan lewat tiga sumbu (modul, tingkat aksi, dan cakupan data own/division/all), bagaimana paket hak bernama (permission set) disusun dari katalog per modul lalu menempel pada posisi/jabatan, dan siapa yang boleh mengubah apa (HR memasang paket, IT menyusun isinya). Menjelaskan jalur penegakannya dari resolusi saat login ke klaim JWT, pembersihan header BIP-* di gateway, middleware RequirePermission/gate di service, sampai cermin gerbangnya di frontend, termasuk mekanisme cadangan tier lama (tier fallback) dan kill-switch enforcement. Juga menjawab modul mana saja yang sudah punya katalog dan paket, serta endpoint katalog dan daftar modul yang mengisi layar Master Data.",
       "kata_kunci": [
         "RBAC",
         "permission set",
-        "paket izin",
+        "paket hak",
         "hak akses",
-        "system_roles",
         "reach",
-        "katalog permission",
         "tier fallback",
-        "JWT",
+        "BIP-Permissions",
+        "katalog modul",
+        "master_permission_set",
         "hak per posisi"
       ]
     },
@@ -2665,7 +2656,7 @@
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id"
       ],
       "hash": "1f546ec243e57c2a7494329a4393932cd09ab836841170ad424ee7c9439b4a78",
-      "ukuran_kb": 80.9,
+      "ukuran_kb": 80.6,
       "ringkasan": "Menjawab: di mana modul pelatihan dan LMS tinggal secara teknis (service `learning`, Go + Fiber + MongoDB `learning_db`, port 6987, modul gateway `/api/learning/*`), kenapa ia dipisah dari Employee Service, dan endpoint apa saja yang tersedia (master jenis pelatihan, master trainer, event pelatihan, peserta dan kehadiran termasuk penugasan massal `POST /training/:id/participants/batch`, pengajuan pelatihan berantai SPV lalu HR, evaluasi trainer, course dan bank soal, pre-test/post-test, rencana pelatihan tahunan, sertifikat otomatis). Menjawab juga: izin apa yang menggerbang tiap rute (PermTrainingView, PermTrainingWork, PermTrainingManage, kill-switch TRAINING_PERMISSION_ENFORCEMENT), bagaimana service ini memasok bahan KPI lewat `GET /kpi/pelatihan` berkunci LEARNING_SERVICE_KEY, dan bagaimana kelas yang diikuti seseorang masuk kalender terpusat lewat `GET /internal/calendar-feed`. Berguna saat mencari jebakan kode konkret, misalnya bahwa `CanEnroll` sudah dihapus dan aturan masuk peserta pindah ke `PilihYangBolehMasuk` di `models_participant.go`.",
       "kata_kunci": [
         "learning service",
@@ -10886,7 +10877,7 @@
         "HRIS - Analysis"
       ],
       "hash": "7e527e9b6b07acd64335455f5b2997b5704653d5737ef57b7e04739781502851",
-      "ukuran_kb": 71.2,
+      "ukuran_kb": 71.0,
       "ringkasan": "Menjawab: apa cakupan modul pelatihan dan pengembangan karyawan dari sisi bisnis, yaitu empat entitas inti (Training Types, Trainers internal atau eksternal, Training sebagai transaksi, serta peserta dan kehadiran), model datanya, alur prosesnya, dan siapa aktor atau persona yang memakainya. Menjawab juga: bagian mana dari modul Training ERPGo yang diambil, disesuaikan, atau dibuang beserta alasannya (misalnya Branch dibuang karena perusahaan single-site), kenapa modul ini akhirnya ditempatkan di service `learning` sendiri, dan bagaimana rencana rollout bertahap menuju LMS People Development (materi, kurikulum per jabatan, Talent Pool yang justru dicatat di dokumen Career & Promotion). Berguna untuk memahami alur ujian e-learning pre-test dan post-test, rantai persetujuan pengajuan pelatihan SPV lalu HR, evaluasi trainer empat aspek dengan ambang tiga responden, serta daftar hal yang masih TBD.",
       "kata_kunci": [
         "training program",
