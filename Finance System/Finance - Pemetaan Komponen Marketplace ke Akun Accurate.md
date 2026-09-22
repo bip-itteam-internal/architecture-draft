@@ -144,4 +144,4 @@ Daftar ini penting supaya ketiadaannya tidak dibaca sebagai kelalaian:
 - [[ADR - 0078 Klasifikasi Fee Lazada Mengikuti Pemetaan COA Finance]]
 - [[ADR - 0097 Kompensasi Shopee Susulan Ditahan dan Dicatat AR lewat Koreksi Manual ERP]]
 - [[REF - Kepemilikan Data]]
-- [[Workspace/ANALISA - Setelan Akun Marketplace dan Komponen Tak Dikenal]]
+- [[ANALISA - Setelan Akun Marketplace dan Komponen Tak Dikenal]], pecahan tugasnya
