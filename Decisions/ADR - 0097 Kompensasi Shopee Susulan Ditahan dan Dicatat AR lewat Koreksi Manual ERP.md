@@ -8,7 +8,7 @@ Shopee kadang membayar kompensasi satu pesanan **lebih dari sekali** (contoh pro
 
 *Menggantikan perlakuan cicilan susulan kompensasi Shopee yang dicatat di [[Microservices - Integration Service]] (PR #1731: susulan dibukukan sebagai tambahan pelunasan faktur; PR #1782: kelebihan kompensasi tetap diskon 4003 bernilai minus) — untuk hari penerimaan pada/sesudah tanggal kv. Hari sebelumnya tetap memakai model lama supaya dokumen yang sudah terkirim tak di-EDIT.*
 
-- **Status**: ⚠️ **Diterima, merged (bip-erp #1909, erp-frontend #1595) dan terpasang di prod — terverifikasi 2026-09-16 lewat string di biner Integration-Service, rute `compensation-installments` membalas 200, dan build FE memuat laman Kompensasi Cicilan. BELUM BERLAKU**: kv `shopee-compensation-susulan-hold-date` belum ada di prod (diperiksa 2026-09-17), jadi penahanan dorman. Isian kv di layar Config Accurate menyusul lewat branch `feat/kv-katalog-tanggal` (belum merged, lihat [[APP - Web ERP]]); sampai itu hanya lewat `POST /accurate/settings/kv-configs`.
+- **Status**: ⚠️ **Diterima, merged (bip-erp #1909, erp-frontend #1595), terpasang di prod, dan BERLAKU** — kv `shopee-compensation-susulan-hold-date` dibuat 2026-09-17 berisi `2026-09-01`, jadi penahanannya sudah berjalan (catatan lama di baris ini yang menyebutnya dorman diperiksa tepat pada hari kv itu diisi dan sudah basi; dikoreksi 2026-09-22). Mekanismenya terbukti bekerja, tindak lanjutnya belum: lihat § Keadaan terukur di prod. Isian kv di layar Config Accurate menyusul lewat branch `feat/kv-katalog-tanggal` (belum merged, lihat [[APP - Web ERP]]); sampai itu hanya lewat `POST /accurate/settings/kv-configs`.
 - **Path di repo**:
   - `bip-erp/services/integration/internal/usecase/accurate_receipt_wallet_adjustment.go` (penahanan di `resolveWalletAdjustments`, `catatPenahananShopee`, `penahananTersimpan`)
   - `bip-erp/services/integration/internal/usecase/accurate_receipt_kompensasi_cicilan.go` (laman, aturan akun, `statusPenahananPenerimaan`)
@@ -80,6 +80,21 @@ Mutasi yang sudah tersimpan di `held_compensations` **tetap ditahan persis seper
 - Membukukan cicilan kedua otomatis ke 8001 atau diskon: aturan akunnya bergantung bulan cicilan pertama dan pertimbangan AR per kasus.
 - Menyimpan status ke dokumen penerimaan: salinan yang tak ikut berubah saat koreksi di-void.
 - Endpoint "lepas penahanan": belum ada kasus yang memerlukannya.
+
+### Keadaan terukur di prod (2026-09-22)
+
+Angka di bawah **bergerak**, ukur ulang sebelum dipakai mengambil keputusan.
+
+Penahanan berjalan sebagaimana dirancang: **4 kompensasi senilai Rp787.000 tertahan**, seluruhnya di satu toko, seluruhnya cicilan kedua bertipe `ADJUSTMENT_CENTER_ADD` atas cicilan pertama bertipe `FULFILMENT_COMPENSATE_ADD`, cair 9 sampai 21 September. Nilai `sebelumnya` yang tersimpan cocok persis dengan mutasi dompet pertama tiap pesanan, jadi jalur deteksinya benar. Satu di antaranya berpola tak lazim dan layak diperiksa lebih dulu: cicilan kedua Rp664.000 atas cicilan pertama Rp50.000, menyumbang 84% dari total yang tertahan.
+
+⛔ **Tetapi nol dari empat sudah dicatat, dan yang tertua sudah 13 hari.** Seluruhnya berstatus MENUNGGU: satu-satunya koreksi manual yang ada di seluruh prod milik kanal TikTok bulan Juli hasil serapan otomatis, dan tidak menyebut satu pun pesanan yang ditahan. Tidak ada halangan teknis, sebab keempat penerimaannya SENT sehingga tombol Catat tersedia dan tak satu pun berstatus penerimaan kosong.
+
+Sebabnya bukan di mekanisme penahanan melainkan di alamat pekerjaannya, dan itu dua hal yang tidak diputuskan ADR ini:
+
+- **Antrean tertahan tidak punya pemilik.** Laman sengaja tidak punya konsep penugasan per orang, jadi barisnya milik "tim AR" secara kolektif. Dalam praktiknya berarti milik tidak seorang pun.
+- **Notifikasinya tidak sampai ke yang harus bertindak.** Penahanan dikabarkan lewat Telegram (`u.notify`), bukan ke inbox ERP atau MyBharata milik AR. Yang menerima kabar dan yang harus mencatat adalah pihak berbeda.
+
+Bentuk kegagalannya identik dengan permintaan yang menggantung di space Task Management tanpa admin space: pekerjaannya ada, mekanismenya jalan, tetapi tidak punya alamat. Penutupnya paling murah bukan fitur baru melainkan menunjuk satu pemegang antrean (AR Leader adalah kandidat yang jelas, atau dibagi per toko bila AR memang punya pembagian toko); mengalihkan notifikasi ke inbox orang layak jadi task tersendiri.
 
 ## Dokumen Terkait
 
