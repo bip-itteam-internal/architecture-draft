@@ -7551,20 +7551,20 @@
         "CORE - RBAC dan Permission Set",
         "Sales - ICC Account Manager Mapping"
       ],
-      "hash": "64fbcebb9297b70a133b2d7c6c80476367b7675298f36a96ead0a7cf6ea00c19",
-      "ukuran_kb": 17.4,
-      "ringkasan": "Menjawab: kenapa riwayat komplain produk (komplain gudang dan komplain mutu QC) dibaca dari satu tabel seragam padahal registernya tetap dua, siapa yang merakitnya (agregator baru di employee-service, memakai ulang mekanisme ringkasan_pengajuan.go), dan di mana pemetaan dua kosakata status dikerjakan. Menjelaskan juga kenapa kedua register nol dokumen di prod 22 September 2026: bukan soal jumlah tabel, melainkan paket izin marketing_akuntoko_pemegang belum dipasang ke satu pun dari 36 Account Specialist pemegang toko, sehingga menu komplain tidak terlihat. Memuat batas yang sengaja tidak dijanjikan: bukan rekap berangka, tidak mengubah wewenang gudang atau QC, tetap hanya Shopee, dan baris komplain mutu belum bisa disempitkan per toko.",
+      "hash": "bc8c3d836e3f2c19bfeeb8bf97ccb861a77073dc37227bbfe66d943349604995",
+      "ukuran_kb": 19.7,
+      "ringkasan": "Menjawab: kenapa riwayat komplain produk digabung jadi satu tabel baca untuk pemegang akun toko, leader, dan SPV sementara register gudang dan register QC tetap dua, siapa yang tetap berwenang menutup tiap jenis komplain, dan kenapa kedua register masih kosong (paket izin marketing_akuntoko_pemegang belum dipasang ke seorang pun, sehingga 36 Account Specialist tidak melihat menu komplain apa pun). Menjelaskan juga di mana agregatornya tinggal (employee-service, memakai ulang mekanisme ringkasan_pengajuan.go), kenapa pemetaan dua kosakata status dikerjakan di agregator bukan di layar, kenapa cakupan baris kedua register tidak sebanding sehingga baris QC belum bisa disempitkan per toko, serta apa saja yang sengaja tidak dijanjikan (bukan rekap berangka, tetap hanya Shopee, wewenang dan cara mengajukan tidak berubah).",
       "kata_kunci": [
         "komplain produk",
         "product complaint",
-        "riwayat komplain",
+        "riwayat komplain terpusat",
         "komplain gudang",
-        "quality_complaint",
-        "QC",
-        "agregator employee-service",
-        "marketing_akuntoko_pemegang",
+        "komplain QC",
+        "quality complaint",
         "pemegang akun toko",
-        "Account Specialist"
+        "account specialist",
+        "agregator employee-service",
+        "marketing_akuntoko_pemegang"
       ]
     },
     {
@@ -16079,23 +16079,23 @@
       "tautan": [
         "ADR - 0117 Riwayat Komplain Produk Terpusat di Satu Tabel, Register Tetap Dua",
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
-        "REF - Kepemilikan Data",
-        "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori"
+        "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
+        "REF - Kepemilikan Data"
       ],
-      "hash": "15785096847e75ba7d2b618b60d7b3532aafd3390244a899a57831d19a981bab",
-      "ukuran_kb": 9.4,
-      "ringkasan": "Menjawab: pekerjaan apa saja yang perlu dilakukan untuk mewujudkan riwayat komplain produk terpusat (ADR 0117), urutan dan ketergantungan antar task, serta mana yang bisa jalan paralel. Merinci T1 sampai T8: memasang paket izin pemegang akun toko ke Account Specialist (termasuk jebakan dua position_key 'icc' vs 'account_specialist' dan empat pemegang toko di luar keduanya yang ditangani lewat jalur akun), kabar inbox untuk ulasan bintang rendah, kolom pengaju di tabel komplain QC, agregator GET /komplain/riwayat di employee-service, halaman /marketing/komplain, penataan menu, dan pendaftaran kedua register di peta kepemilikan data. Papan kerja yang berubah tiap item selesai; keputusannya ada di ADR, dan angka pengukurannya bertanggal sehingga wajib diukur ulang sebelum dipakai.",
+      "hash": "48096618767b8688ad592adb3139a2ab74498b5e42b61d661a2c6d1937b6b0cd",
+      "ukuran_kb": 11.9,
+      "ringkasan": "Papan kerja ADR 0117 yang menjawab: pekerjaan apa saja yang harus dilakukan untuk riwayat komplain produk terpusat, urutan dan ketergantungan antar task (pasang paket izin, kabar inbox ulasan bintang rendah, kolom pengaju di tabel QC, identitas item komplain QC diisi server, agregator GET /komplain/riwayat, halaman /marketing/komplain, menu, pendaftaran kepemilikan data, ukur ulang), dan mana yang boleh jalan paralel serta mana yang prasyarat keras. Menjawab juga kenapa pemasangan paket izin harus lewat dua jalur sekaligus (mayoritas pemegang toko ber-position_key icc alih-alih account_specialist, ditambah pemegang toko di luar kedua item posisi yang ditangani lewat jalur akun), radius izin yang diterima sadar, serta gerbang verifikasi yang dituntut tiap task (login ulang, komplain sungguhan lewat gateway, test kontrak atas rekaman respons asli).",
       "kata_kunci": [
-        "komplain",
-        "complaint",
-        "riwayat komplain",
-        "komplain gudang",
-        "komplain QC",
-        "ADR 0117",
-        "Account Specialist",
-        "paket izin",
-        "permission set",
-        "register komplain"
+        "ANALISA komplain terpusat",
+        "daftar task komplain",
+        "paket izin pemegang toko",
+        "position_key icc",
+        "permission_sets",
+        "GET /komplain/riwayat",
+        "halaman marketing komplain",
+        "notifikasi ulasan bintang rendah",
+        "identitas item komplain QC",
+        "account specialist"
       ]
     },
     {

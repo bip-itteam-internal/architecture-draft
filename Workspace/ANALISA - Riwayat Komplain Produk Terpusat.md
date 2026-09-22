@@ -10,13 +10,19 @@ melihat menu komplain mana pun. Angka-angka itu bergerak; ukur ulang sebelum dip
 ```
 T1 (izin) ──┐
 T2 (kabar)  ├─► T8 (ukur ulang) ──► putuskan rekap berangka
-T3 (kolom pengaju) ──► T4 (agregator) ──► T5 (halaman) ──► T6 (menu)
+T3 (kolom pengaju)
+T3b (identitas item diisi server) ──► T4 (agregator) ──► T5 (halaman) ──► T6 (menu)
 T7 (kepemilikan data) bebas
 ```
 
 T1, T2, T3, dan T7 tidak saling menunggu dan bisa jalan paralel. T1 dan T2 yang menentukan
 apakah T4 dan T5 punya isi; T4 dan T5 tetap benar secara teknis tanpa keduanya, tapi tabelnya
 akan kosong bagi audiens utamanya.
+
+⛔ **T3b adalah prasyarat KERAS T5, bukan perapian.** Tanpa identitas item yang berasal dari
+pesanan, register QC tidak punya toko, sehingga kolom Toko kosong untuk seluruh baris QC. Bagi
+pemegang toko justru kolom itu yang paling menentukan, jadi halaman gabungan yang tayang tanpa
+T3b menyajikan tabel yang tidak menjawab pertanyaan pertama pembacanya.
 
 ## Task
 
@@ -80,6 +86,23 @@ Berguna apa pun yang terjadi pada T4 dan T5, dan menjadi fondasi penanda per bar
   menampilkan sel kosong yang terbaca seperti data hilang.
 - Label lewat i18n dua bahasa, dan tanggal diformat di `render` memakai locale aktif.
 
+### T3b. Identitas item komplain QC diisi SERVER dari data pesanan
+
+Menjalankan keputusan 4 [[ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori]],
+yang sudah diputuskan sejak 17 September dan belum ada kodenya. Prasyarat keras T5.
+
+- Register QC mengambil nama produk, SKU, dan identitas toko dari data pesanan integration-service
+  lalu menyalinnya; nilai serupa dari klien diabaikan. Pesanan yang tak ditemukan ditolak dengan
+  pesan yang menjelaskan sebabnya.
+- ⛔ Data pesanan diambil **server ke server**, tidak lewat layar pengaju, sebab responsnya memuat
+  data pembeli yang tidak dibutuhkan untuk mengajukan komplain.
+- Begitu register QC punya identitas toko, dua hal ikut terbuka: kolom Toko di tabel gabungan
+  terisi untuk kedua unit, dan **penanda per baris** di keputusan 6 ADR 0117 bisa dicabut karena
+  barisnya sudah bisa disempitkan per toko.
+- Diukur prod 2026-09-17 sebagai batas yang jujur: dari 65 ulasan buruk, 61 pesanannya ada di
+  `transaction_orders` dan seluruhnya ber-SKU, sedangkan 45 ada di `fulfillment_orders`. Sisanya
+  tidak dapat diajukan sama sekali, dan itu konsekuensi yang sudah diterima ADR 0103.
+
 ### T4. Agregator `GET /komplain/riwayat` di employee-service
 
 Inti ADR 0117. Bersaudara dengan `/pengajuan/ringkasan`, memakai ulang mekanismenya.
@@ -103,8 +126,20 @@ Satu tabel untuk pengaju, leader, dan SPV. Bergantung T4.
 
 - Struktur tabel HRIS: satu kartu, `Banner bare` di dalam prop `toolbar` milik `MainTable`,
   seluruh keadaan di `useTableState`. Jangan merakit tabel, filter, atau paginasi sendiri.
-- Kolom: Unit, Perihal, Pesanan, Toko, Diajukan oleh, Status, Menunggu sejak. Urut dari yang
-  paling lama menggantung. Penyaring Unit dan Status di toolbar; nomor pesanan bisa dicari.
+- Kolom, **tujuh**: Unit, Perihal, Pesanan, Toko, Diajukan oleh, Status, Menunggu sejak. Urut dari
+  yang paling lama menggantung. Penyaring Unit dan Status di toolbar; nomor pesanan bisa dicari.
+  **Tiap kolom wajib terisi untuk kedua register**, dan itu diperiksa dengan membaca model, bukan
+  menduga dari nama (ADR 0117 keputusan 4).
+- ⛔ **Kolom Toko menuntut T3b selesai lebih dulu.** `QualityComplaint` tak punya `shop_id`, jadi
+  tanpa T3b kolom itu kosong untuk seluruh baris QC. Jangan menambalnya di agregator dengan
+  menebak dari `order_ref`: itu sumber kebenaran kedua soal komplain ini milik toko mana.
+- ⚠️ **Produk, SKU, dan tingkat keparahan tidak jadi kolom, dan itu bukan kekurangan yang bisa
+  ditambal.** Register gudang per pesanan, register QC per item; satu pesanan bisa memuat beberapa
+  produk sehingga satu sel Produk untuk baris gudang akan berbohong. Ketiganya muncul di `Sheet`
+  detail bersama atribusi packer.
+- ⚠️ Dua kolom yang bertahan tetap bercatatan: nilai **Pesanan** sisi gudang diverifikasi ke
+  `fulfillment_orders` sementara sisi QC masih teks bebas, dan **Diajukan oleh** sisi QC bisa
+  kosong (token layanan tanpa header identitas) sehingga barisnya ditangani eksplisit.
 - Detail lewat `Sheet` berangka tiga (header tetap, badan menggulir ber-padding, footer aksi).
   Baris gudang membuka sheet tindak lanjut yang ada; baris QC membuka dialog validasi yang ada.
 - Halaman digerbang **cerminnya sendiri plus backend**, dan rutenya **tidak** dimasukkan ke daftar
