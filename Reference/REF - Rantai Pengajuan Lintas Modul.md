@@ -3,6 +3,8 @@
 *Peta rantai bisnis yang **secara alur seharusnya satu pengajuan berjalan sampai selesai**, tetapi di kode dipecah jadi beberapa pengajuan terpisah — sehingga ketika pengajuan pertama disetujui, orang membuka layar lain dan **mengetik ulang** data yang sama sebagai pengajuan baru. Disusun 2026-08-26 dari pembacaan kode, bukan dari dokumen.*
 
 - **Status**: ⚠️ **Peta masalah, belum ada keputusan.** Seluruh temuan terverifikasi di kode; **arah perbaikannya sengaja belum diputuskan** (lihat §Belum Diputuskan). Dokumen ini ada supaya keputusannya diambil dari peta utuh, bukan dari satu rantai yang kebetulan sedang disentuh.
+- **Diukur ulang 2026-09-22** ke `origin/main`, dan hasilnya **lebih baik daripada peta aslinya** di tiga titik, masing-masing sudah diralat di tempatnya: bukti isolasi manufacture di §1 sudah tidak berlaku, `RealisasiQty` di §1 membuat hulu PO Marketing bergerak sebagian, dan learning sudah membangun rantai baru yang tersambung benar (§2). Klaster pengadaan dan produksi tetap putus di **kedua** pemeriksaan: sebelas nama rujukan dicari (`permintaan_id`, `pesanan_id`, `material_order_id`, `marketing_po_id`, `request_id`, `po_id`, `pr_id`, `penerimaan_id`, `budget_id`, `pengajuan_id`, `training_request_id`) dan **seluruhnya nol hasil**, sementara penyambungnya tetap teks (`no_permintaan` 2×, `nomor_po` 2×, `no_pesanan`, `no_terima`) dan kata "terpenuhi" di procurement muncul 5× **seluruhnya di komentar**. ⚠️ Rantai yang dibangun SESUDAH peta ini justru patuh (`plan_item_id`, `requisition_id`, `manpower_plan_id`, `candidate_id`, `program_id`, `ulasan_comment_id`), jadi yang tersisa adalah utang lama, bukan kebiasaan yang masih berjalan.
+- **Gerbangnya kini ada**: `.agent-kit/rules/review-checklist.md` §F2 menolak entitas hilir yang menyimpan ulang hulu tanpa rujukan id, dengan dua pemeriksaan yang sama dengan §Cara mengaudit ulang di bawah. Keparahannya sengaja dibatasi pada rantai putus **baru**; rantai di dok ini tidak memblokir PR yang tak menyentuhnya, karena arah perbaikannya memang belum diputuskan.
 - **Path di repo**: `bip-erp/services/{manufacture,procurement,learning,recruitment,attendance,payroll,employee}` · `bip-erp/shared-library`
 - **Beda dari [[REF - Alur Persetujuan]]**: dokumen itu menjawab **"persetujuan apa saja yang ada dan siapa yang berwenang"**, disusun per-mekanisme-gerbang. Dokumen ini menjawab **"rantai bisnis mana yang terpecah, dan di titik mana ia putus"**, disusun per-alur-bisnis. Sumbunya berbeda; keduanya dipakai bersama.
 
@@ -32,10 +34,12 @@ Rantai bisnisnya: PPIC menghitung kebutuhan bahan → permintaan pengadaan → P
 | **Entitas** | `manufacture.MaterialOrder` → `manufacture.ProcurementPO` → `procurement.PermintaanERP` |
 | **Diduplikasi** | `supplier_name`, `sku_bahan`, `nama_bahan`, `qty_order`, `unit`, `price_per_unit`, `tanggal_kirim_target`, `procurement_pic` — seluruhnya teks/angka bebas (`shared-library/models/manufacture/models.go:619-638`) |
 | **Referensi hilang** | `permintaan_id` · `pesanan_id` · `material_order_id` · `marketing_po_id` — **nol hasil** di seluruh `services/manufacture` |
-| **Penguat** | `services/manufacture/main.go:16` → `var InternalURL = map[string]string{}` — **kosong**. Manufacture-service tak pernah memanggil service lain sama sekali. Diverifikasi langsung. |
+| ~~**Penguat**~~ | ⛔ **Bukti ini SUDAH TIDAK BERLAKU, diukur ulang 2026-09-22.** Dulu berbunyi: `InternalURL` manufacture kosong, jadi service itu tak pernah memanggil siapa pun. Di `origin/main` manufacture memanggil integration di **empat** tempat (`accurate_push.go:294`, `resi.go:345`, `returns.go:351`, `sync_hpp.go:56`) serta employee dan notification (`po_notify.go:108`, `:173`). ⚠️ Yang patah bukan cuma angkanya melainkan **metodenya**: komentar di `po_notify.go:97` menyatakan `EMPLOYEE_MODULE_URL` sengaja dibaca `os.Getenv` langsung, **tidak** lewat map yang divalidasi. Jadi `InternalURL` kosong tak lagi membuktikan sebuah service terisolasi, di sini maupun di service mana pun. Ukur dengan meng-grep `*_MODULE_URL`, bukan map-nya. |
 | **Akibat** | Data yang sama diketik **tiga kali di tiga layar**. `MaterialOrder` bahkan tak punya field status, jadi tak ada cara tahu permintaan bahan mana yang sudah jadi PO. |
 
 Ini bentuk paling murni dari pola tersebut, dan yang paling banyak memakan waktu orang.
+
+⚠️ **Setengah langkah yang sudah ada, diukur 2026-09-22**: `MarketingPOItem.RealisasiQty` (`shared-library/models/manufacture/models.go`) diisi PPIC saat menindak PO, dan dipakai metrik KPI akurasi demand forecasting SPV Marketing. Jadi untuk PO Marketing hulunya **sudah bergerak sebagian**, berbeda dari kalimat "status hulu berhenti bergerak" di §Pola. Yang tetap hilang rujukan id-nya, sehingga realisasi tak bisa ditelusuri ke permintaan mana. `MaterialOrder` sendiri tidak berubah: nol rujukan, nol field status (diperiksa ulang di `origin/main`).
 
 ✅ **Dikuatkan secara independen** oleh [[Manufacture - Material Order (SPK)]] (ditulis 2026-08-26 dari sisi fitur, bukan dari sisi rantai): MO dinyatakan **"tanpa status/approval"**, dan ketiga sub-tab pada layar yang sama — SPK Material Order, PO Marketing, Permintaan Pengadaan — disebut **"entitas terpisah"**. Dua pembacaan yang berangkat dari arah berbeda sampai pada kesimpulan yang sama, dan itu menaikkan keyakinan bahwa keterpisahannya struktural, bukan kebetulan cara baca.
 
@@ -49,6 +53,8 @@ Ini bentuk paling murni dari pola tersebut, dan yang paling banyak memakan waktu
 | **Akibat** | Pengajuan berstatus **Disetujui adalah ujung jalan**. HR membuat event pelatihan dari nol dan mendaftarkan pesertanya ulang. Di frontend pun tak ada aksi lanjutan dari layar pengajuan. |
 
 Rantai ini berada di **satu service yang sama**, jadi ia membuktikan penyebabnya bukan sekadar batas service.
+
+✅ **Dan service yang sama sudah membuktikan bisa**, diukur 2026-09-22. Rantai **baru** rencana pelatihan tahunan ke kelas tersambung benar lewat `training.plan_item_id` (`services/learning/models_training.go`), dan status pelaksanaannya **diturunkan** dari kelas yang tertaut (`statusButirRencana`, dipakai `kpi_rencana_pelatihan.go:65-66`), bukan disimpan sebagai salinan — bentuk paling kuat untuk lolos gerbang §F2, karena status yang diturunkan tak bisa basi. Peserta juga tertaut lewat `TrainingParticipant.TrainingID`. Sementara itu `request_id` tetap **nol hasil**, jadi rantai di atas masih putus. Dua rantai bertetangga di satu service, satu patuh satu tidak: ini menggeser sebabnya dari "tim belum bisa" ke "yang lama belum disentuh".
 
 ### 3. Pengajuan budget → realisasi kas kecil (putus, tersambung hanya lewat agregat)
 
@@ -129,7 +135,7 @@ Belum diputuskan. Diurutkan menurut **rasio nyeri terhadap ongkos**, bukan menur
 
 1. **PR → PO → Penerimaan** — paling murah karena referensinya sudah setengah ada. Menaikkan `NoPermintaan` jadi id di header + menulis status pemenuhan hulu sudah menutup sebagian besar nyerinya, tanpa mesin baru.
 2. **Pengajuan pelatihan → Pelatihan** — satu service, satu field (`request_id`), satu tombol lanjutan. Kasus terkecil yang membuktikan polanya bisa ditutup.
-3. **PPIC → Pengadaan** — nyeri terbesar (tiga kali ketik), tetapi lintas service dan `InternalURL` manufacture masih kosong, jadi ongkos infrastrukturnya nyata.
+3. **PPIC → Pengadaan** — nyeri terbesar (tiga kali ketik). ⚠️ **Ongkosnya turun sejak diukur ulang 2026-09-22**: alasan lama "`InternalURL` manufacture masih kosong, jadi ongkos infrastrukturnya nyata" sudah gugur, manufacture kini memanggil tiga service (lihat §1). Jalur pemanggilannya sudah ada; yang kurang tinggal rujukan id dan status hulu. Urutannya layak ditimbang ulang.
 4. **Pengajuan budget → realisasi kas** — menuntut keputusan bisnis lebih dulu: apakah satu transaksi boleh merealisasikan lebih dari satu pengajuan.
 5. **Mesin alur bersama di `shared-library`** — hanya masuk akal **sesudah** dua sampai tiga rantai di atas dikerjakan tangan. Mengangkat abstraksi sebelum ada tiga pemakai nyata adalah pola yang sudah berulang kali salah di repo ini; lihat prinsip *tunggu pemakai ketiga* di kit.
 
