@@ -51,10 +51,20 @@ function Tulis-Data($sesi, [bool]$Dikenali = $true, $Berhenti = $null, [int]$Umu
   [IO.File]::WriteAllText($tmp, ('window.__KANTOR__ = ' + ($data | ConvertTo-Json -Depth 8 -Compress) + ";`n"), $utf8)
   Move-Item -LiteralPath $tmp -Destination $dataJs -Force
 }
-function Sesi($id, $judul, $area, $keadaan, $alat = '', $detail = '', $sub = @()) {
+# $pos ditaruh PALING BELAKANG supaya pemanggil lama yang posisional tak bergeser artinya.
+function Sesi($id, $judul, $area, $keadaan, $alat = '', $detail = '', $sub = @(), $pos = 'Umum') {
   [ordered]@{ id = $id; judul = $judul; tahap = 'implement'; pr = $null; area = $area; keadaan = $keadaan; alat = $alat; detail = $detail
-    sejak = $null; durasi_detik = $(if ($alat) { 12 } else { $null }); diam_detik = 5; subagent = @($sub)
+    sejak = $null; durasi_detik = $(if ($alat) { 12 } else { $null }); diam_detik = 5; subagent = @($sub); pos = $pos
     asal = 'claude-vscode'; nama = ('uji-' + $id.Substring(0, 2)); pid = 4242; status_proses = 'busy'; menunggu = $null }
+}
+# Kotak ruangan diambil DARI HALAMAN, bukan diketik ulang di sini: denah pernah digeser dan
+# patokan yang diketik ulang lolos-diam untuk denah mana pun (pusat meja rapat sempat tertinggal
+# di koordinat tata letak lama).
+function Geometri { Eval 'window.__KANTOR_UJI__ ? window.__KANTOR_UJI__.geometri() : null' }
+function DiDalam($robot, $kotak, [double]$longgar = 0.6) {
+  if (-not $robot -or -not $kotak) { return $false }
+  return ($robot.x -ge $kotak.x - $longgar) -and ($robot.x -le $kotak.x + $kotak.w + $longgar) -and
+         ($robot.y -ge $kotak.y - $longgar) -and ($robot.y -le $kotak.y + $kotak.d + $longgar)
 }
 function Sub($id, $peran, $area, $keadaan, $alat = '') {
   [ordered]@{ id = $id; jenis = 'Explore'; peran = $peran; deskripsi = 'uji'; area = $area; keadaan = $keadaan; alat = $alat; detail = ''
@@ -129,9 +139,37 @@ try {
   $b = $r | Where-Object { $_.key -eq 'bbbbbbbb-2222' }
   $s = $r | Where-Object { $_.key -eq 'aaaaaaaa-1111:sub1' }
   Check ($ok -and $a.area -eq 'server' -and $b.area -eq 'meja' -and $s.area -eq 'perpustakaan') '2 normal: data.js terbaca, 3 robot tiba di server/meja/perpustakaan dan tak ada yang masih berjalan'
-  Check ($null -ne $a -and $a.x -ge 12 -and $a.x -le 26 -and $a.y -ge 0 -and $a.y -le 6) "2 posisi robot server benar-benar di dalam ruang server ($($a.x), $($a.y))"
-  Check ($null -ne $s -and $s.x -ge 0 -and $s.x -le 12 -and $s.y -ge 0 -and $s.y -le 6) "2 posisi subagent benar-benar di dalam perpustakaan ($($s.x), $($s.y))"
+  # Ruang server kini ZONA di dalam ruangan Tech Development, bukan ruangan tersendiri.
+  $geo = Geometri
+  $kServer = $geo.server
+  Check (DiDalam $a $kServer) "2 posisi robot server benar-benar di dalam zona server ruangan IT ($($a.x), $($a.y))"
+  # Sesi tanpa pos yang dikenali TIDAK dititipkan ke departemen orang lain: ia duduk di bangku
+  # cadangan dekat pintu, dan kartunyalah yang menjelaskan sebabnya.
+  $bk = @($geo.cadangan)
+  $bangku = @{ x = $bk[0].x; y = $bk[0].y; w = $bk[-1].x - $bk[0].x; d = 0.1 }
+  Check (DiDalam $s $bangku) "2 posisi subagent sesi tanpa pos: bangku cadangan dekat pintu ($($s.x), $($s.y))"
   Foto '2-normal'
+
+  # 2b. POS DEPARTEMEN: inti seluruh perubahan ini. Robot duduk di ruangan departemen yang sedang
+  # dikerjakan sesinya, dan yang menjalankan perintah berjalan ke ruang server yang HANYA ada di
+  # pos Tech Development. Tanpa uji ini, salah-petak pos tak berbunyi apa pun di layar.
+  Tulis-Data @(
+    (Sesi 'aaaaaaaa-1111' 'Pos Marketing' 'meja' 'alat' 'Edit' 'x.tsx' @((Sub 'sub1' 'Peneliti' 'perpustakaan' 'alat' 'Grep')) 'Marketing'),
+    (Sesi 'bbbbbbbb-2222' 'Pos IT' 'meja' 'alat' 'Edit' 'y.go' @() 'Tech Development'),
+    (Sesi 'cccccccc-3333' 'Pos Finance ke server' 'server' 'alat' 'PowerShell' 'go build' @() 'Finance'))
+  $ok = Tunggu { $r = Robot; $r.Count -eq 4 -and -not ($r | Where-Object { $_.jalan }) } 40
+  $rM = Robot | Where-Object { $_.key -eq 'aaaaaaaa-1111' }
+  $rSub = Robot | Where-Object { $_.key -eq 'aaaaaaaa-1111:sub1' }
+  $rIT = Robot | Where-Object { $_.key -eq 'bbbbbbbb-2222' }
+  $rFin = Robot | Where-Object { $_.key -eq 'cccccccc-3333' }
+  $geo = Geometri
+  $kMarketing = $geo.pos.Marketing
+  $kIT = $geo.zona.'Tech Development'
+  Check ($ok -and (DiDalam $rM $kMarketing)) "2b pos: Lead yang menyentuh berkas Marketing duduk di ruangan Marketing ($($rM.x), $($rM.y))"
+  Check (DiDalam $rSub $kMarketing) "2b pos: subagent ikut ke ruangan induknya, bukan ke perpustakaan bersama ($($rSub.x), $($rSub.y))"
+  Check (DiDalam $rIT $kIT) "2b pos: Lead pos Tech Development duduk di ZONA KERJA ruangannya, bukan di antara rak server ($($rIT.x), $($rIT.y))"
+  Check ((DiDalam $rFin $geo.server) -and -not (DiDalam $rFin $geo.pos.Finance)) "2b server: sesi pos Finance yang menjalankan perintah BERJALAN ke ruang server di pos IT ($($rFin.x), $($rFin.y))"
+  Foto '2b-pos'
 
   # 3. data berganti tanpa reload; pod dan warna Lead tetap
   $podA = $a.pod; $warnaA = $a.warna; $podB = $b.pod; $warnaB = $b.warna
@@ -249,38 +287,56 @@ try {
   function Arah([string]$key) { $r = Robot | Where-Object { $_.key -eq $key }; if ($r) { return $r.arah }; return $null }
   # keadaan 'alat' dipakai, bukan 'berpikir': histeresis berpikir menahan robot di ruang sebelumnya 20 detik
   # dua subagent supaya KEDUA bangku pod terisi: yang di barat meja menghadap timur, yang di timur menghadap barat
-  Tulis-Data @((Sesi 'aaaaaaaa-1111' 'Lead di meja' 'meja' 'alat' 'Edit' 'x.py' @((Sub 'sub1' 'Peneliti' 'meja' 'alat' 'Edit'), (Sub 'sub2' 'Peneliti' 'meja' 'alat' 'Edit'))),
+  Tulis-Data @((Sesi 'aaaaaaaa-1111' 'Lead di meja' 'meja' 'alat' 'Edit' 'x.py' @((Sub 'sub1' 'Peneliti' 'meja' 'alat' 'Edit'), (Sub 'sub2' 'Peneliti' 'meja' 'alat' 'Edit')) 'Finance'),
     (Sesi 'bbbbbbbb-2222' 'Lead di server' 'server' 'alat' 'PowerShell' 'pnpm test'),
     (Sesi 'cccccccc-3333' 'Lead di rapat' 'rapat' 'menunggu_subagent'),
     (Sesi 'cccccccc-3334' 'Lead di rapat 2' 'rapat' 'menunggu_subagent'),
     (Sesi 'cccccccc-3335' 'Lead di rapat 3' 'rapat' 'menunggu_subagent'),
     (Sesi 'cccccccc-3336' 'Lead di rapat 4' 'rapat' 'menunggu_subagent'),
     (Sesi 'dddddddd-4444' 'Lead di lounge' 'lounge' 'menunggu_anda'),
-    (Sesi 'eeeeeeee-5555' 'Lead di perpustakaan' 'perpustakaan' 'alat' 'Grep' 'pola'))
+    # diberi pos: tanpa pos ia duduk di bangku cadangan yang menghadap selatan, dan uji arah
+    # rak buku di bawah jadi menguji bangku, bukan rak.
+    (Sesi 'eeeeeeee-5555' 'Lead di perpustakaan' 'perpustakaan' 'alat' 'Grep' 'pola' @() 'Quality'))
   $ok = Tunggu { @(Robot | Where-Object { -not $_.pergi -and -not $_.jalan }).Count -eq 10 } 40
   $rA = Robot | Where-Object { $_.key -eq 'aaaaaaaa-1111' }
   Check ($ok -and (Arah 'aaaaaaaa-1111') -eq 'selatan') "3f arah: Lead di pod menghadap mejanya, selatan (dapat '$(Arah 'aaaaaaaa-1111')')"
-  $barat = Robot | Where-Object { $_.key -like 'aaaaaaaa-1111:*' -and $_.x -lt $rA.x }
-  $timur = Robot | Where-Object { $_.key -like 'aaaaaaaa-1111:*' -and $_.x -gt $rA.x }
-  Check ($barat -and $timur -and $barat.arah -eq 'timur' -and $timur.arah -eq 'barat') "3f arah: bangku pod sisi barat menghadap timur dan sisi timur menghadap barat (dapat '$($barat.arah)' dan '$($timur.arah)')"
+  # Pod digantikan RUANGAN POS: dua subagent sesi yang sama menempati dua slot BERBEDA di ruangan
+  # departemen induknya, dan keduanya berdiri di depan rak menghadap rak (utara).
+  $subA = @(Robot | Where-Object { $_.key -like 'aaaaaaaa-1111:*' })
+  $kFinance = (Geometri).pos.Finance
+  $beda = ($subA.Count -eq 2) -and (($subA[0].x -ne $subA[1].x) -or ($subA[0].y -ne $subA[1].y))
+  $didalam = ($subA | Where-Object { DiDalam $_ $kFinance }).Count
+  Check ($beda -and $didalam -eq 2 -and -not ($subA | Where-Object { $_.arah -ne 'utara' })) "3f arah: dua subagent menempati dua slot berbeda di ruangan pos induknya dan menghadap rak ($didalam di dalam, arah $(($subA | ForEach-Object { $_.arah }) -join '/'))"
   Check ((Arah 'bbbbbbbb-2222') -eq 'utara') "3f arah: robot ruang server menghadap rak, utara (dapat '$(Arah 'bbbbbbbb-2222')')"
   Check ((Arah 'eeeeeeee-5555') -eq 'utara') "3f arah: robot perpustakaan menghadap rak buku, utara (dapat '$(Arah 'eeeeeeee-5555')')"
   Check ((Arah 'dddddddd-4444') -eq 'selatan') "3f arah: robot lounge menghadap penonton, selatan (dapat '$(Arah 'dddddddd-4444')')"
   # empat kursi terisi supaya KEDUA sumbu pembulatan teruji: satu kursi saja bisa kebetulan timur/barat
   # sehingga cabang utara/selatan lolos tanpa penjaga
   $rapatSemua = @(Robot | Where-Object { $_.area -eq 'rapat' -and -not $_.pergi })
+  # Pusat meja DIBACA dari halaman. Sebelumnya ia diketik ulang (22; 11,5) dan tertinggal di
+  # koordinat tata letak lama, sehingga check ini gagal atas kursi yang sebenarnya sudah benar.
+  $pusat = (Geometri).pusat_rapat
   $salah = @()
   foreach ($r in $rapatSemua) {
-    $dx = 22 - $r.x; $dy = 11.5 - $r.y
+    $dx = $pusat.x - $r.x; $dy = $pusat.y - $r.y
     $h = if ([Math]::Abs($dx) -ge [Math]::Abs($dy)) { if ($dx -ge 0) { 'timur' } else { 'barat' } } else { if ($dy -ge 0) { 'selatan' } else { 'utara' } }
     if ($r.arah -ne $h) { $salah += ("{0} di ({1};{2}) menghadap {3}, seharusnya {4}" -f $r.key.Substring(0, 8), $r.x, $r.y, $r.arah, $h) }
   }
   $sumbuX = @($rapatSemua | Where-Object { $_.arah -eq 'timur' -or $_.arah -eq 'barat' }).Count
   $sumbuY = @($rapatSemua | Where-Object { $_.arah -eq 'utara' -or $_.arah -eq 'selatan' }).Count
   Check ($rapatSemua.Count -ge 4 -and $salah.Count -eq 0 -and $sumbuX -ge 1 -and $sumbuY -ge 1) "3f arah: $($rapatSemua.Count) kursi ruang rapat menghadap pusat meja, dibulatkan empat arah, kedua sumbu terwakili ($sumbuX timur/barat, $sumbuY utara/selatan; salah: $($salah -join '; '))"
-  $mata = Eval '(function () { var g = document.querySelector("[data-lead=eeeeeeee-5555] .badan"); return g ? (g.innerHTML.match(/88ffff/g) || []).length : -1; })()'
-  Check ($mata -eq 0) "3f arah: robot yang menghadap utara digambar dari punggung, tanpa mata ($mata mata)"
-  $ledOk = Eval '(function () { var e = document.getElementById("led-pod-0"); return !!e && !!e.getAttribute("fill"); })()'
+  # Mata dihitung lewat KELAS, bukan lewat warnanya: sejak robot modern (1.26.0) warna mata =
+  # warna sesi, jadi mematok '88ffff' akan hijau untuk implementasi apa pun dan check-nya vakum.
+  # Kontrol positifnya wajib ada di baris yang sama: 0 mata tanpa pembanding tak membuktikan
+  # bahwa yang menghadap kamera MEMANG bermata.
+  $mataUtara = Eval '(function () { var g = document.querySelector("[data-lead=eeeeeeee-5555] .badan"); return g ? g.querySelectorAll(".mata").length : -1; })()'
+  $mataDepan = Eval '(function () { var g = document.querySelector("[data-lead=dddddddd-4444] .badan"); return g ? g.querySelectorAll(".mata").length : -1; })()'
+  $senyumDepan = Eval '(function () { var g = document.querySelector("[data-lead=dddddddd-4444] .badan"); return g ? g.querySelectorAll(".senyum").length : -1; })()'
+  Check ($mataUtara -eq 0 -and $mataDepan -eq 2 -and $senyumDepan -eq 1) "3f arah: yang menghadap utara digambar dari punggung tanpa mata ($mataUtara), yang menghadap selatan bermata dua dan bersenyum ($mataDepan mata, $senyumDepan senyum)"
+  # Identitas sesi pindah ke cahaya visor, jadi warna mata WAJIB ikut warna sesi, bukan tetap cyan
+  $warnaMata = Eval '(function () { var g = document.querySelector("[data-lead=dddddddd-4444] .badan .mata"); return g ? g.getAttribute("fill") : ""; })()'
+  Check ($warnaMata -and $warnaMata -ne '#88ffff' -and $warnaMata -match '^#') "3f identitas: mata memakai warna sesi, bukan cyan tetap (dapat '$warnaMata')"
+  $ledOk = Eval '(function () { var e = document.getElementById("led-pos-0"); return !!e && !!e.getAttribute("fill"); })()'
   Check ($ledOk -eq $true) '3f pod: penanda warna Lead tetap ada sesudah layar monitor diputar menghadap robot'
   Foto '3f-arah'
 
@@ -330,6 +386,58 @@ try {
   })()'
   Check ($kembali.tampil -eq $true -and $kembali.teks -eq 'sembunyikan panel' -and $kembali.aria -eq 'true' -and $kembali.kartu -gt 0) "3h panel: saklar mengembalikannya lengkap dengan kartunya ($($kembali.kartu) kartu)"
   Foto '3h-panel'
+
+  # 3i. menyorot sebuah sesi memperbesar denah ke robotnya, dan kameranya mengikutinya berjalan.
+  # Yang diukur viewBox SUNGGUHAN, bukan sekadar kelas .sorot: kelas bisa terpasang sementara
+  # kameranya tak bergerak sama sekali, dan check yang cuma melihat kelas akan hijau untuk itu.
+  function ViewBox { $v = Eval '(function () { return document.getElementById("denah").getAttribute("viewBox"); })()'; return @($v -split '\s+' | ForEach-Object { [double]$_ }) }
+  $vAwal = ViewBox
+  # id sesi yang hidup berganti antar langkah, jadi yang diklik robot mana pun yang sedang ada;
+  # mematok id membuat check-nya gagal bukan karena kameranya, melainkan karena robotnya tak ada
+  $adaRobot = Eval '(function () { var g = document.querySelector("#dunia .robot[data-lead]"); if (!g) return 0; g.dispatchEvent(new MouseEvent("click", { bubbles: true })); return 1; })()'
+  $okZoom = Tunggu { $v = ViewBox; $v[2] -lt ($vAwal[2] * 0.6) } 8
+  $vZoom = ViewBox
+  Check ($adaRobot -eq 1 -and $okZoom -and $vZoom[2] -lt $vAwal[2]) "3i kamera: menyorot sesi memperbesar denah (lebar viewBox $([int]$vAwal[2]) -> $([int]$vZoom[2]))"
+  # â›” JANGAN kembalikan check "pusat viewBox == x robot". Pusat kamera sengaja DIJEPIT ke kotak
+  # denah (targetKamera di template) supaya menyorot robot di pinggir tak memperlihatkan latar
+  # kosong, jadi untuk robot di tepi pusatnya memang TIDAK mendarat di robotnya -- terukur 55px
+  # untuk robot ruang server, dan itu perilaku yang benar, bukan kamera yang meleset. Yang
+  # dijanjikan ke pemakai cuma dua: robotnya TERLIHAT, dan kameranya IKUT BERGERAK saat ia
+  # berjalan. Keduanya diuji di bawah.
+  function PosisiSorot {
+    Eval '(function () {
+      var v = document.getElementById("denah").getAttribute("viewBox").trim().split(/\s+/).map(Number);
+      var g = document.querySelector("#dunia .robot.sorot");
+      if (!g) return null;
+      var m = /translate\(([-0-9.]+),([-0-9.]+)\)/.exec(g.getAttribute("transform") || "");
+      if (!m) return null;
+      var rx = parseFloat(m[1]), ry = parseFloat(m[2]);
+      return { rx: rx, ry: ry, cx: v[0] + v[2] / 2, cy: v[1] + v[3] / 2,
+        dalam: rx > v[0] && rx < v[0] + v[2] && ry > v[1] && ry < v[1] + v[3] };
+    })()'
+  }
+  $okTampak = Tunggu { $p = PosisiSorot; $p -and $p.dalam } 15
+  $p1 = PosisiSorot
+  Check ($okTampak -and $p1.dalam) "3i kamera: robot yang disorot benar-benar masuk bingkai (robot $([int]$p1.rx), pusat $([int]$p1.cx))"
+  # Kamera MENGIKUTI: robot yang sama disuruh pindah ruangan, dan pusat kamera harus ikut bergeser.
+  # Tanpa check ini, kamera yang cuma mengecil sekali lalu diam akan tetap hijau.
+  $keySorot = Eval '(function () { var g = document.querySelector("#dunia .robot.sorot"); return g ? g.getAttribute("data-lead") : null; })()'
+  if ($keySorot) {
+    Tulis-Data @((Sesi $keySorot 'Sorot berjalan' 'lounge' 'menunggu_anda'))
+    $geser = Tunggu { $p = PosisiSorot; $p -and [Math]::Abs($p.cx - $p1.cx) -gt 60 } 25
+    $p2 = PosisiSorot
+    Check ($geser -and $p2.dalam) "3i kamera: kamera IKUT saat robotnya berjalan (pusat $([int]$p1.cx) -> $([int]$p2.cx), robot tetap di bingkai)"
+  } else {
+    Check $false '3i kamera: robot yang disorot tak punya data-lead, uji ikut-berjalan tak bisa dijalankan'
+  }
+  $chipZoom = Eval '(function () { var e = document.getElementById("lepas-sorot"); return !!e && !e.hidden; })()'
+  Check ($chipZoom -eq $true) '3i kamera: petunjuk cara keluar tampil selagi kamera mengikuti'
+  Foto '3i-kamera'
+  Eval '(function () { document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true })); return 1; })()' | Out-Null
+  $okLepas = Tunggu { $v = ViewBox; [Math]::Abs($v[2] - $vAwal[2]) -lt 1 } 8
+  $chipLepas = Eval '(function () { var e = document.getElementById("lepas-sorot"); return !!e && e.hidden; })()'
+  $vAkhir = ViewBox
+  Check ($okLepas -and $chipLepas -eq $true) "3i kamera: Esc melepas sorotan dan kamera kembali ke denah penuh (lebar $([int]$vAkhir[2]))"
 
   # 4. ramai: enam Lead di ruang server -> label ringkas
   Tulis-Data (1..6 | ForEach-Object { Sesi ('cccccccc-000' + $_) ('Lead ramai ' + $_) 'server' 'alat' 'PowerShell' 'pnpm test' })

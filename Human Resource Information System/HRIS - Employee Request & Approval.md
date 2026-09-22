@@ -81,6 +81,66 @@ Tiap turunan punya aturan tanggal sendiri (grounded ke kode attendance service).
 
 **Catatan konsistensi gaji (gap diketahui):** karena Leave bisa backdate & Correction berlaku mundur 7 hari, pengajuan **bisa melewati cutoff** periode gaji → bila periode sudah tutup-buku & dibayar, perubahan attendance tak otomatis ter-rekonsiliasi dengan gaji (mismatch). **Keputusan saat ini: dibiarkan apa adanya** (mengikuti perilaku Leave yang memang tanpa penjaga cutoff). Bila diperlukan, aturan cutoff = **keputusan level payroll terpisah** (sumber tanggal cutoff / flag `locked`), berlaku lintas-request — belum dibangun.
 
+## ⛔ Pengajuan yang MATI karena didiamkan — diukur prod 2026-09-21
+
+Pengajuan yang tak diputus dalam 24 jam ditandai `Diabaikan` oleh `AttendanceSystem`. Diukur di produksi: **119 pengajuan mati begitu, lawan 13 yang benar-benar ditolak.** Sembilan banding satu. Tiga sebab, kekuatan buktinya berbeda-beda.
+
+### ⛔ 1. Jalur Direktur mengabari penerima KOSONG — 15 dari 15 mati, nol pernah disetujui
+
+Ketika seorang supervisor mengajukan cuti atau dinas **untuk dirinya sendiri**, slot SPV dialihkan ke Direktur. Sebab langsungnya ada di kode, bukan dugaan (`services/attendance/main.go:2425-2429`, dan identik di `business_trip.go:159-162` + `:230`):
+
+```go
+if employeeID == spvReview.EmployeeID {
+    entry.SpvReview.EmployeeID = ""        // dikosongkan di sini
+    entry.SpvReview.FullName = "Direktur"
+}
+go pushSupervisorLeaveReviewNotification(entry.FullName, entry.SpvReview.EmployeeID, ...)
+                                                          // dikirim ke string KOSONG
+```
+
+Pemberitahuannya ditujukan ke `SpvReview.EmployeeID` yang baru saja dikosongkan empat baris di atasnya, jadi **tak seorang pun pernah dikabari**. Dua puluh empat jam kemudian sistem menandainya diabaikan.
+
+Terukur: **15 pengajuan pernah masuk jalur ini (8 cuti + 7 dinas), 15-15nya mati, nol disetujui.** ⚠️ **Tujuh di antaranya SESUDAH [[APP - Web ERP]] §Ruang Direktur hidup (2026-08-10)**, yang terbaru **2026-09-19** — jadi layar itu tidak menyembuhkannya, dan memang tak bisa: ia hanya menolong orang yang datang melihat, sementara tak ada apa pun yang memanggilnya. Yang terkena lapisan pimpinan sendiri (Kyura Supervisor 3×, HRD Supervisor 3×, Leader 3×, Quality Supervisor 2×, dan lainnya).
+
+#### ⚠️ Perbaikannya: siaran departemen, dan siapa yang benar-benar menerimanya
+
+Diperbaiki di dua jalur terpisah yang berbagi sebab yang sama, keduanya merged 2026-09-21: bip-erp [#1985](https://github.com/bip-itteam-internal/bip-erp/pull/1985) untuk jalur **pembuatan**, dan [#1986](https://github.com/bip-itteam-internal/bip-erp/pull/1986) untuk **pengingat T+18 jam** (`cron.go`, tiap jam tepat) — kesempatan terakhir sebelum sistem menandai `Diabaikan`. Memperbaiki yang pertama saja tidak cukup, dan itu tidak terlihat dari jalur pertama.
+
+Keduanya memakai `sendDepartmentNotification` ke `Kesekretariatan` dengan kategori `request-waiting-review` yang **sudah** terdaftar, jadi tak ada kategori inbox baru dan tak ada perubahan di MyBharata maupun erp-frontend.
+
+⚠️ **Penerimanya lebih luas daripada yang berwenang memutus, dan itu disengaja.** Siaran pergi ke seluruh anggota Kesekretariatan yang punya perangkat mobile aktif ber-token, sementara yang boleh memutus hanya dua nama jabatan (`common.SetaraDirektur`: `direktur`, `corporate secretary`) — sejalan dengan catatan di [[REF - Alur Persetujuan]] bahwa staf Kesekretariatan memang sudah MELIHAT antrean ini lewat pencocokan departemen.
+
+Diukur prod 2026-09-21 (meniru filter `/list?type=fcm-token&platform=mobile` persis): departemen itu berisi **11** orang, **8** punya perangkat aktif ber-token, dan **kedua** yang berwenang termasuk di dalamnya. ⛔ Angka itu **keadaan, bukan aturan** — ukur ulang sebelum dipakai. Risikonya nyata: daftar penerima ditarik dari perangkat mobile, jadi bila yang berwenang berhenti memakai MyBharata daftarnya kosong dan kegagalannya **identik** dengan bug yang baru saja ditambal. #1986 karena itu menambahkan log `tak punya anggota berperangkat aktif` supaya kejadian berikutnya berbunyi alih-alih diam.
+
+🟡 **Status per 2026-09-21: merged, PROD BELUM.** Gerbang biner di `Attendance-Service` (`grep -c berperangkat /service`) masih **0**, dengan kontrol positif 11 dan kontrol negatif 0. Perintah deploy dan gerbang verifikasi lapangannya ada di `.task-plans/2026-09-21-deploy-notif-direktur.md`; prosedur induknya [[RUN - Deploy Microservices bip-erp]]. ⛔ **Status 200 tidak membuktikan apa pun di kelas ini** — buktinya dokumen `notification_db.inbox` yang bertambah untuk penerima yang berwenang, dan baseline pembandingnya sudah diambil.
+
+### ⛔ 2. Notifikasi "menunggu persetujuan" tak bisa diklik ke mana pun
+
+**2.312 dari 2.312** dokumen `notification_db.inbox` berkategori `request-waiting-review` punya `action` **kosong**: tanpa `app_route`, tanpa `web_route`. Bandingkan kategori lain yang membawanya: `form-submitted` (1.051) dan `form-published` (950) ber-`app_route`, `task-created` 712 ber-`app_route` dan 545 bahkan ber-`web_route`.
+
+Jadi pemberitahuan persetujuan yang paling banyak dikirim di seluruh sistem justru satu-satunya yang tak mengantar penerimanya ke barang yang harus ia putuskan. Bentuk `action` dan cara mengisinya ada di [[Microservices - Notification Service]].
+
+### ⚠️ 3. Sabtu, dan ini bucket TERBESAR
+
+Tingkat kematian menurut hari pembuatan, berpembanding (bukan jumlah mentah):
+
+| Hari | Cuti | Koreksi | Dinas |
+|---|---|---|---|
+| Senin–Kamis | 5,0–7,0% | 0–9,1% | 0–14,3% |
+| Jumat | 7,1% | 14,3% | 53,3% |
+| **Sabtu** | **17,1%** | **20,5%** | 25% |
+
+Sekitar **31 dari 119** kematian lahir dari pengajuan hari Jumat/Sabtu, lebih banyak daripada jalur Direktur. Mekanismenya: 24 jam dari Sabtu mendarat di Minggu.
+
+### ✅ Dua hipotesis yang DIUJI DAN GUGUR — jangan dibangun di atasnya
+
+- **Jendela 24 jam terlalu pendek: TIDAK.** Cuti yang disetujui (n=1.014) diputus pada median **0,4 jam**, p90 9,5 jam, **p99 23,1 jam**. Yang mati berumur median 24,4 jam, maksimum 25 — tepat di batas. Penyetuju yang menengok memutus cepat; memperpanjang jendela hanya menunda kematian yang sama.
+- **Orang tak membaca notifikasi: TIDAK menjelaskan apa pun.** Seno membaca **0,1%** dari 772 notifikasinya tetapi tingkat kematiannya **paling rendah** (2,0%); Wirawan membaca 3,2% dengan tingkat kematian **paling tinggi** (26,9%). Diki 100% terbaca, hampir pasti karena "tandai semua dibaca", sehingga `is_read` sendiri bukan ukuran yang bisa dipercaya. Nol korelasi.
+
+### Batasan yang mengikat perbaikannya
+
+Alur ini dipakai bersama web dan MyBharata. Perbaikan 1 dan 3 **murni server-side**, tak menyentuh kode mobile. Perbaikan 2 aman **selama memakai ulang kategori yang sudah ada**: MyBharata memilih label, warna, dan ikon dari kategori, dan kategori baru yang tak dipetakan jatuh ke `default` lalu tampil dengan label yang salah ([[Microservices - Notification Service]], daftar-izin `notification.InboxCategories` di `shared-library`). Perbaikan 3 mengubah kebijakan, bukan cuma kode, jadi periksa `BUSINESS_LOGIC_IMPLEMENTATION.md` di repo mobile lebih dulu.
+
 ## Manfaat & Catatan
 
 - **Reuse infrastruktur** → konsisten + cepat menambah jenis request baru

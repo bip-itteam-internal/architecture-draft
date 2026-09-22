@@ -131,14 +131,18 @@ $cm = Get-Content (Join-Path $kitRoot 'templates\workspace-CLAUDE.md') -Raw -Enc
 $cm = $cm.Replace('__KIT_VERSION__', $kitVer).Replace('__ACTIVE_PROJECT__', $active)
 [System.IO.File]::WriteAllText((Join-Path $claude 'CLAUDE.md'), $cm, $utf8NoBom)
 
-# 7. git hooks lokal (pre-push) lewat core.hooksPath ABSOLUT per repo kode.
+# 7. git hooks lokal (pre-push) lewat core.hooksPath ABSOLUT per repo kode DAN vault.
 # .git/hooks tidak ikut ter-clone, jadi tanpa langkah ini gerbangnya cuma hidup di mesin
 # yang kebetulan memasangnya. Path absolut karena worktree tertaut punya root berbeda.
 # Repo yang sudah punya hooksPath lain (mis. husky) DILEWATI, bukan ditimpa.
+#
+# VAULT IKUT sejak 1.25.0 (ADR 0077 par 4): sebelumnya ia sengaja dikecualikan, dan akibatnya
+# test milik kit sendiri tidak pernah digerbang apa pun. Push dokumentasi tetap seketika karena
+# gerbangnya menyaring path lebih dulu (lihat hooks/gerbang-kit.py).
 $githooks = Join-Path $claude 'hooks\githooks'
 $hookDipasang = @(); $hookDilewati = @()
 if (-not $NoGitHooks) {
-  foreach ($p in $projects) {
+  foreach ($p in (@($projects) + @('architecture-draft'))) {
     $dir = Join-Path $ws $p
     $existing = ''
     try { $existing = (git -C $dir -c core.fsmonitor=false config --get core.hooksPath 2>$null) } catch {}

@@ -10,6 +10,8 @@
 
 Dari **24 metrik General Affair, sembilan terkunci pada satu hal yang sama**: tidak ada modul checklist berjadwal (patroli, 5R, GMP, preventive maintenance) di sistem. Konsepnya sudah ditulis di [[GA - Checklist Management]] tetapi belum dibangun.
 
+⚠️ **Angka sembilan itu diukur 2026-08-28 dan kini terlalu tinggi.** Sejak [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]], sebagian metrik 5R dan kebersihan sudah punya sumber lewat `nilai_inspeksi_satgas`, dan metrik yang dinilai "sudah atau belum" oleh seorang penilai sudah bisa ditautkan lewat `ceklis_kpi` tanpa modul baru sama sekali (rinciannya di [[GA - Checklist Management]]). Yang benar-benar masih menuntut modul baru adalah **inspeksi berjadwal berfrekuensi tinggi**, terutama ronda tiap 3 jam, karena recurrence form-builder hanya mengenal `monthly` dan `weekly`. **Hitung ulang penghambat di tabel bawah sebelum memakainya untuk memprioritaskan pekerjaan.**
+
 | Penghambat | Metrik | Posisi yang terdampak |
 |---|---:|---|
 | Modul checklist berjadwal belum ada | 9 | Office Boy (semua), Security (separuh), kedua GA Staff, Admin |
@@ -89,16 +91,22 @@ Keempat metriknya, bobot penuh 1,0, terkunci pada satu modul yang sama dan belum
 
 ## Security
 
-**Dinilai dari** (template `Security Team`, 4 metrik):
+**Dinilai dari** (template `Security Team`, 4 metrik; kolom Keadaan diukur ulang 2026-09-21 ke `origin/main` `bip-erp` `6ef719e3`):
 
-| Bobot | Metrik | Sumber |
-|---:|---|---|
-| 0,3 | Rating pelayanan dan keamanan | belum dipetakan |
-| 0,3 | Kepatuhan patroli tiap 3 jam | modul checklist belum ada |
-| 0,2 | Kepatuhan SOP security | belum dipetakan |
-| 0,2 | Kerapihan dan kebersihan pos jaga | modul checklist belum ada |
+| Bobot | Metrik | Sumber | Keadaan |
+|---:|---|---|---|
+| 0,3 | Rating pelayanan dan keamanan | belum dipetakan | ❌ |
+| 0,3 | Kepatuhan patroli tiap 3 jam | belum ada modulnya | 🟡 [[GA - Ronda Security]] |
+| 0,2 | Kepatuhan SOP security | belum dipetakan | ❌ berpeluang lewat `ceklis_kpi` |
+| 0,2 | Kerapihan dan kebersihan pos jaga | `nilai_inspeksi_satgas` | ✅ sumbernya ada, prod belum |
 
-⛔ **Tidak direkomendasikan dibuatkan dashboard.** Nol dari empat metrik punya sumber, dan separuhnya menunggu modul yang sama dengan Office Boy.
+⚠️ **Koreksi 2026-09-21.** Baris terakhir sebelumnya tertulis menunggu modul checklist, dan itu **sudah tidak berlaku**: `services/employee/kpi_sumber_inspeksi_satgas.go` menyebut eksplisit dalam komentarnya bahwa ia menjawab metrik Security "Kerapihan dan kebersihan Pos" ([[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] §8). Merged dan live di dev, prod belum. Kalimat lama "nol dari empat metrik punya sumber" karena itu juga tidak berlaku.
+
+⛔ **Jangan tertukar dengan track 5R yang lain.** Per 2026-09-21 ada **tiga** jalur bernama mirip, dan hanya yang pertama yang menilai KPI: track **per-PIC ber-KPI** ([[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]], inilah yang mengisi metrik pos jaga), track **catatan per-orang non-KPI** ([[ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI]]), dan track **area per-department non-KPI** ([[ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor]]). Yang kedua dan ketiga **tidak** menyumbang angka ke tabel di dokumen ini, dan ADR 0111 menegaskannya sendiri.
+
+⚠️ Komentar yang sama menyebut ia turut menjawab metrik **Office Boy "Kebersihan 3"**, dan label itu **tidak cocok dengan satu pun** dari empat metrik Office Boy yang tercatat di dokumen ini. Entah templatenya sudah berganti, entah salah satu label di sini sudah basi. **Ukur ulang ke `employee_db` sebelum memakai bab Office Boy di bawah**; jangan menyimpulkan bahwa metriknya sudah tertutup, dan jangan pula menyimpulkan belum.
+
+⛔ **Tetap tidak direkomendasikan dibuatkan dashboard**, tetapi alasannya kini lebih sempit: yang punya sumber baru berbobot 0,2, dan sumbu kedua ADR 0076 (antrean, tenggat, persetujuan) masih kosong sepenuhnya. **Yang membalikkannya adalah [[GA - Ronda Security]]**, yang sekaligus mengisi metrik 0,3 dan memberi posisi ini antrean pertamanya.
 
 ⚠️ Satu pengecualian yang layak diperiksa terpisah: Security adalah satu-satunya posisi GA yang punya modul operasional berjalan, yaitu [[GA - Guestbook System (Complete)]]. Buku tamu **tidak muncul di satu pun metrik KPI-nya**, jadi ia bukan bahan dashboard menurut sumbu pertama. Tetapi ia pekerjaan nyata yang tercatat, sehingga bila posisi ini akhirnya dibuatkan layar, sumbu keduanya sudah ada. **Keputusan itu di luar dokumen ini**; yang jelas, ketidakhadiran buku tamu di KPI adalah pertanyaan untuk HR, bukan celah yang boleh ditambal frontend.
 
@@ -142,7 +150,7 @@ Ini **bukan metrik yang belum tersambung, melainkan metrik yang tersambung ke te
 
 ## Kebutuhan backend, terurut
 
-1. **Modul checklist berjadwal** ([[GA - Checklist Management]]). Membuka 9 metrik di 5 posisi, dan satu-satunya yang membuat Office Boy serta Security layak punya layar sama sekali. Daya ungkit tertinggi di dokumen ini.
+1. **Inspeksi berjadwal berfrekuensi tinggi** ([[GA - Checklist Management]]). Masih daya ungkit tertinggi di dokumen ini, tetapi **cakupannya lebih sempit daripada yang tertulis sebelumnya**: sebagian metrik 5R dan kebersihan sudah terjawab `nilai_inspeksi_satgas`, dan yang berbentuk "sudah atau belum" bisa lewat `ceklis_kpi` tanpa modul baru. Yang tersisa adalah yang berfrekuensi lebih rapat dari mingguan. Irisan pertamanya sudah dirancang di [[GA - Ronda Security]].
 2. **Perbaiki pemetaan Staff Inventory.** Dua metrik berbobot 0,6 menunjuk data iklan TikTok. Keputusan pemilik KPI, bukan pekerjaan kode.
 3. **Perbaiki pemetaan rebate Procurement Leader** dari kontrak karyawan ke kontrak vendor.
 4. **Riwayat perbaikan aset dan stok opname** di `inventory_db`, mengunci 3 metrik GA Staff.

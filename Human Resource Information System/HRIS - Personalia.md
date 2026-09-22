@@ -33,6 +33,17 @@ Langkah **pencatatan berhentinya karyawan sekaligus penonaktifan akunnya** sudah
 - Alasan yang dicatat di sini adalah **prasyarat demografi** yang selama ini menghalangi [[HRIS - Attrition]].
 - ⚠️ **Belum ditangani**: karyawan non-aktif ikut lenyap dari laporan absensi dan basis payroll bulan berjalan, karena beberapa kueri menyaring `is_active` diam-diam. Lihat [[Microservices - Employee Service]].
 
+**Akun nonaktif tanpa catatan keluar — 🔜 belum merge & belum deploy** (branch bip-erp `feat/employee-status-akun-bertanggal` + erp-frontend `feat/hris-backlog-catatan-keluar`)
+
+Mencatat resign bukan satu-satunya cara akun mati: jalur IT tetap ada dan sah (akun ganda, akun titipan, insiden keamanan). Yang tak sah adalah kepergian karyawan yang tak pernah tercatat, sebab kepergian tanpa tanggal membuat headcount bulan lampau tak bisa dipercaya — dan angka itu dipakai menilai tim rekrutmen ([[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]]).
+
+- Diukur PROD 2026-09-21: **35 akun non-aktif, hanya 11 punya catatan keluar**, jadi **24 kepergian tak punya tanggal sama sekali**.
+- Halaman Resign mendapat panel **"Akun nonaktif tanpa catatan keluar"**. Memilih satu nama membuka formulir resign yang orangnya sudah terisi — perlu, karena pemilih karyawan biasa hanya memuat yang **aktif** sehingga orang-orang ini tak akan pernah muncul di sana. Barisnya hilang sendiri begitu catatannya tersimpan.
+- ⚠️ Mencatat backlog **tidak** mengubah akses siapa pun (akunnya sudah mati), dan membatalkan catatan itu nanti **tidak** menghidupkan akunnya — sebab bukan catatan itu yang mematikannya (aturan `account_deactivated`, keputusan 5 [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]]). Layarnya menyebutkan ini saat mencatat.
+- Tanggal usulan untuk 24 orang itu diturunkan dari **absensi terakhir + 1 hari**; HRD yang memutuskan, karena orang bisa cuti panjang sebelum berhenti. Kategori diisi HRD, tidak disimpulkan dari jenis kontrak.
+- Menambalnya **mengubah angka turnover bulan lampau** dari 11 menjadi 35 orang keluar. Skor KPI yang sudah final tidak ikut berubah.
+- Sejak ini hidup, tiap penonaktifan meninggalkan jejak bertanggal beserta pintu dan pelakunya, dan layar IT mewajibkan alasan — jadi backlog baru tak bisa lahir tanpa tanggal.
+
 Implementasi: [[Microservices - Employee Service]] · endpoint: [[API - Employee Service]] · halaman: [[APP - Web ERP]] (HRIS → Personalia → Resign).
 
 ## Integrasi

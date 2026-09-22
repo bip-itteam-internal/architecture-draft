@@ -24,6 +24,15 @@ grounding pada satu dua pencarian yang mengisi bagian Konteks.
    catatan urutan deploy di bagian Batas. Bila tidak ada yang cocok → pilih yang paling mungkin
    dan tulis `(ditebak)` di sebelahnya.
 
+2b. **Paralel**, isi field `Paralel` di tiap brief. Nilai `aman` hanya bila repo-nya berbeda DAN
+   pekerjaannya tidak saling menunggu. **Ragu berarti `tidak`**, karena salahnya senyap: FE bisa
+   merged lebih dulu lalu layarnya patah di produksi sementara seluruh gerbang hijau.
+   Bila dua brief menyentuh **satu endpoint yang sama**, tulis bagian `## Kontrak` berisi bentuk
+   request dan respons yang disepakati, **identik di kedua brief**; sesudah itu `Paralel: aman`
+   sah, karena keduanya membangun terhadap bentuk yang sama. Tanpa blok itu tulis
+   `Paralel: tidak (BE dulu, perubahan kontrak)`. Urutan deploy BE sebelum FE tetap berlaku
+   apa pun isi field ini: yang diparalelkan waktu mengetik, bukan waktu deploy.
+
 3. **Domain**, urutan menang bila lebih dari satu cocok: **fix** (bug, salah, gagal, error,
    tidak muncul, 502, hilang) > **test** (uji, test, coverage, kontrol negatif) > **refactor**
    (rapikan, pisahkan, duplikat, pindahkan) > **docs** (dok, dokumentasi, ADR, README,
@@ -57,10 +66,13 @@ grounding pada satu dua pencarian yang mengisi bagian Konteks.
 
 ```
 Brief: .task-plans/briefs/<tanggal>-<slug>.md
-Repo <repo> · Domain <domain> · Ukuran <S/M>
+Repo <repo> · Domain <domain> · Ukuran <S/M> · Paralel <aman/tidak>
 Kriteria: <n> (mesin: <m>)
 Berikutnya: /kerjakan .task-plans/briefs/<tanggal>-<slug>.md
 ```
+
+Bila kamu menulis **dua** brief sekaligus, cetak keduanya lalu satu baris penutup: perintah
+paralel `/kerjakan <a> <b>` bila keduanya `Paralel: aman`, atau urutannya bila tidak.
 
 ## Jangan
 

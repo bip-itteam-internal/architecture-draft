@@ -78,6 +78,26 @@
 - **Form** (`features/room_booking`): ruang, tanggal, grid slot 30 menit (terpakai, lewat, dan milik booking yang diubah **ditulis**, bukan cuma diwarnai), keperluan, nomor WA, keterangan. Tanpa penyetuju yang ditunjuk HR atau tanpa ruang, form ajukan terkunci jadi keadaan kosong berjudul "Belum ada penyetuju" atau "Belum ada ruang", tanpa isian dan tombol kirim (`kunciFormBooking`). String waktu slot dari server dikirim apa adanya. Gagal kirim menampilkan pesan penolakannya di bawah isian dan memuat ulang slot; pengajuan baru yang tersimpan kembali ke beranda, ubah jadwal kembali ke detail. Booking disetujui yang ruang atau jamnya berubah meminta konfirmasi lepas slot. `PATCH` hanya membawa field yang berubah.
 - **Detail**: pemohon mendapat Ubah Jadwal (hanya bila perusahaan sama) dan Batalkan; penyetuju yang ditunjuk HR (belum tentu atasan) mendapat Setujui dan Tolak beralasan, hanya untuk booking orang lain yang menunggu dan belum selesai. Aturan tombol di `hak_booking.dart` mencerminkan server, cermin lintas repo dengan `lib/status.ts` web. 404 tampil "Booking tidak ditemukan" dengan kalimat "Booking ini tidak ada, atau Anda tidak lagi berhak melihatnya.", sebab inventory membalas 404 juga bagi yang tak berhak. Riwayat dirakit dari `jadwal_sebelumnya`/`nomor_terkait` lewat l10n; riwayat lama memakai `alasan`.
 - **Jam** jadwal booking dipatok **WIB** di semua tempat tampil (`format_jadwal_booking.dart`), bukan zona perangkat.
+- **Rapi-rapi form dan layar Jadwal Ruang** (2026-09-22, belum merged saat dok ini ditulis; branch `feat/booking-ruang-rapikan-form`):
+  - Judul halaman form memakai key yang **sama** dengan kartunya di menu Pengajuan (`roomBookingTypeLabel`, "Booking Ruang"). Sebelumnya "Pesan Ruang Rapat" lewat key tersendiri, dan bedanya terbaca seperti salah masuk halaman. Key lama `submissionGA_RuangRapat` dihapus.
+  - Isian dibungkus **satu `Card`** dipisah `Divider`, bentuk yang sama dengan form Perjalanan Dinas; field teks jadi baris tappable yang membuka bottom sheet. Karena itu `ruang_tanggal_fields.dart` kembali memakai padding kartu dan **keluar** dari daftar penjaga `custom_form_field_test.dart`.
+  - **Nomor WhatsApp tak lagi diminta**: diambil dari Data Pribadi pemakai di `RoomBookingFormPage` (bukan di view, supaya view tetap bisa diuji tanpa `UserProfileBloc`). Server TETAP mewajibkannya, jadi profil yang belum berisi nomor **memunculkan kembali** fieldnya; tanpa itu orangnya ditolak 400 dan satu-satunya cara membetulkan ada di layar lain. Mode **ubah** selalu menampilkan fieldnya: nomor di sana milik bookingnya, dan [[ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor]] §4 mengizinkannya dikoreksi tanpa melepas persetujuan.
+  - **Jadwal Ruang** (ikon kalender di kanan atas form): daftar ruang terpakai dari `GET /peminjaman/jadwal`, dikelompokkan per tanggal seperti notifikasi, **tanpa identitas pemesan**. Rentang yang ditampilkan dibaca dari respons server, bukan dihitung ulang di aplikasi. `SliverGroupedList` mendapat flag `menaik` karena daftar ini menatap ke depan; bawaannya tetap menurun sehingga lima pemakai lain tak berubah.
+  - **"Tukar Jadwal Kerja" dipendekkan jadi "Tukar Jadwal"** di semua teks yang dilihat pemakai, lewat satu fungsi `labelTipePengajuan`. ⛔ **Kunci** tipenya di kode tetap `Tukar Jadwal Kerja` (`RequestTypeUIHelper.tukarJadwalKerja`): nilai itu datang dari `GET /leave-types`, dikirim balik ke backend, dan dipakai mencocokkan ikon, warna, adapter riwayat, serta saringan peninjau.
+
+### Club & Event (Bharata Community)
+
+> Status: ⚠️ **belum merged saat dok ini ditulis** (2026-09-22; my-bharata [#163](https://github.com/bip-itteam-internal/my-bharata/pull/163) bersama rapi-rapi Booking Ruang). Butuh bip-erp [#1996](https://github.com/bip-itteam-internal/bip-erp/pull/1996) naik lebih dulu; tanpa itu aplikasi tetap jalan, hanya menampilkan 0 anggota dan "Belum dijadwalkan" untuk semua klub. Kontrak: [[API - Form Builder Service]] § Culture untuk karyawan.
+
+- **Pintu masuk**: tombol di header section "Event terkini" beranda kini **"Lihat Semua"** (`CustomButton` `successSoft` `xs`, key `seeAll`), seragam dengan section Tim saya. Menggantikan tombol "Lihat Daftar Club" berikon piala yang membuka **bottom sheet**; sheet itu **dihapus**, bukan dibiarkan berdampingan — dua pintu ke daftar yang sama berarti dua tempat yang harus dijaga sama.
+- **Halaman Semua Event** (`all_events_page.dart`, rute `/events`): section **Upcoming** (`?hari=30`, lebih lebar dari bawaan beranda 7 hari; rentangnya **disebutkan di layar** supaya daftar kosong terbaca "tak ada 30 hari ke depan", bukan "tak ada event sama sekali") + section **Bharata Community**. Satu section yang gagal tidak memadamkan yang lain.
+- **Daftar klub jadi LIST**, bukan kisi tiga kolom ber-background warna khas klub. Memakai `SurfaceCard`; tiap baris menyebut **nama, jadwal rutin, jumlah anggota**, dan tanda centang bila sudah diikuti. `ClubEntity.clubColor` adalah palet di luar token tema sehingga kisinya tak pernah ikut mode gelap; identitas visual klub kini dipegang **logonya**. `club_grid_section.dart`, `club_grid_card.dart`, dan `club_grid_live.dart` (yang nol pemanggil) dihapus.
+- ⛔ **Satu widget untuk dua layar**: `ClubCommunitySection` dipakai beranda DAN halaman Semua Event. Kartu klub, urutannya (yang diikuti di atas, sisanya menurut nama), dan kelima keadaan layarnya satu fakta; menyalinnya ke dua tempat berarti salah satunya menyimpang begitu salah satu disunting.
+- **Jumlah anggota** akhirnya sampai ke layar. Backend sudah mengirim `jumlah` sejak awal; `ClubModel.fromJson` yang membuangnya.
+- ⛔ **Jadwal tak lagi "TBA" untuk semua klub.** Nilainya dulu di-hardcode `schedule: 'TBA'` di `ClubModel`, jadi seluruh klub berbunyi sama dan tak bisa dibedakan dari gagal dimuat. Kini dibaca dari backend dan dirender fungsi murni `jadwalKlubTampil`; klub yang belum diatur HR berbunyi **"Belum dijadwalkan"**. Nilai di luar jangkauan (hari ke-7, tanggal 0) juga jadi "belum dijadwalkan", bukan hari karangan.
+- **Detail klub dibawa ke komponen dan token bersama**: `AppBar` biasa, `SurfaceCard`, `InfoCard`, `BottomActionBar`, `CustomButton`. Versi lama punya tema gelap sendiri, header 320px, judul 40px italic, tombol `BeveledRectangleBorder`, dan kartu rekomendasi 140px bergradien — tampilan ketiga untuk data yang sama. Rekomendasi klub lain kini memakai kartu yang sama dengan daftarnya.
+- **Susunan beranda**: section Event terkini dipindah **ke atas** `HomeCarousel` (yang memuat kartu promo "Punya Kendala dalam aplikasi?"), dan ikut menampilkan daftar klub.
+- **Utang yang diterima sadar**: `ClubEntity.clubColor` **tidak** jadi dihapus — `culture_event_card.dart` masih memakainya untuk chip logo klub di kartu event. Itu masih palet di luar token tema, dan jadi task tersendiri.
 - **Daftar terpadu**: Aktivitas Saya, Riwayat (Lihat Semua), dan Review Submission meminta `include=booking` dan berhalaman 20 item. Chip **Booking** ada di Lihat Semua dan di tab antrean Review Submission; tab Sudah tak memuat booking, dan filter Booking dilepas saat pindah ke sana. Kartu booking di antrean memakai kartu terpadu (`RequestHistoryCard`) karena langkahnya `penyetuju`, bukan atasan atau HR. Ketuk booking membuka detail booking langsung, tanpa `/hr/requests/detail`. Balasan ber-`degraded: ["booking"]` menampilkan keterangan "Booking ruang tidak dapat dimuat saat ini" di Review Submission dan Riwayat; daftar izin tetap tampil.
 - **Notifikasi**: `peminjaman-ga-perlu-aksi` dan `peminjaman-ga-diperbarui` berlabel "Booking Ruang Perlu Persetujuan" dan "Kabar Booking Ruang" (sama dengan inbox web) dan berikon sendiri; ketukan tetap mendarat di kotak masuk (keputusan user).
 - **Utang dan batas yang diterima** (review 2026-09-15): `PemberitahuanBooking` meniru `InfoCard` core, dan penyatuannya dikerjakan di sumber `InfoCard` yang warnanya belum ikut mode gelap; waktu "Diajukan" dan waktu keputusan di stepper kartu booking memakai zona perangkat seperti jenis pengajuan lain; carousel Aktivitas Saya tanpa keterangan saat booking tak terbaca; test jam WIB hanya berjalan di mesin berzona WIB; ringkasan Riwayat di beranda Riwayat belum punya keadaan galat (sudah ada sebelum irisan ini).
@@ -185,6 +205,24 @@ Grid hijau di atasnya (`home_menu_grid.dart`) bukan daftar menu umum: isinya emp
 - **Lembur** (`RouteNames.overtime`) punya `GoRoute` dan halaman sah, tapi **nol pintu masuk** untuk pemakai biasa sejak Februari 2026. Hanya ada di menu developer.
 - **`/inbox`** dideklarasikan di `names.dart` **tanpa `GoRoute` maupun halaman**. Halaman notifikasi yang asli adalah `/notifications`.
 
+⚠️ **Warna per-menu di daftar itu MATI di Akses Cepat, dan sudah lama begitu.** Tiap
+`MenuItemModel` membawa `color` sendiri (`deptHRGA` oranye, `deptIT` ungu, `redAccent` untuk
+Sesi Live), tetapi kedua permukaan yang merendernya — grid beranda dan sheet "Semua Menu" —
+merakit ulang modelnya **tanpa** `color`. Membaca daftarnya orang akan mengira gridnya
+warna-warni; mengubah warna di daftar itu tidak mengubah apa pun di layar. Yang menentukan
+ada di dua titik render itu, bukan di daftarnya.
+
+✅ **Sejak my-bharata #161 (merged ke `dev` 2026-09-21) latar ikon bukan lagi kotak berwarna**
+melainkan `SurfaceCard` netral, dan warnanya pindah ke glyph. Sebelumnya glyph putih di atas
+kotak, dan karena `color` dibuang di atas, kotak itu hijau seragam — belasan petak hijau pekat
+memenuhi beranda sementara ikon yang membedakan tiap menu jadi bagian yang paling tidak
+terlihat. Perubahannya di `GridMenuItem` sehingga menyentuh **seluruh** pemakainya: grid Akses
+Cepat, sheet "Semua Menu", sheet atur favorit, dan **grid tipe Pengajuan**. Yang terakhir ikut
+berubah dengan sengaja — ia memang meniru gaya Akses Cepat lewat komponen yang sama, dan di
+sana warnanya nyata per tipe sehingga glyph-nya warna-warni di atas kartu netral. Pola
+gelombang `shapes3.png` dihapus, bukan dipindah. ⚠️ Kontras hijau `#00AA13` di atas
+`surfaceContainerHighest` beropasitas 0.3 pada **mode gelap** belum dilihat di perangkat.
+
 ⚠️ **PR #114 merged tapi BELUM pernah dijalankan di aplikasi.** Bukti yang ada baru 727 test hijau plus `dart analyze` bersih, dan justru bug inilah yang membuktikan keduanya bukan bukti fitur terjangkau. Yang masih harus dilakukan sekali: buka flavor dev → **Semua Menu** → pastikan Kaizen dan Learning terlihat → tekan keduanya sampai halamannya benar-benar terbuka. **Halaman Pelatihan yang tampil kosong adalah pertanyaan, bukan kabar baik** — `learning-service` di dev harus sudah naik, dan `/me/trainings` tercatat belum pernah dipanggil siapa pun.
 
 ### Kaizen (menu tersendiri)
@@ -261,9 +299,16 @@ Petugas Satgas mencatat temuan 5R & K3 atas Office Boy dan Security, lalu mengec
 ### Sesi Live Host (`/live-shift`): ⚠️ live di `dev`, satu-satunya klien pencatatan sejak 2026-09-11
 
 Host live mencatat sendiri siaran TikTok-nya dari HP: Mulai (toko + akun), Jeda/Lanjutkan,
-Akhiri, plus riwayat 7 hari terakhir dengan porsi GMV-nya sendiri. Ini catatan yang ditulis
-**host**, bukan hasil sync TikTok — sync datang terpisah sebagai `RingkasanShift`, dan
+Akhiri, plus riwayat **satu bulan kalender** dengan porsi GMV-nya sendiri. Ini catatan yang
+ditulis **host**, bukan hasil sync TikTok — sync datang terpisah sebagai `RingkasanShift`, dan
 keduanya dijodohkan lewat toko **dan** akun.
+
+✅ **Riwayatnya per BULAN sejak my-bharata #161** (merged ke `dev` 2026-09-21), menggantikan
+jendela bergulir 7 hari: porsi GMV host dicocokkan dengan periode insentif yang memang bulanan,
+dan jendela yang memotong di tengah bulan tak pernah bisa dijumlahkan jadi angka yang berarti.
+Bulan lain dipilih lewat halaman daftar 12 bulan bergaya daftar bulan Slip Gaji. Backend tidak
+disentuh — `GET /live-shifts` sudah menerima `dari`/`sampai` bebas dengan batas 92 hari, jadi
+satu bulan jauh di bawah batas. Rinciannya di [[#Riwayat per bulan kalender]].
 
 Menunya digerbang **host saja** (`isHostLive`), sengaja tanpa leader marketing: tombol
 Mulai/Akhiri di kartu tidak digerbang peran, jadi memberi leader akses menu berarti memberi
@@ -283,9 +328,22 @@ mencatat sesi.
 
 **Siaran serentak** (T2, my-bharata #128, merged ke `dev` 2026-08-31): host memegang beberapa akun sekaligus, jadi sesi berjalan adalah **daftar**, bukan
 satu. Halaman penuh merender satu kartu per sesi dengan timer dan peringatan ambangnya
-masing-masing. **Beranda tetap satu kartu** supaya tak berubah jadi daftar panjang, dengan
-penanda "Lihat N sesi lainnya" yang **bisa ditekan** menuju halaman penuh — sebagai teks
-mati, sesi kedua akan tak terjangkau dari beranda sama sekali.
+masing-masing. **Beranda semula tetap satu kartu** supaya tak berubah jadi daftar panjang,
+dengan penanda "Lihat N sesi lainnya" yang **bisa ditekan** menuju halaman penuh — sebagai
+teks mati, sesi kedua akan tak terjangkau dari beranda sama sekali.
+
+✅ **Beranda kini menggulir mendatar saat sesinya lebih dari satu**, menggantikan penanda itu
+— my-bharata [#161](https://github.com/bip-itteam-internal/my-bharata/pull/161), **merged ke
+`dev` 2026-09-21** (1.21.0+168). Irama dan
+angkanya menyalin carousel "Aktivitas Saya" tepat di atasnya (lebar kartu 75% layar, jarak 8,
+padding di dalam scroll view supaya kartu terakhir bisa digulir sampai menyentuh tepi); **satu
+sesi tetap selebar layar**, karena kartu sempit yang berdiri sendiri terbaca sebagai tata letak
+yang salah, bukan isyarat "geser". Yang berubah bukan cuma tampilan: dengan penanda, sesi kedua
+di beranda tak punya timer, tak punya peringatan jam ke-11, dan tak bisa dijeda atau diakhiri
+tanpa pindah halaman — padahal
+[[ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun]] par.5 meminta setiap sesi
+berjalan punya kartunya sendiri. Jalan ke halaman penuh tetap ada lewat menu Sesi Live di Akses
+Cepat, yang bahkan default favorit untuk host.
 
 Yang mudah terlewat saat menyentuh layar ini:
 
@@ -301,6 +359,15 @@ Yang mudah terlewat saat menyentuh layar ini:
   sudah host-saja sehingga nilainya selalu `true` dan gerbang berbasis field itu akan jadi
   logika mati. Default **`true`** saat field-nya absen: backend sebelum 2026-08-30 tidak
   mengirimnya, dan `false` akan mencabut tombol host atas sesinya sendiri.
+- ⚠️ **`CustomFormField` berpadding 16 SEGALA SISI, dan itu mengasumsikan ia di dalam
+  `Card`.** Field di sheet Mulai Live tidak, dan `CustomBottomSheet` sudah memasang padding
+  sheet sendiri, jadi jaraknya menumpuk jadi 32 dan isiannya terlihat menjorok jauh
+  dibanding sisa sheet. Sejak my-bharata #161 field di luar kartu memakai
+  `CustomFormField.paddingTanpaKartu` (vertikal 16, mendatar 0). Diukur saat itu: dari **44
+  pemakaian di 15 berkas**, cuma **7 yang di luar kartu** (5 di sheet ini, 2 di
+  `ruang_tanggal_fields.dart` milik Booking Ruang). ⛔ Keanggotaan itu **tak bisa
+  disimpulkan dari isi satu berkas**: kebanyakan field dibungkus `Card` oleh widget INDUK di
+  berkas lain — field pengajuan, misalnya, dibungkus di `hr_submission_page.dart`.
 - **Pembagiannya: `CustomDialog` untuk keputusan ya/tidak, `CustomBottomSheet` untuk
   formulir.** Konfirmasi Akhiri Sesi dan konfirmasi toko-tanpa-akun memakai `CustomDialog`
   (yang sudah membawa ikon tipe, tata letak tombol, jaraknya, dan menutup dirinya sendiri
@@ -317,6 +384,63 @@ Yang mudah terlewat saat menyentuh layar ini:
   panjang atau skala teks naik — terlihat di kartu sesi live (Jeda + Akhiri Sesi) pada
   lebar HP yang lazim. Tak pernah tertangkap test karena permukaan test bawaan 800 px.
   Diperbaiki di komponennya; ini menyentuh **seluruh** pemakai `CustomButton`.
+- ⛔ **Section beranda membawa jarak tepinya SENDIRI.** `SliverList` di `home_page.dart`
+  tidak memberi padding mendatar apa pun, jadi kartu Sesi Live sempat menempel ke tepi layar
+  sementara `AttendanceActivityCard` di atasnya dan `HomeQuickAccess` di bawahnya tidak. Tak
+  ada galat — cuma satu kartu yang terlihat lebih lebar, dan itu ditemukan dari layar, bukan
+  dari test. Nilainya **literal 16**, bukan `AppDimens.paddingM` (= `16.w`, responsif):
+  kedua tetangga itu memakai 16 mati, dan nilai yang ikut lebar layar akan meleset beberapa
+  piksel dari mereka di HP yang lebarnya bukan 360 (my-bharata #161).
+- **Durasi sesi berjalan dibaca sebagai jam : menit**, bukan total menit (my-bharata #161,
+  pola `presence_real_time_clock.dart`): sesi di sini rutin berjalan berjam-jam dan ambang
+  koreksinya 12 jam, jadi "184 menit berjalan" menuntut pembacanya membagi sendiri untuk tahu
+  jaraknya ke ambang itu — padahal angka itulah yang menentukan hangus-tidaknya porsi GMV-nya.
+- ⛔ **`DateFormatter.formatDuration` dulu tak pernah mengikuti bahasa aktif.** Ia hanya
+  membaca `Intl.defaultLocale`, dan aplikasi ini **tak pernah menyetelnya di mana pun**,
+  sehingga cabang Inggrisnya tak sekali pun terpakai di produksi: pemakai berbahasa Inggris
+  tetap membaca "jam"/"menit" di layar yang seluruhnya berbahasa Inggris. Tak ada galat, dan
+  seluruh test buta terhadapnya karena semuanya dipompa dengan locale Indonesia — cacatnya
+  malah sempat tercatat sebagai komentar di `live_shift_detail_page_test.dart` sebelum
+  diperbaiki. Helper-nya kini menerima `locale` dan **keempat** pemanggilnya mengopernya:
+  `KartuRiwayatSesi` (Durasi Efektif) dan tiga durasi di `LiveShiftDetailPage` (Durasi Total,
+  Total Jeda, Durasi Efektif) — my-bharata #161. ⚠️ Repo ini masih punya helper KEDUA
+  bernama sama, `TimeFormatter.formatDuration` (`lib/src/core/utils/time_formatter.dart`);
+  penyatuannya belum dikerjakan.
+
+#### Riwayat per bulan kalender
+
+Rentangnya satu bulan kalender **WIB**, menggantikan jendela bergulir 7 hari
+(`hariRiwayatKeBelakang = 6`) — my-bharata #161, merged ke `dev` 2026-09-21. Bulan lain
+dipilih lewat halaman daftar 12 bulan (`pilih_bulan_riwayat_page.dart`, rute
+`/live-shift/pilih-bulan`) yang meniru bentuk daftar bulan Slip Gaji.
+
+- ⛔ **Bulan aktif tinggal di `LiveShiftState.bulanRiwayat`, bukan dihitung ulang di tiap
+  pemanggil.** Riwayat di bloc cuma SATU daftar yang dipakai bersama halaman Sesi Live dan
+  tarik-untuk-muat-ulang di halaman detail; kalau keduanya menyimpulkan bulannya
+  sendiri-sendiri, refresh dari detail menarik rentang yang tak memuat baris yang sedang
+  dibuka, lalu halaman itu diam-diam jatuh ke salinan lamanya. Invarian ini sebelumnya
+  dijaga sebuah konstanta bersama, dan konstanta tak lagi cukup begitu bulannya bisa dipilih.
+  Karena itu pula halaman daftar bulan **tidak memuat datanya sendiri**: ia hanya
+  memulangkan bulan terpilih lewat `pop`.
+- ⛔ **Tanggal rentang dipatok TENGAH HARI, bukan tengah malam.** Datasource mengirimnya
+  lewat `_tanggalWib` (`toUtc()` + 7 jam), jadi tengah malam di perangkat WITA (+8) atau WIT
+  (+9) mundur jadi pukul 23:00 hari terakhir bulan SEBELUMNYA dalam WIB: awal bulan terkirim
+  sebagai hari terakhir bulan lalu, dan gagalnya senyap karena tanggalnya tetap sah. Tengah
+  hari menyisakan margin 10 jam untuk seluruh zona Indonesia.
+- ⛔ **Bulan berjalan diturunkan dari WIB, bukan zona perangkat.** Host di WIT yang membuka
+  aplikasi pukul 00:30 tanggal 1 masih berada di bulan sebelumnya menurut server (backend
+  memparsing `dari`/`sampai` dengan `time.ParseInLocation(..., zonaWIB)`); memakai zona
+  perangkat melemparnya ke bulan baru yang kosong tepat setelah ia selesai siaran.
+- **Tanggal 1 hampir selalu kosong**, dan itu harga dari bulan kalender. Empty state bulan
+  berjalan karena itu menyebut bulannya dan menawarkan "Lihat bulan lalu"; di bulan yang
+  sudah lewat tombol itu sengaja TIDAK muncul, karena kosongnya sudah final.
+- ⚠️ **Daftar bulannya dikarang KLIEN** (12 bulan), dan itu bedanya dari daftar bulan Slip
+  Gaji yang ditiru bentuknya: di sana server memberi tahu bulan mana yang slipnya sudah
+  terbit, di sini tak ada endpoint semacam itu untuk sesi live. Bulan tanpa sesi tetap
+  tampil dan kosongnya baru ketahuan setelah dibuka. Jangan menuliskan 12 sebagai janji
+  "riwayat tersedia 12 bulan"; yang dijamin cuma bahwa 12 bulan itu boleh DIMINTA.
+- **Backend tidak disentuh.** `GET /live-shifts` sudah menerima `dari`/`sampai` bebas dengan
+  batas `rentangDaftarShiftMaksimal` = 92 hari, jadi satu bulan jauh di bawah batas.
 
 ⛔ **Belum terverifikasi di perangkat sungguhan.** ~~`live_shifts` produksi masih 0
 dokumen~~: tidak berlaku lagi, terukur 74 sesi per 2026-09-11; dari klien mana tidak terukur
@@ -516,7 +640,7 @@ Ini menutup lubang lama: `/me/trainings` di [[Microservices - Learning Service]]
 
 Dua layar **self-service yang PINDAH dari web**: menunya dicabut dari Portal Saya > Manajemen HR di erp-frontend [#1022](https://github.com/bip-itteam-internal/erp-frontend/pull/1022). Keduanya urusan karyawan atas pekerjaannya sendiri, dan sebagian besar karyawan tak duduk di depan komputer. Detail sisi web di [[APP - Web ERP]].
 
-- **`/pengajuan-pelatihan`** menumpang `features/training/` yang sudah ada: daftar pengajuan sendiri (`as=self`) berikut kedua tahap peninjauan dan catatan penolakannya, formulir topik/alasan/perkiraan biaya, dan pembatalan untuk yang masih menunggu keputusan. ✅ **Merged ke `dev` 2026-09-16** (my-bharata PR [#151](https://github.com/bip-itteam-internal/my-bharata/pull/151), diukur 2026-09-17, belum ada di rilis GitHub): halaman ini disatukan dengan Pelatihan Saya jadi dua tab satu layar dan formulirnya pindah dari bottom sheet ke halaman penuh. Lihat [[#Post-test Peserta dan Penyatuan Menu Pelatihan]].
+- **`/pengajuan-pelatihan`** menumpang `features/training/` yang sudah ada: daftar pengajuan sendiri (`as=self`) berikut kedua tahap peninjauan dan catatan penolakannya, formulir topik/alasan/perkiraan biaya, dan pembatalan untuk yang masih menunggu keputusan. ✅ **Merged ke `dev` 2026-09-16** (my-bharata PR [#151](https://github.com/bip-itteam-internal/my-bharata/pull/151), diukur 2026-09-17, belum ada di rilis GitHub): halaman ini disatukan dengan Pelatihan Saya jadi dua tab satu layar dan formulirnya pindah dari bottom sheet ke halaman penuh. ⏳ Tabnya dilepas lagi di my-bharata [#162](https://github.com/bip-itteam-internal/my-bharata/pull/162) (open 2026-09-21): `/pengajuan-pelatihan` kembali jadi halaman tersendiri, dicapai lewat aksi kanan AppBar Pelatihan. Lihat [[#Post-test Peserta dan Penyatuan Menu Pelatihan]].
 - **`/tugas-onboarding`** jadi modul baru `features/onboarding_tasks/`. ⚠️ Namanya sengaja **BUKAN** `onboarding`: berkas itu sudah dipakai onboarding APLIKASI (registrasi, PIN, biometrik) dan tak berhubungan sama sekali dengan checklist karyawan baru.
 - ⚠️ **Formulir memakai TOPIK BEBAS, tanpa katalog jenis pelatihan.** Bukan penyederhanaan sementara: `GET /training/types` digerbang `PermTrainingView`, yaitu izin **mengelola** pelatihan, sehingga karyawan biasa dibalas 403. Server memang menerima katalog **atau** topik bebas.
 - ⚠️ **Body pengajuan tak mengirim `department_key` maupun `employee_id`.** Keduanya kosong berarti "departemen saya" dan "untuk saya sendiri", diselesaikan server dari header identitas. Mengirim key dari aplikasi menuntutnya menyalin pemetaan nama↔key departemen, dan salinan itu persis yang melahirkan bug 409 di 6 dari 10 departemen. Dikunci test regresi.
@@ -530,6 +654,10 @@ Dua layar **self-service yang PINDAH dari web**: menunya dicabut dari Portal Say
 > **Status, diukur 2026-09-17 (`gh pr view`, `gh api compare`)**: my-bharata PR [#151](https://github.com/bip-itteam-internal/my-bharata/pull/151) (branch `feat/post-test-peserta`) **merged ke `dev` 2026-09-16** dengan head `c988d43e`, jadi Tahap 3b (pre-test) di bawah ikut masuk `dev`. Dua commit sesudahnya (soal ujian dari komponen form `f076c04e`, kartu pre-test terlewat `f95cc52f`) dibawa PR baru [#153](https://github.com/bip-itteam-internal/my-bharata/pull/153) ke `dev` (dibuka 2026-09-17, belum merge). **Belum ada di rilis GitHub**: rilis terakhir `v1.14.5+135` terbit 2026-08-03. ⚠️ **Backend pre-test-nya BELUM merge**: rute `POST /me/pre-test/:trainingId/start`, penanda `pre_test_tersedia`/`pre_test_selesai`/`pre_test_terlewat`, dan `pre_score` pembanding baru ada di bip-erp PR [#1934](https://github.com/bip-itteam-internal/bip-erp/pull/1934) (branch `feat/learning-post-test-batas`, dibuka 2026-09-17). Server yang belum membawanya tak mengirim penanda pre, dan penanda yang absen dibaca `false` (`_bool`, `data/models/my_training_model.dart:57-63,69-73`), sehingga tombol, peringatan, dan kartu terkunci pre-test tak muncul: gagal-tertutup, tanpa tombol yang pasti ditolak dan tanpa tuduhan.
 
 Menutup lubang dicatat di [[#Pelatihan Saya — ✅ PR #112 merged ke `dev`]]: sampai 2026-09-15 nol pemanggil `/me/post-test` di `origin/dev`. PR ini menambahkannya, sekaligus menata ulang menu Pelatihan yang sejak PR #112/#115 terpecah jadi dua tempat.
+
+> ⏳ **Dua tab di bawah ini SUDAH TIDAK BERLAKU begitu my-bharata [#162](https://github.com/bip-itteam-internal/my-bharata/pull/162) merged** (dibuka 2026-09-21, 1.21.1+169; `origin/dev` masih bertab sampai saat itu). Tabnya dihapus: Pelatihan jadi SATU layar yang langsung menampilkan Pelatihan Saya, dan Pengajuan pindah ke aksi kanan AppBar yang membuka **halaman tersendiri** (`TrainingRequestsPage`). FAB "Ajukan" ikut dihapus, dan halaman pengajuan jadi **baca-saja** — mengajukan pelatihan satu pintu lewat kartu "Pelatihan" di menu Pengajuan, sejajar Cuti dan Booking Ruang. Alasannya: tab menyembunyikan salah satu isi di balik ketukan, padahal yang dibuka orang hampir selalu "pelatihan saya" sementara pengajuan kunjungan sesekali. ⚠️ `TrainingRequestsPage` menyediakan blocnya SENDIRI, karena `/pengajuan-pelatihan` adalah `app_route` notifikasi dan penerimanya bisa mendarat di sana tanpa pernah membuka halaman Pelatihan.
+>
+> ⛔ **PR yang sama MENGHAPUS `CustomCard` dari repo**, dan itu berlaku untuk seluruh aplikasi, bukan cuma Pelatihan. Pembungkus kartu buatan sendiri itu menyimpang dari `cardTheme` di tiga hal: `elevation: 4` melawan `elevation: 0` (kartunya mengambang sendirian), border `Colors.grey` ditulis mati sehingga tak ikut mode gelap, dan **isinya dibungkus `ListTile`** yang punya `contentPadding` sendiri. Yang terakhir itu jebakannya: jaraknya MENUMPUK dengan `Padding` di dalam kartu, jadi keluhan "padding kartu ini menjorok" tak pernah bisa diperbaiki dengan menyetel angka `Padding`-nya. Diukur saat penghapusan: `Card(` polos dipakai **158** tempat, `CustomCard` cuma **4** (definisinya, halaman demo komponen, dan kartu Pelatihan). Bentuk yang benar untuk kartu isi: `Card` polos + `Padding(16)`, sama dengan [[#Pengajuan Pelatihan & Tugas Onboarding — ✅ PR #115 merged ke `dev` 2026-08-22]] yang memakai `HistoryTicketCard`. Seseorang sudah pernah menabrak ini sebelumnya dan meninggalkan peringatan di `triage_summary_card.dart`; peringatan itu kini tak lagi punya sasaran.
 
 - **`TrainingPage` menyatukan "Pelatihan Saya" dan "Pengajuan" jadi DUA TAB satu halaman** (`lib/src/features/training/presentation/pages/training_page.dart`), menggantikan dua halaman terpisah dengan dua kartu beranda. Kedua rute lama **tetap hidup** dan sama-sama membuka halaman ini, cuma beda tab awal: `RouteNames.myTrainings` (`/pelatihan-saya`, dipakai menu **Pelatihan** di Quick Access lewat `home_quick_access.dart:103-104` — entry point-nya **tidak berubah**) membuka tab 0 "Pelatihan Saya", `RouteNames.trainingRequests` (`/pengajuan-pelatihan`) membuka tab **1** "Pengajuan". `/pengajuan-pelatihan` sengaja dipertahankan karena ia `app_route` notifikasi `learning-service` (`rutePengajuanUntukMobile`, `bip-erp/services/learning/request_notify.go`) — mencabutnya membuat notifikasi tetap tiba lalu mendarat di layar galat go_router, kelas kegagalan yang sama dengan bug rute `/pelatihan-saya` yang belum terdaftar di PR #112 (lihat [[#Struktur menu beranda]]). Tombol **Ajukan** (FAB) cuma tampil di tab Pengajuan — di tab Pelatihan Saya ia menawarkan aksi yang hasilnya mendarat di tab sebelah. Kedua rute **terdaftar rapi** di `misc_routes.dart` (`GoRoute`) **dan** `misc_pages.dart` (`AppPages.getPage`), berbeda dari cacat PR #112 yang jadi bahan pelajaran di [[#Struktur menu beranda]].
 - **Formulir pengajuan pelatihan kini HALAMAN, bukan bottom sheet** (`training_request_form_page.dart`, rute baru `/pengajuan-pelatihan/form`): meniru komponen form HR (`CustomFormField` yang membuka `CustomBottomSheet` per field, tombol kirim di `BottomActionBar`), bukan tiga kotak teks yang semuanya terbuka sekaligus. `widgets/training_request_form_sheet.dart` **DIHAPUS** (115 baris). Isinya tetap dua field wajib (topik bebas, alasan) + biaya perkiraan opsional, **tanpa katalog jenis pelatihan** — `GET /training/types` digerbang izin *mengelola* pelatihan (`PermTrainingView`), yang tak dipegang karyawan biasa. Dibuka dari DUA tempat (kartu Pengajuan dan tombol Ajukan di daftar); keduanya memulangkan `true` bila terkirim, pemanggil yang memutuskan artinya.

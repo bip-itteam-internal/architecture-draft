@@ -53,10 +53,21 @@ EKOR_MAKS = 2 * 1024 * 1024
 EKOR_LATAR = 8 * 1024 * 1024
 LATAR_TUNDA_MAKS = 256  # tool_use yang hasilnya belum terlihat oleh pelacak; hasil selalu datang jauh sebelum batas ini
 LATAR_MAKS = 32
+# ⛔ Pos departemen TIDAK bisa diambil dari ekor 64 KB. Ekor itu cuma memuat 26 sampai 46 kejadian,
+# dan yang terakhir hampir tak pernah berupa path berkas departemen. Diukur 2026-09-21 atas 8
+# transkrip hidup: dari ekor, 8 DARI 8 sesi jatuh ke `Umum`, padahal kedelapannya punya departemen
+# yang jelas bila dibaca lebih dalam. Gagalnya senyap sempurna -- tiap robot duduk di bangku
+# cadangan, denahnya tetap masuk akal, dan pos departemen jadi hiasan.
+# Kedalaman yang diperlukan diukur pada transkrip yang sama: 6 dari 8 ketemu dalam 1 MB, 2 sisanya
+# dalam 2 MB, seluruhnya 3 sampai 13 ms. Batas 4 MB memberi ruang dua kali lipat yang terukur dan
+# tetap separuh dari jendela tugas latar yang sudah dijalankan tiap tick.
+EKOR_POS = 4 * 1024 * 1024
+POS_POTONGAN = 1024 * 1024
 # prasaring daftar direktori, sengaja longgar (lihat _daftar_jsonl)
 PRASARING_UTAMA_DETIK = 6 * 3600
 PRASARING_SUB_DETIK = 30 * 60
 _CACHE = {}  # path -> ((ukuran, mtime_ns), (hasil urai, baris_diurai, baris_rusak))
+_POS_DALAM = {}  # path -> (ukuran saat dipindai, pos atau None): hasil pindai dalam, supaya tak diulang tiap tick
 _LOKASI = {}  # sessionId -> path transkrip terakhir ditemukan, supaya tak mencari ulang di tiap folder proyek
 _LATAR = {}  # path -> {"offset", "tunda", "latar"}: pelacak tugas shell latar bertahap per transkrip
 # transkrip sependek ini tanpa user/assistant = sesi yang baru lahir, bukan tanda format berubah
@@ -79,11 +90,89 @@ AREA_ALAT = {
     "Agent": "rapat", "Workflow": "rapat", "SendMessage": "rapat",
     "AskUserQuestion": "lounge", "ExitPlanMode": "lounge",
 }
+# Tiap agen kit WAJIB punya entri di sini, dijaga tests/test-init.ps1. Tanpa entri, robotnya tampil
+# dengan nama mentah `loop-xxx`: tidak salah, tetapi tak terbaca sebagai peran, dan gagalnya senyap.
 PERAN = {
     "general-purpose": "Generalis", "Explore": "Peneliti", "Plan": "Arsitek", "loop-fix": "Engineer",
     "loop-test": "QA", "loop-refactor": "Refactor", "loop-judge": "Juri", "loop-docs": "Penulis",
     "claude-code-guide": "Pemandu",
+    "loop-fe": "Frontend Dev", "loop-be": "Backend Dev", "loop-mobile": "Mobile Dev", "loop-devops": "DevOps",
+    "loop-supervisor": "Supervisor", "loop-ekstrak-skill": "Ekstraktor",
 }
+
+
+# Pos departemen di denah. Nama dan pengelompokannya keputusan pemilik 2026-09-21, dan namanya
+# GROUNDED ke `deptKeyToNames` (bip-erp `shared-library/common/roles.go`), bukan dikarang.
+# Dua penyimpangan yang disengaja dan dicatat:
+#   - `Human Resource` + `General Affair` digabung jadi `HRGA`, dan itu justru selaras dengan
+#     master data: HRGA adalah `supervision_label` keduanya, bukan departemen tersendiri.
+#   - `Beauty Hacks` + `Kyura` digabung jadi `Marketing`, yang di `deptKeyToNames` memang TIDAK
+#     punya key sama sekali (dicatat komentar di berkas itu sendiri sebagai lubang yang hidup
+#     di produksi). `Warehouse` juga tak punya key di sana padahal modulnya besar di dua repo;
+#     memasukkannya adalah keputusan kit ini, bukan turunan dari peta itu.
+# Legal dan R&D Regulatory DIGABUNG ke Kesekretariatan (keputusan pemilik 2026-09-21): ketiganya
+# berbagi satu pos di denah. Penggabungan ada DI SINI saja, bukan di peta path, supaya kalau
+# kelak dipisah lagi cukup satu baris yang berubah.
+# `Printing` DIHAPUS 2026-09-21 (keputusan pemilik): selnya di denah jadi perluasan lounge. Ia
+# memang tak pernah punya potongan path di PETA_POS, jadi tak ada sesi yang kehilangan posnya.
+POS = (
+    "HRGA", "Marketing", "Tech Development", "Kesekretariatan", "Finance", "Procurement",
+    "Warehouse", "Manufaktur", "Quality",
+)
+POS_UMUM = "Umum"
+
+# Potongan path -> pos. Dicocokkan pada path yang sudah dinormalkan (pemisah `/`, huruf kecil,
+# berpagar `/` di kedua ujung), dan yang PERTAMA cocok menang.
+#
+# ⛔ Yang ambigu sengaja TIDAK dipetakan. `services/insentive` dan `services/integration` bisa
+# dibaca Finance maupun Marketing, dan robot yang duduk di pos KELIRU tidak berbunyi apa pun,
+# sementara robot di pos `Umum` menyatakan dirinya sendiri. Salah-petak lebih buruk daripada
+# tidak memetakan.
+PETA_POS = (
+    ("marketing-analytics", "Marketing"), ("marketing-insight", "Marketing"),
+    ("marketing-po", "Marketing"), ("marketing", "Marketing"),
+    ("tiktok-shop-service", "Marketing"), ("icc", "Marketing"),
+    ("hris", "HRGA"), ("ga", "HRGA"), ("employee", "HRGA"), ("attendance", "HRGA"),
+    ("payroll", "HRGA"), ("recruitment", "HRGA"), ("learning", "HRGA"),
+    ("hrd-document", "HRGA"), ("psikotes", "HRGA"), ("mybharata-app", "HRGA"),
+    (".agent-kit", "Tech Development"), ("architecture-draft", "Tech Development"),
+    ("it", "Tech Development"), ("monitoring", "Tech Development"), ("vault-mcp", "Tech Development"),
+    ("secretary", "Kesekretariatan"),
+    ("finance", "Finance"), ("kas-kecil", "Finance"), ("pembukuan-pengajuan", "Finance"),
+    ("procurement", "Procurement"), ("pengajuan-barang", "Procurement"),
+    ("warehouse-sadewa", "Warehouse"), ("warehouse", "Warehouse"), ("inventory", "Warehouse"),
+    ("manufacture", "Manufaktur"), ("quality", "Quality"), ("legal", "Kesekretariatan"), ("rnd", "Kesekretariatan"),
+)
+
+
+def pos_dari_path(p):
+    """Pos departemen dari sebuah path berkas, atau None bila tak ada yang cocok.
+
+    None BUKAN kegagalan: ia berarti "belum tahu", dan pemanggil menaruhnya di pos Umum yang
+    menyatakan dirinya sendiri. Menebak akan mendudukkan robot di departemen orang lain tanpa
+    satu pun tanda.
+    """
+    s = "/" + str(p or "").replace("\\", "/").strip("/").lower() + "/"
+    for potongan, pos in PETA_POS:
+        if ("/" + potongan + "/") in s:
+            return pos
+    return None
+
+
+def pos_dari_masukan(masukan):
+    """Pos dari input sebuah tool. Hanya field yang MEMANG path yang dibaca.
+
+    Isi perintah shell sengaja tidak diurai: path di dalamnya bercampur argumen dan pola, dan
+    menebaknya mengembalikan kelas salah-petak yang PETA_POS justru dibuat untuk menghindarinya.
+    """
+    m = masukan if isinstance(masukan, dict) else {}
+    for kunci in ("file_path", "notebook_path", "path"):
+        nilai = m.get(kunci)
+        if isinstance(nilai, str) and nilai:
+            pos = pos_dari_path(nilai)
+            if pos:
+                return pos
+    return None
 
 
 def area_alat(nama):
@@ -213,7 +302,7 @@ def urai(kejadian):
     Aturan `latar` ada di `lacak_latar`, bersama pelacak bertahap per berkas.
     Tipe selain user/assistant/queue-operation (attachment, ...) tidak mengubah keadaan; ai-title
     dan pr-link hanya dibaca sebagai label."""
-    judul = pr = cwd = None
+    judul = pr = cwd = pos = None
     tertunda = OrderedDict()
     tunda_latar = OrderedDict()
     latar = OrderedDict()
@@ -237,6 +326,10 @@ def urai(kejadian):
             for b in pesan.get("content") or []:
                 if isinstance(b, dict) and b.get("type") == "tool_use":
                     tertunda[b.get("id")] = (b.get("name"), b.get("input"), o.get("timestamp"))
+                    # Pos hanya BERGANTI bila ada path yang dikenali; path tak dikenali tidak
+                    # menariknya kembali ke Umum, kalau tidak sesi akan bolak-balik tiap kali
+                    # membaca satu berkas di luar modulnya.
+                    pos = pos_dari_masukan(b.get("input")) or pos
             if pesan.get("stop_reason") == "end_turn":
                 tertunda.clear()
             akhir = o
@@ -254,8 +347,8 @@ def urai(kejadian):
             if not ada_hasil:
                 tertunda.clear()  # prompt baru dari user
             akhir = o
-    return {"judul": judul, "pr": pr, "cwd": cwd, "tertunda": tertunda, "latar": latar, "akhir": akhir,
-            "dikenal": dikenal}
+    return {"judul": judul, "pr": pr, "cwd": cwd, "pos": pos, "tertunda": tertunda, "latar": latar,
+            "akhir": akhir, "dikenal": dikenal}
 
 
 _PECAHAN_LEBIH = re.compile(r"(\.\d{6})\d+")
@@ -612,6 +705,54 @@ def _latar_berkas(path, ukuran):
     return s["latar"]
 
 
+def pos_dari_pindai_dalam(path, ukuran, batas=EKOR_POS):
+    """Pos departemen dari pemindaian MUNDUR transkrip, berhenti di path dikenali yang pertama ketemu.
+
+    Ini jalur cadangan untuk apa yang tak muat di ekor pendek, bukan pengganti `urai`: ia hanya
+    mencari `pos`, dan hanya dipanggil saat ekor maupun cache tak punya. Mundur, karena yang dicari
+    adalah departemen TERAKHIR yang disentuh; memindai maju akan mengembalikan yang pertama, dan
+    sesi panjang biasanya berpindah modul beberapa kali.
+
+    Mengembalikan None bila sampai batas tak ada yang cocok. None tetap berarti "belum tahu", bukan
+    "bukan departemen apa pun": menebak akan mendudukkan robot di departemen orang lain tanpa tanda.
+    """
+    sisa = ""
+    ujung = ukuran
+    dasar = max(0, ukuran - batas)
+    while ujung > dasar:
+        mulai = max(dasar, ujung - POS_POTONGAN)
+        try:
+            with open(path, "rb") as f:
+                f.seek(mulai)
+                blok = f.read(ujung - mulai).decode("utf-8", "replace")
+        except OSError:
+            return None
+        baris = (blok + sisa).splitlines()
+        # Potongan dipotong di tengah baris, jadi baris pertama disimpan untuk disambung ke
+        # potongan BERIKUTNYA (yang letaknya lebih awal di berkas). Tanpa ini satu kejadian
+        # terbelah dua dan hilang dari kedua potongan, senyap.
+        if mulai > dasar and baris:
+            sisa, baris = baris[0], baris[1:]
+        else:
+            sisa = ""
+        for b in reversed(baris):
+            if not b.strip():
+                continue
+            try:
+                o = json.loads(b)
+            except Exception:
+                continue
+            if not isinstance(o, dict) or o.get("type") != "assistant":
+                continue
+            for blok_isi in (o.get("message") or {}).get("content") or []:
+                if isinstance(blok_isi, dict) and blok_isi.get("type") == "tool_use":
+                    pos = pos_dari_masukan(blok_isi.get("input"))
+                    if pos:
+                        return pos
+        ujung = mulai
+    return None
+
+
 def _urai_berkas(path, st, awal, terlihat):
     """urai() atas ekor berkas, di-cache per (ukuran, mtime): hanya transkrip yang berubah yang diurai ulang.
     `latar` diganti hasil pelacak bertahap: ekor terlalu pendek untuk tugas latar (lihat EKOR_LATAR)."""
@@ -623,11 +764,23 @@ def _urai_berkas(path, st, awal, terlihat):
     kejadian, d, r = baca_ekor(path, awal)
     u = urai(kejadian)
     u["latar"] = OrderedDict(_latar_berkas(path, st.st_size))
-    if lama:  # judul dan PR bisa jatuh di luar ekor yang pendek: pertahankan yang terakhir terlihat
+    if lama:  # judul, PR, dan pos bisa jatuh di luar ekor yang pendek: pertahankan yang terakhir terlihat
         if u["judul"] is None:
             u["judul"] = lama[1][0]["judul"]
         if u["pr"] is None:
             u["pr"] = lama[1][0]["pr"]
+        if u["pos"] is None:
+            u["pos"] = lama[1][0].get("pos")
+    if u["pos"] is None:
+        # Pindai dalam dipakai SESUDAH ekor dan cache, dan hasilnya diingat supaya tak diulang tiap
+        # tick. Yang negatif pun diingat, dengan ukuran saat itu: ia baru dipindai ulang setelah
+        # transkrip tumbuh sepanjang satu ekor penuh, yaitu saat memang mungkin ada yang baru.
+        memo = _POS_DALAM.get(path)
+        if memo and memo[1] is None and st.st_size - memo[0] < EKOR_UTAMA:
+            u["pos"] = None
+        else:
+            u["pos"] = pos_dari_pindai_dalam(path, st.st_size)
+            _POS_DALAM[path] = (st.st_size, u["pos"])
     _CACHE[path] = (kunci, (u, d, r))
     return u, d, r
 
@@ -710,6 +863,7 @@ def kumpulkan(proyek_dir, workspace, sekarang, registri_dir=None, hidup=None):
         rusak += r2
         mulai = kit.get("mulai") or (_iso(e.get("mulai")) if e else None) or "~"
         sesi.append(dict(id=sid, judul=_potong(u["judul"] or kit.get("task") or "", 90), tahap=kit.get("tahap") or "",
+                         pos=u.get("pos") or POS_UMUM,
                          pr=u["pr"], asal=e.get("asal") if e else None, nama=e.get("nama") if e else None,
                          pid=e.get("pid") if e else None, status_proses=e.get("status") if e else None,
                          menunggu=e.get("menunggu") if e else None,

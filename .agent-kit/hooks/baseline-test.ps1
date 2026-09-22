@@ -24,7 +24,11 @@ $sw = [Diagnostics.Stopwatch]::StartNew()
 $gagal = @(); $jumlah = 0; $terurai = $false; $catatan = @()
 
 if ($jenis -eq 'node') {
-  $t = Invoke-VitestJson $top
+  $t = Invoke-VitestJson $top (Get-PmNode $top)
+  $gagal = $t.gagal; $jumlah = $t.jumlah; $terurai = $t.terurai
+}
+elseif ($jenis -eq 'flutter') {
+  $t = Invoke-FlutterTestJson $top
   $gagal = $t.gagal; $jumlah = $t.jumlah; $terurai = $t.terurai
 }
 elseif ($jenis -eq 'go') {

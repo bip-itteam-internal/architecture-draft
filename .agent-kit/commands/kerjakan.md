@@ -13,10 +13,24 @@ dulu, lalu lanjut dengan brief yang dihasilkan).
 Skrip pendukung ada di `.claude/hooks/` (Windows: `.ps1` lewat tool PowerShell; mac/linux:
 `.sh`). Di mesin dev Windows tool Bash tidak berfungsi, jangan dipakai.
 
-## 0. Baca brief, tentukan repo dan domain
+## 0. Baca brief, tentukan repo, domain, dan PERAN
 
-Baca brief utuh. `Repo` → path `<workspace>/<repo>`. `Domain` → agen `loop-<domain>`
-(`loop-fix`, `loop-refactor`, `loop-test`, `loop-docs`). Slug = nama berkas brief tanpa tanggal.
+Baca brief utuh. `Repo` → path `<workspace>/<repo>`. Slug = nama berkas brief tanpa tanggal.
+Eksekutornya dipilih dari **dua sumbu**, domain DAN repo, bukan domain saja:
+
+| Domain | Repo | Eksekutor |
+|---|---|---|
+| `docs` | `architecture-draft` | `loop-docs` (Penulis) |
+| `test` | mana pun | `loop-test` (QA) |
+| `fix`, `refactor` | `erp-frontend` | `loop-fe` |
+| `fix`, `refactor` | `bip-erp` | `loop-be` |
+| `fix`, `refactor` | `mybharata-app` | `loop-mobile` |
+| `fix`, `refactor` | brief menyentuh CI, compose, env, atau urutan deploy | `loop-devops` |
+| `fix`, `refactor` | repo lain | `loop-fix` / `loop-refactor` (cadangan) |
+
+`test` dan `docs` sengaja tetap lintas lapisan: QA menguji lapisan mana pun, dan dok tinggal di
+vault. `loop-devops` menang atas lapisan bila briefnya memang soal jalur rilis, bukan soal layar
+atau handler; ia **tidak punya shell** dan hanya menyiapkan perintah untuk manusia.
 Id sesi ini ada di konteks SessionStart (`Sesi ini: <id>`); kalau ada, catat `worktree` dan
 `branch` ke `.task-plans/sesi/<id>.json` begitu worktree jadi (sunting dua field itu saja).
 
@@ -36,9 +50,12 @@ panjang membuat vitest mati diam-diam (team-memory).
 Untuk `architecture-draft` (domain docs): **tanpa worktree**, kerja langsung di vault di `main`
 (konvensi vault: push langsung, tanpa PR).
 
+Dua brief berarti **dua worktree**, satu per repo, dibuat lebih dulu sebelum §2. Keduanya berdiri
+sendiri, jadi tak ada berkas yang diperebutkan dan tak ada stash yang perlu dipakai bersama.
+
 ## 2. Eksekutor
 
-Dispatch `Agent` dengan `subagent_type: loop-<domain>`, `run_in_background: false`. Prompt wajib
+Dispatch `Agent` dengan `subagent_type` = peran hasil §0, `run_in_background: false`. Prompt wajib
 memuat, dalam bentuk path absolut:
 
 ```
@@ -49,17 +66,52 @@ Skill yang relevan untuk dibaca dulu: <daftar .claude/skills/<x>/SKILL.md yang c
 Percobaan: 1 dari 3
 ```
 
-**Bila `Agent` menjawab "Agent type 'loop-<domain>' not found"**: daftar agen kustom dibaca saat sesi
-mulai, jadi sesi ini lahir sebelum kit 1.15.0 di-init. Jalan yang benar: **restart sesi**. Jalan
-darurat satu kali: dispatch `general-purpose` dengan seluruh isi `.claude/agents/loop-<domain>.md`
-(tanpa frontmatter) sebagai pembuka prompt, lalu catat `agen` di log judge sebagai
-`general-purpose(loop-<domain>)`; jangan jadikan ini kebiasaan, model dan batas tools-nya berbeda.
+**Bila `Agent` menjawab "Agent type '<peran>' not found"**: sesi ini lahir sebelum kit yang
+memperkenalkan peran itu di-init (peran per lapisan masuk di 1.24.0, agen loop pertama di 1.15.0).
+⚠️ **Coba sekali lagi di giliran berikutnya sebelum memutuskan restart.** Diukur 2026-09-21:
+sesudah `init` dijalankan di tengah sesi, `loop-fe` ditolak "not found" pada giliran yang sama,
+lalu **terbaca sendiri pada giliran berikutnya tanpa restart apa pun**. Bila giliran berikutnya
+masih menolak, barulah **restart sesi**. Jalan darurat
+satu kali: dispatch `general-purpose` dengan seluruh isi `.claude/agents/<peran>.md` (tanpa
+frontmatter) sebagai pembuka prompt, lalu catat `agen` di log judge sebagai
+`general-purpose(<peran>)`; jangan jadikan ini kebiasaan, model dan batas tools-nya berbeda.
+⚠️ Untuk `loop-devops` jalan darurat ini **tidak sah**: `general-purpose` punya shell, sementara
+seluruh gerbang peran itu justru terletak pada ketiadaan shell. Restart sesi, atau kerjakan manual.
 
 Pilih skill relevan dari `.claude/skills/`: `migrasi-tabel-hris` untuk halaman daftar erp-frontend,
-`deploy-bip-erp` tidak relevan untuk eksekutor (jangan disertakan), `audit-keamanan` bila brief
-menyebut auth/RBAC/izin. Catat daftar itu; ia masuk log judge sebagai `skills_dibaca`.
+`deploy-bip-erp` hanya untuk `loop-devops`, `audit-keamanan` bila brief menyebut auth/RBAC/izin.
+Catat daftar itu; ia masuk log judge sebagai `skills_dibaca`.
+
+**Jangan menyuruh eksekutor membaca `rules/team-memory.md`.** Isinya sudah ada di konteks tiap
+subagent lewat `CLAUDE.md` (diukur 2026-09-21); menyuruhnya membaca ulang hanya membakar satu
+panggilan tool untuk isi yang sudah dipegangnya.
+
+### Dua brief sekaligus (paralel)
+
+`/kerjakan <a.md> <b.md>` menjalankan keduanya bersamaan. Periksa **tiga syarat** sebelum dispatch,
+dan bila satu saja tidak terpenuhi, jalankan berurutan sesuai urutan yang ditulis `/brief`:
+
+1. **Repo-nya berbeda.** Dua brief di repo yang sama selalu satu per satu.
+2. **Tiap brief menulis `Paralel: aman`.** Ragu berarti `tidak`, dan `tidak` berarti berurutan.
+   Brief lama yang ditulis sebelum kit 1.24.0 **tidak punya field ini sama sekali**; itu dibaca
+   sebagai `tidak`, bukan sebagai izin. Jangan menambahkan fieldnya sendiri demi meloloskan.
+3. **Bila keduanya menyentuh satu endpoint yang sama**, kedua brief memuat blok `## Kontrak`
+   dengan isi identik. Tanpa blok itu, pasangan BE dan FE dijalankan berurutan, BE dulu.
+
+Caranya: dispatch kedua `Agent` **dalam satu pesan** (dua tool call sekaligus), bukan
+`run_in_background`. Keduanya selesai lebih dulu, baru §3 dijalankan **per brief**.
+
+Batasnya satu mesin: dua eksekutor wajar, lebih dari itu mereka berebut CPU dan ada yang gagal
+karena timeout, bukan karena kodenya salah. **Jangan menjalankan lebih dari dua brief sekaligus.**
+
+Paralel di sini soal waktu MENGETIK, bukan waktu deploy. Untuk perubahan kontrak, BE tetap
+di-deploy sebelum FE, dan itu ditulis di badan PR (§5).
 
 ## 3. Judge
+
+**Bila dua brief dijalankan paralel, §3 sampai §6 dikerjakan PER BRIEF**, berurutan dan terpisah:
+satu judge, satu loop perbaikan, satu commit, dan satu PR untuk masing-masing. Yang paralel hanya
+eksekutornya di §2. Brief yang gagal tidak menahan pasangannya yang lolos.
 
 Jalankan prosedur `/judge` (baca `.claude/commands/judge.md` dan lakukan) atas worktree itu dengan
 brief yang sama. Hasilnya `lolos` (gerbang deterministik **dan** agen judge sama-sama lolos) dan
@@ -76,12 +128,16 @@ Tulis log `.task-plans/judge/<slug>-<n>.json`:
 ```json
 { "brief": "<path>", "worktree": "<path>", "branch": "...", "percobaan": n, "waktu": "<UTC ISO>",
   "gerbang": <hasil gerbang.ps1>, "verdict": <JSON judge>, "lolos": true|false,
-  "skills_dibaca": ["..."], "agen": "loop-<domain>" }
+  "skills_dibaca": ["..."], "agen": "<peran hasil §0, mis. loop-fe>" }
 ```
+
+Field `agen` ditulis apa adanya karena ia yang membuat angka pengulangan bisa dibandingkan
+antar-peran nanti: apakah spesialis lapisan benar-benar lebih jarang ditolak judge daripada
+eksekutor domain generik. Tanpa field itu, klaim "peran spesialis mempercepat" tak bisa diukur.
 
 ## 4. Loop perbaikan
 
-Bila **gagal** dan percobaan < 3: dispatch ulang `loop-<domain>` dengan prompt yang sama plus
+Bila **gagal** dan percobaan < 3: dispatch ulang **peran yang sama** dengan prompt yang sama plus
 bagian **"Yang harus diperbaiki (dari judge)"** berisi temuan `kritis`, kriteria yang tidak
 terpenuhi, dan `gagal_baru` gerbang, apa adanya. Lalu kembali ke §3 dengan `percobaan+1`.
 
@@ -119,6 +175,10 @@ Repo kode, di dalam worktree:
    - Kriteria lolos + bukti (dari verdict)
    - Ringkasan judge + gerbang yang dijalankan (nama, durasi, lolos)
    - `Brief: <path>` · `Log: .task-plans/judge/<slug>-<n>.json`
+   - **Urutan deploy**, wajib ditulis bila brief ini separuh dari pasangan yang berbagi blok
+     `## Kontrak`: sebut PR pasangannya dan tegaskan **BE di-deploy sebelum FE**. Paralel di §2
+     hanya soal waktu mengetik; yang menentukan aman atau tidaknya di produksi adalah urutan ini,
+     dan ia harus terbaca oleh yang menekan tombol merge.
    - Baris penutup: *Dibuat oleh AI Engineering Loop (agent-kit). Merge tetap keputusan manusia (ADR 0077 §1).*
 5. Cetak URL PR. Tambahkan `## Hasil` di brief: percobaan, verdict, URL PR. Kirim ke papan tim:
    ```

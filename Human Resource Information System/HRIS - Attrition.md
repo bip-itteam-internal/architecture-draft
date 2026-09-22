@@ -24,6 +24,8 @@ Yang berubah dengan adanya catatan resign adalah **prasyarat datanya terpenuhi**
 
 ⚠️ **Datanya masih kosong.** Verifikasi produksi 2026-08-06: `employee_resign` **0 dokumen**, akun aktif **183**. Angka apa pun yang dihitung darinya akan nol sampai HR benar-benar memakai menunya.
 
+⚠️ **Dipakai sebagian, dan itu bentuk kekosongan yang lebih menipu.** Diukur ulang PROD 2026-09-21: `employee_resign` **12 dokumen**, akun aktif **182**, akun non-aktif **35** — tetapi hanya **11** dari yang non-aktif itu punya catatan, jadi **24 kepergian tak punya tanggal sama sekali**. Angka turnover karena itu bukan nol melainkan **terlalu kecil**, dan tampak wajar. Menambal 24 itu akan mengubah turnover bulan-bulan lampau dari 11 menjadi 35 orang keluar. Penjaganya: panel "akun nonaktif tanpa catatan keluar" di halaman Resign (🔜 belum merge; [[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]]), dan sejak itu hidup tiap penonaktifan meninggalkan jejak bertanggal sehingga kekurangan ini tak bisa tumbuh diam-diam lagi.
+
 ### Kartu turnover bulan berjalan — ✅ live di produksi
 
 Cicilan pertama Dashboard: empat kartu di halaman Resign ([[APP - Web ERP]]) yang disuplai `GET /resign/summary`, kini juga tampil sebagai `KartuAmbang` di tab **Ringkasan** dan **HRD Supervisor** Dashboard HRGA.
@@ -41,6 +43,15 @@ Tiga keterbatasan yang menempel pada angkanya, dan semuanya berasal dari bentuk 
 - **Karena itu hanya bulan BERJALAN yang disajikan.** Bulan lampau menuntut penguraian mundur bulan demi bulan, tiap langkah menambah galat, dan hasilnya terlihat pasti padahal tidak.
 
 ⚠️ Saat dashboard penuh dibangun nanti: **tanggal keluar yang dipercaya adalah `effective_date`, bukan `applied_at`.** Keduanya bisa berbeda bila catatan dibuat mundur atau cron sempat tak jalan.
+
+### ⛔ Ada MESIN KEDUA yang menghitung headcount, dan metodenya berbeda
+
+T3 [[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]] (⚠️ merged ke `main` 2026-09-22 WIB, PR [#1993](https://github.com/bip-itteam-internal/bip-erp/pull/1993) merge `a6e26941`; belum deploy) menambahkan `GET /kpi/headcount-periode` yang menjawab pertanyaan yang **terdengar sama** tetapi dihitung dengan cara lain. Siapa pun yang membandingkan kedua angka perlu tahu ini lebih dulu, sebab selisihnya bukan bug.
+
+- Rekonstruksi di halaman ini memakai **selisih**: kurangi yang keluar, tambah yang masuk, mundur dari keadaan sekarang. Itu sah untuk **perusahaan utuh** saja, dan penolakannya untuk cakupan di bawah perusahaan sudah dikunci uji — mutasi antar departemen tak tercatat sebagai keluar maupun masuk, jadi per departemen ia menghitung mutasi sebagai pengunduran diri.
+- Mesin T3 merekonstruksi **per orang** lewat `employee_movement`, sehingga mutasi memindahkan orangnya antar sel tanpa mengubah total. Itulah satu-satunya cara memecah headcount per departemen dan posisi.
+- **Konsekuensinya kedua angka tidak akan sama persis**, dan itu diterima sadar. Mengalihkan `/resign/summary/riwayat` ke mesin T3 adalah pekerjaan tersendiri (keputusan 2026-09-21): perubahan angka yang sudah dilihat HR di kartu turnover tidak boleh menyelinap bersama fitur baru.
+- Keterbatasan kedua di atas ("buta terhadap penonaktifan yang tak lewat menu Resign") **tidak hilang** di mesin T3; ia justru diangkat jadi gerbang. Bulan lampau **menolak menjawab** selama masih ada akun non-aktif tanpa catatan keluar (24 per 2026-09-21), dan penolakan itu mencabut dirinya sendiri begitu HRD menambal. Rincian: [[Microservices - Employee Service]].
 
 ## Dokumen Terkait
 

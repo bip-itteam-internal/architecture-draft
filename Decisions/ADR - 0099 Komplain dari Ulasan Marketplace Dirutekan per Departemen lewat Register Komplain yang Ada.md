@@ -78,6 +78,7 @@ Penelusuran menyeluruh atas seluruh service (nama koleksi dan tipe struct yang m
 3. **Pekerjaan terbesarnya adalah LAYAR untuk register gudang**, bukan model data. Termasuk membuka rute BACA `/wms/komplain` ke marketing, yang hari ini sengaja dibatasi peran gudang dan dicatat di kodenya sebagai perubahan tersendiri.
 
 4. **Isi ulasan DISALIN ke dalam komplain, bukan ditautkan lewat id saja.** Ulasan tinggal di `integration_db`, register di database lain, dan aturan database-per-service melarang lintas database. Salinan bertanggal juga yang benar secara makna: ia bukti, dan ulasan yang kelak disunting atau disembunyikan tidak boleh mengubah dasar komplain yang sudah diajukan. Register gudang sudah memakai prinsip yang sama untuk atribusi packer.
+   - *Jalur gudang tuntas 2026-09-16 (T6). Jalur QC menyusul T12 2026-09-21 (kode selesai, belum merge):* `QualityComplaint` mendapat lima field bernama persis seperti padanannya di register gudang, dan buktinya **dirender di dialog validasi QC**. Yang kedua itu bukan tambahan kosmetik melainkan syarat keputusan ini benar-benar terpenuhi: sampai T12 kelima field disimpan tanpa pernah tampil di satu titik pun, sehingga QC memvonis tanpa melihat dasar tudingannya sementara pemeriksaan basis data tetap berkata semuanya benar. ⚠️ Bedanya dengan jalur gudang dicatat di [[ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori]] keputusan 13: isian jalur QC **tidak dibersihkan server**, jadi salinannya klaim klien, bukan data berprovenans server.
 
 5. **Kategori dipilih manusia.** Tidak ada klasifikasi otomatis, tidak ada LLM, karena volumenya 3 sampai 4 per bulan.
 
@@ -96,6 +97,8 @@ Penelusuran menyeluruh atas seluruh service (nama koleksi dan tipe struct yang m
 
 12. **Dua utang register QC ditutup hanya bila jalur QC benar-benar disentuh**: `company_id` yang belum ada, dan race `ReplaceOne` berfilter `_id` saja. Keduanya sudah tercatat di [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]].
    - *Terpicu 2026-09-17*: ADR 0103 menyentuh register QC (kategori tertutup, isian server), jadi kedua utang ini masuk task yang sama.
+   - *DITUTUP 2026-09-18* lewat [[ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori]] keputusan 11. `company_id` kini disimpan dan menyaring seluruh rute register itu, dan race `ReplaceOne` ditutup dengan memasukkan status ke filter lalu menjawab 409. Dua race lain yang belum pernah tercatat ikut ditemukan dan ditutup bersamaan: lost-update dua penyunting serentak, dan vonis ganda saat validasi.
+   - ⚠️ Pelajaran keputusan 5 tetap berlaku dan justru menguat: gerbang register QC pun akhirnya diturunkan dari kepemilikan toko, bukan dari daftar peran. Jangan merancang gerbang berikutnya di atas asumsi bahwa peran mewakili kepemilikan toko.
 
 ## Consequences
 
