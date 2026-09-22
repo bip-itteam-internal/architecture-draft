@@ -15531,7 +15531,7 @@
       "area": "Workspace",
       "jenis": "workspace",
       "status_emoji": "🟡",
-      "status_teks": "Daftar kerja, belum ada yang dikerjakan.",
+      "status_teks": "Sebagian irisan 1 sudah mendarat di `main` (erp-frontend [#1665](https://github.com/bip-itteam-internal/erp-frontend/pull/1665) merged 2026-09-21, disusul [#1667](https://github.com/bip-itteam-internal/erp-frontend/pull/1667)); irisan 2 belum dikerjakan. ⚠️ Status **per task** belum diukur ulang satu per satu — ukur sebelum memakainya sebagai dasar rencana.",
       "publik": false,
       "tautan": [
         "ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service",
@@ -15541,19 +15541,19 @@
         "APP - Web ERP",
         "Microservices - Employee Service"
       ],
-      "hash": "19a98d52731d7e240f221660757cd16eed47d8dd08ef4ddba145addbb937c8d7",
-      "ukuran_kb": 6.1,
-      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dilakukan untuk mewujudkan ADR 0114, dibagi jadi butir task siap dilempar ke `/start-task` (T1 sampai T13) beserta ketergantungan antar butirnya. Irisan 1 menayangkan halaman dan tabel seragam tanpa menyentuh backend sama sekali (memakai `/hr/requests?as=reviewer&include=booking`), lengkap dengan aturan Sheet berangka tiga, endpoint keputusan per modul, gerbang menu berdasarkan isi antrean bukan peran, dan penggantian panel Ruang Direktur; irisan 2 menambah endpoint agregat `/pengajuan/antrean` di employee-service plus adapter tiap sumber dan test kontraknya. Memuat juga dua task yang sengaja dipisah dari ADR: mengukur sebab pengajuan berakhir diabaikan sistem, dan membuktikan apakah kartu pembelian di beranda portal selamanya degraded.",
+      "hash": "9842f4665e6b40a7e1b315ceaf84ea56c93a4592c5c23320929657c6703384ef",
+      "ukuran_kb": 8.2,
+      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk menyatukan seluruh antrean persetujuan ERP jadi satu halaman web, dipecah jadi irisan 1 (tayang tanpa menyentuh backend, memakai /hr/requests?as=reviewer&include=booking) dan irisan 2 (agregator GET /pengajuan/antrean di employee-service plus adapter tiap modul). Menjawab juga kapan menu persetujuan per-modul lama boleh dicabut dan kenapa urutannya tidak boleh dibalik, serta mana saja rute /persetujuan/* yang masih hidup di menu Portal. Memuat dua task terpisah di luar ADR 0114: mengukur kenapa 119 pengajuan mati karena didiamkan, dan membuktikan apakah kartu pembelian di beranda portal selamanya degraded.",
       "kata_kunci": [
         "antrean persetujuan",
         "approval queue",
-        "daftar kerja",
-        "irisan",
         "portal persetujuan",
-        "pengajuan/antrean",
-        "adapter sumber",
-        "test kontrak",
-        "employee-service",
+        "pengajuan antrean",
+        "agregator persetujuan",
+        "cabut menu persetujuan",
+        "pengajuan barang",
+        "reviewer",
+        "penyetuju",
         "ADR 0114"
       ]
     },
