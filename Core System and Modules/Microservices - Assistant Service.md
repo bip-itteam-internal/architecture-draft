@@ -2,7 +2,15 @@
 
 *Asisten tanya-jawab di dalam Web ERP yang menjawab pertanyaan tentang angka bisnis dengan cara MERUTEKAN pertanyaan ke endpoint yang sudah menghitungnya, bukan dengan menghitung sendiri. Ia memanggil endpoint memakai JWT orang yang bertanya, sehingga hak aksesnya identik dengan hak akses orang itu di layar. Irisan pertama diarahkan ke data marketing analytics.*
 
-- **Status**: 🟡 **Konsep**, 2026-08-29, **0 kode**. Belum ada direktori service, belum ada ADR yang mengesahkannya.
+- **Status**: 🟡 **Konsep**, 2026-08-29, **0 kode**. Belum ada direktori service.
+  ⚠️ **SEBAGIAN DIGANTIKAN 2026-09-22** oleh [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]]:
+  asisten analisa marketing diputuskan berdiri **di dalam service pemilik data lewat klien tipis
+  `shared-library/ai`**, bukan sebagai service tersendiri, dan tanya-jawab bebas ditunda sampai
+  template serta penjadwalan tanpa AI terbukti dipakai. Ketegangan dengan ADR 0058 §2 yang
+  dicatat dokumen ini (§ Dua ketegangan terbuka) **sudah dijawab** di sana. Yang TETAP berlaku
+  dari dokumen ini dan jadi bahan utama irisan ketiga: empat keputusan rancangannya (asisten
+  dilarang berhitung, tool memanggil lewat gateway dengan JWT pemakai, jawaban adalah pintu),
+  empat penjaga anti angka karangan, dan § Temuan gateway soal batas 30 detik.
 - **Stack (rencana)**: Go + [Anthropic Go SDK](https://github.com/anthropics/anthropic-sdk-go) dengan **Tool Runner** (masih beta) + MongoDB untuk riwayat percakapan.
 - **Path di repo (rencana)**: `bip-erp/services/assistant/`, mengikuti pola `services/.template`.
 - **Rute (rencana)**: lewat [[CORE - API Master Gateway]] seperti service lain. ⚠️ Cara mengantar jawabannya BELUM diputuskan karena gateway tidak meneruskan stream (lihat § Temuan gateway).
