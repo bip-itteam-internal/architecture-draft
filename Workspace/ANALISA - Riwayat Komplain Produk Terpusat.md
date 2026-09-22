@@ -24,18 +24,39 @@ akan kosong bagi audiens utamanya.
 
 Paling mendesak dan paling murah: tanpa ini seluruh fitur komplain tak terjangkau audiensnya.
 
-⚠️ **Jalur pemasangannya belum diketahui dan wajib dibaca dari kode lebih dulu.** Di prod tidak
-ada satu pun contoh pemasangan (nol dokumen di 36 koleksi `employee_db` menyebut `akuntoko`),
-jadi tidak ada pola yang bisa ditiru dari data. Tim mencatat paket izin punya **dua jalur**,
-lewat posisi dan lewat akun; tentukan yang mana yang berlaku, lalu baru susun skripnya.
+✅ **Skripnya sudah ditulis dan sudah diuji mode baca**: `.task-plans/2026-09-22-pasang-paket-akuntoko-prod.ps1`
+beserta `.js`-nya. Tulis PROD, jadi **manusia yang menjalankan**. Urutannya `-Mode cek` (tidak
+menulis, keluarannya jadi berkas cadangan), lalu `-Mode terapkan`, dan `-Mode balik -Cadangan <file>`
+bila perlu pulang. Mode `terapkan` menolak jalan bila cadangan belum ada.
 
-- Tulis PROD, jadi agent menyiapkan `.ps1` + `.js` idempoten (backup, dry-run, gerbang yang
-  menolak melanjutkan, rollback) dan **manusia yang menjalankan**.
-- Gerbang verifikasi: bukan `docker ps` dan bukan jumlah dokumen saja. Satu akun uji pemegang
-  toko membuka sidebar dan melihat ketiga menu (Ulasan, Komplain ke Gudang, Komplain ke QC),
-  lalu mengajukan satu komplain sungguhan lewat gateway sampai baris pertama muncul di register.
+**Dua temuan pengukuran yang menentukan bentuk skripnya**, dan keduanya tak terlihat tanpa membuka
+data prod:
+
+- ⛔ **Kedua departemen punya DUA item posisi untuk pekerjaan yang sama**: `icc` ("ICC") dan
+  `account_specialist` ("Account Specialist"), keduanya kini berisi `marketing_engagement_pemohon`.
+  Dari 36 Account Specialist, **33 ber-`position_key: "icc"`** dan hanya 3 ber-`account_specialist`.
+  `paketPosisi` (`services/employee/permission_resolve.go`) mencocokkan `position_key` lebih dulu
+  dan baru jatuh ke nama, jadi memasang paket hanya ke item "Account Specialist" akan melewatkan
+  **33 orang tanpa satu pun galat**. Skrip menyentuh keempat item.
+- ⛔ **Empat pemegang toko aktif berada di luar kedua item itu**: dua Leader dan dua Marketplace
+  Advertiser di Beauty Hacks. Memasang paket ke item `leader`/`marketplace_advertiser` akan ikut
+  memberi hak ke seluruh pemegang jabatan itu yang tidak memegang toko, jadi keempatnya ditangani
+  lewat **jalur akun** (`system_authentication.permission_sets`), yang memang jalur pengecualian
+  individu dan sudah dipakai 23 akun lain di prod.
+
+Radius yang diterima sadar: 44 orang terkena jalur posisi, 29 di antaranya pemegang toko aktif.
+15 sisanya tidak memegang toko, jadi mereka melihat menunya tetapi tidak dapat mengajukan apa pun
+(backend menyaring lewat `icc_account_mappings`) dan daftar komplain gudangnya nol baris. Yang
+benar-benar melebar hanya bacaan register QC, yang memang tidak tersempit per toko.
+
 - ⛔ Jangan memecah paketnya. ADR 0107 melarangnya, dan pemegang paket separuh justru kehilangan
-  menu yang dulu dibuka perannya, sebab klaim `akuntoko.*` mematikan fallback tier seluruh modul.
+  menu yang dulu dibuka perannya. Skrip menolak jalan bila paketnya tidak utuh.
+- ⚠️ Klaim izin terbit saat **login**, jadi yang sudah login belum melihat menunya sampai login
+  ulang atau tokennya kedaluwarsa (TTL 72 jam).
+- Gerbang verifikasi: bukan `docker ps` dan bukan jumlah dokumen saja. Satu pemegang toko login
+  ulang, melihat ketiga menu (Ulasan, Komplain ke Gudang, Komplain ke QC), lalu mengajukan satu
+  komplain sungguhan lewat gateway sampai baris pertama muncul di register. Kedua register nol
+  dokumen sebelum ini, jadi baris pertama itulah buktinya.
 
 ### T2. Kabar inbox saat ulasan bintang rendah masuk
 
