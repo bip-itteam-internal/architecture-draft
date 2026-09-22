@@ -248,6 +248,8 @@ dibuka sesudah login. Semuanya gagal dengan cara yang sama, dan itu yang membuat
 tak ada galat, layarnya terlihat profesional, dan ia tidak menjawab pertanyaan siapa pun.
 Dipungut dan diterjemahkan dari antislop (MIT, `github.com/miqdadbadjuber/anti-slop`)
 §App & Dashboard, diperiksa 2026-09-21; yang sudah diatur §2 tidak disalin ulang ke sini.
+⚠️ Ketujuhnya **7 dari 43** pola di `antislop-ui` saja, dan nol dari lima skill antislop
+lainnya, jadi bagian ini bukan ringkasan antislop. Sisanya hidup di skill terpasang, §3a.
 
 1. **Shell dashboard bawaan.** Sidebar kiri, bilah atas, empat stat card, satu bagan, satu
    tabel, dipilih sebelum ada yang bertanya layar ini untuk apa. Tukar labelnya dan ia cocok
@@ -325,6 +327,59 @@ menuntut `DESIGN.md` dan melabeli hasil tanpa itu "draft without direction"; kit
 [[REF - Layout Dashboard erp-frontend]] dan token tema repo. Yang dipungut dari sumber semacam
 itu bentuk kegagalan yang perlu dihindari, **bukan** perintah membangun kosakata visual baru.
 Sumber luar yang menyarankan komponen atau palet sendiri dikalahkan §1.
+
+## 3a. Skill antislop: dipasang per mesin, repo tetap yang menang
+
+antislop (sumber §2c) tersedia sebagai **enam skill**, bukan satu dokumen. Pasang per mesin:
+
+```
+pnpm dlx skills@latest add miqdadbadjuber/anti-slop -g -s "*" -a claude-code -y
+```
+
+**Scope `-g` (global) disengaja.** Scope project menulis ke `.claude/skills/`, dan folder itu
+di-generate ulang oleh `init` sehingga pasangannya akan hilang tanpa pemberitahuan.
+
+⚠️ **Karena per-mesin, ia TIDAK sampai lewat `git pull`.** Itu sebabnya §2c tetap memuat
+ketujuh polanya lengkap dan sengaja **tidak** dipangkas jadi rujukan: rekan yang belum
+memasang skill-nya akan kehilangan isinya, dan kegagalannya senyap. Kelas yang sama dengan
+`enabledPlugins` yang menyalakan tapi belum tentu memasang (`team-memory.md` § Skill & tooling
+AI).
+
+**Cakupan yang sudah dipungut kecil.** Diukur 2026-09-22: `antislop-ui` memuat 43 pola (Visual
+& Color 10, Layout & Components 10, Decorative 11, Structural & Flow 3, App & Dashboard 7,
+Motion 2), dan yang diterjemahkan ke §2c hanya App & Dashboard. Lima skill lain
+(`antislop`, `antislop-code`, `antislop-copywriting`, `antislop-human`, `antislop-layoutmobile`)
+belum tersentuh sama sekali.
+
+**Mana yang berguna di repo mana.** antislop ditulis untuk **situs publik**, bukan aplikasi di
+balik login, dan itu terbaca dari isinya: §Layout & Components berbicara soal bento grid,
+"Trusted By" logo bar, kartu pricing "Most Popular", dan footer 4 kolom, yang tak punya padanan
+di ERP internal.
+
+| Repo | Yang dipakai |
+|---|---|
+| `erp-frontend` | `antislop-human`, `antislop-layoutmobile`, `antislop-code` |
+| `mybharata-app` | `antislop-layoutmobile`, `antislop-human` |
+| `website-bharata` | keenamnya, tanpa pengecualian di bawah |
+
+**Yang menang saat bertabrakan** (berlaku untuk `erp-frontend` dan `mybharata-app`):
+
+- ⛔ **Ikon Lucide TETAP dipakai.** `antislop-ui` §Decorative menandainya sebagai penanda AI
+  slop karena "satu pustaka ikon bawaan membuat ikon tiap situs AI identik". Di sini ia bukan
+  default yang tak dipikirkan melainkan bagian dari shadcn/ui: diukur 2026-09-22 di
+  `origin/main`, **799 dari 2271 berkas `.tsx`** mengimpor `lucide-react`, termasuk primitif
+  kita sendiri (`components/ui/breadcrumb.tsx`, `calendar.tsx`, `card.tsx`). Menggantinya
+  melanggar §1 dan bukan pekerjaan yang pernah diputuskan siapa pun.
+- ⛔ **Radius, bayangan, palet, dan tipografi tetap dari token repo** (§3). Saran `antislop-ui`
+  §Visual & Color dibaca sebagai bentuk kegagalan yang perlu dihindari, **bukan** izin menulis
+  kosakata visual baru.
+- ⛔ **Kontras diukur `pnpm contrast`, bukan `contrast-check.py`.** Milik antislop hanya
+  menerima dua warna heksa dan tidak mengurai `oklch()`, sementara token kita campuran
+  `oklch()` (shadcn) dan heksa (token domain). Rincian gerbang kita di §4.
+- ⚠️ **`antislop-code` tidak boleh menghapus komentar yang menjelaskan sebuah KEPUTUSAN.**
+  `warna.test.ts` sengaja mengizinkannya, dengan alasan bahwa melarang penjelasan adalah cara
+  tercepat membuat keputusan itu terlupakan. Bagian "Not a Ban (preserve these)" di skill itu
+  sejalan; yang dilarang cuma komentar yang tak menambah apa-apa.
 
 ## 4. Bukti sebelum menyebut selesai
 
