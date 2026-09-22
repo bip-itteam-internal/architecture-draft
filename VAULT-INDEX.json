@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-22",
-  "jumlah_dokumen": 464,
+  "jumlah_dokumen": 466,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -2291,25 +2291,28 @@
         "ADR - 0006 Swap Jadwal Same-Department",
         "ADR - 0036 Roster Harian Menimpa Jadwal Dasar",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin",
+        "ADR - 0117 Riwayat Komplain Produk Terpusat di Satu Tabel, Register Tetap Dua",
+        "ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service",
+        "ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko",
         "Microservices - Notification Service",
         "CORE - API Master Gateway",
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "8cfe7d2dbc772deb274744f01b2c3db71ea840b06586a66b363d07adfa4a7815",
-      "ukuran_kb": 222.0,
-      "ringkasan": "Menjawab: apa tanggung jawab employee-service sebagai sumber kebenaran autentikasi dan master data karyawan, fitur apa saja yang dilayaninya (login/SSO, onboarding, account admin, master departemen dan divisi, KPI, kontrak, resign, jadwal kerja), dan jebakan implementasi apa yang menempel pada tiap bagian. Juga menjawab stack dan path repo-nya, service lain mana yang bergantung padanya, dan bagian mana yang masih berupa catatan terbuka.",
+      "hash": "8d30c7475f65fad99c63d57e60b84f5e660c909488528fd88b48e1da45b6c25a",
+      "ukuran_kb": 224.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki employee-service dan bagaimana login, PIN, biometric, refresh token, serta onboarding registrasi karyawan bekerja sebagai sumber SSO bip-erp. Menjelaskan juga operasi admin akun oleh IT (aktif/nonaktif, forget-device, hard reset, system_roles), CRUD master department, master divisi, dan aturan turunannya seperti indeks unik {company_id, key}, penolakan 409 saat divisi masih dipakai, serta field yang dipertahankan saat PUT department memakai ReplaceOne. Berguna untuk mencari siapa pemilik data karyawan, bagaimana multi-perusahaan (tenant) di-scope, dan bagaimana jalur resign/non-aktif menulis is_active lewat satu pintu.",
       "kata_kunci": [
+        "employee service",
         "employee-service",
-        "microservice",
-        "Go Fiber MongoDB",
-        "autentikasi SSO",
-        "onboarding",
+        "autentikasi",
+        "login",
+        "SSO",
+        "onboarding registrasi",
+        "master department",
         "master divisi",
-        "master_department",
-        "account admin",
-        "multi-tenant",
-        "source of truth"
+        "system_roles",
+        "resign non-aktif"
       ]
     },
     {
@@ -7523,6 +7526,45 @@
         "integration-service",
         "audit trail approval",
         "SPV FAT"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0117 Riwayat Komplain Produk Terpusat di Satu Tabel, Register Tetap Dua.md",
+      "judul": "ADR - 0117 Riwayat Komplain Produk Terpusat di Satu Tabel, Register Tetap Dua",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, kodenya belum ada. Pekerjaan pertamanya (memasang paket izin `marketing_akuntoko_pemegang` ke pemegang toko) adalah master data dan **tidak menunggu ADR ini**. Diukur prod 2026-09-22: kedua register komplain nol dokumen dan paket izin itu dipasang ke nol orang, sehingga 36 pemegang toko belum melihat satu pun menu komplain. Daftar task: [[ANALISA - Riwayat Komplain Produk Terpusat]].",
+      "publik": true,
+      "tautan": [
+        "ANALISA - Riwayat Komplain Produk Terpusat",
+        "ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service",
+        "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
+        "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
+        "ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko",
+        "REF - Alur Persetujuan",
+        "REF - Kepemilikan Data",
+        "Microservices - Employee Service",
+        "Microservices - Warehouse Service",
+        "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
+        "APP - Web ERP",
+        "CORE - RBAC dan Permission Set",
+        "Sales - ICC Account Manager Mapping"
+      ],
+      "hash": "64fbcebb9297b70a133b2d7c6c80476367b7675298f36a96ead0a7cf6ea00c19",
+      "ukuran_kb": 17.4,
+      "ringkasan": "Menjawab: kenapa riwayat komplain produk (komplain gudang dan komplain mutu QC) dibaca dari satu tabel seragam padahal registernya tetap dua, siapa yang merakitnya (agregator baru di employee-service, memakai ulang mekanisme ringkasan_pengajuan.go), dan di mana pemetaan dua kosakata status dikerjakan. Menjelaskan juga kenapa kedua register nol dokumen di prod 22 September 2026: bukan soal jumlah tabel, melainkan paket izin marketing_akuntoko_pemegang belum dipasang ke satu pun dari 36 Account Specialist pemegang toko, sehingga menu komplain tidak terlihat. Memuat batas yang sengaja tidak dijanjikan: bukan rekap berangka, tidak mengubah wewenang gudang atau QC, tetap hanya Shopee, dan baris komplain mutu belum bisa disempitkan per toko.",
+      "kata_kunci": [
+        "komplain produk",
+        "product complaint",
+        "riwayat komplain",
+        "komplain gudang",
+        "quality_complaint",
+        "QC",
+        "agregator employee-service",
+        "marketing_akuntoko_pemegang",
+        "pemegang akun toko",
+        "Account Specialist"
       ]
     },
     {
@@ -16021,6 +16063,36 @@
         "redesign ACL",
         "fase contract",
         "ShopACLUseCase"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Riwayat Komplain Produk Terpusat.md",
+      "judul": "ANALISA - Riwayat Komplain Produk Terpusat",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0117 Riwayat Komplain Produk Terpusat di Satu Tabel, Register Tetap Dua",
+        "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
+        "REF - Kepemilikan Data",
+        "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori"
+      ],
+      "hash": "a588f889c0be4d3b5965ff13ec059ea217c5273eae1373b6039cf4131f66629c",
+      "ukuran_kb": 7.9,
+      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dikerjakan untuk mewujudkan riwayat komplain produk terpusat, urutannya, dan mana yang bisa jalan paralel (T1 izin, T2 kabar inbox ulasan bintang rendah, T3 kolom pengaju di tabel QC, T4 agregator GET /komplain/riwayat, T5 halaman /marketing/komplain, T6 menu, T7 peta kepemilikan data, T8 ukur ulang). Memuat gerbang verifikasi tiap task, peringatan yang sudah diketahui seperti created_by yang bisa kosong, env warehouse yang menuntut --force-recreate, dan label menu kembar berawalan sama yang terpotong di sidebar. Menyebut pula apa yang sengaja tidak masuk daftar: penggabungan register, perpindahan komplain antar unit, rekap berangka, dan service Quality tersendiri.",
+      "kata_kunci": [
+        "papan kerja",
+        "task komplain",
+        "riwayat komplain terpusat",
+        "GET /komplain/riwayat",
+        "marketing komplain",
+        "paket izin",
+        "Account Specialist",
+        "notifikasi ulasan",
+        "kepemilikan data",
+        "ukur ulang"
       ]
     },
     {

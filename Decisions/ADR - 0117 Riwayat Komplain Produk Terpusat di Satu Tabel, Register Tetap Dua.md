@@ -1,3 +1,5 @@
+> **Status**: 🟡 **Diusulkan**, kodenya belum ada. Pekerjaan pertamanya (memasang paket izin `marketing_akuntoko_pemegang` ke pemegang toko) adalah master data dan **tidak menunggu ADR ini**. Diukur prod 2026-09-22: kedua register komplain nol dokumen dan paket izin itu dipasang ke nol orang, sehingga 36 pemegang toko belum melihat satu pun menu komplain. Daftar task: [[ANALISA - Riwayat Komplain Produk Terpusat]].
+
 ## Untuk Manajemen
 
 Pemegang akun toko, leader, dan SPV mendapat **satu halaman berisi seluruh riwayat komplain produk**, keluhan pekerjaan gudang dan keluhan mutu dalam satu tabel dengan kolom yang sama, urut dari yang paling lama menggantung, dan bisa dicari per nomor pesanan. Sekarang riwayat itu terpecah di dua halaman milik dua departemen lain, sehingga orang yang mengajukan harus membuka dua tempat untuk tahu nasib laporannya. Tim gudang dan staf QC tetap bekerja di halamannya masing-masing; yang digabung hanya bacaannya.
@@ -18,7 +20,6 @@ Pemegang akun toko, leader, dan SPV mendapat **satu halaman berisi seluruh riway
 
 *Riwayat komplain produk dibaca dari satu tabel seragam yang dirakit agregator di employee-service dari kedua register yang sudah ada, dengan kosakata status dipetakan di agregator dan bukan di layar, sementara register, gerbang, wewenang, dan sambungan KPI tetap milik unit masing-masing.*
 
-- **Status**: 🟡 **Diusulkan**, kodenya belum ada. Pekerjaan pertamanya (memasang paket izin) adalah master data dan tidak menunggu ADR ini.
 - **Path di repo**:
   - `bip-erp/services/employee/komplain_riwayat.go` **(baru)** — agregator, bersaudara dengan `ringkasan_pengajuan.go`
   - `bip-erp/services/employee/ringkasan_pengajuan.go` — pola yang dipakai ulang (registri sumber, batas waktu per sumber, balasan `{data, degraded}`)
