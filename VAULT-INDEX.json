@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-22",
-  "jumlah_dokumen": 472,
+  "jumlah_dokumen": 473,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -477,25 +477,26 @@
         "APP - Web ERP",
         "APP - MyBharata",
         "API - Attendance Service",
+        "ADR - 0121 Jadwal Ruang Publik Menyertakan Nama dan Divisi Pemohon",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "Microservices - Notification Service",
         "Microservices - Calendar Service",
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI"
       ],
-      "hash": "42d74029290edb1e872c84acc7d2d8ac02a43d3852ce1eaa38c732844c325155",
-      "ukuran_kb": 26.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan inventory-service untuk aset dan inventaris GA, siapa yang boleh memanggil tiap rute, dan bagaimana bentuk request serta validasinya. Mencakup master item dan data-type, CRUD item termasuk serah-terima yang disetujui SPV penaung, repair history, opname perlengkapan per periode (ADR-0067), padanan item Accurate lewat accurate_item_no (ADR-0069), serta seluruh rute Booking Ruang /peminjaman berikut lapisan gerbangnya dan feed kalender.",
+      "hash": "45a5b91cb894ea18b6ba3f0504b72a3b5cc1312797ed7e8e41dcae37b1efe9a6",
+      "ukuran_kb": 26.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan inventory-service untuk aset dan inventaris GA, siapa yang boleh memanggil tiap rute, dan bentuk request serta validasinya. Mencakup master item dan data-type, repair history, opname perlengkapan bulanan (ADR-0067), padanan item Accurate lewat accurate_item_no (ADR-0069), seluruh rute Booking Ruang /peminjaman beserta lapisan gerbangnya, dan feed kalender. Menerangkan juga kenapa GET /peminjaman/jadwal dan GET /peminjaman/slot sengaja berada di luar izin ga.view.",
       "kata_kunci": [
         "inventory-service",
-        "inventaris",
         "aset GA",
+        "inventaris",
         "opname perlengkapan",
         "booking ruang",
         "peminjaman",
         "room booking",
+        "Accurate",
         "repair history",
-        "category-mapping",
-        "endpoint GA"
+        "ga.view"
       ]
     },
     {
@@ -1324,6 +1325,7 @@
         "ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web",
         "API - Inventory Service",
         "GA - Asset Loan & Room Booking",
+        "ADR - 0121 Jadwal Ruang Publik Menyertakan Nama dan Divisi Pemohon",
         "API - Form Builder Service",
         "Microservices - Payroll Service",
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
@@ -1353,20 +1355,20 @@
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "ca738efad07ce77a7521f500f8a95e5fd67f951a8a0d1105487594966a54e0be",
-      "ukuran_kb": 111.8,
-      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, fitur HRIS apa saja yang ada di dalamnya (attendance, pengajuan cuti/izin, lembur, payroll dan slip gaji ber-PIN, KPI, task management, survei, Kaizen, Satgas, Sesi Live Host, Booking Ruang, Pelatihan), dan bagaimana arsitektur Flutter-nya disusun (Clean Architecture feature-first, bloc, get_it, dio + fpdart, go_router, ARB id/en). Juga menjawab bagaimana autentikasi bekerja (JWT + biometric + PIN, 1 akun 1 device), bagaimana multi-perusahaan di-scope lewat JWT dan `CompanyScope`, mana konten yang masih dipaku untuk BIP, serta versi mana yang ada di `dev`, `main`, dan yang benar-benar beredar di HP pemakai. Berisi pula tech stack, struktur menu beranda, known issues, dan daftar fitur yang belum tersedia.",
+      "hash": "1319c88eca53f7726ae2ec04d2fa1c349fb67440141f5eb9efd0da3b7e060e7a",
+      "ukuran_kb": 112.7,
+      "ringkasan": "Menjawab: aplikasi mobile HRIS MyBharata itu apa, dibangun dengan tech stack dan arsitektur apa (Flutter, Clean Architecture feature-first, bloc, dio, go_router), dan fitur karyawan apa saja yang sudah hidup di dalamnya: attendance, pengajuan izin dan cuti, lembur, payroll dan slip gaji, KPI, survei, Kaizen, pelatihan, sesi live host, serta booking ruang. Menerangkan juga autentikasi (JWT, biometric, PIN, kebijakan satu akun satu device), penanganan multi-perusahaan lewat CompanyScope dan gerbang konten per tenant, plus versi build dan riwayat PR-nya. Berguna saat mencari di mana sebuah fitur karyawan berada di aplikasi dan bagaimana ia terhubung ke backend.",
       "kata_kunci": [
         "MyBharata",
-        "aplikasi mobile karyawan",
+        "my_bharata",
         "Flutter",
+        "aplikasi mobile",
         "HRIS mobile",
-        "absensi geofencing biometric",
-        "slip gaji PIN",
-        "multi-tenant company_id",
-        "versionCode rilis",
-        "bloc clean architecture",
-        "employee self service"
+        "portal karyawan",
+        "absensi",
+        "attendance",
+        "biometric",
+        "multi-perusahaan"
       ]
     },
     {
@@ -6649,6 +6651,7 @@
         "Microservices - Calendar Service",
         "API - Inventory Service",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
+        "ADR - 0121 Jadwal Ruang Publik Menyertakan Nama dan Divisi Pemohon",
         "REF - Kepemilikan Data",
         "CORE - RBAC dan Permission Set",
         "RUN - Deploy Microservices bip-erp",
@@ -6658,20 +6661,20 @@
         "APP - MyBharata",
         "REF - Alur Persetujuan"
       ],
-      "hash": "7a11210c6953a079ea67e173bd9fe9b7eb81e54e66351b98feeceeda91390ba7",
-      "ukuran_kb": 13.6,
-      "ringkasan": "Menjawab: kenapa booking ruang rapat dibangun di inventory-service dengan kontrak /peminjaman, siapa yang menyetujui (daftar penyetuju yang ditunjuk HR per perusahaan, bukan tim GA dan bukan atasan pemohon), dan lewat kanal mana pengajuan serta keputusan dilakukan. Juga menjawab status apa saja yang berlaku (tanpa Selesai dan tanpa checklist kebersihan), bagaimana bentrok slot ditahan tanpa transaksi Mongo, kategori notifikasi mana yang dipakai, kenapa kalender memakai feed milik pembaca, dan bagian mana yang sudah diamandemen ADR 0095.",
+      "hash": "b90db0d7a9b0c00757ec9dc3276f7b9c258be3a4be882c7c8186c336e907113e",
+      "ukuran_kb": 14.3,
+      "ringkasan": "Menjawab: kenapa Booking Ruang dibangun di inventory-service dengan kontrak /peminjaman dan nomor PJR, siapa yang berwenang menyetujui booking (daftar penyetuju yang ditunjuk HR per perusahaan, bukan tim GA dan bukan atasan pemohon), dan status apa saja yang dilalui sebuah booking beserta aturan ubah dan batalnya. Menerangkan juga cara mencegah bentrok slot tanpa transaksi MongoDB, dua kategori notifikasi yang dipakai, cara booking masuk kalender lewat feed milik pembaca, dan rencana menjadikan Booking Ruang satu-satunya sumber ruang kantor bagi modul lain. Mencatat penyimpangan sadar dari desain rilis-1 di GA - Asset Loan & Room Booking: checklist kebersihan dan status Selesai dihapus.",
       "kata_kunci": [
         "booking ruang",
         "room booking",
-        "peminjaman",
+        "peminjaman ruang",
         "ADR 0094",
-        "penyetuju ditunjuk HR",
+        "penyetuju",
         "approval",
-        "ruang rapat",
         "inventory-service",
         "anti-bentrok slot",
-        "feed kalender"
+        "ruang rapat",
+        "PJR"
       ]
     },
     {
@@ -7701,6 +7704,38 @@
         "inbox notifikasi",
         "belanja iklan",
         "laba matang"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0121 Jadwal Ruang Publik Menyertakan Nama dan Divisi Pemohon.md",
+      "judul": "ADR - 0121 Jadwal Ruang Publik Menyertakan Nama dan Divisi Pemohon",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diterima, belum di prod**. Kode bip-erp branch `feat/jadwal-ruang-identitas`, layar MyBharata branch `feat/jadwal-ruang-tampilan`. Status yang bergerak (PR, deploy) sengaja tidak dicatat di sini; ukur ulang dengan `gh pr list` dan `docker images` saat dibutuhkan.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor",
+        "REF - Kepemilikan Data",
+        "Microservices - Calendar Service",
+        "ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web",
+        "API - Inventory Service",
+        "APP - MyBharata"
+      ],
+      "hash": "af2faddd09b7c5e7f68f1b0dbb0aa739a0b3cc4ac5689c76dc1beacbc2965691",
+      "ukuran_kb": 8.6,
+      "ringkasan": "Menjawab: kenapa layar Jadwal Ruang yang dibaca seluruh karyawan kini ikut menyebut nama dan divisi pemesan, dan data apa yang tetap tertutup di balik izin ga.view (keperluan, nomor WA, nomor booking, posisi, riwayat keputusan). Menerangkan kenapa GET /peminjaman/slot sengaja tidak ikut dibuka, kenapa pemohon_nama dan divisi wajib omitempty demi booking lama tanpa identitas, dan bagaimana test pematok diperlebar dengan assertion positif alih-alih dibuang. Mencatat pelonggaran privasi yang diterima sadar oleh pemilik produk sebagai amandemen ADR 0094 paragraf 7.",
+      "kata_kunci": [
+        "jadwal ruang",
+        "ADR 0121",
+        "booking ruang",
+        "peminjaman jadwal",
+        "privasi",
+        "ga.view",
+        "pemohon_nama",
+        "divisi",
+        "room schedule",
+        "amandemen ADR 0094"
       ]
     },
     {
@@ -12954,6 +12989,7 @@
         "ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor",
         "GA - Asset Loan & Room Booking",
         "REF - Alur Persetujuan",
+        "ADR - 0121 Jadwal Ruang Publik Menyertakan Nama dan Divisi Pemohon",
         "Microservices - Calendar Service",
         "Microservices - Task Management Service",
         "Microservices - Learning Service",
@@ -12983,20 +13019,20 @@
         "Microservices - Inventory Service",
         "Microservices - Marketing Analytics Service"
       ],
-      "hash": "1241314259d411ed6917d11a1e391aaa4e83e19d3c94a82b91ad800d427d783e",
-      "ukuran_kb": 65.9,
-      "ringkasan": "Menjawab: siapa pemilik tiap fakta bisnis di ERP Bharata (service dan koleksi mana yang memegangnya), siapa yang boleh menulisnya, lewat jalan mana service lain boleh membacanya, salinan mana yang sah beserta arah dan penjaganya, serta duplikasi dan pengecualian database-per-service mana yang masih hidup. Dipakai sebelum membangun penyimpanan atau fitur atas fakta yang mungkin sudah dimiliki modul lain, supaya satu fakta tidak lahir di dua tempat lalu menyimpang diam-diam.",
+      "hash": "36a432c57761e9f61ed19bdca1a28b4c6c90b9474ac39d6994dbc017fe45db26",
+      "ukuran_kb": 66.4,
+      "ringkasan": "Menjawab: sebuah fakta bisnis (identitas dan data kerja karyawan, status aktif, departemen, divisi, jadwal kerja, presensi, hak akses, kontrak, headcount per periode, dan seterusnya) dimiliki service serta koleksi mana, siapa yang boleh menulisnya, dan lewat jalan mana service lain boleh membacanya. Dipakai sebelum membangun penyimpanan atau fitur atas fakta yang mungkin sudah dimiliki departemen lain, untuk memeriksa apakah salinan yang direncanakan sah menurut tiga syaratnya: arahnya satu, sisi salinan tak pernah ditulis tangan, dan ada penjaganya. Memuat juga pengecualian ADR 0002 database-per-service yang masih hidup di kode, duplikasi yang belum diputuskan, dan daftar bagian yang belum dipetakan.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "source of truth",
+        "satu fakta satu tempat",
         "database-per-service",
         "duplikasi data",
-        "salinan sinkron",
-        "SyncCollection",
-        "fakta bisnis",
+        "salinan data",
+        "sumber kebenaran",
         "ADR 0002",
-        "koleksi"
+        "SyncCollection",
+        "peta fakta bisnis"
       ]
     },
     {
