@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-22",
-  "jumlah_dokumen": 461,
+  "jumlah_dokumen": 464,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -7492,6 +7492,40 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0116 Setelan Akun Marketplace Bergerbang dan Berjejak, Komponen Tak Dikenal Wajib Terlihat.md",
+      "judul": "ADR - 0116 Setelan Akun Marketplace Bergerbang dan Berjejak, Komponen Tak Dikenal Wajib Terlihat",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, kode belum ada. Pemutus: SPV FAT (akun untuk keranjang sisa) dan IT (gerbang peran).",
+      "publik": true,
+      "tautan": [
+        "Microservices - Integration Service",
+        "REF - Kepemilikan Data",
+        "ADR - 0001 Akuntansi via Accurate",
+        "ADR - 0078 Klasifikasi Fee Lazada Mengikuti Pemetaan COA Finance",
+        "ADR - 0097 Kompensasi Shopee Susulan Ditahan dan Dicatat AR lewat Koreksi Manual ERP",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "Finance - Pemetaan Komponen Marketplace ke Akun Accurate",
+        "Finance - Proses Penjualan Marketplace dan Uang Masuk"
+      ],
+      "hash": "27dd4d2eb753184128139f2df31833476dfa541795f284657e2cef2e589aef3b",
+      "ukuran_kb": 15.9,
+      "ringkasan": "Menjawab: kenapa biaya marketplace (ongkir, proteksi pengiriman, PPh 22) sering mendarat di Biaya Admin, dan kenapa penyebabnya bukan salah pemetaan melainkan keranjang sisa TotalAdjustment yang berbagi akun 6112 dengan laci service-fee. Menjelaskan siapa yang boleh mengubah pemetaan akun di tab Setelan Akun Config Accurate (staf mengusulkan, SPV FAT menyetujui), kenapa keenam rute kv-config hari ini tanpa gerbang peran dan tanpa updated_by atau koleksi riwayat, serta apa bedanya akun 611701 (nilai barang sampel) dan 611704 (ongkir sampel). Memuat sembilan keputusan: gerbang peran, alur usul lalu setujui berjejak, validasi nilai akun, larangan keranjang sisa berbagi akun dengan kategori bernama, daftar komponen biaya yang belum punya akun, pratinjau transaksi terdampak, plus batasan bahwa koreksi di Accurate dan dimensi per marketplace tidak termasuk.",
+      "kata_kunci": [
+        "setelan akun marketplace",
+        "accurate_kv_configs",
+        "kv-config",
+        "Config Accurate",
+        "COA / chart of accounts",
+        "biaya admin",
+        "settlement-adjustment",
+        "integration-service",
+        "audit trail approval",
+        "SPV FAT"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -7981,6 +8015,43 @@
         "ACCURATE_KAS_PUSH",
         "ADR 0055",
         "top-up"
+      ]
+    },
+    {
+      "path": "Finance System/Finance - Pemetaan Komponen Marketplace ke Akun Accurate.md",
+      "judul": "Finance - Pemetaan Komponen Marketplace ke Akun Accurate",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (ada catatan)",
+      "publik": true,
+      "tautan": [
+        "Microservices - Integration Service",
+        "ADR - 0116 Setelan Akun Marketplace Bergerbang dan Berjejak, Komponen Tak Dikenal Wajib Terlihat",
+        "ADR - 0001 Akuntansi via Accurate",
+        "ADR - 0078 Klasifikasi Fee Lazada Mengikuti Pemetaan COA Finance",
+        "Finance - Buku Besar CV",
+        "ADR - 0097 Kompensasi Shopee Susulan Ditahan dan Dicatat AR lewat Koreksi Manual ERP",
+        "Finance - Proses Penjualan Marketplace dan Uang Masuk",
+        "Finance - Proses Pencatatan dan Buku Besar",
+        "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
+        "REF - Kepemilikan Data",
+        "ANALISA - Setelan Akun Marketplace dan Komponen Tak Dikenal"
+      ],
+      "hash": "232eb1feb9737b21891422c0ba5290d0e8581d1cc8a7aa86ec46ca848eded854",
+      "ukuran_kb": 10.9,
+      "ringkasan": "Menjawab: komponen biaya dan pendapatan Shopee, TikTok, dan Lazada diterjemahkan jadi baris berakun apa di Accurate, di mana pemetaannya hidup, dan siapa yang boleh mengubahnya. Memuat daftar sebelas laci akun beserta artinya (service-fee, discount, affiliate-commision, shipping-cost, advertising-cost, settlement-adjustment, other-income, tax-pph, insurance-fee, sample-adjustment-account, sample-shipping-account), termasuk kenapa dua laci sampel 611701 dan 611704 bukan pengganti satu sama lain. Menjawab juga kolom mana yang aman dijumlahkan dan mana yang himpunan bagian sehingga menghitung rupiah dua kali, kenapa residual jadi sumber keluhan berulang, berapa jenis komponen yang beredar per marketplace, dan komponen apa saja yang memang sengaja tidak dipetakan.",
+      "kata_kunci": [
+        "pemetaan komponen marketplace",
+        "akun Accurate",
+        "laci akun",
+        "settlement",
+        "escrow",
+        "fee Lazada",
+        "ongkir sampel",
+        "hitung ganda",
+        "residual",
+        "Shopee TikTok Lazada"
       ]
     },
     {
@@ -15979,6 +16050,40 @@
         "tahap 1",
         "tahap 2",
         "returselisih"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Setelan Akun Marketplace dan Komponen Tak Dikenal.md",
+      "judul": "ANALISA - Setelan Akun Marketplace dan Komponen Tak Dikenal",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": "🟡",
+      "status_teks": "Daftar task dari `/analisa-kebutuhan` 2026-09-22. Keputusannya di [[ADR - 0116 Setelan Akun Marketplace Bergerbang dan Berjejak, Komponen Tak Dikenal Wajib Terlihat]], cara kerjanya di [[Finance - Pemetaan Komponen Marketplace ke Akun Accurate]]. Dok ini papan kerja, bukan arsitektur. Coret item begitu PR-nya merge, dan pindahkan keadaannya ke dok domain lewat `/sync-docs`, jangan menumpuk status di sini.",
+      "publik": false,
+      "tautan": [
+        "ADR - 0116 Setelan Akun Marketplace Bergerbang dan Berjejak, Komponen Tak Dikenal Wajib Terlihat",
+        "Finance - Pemetaan Komponen Marketplace ke Akun Accurate",
+        "ADR - 0001 Akuntansi via Accurate",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "REF - Kepemilikan Data",
+        "Finance - Proses Penjualan Marketplace dan Uang Masuk",
+        "Finance - Proses Pencatatan dan Buku Besar",
+        "ADR - 0097 Kompensasi Shopee Susulan Ditahan dan Dicatat AR lewat Koreksi Manual ERP"
+      ],
+      "hash": "c3c9604eb087073c7190f74d54e79abfaa274cbfc39d49afe5e8595734c0b0c3",
+      "ukuran_kb": 9.7,
+      "ringkasan": "Menjawab: pekerjaan apa saja yang perlu dikerjakan untuk membenahi setelan akun marketplace, dalam urutan dan dependensi apa. Memuat sembilan task (mengukur pemakai layar Setelan Akun, gerbang peran dan validasi nilai pada rute kv-config, jejak perubahan laci, alur usul lalu setujui, larangan residual berbagi akun, daftar komponen belum berakun per marketplace, tampilan transaksi terdampak, i18n layar Config Accurate, pencatatan pemilik) lengkap dengan isi, test, dan cara verifikasinya. Menjawab juga prasyarat non-kode yang menunggu keputusan orang (akun tersendiri untuk residual dari SPV FAT, penetapan peran penyetuju, daftar komponen yang memang bukan biaya) dan urutan deploy yang mengikat.",
+      "kata_kunci": [
+        "daftar task",
+        "analisa kebutuhan",
+        "setelan akun marketplace",
+        "config accurate",
+        "kv-config",
+        "komponen belum berakun",
+        "usul lalu setujui",
+        "i18n",
+        "urutan deploy",
+        "integration service"
       ]
     },
     {
