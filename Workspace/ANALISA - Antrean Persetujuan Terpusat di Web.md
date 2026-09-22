@@ -2,7 +2,7 @@
 
 *Pecahan kerja untuk [[ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service]]. Bukan rencana per berkas; tiap butir cukup jelas untuk langsung dilempar ke `/start-task`.*
 
-- **Status**: 🟡 Daftar kerja, belum ada yang dikerjakan.
+- **Status**: 🟡 Sebagian irisan 1 sudah mendarat di `main` (erp-frontend [#1665](https://github.com/bip-itteam-internal/erp-frontend/pull/1665) merged 2026-09-21, disusul [#1667](https://github.com/bip-itteam-internal/erp-frontend/pull/1667)); irisan 2 belum dikerjakan. ⚠️ Status **per task** belum diukur ulang satu per satu — ukur sebelum memakainya sebagai dasar rencana.
 - **Tanggal**: 2026-09-21
 
 ## Irisan 1 — tayang tanpa menyentuh backend
@@ -54,6 +54,24 @@ Keduanya sudah ada di `registriRingkasan` sebagai angka; di sini mereka menyumba
 **T11. Test kontrak per sumber.**
 Mengurai rekaman respons sungguhan tiap endpoint apa adanya, bukan struct tiruan. Ini satu-satunya penjaga terhadap adapter yang rusak diam-diam saat modul asalnya mengubah field, dan pola yang sama sudah dipakai `services/finance/audit_kontrak_test.go`.
 *Tergantung*: T8.
+
+**T14. Cabut menu persetujuan per-modul yang sudah digantikan antrean terpusat.**
+Diminta pemilik produk 2026-09-22: begitu sebuah kategori benar-benar tampil di `/portal/persetujuan`, pintu lamanya dicabut supaya tak ada dua tempat memutuskan hal yang sama.
+
+⛔ **Urutannya tidak boleh dibalik, dan inilah seluruh isi task ini.** Syarat cabut = kategorinya **terbukti tampil dan bisa diputus** di `/portal/persetujuan`, dibuktikan dengan satu perjalanan sebagai orang lewat gateway, bukan dengan diff atau test hijau. Mencabut lebih dulu tidak menghasilkan galat apa pun: penyetujunya sekadar kehilangan satu-satunya pintu keputusan, dan yang terlihat cuma antrean yang tak pernah berkurang.
+
+Yang benar-benar ada di menu Portal hanya **dua**, keduanya konstanta di `components/layout/portal-menu.ts`:
+
+| Konstanta | Rute | Isi |
+|---|---|---|
+| `URL_PORTAL_PERSETUJUAN_PENGAJUAN_BARANG` | `/persetujuan/pengajuan-barang` | Pengajuan Barang (T8) |
+| `URL_PORTAL_PERSETUJUAN_BUDGET` | `/persetujuan/pengajuan` | Persetujuan Pengajuan **Budget** kas kecil, penyetuju SPV Finance / Direktur — **belum punya task adapter sama sekali**, jadi belum boleh dicabut walau namanya mirip |
+
+`/persetujuan/permintaan-barang` dan `/persetujuan/pesanan-pembelian` **sudah sengaja tidak ada di menu Portal**, dikunci `portal-menu.test.ts:532-533`. Rutenya tetap hidup dan masih dipakai dari menu modulnya; jangan menyimpulkan keduanya sudah pensiun.
+
+⚠️ **Mencabut menu bukan mencabut rute.** Ruang Direktur memanggil antrean Pengajuan Barang lewat jalurnya sendiri (`features/direktur/lib/tab-antrean.ts`, `ANTREAN_PENGAJUAN_BARANG`), jadi rute dan komponennya tetap dibutuhkan sampai T6 selesai. Yang dicabut entri menunya, bukan halamannya.
+
+*Tergantung*: T8 untuk Pengajuan Barang. Budget kas kecil menunggu keputusan apakah ia ikut sama sekali.
 
 ## Task terpisah, bukan bagian ADR 0114
 
