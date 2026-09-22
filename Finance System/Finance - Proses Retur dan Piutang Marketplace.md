@@ -31,6 +31,7 @@ Gudang men-scan retur tepat waktu → retur terbukukan otomatis → AR menangani
 - **B** Satu daftar pengecualian retur dan piutang di ERP untuk menggantikan basis data kerja. 🟡 Sisi retur diusulkan jadi tab **Selisih Retur** di Auto Sync Retur ([[ADR - 0104 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres]], 2026-09-17): menunggu scan >30 hari, dibukukan tanpa scan, komponen paket belum discan, scan tak sampai pembukuan, dan (Tahap 2) catatan ERP berbeda dari isi Accurate. **Piutang minus dan retur yang lolos sinkron belum tercakup** di sana.
 - **TBD** Pemilik pelacakan paket yang tertahan di ekspedisi.
 - **TBD** Kenapa fitur pelacakan cancel dan retur yang sudah ada di ERP belum membantu; tanyakan saat wawancara sebelum membangun fitur pelacakan baru.
+- **B** Kompensasi TikTok atas pesanan yang uangnya **sudah pernah cair** menambah nilai bayar faktur yang sudah lunas, dan dokumen returnya justru ter-skip. Terukur prod 2026-09-22: **14 pesanan, Rp1.610.697** (lawan 360 pesanan Rp34.872.894 yang sudah benar dan tak boleh disentuh). Sumber piutang minus yang selama ini ditelusuri AR. 🟡 [[ADR - 0119 Kompensasi TikTok Dipisah Menurut Sudah atau Belum Ada Uang Masuk]] (diusulkan, belum di kode) — dua sisi (penerimaan dan gerbang retur) wajib berubah bersamaan.
 
 ## Kontrol wajib
 

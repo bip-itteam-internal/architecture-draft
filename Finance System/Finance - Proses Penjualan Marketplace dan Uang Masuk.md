@@ -30,6 +30,7 @@ Toko dipetakan ke entitas CV di master CV → sistem menghasilkan penjualan, pot
 - **C** Aturan kolom yang tidak boleh dijumlahkan ikut tertulis di rancangan ([[Finance - Buku Besar CV]] § Gerbang kolom).
 - **TBD** Isi, aturan, dan pemilik alat web rekap penarikan CV ditelusuri sebelum T8 dirancang, supaya tidak membangun tandingannya dari nol.
 - **TBD** Income yang belum masuk sinkron dan masih diinput manual: kanal dan penyebabnya belum diukur.
+- **B** Beban ongkir Shopee salah hitung pada pesanan yang punya `final_shipping_fee` — akun ongkir kelebihan dan kelebihannya mendarat di beban admin. Terukur prod 2026-09-22: **3.865 pesanan, Rp98.260.427**, masih bertambah ±Rp16 jt/bulan. Kas tidak terpengaruh, jadi tak pernah memunculkan galat. 🟡 [[ADR - 0118 Ongkir Shopee Dihitung Aktual Dikurangi Bagian Pembeli dan Subsidi]] (diusulkan, belum di kode).
 
 ## Kontrol wajib
 
