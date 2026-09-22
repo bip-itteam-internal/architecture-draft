@@ -56,7 +56,9 @@ Hanya booking `DISETUJUI` yang menghalangi; rentang dibaca setengah-terbuka, jam
 
 Booking masuk kalender terpusat lewat feed `inventory` berjenis `room_booking` yang **hanya** memuat booking milik pembaca dan melewati booking yang lahir dari modul lain. Jadwal seluruh perusahaan tidak masuk kalender siapa pun; tempatnya halaman Ruang & Booking (`ga.view`).
 
-> **Catatan 2026-09-22, bukan amandemen.** Yang dibatasi `ga.view` di sini adalah jadwal **beserta identitas pemohon** (nama, nomor WA, keperluan). `GET /peminjaman/jadwal` yang ditambahkan untuk layar Jadwal Ruang MyBharata memancarkan **ruang, tanggal, dan jam saja**, tanpa satu pun identitas, dan dibaca seluruh karyawan ber-identitas tanpa izin modul. Keterbukaannya setara `GET /peminjaman/slot` yang sejak awal dibaca semua orang saat memilih jam ([[REF - Kepemilikan Data]]), jadi §7 tidak berubah: jadwal beridentitas tetap milik `ga.view`, dan jadwal seluruh perusahaan tetap tidak masuk kalender siapa pun. Daftar fieldnya dipatok test supaya penambahan field identitas jadi merah, bukan bocor diam-diam. Kontrak: [[API - Inventory Service]].
+> ⚠️ **Diamandemen** [[ADR - 0121 Jadwal Ruang Publik Menyertakan Nama dan Divisi Pemohon]] (2026-09-22): `GET /peminjaman/jadwal` kini memancarkan `pemohon_nama` dan `divisi` juga. Yang **tetap** milik `ga.view` lewat `GET /peminjaman`: keperluan, nomor WA, nomor booking, posisi, dan riwayat keputusan. `GET /peminjaman/slot` tidak ikut digeser dan tetap anonim. Yang tidak berubah sama sekali: jadwal seluruh perusahaan tetap **tidak** masuk kalender siapa pun. Catatan di bawah dipertahankan sebagai keadaan sebelum amandemen.
+
+> **Catatan 2026-09-22 pagi, sudah diamandemen sore harinya (lihat di atas).** Yang dibatasi `ga.view` di sini adalah jadwal **beserta identitas pemohon** (nama, nomor WA, keperluan). `GET /peminjaman/jadwal` yang ditambahkan untuk layar Jadwal Ruang MyBharata memancarkan **ruang, tanggal, dan jam saja**, tanpa satu pun identitas, dan dibaca seluruh karyawan ber-identitas tanpa izin modul. Keterbukaannya setara `GET /peminjaman/slot` yang sejak awal dibaca semua orang saat memilih jam ([[REF - Kepemilikan Data]]), jadi §7 tidak berubah: jadwal beridentitas tetap milik `ga.view`, dan jadwal seluruh perusahaan tetap tidak masuk kalender siapa pun. Daftar fieldnya dipatok test supaya penambahan field identitas jadi merah, bukan bocor diam-diam. Kontrak: [[API - Inventory Service]].
 
 ### 8. Satu sumber ruang kantor (direncanakan)
 
@@ -97,6 +99,7 @@ Irisan 3: pola harian atau mingguan, maksimal 3 bulan, satu persetujuan untuk sa
 ## Dokumen Terkait
 
 - [[ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web]]: amandemen §2 (aksi booking lewat web)
+- [[ADR - 0121 Jadwal Ruang Publik Menyertakan Nama dan Divisi Pemohon]]: amandemen §7 (jadwal publik kini beridentitas seperlunya)
 - [[GA - Asset Loan & Room Booking]]: konsep domain yang desain rilis-1-nya direvisi ADR ini
 - [[Microservices - Inventory Service]] · [[API - Inventory Service]]: rumah kode dan kontrak
 - [[Microservices - Calendar Service]] · [[Microservices - Notification Service]]: feed dan kabar
