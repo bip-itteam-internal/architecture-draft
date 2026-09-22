@@ -37,10 +37,16 @@ Menggantikan enam panel `features/direktur/components/*-menunggu-panel.tsx` di t
 
 **T7. `GET /pengajuan/antrean` di employee-service.**
 Bersaudara dengan `/pengajuan/ringkasan`, memakai ulang seluruh mekanismenya: registri sumber satu baris per antrean, identitas disalin sekali sebelum goroutine, batas waktu per sumber, badan dibatasi, balasan `{data, degraded}` dengan aturan **401/403 bukan degraded**. Mengembalikan baris dalam bentuk seragam, bukan angka. Rute literal didaftarkan sebelum saudara ber-`:param`.
+
+⚠️ **Endpoint yang SAMA melayani dua sumbu** (keputusan pemilik produk 2026-09-22, [[ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service]] butir 11): menunggu keputusan pembaca, dan yang sudah ia putuskan, dibedakan satu parameter. Bukan dua endpoint: keduanya menyaring dengan identitas yang sama dan memungut sumber yang sama, jadi memisahkannya melahirkan dua registri sumber yang wajib sepakat.
+
+⛔ **"Riwayat" berarti KEPUTUSAN PEMANGGIL, bukan "sudah diputus siapa pun"**, dan itu tidak gratis: tiap adapter wajib membawa penanda **per baris** siapa yang memutus. Bentuk longgar yang berlaku hari ini di absensi mencocokkan **departemen**; diukur prod 2026-09-22, klausa tahap HR yang terbuka mengembalikan **1282 baris** keputusan orang lain, dan tak ada satu pun gejala yang membedakannya dari keputusan sendiri.
 *Tergantung*: T1 (bentuk kolomnya sudah terbukti di layar).
 
 **T8. Adapter tiga sumber "menunggu saya" yang belum ikut.**
 Tinjau Setoran Live Support (`/live-support/karya/antrean`), Pengajuan Barang (`/pengajuan-barang/antrean`), Permintaan ERP (`/permintaan-erp/persetujuan`). Ketiganya sudah menyaring per pemanggil, jadi tak ada keputusan produk baru. Permintaan Barang GA (`/permintaan/perlu-aksi`) menyusul, dengan catatan daftarnya dipotong di 200.
+
+⚠️ **"Sudah menyaring per pemanggil" cukup untuk sumbu MENUNGGU, tidak untuk sumbu RIWAYAT.** Menunggu bisa disaring dengan slot yang masih terbuka; riwayat menuntut nama orang yang benar-benar memutus, dan itu field tersendiri. Adapter yang melewatkannya akan mengembalikan baris yang sah tapi bukan milik pembacanya, tanpa satu pun gejala. Lihat T7 dan ADR 0114 butir 11.
 *Tergantung*: T7.
 
 **T9. Adapter tiga sumber "daftar modul".**
@@ -50,6 +56,14 @@ Pesanan ERP, Payroll run, Rekrutmen. Ketiganya bukan antrean pribadi, jadi wajib
 **T10. Pelatihan dan Tiket ikut masuk.**
 Keduanya sudah ada di `registriRingkasan` sebagai angka; di sini mereka menyumbang baris.
 *Tergantung*: T7.
+
+**T15. Mode riwayat untuk Pengajuan Barang, di procurement.**
+Antrean `/pengajuan-barang/antrean` hari ini hanya mengembalikan yang **menunggu tahap si pemanggil**; tak ada mode "sudah saya putus". Dibangun di service asalnya, bukan direkonstruksi di agregator — merekonstruksinya berarti menuliskan ulang aturan "siapa memutus apa" milik procurement, yaitu sumber kebenaran kedua yang dilarang butir 7 ADR 0114. Wajib membawa penanda per baris siapa yang memutus, bukan sekadar status akhir. Ini juga yang mencabut baris `punyaRiwayat()` di `features/direktur/lib/tab-antrean.ts:210-217`, yang hari ini mengecualikan Pengajuan Barang dengan catatan "begitu endpointnya punya mode riwayat, baris ini yang dicabut, bukan panelnya yang diakali".
+*Tergantung*: tidak ada (bisa jalan paralel dengan T7).
+
+**T16. Mode riwayat untuk Booking Ruang, di inventory.**
+Inventory tak menyimpan daftar booking yang pernah diputus seseorang; itu keputusan sadar 2026-09-15, dicatat di `services/attendance/pengajuan_booking.go:128-130`. ⚠️ Datanya sebenarnya **ada**: `Peminjaman.riwayat[]` memuat `{aksi, oleh, nama, alasan, waktu}` dan sudah dibaca `langkahPenyetujuBooking`. Yang belum ada endpoint yang menyaringnya per penyetuju. Jadi ini menambah jalur baca, bukan menambah penyimpanan.
+*Tergantung*: tidak ada (bisa jalan paralel dengan T7).
 
 **T11. Test kontrak per sumber.**
 Mengurai rekaman respons sungguhan tiap endpoint apa adanya, bukan struct tiruan. Ini satu-satunya penjaga terhadap adapter yang rusak diam-diam saat modul asalnya mengubah field, dan pola yang sama sudah dipakai `services/finance/audit_kontrak_test.go`.
