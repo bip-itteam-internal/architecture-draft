@@ -6789,7 +6789,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Diterima, merged (bip-erp #1909, erp-frontend #1595) dan terpasang di prod — terverifikasi 2026-09-16 lewat string di biner Integration-Service, rute `compensation-installments` membalas 200, dan build FE memuat laman Kompensasi Cicilan. BELUM BERLAKU**: kv `shopee-compensation-susulan-hold-date` belum ada di prod (diperiksa 2026-09-17), jadi penahanan dorman. Isian kv di layar Config Accurate menyusul lewat branch `feat/kv-katalog-tanggal` (belum merged, lihat [[APP - Web ERP]]); sampai itu hanya lewat `POST /accurate/settings/kv-configs`.",
+      "status_teks": "**Diterima, merged (bip-erp #1909, erp-frontend #1595), terpasang di prod, dan BERLAKU** — kv `shopee-compensation-susulan-hold-date` dibuat 2026-09-17 berisi `2026-09-01`, jadi penahanannya sudah berjalan (catatan lama di baris ini yang menyebutnya dorman diperiksa tepat pada hari kv itu diisi dan sudah basi; dikoreksi 2026-09-22). Mekanismenya terbukti bekerja, tindak lanjutnya belum: lihat § Keadaan terukur di prod. Isian kv di layar Config Accurate menyusul lewat branch `feat/kv-katalog-tanggal` (belum merged, lihat [[APP - Web ERP]]); sampai itu hanya lewat `POST /accurate/settings/kv-configs`.",
       "publik": true,
       "tautan": [
         "Microservices - Integration Service",
@@ -6797,20 +6797,20 @@
         "API - Integration Service",
         "ADR - 0001 Akuntansi via Accurate"
       ],
-      "hash": "25ab1b4ad3c7b5e6987da7013a762fca4e0b59b0066c3c33fc7f1fcc453f406e",
-      "ukuran_kb": 10.8,
-      "ringkasan": "Menjawab: bagaimana ERP menangani kompensasi Shopee yang cair lebih dari sekali per pesanan, mengapa cicilan kedua dst ditahan dari penerimaan otomatis Accurate, dan bagaimana tim AR mencatatnya lewat laman Kompensasi Cicilan dengan koreksi manual. Juga menjawab aturan pemilihan akun (diskon 4003 bila bulan sama, Pendapatan Lain-lain 8001 bila beda bulan), arti status MENUNGGU/TERTUNDA/SELESAI, dan peran kv shopee-compensation-susulan-hold-date.",
+      "hash": "f22f09d60d064eb947efea4580a520f95adb6747697531ab206252e39e1038a4",
+      "ukuran_kb": 12.8,
+      "ringkasan": "Menjawab: kenapa cicilan kedua dan seterusnya dari kompensasi Shopee tidak lagi dibukukan otomatis ke penerimaan Accurate, sejak kapan penahanan itu berlaku (kv `shopee-compensation-susulan-hold-date` per hari penerimaan WIB), dan bagaimana tim AR menindaklanjutinya lewat laman Kompensasi Cicilan plus koreksi manual penerimaan di ERP. Menjelaskan juga aturan pemilihan akun (cicilan kedua cair di bulan yang sama dengan cicilan pertama memakai akun diskon, beda bulan memakai Pendapatan Lain-lain, nomor akun selalu dari kv Accurate), arti status MENUNGGU, TERTUNDA, dan SELESAI, serta kenapa penahanan dibuat lengket supaya satu kompensasi tidak terbukukan dua kali. Berguna saat menelusuri kasus kompensasi bertahap satu order, endpoint `GET /accurate/compensation-installments`, field `held_compensations`, atau hari penerimaan yang jadi SKIPPED karena isinya hanya kompensasi ditahan.",
       "kata_kunci": [
         "kompensasi Shopee",
-        "compensation installments",
-        "kompensasi cicilan",
-        "penerimaan receipt",
-        "koreksi manual",
-        "AR piutang",
-        "held_compensations",
-        "Pendapatan Lain-lain",
+        "cicilan susulan",
+        "held compensation",
+        "koreksi manual penerimaan",
+        "Accurate receipt",
+        "AR",
         "akun diskon",
-        "ADR 0097"
+        "Pendapatan Lain-lain",
+        "shopee-compensation-susulan-hold-date",
+        "integration service"
       ]
     },
     {
