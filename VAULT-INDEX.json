@@ -7447,25 +7447,20 @@
         "APP - MyBharata",
         "Microservices - Employee Service"
       ],
-      "hash": "fd06662140af437562118afd43fcb91bb9112c4e60b1ab9565ebfeb9aebb3fa6",
-      "ukuran_kb": 16.5,
-      "ringkasan": "Menjawab: kenapa penyetuju di web mendapat satu halaman `/portal/persetujuan` berisi semua antrean keputusannya dalam satu tabel seragam, dan kenapa penggabungan itu dikerjakan oleh satu endpoint agregat di employee-service (`GET /pengajuan/antrean`) alih-alih dirakit frontend. Memetakan 13 kategori pengajuan ke 11 endpoint antrean di 7 service beserta cara penyaringannya (menunggu pemanggil vs daftar modul), mendaftar enam kosakata status berbeda untuk hal yang sama sehingga normalisasinya wajib di agregator, dan menjelaskan pola yang dipakai ulang dari agregator angka `ringkasan_pengajuan.go` serta agregator baris `hr_admin.go?as=reviewer`. Mencatat juga batasan yang sengaja tidak dijanjikan (bukan obat pengajuan yang mati karena didiamkan, tidak mengubah siapa yang berwenang), asimetri \"melihat tidak sama dengan memutus\", dan empat butir keputusan yang menyimpang saat implementasi irisan 1 (antara lain kolom Nilai yang tidak dibangun).",
+      "hash": "92b2a5ff8ffb09f06cc7dcf00ba4424bdd1de5e7423993142b63eb51fd885b18",
+      "ukuran_kb": 18.8,
+      "ringkasan": "Menjawab: kenapa penyetuju di web mendapat satu tabel seragam berisi seluruh antrean keputusan miliknya, siapa yang menyediakan datanya (agregator GET /pengajuan/antrean di employee-service, bukan attendance), dan kenapa gerbang tiap baris tetap milik service asalnya lewat penerusan identitas pemanggil. Menjawab juga apa arti 'riwayat' di endpoint itu, yaitu keputusan pemanggil sendiri dan bukan 'sudah diputus siapa pun', beserta penanda per baris yang dituntutnya. Memuat empat penyimpangan irisan 1 yang ditandai di tempatnya masing-masing: kolom Nilai tak dibangun, hitungan judul satu angka bukan dua, baris Booking mengantar ke halaman lain, dan menu tampil tanpa gerbang.",
       "kata_kunci": [
         "antrean persetujuan",
         "approval queue",
-        "portal persetujuan",
-        "penyetuju",
-        "approver",
-        "reviewer",
+        "pengajuan antrean",
         "agregator",
-        "employee-service",
-        "pengajuan",
-        "ADR 0114",
-        "lintas modul",
-        "degraded",
-        "HRRequestSummary",
-        "Ruang Direktur",
-        "alur persetujuan"
+        "employee service",
+        "penyetuju",
+        "reviewer",
+        "riwayat keputusan",
+        "portal persetujuan",
+        "ADR 0114"
       ]
     },
     {
@@ -15541,9 +15536,9 @@
         "APP - Web ERP",
         "Microservices - Employee Service"
       ],
-      "hash": "9842f4665e6b40a7e1b315ceaf84ea56c93a4592c5c23320929657c6703384ef",
-      "ukuran_kb": 8.2,
-      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk menyatukan seluruh antrean persetujuan ERP jadi satu halaman web, dipecah jadi irisan 1 (tayang tanpa menyentuh backend, memakai /hr/requests?as=reviewer&include=booking) dan irisan 2 (agregator GET /pengajuan/antrean di employee-service plus adapter tiap modul). Menjawab juga kapan menu persetujuan per-modul lama boleh dicabut dan kenapa urutannya tidak boleh dibalik, serta mana saja rute /persetujuan/* yang masih hidup di menu Portal. Memuat dua task terpisah di luar ADR 0114: mengukur kenapa 119 pengajuan mati karena didiamkan, dan membuktikan apakah kartu pembelian di beranda portal selamanya degraded.",
+      "hash": "30f1c97456a59e3f746cdf4840971e20dbaee8e5c9468ffc4675e8cd22e8440d",
+      "ukuran_kb": 10.7,
+      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk menyatukan seluruh antrean persetujuan ERP jadi satu halaman web, dipecah jadi irisan 1 (tayang tanpa menyentuh backend lewat /hr/requests?as=reviewer&include=booking) dan irisan 2 (agregator GET /pengajuan/antrean plus adapter tiap modul, termasuk mode riwayat yang belum dimiliki Pengajuan Barang dan Booking Ruang). Menjawab juga kapan menu persetujuan per-modul lama boleh dicabut dan kenapa urutannya tidak boleh dibalik, serta rute /persetujuan/* mana yang masih ada di menu Portal. Memuat dua task di luar ADR 0114: mengukur kenapa 119 pengajuan mati karena didiamkan, dan membuktikan apakah kartu pembelian di beranda portal selamanya degraded.",
       "kata_kunci": [
         "antrean persetujuan",
         "approval queue",
@@ -15551,9 +15546,9 @@
         "pengajuan antrean",
         "agregator persetujuan",
         "cabut menu persetujuan",
+        "mode riwayat",
         "pengajuan barang",
-        "reviewer",
-        "penyetuju",
+        "booking ruang",
         "ADR 0114"
       ]
     },
