@@ -9,31 +9,44 @@ hanya papan kerja, bukan sumber keputusan.
 
 | Pokok | Terdampak | Nilai | Masih bertambah? |
 |---|---|---|---|
-| Ongkir Shopee salah pos (6114 ↔ admin) | 3.865 pesanan | **Rp98.260.427** | ya, ±Rp16 jt/bulan |
+| Ongkir Shopee salah pos (6114 ↔ admin) | 3.870 pesanan | **Rp96.826.227** | ya, ±Rp16 jt/bulan |
 | Kompensasi TikTok atas pesanan sudah cair | 14 pesanan | **Rp1.610.697** | pelan |
 | *(kontrol)* kompensasi TikTok yang sudah benar | 360 pesanan | Rp34.872.894 | — jangan disentuh |
+
+⚠️ Angka ongkir Shopee **diperbaiki 2026-09-22 saat implementasi** — angka awal (3.865/Rp98.260.427)
+memakai pendekatan bucket (Σ|final|) atas hipotesis yang belum tepat. Angka final di atas hasil
+perbandingan langsung rumus lama vs rumus baru atas seluruh populasi. Lihat
+[[ADR - 0118 Ongkir Shopee Dihitung Aktual Dikurangi Bagian Pembeli dan Subsidi]] § Context.
 
 Prioritas mengikuti angka, bukan urutan di tiket: **Shopee ±60× lipat TikTok** dan tak menunggu
 keputusan siapa pun lagi.
 
 ## Urutan kerja
 
-**T1 — Ukur 96 pesanan Shopee yang menyimpang dari pola.** Read-only, tanpa kode. Dari 3.865
-pesanan kelas bermasalah, 3.769 berpola `final = −bagian pembeli`; sisa **96** belum terjelaskan.
-Cari polanya dan pastikan rumus baru tidak membuat mereka lebih salah. **Prasyarat T3** — jangan
-menyalakan saklar sebelum ini terjawab.
+**T1 — ~~Ukur 96 pesanan Shopee yang menyimpang dari pola~~ GUGUR.** Hipotesis "96 pesanan
+menyimpang" hasil pendekatan bucket yang belum tepat (`final = −buyer`, cocok 97,5%). Diukur ulang
+saat implementasi dengan hipotesis yang benar (`final = −(actual−rebate)`): cocok **100%**, nol
+pengecualian, atas seluruh 90.194 dokumen. Rumus final (T2) tidak lagi bergantung pada
+`final_shipping_fee` sama sekali, jadi populasi menyimpang itu tidak pernah ada. Detail:
+[[ADR - 0118 Ongkir Shopee Dihitung Aktual Dikurangi Bagian Pembeli dan Subsidi]] § Consequences.
 
-**T2 — Perbaiki rumus ongkir Shopee.** Beban ongkir = aktual − (bagian pembeli + subsidi) +
-proteksi + ongkir pengembalian; `final_shipping_fee` tidak dipakai. Sekalian: betulkan fixture
-`TestShopeeTransformIncomeIdentity_RealSample` yang kehilangan `actual_shipping_fee`, tambah kasus
-dari kelas bermasalah, dan **kontrol negatif** (mengembalikan rumus lama harus merah pada nilai
-ongkirnya). Tambahkan penjaga residual bernilai untuk pesanan Shopee. Tanpa dependensi.
+**T2 — ✅ SELESAI (kode).** Perbaiki rumus ongkir Shopee. Beban ongkir = aktual − bagian pembeli +
+proteksi + ongkir pengembalian; `final_shipping_fee` **dan subsidi** tidak dipakai di rumus ini —
+subsidi tetap di `TotalOtherIncome`, diurus mekanisme rebate-ke-ongkir yang sudah ada (ditemukan
+saat implementasi: memasukkan subsidi ke rumus ini akan menghitungnya dua kali). Diimplementasikan
+lewat `entity.OpsiTransformShopee` (bukan mengubah tanda tangan fungsi lama). Fixture
+`TestShopeeTransformIncomeIdentity_RealSample` diperbaiki + kontrol negatif dijalankan manual (2×:
+rumus dengan subsidi salah arah, dan rumus lama dikembalikan — dua-duanya merah pada sebab yang
+tepat). Penjaga residual bernilai (WARN, ambang Rp500) terpasang di `transformShopeeIncome`.
+Commit: `5db06269` (entity), `f457614d` (usecase, branch `fix/ongkir-shopee-rumus-resmi`).
 
-**T3 — Saklar tanggal + penerapan prod ongkir Shopee.** kv cutover dipasang di **seluruh** jalur
-(kirim, pratinjau, ekspor) lewat satu penentu akun-per-hari. Urutan: deploy dengan kv kosong →
-ukur → isi kv → beri tahu finance. ⛔ **Jangan** memanggil kirim-ulang dokumen lama: jalur itu
-masih membawa cacat "menarik keluar pelunasannya sendiri". **Butuh T1 + T2. Eksekusi prod oleh
-manusia.**
+**T3 — Gerbang per-order + penerapan prod ongkir Shopee.** ⚠️ **Bukan kv tanggal seperti rencana
+awal** — income Shopee ditulis ulang dari escrow tiap sync, jadi kv tanggal akan retroaktif
+(ditemukan saat implementasi). Gerbangnya `rumusOngkirBaruBerlaku` (per shop+hari, memakai
+`ShopeeHariSudahDibukukan` — mekanisme yang sama dengan `bolehBukukanPenyesuaian`) — **sudah
+terpasang di kode** (bagian dari T2). Yang tersisa di sini murni operasional: merge PR → deploy →
+ukur order yang sudah dapat rumus baru pasca-deploy → buktikan satu penerimaan di Accurate cocok
+dengan Subtotal Ongkos Kirim Shopee → beri tahu finance. **Eksekusi prod oleh manusia.**
 
 **T4 — Kompensasi TikTok: pisahkan populasi + gerbang retur, SATU perubahan.** Pembedanya payout
 pesanan itu sendiri (bukan payout + kompensasi). Payout ≈ 0 → perilaku sekarang. Payout > 0 →

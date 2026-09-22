@@ -1,15 +1,15 @@
 ## Untuk Manajemen
 
-Pada sebagian pesanan Shopee, biaya ongkir yang tercatat di pembukuan **lebih besar** daripada yang ditampilkan Shopee, dan kelebihannya mendarat di akun **Beban Admin E-Commerce**. Contoh yang finance laporkan: Shopee menampilkan Subtotal Ongkos Kirim **Rp0**, sistem mencatat **Rp112.000**. Terukur di produksi 22 September 2026: **3.865 pesanan, Rp98.260.427**, dan masih bertambah sekitar **Rp16 juta per bulan**. Uang yang diterima **tidak berubah sepeser pun** — yang salah pembagiannya antar dua akun, sehingga totalnya selalu tetap seimbang dan tak pernah memunculkan pesan galat.
+Pada sebagian pesanan Shopee, biaya ongkir yang tercatat di pembukuan **lebih besar** daripada yang ditampilkan Shopee, dan kelebihannya mendarat di akun **Beban Admin E-Commerce**. Contoh yang finance laporkan: Shopee menampilkan Subtotal Ongkos Kirim **Rp0**, sistem mencatat **Rp112.000**. Terukur di produksi 22 September 2026: **3.870 pesanan, Rp96.826.227**, dan masih bertambah sekitar **Rp16 juta per bulan**. Uang yang diterima **tidak berubah sepeser pun** — yang salah pembagiannya antar dua akun, sehingga totalnya selalu tetap seimbang dan tak pernah memunculkan pesan galat.
 
-**Terdampak**: tim FAT/AR yang mencocokkan akun ongkir dan admin ke Accurate, serta kolom ongkir di Rekap Pencairan. **Yang TIDAK dijanjikan**: membetulkan dokumen yang sudah terbit (berlaku maju saja, sesuai arahan finance "sekarang dan ke depan"), mengubah nilai uang masuk, menyentuh TikTok/Lazada, dan menyelesaikan 96 pesanan menyimpang yang belum terjelaskan. **Besaran kerja**: kecil sampai sedang; perubahan hitungannya satu tempat, ongkos sebenarnya ada di penerapan bertanggal dan pembuktiannya.
+**Terdampak**: tim FAT/AR yang mencocokkan akun ongkir dan admin ke Accurate, serta kolom ongkir di Rekap Pencairan. **Yang TIDAK dijanjikan**: membetulkan dokumen yang sudah terbit (berlaku maju saja, sesuai arahan finance "sekarang dan ke depan"), mengubah nilai uang masuk, dan menyentuh TikTok/Lazada. **Besaran kerja**: kecil sampai sedang; perubahan hitungannya satu tempat, ongkos sebenarnya ada di penerapan bertanggal dan pembuktiannya.
 
 ## Deskripsi
 
-*Beban ongkir Shopee dihitung dari **ongkir aktual dikurangi bagian yang dibayar pembeli dan subsidi Shopee** — mengikuti definisi resmi Shopee — menggantikan rumus lama yang memasangkan `final_shipping_fee` dengan `buyer_paid_shipping_fee`. Keduanya bukan komponen sejajar: di data produksi `final_shipping_fee` bernilai tepat negatif dari bagian pembeli, sehingga memasangkannya membuat bagian pembeli hilang dari perhitungan.*
+*Beban ongkir Shopee dihitung dari **ongkir aktual dikurangi bagian yang dibayar pembeli**, ditambah biaya proteksi kirim dan ongkir pengembalian barang — menggantikan rumus lama yang memasangkan `final_shipping_fee` dengan `buyer_paid_shipping_fee` DAN `actual_shipping_fee` sekaligus. Subsidi Shopee (`shopee_shipping_rebate`) SENGAJA TIDAK ikut dikurangkan di rumus ini — ia tetap tinggal di `TotalOtherIncome`/`TotalShippingRebate` seperti sekarang, karena mekanisme "Potongan Ongkos Kirim dari Shopee" yang sudah berjalan menanganinya di lapisan penerimaan.*
 
-- **Status**: 🟡 **Diusulkan** — belum ada di kode. Keputusan finance atas gejalanya sudah ada (tiket "Revisi Sistem Income"); rumus penggantinya diukur ke prod 2026-09-22 dan belum diimplementasi.
-- **Path di repo**: `bip-erp/services/integration/internal/domain/entity/shopee.go` (`TransformToOrderIncomeWithAdjustment`) · `internal/usecase/receipt_rebate_ongkir.go` (saklar tanggal) · `internal/domain/entity/income_identity_test.go` (fixture diperbaiki) · `internal/domain/entity/shopee_ongkir_test.go` **(baru)**
+- **Status**: 🟡 **Diusulkan, kode ditulis** — branch `fix/ongkir-shopee-rumus-resmi` (bip-erp), belum merge, belum deploy. Keputusan finance atas gejalanya ada di tiket "Revisi Sistem Income"; rumus dan dampaknya diukur ke prod 22 September 2026.
+- **Path di repo**: `bip-erp/services/integration/internal/domain/entity/shopee.go` (`OpsiTransformShopee`, `TransformToOrderIncomeDenganOpsi`) · `internal/usecase/shopee_new_usecase.go` (`rumusOngkirBaruBerlaku`, `transformShopeeIncome`) · `internal/domain/entity/income_identity_test.go` (fixture diperbaiki) · `internal/domain/entity/shopee_ongkir_test.go` **(baru)** · `internal/usecase/shopee_new_usecase_ongkir_test.go` **(baru)**
 - **Tanggal**: 2026-09-22
 
 ## Context
@@ -20,27 +20,34 @@ Tiket finance melaporkan: saat muncul baris "Potongan Ongkos Kirim dari Shopee",
 
 Gejalanya nyata, tapi **sebabnya tidak mungkin seperti yang ditulis**: rumus ongkir di kode tidak punya percabangan sama sekali terhadap ada-tidaknya baris potongan. Menerima sebab itu apa adanya akan menghasilkan perbaikan yang menambal percabangan yang tak pernah ada.
 
-### Sebab sebenarnya, diukur ke produksi
+### Sebab sebenarnya: `final_shipping_fee` murni cerminan aktual dan subsidi
 
-Rumus sekarang: `−(final_shipping_fee + buyer_paid_shipping_fee) + actual_shipping_fee + proteksi`.
+Rumus lama: `−(final_shipping_fee + buyer_paid_shipping_fee) + actual_shipping_fee + proteksi`.
 
-Diukur atas seluruh 90.139 dokumen escrow di prod (22 September 2026):
+Diuji ke **seluruh 90.194 dokumen** escrow prod (22 September 2026), bukan sampel:
 
-| Keadaan | Jumlah | Σ \|final\| |
-|---|---|---|
-| `actual` terisi, `final` = 0 | 86.147 | 0 — rumus sekarang **benar** |
-| `actual` terisi, `final` terisi | **3.865** | **Rp98.260.427** — kelas yang salah |
-| keduanya 0 | 130 | 0 |
+> `final_shipping_fee` == `−(actual_shipping_fee − shopee_shipping_rebate)` pada **90.194 dari 90.194 dokumen — 100%, nol pengecualian.**
 
-Pada **3.769 dari 3.865** (97,5%) kelas bermasalah, `final_shipping_fee` bernilai **tepat negatif dari `buyer_paid_shipping_fee`**. Karena itu suku `−(final + buyer)` saling meniadakan jadi nol, dan akun ongkir menerima `aktual − subsidi` alih-alih `aktual − bagian pembeli − subsidi`. Selisihnya secara aljabar **tepat sebesar `final`**, yaitu sebesar bagian yang dibayar pembeli.
+`final_shipping_fee` bukan komponen independen — ia **Shopee sendiri yang menghitungnya** dari aktual dan subsidi. Rumus lama menjumlahkan `−final` (yang sudah memuat `aktual − subsidi` di dalamnya) **DAN** `actual_shipping_fee` mentah sekaligus, sehingga ongkir aktual terhitung **dua kali** untuk setiap pesanan yang final-nya bukan nol.
 
-Contoh nyata dari prod: `260611SESSAEPU` (pembeli 23.300 · final −23.300 · aktual 38.300 · subsidi 15.000) dan `260612T9TYCNTA` (pembeli 1.000 · final −1.000 · aktual 61.000 · subsidi 60.000).
+Kenapa mayoritas pesanan (86.324 dari 90.194) tak pernah kelihatan salah: pada pesanan itu `final_shipping_fee = 0` (subsidi menutup penuh ongkir aktual, pembeli tak menanggung apa pun), sehingga suku `−(final+buyer)` lenyap dan kebetulan menyisakan angka yang sama dengan rumus yang benar. Begitu `final` bukan nol, kebetulan itu berhenti berlaku.
 
 ### Rumus resmi Shopee, diuji ke populasi yang sama
 
 Dokumentasi `payment.get_escrow_detail` menyatakan (pada keterangan `shipping_fee_sst`): *Seller Paid Shipping Fee = Actual Shipping Fee − (Shipping Fee Paid by Buyer + Shipping Rebate From Shopee)*.
 
-Diuji: rumus itu menghasilkan **tepat nol pada 3.769 pesanan** yang sama — yaitu persis angka "Subtotal Ongkos Kirim" yang finance tunjukkan di layar Shopee. Rumus lama hanya benar bila `final` kebetulan nol.
+Pengujian awal memakai rumus itu **apa adanya** (termasuk mengurangkan subsidi) sempat dianggap benar. **Dikoreksi saat implementasi (22 September 2026, hari yang sama):** test yang sedang HIJAU, `TestTransformToOrderIncome_TanpaProteksiKirimTakBerubah` (`actual_shipping_fee=3500`, `shopee_shipping_rebate=3500`, `buyer_paid=0`, mengunci `TotalShippingCost=3500`, komentar *"tak boleh berubah sedikit pun"*), akan **merah** bila subsidi ikut dikurangkan (hasilnya jadi 0, bukan 3500). Itu sinyal rumusnya salah arah, bukan test-nya yang perlu diubah — lihat § berikut.
+
+### Kenapa subsidi TIDAK ikut dikurangkan di rumus ini
+
+Subsidi Shopee (`shopee_shipping_rebate`) sudah punya rumah: ia ada di `TotalOtherIncome`, dan mekanisme **"Potongan Ongkos Kirim dari Shopee"** yang sudah berjalan (`accurate_receipt_usecase.go`, gerbang `RebateKeOngkir`, kv `shopee-shipping-rebate-cutover-date`) MENGURANGKAN `TotalShippingRebate` dari `TotalShippingCost` **di lapisan penerimaan**, per hari, dengan asumsi `TotalShippingCost` belum menghitungnya.
+
+Menarik subsidi ke dalam rumus entity akan membuatnya terhitung **dua kali** begitu kedua mekanisme berjalan bersamaan, dan dua arah kegagalannya berbeda tapi sama-sama nyata:
+
+- Hari yang sudah lewat cutover (`RebateKeOngkir=true`): subsidi dikurangkan **dua kali** dari ongkir — beban ongkir **kurang catat** sebesar subsidi.
+- Hari sebelum cutover (`RebateKeOngkir=false`): subsidi tampil **dua kali** di dokumen — sekali sebagai ongkir yang sudah lebih kecil, sekali lagi sebagai baris Pendapatan Lain-lain terpisah — dokumen yang terposting lebih besar dari yang sebenarnya.
+
+Verifikasi ke prod: order `260907CHCFD1D5` (pola Contoh B tiket — pembeli 112.000, aktual 127.000, subsidi 15.000) menghasilkan `TotalShippingCost = 15.000` (aktual − pembeli, TANPA subsidi) di rumus ini. Angka **Rp0** yang ditunjukkan Shopee baru tercapai **setelah** mekanisme rebate-ke-ongkir yang sudah ada mengurangkan subsidi di lapisan penerimaan — bukan di sini. Ini bukan kekurangan, melainkan pembagian tanggung jawab yang disengaja: satu fakta (subsidi), satu tempat (mekanisme yang sudah ada dan sudah disetujui finance 2026-09-14).
 
 ### Kenapa bertahun-tahun tak berbunyi
 
@@ -57,41 +64,47 @@ Ini bukan test yang lemah, melainkan test yang **fixture-nya kehilangan justru f
 
 ### Komponen lain yang ikut terperiksa
 
-- **`reverse_shipping_fee`** (Ongkos Kirim Pengembalian Barang): **77 dokumen, Rp1.574.800**, tidak pernah masuk rumus ongkir mana pun — ikut mendarat di residual.
-- **`shipping_fee_discount_from_3pl`** (Potongan Ongkos Kirim dari Jasa Kirim): **nol kejadian** di seluruh 90.139 dokumen. Sengaja **tidak** dimasukkan; menambah komponen yang tak pernah terisi hanya menambah permukaan tanpa manfaat.
+- **`reverse_shipping_fee`** (Ongkos Kirim Pengembalian Barang): **77 dokumen, Rp1.574.800, seluruhnya bertanda POSITIF** (diverifikasi, bukan diasumsikan) — tidak pernah masuk rumus ongkir mana pun sebelumnya, ikut mendarat di residual. Diberi rumah di rumus baru sebagai penambah beban.
+- **`shipping_fee_discount_from_3pl`** (Potongan Ongkos Kirim dari Jasa Kirim): **nol kejadian** di seluruh 90.194 dokumen. Sengaja **tidak** dimasukkan; menambah komponen yang tak pernah terisi hanya menambah permukaan tanpa manfaat.
 
 ## Decision
 
-### 1. Beban ongkir mengikuti definisi resmi Shopee
+### 1. Beban ongkir = aktual − bagian pembeli, ditambah proteksi dan ongkir pengembalian
 
-Beban ongkir seller = **ongkir aktual − (bagian yang dibayar pembeli + subsidi Shopee)**, ditambah **biaya proteksi pengiriman** dan **ongkir pengembalian barang**.
+Beban ongkir seller = **ongkir aktual − bagian yang dibayar pembeli**, ditambah **biaya proteksi pengiriman** dan **ongkir pengembalian barang**. Subsidi Shopee **TIDAK** ikut — lihat § "Kenapa subsidi TIDAK ikut dikurangkan" di atas.
 
-`final_shipping_fee` **tidak dipakai sama sekali**. Ia bukan komponen sejajar melainkan cerminan bagian pembeli; memasangkannya dengan `buyer_paid_shipping_fee` adalah bentuk hitung-ganda yang saling meniadakan.
+`final_shipping_fee` **tidak dipakai sama sekali**. Ia bukan komponen independen melainkan cerminan Shopee sendiri atas aktual dan subsidi (terbukti 100%, nol pengecualian); memasangkannya dengan `actual_shipping_fee` adalah bentuk hitung-ganda.
 
-### 2. Berlaku maju lewat saklar tanggal, dokumen terbit tidak disentuh
+Diimplementasikan lewat `entity.OpsiTransformShopee{RumusOngkirBaru: bool}` — opsi baru, bukan mengubah tanda tangan fungsi yang sudah ada. `TransformToOrderIncomeWithAdjustment`/`TransformToOrderIncome` jadi pembungkus tipis (`RumusOngkirBaru` selalu `false`) — perilaku lama byte-identik, ~20 titik panggil test lama tak berubah.
 
-Finance menyatakan "sekarang dan ke depan". Karena perubahan ini menggeser komposisi baris, dokumen penerimaan berstatus terkirim di dalam jendela pindai akan **diedit sendiri oleh penjadwal** bila tidak digerbang. Karena itu saklar tanggal **wajib**, mengikuti pola yang sudah terbukti pada perpindahan potongan ongkir ke akun ongkir: kosong berarti perilaku lama persis, dan satu penentu akun-per-hari dipasang di **seluruh** jalur (kirim, pratinjau, ekspor) supaya layar dan dokumen mustahil berselisih.
+### 2. Berlaku maju lewat gerbang PER-ORDER, bukan kv tanggal
+
+Finance menyatakan "sekarang dan ke depan". **Bukan kv tanggal** seperti pola potongan ongkir (§Consequences ADR ini menyimpang sengaja dari pola itu) — income Shopee **ditulis ulang dari escrow setiap kali order di-sync** (`shopee_new_usecase.go`, tiga titik: `SyncOrderDetailSNs` ×2, `RefetchOrderEscrow`), jadi perubahan rumus di lapisan transform bersifat retroaktif kalau digerbang per-tanggal saja: sync ulang order lama akan menimpa nilai yang sudah benar.
+
+Gerbangnya `rumusOngkirBaruBerlaku(shopID, paidAt)`: order yang **hari cairnya sudah dibukukan ke Accurate** (`ShopeeHariSudahDibukukan` — mekanisme yang sama dipakai `bolehBukukanPenyesuaian`) tetap dapat rumus lama; selebihnya (termasuk order yang belum pernah cair) dapat rumus baru. Predikatnya **terbalik** dari `bolehBukukanPenyesuaian`: order yang belum pernah cair (`paidAt` nil) pasti belum mungkin dibukukan, jadi justru harus dapat rumus **baru** — bukan ditolak. Galat baca / repo nil → rumus lama (konservatif).
+
+Ketiga titik tulis dikonsolidasi lewat satu fungsi `transformShopeeIncome` supaya gerbang ini (dan `bolehBukukanPenyesuaian`) tak mungkin lupa dipasang di titik baru.
 
 ### 3. Residual Shopee diberi penjaga bernilai
 
-Residual penyesuaian untuk pesanan Shopee yang melewati ambang dicatat sebagai peringatan **beserta nominalnya**, tidak diam. Tanpa ini, kelas "komponen ongkir yang kehilangan nama" akan terulang dan kembali hanya ketahuan dari layar finance berbulan-bulan kemudian — persis riwayat biaya proteksi pengiriman dan ongkir pengembalian.
+Bila residual identitas Shopee melewati ambang (Rp500) sesudah transform, dicatat WARN beserta `order_sn` dan nominalnya — tidak diam. Tanpa ini, kelas "komponen ongkir yang kehilangan nama" akan terulang dan kembali hanya ketahuan dari layar finance berbulan-bulan kemudian — persis riwayat biaya proteksi pengiriman dan ongkir pengembalian sebelum keduanya dipetakan.
 
 ### 4. Fixture diperbaiki, dan perbaikannya dikunci kontrol negatif
 
-`actual_shipping_fee` yang sebenarnya dikembalikan ke fixture, dan ditambahkan kasus dari kelas bermasalah (pembeli 112.000 · aktual 127.000 · subsidi 15.000 → nol). Kontrol negatifnya: mengembalikan rumus lama harus membuat test itu **merah pada nilai ongkirnya**, bukan merah karena sebab lain.
+`actual_shipping_fee` yang sebenarnya dikembalikan ke fixture `RealSample`, dan panggilannya diarahkan ke rumus baru (nilainya tetap 0 — buyer menanggung penuh, sekarang untuk alasan yang benar, bukan kebetulan field kosong). Ditambahkan kasus baru dari data prod: kelas rusak (`260907CHCFD1D5`), kelas retur (`26061309NVHYNA`), kombinasi retur+proteksi (`260607EHDM3DY6`), dan kelas sehat yang **wajib** menghasilkan angka sama persis di rumus lama maupun baru.
 
-### 5. 96 pesanan menyimpang tidak ikut diputuskan di sini
-
-Sisa 3.865 − 3.769 = **96 pesanan** tidak mengikuti pola `final = −pembeli` dan belum terjelaskan. Rumus baru tetap berlaku seragam untuk mereka, tetapi **jumlah dan sebarannya wajib diukur sebelum saklar dinyalakan**. Menyatakan mereka "pasti ikut benar" tanpa melihat datanya adalah bentuk klaim yang berulang kali salah di layanan ini.
+Kontrol negatif dijalankan manual dua kali selama implementasi: (a) rumus sempat ditulis dengan subsidi ikut dikurangkan — 3 dari 6 test baru merah pada nilai `TotalShippingCost` yang salah, dikoreksi sebelum commit; (b) rumus lama sengaja dikembalikan sementara — hasil yang sama, test merah pada sebab yang tepat, bukan sebab lain.
 
 ## Consequences
 
 - **Kas tidak berubah sepeser pun.** Yang berpindah hanya komposisi baris antara akun ongkir dan akun admin; nilai penerimaan, alokasi ke faktur, dan uang diterima tetap.
 - **Beban admin akan turun dan beban ongkir naik** pada pesanan terdampak — dan itu memang arah yang benar. Finance perlu diberi tahu supaya perubahan tren tidak terbaca sebagai anomali baru.
-- **Tidak menggeser insentif.** Profit insentif hanya bersandar pada net settlement; beban ongkir masuk sebagai kolom informasi. Diperiksa langsung ke rumusnya, bukan disimpulkan.
-- **Penerapannya menuntut urutan operasi, bukan sekadar deploy**: deploy dengan saklar kosong → ukur → nyalakan saklar per tanggal → beri tahu finance. Eksekusi prod dijalankan manusia.
-- ⚠️ **Jebakan yang sudah terbukti dan belum diperbaiki**: mengulang kirim dokumen penerimaan yang **pernah** terkirim tetapi statusnya kini bukan terkirim dapat menarik keluar pelunasannya sendiri. Karena keputusan ini berlaku maju dan tidak menyentuh dokumen lama, jalur itu **tidak boleh** dipanggil sebagai bagian penerapan.
-- **Yang tetap terbuka**: 96 pesanan menyimpang; dokumen yang terlanjur terbit dengan pembagian akun lama; dan kunci `settlement-adjustment` yang masih berbagi akun dengan biaya admin sehingga residual tetap tak bernama.
+- **Tidak menggeser insentif.** Profit insentif hanya bersandar pada net settlement (`entity/incentive_profit.go`: `ProfitSebelumOperasi = NetSettlement − HPP − IklanTiktok − IklanShopee`); beban ongkir masuk sebagai kolom informasi (`feeShipping`, PERAN "informasi"). Diperiksa langsung ke rumusnya dan ke seluruh pemanggilnya (`git grep TransformToOrderIncome` di `internal/usecase`), bukan disimpulkan.
+- **Gerbangnya per-order, bukan kv tanggal** — pilihan yang menyimpang sengaja dari pola perpindahan potongan ongkir (PR #1883). Alasannya di Decision §2: field yang berubah di sini ditulis ulang setiap sync, kv tanggal akan retroaktif.
+- **Penerapannya menuntut urutan operasi, bukan sekadar deploy**: deploy → ukur order yang sudah dapat rumus baru pasca-deploy → buktikan satu penerimaan di Accurate cocok dengan Subtotal Ongkos Kirim Shopee → beri tahu finance. Eksekusi prod dijalankan manusia.
+- ⚠️ **Jebakan yang sudah terbukti dan belum diperbaiki di jalur LAIN**: mengulang kirim dokumen penerimaan yang **pernah** terkirim tetapi statusnya kini bukan terkirim dapat menarik keluar pelunasannya sendiri. Keputusan ini **tidak menyentuh** jalur itu (berlaku maju, gerbang per-order mencegah dokumen lama tersentuh oleh sync ulang) — dicatat di sini supaya siapa pun yang menguji dengan Retry manual tahu risikonya bukan dari perubahan ini.
+- **Yang tetap terbuka**: dokumen yang terlanjur terbit dengan pembagian akun lama (dibiarkan, sesuai arahan finance); kunci `settlement-adjustment` yang masih berbagi akun dengan biaya admin sehingga residual selain ongkir tetap tak bernama.
+- **96 "pesanan menyimpang" dari analisis awal TIDAK ADA** — itu artefak dari hipotesis awal yang belum tepat (`final = −buyer`, cocok 97,5%). Hipotesis yang benar (`final = −(actual−rebate)`) cocok 100%, nol pengecualian, dan rumus final (Decision §1) tidak lagi bergantung pada `final_shipping_fee` sama sekali — pertanyaan itu gugur dengan sendirinya, bukan dijawab.
 
 ## Dokumen Terkait
 
