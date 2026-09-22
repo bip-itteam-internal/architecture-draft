@@ -235,6 +235,7 @@
         "ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)",
         "ADR - 0066 Modul Kelola Program Culture",
         "ADR - 0093 Tipe Program Culture Non-Event Dinilai Terlaksana dengan Approval SPV HR, plus Jadwal di Master",
+        "HRIS - Pengembangan Organisasi (Community of Interest)",
         "HRIS - Kaizen (Ide Perbaikan)",
         "Microservices - Attendance Service",
         "Microservices - Employee Service",
@@ -245,20 +246,20 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "bf654f8b6c7b1f1a142157cff497a203f1e5dda2ea3a3e426ad9e74af497548d",
-      "ukuran_kb": 55.3,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan form-builder-service lewat gateway `/api/form-builder/*` untuk membuat, menyunting, menerbitkan, menutup, dan menghapus form, beserta kode galatnya (mis. 409 saat susunan field diubah sesudah ada jawaban, 422 saat potret sasaran gagal). Juga menjawab siapa yang boleh mengelola form (tingkat peran plus cakupan departemen, kepemilikan bersama `owner_departments`), bagaimana IT mengatur tipe form terlarang per departemen lewat `/form-type-rules`, serta rute template, Program Culture, analisa dan export, pengisian karyawan `/me/*`, Kaizen, inspeksi Satgas `/me/satgas`, dan endpoint internal untuk service lain.",
+      "hash": "8dc38db298294ec606a8e933ee313dcd8887591b34d8c8d8bc9c9b3718d5d98e",
+      "ukuran_kb": 58.2,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway `/api/form-builder/*`, siapa yang boleh mengelola form (cakupan departemen dari `SupervisedDepartments` diiris `FORM_BUILDER_DEPARTMENTS`, bukan modul), dan bagaimana alur draft menuju published lalu closed beserta aturan 409/422-nya. Juga menjawab bagaimana tipe form dilarang per departemen oleh IT (`/form-type-rules`), bagaimana karyawan mengisi form lewat rute `/me/*`, serta di mana letak Kaizen, Culture, dan Inspeksi Satgas 5R & K3 termasuk gerbang izin `kepatuhan.satgas.input`. Berisi juga rute analytics, export, response, template, form berulang (`recurrence`/`period_key`), indeks layanan departemen, dan rute `/internal/*` yang dipanggil service lain.",
       "kata_kunci": [
         "form builder",
-        "API form",
-        "endpoint form-builder",
         "form dinamis",
         "survei",
+        "kaizen",
+        "satgas 5R K3",
+        "program culture",
         "form-type-rules",
-        "owner_departments",
-        "Kaizen",
-        "Satgas 5R K3",
-        "/me/forms"
+        "owner_department",
+        "recurrence form berulang",
+        "endpoint gateway form-builder"
       ]
     },
     {
@@ -1321,6 +1322,7 @@
         "ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web",
         "API - Inventory Service",
         "GA - Asset Loan & Room Booking",
+        "API - Form Builder Service",
         "Microservices - Payroll Service",
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
         "APP - Web ERP",
@@ -1332,7 +1334,6 @@
         "Microservices - Task Management Service",
         "APP - Dynamic Task Tracker",
         "API - Task Management Service",
-        "API - Form Builder Service",
         "HRIS - Kaizen (Ide Perbaikan)",
         "Microservices - Notification Service",
         "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
@@ -1350,20 +1351,20 @@
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "6d0bd855cd62d9a04450510a09f22461e10c6a4d721bd1969f4cd60878ad653e",
-      "ukuran_kb": 108.5,
-      "ringkasan": "Menjawab: aplikasi mobile MyBharata itu apa dan fitur HRIS apa saja yang sudah hidup di dalamnya, mulai dari attendance, pengajuan cuti dan izin, lembur, payroll dan slip gaji, KPI dan task, survei form builder, Sesi Live Host, Booking Ruang, sampai pelatihan. Juga menjawab bagaimana arsitektur Clean Architecture feature-first serta tech stack Flutter-nya disusun, bagaimana autentikasi bekerja (JWT, biometric, PIN, satu akun satu device), bagaimana konten dibatasi per perusahaan, dan versi mana yang beredar di HP pemakai dibanding yang ada di branch dev.",
+      "hash": "ca738efad07ce77a7521f500f8a95e5fd67f951a8a0d1105487594966a54e0be",
+      "ukuran_kb": 111.8,
+      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, fitur HRIS apa saja yang ada di dalamnya (attendance, pengajuan cuti/izin, lembur, payroll dan slip gaji ber-PIN, KPI, task management, survei, Kaizen, Satgas, Sesi Live Host, Booking Ruang, Pelatihan), dan bagaimana arsitektur Flutter-nya disusun (Clean Architecture feature-first, bloc, get_it, dio + fpdart, go_router, ARB id/en). Juga menjawab bagaimana autentikasi bekerja (JWT + biometric + PIN, 1 akun 1 device), bagaimana multi-perusahaan di-scope lewat JWT dan `CompanyScope`, mana konten yang masih dipaku untuk BIP, serta versi mana yang ada di `dev`, `main`, dan yang benar-benar beredar di HP pemakai. Berisi pula tech stack, struktur menu beranda, known issues, dan daftar fitur yang belum tersedia.",
       "kata_kunci": [
         "MyBharata",
-        "aplikasi mobile",
+        "aplikasi mobile karyawan",
         "Flutter",
         "HRIS mobile",
-        "absensi",
-        "attendance",
-        "pengajuan cuti",
-        "slip gaji",
-        "multi-perusahaan",
-        "versi rilis"
+        "absensi geofencing biometric",
+        "slip gaji PIN",
+        "multi-tenant company_id",
+        "versionCode rilis",
+        "bloc clean architecture",
+        "employee self service"
       ]
     },
     {
@@ -6602,15 +6603,16 @@
         "ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program",
         "ADR - 0066 Modul Kelola Program Culture",
         "HRIS - Pengembangan Organisasi (Community of Interest)",
+        "API - Form Builder Service",
+        "APP - MyBharata",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "ADR - 0053 Struktur dan Target KPI Disatukan di Satu Halaman",
         "Microservices - Form Builder Service",
-        "Microservices - Employee Service",
-        "APP - MyBharata"
+        "Microservices - Employee Service"
       ],
-      "hash": "e7bc731666eaf417cac2bbdc2bd2c6022994a2edb321efb1144461a5c0a77a7e",
-      "ukuran_kb": 14.0,
-      "ringkasan": "Menjawab: bagaimana program Culture yang bukan acara (non-event, mis. Kamis Batik) dinilai tanpa daftar hadir/scan/rating, yaitu lewat tanda \"terlaksana\" yang disetujui SPV HR (100 bila disetujui, else 0) dan masuk array komposit yang sama sehingga KPI officer dan bentuk GET /internal/culture/metrics tidak berubah. Menjelaskan penambahan field tipe (event/non_event) pada program dan master, serta jadwal hari/tanggal berulang di master yang mem-pra-isi tanggal saat program dibuat. Merekam alasan keputusan: KPI diatur SK (tak boleh didesain ulang) dan self-report harus ditahan gerbang approval.",
+      "hash": "ac0a539211444aac0806ccc476106586e7956dd922184fa17f1f88bafd08d021",
+      "ukuran_kb": 15.0,
+      "ringkasan": "Menjawab: bagaimana program culture yang bukan acara (mis. Kamis Batik) dinilai tanpa daftar hadir dan rating, yaitu lewat field `tipe` (event | non_event), penandaan terlaksana oleh officer, dan approval SPV HR sebelum angkanya berhitung (disetujui 100, selain itu 0). Menjawab juga kenapa program non-event sebelumnya justru menyeret turun KPI officer Culture & Industrial, kenapa self-report saja ditolak (alasan ADR 0065 dibuang), dan kenapa struktur KPI serta bobot komposit 30/30/40 sengaja tidak diubah karena diatur SK. Berisi pula keputusan jadwal hari/tanggal berulang di master program yang mem-pra-isi tanggal saat program dibuat, anti-gaming dua lapis, daftar berkas yang disentuh di bip-erp, erp-frontend, dan my-bharata, serta consequences-nya.",
       "kata_kunci": [
         "ADR 0093",
         "program culture",
@@ -6618,11 +6620,10 @@
         "Kamis Batik",
         "approval SPV HR",
         "terlaksana",
-        "jadwal master",
-        "komposit",
-        "KPI culture",
-        "event",
-        "form-builder"
+        "master program culture",
+        "jadwal berulang",
+        "KPI Culture & Industrial",
+        "form-builder culture_metrics"
       ]
     },
     {
@@ -10500,26 +10501,26 @@
         "Microservices - Employee Service",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "ADR - 0093 Tipe Program Culture Non-Event Dinilai Terlaksana dengan Approval SPV HR, plus Jadwal di Master",
+        "API - Form Builder Service",
         "APP - MyBharata",
         "APP - Web ERP",
         "HRIS - Personalia",
         "HRIS - Big Pictures"
       ],
-      "hash": "8432eadcb61844279e9d40ff3d8601a6dcabc706a80ef605bc39d86def5b99ef",
-      "ukuran_kb": 5.8,
-      "ringkasan": "Menjawab: apa isi menu Pengembangan Organisasi (Organization Development) di Web ERP, yaitu Community of Interest (jadwal klub, dokumentasi kegiatan) dan ulang tahun karyawan, siapa yang bisa mengaksesnya (role hris + IT supervisor), dan bagaimana data klub/jadwal disimpan. Menjelaskan bahwa jadwal klub dan dokumentasi masih konstanta di frontend tanpa backend, hanya ulang tahun yang bersumber data nyata dari Employee Service, serta rencana memindahkan jadwal berulang ke master program culture.",
+      "hash": "56fae53e688f3d0c756ccd64917fb2a92744e63fb005d95925738fcdf25d3c58",
+      "ukuran_kb": 6.4,
+      "ringkasan": "Menjawab: apa isi menu Pengembangan Organisasi (Organization Development) di Web ERP, yaitu Jadwal Club, Dokumentasi Kegiatan Club, dan Ulang Tahun karyawan, beserta route, sumber data, dan siapa yang bisa melihatnya (pemegang `system_roles.hris` dan IT supervisor, karyawan peserta klub belum termasuk). Menjawab juga klub apa saja yang rutin berjalan dan di hari apa, kenapa hari disimpan sebagai angka `getDay()` agar ikut i18n ADR 0010, dan bagian mana yang masih konstanta frontend tanpa backend sama sekali (klub, keanggotaan, foto kegiatan). Berisi peringatan bahwa jadwal klub kini punya dua sumber yang bisa menyimpang (master program culture yang dibaca MyBharata vs konstanta FE di layar web), plus daftar hal yang masih TBD seperti keanggotaan, absensi kegiatan, notifikasi, dan cakupan akses.",
       "kata_kunci": [
         "pengembangan organisasi",
         "organization development",
         "community of interest",
-        "klub",
+        "klub karyawan",
         "jadwal club",
+        "Bharata Club Community",
         "dokumentasi kegiatan",
-        "ulang tahun",
-        "birthday",
-        "HRIS",
-        "engagement",
-        "i18n"
+        "ulang tahun karyawan",
+        "birthdays",
+        "engagement retention"
       ]
     },
     {

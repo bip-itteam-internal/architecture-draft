@@ -106,6 +106,27 @@ Koleksi `culture_terlaksana`: tanda pelaksanaan program **non-event** yang menun
 
 **Skor komposit blueprint 30/30/40, otomatis** (`hitungSkorProgram`, satu tempat): Partisipasi 30% + Antusiasme 30% + Implementasi 40%, dengan **Implementasi = Partisipasi × Antusiasme ÷ 100** (dihitung, bukan diisi). KPI officer = rata-rata skor programnya. Detail konsep: [[Microservices - Form Builder Service]].
 
+## Culture untuk karyawan (MyBharata)
+
+> ⚠️ **Bagian ini belum lengkap.** Yang didokumentasikan baru dua rute yang disentuh perubahan 2026-09-22; rute culture mobile lainnya (scan kehadiran, QR PIC, rating, riwayat) **TBD** — sebelumnya tak satu pun terdokumentasi di vault. Jangan membacanya sebagai daftar utuh.
+
+Dibaca SELURUH karyawan terautentikasi, bukan hanya pengelola. Konsumen: [[APP - MyBharata]].
+
+| Method | Path | Gerbang | Fungsi |
+|---|---|---|---|
+| GET | `/culture/clubs/mobile` | identitas | Daftar klub perusahaan pemanggil + status keanggotaannya |
+| GET | `/culture/events[?hari=]` | identitas | Event (`tipe != non_event`) berstatus aktif yang tanggalnya jatuh di jendela hari ini s/d `hari` ke depan (WIB) |
+
+**`mobileClubDTO`**: `slug`, `nama`, `logo` (path relatif berversi, kosong = app pakai aset lokal), `wa_link`, `jumlah` (anggota), `joined`, dan sejak 2026-09-22 **`pelaksanaan`, `jadwal_hari` (0=Minggu..6=Sabtu), `jadwal_tanggal` (1-31)**.
+
+⛔ **Jadwal klub DITURUNKAN dari master program, bukan kolom di `ga_ruang`-nya klub.** `CultureClub` tak punya field jadwal; yang memilikinya `MasterCultureProgram` ber-`jenis=club` + `target_club=<slug>` ([[ADR - 0093 Tipe Program Culture Non-Event Dinilai Terlaksana dengan Approval SPV HR, plus Jadwal di Master]] §5). Menambahkannya di klub akan melahirkan fakta kedua yang pasti menyimpang dari master. Ini menutup gap yang dicatat ADR itu sendiri: jadwal klub berulang sebelumnya cuma konstanta FE tanpa backend ([[HRIS - Pengembangan Organisasi (Community of Interest)]]).
+
+Aturan pemilihannya, ditulis karena akibatnya senyap: master ber-`jenis` lain **diabaikan** walau `target_club`-nya terisi; master **tanpa** jadwal **dilewati** (bila ia menang, klub yang sebenarnya terjadwal berbunyi "belum dijadwalkan"); bila dua master sama-sama berjadwal, yang dipakai **yang paling baru diperbarui** — tanpa aturan itu urutannya mengikuti urutan baca Mongo dan jadwal klub berubah antar-permintaan tanpa seorang pun menyentuh datanya. `pelaksanaan: tahunan` tak dihitung berjadwal (master tak punya wadah tanggal spesifiknya).
+
+⛔ **Ketiga kunci jadwal `omitempty`, dan itu bagian kontraknya**: klub tanpa master mengirim badan TANPA kunci itu, sehingga klien membedakan "belum diatur" dari nilai nol — `jadwal_hari: 0` berarti hari Minggu. `jumlah` sengaja **bukan** `omitempty`: 0 anggota adalah fakta, bukan ketiadaan. Katalog master dibaca **sekali** di luar loop klub.
+
+**`?hari=`** (2026-09-22): bawaan **7** (jendela yang dipakai beranda MyBharata sejak awal, sengaja tak diubah), maksimum **60**. Kosong atau spasi = tak disebut. Nilai yang **disebut tapi ngawur** (bukan angka, < 1, > 60) dibalas **400**, bukan diam-diam jatuh ke bawaan: klien yang salah kirim lalu menerima 200 menampilkan jendela berbeda dari yang diminta, dan itu terbaca sebagai "eventnya memang cuma segitu".
+
 ## Analisa & Export (RBAC per departemen)
 | Method | Path | Fungsi |
 |---|---|---|

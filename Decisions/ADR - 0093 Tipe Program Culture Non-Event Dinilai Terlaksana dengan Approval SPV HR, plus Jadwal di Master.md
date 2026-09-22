@@ -66,6 +66,10 @@ Officer menandai pelaksanaan program non-event **bebas kapan saja** (boleh >1× 
 
 `MasterCultureProgram` mendapat field jadwal yang **artinya bergantung `pelaksanaan`**: `mingguan` → hari-dalam-minggu; `bulanan` → tanggal-dalam-bulan; `harian` → tiap hari kerja; `tahunan` → tanggal spesifik. Saat officer memilih master di form buat program, jadwal ini **mem-pra-isi** `tanggal` (dan jam bila ada) — **tetap bisa disesuaikan** sebelum simpan. Jadwal adalah **acuan/template**, bukan generator: tak ada cron, tak ada sesi yang dibangkitkan otomatis. Untuk event ini menghapus ketik-ulang tanggal rutin; untuk non-event jadi dasar pengingat "sudah terlaksana belum".
 
+> **Lanjutan 2026-09-22 (bip-erp [#1996](https://github.com/bip-itteam-internal/bip-erp/pull/1996), belum merged).** Jadwal master kini juga **DIBACA** MyBharata, bukan cuma mem-pra-isi form: `GET /culture/clubs/mobile` menurunkan `pelaksanaan`/`jadwal_hari`/`jadwal_tanggal` dari master ber-`jenis=club` + `target_club=<slug>`. Ini menutup gap yang dicatat Context ADR ini sendiri — jadwal klub berulang yang "masih konstanta FE tanpa backend, tak tertaut master". Klub TIDAK diberi kolom jadwal sendiri, justru supaya tak lahir fakta kedua.
+>
+> Dua aturan yang lahir dari sana dan perlu diketahui saat menyunting master: `tahunan` **tak dihitung berjadwal** (master tak punya wadah tanggal spesifiknya, jadi §5 di atas menjanjikan lebih dari yang disimpan), dan bila satu klub punya **dua master berjadwal**, yang dipakai adalah yang **paling baru diperbarui**. Kontrak lengkap: [[API - Form Builder Service]] § Culture untuk karyawan. Permukaannya: [[APP - MyBharata]] § Club & Event.
+
 ### 6. Anti-gaming dua lapis
 
 Skor non-event rawan diangkat sendiri. Ditahan dua lapis yang **sudah** jadi keputusan: (a) program **wajib dari master** milik HR (`requireCultureManager`, ADR 0084 §5) — set program bukan bebas dikarang officer; (b) tiap terlaksana **disetujui SPV HR** (§4). Keduanya bersama membuat "100" non-event bukan self-grade murni.
