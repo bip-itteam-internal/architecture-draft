@@ -211,6 +211,41 @@ Berlaku untuk tiap diff yang menyentuh UI, menu, atau navigasi.
 Bila rencana punya bagian `## Alur Pengguna`, bandingkan diff dengannya: titik putus yang
 sudah ditandai di rencana tetapi tak ditutup di diff adalah temuan, bukan catatan.
 
+### F2. Rantai bisnis terputus: hilir menyimpan ulang hulu tanpa rujukan
+
+Sumbu berbeda dari §F, dan keduanya bisa terjadi sendiri-sendiri. §F soal **orang tersesat
+antar layar**; ini soal **data yang tak tersambung antar entitas**. ⚠️ Obat §F ("beri tautan
+langsung ke layar tujuan") **tidak** menutup kelas ini: tautannya ada, pengetikan ulangnya
+tetap. Sebuah rantai bisa lolos §F dan tetap patah di sini.
+
+Berlaku untuk tiap diff yang **membuat entitas baru**, atau menambah pengajuan/dokumen yang
+punya tahap sebelumnya di modul mana pun.
+
+Bentuk yang dicari:
+
+> Entitas hilir **menyimpan ulang** data entitas hulu (nama barang, jumlah, pemohon, nominal)
+> **tanpa menyimpan referensi id** ke hulunya.
+
+Dua pertanyaan, dan dua-duanya dijawab dengan Grep, bukan dengan membaca diff:
+
+1. **Ada field yang menunjuk hulunya?** Cari `<hulu>_id` di model hilir. Nol hasil = temuan.
+   ⛔ Nomor dokumen berbentuk teks (`no_permintaan`, `nomor_po`) **bukan** rujukan: ia tak
+   dijamin unik, tak bisa di-join, dan tak ada yang menjaganya saat hulunya diubah.
+2. **Status hulu ikut bergerak saat hilir dibuat?** Cari penulisan status hulu dari jalur
+   hilir. Nol hasil = hulu akan berbunyi `menunggu` selamanya walau sudah dipenuhi penuh,
+   dan tak ada galat yang menandainya.
+
+⛔ **Prefill bukan sambungan.** Tombol "Ambil dari …" menyalin isi hulu ke form hilir dan
+terbaca seperti rantai yang sudah tersambung. Yang tersimpan tetap salinan lepas: begitu
+tombolnya ditekan, tak ada apa pun yang tahu kedua dokumen berkerabat. Membacanya sebagai
+"rantainya sudah tersambung" sudah terbukti keliru di sini pada rantai PR → PO → Penerimaan
+(inventaris lengkap: dok vault `REF - Rantai Pengajuan Lintas Modul`).
+
+**Keparahan.** Pass 1 bila diff menambah rantai putus **baru**. Rantai yang sudah putus sejak
+dulu bukan tugas diff ini: sebutkan sebagai catatan dan tunjuk ke dok inventarisnya, jangan
+memblokir PR yang tidak menyentuhnya. Arah perbaikan menyeluruh belum diputuskan, jadi
+menuntut satu PR menutup rantai lama adalah menuntut keputusan yang belum ada.
+
 ### G. Satu fakta hidup di dua tempat
 
 Pertanyaannya bukan "apakah kodenya mirip" melainkan **"kalau fakta ini berubah, berapa
@@ -496,7 +531,8 @@ KRITIS                              INFORMASIONAL
 ├─ Konkurensi & keutuhan data       ├─ Celah test
 ├─ Batas kepercayaan input          ├─ Deploy & konfigurasi
 ├─ Alur pengguna terputus           ├─ Kode mati & konsistensi
-├─ Satu fakta dua tempat (§G)       └─ Abstraksi kelewat dini (§N)
+├─ Rantai bisnis terputus (§F2)     └─ Abstraksi kelewat dini (§N)
+├─ Satu fakta dua tempat (§G)
 └─ Pemeriksaan gagal-terbuka (§G3)
 ```
 
