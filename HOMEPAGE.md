@@ -2,6 +2,16 @@
 
 *Semua yang ada di sini hanyalah ikhtisar singkat dan gambaran kasar tentang bagaimana sistem terlihat serta bagaimana setiap bagian berinteraksi satu sama lain, hal ini memerlukan diskusi terbuka lebih lanjut bersama-sama. Halaman ini juga berfungsi sebagai **landing page / peta dokumentasi** — lihat indeks di bawah.*
 
+## Kenapa ERP ini dibangun
+
+Tiga hal yang dikejar, dan cara ERP Bharata menempuhnya berbeda dari rumusan ERP yang lazim beredar. Bagian ini menyebut **arahnya** saja; angka dan keadaan terkini dibaca di dok yang ditunjuk, bukan di sini.
+
+- **Integrasi data — satu fakta satu pemilik, BUKAN satu basis data tunggal.** Rumusan umum "menyatukan seluruh data ke dalam satu database" **sengaja ditolak** di sini: tiap service memiliki MongoDB-nya sendiri dan tak ada akses langsung lintas-database ([[ADR - 0002 Database-per-Service]]). Yang menggantikannya: tiap fakta bisnis punya satu service pemilik, dikonsumsi lewat pemiliknya (HTTP internal, feed kalender, klaim JWT), dan salinan hanya sah bila arahnya satu, sisi salinan tak pernah ditulis tangan, dan ada penjaganya. Peta pemilik tiap fakta beserta duplikasi yang belum diputuskan: [[REF - Kepemilikan Data]].
+- **Otomatisasi proses lintas divisi — target, belum keadaan.** Rantai bisnis yang seharusnya berjalan sekali jalan masih terpecah jadi pengajuan terpisah di beberapa modul, sehingga data yang sama diketik ulang di layar berikutnya. Inventarisnya beserta titik putus tiap rantai: [[REF - Rantai Pengajuan Lintas Modul]]; arah perbaikannya sengaja belum diputuskan.
+- **Akses real-time untuk manajemen — sebagian besar masih rancangan.** Mayoritas baris metrik KPI masih dinilai manusia, bukan dihitung sistem. Cakupan dashboard per posisi dan penghambat yang muncul di banyak divisi sekaligus: [[REF - Dashboard per Posisi (Indeks Cakupan)]]; prinsip isi dashboard: [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]].
+
+⚠️ Dua dari tiga di atas terdokumentasi sebagai **gap yang terukur**, bukan sebagai pencapaian. Menyebut ERP ini "sudah terintegrasi penuh dan real-time" akan meleset dari yang bisa dibuktikan hari ini. Peta kelengkapan per bagian PRD: [[REF - PRD ERP]]; arah dan prioritas: [[ROADMAP]].
+
 ## Seperti apa sistem ERP itu?
 
 **Backend** ERP (`bip-erp`) berupa **mono-repo microservices Go** (di belakang satu API Gateway). **Frontend & aplikasi** berada di **repo terpisah**: web ([[APP - Web ERP]]), mobile ([[APP - MyBharata]]), Task Manager ([[APP - Dynamic Task Tracker]]), generator konten (Ideamills → [[Sales - Veo (Gemini) Implementation]]), dan beberapa tool lain.
