@@ -1,18 +1,10 @@
-# ADR - 0116 Setelan Akun Marketplace Bergerbang dan Berjejak, Komponen Tak Dikenal Wajib Terlihat
-
 ## Untuk Manajemen
 
-Finance berulang kali melaporkan biaya marketplace tercatat di akun yang salah, dan tiap laporan diperbaiki satu per satu lewat tiket ke IT. Pemeriksaan menemukan bahwa penyebabnya bukan pemetaan yang salah, melainkan dua hal yang tidak terlihat oleh siapa pun.
+Finance berulang kali melaporkan biaya marketplace tercatat di akun yang salah, dan tiap laporan diperbaiki satu per satu lewat tiket ke IT. Penyebabnya bukan pemetaan yang salah, melainkan dua hal yang tidak terlihat siapa pun: komponen biaya yang belum dikenal sistem masuk ke satu keranjang sisa yang kebetulan memakai akun yang sama dengan Biaya Admin (sehingga biaya apa pun yang belum punya tempat muncul sebagai biaya admin, persis yang selama ini dikeluhkan), dan tidak ada yang bisa melihat pemetaan yang sedang berlaku beserta artinya, sehingga dua akun yang namanya mirip berulang kali disimpulkan tertukar padahal peruntukannya memang berbeda.
 
-Pertama, komponen biaya yang belum dikenal sistem tidak hilang dan tidak berbunyi, melainkan masuk ke satu keranjang sisa. Keranjang sisa itu kebetulan memakai akun yang sama dengan Biaya Admin, sehingga biaya apa pun yang belum punya tempat akan muncul sebagai Biaya Admin. Itulah yang selama ini dibaca sebagai "ongkir masuk ke biaya admin". Kedua, tidak ada yang bisa melihat pemetaan yang sedang berlaku beserta artinya, sehingga dua akun yang namanya mirip berulang kali disimpulkan tertukar padahal keduanya memang berbeda peruntukan.
+**Yang berubah di layar**: halaman setelan akun menampilkan daftar komponen biaya yang muncul di data tetapi belum punya akun, lengkap dengan jumlah kejadian dan nilainya per marketplace; perubahan akun tidak lagi langsung tersimpan melainkan diusulkan staf dan disetujui atasan dengan alasan tertulis; setiap perubahan mencatat siapa dan kapan; sebelum diterapkan, sistem menampilkan transaksi mana saja yang tercatat dengan akun lama. **Terdampak**: staf Finance dan Accounting yang mengisi setelan, atasan yang menyetujui, dan AR yang menelusuri selisih. Di luar Finance tidak ada yang berubah.
 
-**Yang berubah di layar.** Halaman setelan akun akan menampilkan daftar komponen biaya yang muncul di data tetapi belum punya akun, lengkap dengan berapa kali muncul dan berapa nilainya per marketplace. Perubahan akun tidak lagi langsung tersimpan, melainkan diusulkan oleh staf dan disetujui atasan, dengan catatan alasan yang tersimpan. Setiap perubahan mencatat siapa yang mengubah dan kapan. Sebelum perubahan diterapkan, sistem menampilkan transaksi mana saja yang tercatat dengan akun lama.
-
-**Siapa yang terdampak.** Staf Finance dan Accounting yang mengisi setelan akun, atasan yang menyetujui, dan AR yang menelusuri selisih. Tidak ada perubahan bagi pengguna di luar Finance.
-
-**Yang tidak dijanjikan.** Sistem tidak akan memperbaiki sendiri transaksi yang sudah terlanjur tercatat di Accurate, dan tidak akan mengirim jurnal koreksi. Ia hanya menunjukkan mana yang terdampak; koreksinya tetap dikerjakan Accounting di Accurate. Sistem juga tidak menebak akun yang benar untuk komponen baru, ia hanya memastikan komponen itu terlihat sebelum menjadi selisih. Pemetaan yang berbeda per marketplace belum dibangun pada keputusan ini.
-
-**Perkiraan besaran kerja.** Sedang. Seluruhnya di satu service dan satu halaman yang sudah ada, tanpa modul baru dan tanpa perubahan pada cara data dikirim ke Accurate.
+**Yang tidak dijanjikan**: sistem tidak memperbaiki sendiri transaksi yang terlanjur tercatat di Accurate dan tidak mengirim jurnal koreksi (ia hanya menunjukkan mana yang terdampak, koreksinya tetap dikerjakan Accounting di Accurate); sistem juga tidak menebak akun yang benar untuk komponen baru, hanya memastikan komponen itu terlihat sebelum menjadi selisih; pemetaan yang berbeda per marketplace belum dibangun di keputusan ini. **Besaran kerja**: sedang, seluruhnya di satu service dan satu halaman yang sudah ada, tanpa modul baru dan tanpa mengubah cara data dikirim ke Accurate.
 
 ## Deskripsi
 
