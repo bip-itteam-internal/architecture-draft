@@ -7618,15 +7618,16 @@
       "status_teks": "**Diusulkan, kode ditulis** — branch `fix/ongkir-shopee-rumus-resmi` (bip-erp), belum merge, belum deploy. Keputusan finance atas gejalanya ada di tiket \"Revisi Sistem Income\"; rumus dan dampaknya diukur ke prod 22 September 2026.",
       "publik": true,
       "tautan": [
+        "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
         "Microservices - Integration Service",
         "Finance - Proses Penjualan Marketplace dan Uang Masuk",
         "ADR - 0078 Klasifikasi Fee Lazada Mengikuti Pemetaan COA Finance",
         "ADR - 0001 Akuntansi via Accurate",
         "APP - Web ERP"
       ],
-      "hash": "4b5d5ed78dd3d222abbba203d0b6e48410a39d0655c4c57cc2a8d548dee5472f",
-      "ukuran_kb": 14.5,
-      "ringkasan": "Menjawab: kenapa beban ongkir Shopee di pembukuan kadang lebih besar daripada yang ditampilkan Shopee dan selisihnya mendarat diam-diam di akun Beban Admin E-Commerce, apa rumus ongkir yang benar (ongkir aktual dikurangi bagian yang dibayar pembeli, ditambah biaya proteksi kirim dan ongkir pengembalian barang), serta kenapa subsidi Shopee (shipping rebate) sengaja TIDAK ikut dikurangkan di rumus ini melainkan tetap diurus mekanisme rebate-ke-ongkir yang sudah ada. Menjelaskan juga akar penyebab sebenarnya (final_shipping_fee sudah memuat aktual dikurangi subsidi, sehingga rumus lama menghitung ongkir aktual dua kali) dan bagaimana bug ini bisa lolos bertahun-tahun karena dokumen selalu balance dan fixture test-nya kehilangan field penentu.",
+      "hash": "05477654fc119fb93e87d7ea1ffa0cfd392039c26efb61bead1bf5835377326a",
+      "ukuran_kb": 15.8,
+      "ringkasan": "Menjawab: kenapa beban ongkir Shopee di pembukuan lebih besar daripada Subtotal Ongkos Kirim yang ditampilkan Shopee (contoh Shopee Rp0 vs sistem Rp112.000), dan bagaimana rumus barunya dihitung — beban ongkir = actual_shipping_fee dikurangi buyer_paid_shipping_fee, ditambah proteksi kirim dan reverse_shipping_fee, sementara final_shipping_fee tidak dipakai sama sekali karena terbukti 90.194 dari 90.194 dokumen escrow prod memenuhi final = −(actual − rebate) sehingga rumus lama menghitung ongkir aktual dua kali. Menjawab kenapa shopee_shipping_rebate SENGAJA tidak ikut dikurangkan (sudah diurus mekanisme 'Potongan Ongkos Kirim dari Shopee' lewat gerbang RebateKeOngkir di lapisan penerimaan, menariknya ke entity akan menghitungnya dua kali) dan kenapa gerbang berlaku-maju dipasang PER-ORDER lewat rumusOngkirBaruBerlaku/ShopeeHariSudahDibukukan alih-alih kv tanggal, karena income Shopee ditulis ulang dari escrow tiap sync. Menjawab pula kenapa cacat ini bertahun-tahun tak berbunyi (residual selalu menutup identitas dan berbagi akun dengan biaya admin) dan kenapa penjaganya lolos (fixture TestShopeeTransformIncomeIdentity_RealSample kehilangan field actual_shipping_fee), serta apa akibatnya: 3.870 pesanan senilai Rp96.826.227 salah pos, kas tidak berubah, insentif tidak bergeser.",
       "kata_kunci": [
         "ongkir Shopee",
         "shipping fee",
@@ -7634,9 +7635,13 @@
         "actual_shipping_fee",
         "buyer_paid_shipping_fee",
         "shopee_shipping_rebate",
-        "subsidi ongkir",
-        "Beban Admin E-Commerce",
-        "escrow Shopee",
+        "reverse_shipping_fee",
+        "escrow get_escrow_detail",
+        "TotalShippingCost",
+        "Beban Admin E-Commerce 6112",
+        "OpsiTransformShopee",
+        "rumusOngkirBaruBerlaku",
+        "residual settlement-adjustment",
         "ADR 0118"
       ]
     },
@@ -16282,22 +16287,24 @@
         "ADR - 0118 Ongkir Shopee Dihitung Aktual Dikurangi Bagian Pembeli dan Subsidi",
         "ADR - 0119 Kompensasi TikTok Dipisah Menurut Sudah atau Belum Ada Uang Masuk",
         "ADR - 0056 Penyesuaian Statement TikTok Menambah Payout Order",
-        "ADR - 0100 Penerimaan Beda dengan Accurate Diputus di Halaman Penerimaan"
+        "ADR - 0100 Penerimaan Beda dengan Accurate Diputus di Halaman Penerimaan",
+        "ADR - 0116 Setelan Akun Marketplace Bergerbang dan Berjejak, Komponen Tak Dikenal Wajib Terlihat"
       ],
-      "hash": "78e04653d5fd5d926d446a738b52f8f55371dd806c78c53f507927ea58cc1b0f",
-      "ukuran_kb": 5.6,
-      "ringkasan": "Menjawab: apa status pengerjaan revisi tiket finance \"Revisi Sistem Income\" untuk dua pokok masalah (ongkir Shopee salah pos dan kompensasi TikTok atas pesanan yang sudah cair), berapa besar dampak uangnya di prod, dan bagaimana urutan kerja T1 sampai T5 beserta status masing-masing (mana yang gugur, selesai kode, atau masih menunggu deploy manusia). Juga mendaftar utang/temuan tambahan di luar lingkup tiket yang ditemukan selama analisa, seperti penyesuaian TikTok tanpa pesanan padanan dan retur TikTok lama yang menggantung, serta menunjuk ke ADR 0118 dan ADR 0119 sebagai sumber keputusan resminya.",
+      "hash": "502459db9078ed7439df8748be1bfdda0af7c4bf4e9fbcd046d5f84fcb04c1cf",
+      "ukuran_kb": 7.9,
+      "ringkasan": "Menjawab: apa saja yang dituntut tiket finance 'Revisi Sistem Income', berapa besar dampaknya, dan dalam urutan apa dikerjakan — papan kerja /analisa-kebutuhan 2026-09-22 dengan angka yang diukur read-only di prod VPS Biznet: ongkir Shopee salah pos 3.870 pesanan / Rp96.826.227 (±Rp16 jt per bulan) versus kompensasi TikTok atas pesanan sudah cair 14 pesanan / Rp1.610.697, plus 360 pesanan kompensasi yang sudah benar (Rp34,87 jt) sebagai kontrol yang tidak boleh disentuh. Menjawab status tiap langkah T1–T5 (T1 gugur karena hipotesis '96 pesanan menyimpang' salah, T2 selesai di kode lewat commit 5db06269 dan f457614d di branch fix/ongkir-shopee-rumus-resmi, T3/T5 tersisa operasional dan dieksekusi manusia) dan kenapa kompensasi TikTok dipisah menurut payout pesanan itu sendiri tanpa boleh dipecah jadi dua PR. Menjawab juga pertanyaan apa yang masih menahan penerapan ke finance (akun tersendiri untuk baris Penyesuaian, perlakuan periode tertutup, proteksi pengiriman Rp7,4 jt di 21.148 pesanan) dan utang di luar lingkup tiket: 54 penyesuaian TikTok tanpa pesanan padanan, 208 dokumen retur menggantung, dan larangan memakai 10.10.10.120 sebagai pembanding.",
       "kata_kunci": [
-        "revisi income",
-        "Shopee",
-        "TikTok",
-        "ongkir",
+        "Revisi Sistem Income",
+        "income Shopee TikTok",
         "kompensasi TikTok",
-        "analisa kebutuhan",
-        "ADR 0118",
-        "ADR 0119",
-        "papan kerja",
-        "Rekap Pencairan"
+        "Pendapatan Lain-lain",
+        "ongkir salah pos",
+        "analisa kebutuhan finance",
+        "VPS Biznet prod",
+        "retur menggantung",
+        "penyesuaian TikTok tanpa order",
+        "pertanyaan untuk Finance FAT",
+        "payout settlement"
       ]
     },
     {
