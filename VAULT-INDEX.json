@@ -1555,20 +1555,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "595ed5fdaf0b31246db0887f4f45403635863ea9fa3029f1cf7a45a15e7d81aa",
-      "ukuran_kb": 563.1,
-      "ringkasan": "Menjawab: apa itu portal web internal `erp-frontend` (One Bharata), stack apa yang dipakainya, bagaimana login dan SSO Identity Provider bekerja, dan bagaimana `system_roles` menentukan modul serta menu yang tampil di sidebar. Menjelaskan konvensi data-fetching TanStack Query (hook sidebar wajib ber-`enabled`, badge pakai refetchOnWindowFocus, pencacah membalas angka), konvensi bagan Recharts lewat `ChartContainer`, struktur menu HRIS termasuk Pengaturan HRGA terpusat, dan dukungan multi-perusahaan (tenant).",
+      "hash": "59b552341b7eabe16428b9989841853144e6412ef583bc723b1a3dbd42cc560d",
+      "ukuran_kb": 565.1,
+      "ringkasan": "Menjawab: apa itu portal web ERP internal Bharata (erp-frontend / \"One Bharata\"), stack apa yang dipakainya, dan bagaimana login, refresh token, serta SSO Identity Provider ke aplikasi lain bekerja. Menjelaskan bagaimana sidebar dan halaman digerbang oleh system_roles per modul plus paket izin, bagaimana menu HRIS dikelompokkan lewat menu induk bersarang (bukan field group), dan bagaimana mode multi-perusahaan (CompanySwitcher, kelola perusahaan/departemen/shift/WiFi, rekrutmen lintas perusahaan) berperilaku. Juga memuat konvensi wajib data-fetching TanStack Query (hook sidebar ber-enabled, badge pakai refetchOnWindowFocus, pencacah membalas angka) dan konvensi bagan Recharts dengan ChartContainer.",
       "kata_kunci": [
         "erp-frontend",
-        "web ERP",
+        "hris-dashboard",
         "One Bharata",
-        "SSO",
+        "frontend web ERP",
+        "Next.js App Router",
+        "SSO identity provider",
         "system_roles",
-        "sidebar",
-        "Next.js",
-        "TanStack Query",
-        "multi-perusahaan",
-        "role gating"
+        "role gating sidebar",
+        "multi-perusahaan multi-tenant",
+        "TanStack Query"
       ]
     },
     {
@@ -2562,20 +2562,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "5daf0ac645cb07242a09d118014c11eae50539fd94d2e7d1ced274e4b8569e0a",
-      "ukuran_kb": 418.6,
-      "ringkasan": "Menjawab: bagaimana order marketplace (TikTok Shop, Shopee, Lazada) masuk realtime lewat webhook, bagaimana laporan iklan TikTok Business dan GMV Max diagregasi untuk dashboard marketing, dan bagaimana transaksi di-bridging ke Accurate Online sebagai invoice, retur, dan penerimaan. Juga menjawab endpoint apa yang tersedia untuk kredensial OAuth per marketplace, automasi auto-ship/auto-approve yang sadar hari libur, kepemilikan toko per departemen dan ACL toko, serta cron/worker sinkronisasi yang berjalan.",
+      "hash": "4193fca593fe33efdd739add369f5d63c92277f11210a9429a26cfcb88ee6887",
+      "ukuran_kb": 419.9,
+      "ringkasan": "Menjawab: bagaimana order dan laporan iklan marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) masuk ke ERP lewat webhook dan job sync, bagaimana semuanya dinormalkan jadi model transaction terpadu, dan bagaimana bridging akuntansi ke Accurate Online (Sales Invoice, Sales Return, ringkasan transaksi harian per shop/channel) dilakukan. Menjelaskan endpoint per modul (webhooks, credentials OAuth, holidays, TikTok Business/Ads termasuk GMV Max dan ICC video metrics, Shopee, Affiliate, transactions, fulfillment WMS bridge, workers/cron), aturan hitung ROAS/ROI dan GMV winner, serta ACL toko dan kepemilikan toko per departemen. Juga sumber jawaban untuk pertanyaan operasional: verifikasi HMAC webhook Shopee, status sinkron per toko (toko banned dilewati), alarm toko tanpa config Accurate, index MongoDB jalur panas, dan status soft-disabled jalur Desty.",
       "kata_kunci": [
-        "integration service",
-        "marketplace",
-        "Shopee",
+        "integration-service",
+        "integrasi marketplace",
         "TikTok Shop",
+        "Shopee",
         "Lazada",
-        "Accurate",
-        "webhook",
+        "Accurate Online",
+        "webhook marketplace",
         "GMV Max",
-        "OAuth kredensial",
-        "sync order"
+        "ROAS ROI iklan",
+        "sinkronisasi order"
       ]
     },
     {
