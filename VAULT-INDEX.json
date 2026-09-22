@@ -2553,20 +2553,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "507a406d91cd5ac492d807163545de16d7944505cfda5dbad74cc412178f72a9",
-      "ukuran_kb": 414.0,
-      "ringkasan": "Menjawab: apa peran integration-service sebagai penghubung marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) ke Accurate Online, bagaimana webhook Shopee/TikTok diterima dan diverifikasi, bagaimana order dinormalkan jadi model transaksi terpadu lalu dibukukan jadi Sales Invoice/Sales Return, dan cron/worker apa saja yang berjalan. Juga menjawab laporan GMV Max, ICC account mapping, shop ACL dan kepemilikan toko per departemen, rencana Meta Ads, ulasan marketplace, gross profit per produk, status sinkron toko banned, serta catatan ketahanan dan performa MongoDB.",
+      "hash": "61aeab68e47e6534fce5befbd529510ecbf730213951a6480aa052fe17659ad9",
+      "ukuran_kb": 414.4,
+      "ringkasan": "Menjawab: bagaimana order marketplace (TikTok Shop, Shopee, Lazada, TikTok Business/Ads) masuk ke ERP lewat webhook direct, bagaimana order dan laporan iklan dinormalkan jadi model transaction terpadu, dan bagaimana bridging finansial ke Accurate Online (Sales Invoice, Sales Return, ringkasan harian per shop/channel) bekerja. Menjelaskan juga endpoint per modul (webhooks, credentials, holidays, TikTok Business/Ads, GMV Max, ICC video metrics, Shopee, transactions, Accurate, fulfillment WMS bridge, workers/cron), aturan hitung metrik iklan (ROAS, ROI, GMV winner ROI >= 3.2 & order >= 15), ACL toko per departemen, dan mapping akun ICC. Berguna untuk menelusuri kenapa sebuah angka iklan/order salah, key HMAC webhook Shopee mana yang dipakai, atau status implementasi bagian mana yang masih konsep (Meta Ads) dan mana yang soft-disabled (Desty).",
       "kata_kunci": [
+        "integration-service",
         "integration service",
         "marketplace",
-        "Accurate",
         "TikTok Shop",
-        "Shopee",
+        "TikTok Business Ads",
         "GMV Max",
-        "webhook",
-        "sales invoice",
-        "faktur",
-        "cron worker"
+        "Shopee webhook",
+        "Accurate Online",
+        "Sales Invoice",
+        "ROAS ROI"
       ]
     },
     {
