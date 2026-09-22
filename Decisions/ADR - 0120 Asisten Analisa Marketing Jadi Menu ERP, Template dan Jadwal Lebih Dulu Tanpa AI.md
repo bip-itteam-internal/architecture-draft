@@ -29,7 +29,7 @@ kurang adalah pengantarannya. Keputusan ini menempatkan asisten analisa sebagai 
 ERP, bukan di harness luar, dan menunda lapisan AI sampai template dan penjadwalan tanpa AI
 terbukti dipakai.*
 
-- **Status**: 🟡 Diusulkan, kode belum ada
+- **Status**: 🟡 **Diusulkan** — kode belum ada. Berdiri di atas pengukuran produksi dan `origin/main` 2026-09-22.
 - **Path di repo**: `bip-erp/services/marketing-analytics/` (baru), `erp-frontend/src/features/marketing-analytics/` (baru), `bip-erp/shared-library/notification/` (kategori inbox baru)
 - **Tanggal**: 2026-09-22
 
