@@ -77,6 +77,39 @@ dengan menelusuri satu pesanan dari populasi tiket sampai ke dokumen Accurate �
 - ✅ **Label server di vault sudah dibetulkan di sesi ini** — VPS Biznet kini ditandai sebagai
   produksi, dan `10.10.10.120` ditandai menyala-tapi-tidak-dipakai.
 
+## Pertanyaan untuk Finance (disusun 2026-09-22)
+
+Ditulis untuk tim Finance/FAT, bahasa bisnis. Nomor 1 dan 2 **menahan** T3; sisanya paralel.
+
+**Ongkir Shopee**
+
+1. ⛔ Selisih ongkir **pindah ke Beban Admin, bukan hilang**. Perbaikan membuat Biaya Ongkir jadi 0
+   (sama dengan Subtotal Ongkos Kirim Shopee), tapi selisihnya berpindah ke baris Penyesuaian yang
+   memakai akun **sama dengan Beban Admin E-Commerce (6112)** — ±Rp96,8 jt di ±3.870 pesanan. Tiket
+   minta dua akun sama-sama benar; perbaikan ini menutup sisi ongkir tapi menambah sisi admin dulu.
+   Boleh dinyalakan begitu, atau tunggu sisi admin beres?
+2. ⛔ **Akun tersendiri untuk baris Penyesuaian** — sudah bisa diputuskan? Pertanyaan yang sama sudah
+   menunggu SPV FAT di [[ADR - 0116 Setelan Akun Marketplace Bergerbang dan Berjejak, Komponen Tak Dikenal Wajib Terlihat]] (T5).
+   Kalau akunnya dipisah, nomor 1 selesai sendiri.
+3. **Ongkir pengembalian barang** selama ini tak pernah masuk Biaya Ongkir (nyangkut di Penyesuaian
+   tanpa nama); perbaikan ini memberinya rumah di Biaya Ongkir. Pos yang benar?
+4. **Periode yang sudah ditutup tidak diubah** — konfirmasi ini yang dimaksud "sekarang dan ke depan".
+   Konsekuensinya laporan lama dan baru memakai dua cara hitung.
+5. Pesanan **cair sebelum 1 September tapi belum dibukukan** hasilnya tidak 0 melainkan sebesar
+   subsidinya (aturan potongan ongkir baru berlaku 1 September). Perlu perlakuan khusus?
+6. **Proteksi pengiriman ±Rp7,4 jt (21.148 pesanan)** dan **ongkir balik ±Rp1,17 jt** masih tercatat
+   di Beban Admin padahal sifatnya ongkir. Sekalian dipindah, atau terpisah?
+
+**Kompensasi TikTok** (perlakuannya sudah dijawab tiket: Pendapatan Lain-lain, nilai bayar 0)
+
+7. **14 pesanan yang terlanjur salah catat** (±Rp1,61 jt) — dibetulkan mundur atau berlaku maju saja?
+8. **208 dokumen retur menggantung** menunggu scan atas barang yang takkan pernah datang (hilang di
+   logistik, sudah diganti rugi), plus beberapa retur terkirim padahal barang tak pernah kembali
+   sehingga stok Accurate bertambah untuk barang yang tak ada. Dijadwalkan pembersihannya?
+9. **54 penyesuaian TikTok tanpa pesanan padanan** (naik tajam dari 7) — dibukukan sebagai Pendapatan
+   Lain-lain tanpa pesanan, atau ditahan untuk ditelusuri?
+10. Konfirmasi **360 pesanan kompensasi yang sudah benar** (±Rp34,87 jt) tidak disentuh.
+
 ## Catatan cara mengukur ulang
 
 Pengukuran dijalankan **read-only** di VPS Biznet lewat `docker exec Integration-MongoDB mongosh`,
