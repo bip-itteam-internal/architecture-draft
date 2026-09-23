@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-22",
+  "digenerate": "2026-09-23",
   "jumlah_dokumen": 473,
   "dokumen": [
     {
@@ -7609,8 +7609,8 @@
       "judul": "ADR - 0118 Ongkir Shopee Dihitung Aktual Dikurangi Bagian Pembeli dan Subsidi",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan, kode ditulis** — branch `fix/ongkir-shopee-rumus-resmi` (bip-erp), belum merge, belum deploy. Keputusan finance atas gejalanya ada di tiket \"Revisi Sistem Income\"; rumus dan dampaknya diukur ke prod 22 September 2026.",
+      "status_emoji": "✅",
+      "status_teks": "**Implemented & Deployed** — PR [#2004](https://github.com/bip-itteam-internal/bip-erp/pull/2004) merged, live prod 22 September 2026 19:17 WIB. Diverifikasi ke biner yang berjalan (tiga string khas, kontrol positif & negatif) dan ke data (11 order pasca-deploy cocok rumus baru, nol masih rumus lama). **Amandemen 2026-09-23**: pengecualian bertanggal untuk backfill September — lihat Decision §2a, kodenya di branch `fix/ongkir-shopee-backfill-september`, **belum merge, kv belum diisi**.",
       "publik": true,
       "tautan": [
         "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
@@ -7620,20 +7620,20 @@
         "ADR - 0001 Akuntansi via Accurate",
         "APP - Web ERP"
       ],
-      "hash": "05477654fc119fb93e87d7ea1ffa0cfd392039c26efb61bead1bf5835377326a",
-      "ukuran_kb": 15.8,
-      "ringkasan": "Menjawab: bagaimana beban ongkir Shopee dihitung (ongkir aktual dikurangi bagian yang dibayar pembeli, ditambah biaya proteksi pengiriman dan ongkir pengembalian barang), kenapa `final_shipping_fee` tidak dipakai lagi sama sekali (terbukti sama dengan minus `actual_shipping_fee` dikurangi `shopee_shipping_rebate` pada 90.194 dari 90.194 dokumen escrow prod, sehingga rumus lama menghitung ongkir aktual dua kali), dan kenapa subsidi `shopee_shipping_rebate` SENGAJA tidak ikut dikurangkan karena sudah diurus mekanisme \"Potongan Ongkos Kirim dari Shopee\" (gerbang `RebateKeOngkir`) di lapisan penerimaan. Juga menjawab kenapa selisih Rp96.826.227 di 3.870 pesanan mendarat diam-diam di Beban Admin E-Commerce tanpa satu pun galat, kenapa gerbang berlakunya PER-ORDER lewat `rumusOngkirBaruBerlaku` + `ShopeeHariSudahDibukukan` dan bukan kv tanggal (income Shopee ditulis ulang dari escrow tiap sync sehingga kv tanggal jadi retroaktif), serta kenapa `TestShopeeTransformIncomeIdentity_RealSample` tetap hijau padahal rumusnya salah (fixture kehilangan field `actual_shipping_fee`). Menjelaskan pula akibatnya bagi tim FAT/AR dan kolom ongkir Rekap Pencairan, kenapa kas dan insentif profit tidak bergeser, dan kenapa hipotesis awal \"96 pesanan menyimpang\" gugur.",
+      "hash": "739bcf07d1ffe96ea4cfcb7f7c9f80aece6d2471d0bb99b37fc7ccd990f1b835",
+      "ukuran_kb": 19.8,
+      "ringkasan": "Menjawab: bagaimana beban ongkir Shopee dihitung (aktual − bagian pembeli, ditambah proteksi kirim dan `reverse_shipping_fee`), kenapa `final_shipping_fee` dibuang sama sekali (terbukti == −(actual − rebate) pada 90.194 dari 90.194 dokumen escrow prod, sehingga rumus lama menghitung ongkir aktual dua kali), dan kenapa subsidi `shopee_shipping_rebate` SENGAJA tidak ikut dikurangkan (sudah ditangani mekanisme \"Potongan Ongkos Kirim dari Shopee\" lewat gerbang `RebateKeOngkir` + kv `shopee-shipping-rebate-cutover-date` di lapisan penerimaan). Menjelaskan juga kenapa selisihnya mendarat di Beban Admin E-Commerce tanpa galat (3.870 pesanan, Rp96.826.227, ~Rp16 juta/bulan), kenapa gerbangnya PER-ORDER lewat `rumusOngkirBaruBerlaku(shopID, paidAt, tepercayaPaidAt)` alih-alih kv tanggal, dan kenapa keterpercayaan bacaan `paid_at` dioper terpisah dari nilainya. Amandemen 2026-09-23 menjawab bagaimana 644 order September (koreksi −Rp15.943.750 di 137 hari-penerimaan) diperbaiki lewat kv `shopee-ongkir-rumus-cutover-date` dan `cmd/ongkirbackfillsep` yang memanggil `RefetchOrderEscrow`, serta apa akibatnya bagi identitas `total_adjustment` (551 dari 601 residual jadi nol) — Agustus tetap terlarang.",
       "kata_kunci": [
         "ongkir Shopee",
         "shipping fee",
-        "final_shipping_fee",
         "actual_shipping_fee",
+        "final_shipping_fee",
+        "buyer_paid_shipping_fee",
         "shopee_shipping_rebate",
         "escrow",
-        "Beban Admin E-Commerce",
-        "OpsiTransformShopee",
-        "rumusOngkirBaruBerlaku",
-        "proteksi pengiriman"
+        "beban admin e-commerce",
+        "cutover backfill",
+        "ADR 0118"
       ]
     },
     {
