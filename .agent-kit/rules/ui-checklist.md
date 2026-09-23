@@ -182,9 +182,13 @@ tombol aksinya masih terjangkau tanpa menggulir balik.
 Berlaku untuk setiap induk (item ber-`items[]` tanpa `url`) di
 `components/layout/sidebar-menus.tsx`.
 
-**Induk menamai URUSAN yang dibagi anak-anaknya, atau HUBUNGAN halaman itu dengan
-pembacanya (milik saya vs milik tim). Yang dilarang adalah menjadikan JABATAN sebagai
-sumbu: satu induk per posisi, diisi apa pun yang posisi itu kerjakan.**
+**Induk menamai URUSAN yang dibagi anak-anaknya. Titik.** Yang dilarang ada dua: menjadikan
+JABATAN sebagai sumbu (satu induk per posisi, diisi apa pun yang posisi itu kerjakan), dan
+menjadikan HUBUNGAN pembaca dengan halamannya sebagai sumbu ("milik saya" vs "milik tim").
+
+⚠️ **Sumbu HUBUNGAN sebelumnya DIIZINKAN di aturan ini, dan dicabut 2026-09-23** atas
+permintaan pemilik produk. Kalau Anda menemukan induk bersumbu hubungan di kode, ia
+peninggalan aturan lama, bukan pengecualian yang disengaja.
 
 Ujinya satu pertanyaan, dijawab sebelum menambah induk atau memindahkan menu ke dalamnya:
 kalau nanti ada halaman baru yang dikerjakan posisi itu tetapi urusannya lain, apakah ia
@@ -193,6 +197,26 @@ Jawaban "tidak, urusannya beda" berarti sumbunya urusan, aman.
 
 Nama induk yang KEBETULAN sama dengan nama jabatan tidak melanggar apa pun, selama yang
 dinamainya memang urusannya. "Personalia" dan "Live Support" keduanya begitu.
+
+**Untuk DAUN berlaku satu larangan tambahan: jangan memakai embel-embel kepemilikan
+("Saya").** Halaman yang memang hanya memuat data pembacanya tidak butuh kata itu, dan
+halaman yang butuh pembeda lebih baik dibedakan oleh isinya: "Daftar Tugas" di sebelah
+"Permintaan Masuk", "Rincian Insentif" di sebelah "Dashboard Insentif", "CV Ditugaskan" di
+sebelah "Entitas CV". Kata "Tim" TIDAK dilarang: ia menyebut datanya siapa yang ditampilkan,
+bukan kepemilikan pembaca, dan mencabutnya menghapus satu-satunya pembeda "Laporan Tim" dari
+"Laporan Tugas".
+
+⛔ **Judul menu menurunkan kunci i18n-nya** lewat `keySidebar` (slug dari label). Mengganti
+judul tanpa mengganti kuncinya membuat labelnya jatuh ke judul mentah, sehingga mode English
+menampilkan kata Indonesia tanpa satu pun galat. Sebagian kunci itu berfungsi GANDA sebagai
+judul halaman (`tugas_saya` di `my-tasks-view`, `riwayat_pengajuan_saya` di
+`tabel-riwayat-pengajuan` sebelum 2026-09-23), jadi periksa pemakainya sebelum mengganti.
+
+Penjaganya memindai DEFINISI menu, bukan hasil satu persona:
+`components/layout/sidebar-urusan.test.ts` (tak ada induk bersumbu hubungan, tak ada daun
+ber-"Saya") dan `features/marketing-analytics/constants/sidebar-entry.test.ts` (tak ada judul
+menyebut "ICC"). Memeriksa lewat persona akan lolos untuk judul yang kebetulan tak terlihat
+olehnya.
 
 ### Kenapa sumbu jabatan rusak
 
