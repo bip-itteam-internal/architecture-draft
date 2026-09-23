@@ -63,6 +63,14 @@ grounding pada satu dua pencarian yang mengisi bagian Konteks.
    harus hijau, `file:line` yang harus berubah) dan minimal satu dari sudut **orang yang
    memakainya** ("di layar X, setelah Y, terlihat Z"). Kriteria "kodenya bagus" ditolak.
 
+5b. **Alur Pengguna**, WAJIB bila brief menyentuh layar (halaman, komponen, atau navigasi —
+   erp-frontend dan mybharata-app hampir selalu begini). Brief backend murni, docs, atau devops
+   tanpa layar **LEWATI langkah ini** dan hapus bagian `## Alur Pengguna` dari berkasnya, sama
+   seperti `## Kontrak`. Isi bagiannya:
+   langkah orang, bukan aliran data, dengan titik putusnya ditandai
+   — kosakata dan tiga bentuk putus yang sudah terbukti menggigit sudah didefinisikan
+   `plan-checklist.md` §1b. **RUJUK** ke sana, jangan disalin ulang di brief.
+
 6. **Batas**: sebutkan yang TIDAK boleh disentuh. Untuk erp-frontend hampir selalu: komponen
    shared (`FilterTable`, `MainTable`, `ScrollArea`) tidak ditambahi prop demi satu pemanggil.
    Untuk bip-erp: kontrak respons yang sudah dikonsumsi FE/mobile.

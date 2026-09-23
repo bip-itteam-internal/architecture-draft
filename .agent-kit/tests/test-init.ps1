@@ -139,6 +139,21 @@ try {
   # membakar konteks brief backend/docs yang tak punya layar sama sekali (Batas brief).
   Check ($jdMd.Contains('menyentuh berkas layar')) 'rujukan ui-checklist.md bersyarat pada diff berlayar, bukan tanpa syarat'
 
+  # brief 2026-09-23 (alur-pengguna-di-brief): /plan, /review, dan /wrap sudah menuntut dan
+  # menggerbang '## Alur Pengguna', tapi /brief -- satu-satunya pintu ke loop OTONOM -- tak
+  # pernah menuntutnya, jadi celah itu justru lebih lebar di loop daripada di jalur manual.
+  # templates/ TIDAK disalin init (sama seperti rules/, lihat catatan team-memory di atas),
+  # jadi dibaca dari SUMBER kit, bukan dari $claude.
+  $tplBrief = Get-Content (Join-Path $kitRoot 'templates/brief.md') -Raw -Encoding UTF8
+  Check ($tplBrief.Contains('## Alur Pengguna (WAJIB bila brief menyentuh layar') -and $tplBrief.Contains('hapus bagian ini bila brief tidak menyentuh layar')) 'templates/brief.md: bagian Alur Pengguna bersyarat, pola sama dengan Kontrak'
+
+  # commands/brief.md wajib mendefinisikan KAPAN bagian itu wajib (brief menyentuh layar) DAN
+  # apa ISINYA (langkah orang + titik putus), merujuk plan-checklist.md -- BUKAN menyalin tabel
+  # tiga-bentuk-putusnya ke sini (Batas brief tugas ini). $bfTriase sudah dibaca di atas (baris
+  # 'Field `Sumber`...'), dipakai ulang di sini.
+  Check ($bfTriase.Contains('Alur Pengguna') -and $bfTriase.Contains('menyentuh layar')) 'brief.md: mendefinisikan KAPAN Alur Pengguna wajib (brief menyentuh layar)'
+  Check ($bfTriase.Contains('langkah orang, bukan aliran data, dengan titik putusnya ditandai') -and $bfTriase.Contains('plan-checklist.md')) 'brief.md: mendefinisikan ISI Alur Pengguna (langkah orang + titik putus) dan merujuk plan-checklist.md, bukan menyalin'
+
   # --- Sambungan antar-berkas, temuan review akhir 1.28.0 ---
   # Kelas yang sama untuk kelimanya: tiap berkas benar sendiri-sendiri, yang salah sambungannya.
 

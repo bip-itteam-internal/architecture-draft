@@ -26,6 +26,10 @@ __TUJUAN__
 __KONTRAK__
 ```
 
+## Alur Pengguna (WAJIB bila brief menyentuh layar — halaman, komponen, atau navigasi; hapus bagian ini bila brief tidak menyentuh layar)
+
+__ALUR_PENGGUNA__
+
 ## Konteks yang diketahui (grounded, kosongkan bila tidak ada; jangan mengarang)
 
 - __KONTEKS__
