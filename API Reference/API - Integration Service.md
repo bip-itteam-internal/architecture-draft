@@ -293,12 +293,15 @@
 | GET | `/lazada/payouts` | ✅ Pencairan Lazada per-statement dari `lazada_payouts` (`shop_id`/`date_from`/`date_to`/paging; row: `statement_number`, `created_at`=tanggal cair, `payout`, `closing_balance`=saldo, `paid`) — analog `/tiktok/shop/statements` + `/shopee/payouts` |
 
 ## Reviews (Ulasan Marketplace)
+
+**Cakupan (sejak 2026-09-23)**: kelima rute di bawah dibatasi ke toko yang DIPEGANG pemanggil (`icc_account_mappings`, `is_active: true`), bukan ke daftar peran. Leader/SPV marketing dan tim Integration tanpa batas; yang tak memetakan toko mendapat **nol baris**, bukan semua. `shop_id` dari query tidak bisa melangkahinya. Identitas wajib (`BIP-Employee-ID`), dan mapping yang gagal dibaca menghasilkan **500**, bukan daftar kosong.
+
 | Method | Path | Fungsi |
 |---|---|---|
 | GET | `/reviews/summary` | Ringkasan rating per toko (`start`/`end` YYYY-MM-DD WIB, `channel`, `shop_id`; SHOPEE=SUM harian, TIKTOK=snapshot kumulatif terbaru) |
 | GET | `/reviews/products` | Agregat per produk, sort avg terendah dulu (`rating_avg` 1-5 bucket floor(avg) · `with_star` · `min_reviews` · +`shop_name`/`product_name`) |
 | GET | `/reviews/products/:productId/trend` | Deret snapshot harian per produk (tren; TikTok = kumulatif, delta dihitung FE) |
-| GET | `/reviews/comments` | Komentar Shopee (teks, baca-saja); `shop_id` **opsional** = feed global lintas toko (PR #568) · filter `item_id`/`rating`/`channel`/`has_text`/`has_media`/`unreplied` · paginated + join `product_name`/`shop_name` |
+| GET | `/reviews/comments` | Komentar Shopee (teks, baca-saja); `shop_id` **opsional** = feed lintas toko DI DALAM cakupan pemanggil (PR #568) · filter `item_id`/`rating`/`channel`/`has_text`/`has_media`/`unreplied` · paginated + join `product_name`/`shop_name` |
 | GET | `/reviews/sync-status` | State sync per toko (`last_synced_at`, `last_error`, `backfill_truncated` cap-500 Shopee) |
 
 > Worker `sync-reviews` harian 06:45 WIB. TikTok TIDAK punya API teks ulasan (hanya distribusi bintang kumulatif) — detail keterbatasan & desain: [[Microservices - Integration Service]] §Ulasan Marketplace.
