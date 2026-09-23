@@ -109,6 +109,12 @@ try {
   # .Contains, BUKAN -like: backtick adalah karakter ESCAPE di pola wildcard PowerShell, jadi
   # '*`yakin`*' terurai jadi "yakin" diikuti tanda bintang HARFIAH dan tak akan pernah cocok.
   Check ($stTriase.Contains('`yakin`') -and $stTriase.Contains('`ragu`')) 'start-task menyebut tingkat yakin dan ragu'
+
+  # Field `Sumber` sudah ada di templates/brief.md sejak lama; yang dijaga di sini ARTINYA.
+  # Frasa 'turun ke `ragu`' sengaja spesifik: assertion atas kata 'Sumber' saja akan hijau
+  # untuk implementasi apa pun begitu kata itu muncul di kalimat lain, dan jadi vakum.
+  $bfTriase = Get-Content (Join-Path $claude 'commands/brief.md') -Raw -Encoding UTF8
+  Check ($bfTriase.Contains('`Sumber`') -and $bfTriase.Contains('turun ke `ragu`')) 'brief memberi arti Sumber dan aturan turun ke ragu'
   Check (Test-Path (Join-Path $claude 'hooks/session-start.ps1')) 'hooks tersalin'
   Check (Test-Path (Join-Path $claude 'settings.json')) 'settings.json ada'
   $cm = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw -Encoding UTF8

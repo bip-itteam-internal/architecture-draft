@@ -42,6 +42,15 @@ grounding pada satu dua pencarian yang mengisi bagian Konteks.
    yang relevan, dan bagian `team-memory.md` yang menyangkut area itu. Masukkan ke Konteks.
    Yang tidak ditemukan **tidak ditulis**; Konteks kosong lebih jujur daripada Konteks karangan.
 
+4b. **`Sumber`** — field ini sudah ada di template dan selama ini tak pernah diisi berarti. Isi
+   dengan ADR, dok domain vault, atau `Workspace/ANALISA - *.md` yang **memutuskan** hal ini, dan
+   **buka berkasnya** untuk membuktikan ia ada. Tak ada yang bisa ditunjuk → tulis `tidak ada`.
+
+   `Sumber` kosong, `tidak ada`, atau disebut dari ingatan tanpa dibuka → triase turun ke `ragu`:
+   brief tetap ditulis, tetapi **ditampilkan ke user dan menunggu persetujuan** sebelum
+   `/kerjakan`. Jalur `yakin` melewati manusia sepenuhnya, jadi ia satu-satunya tempat sumber
+   karangan tidak akan tertangkap siapa pun.
+
 5. **Kriteria lolos**: minimal satu yang bisa dibuktikan **mesin** (test bernama, perintah yang
    harus hijau, `file:line` yang harus berubah) dan minimal satu dari sudut **orang yang
    memakainya** ("di layar X, setelah Y, terlihat Z"). Kriteria "kodenya bagus" ditolak.
