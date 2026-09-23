@@ -194,6 +194,21 @@ try {
   # tidak vakum satu sama lain (lihat laporan kontrol negatif eksekutor).
   Check ($kjTriase.Contains('titik mulai, bukan pagar') -and $kjTriase.Contains('tetap boleh membaca')) 'kerjakan §2: eksplisit anchor cuma titik mulai (bukan pagar), eksekutor tetap boleh membaca lebih luas'
 
+  # brief 2026-09-23 (log-judge-catat-anchor): kriteria "(orang)" milik brief prompt-eksekutor
+  # (41771a89) tak bisa ditafsirkan -- log judge mencatat skills_dibaca/agen/keputusan_lanjut tapi
+  # TIDAK anchor yang benar-benar dikirim ke prompt §2, jadi token antar-run tak bisa dipisahkan
+  # antara run yang membawa anchor nyata dan run yang fieldnya kosong. Dua fakta terpisah, dua
+  # assertion: (a) skema §3 memuat field titik_mulai berisi anchor apa adanya atau literal
+  # "kosong", (b) teksnya eksplisit field ini DESKRIPTIF bukan gerbang -- anchor kosong bukan
+  # kegagalan dan tidak menahan apa pun, karena brief tanpa file:line di Konteksnya itu SAH
+  # (brief.md:51, "Konteks kosong lebih jujur daripada Konteks karangan"). $kjTriase sudah dibaca
+  # di atas (baris 'keputusan_lanjut'), dipakai ulang -- BUKAN variabel baru (lihat catatan nama
+  # variabel di brief tugas ini).
+  Check ($kjTriase.Contains('"titik_mulai"') -and $kjTriase.Contains('| "kosong" }')) 'kerjakan §3: skema log memuat titik_mulai (anchor apa adanya atau literal "kosong")'
+  # Assertion terpisah dari yang di atas: field bisa ada TANPA teksnya bilang ia deskriptif,
+  # bukan gerbang -- dua klausa itu wajib bisa gagal SENDIRI-SENDIRI (kontrol negatif di laporan).
+  Check ($kjTriase.Contains('deskriptif, bukan gerbang') -and $kjTriase.Contains('bukan kegagalan')) 'kerjakan §3: titik_mulai eksplisit deskriptif bukan gerbang, kosong bukan kegagalan'
+
   # Langkah 0 menuntut resolusi sumber 'dengan perintah' tapi prosedur pencariannya hanya
   # dirujuk di langkah 2, yang justru dilewati saat task dialihkan ke brief.
   $iLangkah = $stTriase.IndexOf('Langkah:')

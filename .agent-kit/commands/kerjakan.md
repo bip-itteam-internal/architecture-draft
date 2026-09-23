@@ -139,7 +139,8 @@ Tulis log `.task-plans/judge/<slug>-<n>.json`:
 { "brief": "<path>", "worktree": "<path>", "branch": "...", "percobaan": n, "waktu": "<UTC ISO>",
   "gerbang": <hasil gerbang.ps1>, "verdict": <JSON judge>, "lolos": true|false,
   "skills_dibaca": ["..."], "agen": "<peran hasil §0, mis. loop-fe>",
-  "keputusan_lanjut": "ulangi" | "berhenti_lolos" | "berhenti_gagal" }
+  "keputusan_lanjut": "ulangi" | "berhenti_lolos" | "berhenti_gagal",
+  "titik_mulai": "<anchor file:line dari §2, apa adanya>" | "kosong" }
 ```
 
 Field `agen` ditulis apa adanya karena ia yang membuat angka pengulangan bisa dibandingkan
@@ -159,6 +160,14 @@ Pemetaannya ditetapkan, jangan ditebak: `berhenti_lolos` bila §3 menghasilkan l
 gagal dan percobaan < 3; `berhenti_gagal` bila gagal pada percobaan ke-3. Nilai yang tidak jujur
 membatalkan seluruh gunanya — `ulangi` yang ditulis pada percobaan terakhir membuat run yang
 selesai wajar terbaca sebagai run yang terputus.
+
+`titik_mulai` mencatat anchor `file:line` yang benar-benar dikirim ke prompt eksekutor di §2, apa
+adanya, atau literal `"kosong"` bila brief itu sendiri tak punya satu pun di bagian Konteks. Field
+ini **deskriptif, bukan gerbang**: log `kosong` bukan kegagalan dan tidak menahan apa pun — brief
+tanpa `file:line` di Konteksnya itu sah (`brief.md:51`, "Konteks kosong lebih jujur daripada
+Konteks karangan"), dan memaksanya terisi hanya akan mengundang karangan yang lebih buruk daripada
+kosong. Gunanya murni supaya token antar-run bisa dibandingkan tahu run mana yang benar-benar
+membawa anchor dan run mana yang fieldnya kosong, bukan menuntut brief selalu punya satu.
 
 ## 4. Loop perbaikan
 
