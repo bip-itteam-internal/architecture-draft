@@ -571,6 +571,34 @@ try {
   & (Join-Path $svVault '.agent-kit/init.ps1') -Workspace $tmp -ActiveProject 'demo-proj' -NoPreCommitHook | Out-Null
   Check (-not (Test-Path $stale)) 're-init prune file command lama'
   Check (Test-Path (Join-Path $claude 'commands/start-task.md')) 're-init tetap salin command nyata'
+
+  # ---- brief 2026-09-23 (init-project-aktif-kosong): cabang interaktif TANPA -ActiveProject,
+  # jawaban kosong/spasi. Sebelum ini `$sel` yang kosong jatuh ke else `$active = $sel` tanpa
+  # validasi, dan '__ACTIVE_PROJECT__' tetap tergantikan (oleh string kosong) -- test lama
+  # (baris ~181-182) tak pernah menangkapnya karena SELALU memanggil dengan -ActiveProject.
+  # Invoke-Ps -RedirectStandardInput menjalankan cabang interaktif tanpa menggantung.
+  $initUji = Join-Path $svVault '.agent-kit/init.ps1'
+  $cmSebelum = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw -Encoding UTF8
+
+  $stdinKosong = Join-Path $tmp 'stdin-kosong.txt'
+  [IO.File]::WriteAllText($stdinKosong, "`r`n")
+  $errfKosong = Join-Path $tmp 'hook-kosong.err'
+  $rcKosong = Invoke-Ps $initUji @('-Workspace', $tmp, '-NoPreCommitHook') $stdinKosong $errfKosong
+  $errKosongTxt = if (Test-Path $errfKosong) { Get-Content $errfKosong -Raw } else { '' }
+  Check ($rcKosong -ne 0) "jawaban interaktif KOSONG: init.ps1 exit code bukan 0 (exit $rcKosong)"
+  Check ($errKosongTxt -match '(?i)project aktif') "pesan penolakan (kosong) menyebut project aktif ($errKosongTxt)"
+  $cmSesudahKosong = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw -Encoding UTF8
+  Check ($cmSesudahKosong -eq $cmSebelum) 'CLAUDE.md tidak tersentuh saat jawaban interaktif kosong (tidak dirusak)'
+
+  $stdinSpasi = Join-Path $tmp 'stdin-spasi.txt'
+  [IO.File]::WriteAllText($stdinSpasi, "   `r`n")
+  $errfSpasi = Join-Path $tmp 'hook-spasi.err'
+  $rcSpasi = Invoke-Ps $initUji @('-Workspace', $tmp, '-NoPreCommitHook') $stdinSpasi $errfSpasi
+  $errSpasiTxt = if (Test-Path $errfSpasi) { Get-Content $errfSpasi -Raw } else { '' }
+  Check ($rcSpasi -ne 0) "jawaban interaktif HANYA SPASI: init.ps1 exit code bukan 0 (exit $rcSpasi)"
+  Check ($errSpasiTxt -match '(?i)project aktif') "pesan penolakan (spasi) menyebut project aktif ($errSpasiTxt)"
+  $cmSesudahSpasi = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw -Encoding UTF8
+  Check ($cmSesudahSpasi -eq $cmSebelum) 'CLAUDE.md tidak tersentuh saat jawaban interaktif hanya spasi'
 }
 finally {
   # penulis kantor-agent yang tertinggal (test gagal di tengah) jangan sampai hidup terus

@@ -32,6 +32,7 @@ if (-not $active) {
   for ($i=0; $i -lt $projects.Count; $i++) { Write-Host ("  [{0}] {1}" -f $i, $projects[$i]) }
   $sel = Read-Host 'Pilih nomor/nama project aktif'
   if ($sel -match '^\d+$' -and [int]$sel -lt $projects.Count) { $active = $projects[[int]$sel] } else { $active = $sel }
+  if ([string]::IsNullOrWhiteSpace($active)) { Write-Error 'Project aktif kosong. Jalankan ulang dan isi nomor/nama project, atau pakai -ActiveProject <nama>.'; exit 1 }
 }
 
 # 4. salin commands/hooks/skills/agents -> erp/.claude
