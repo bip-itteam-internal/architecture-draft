@@ -7342,7 +7342,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented sebagian, di BRANCH — belum merged, belum deploy.** T1+T2 (tulis+foto) mendarat di `origin/main` 2026-09-21 (`services/employee/area_inspection.go`, commit `6d5f4634`). **T3+T4+T5 dibuat 2026-09-23 dan di-push ke branch, BELUM merged ke `main`, BELUM prod, mobile BELUM diuji perangkat:** T3 baca/rekap di bip-erp `feat/area-inspection-baca-rekap` (`services/employee/area_inspection_read.go`, 9 test Fiber hijau); T5 rekap web SPV di erp-frontend `feat/area-inspection-rekap-web` (tab \"Inspeksi Area\", build + 27 test hijau); T4 mode isi petugas di my-bharata `feat/faiz` (`lib/src/features/area_inspection/*`, `dart analyze` bersih + `flutter test` 1538 hijau). T6 (KPI & push SPV) tetap **TBD**. Menambah track KETIGA di payung Satgas/Industrial Relation; **tidak** mengubah track per-PIC (ADR 0090) maupun catatan per-orang (ADR 0085). Rincian di `## Deskripsi`.",
+      "status_teks": "**Implemented sebagian, di BRANCH — belum merged, belum deploy.** T1+T2 (tulis+foto) mendarat di `origin/main` 2026-09-21 (`services/employee/area_inspection.go`, commit `6d5f4634`). **T3+T4+T5 dibuat 2026-09-23 dan di-push ke branch, BELUM merged ke `main`, BELUM prod, mobile BELUM diuji perangkat:** T3 baca/rekap di bip-erp `feat/area-inspection-baca-rekap` (`services/employee/area_inspection_read.go`); T5 rekap web SPV di erp-frontend `feat/area-inspection-rekap-web` (tab \"Inspeksi Area\"); T4 mode isi petugas di my-bharata `feat/faiz` (`lib/src/features/area_inspection/*`). **Tambahan 2026-09-23 (di branch yang sama, dev sudah di-rebuild dari branch & diverifikasi lewat gateway):** (a) **roster ikut department terpilih di form Satgas** — endpoint internal baru form-builder `/internal/satgas/area-departments` + penyaringan roster di employee-service (refinasi §6, lihat §Diputuskan saat implementasi); (b) **input area lewat WEB** (toggle Rekap/Isi Inspeksi di tab Inspeksi Area untuk petugas), tak lagi hanya mobile; (c) **menu web dipisah** jadi \"Satgas 5R & K3\" tersendiri berisi tab Individu + Area. T6 (KPI & push SPV) tetap **TBD**. Menambah track KETIGA di payung Satgas/Industrial Relation; **tidak** mengubah track per-PIC (ADR 0090) maupun catatan per-orang (ADR 0085). Rincian di `## Deskripsi`.",
       "publik": true,
       "tautan": [
         "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI",
@@ -7358,20 +7358,20 @@
         "APP - MyBharata",
         "APP - Web ERP"
       ],
-      "hash": "f6927830b84f752981567a84891680c181125bcb22a6f28d69a387a043798d2d",
-      "ukuran_kb": 16.8,
-      "ringkasan": "Menjawab: bagaimana inspeksi 5R (kebersihan area kerja) dilakukan per department sebagai catatan non-KPI; siapa yang melakukan (petugas Culture & Industrial), siapa yang membaca hasilnya (supervisor department), dan bagaimana atasan diberitahu temuan ruangannya hingga 15 foto bukti.",
+      "hash": "a267f6ebba3b085aab24f7ede40a872b5ddfbde0e8237317f07a73d250d379ec",
+      "ukuran_kb": 20.3,
+      "ringkasan": "Menjawab: bagaimana inspeksi 5R yang objeknya ruangan/area sebuah department dicatat, siapa yang boleh mengisi (petugas Culture & Industrial lewat izin kepatuhan.satgas.input) dan siapa yang boleh membacanya (supervisor department yang diawasinya, lewat SupervisedDepartmentsStrict). Menjelaskan kenapa temuan area sengaja berdiri sebagai catatan pembinaan non-KPI, terpisah dari Surat Peringatan, dari track per-PIC ber-KPI (ADR 0090), dan dari catatan kepatuhan per-orang (ADR 0085), plus batas hingga 15 foto per department per periode bulanan. Juga memuat keputusan permukaan layar: mode area di menu Satgas MyBharata, rekap dan input area di web ERP, serta alasan notifikasi push ke supervisor ditunda.",
       "kata_kunci": [
         "5R",
+        "inspeksi area",
         "area inspection",
-        "inspeksi ruangan",
-        "department",
-        "industrial relation",
-        "satgas",
-        "culture & industrial",
-        "catatan non-KPI",
-        "foto bukti",
-        "supervisor department"
+        "Satgas 5R & K3",
+        "Culture & Industrial",
+        "kepatuhan.satgas.input",
+        "supervisor department",
+        "non-KPI",
+        "Industrial Relation",
+        "foto temuan"
       ]
     },
     {
@@ -15844,20 +15844,20 @@
       "tautan": [
         "ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor"
       ],
-      "hash": "6d92aa993352a654c1e6da1a1188b12277f4991bb6db2879c90f3340ba963922",
-      "ukuran_kb": 6.4,
-      "ringkasan": "Papan kerja dan daftar task implementasi inspeksi 5R area per department; menjelaskan urutan pengerjaan (backend dulu, lalu mobile dan web), dependensi antar-task, status tiap tahap (T1-T2 merged, T3-T5 di branch belum merged, T6 TBD), dan kriteria selesai untuk tiap task.",
+      "hash": "048544be50342d7639290b709b372a2e2a651ce329699120e0297fab0759be5b",
+      "ukuran_kb": 7.7,
+      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dilakukan untuk inspeksi 5R area per department, bagaimana urutan dan dependensinya (entitas dan penyimpanan area_inspection di employee-service, gerbang tulis server-side plus unggah multi-foto, endpoint baca/rekap dua arah, mode isi di MyBharata, rekap dan input di web), serta apa kriteria selesai tiap task. Mencatat titik yang sudah diputuskan: satu inspeksi per (department, periode) secara upsert, maksimum 15 foto per department per periode, reuse izin kepatuhan.satgas.input tanpa izin baru, roster department mengikuti department terpilih di form Satgas lewat endpoint internal form-builder, dan visibilitas supervisor di web tanpa klaim JWT is_supervisor. Berguna untuk melihat pembagian kerja BE/mobile/web dan hal yang sengaja ditunda, yaitu pemetaan ke KPI dan notifikasi push ke supervisor.",
       "kata_kunci": [
-        "task management",
-        "implementasi",
+        "inspeksi 5R",
         "area inspection",
-        "papan kerja",
-        "fase backend",
-        "mobile development",
-        "web development",
-        "checklist implementasi",
-        "satgas 5R",
-        "koordinasi tim"
+        "area_inspection",
+        "daftar task",
+        "employee-service",
+        "rekap supervisor",
+        "roster department",
+        "form-builder internal endpoint",
+        "MyBharata",
+        "kepatuhan.satgas.input"
       ]
     },
     {
