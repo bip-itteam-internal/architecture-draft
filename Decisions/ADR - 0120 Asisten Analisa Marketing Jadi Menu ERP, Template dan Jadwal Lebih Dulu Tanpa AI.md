@@ -1,6 +1,6 @@
 # ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI
 
-> **Status**: ⚠️ **Implemented (ada catatan)** — irisan 1 di `main` sejak 2026-09-23 (backend saja; merged bukan deployed, layar FE belum ada). Irisan 2 dan 3 belum. Rinciannya di § Realisasi.
+> **Status**: ⚠️ **Implemented (ada catatan)** — irisan 1 **hidup di PRODUKSI** sejak 2026-09-23, backend saja; layar FE belum ada. Irisan 2 dan 3 belum. Rinciannya di § Realisasi.
 
 %% Status ditulis DI SINI, bukan sebagai bullet di ## Deskripsi seperti ADR lain, dan itu
 bukan gaya bebas: `## Untuk Manajemen` mendorong bagian Deskripsi melewati baris ke-15, dan
@@ -193,7 +193,21 @@ Irisan 1 mendarat di `main` lewat PR [#2003](https://github.com/bip-itteam-inter
 
 ⛔ **Satu temuan yang mengubah arti §6, dan belum diputuskan.** Diukur di PROD 2026-09-23 dengan kontrol positif dan negatif: `/beranda`, `/summary`, dan `/returns/detail` membalas **200 berisi angka laba seluruh perusahaan** untuk pemanggil **tanpa peran modul apa pun**, sementara `/jadwal-laporan` membalas 403 untuk peran yang sama. Artinya lingkup pada kiriman adalah penyaring **tampilan**, bukan kontrol kerahasiaan, dan §6 melindungi daftar kirim tanpa melindungi angkanya. Menyusun aturan lingkup per orang di atas endpoint yang tak punya gerbang menciptakan kesan kerahasiaan yang tidak ada — lebih berbahaya daripada terbuka terang-terangan, karena orang lalu memasukkan hal sensitif ke dalamnya. Keputusannya (terima terbuka, atau gerbang jalur bacanya) menunggu di issue bip-erp [#2008](https://github.com/bip-itteam-internal/bip-erp/issues/2008).
 
-**Yang belum**: narasi AI (irisan 2) belum dipasang sehingga seluruh baris berstatus `menunggu`; layar FE belum ada; dan §7 belum dapat ditegakkan karena pengukuran pemakaian (T6) menunggu layar itu. **Jam nol 30 hari §7 belum berjalan** — ia mulai saat orang benar-benar bisa membuka laporannya, bukan saat kodenya merged.
+**Yang belum**: narasi AI (irisan 2) belum dipasang sehingga seluruh baris berstatus `menunggu`; layar FE belum ada; dan §7 belum dapat ditegakkan karena pengukuran pemakaian (T6) menunggu layar itu. **Jam nol 30 hari §7 belum berjalan** — ia mulai saat orang benar-benar bisa membuka laporannya, bukan saat kodenya merged maupun ter-deploy.
+
+### Terbukti jalan di PRODUKSI, 2026-09-23
+
+⚠️ Keadaan bertanggal, **ukur ulang sebelum dipakai**. Prosedur dan gerbangnya di [[RUN - Deploy Microservices bip-erp]].
+
+Satu kiriman sungguhan dijalankan ujung-ke-ujung di prod dengan lingkup `Kyura`: dibuat lewat `POST /jadwal-laporan` (201), penjalan merangkainya, dan notifikasinya **tiba di kotak masuk penerimanya**. Gerbang biner terbukti dari keluarannya sendiri — string `variasi angka berbeda` terukur **nol** di biner prod sebelum deploy dan muncul di badan notifikasi sesudahnya, sehingga yang melayani memang build baru.
+
+**Badan kiriman 686 karakter, 11 baris.** Pembandingnya: kiriman pertama di DEV sebelum perbaikan berukuran **13.017 karakter, 43 baris**, yang 98%-nya satu kalimat catatan diulang. Perbaikannya di bip-erp [#2024](https://github.com/bip-itteam-internal/bip-erp/pull/2024); alasannya di [[Microservices - Marketing Analytics Service]] §Asisten Analisa.
+
+⛔ **Dua hal di isi laporan produksi yang menuntut keputusan, bukan perbaikan kode.**
+
+Pertama, laporannya mencetak `ROAS: 5.95 (ambang 4.5)`. Ambang 4,5 adalah angka dashboard, sementara KPI Leader memakai 3,2 — dan §Consequences ADR ini sendiri mencatat keduanya belum disatukan. Artinya vonis yang sekarang benar-benar sampai ke orang berdiri di atas ambang yang belum disepakati siapa pun. Selama dua angka beredar, kata "boros" dan "sehat" di laporan ini tak punya dasar yang bisa dipertahankan.
+
+Kedua, laporannya mencetak `Laba kotor: -Rp112.322.242` dengan `Status: belum_matang` — persis **jebakan pertama** di §Context, dan kekerapan `dua_harian` berjalan lurus ke sana. Peredamnya bekerja: baris catatan menerangkan bahwa minus itu berarti belum matang, bukan rugi. Tetapi yang terbaca lebih dulu tetap angka minus ratusan juta di baris ketiga, dan pembaca yang berhenti di situ menyimpulkan kebalikan dari yang benar. **Untuk penerima tingkat direksi, kekerapan bawaan sebaiknya mingguan, bukan dua harian.**
 
 ## Terkait
 

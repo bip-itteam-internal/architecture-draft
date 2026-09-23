@@ -174,7 +174,9 @@ Keduanya membalas **200 dengan amplop `unavailable_channels: SEMUA`** saat sumbe
 
 ## Asisten Analisa (katalog, kiriman terjadwal, riwayat hasil)
 
-✅ **Di `main` sejak 2026-09-23** ([[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] irisan 1), lewat PR [#2003](https://github.com/bip-itteam-internal/bip-erp/pull/2003), [#2005](https://github.com/bip-itteam-internal/bip-erp/pull/2005), dan [#2013](https://github.com/bip-itteam-internal/bip-erp/pull/2013). ⚠️ **Status deploy belum diverifikasi — merged bukan deployed.** Enam rute, di luar hitungan enumerasi mana pun di § Deskripsi; hitung ulang pada enumerasi berikutnya.
+✅ **Hidup di PRODUKSI sejak 2026-09-23** ([[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] irisan 1), lewat PR [#2003](https://github.com/bip-itteam-internal/bip-erp/pull/2003), [#2005](https://github.com/bip-itteam-internal/bip-erp/pull/2005), [#2013](https://github.com/bip-itteam-internal/bip-erp/pull/2013), dan [#2024](https://github.com/bip-itteam-internal/bip-erp/pull/2024). Enam rute, di luar hitungan enumerasi mana pun di § Deskripsi; hitung ulang pada enumerasi berikutnya.
+
+⚠️ Keadaan bertanggal, **ukur ulang sebelum dipakai**. Terverifikasi ujung-ke-ujung di prod 2026-09-23 dengan satu kiriman berlingkup `Kyura`: `POST /jadwal-laporan` 201, penjalan merangkainya, notifikasi tiba di kotak masuk penerimanya, badan 686 karakter. Lingkup di prod memang bisa diuji karena `department_shops` punya `Kyura` (22 toko) dan `Beauty Hacks` (42 toko); **di DEV tidak bisa** — di sana hanya ada `belum_dipetakan`.
 
 | Method | Path | Gerbang | Catatan |
 |---|---|---|---|

@@ -521,7 +521,9 @@ Penyatuannya **tidak** dilakukan sekarang dan itu disengaja: pipeline `toko.go` 
 
 ## Asisten Analisa: kiriman terjadwal & riwayat hasil
 
-✅ **Di `main` sejak 2026-09-23**, irisan 1 [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] (PR [#2003](https://github.com/bip-itteam-internal/bip-erp/pull/2003), [#2005](https://github.com/bip-itteam-internal/bip-erp/pull/2005), [#2013](https://github.com/bip-itteam-internal/bip-erp/pull/2013)). ⚠️ **Merged bukan deployed.** Kontrak per-rute: [[API - Marketing Analytics Service]] §Asisten Analisa. Layar FE-nya **belum ada**.
+✅ **Hidup di PRODUKSI sejak 2026-09-23**, irisan 1 [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] (PR [#2003](https://github.com/bip-itteam-internal/bip-erp/pull/2003), [#2005](https://github.com/bip-itteam-internal/bip-erp/pull/2005), [#2013](https://github.com/bip-itteam-internal/bip-erp/pull/2013), [#2024](https://github.com/bip-itteam-internal/bip-erp/pull/2024)). Kontrak per-rute: [[API - Marketing Analytics Service]] §Asisten Analisa. Layar FE-nya **belum ada**, jadi satu-satunya jalan masuknya hari ini notifikasi inbox.
+
+⚠️ Keadaan bertanggal, **ukur ulang sebelum dipakai**. Terverifikasi ujung-ke-ujung di prod 2026-09-23: satu kiriman berlingkup `Kyura` dibuat, penjalan merangkainya, notifikasinya tiba di kotak masuk penerimanya, badan **686 karakter / 11 baris**. Gerbang biner terbukti dari keluarannya sendiri — string `variasi angka berbeda` terukur nol di biner prod sebelum deploy dan muncul sesudahnya.
 
 **Kepemilikan data diputuskan di sini** (menutup G4 di [[ANALISA - Asisten Analisa Marketing]]): dua koleksi baru, `jadwal_laporan` dan `hasil_analisa`, keduanya di `marketing_analytics_db`. Alternatifnya melahirkan pertanyaan service baru yang sudah dijawab ADR 0120 §1. Konsekuensi yang diterima sadar: modul ini kini tahu soal penjadwalan dan notifikasi. **Keduanya sengaja TIDAK masuk `indexSpecs()`**, konsisten satu sama lain; `hasil_analisa` diurutkan `dibuat_pada` desc tanpa index, dan pada ~260 baris setahun per kiriman itu belum jadi soal.
 
@@ -559,6 +561,18 @@ Angkanya **dibekukan**, termasuk `ambang_roas` yang berlaku saat itu, berikut de
 ⛔ **`Ringkasan` (ditulis KODE, selalu ada) dipisah dari `Narasi` (dari model, bisa gagal)**, dan pemisahan itu yang membuat `narasi_status` tiga keadaan (`menunggu`/`siap`/`gagal`) jujur: kegagalan model **menurunkan mutu** laporan jadi angka tanpa cerita, bukan menghapusnya. `NarasiJejak` ditambahkan tiap percobaan dan **tak pernah ditimpa** — model yang benar-benar menjawab (dibaca dari balasan, bukan dari config, karena proxy bisa menggantinya), token, latensi, dan sidik prompt. Percobaan yang gagal lalu berhasil di siklus berikutnya adalah jalur normal; menyimpan hanya yang terakhir membuat kegagalan berulang tiap pekan terbaca sebagai gangguan sesekali, dan riwayat yang ditimpa tidak terlihat hilang.
 
 Prompt disimpan sebagai **sidik** (12 heksa sha256), bukan teksnya: teks penuh memuat angka yang sudah dibekukan di dokumen yang sama, jadi menyimpannya berarti satu fakta di dua tempat sekaligus melipatgandakan ukuran dokumen. Yang tak bisa direkonstruksi cuma satu, yaitu template mana yang dipakai — dan sidik menjawab itu tanpa menuntut siapa pun ingat menaikkan versi.
+
+### Catatan perkiraan dikumpulkan, bukan dipotong
+
+`catatan_perkiraan_ringkas.go` (bip-erp [#2024](https://github.com/bip-itteam-internal/bip-erp/pull/2024)). Kiriman pertama yang benar-benar terkirim di DEV berukuran **13.017 karakter dalam 43 baris**, dan **33 baris di antaranya (12.722 karakter, 98%) adalah `CatatanPerkiraan` yang nyaris identik** — satu kalimat diulang, hanya angkanya berbeda. Rangka laporannya sendiri 7 baris.
+
+Yang dilakukan **mengumpulkan**, bukan memotong: memotong ("lima pertama, dan 28 lainnya") menyisakan lima kalimat identik, yang sama tak bergunanya dengan tiga puluh tiga. Tiga keputusan di dalamnya, dan ketiganya lahir dari kegagalan yang sudah terjadi:
+
+- **Alasan yang KALIMATNYA identik tetapi ditandai kolom berbeda tetap digabung.** `agregasi_profit.go` menandai satu variabel `catatan` ke `KolomNetSettlement` **dan** `KolomGrossProfit`. Tanpa penggabungan ini badan tetap berparagraf di produksi meski fixture satu-kolom terlihat ringkas — versi pertama lolos justru karena fixture-nya tak mewakili.
+- ⛔ **Kelompok berisi lebih dari satu kejadian TIDAK mengutip angka satu kejadian sebagai wakil.** `catatanPerkiraan` diakhiri `sort.Strings`, jadi "kejadian pertama" berarti paling kecil secara **abjad**, dan untuk settlement itu hampir selalu `baru 0 dari 1 order (0%)`: meremehkan skalanya sekaligus melebih-lebihkan rasionya. erp-frontend sudah mengukur kalimat yang sama di produksi dan **justru karena itu** memakai lencana turunan nama kolom, bukan kalimatnya (`catatan-perkiraan.tsx`).
+- ⛔ **Cacah yang dicetak menghitung ALASAN UNIK, bukan pasangan kolom-alasan.** Versi kedua mencetak **66 untuk 33 variasi** karena satu kejadian menghasilkan dua string, dan ujinya sendiri sempat mengunci angka yang salah itu. Hanya kolom kanonik per alasan yang menaikkan cacahnya. Konstanta yang ditandai beberapa kolom dicetak apa adanya tanpa netralisasi angka, sehingga `nilai retur 0` tidak berubah jadi `nilai retur #`.
+
+`AngkaHasil.CatatanPerkiraan` **tidak disentuh**: rincian per-kejadian tetap tersimpan utuh dan terstruktur di `hasil_analisa`, jadi yang diringkas penyajiannya, bukan datanya. Terukur prod 2026-09-23: 31 alasan unik jadi satu baris, badan utuh 686 karakter.
 
 ### Katalog: lima entri, satu perakit
 

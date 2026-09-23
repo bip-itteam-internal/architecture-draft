@@ -11,11 +11,27 @@ apakah sisanya layak dikerjakan. G1 khususnya dapat membatalkan sebagian besar d
 
 ## Keadaan per 2026-09-23
 
-**Irisan 1 backend mendarat di `main`**: G4, T1, T2, T3, T4 selesai lewat PR
+**Irisan 1 backend HIDUP DI PRODUKSI**: G4, T1, T2, T3, T4 selesai lewat PR
 [#2003](https://github.com/bip-itteam-internal/bip-erp/pull/2003),
-[#2005](https://github.com/bip-itteam-internal/bip-erp/pull/2005), dan
-[#2013](https://github.com/bip-itteam-internal/bip-erp/pull/2013).
-**Merged bukan deployed**, dan **T5 (layar) belum ada** sehingga belum seorang pun bisa memakainya.
+[#2005](https://github.com/bip-itteam-internal/bip-erp/pull/2005),
+[#2013](https://github.com/bip-itteam-internal/bip-erp/pull/2013), dan
+[#2024](https://github.com/bip-itteam-internal/bip-erp/pull/2024). Terverifikasi ujung-ke-ujung
+di prod 2026-09-23: kiriman berlingkup Kyura dibuat, penjalan merangkainya, notifikasinya tiba
+di kotak masuk penerimanya (686 karakter). **T5 (layar) belum ada**, jadi satu-satunya jalan
+masuknya hari ini notifikasi inbox.
+
+⚠️ **Jam nol 30 hari ADR 0120 §7 belum berjalan.** Ia mulai saat orang benar-benar bisa membuka
+laporannya, bukan saat kodenya ter-deploy — dan tanpa T5 belum ada yang bisa dibuka.
+
+⛔ **G2 berubah dari teoretis jadi mendesak.** Laporan produksi yang sudah terkirim mencetak
+`ROAS: 5.95 (ambang 4.5)`. Selama dashboard memakai 4,5 dan KPI Leader memakai 3,2, vonis yang
+sampai ke orang berdiri di atas ambang yang belum disepakati siapa pun.
+
+⚠️ **Kekerapan bawaan sebaiknya mingguan, bukan dua harian.** Laporan prod pertama mencetak
+`Laba kotor: -Rp112.322.242` dengan `Status: belum_matang` — jebakan pertama di ADR 0120
+§Context, dan `dua_harian` berjalan lurus ke sana. Peredamnya bekerja (baris catatan menerangkan
+minus itu berarti belum matang), tetapi yang terbaca lebih dulu tetap angka minus ratusan juta di
+baris ketiga.
 
 ⚠️ **G1 dilewati, dan itu menyimpang dari papan ini sendiri.** G1 ditandai "memblokir seluruh
 irisan 1", dan T1 menuliskan G1 sebagai dependensinya — tetapi T1 sampai T4 dikerjakan tanpa G1
