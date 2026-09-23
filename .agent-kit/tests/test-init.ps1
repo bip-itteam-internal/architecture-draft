@@ -116,6 +116,13 @@ try {
   $bfTriase = Get-Content (Join-Path $claude 'commands/brief.md') -Raw -Encoding UTF8
   Check ($bfTriase.Contains('`Sumber`') -and $bfTriase.Contains('turun ke `ragu`')) 'brief memberi arti Sumber dan aturan turun ke ragu'
 
+  # Grounding graf kode (2026-09-23): langkah 4 brief.md dulu menyuruh "satu dua Grep" saja,
+  # bertentangan dengan protokol SessionStart yang mewajibkan codebase-memory-mcp lebih dulu
+  # untuk eksplorasi kode. .Contains, BUKAN -like (backtick = escape di wildcard, lihat catatan
+  # di atas). Dua klaim wajib benar BERSAMA: alatnya (search_graph) DAN kewajiban menuliskan
+  # kesegaran graf ke Konteks -- bukan gerbang wajib yang memblokir (lihat Batas brief tugas ini).
+  Check ($bfTriase.Contains('search_graph') -and $bfTriase.Contains('kesegaran graf')) 'brief grounding menyebut search_graph dan kewajiban kesegaran graf'
+
   # Log .task-plans/judge/<slug>-<n>.json ditulis /kerjakan Sec.3, BUKAN /judge (yang hanya
   # menulis <slug>-gerbang.json dan <slug>-diff.patch). Menyunting judge.md tak berpengaruh apa pun.
   $kjTriase = Get-Content (Join-Path $claude 'commands/kerjakan.md') -Raw -Encoding UTF8

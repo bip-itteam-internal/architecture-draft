@@ -38,9 +38,17 @@ grounding pada satu dua pencarian yang mengisi bagian Konteks.
    (rapikan, pisahkan, duplikat, pindahkan) > **docs** (dok, dokumentasi, ADR, README,
    sinkron). Tidak ada yang cocok → satu keputusan klasifikasi olehmu, tandai `(ditebak)`.
 
-4. **Grounding ringan** (maksimal beberapa menit): satu dua `Grep` untuk menemukan `file:line`
-   yang relevan, dan bagian `team-memory.md` yang menyangkut area itu. Masukkan ke Konteks.
-   Yang tidak ditemukan **tidak ditulis**; Konteks kosong lebih jujur daripada Konteks karangan.
+4. **Grounding ringan** (maksimal beberapa menit): pakai `codebase-memory-mcp`
+   (`search_graph`/`trace_path`/`get_code_snippet`) **lebih dulu**, bukan `Grep` polos — bedanya
+   bukan gaya, tapi pertanyaan yang bisa dijawab: `Grep` menemukan `file:line`, `trace_path`
+   menjawab **konsumen lain** yang memegang fakta yang sama (§ SATU FAKTA SATU TEMPAT). Masukkan
+   `file:line` **dan** konsumen lain itu ke Konteks. **Tulis satu baris status kesegaran graf**
+   (segar, atau basi/berapa commit tertinggal dari `origin/main`) — grafnya di-index dari working
+   tree, jadi ia bisa menjawab tentang kode berbulan lalu dengan percaya diri tanpa berbunyi.
+   Graf basi, belum ter-index, atau MCP-nya mati **bukan alasan berhenti**: lanjutkan dengan
+   `git grep` seperti biasa, asal ketidaksegarannya **ditulis** di Konteks, bukan didiamkan.
+   Tambahkan juga bagian `team-memory.md` yang menyangkut area itu. Yang tidak ditemukan
+   **tidak ditulis**; Konteks kosong lebih jujur daripada Konteks karangan.
 
 4b. **`Sumber`** — field ini sudah ada di template dan selama ini tak pernah diisi berarti. Isi
    dengan ADR, dok domain vault, atau `Workspace/ANALISA - *.md` yang **memutuskan** hal ini, dan
