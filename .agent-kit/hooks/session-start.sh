@@ -8,7 +8,8 @@ vault="$ws/architecture-draft"
 kit_ver_file="$vault/.agent-kit/VERSION"
 inst_file="$ws/.claude/.kit-version"
 
-ctx="Flow wajib: /start-task -> /plan -> /implement -> /review -> /sync-docs -> /wrap"
+ctx="Triase dulu: keputusannya sudah tertulis dan bisa DITUNJUK (ADR/dok/ANALISA)? -> /brief lalu /kerjakan, lewati flow manual."
+ctx="$ctx | Flow wajib (hanya bila triase menghasilkan \"tidak\"): /start-task -> /plan -> /implement -> /review -> /sync-docs -> /wrap"
 ctx="$ctx | Opsional sebelum flow: /analisa-kebutuhan <kebutuhan manajemen> (mentah -> ADR + dok + daftar task)"
 ctx="$ctx | Loop otonom: /brief <masalah> -> /kerjakan <brief> (judge otomatis, berhenti di PR). Sesi lain: /papan-sesi. Skill: /ekstrak-skill, /supervise"
 

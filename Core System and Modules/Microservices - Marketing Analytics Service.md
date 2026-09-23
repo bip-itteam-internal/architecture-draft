@@ -519,6 +519,59 @@ Penyatuannya **tidak** dilakukan sekarang dan itu disengaja: pipeline `toko.go` 
 
 `{rows, unavailable_channels, ...}` — plus **`kolom_tidak_berlaku`** (level response): daftar kolom yang di level itu **tak punya sumber sama sekali** dan wajib DIHILANGKAN FE dari tabel, bukan dirender "—" per baris. Isi per level (`kolom_struktural.go`): level **ad** → `revenue, net_settlement, gross_profit, hpp, fee_marketplace, retur` (laporan VSA tak membawa rupiah/SKU/jalur order); level **campaign/video** → `fee_marketplace, retur` saja (revenue & HPP nyata dari GMV Max). Ini satu-satunya penanda sah untuk menghapus kolom — menebak dari null akan ikut menghapus kolom yang kadang berisi.
 
+## Asisten Analisa: kiriman terjadwal & riwayat hasil
+
+✅ **Di `main` sejak 2026-09-23**, irisan 1 [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] (PR [#2003](https://github.com/bip-itteam-internal/bip-erp/pull/2003), [#2005](https://github.com/bip-itteam-internal/bip-erp/pull/2005), [#2013](https://github.com/bip-itteam-internal/bip-erp/pull/2013)). ⚠️ **Merged bukan deployed.** Kontrak per-rute: [[API - Marketing Analytics Service]] §Asisten Analisa. Layar FE-nya **belum ada**.
+
+**Kepemilikan data diputuskan di sini** (menutup G4 di [[ANALISA - Asisten Analisa Marketing]]): dua koleksi baru, `jadwal_laporan` dan `hasil_analisa`, keduanya di `marketing_analytics_db`. Alternatifnya melahirkan pertanyaan service baru yang sudah dijawab ADR 0120 §1. Konsekuensi yang diterima sadar: modul ini kini tahu soal penjadwalan dan notifikasi. **Keduanya sengaja TIDAK masuk `indexSpecs()`**, konsisten satu sama lain; `hasil_analisa` diurutkan `dibuat_pada` desc tanpa index, dan pada ~260 baris setahun per kiriman itu belum jadi soal.
+
+### Satu jadwal = satu KIRIMAN, bukan satu analisa
+
+`jadwal_laporan.go`. Satu kiriman memegang **satu** jadwal, **satu** lingkup, **satu** daftar penerima, dan **beberapa** analisa (`kode []KodeTemplate`).
+
+Bentuk pertama satu jadwal satu analisa. Dengan katalog yang tumbuh, itu berarti empat setelan dikali jumlah analisa yang harus dijaga tetap masuk akal, dan kiriman berceceran sepanjang hari: lima analisa di lima jam berbeda menghasilkan lima pemberitahuan untuk satu badan pekerjaan yang sama. Yang berbeda iramanya bukan tiap analisa melainkan tiap **kebutuhan** — rapat mingguan dan pantauan iklan adalah dua kiriman, bukan enam belas jadwal.
+
+Lingkup dan penerima ikut melekat pada kiriman karena keduanya sifat **pembaca**, bukan sifat analisa: lingkup per analisa memungkinkan kombinasi yang tak seorang pun minta (laba Kyura tetapi Account Specialist Beauty Hacks), dan daftar penerima untuk campuran semacam itu tak punya arti yang bisa dipertahankan.
+
+**Lingkup benar-benar menyaring**, bukan setelan mati. `bacaDivisiKueri` diekstrak jadi `divisiDariNilai` (`divisi.go`) supaya penjalan dan jalur query string memakai **satu** resolver; menyalinnya akan melahirkan definisi kedua yang pasti melewatkan kasus `DivisiBelumDipetakan`. Saringannya dipasang ke `filterMart` **sebelum** menghitung, bukan menyaring hasilnya di belakang: vonis SEHAT/RUGI dihitung dari agregat, jadi penyaringan belakangan menghasilkan angka per divisi dengan vonis milik seluruh perusahaan. Lingkup yang tak dikenal, atau sumber divisi yang mati, membuat laporan **gagal** — bukan terkirim tanpa saringan.
+
+### Penjalan: satu tik sejam, kegagalan sebagian tidak menyandera
+
+`penjalan_jadwal.go`, `jadwal_jatuh_tempo.go`. Tik **sejam** plus satu tik segera saat boot, dengan idempotensi per tanggal WIB sehingga deploy berulang tidak menghasilkan kiriman berulang. Tik sejam, bukan timer ke jadwal terdekat: iramanya ditentukan pemakai dan berubah tiap penyuntingan, jadi timer yang di-arm ulang tiap edit adalah jalur yang mudah bocor dan gagalnya senyap.
+
+Kontrak kegagalannya **tidak simetris**, dan tiap cabang punya sebabnya:
+
+| Yang gagal | Stempel | Alasan |
+|---|---|---|
+| SELURUH analisa gagal dirakit | tidak distempel, dicoba lagi | sumber mart yang tak terbaca biasanya pulih sendiri; menyerah membuang laporan seharian |
+| SEBAGIAN analisa gagal | **distempel**, yang berhasil tetap dikirim | yang gagal disebut di badan kiriman yang sama dan dicatat di `terakhir_galat`; kiriman berisi empat dari lima yang diam terbaca sebagai lengkap |
+| SEBAGIAN penerima gagal | **distempel** | mencoba ulang mengirim ganda ke yang sudah menerima, dan inbox yang sama dua kali lebih merusak kepercayaan daripada satu yang tak sampai |
+| Potret gagal disimpan | **distempel**, kiriman tetap jalan | penerima tidak boleh kehilangan laporannya demi arsip yang bukan mereka minta; hanya di-log |
+
+Pengirimannya memakai `kirimInboxErr`, **bukan** `kirimInbox` yang best-effort: stempel atas kiriman yang ditolak membuat laporan berikutnya ikut terlewat sementara layar berbunyi "terkirim".
+
+### Hasil dibekukan jadi riwayat
+
+`hasil_analisa.go`, `hasil_analisa_store.go`. **Satu baris per ANALISA**, bukan per kiriman: pertanyaan yang dijawab riwayat ("laba pekan lalu berapa") milik satu analisa, dan satu baris gabungan menuntut tiap pembacaan mengurai teks untuk menemukan angkanya lagi — cara paling pasti melahirkan angka kedua yang berbeda.
+
+Angkanya **dibekukan**, termasuk `ambang_roas` yang berlaku saat itu, berikut deret grafik `laba_harian` dan `tren`. Mart disegarkan tiap 48 jam dan marketplace mengoreksi angka lampau berhari-hari kemudian, jadi laporan yang menghitung ulang saat dibaca akan menyajikan angka yang berbeda dari yang diceritakan narasinya sendiri — dua angka yang saling membantah di satu layar, tanpa cara memutuskan mana yang benar. Lingkup dan penerima ikut dibekukan, supaya kiriman yang diubah tidak membuat laporan lama menyatakan angka satu divisi sebagai milik divisi lain.
+
+⛔ **`Ringkasan` (ditulis KODE, selalu ada) dipisah dari `Narasi` (dari model, bisa gagal)**, dan pemisahan itu yang membuat `narasi_status` tiga keadaan (`menunggu`/`siap`/`gagal`) jujur: kegagalan model **menurunkan mutu** laporan jadi angka tanpa cerita, bukan menghapusnya. `NarasiJejak` ditambahkan tiap percobaan dan **tak pernah ditimpa** — model yang benar-benar menjawab (dibaca dari balasan, bukan dari config, karena proxy bisa menggantinya), token, latensi, dan sidik prompt. Percobaan yang gagal lalu berhasil di siklus berikutnya adalah jalur normal; menyimpan hanya yang terakhir membuat kegagalan berulang tiap pekan terbaca sebagai gangguan sesekali, dan riwayat yang ditimpa tidak terlihat hilang.
+
+Prompt disimpan sebagai **sidik** (12 heksa sha256), bukan teksnya: teks penuh memuat angka yang sudah dibekukan di dokumen yang sama, jadi menyimpannya berarti satu fakta di dua tempat sekaligus melipatgandakan ukuran dokumen. Yang tak bisa direkonstruksi cuma satu, yaitu template mana yang dipakai — dan sidik menjawab itu tanpa menuntut siapa pun ingat menaikkan versi.
+
+### Katalog: lima entri, satu perakit
+
+`template_analisa.go`. Lima template, dan `dapat_dijadwalkan` dibaca dari **peta perakit** (`perakitLaporan` di `penjalan_jadwal.go`), bukan daftar kedua yang dijaga tangan. Per 2026-09-23 hanya `ringkasan_laba` yang punya perakit; empat sisanya sumber datanya sudah terbukti ada tetapi merangkainya jadi kiriman yang terbaca adalah keputusan tersendiri. `validasiJadwal` **menolak** template tanpa perakit di depan, bukan membiarkan penjalan melewatinya diam-diam: jadwal yang tak pernah mengirim terlihat persis sama dengan jadwal yang belum jatuh tempo.
+
+### Yang belum, dan yang perlu diputuskan
+
+- 🟡 **Narasi AI (irisan 2) belum dipasang**, jadi seluruh baris berstatus `menunggu`. FE wajib merender `ringkasan`, bukan penanda menunggu.
+- 🟡 **Layar FE belum ada.** Rute tujuan notifikasi masih `tautanBerandaAnalytics` = `/marketing-analytics` (beranda modul). Saat halaman riwayat lahir, rutenya wajib ikut terdaftar di `aturanRuteWeb` (`services/notification/webpush.go`), kalau tidak notifikasinya tiba tanpa tombol tujuan.
+- ⚠️ **Kiriman tanpa lingkup hanya terbaca Direktur** (lingkup kosong → `LingkupSemua`), sementara `validasiJadwal` tak mewajibkannya. Belum diputuskan: wajibkan lingkup, atau longgarkan `BolehLihatHasil`.
+- ⚠️ **Belum diukur**: apakah ruang nama `department_shops.Department` (sumber id divisi, jadi sumber `hasil_analisa.lingkup`) selalu sama dengan `work_data.department` orang marketing. Bila pernah menyimpang, SPV membaca nol baris tanpa satu pun galat.
+- ⚠️ **Kekerapan sebagian analisa ditentukan DATANYA, bukan selera.** `mart_komplain_bulanan` diringkas per bulan, jadi analisa komplain di kiriman mingguan akan mengirim angka yang sama empat pekan berturut-turut lalu melompat. Aturannya belum ditegakkan kode karena perakitnya belum ada; tegakkan bersamaan dengan perakit itu, jangan lebih awal.
+
 ## Penjadwal Internal (48 jam)
 
 `penjadwal.go` — sejak 2026-08-01 service ini **punya scheduler sendiri**; entri lama "tidak ada scheduler" tidak berlaku lagi.

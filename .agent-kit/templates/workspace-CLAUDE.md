@@ -10,7 +10,12 @@ terkait DULU sebelum menulis kode. Aturan dokumentasi: `architecture-draft/CLAUD
 ## Project aktif
 __ACTIVE_PROJECT__
 
-## Flow wajib (per task)
+## Triase dulu (menentukan jalur)
+Keputusannya sudah tertulis dan bisa **ditunjuk** (ADR, dok domain, `ANALISA - *.md`)? → `/brief`
+lalu `/kerjakan`, lewati flow manual. Belum ada, atau yang diminta justru memutuskan → flow di
+bawah. Kriteria lengkap + tingkat keyakinan ada di `/start-task` langkah 0.
+
+## Flow wajib (hanya bila triase menghasilkan "tidak")
 `/start-task` → `/plan` → `/implement` → `/review` → `/sync-docs` → `/wrap`
 
 ## Sebelum flow (opsional)

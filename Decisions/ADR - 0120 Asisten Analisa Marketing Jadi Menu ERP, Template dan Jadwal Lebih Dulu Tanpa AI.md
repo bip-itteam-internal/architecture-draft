@@ -1,5 +1,13 @@
 # ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI
 
+> **Status**: ⚠️ **Implemented (ada catatan)** — irisan 1 di `main` sejak 2026-09-23 (backend saja; merged bukan deployed, layar FE belum ada). Irisan 2 dan 3 belum. Rinciannya di § Realisasi.
+
+%% Status ditulis DI SINI, bukan sebagai bullet di ## Deskripsi seperti ADR lain, dan itu
+bukan gaya bebas: `## Untuk Manajemen` mendorong bagian Deskripsi melewati baris ke-15, dan
+di bawah baris itu status tak terbaca VAULT-INDEX.json sehingga dok muncul tanpa status di
+/ask (rulebook vault §5). Terbukti: serap 2026-09-23 memperingatkan "status hilang" untuk
+dok ini. Satu tempat saja — jangan tambahkan bullet Status di ## Deskripsi. %%
+
 ## Untuk Manajemen
 
 **Apa yang berubah di layar.** Muncul satu menu baru di Marketing: daftar analisa siap pakai
@@ -29,9 +37,8 @@ kurang adalah pengantarannya. Keputusan ini menempatkan asisten analisa sebagai 
 ERP, bukan di harness luar, dan menunda lapisan AI sampai template dan penjadwalan tanpa AI
 terbukti dipakai.*
 
-- **Status**: 🟡 **Diusulkan** — kode belum ada. Berdiri di atas pengukuran produksi dan `origin/main` 2026-09-22.
-- **Path di repo**: `bip-erp/services/marketing-analytics/` (baru), `erp-frontend/src/features/marketing-analytics/` (baru), `bip-erp/shared-library/notification/` (kategori inbox baru)
-- **Tanggal**: 2026-09-22
+- **Path di repo**: `bip-erp/services/marketing-analytics/` (`template_analisa*.go`, `jadwal_laporan*.go`, `jadwal_jatuh_tempo.go`, `penjalan_jadwal.go`, `hasil_analisa*.go`, `lingkup_hasil.go`), `bip-erp/shared-library/common/roles.go` (`RequireMarketingReportAdmin`), `bip-erp/shared-library/models/notification/models.go` (kategori `marketing-laporan-terjadwal`), `bip-erp/services/notification/webpush.go` (`aturanRuteWeb`); `erp-frontend/src/features/marketing-analytics/` **belum ada**
+- **Tanggal**: 2026-09-22 (diputuskan) · 2026-09-23 (irisan 1 mendarat)
 
 ## Context
 
@@ -173,6 +180,20 @@ tidak dapat dianalisa apa pun.
 **Hermes tetap dipakai sebagai alat uji.** Ia sudah membayar dirinya: membuktikan rantai ERP
 dapat dipanggil dan bentuk laporan masuk akal, tanpa satu baris kode ditulis di repo. Ia tidak
 menjadi ketergantungan produk.
+
+## Realisasi (2026-09-23)
+
+Irisan 1 mendarat di `main` lewat PR [#2003](https://github.com/bip-itteam-internal/bip-erp/pull/2003), [#2005](https://github.com/bip-itteam-internal/bip-erp/pull/2005), dan [#2013](https://github.com/bip-itteam-internal/bip-erp/pull/2013). Cara kerjanya diuraikan satu tempat saja, di [[Microservices - Marketing Analytics Service]] §Asisten Analisa; kontrak per-rute di [[API - Marketing Analytics Service]]. Yang dicatat di sini hanya **tempat keputusannya bergeser dari ADR ini**.
+
+**Kepemilikan data diputuskan: `marketing_analytics_db`**, koleksi `jadwal_laporan` dan `hasil_analisa`. §Consequences menyebut ini perlu diputuskan saat perencanaan dan menandai konsekuensinya (modul ini jadi tahu soal penjadwalan); konsekuensi itu diterima, karena alternatifnya melahirkan pertanyaan service baru yang sudah dijawab §1.
+
+**§6 dilampaui, bukan sekadar dipenuhi.** §6 menulis "gerbang akses **menu** tetap memakai peran; daftar **penerima** ditulis sendiri". Penerima memang ditulis eksplisit. Tetapi gerbang menunya ikut dipersempit jadi `RequireMarketingReportAdmin` (kyura SPV/admin, beauty_hacks SPV/admin, it admin), memakai alasan §6 sendiri: `RequireMarketingLeader` jauh lebih luas daripada namanya. Yang berhak MEMBACA angka marketing tidak dengan sendirinya berhak memutuskan angka itu dikirim ke siapa. Terukur kosong saat dipersempit, jadi tak mencabut apa pun dari siapa pun.
+
+**Satu bentuk yang tidak ada di ADR ini: KIRIMAN.** Satu jadwal memegang beberapa analisa, satu lingkup, satu daftar penerima. ADR ini mengandaikan jadwal per template. Alasannya di dok service; ringkasnya, yang berbeda iramanya bukan tiap analisa melainkan tiap kebutuhan.
+
+⛔ **Satu temuan yang mengubah arti §6, dan belum diputuskan.** Diukur di PROD 2026-09-23 dengan kontrol positif dan negatif: `/beranda`, `/summary`, dan `/returns/detail` membalas **200 berisi angka laba seluruh perusahaan** untuk pemanggil **tanpa peran modul apa pun**, sementara `/jadwal-laporan` membalas 403 untuk peran yang sama. Artinya lingkup pada kiriman adalah penyaring **tampilan**, bukan kontrol kerahasiaan, dan §6 melindungi daftar kirim tanpa melindungi angkanya. Menyusun aturan lingkup per orang di atas endpoint yang tak punya gerbang menciptakan kesan kerahasiaan yang tidak ada — lebih berbahaya daripada terbuka terang-terangan, karena orang lalu memasukkan hal sensitif ke dalamnya. Keputusannya (terima terbuka, atau gerbang jalur bacanya) menunggu di issue bip-erp [#2008](https://github.com/bip-itteam-internal/bip-erp/issues/2008).
+
+**Yang belum**: narasi AI (irisan 2) belum dipasang sehingga seluruh baris berstatus `menunggu`; layar FE belum ada; dan §7 belum dapat ditegakkan karena pengukuran pemakaian (T6) menunggu layar itu. **Jam nol 30 hari §7 belum berjalan** — ia mulai saat orang benar-benar bisa membuka laporannya, bukan saat kodenya merged.
 
 ## Terkait
 

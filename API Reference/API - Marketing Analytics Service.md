@@ -172,6 +172,27 @@ Keduanya membalas **200 dengan amplop `unavailable_channels: SEMUA`** saat sumbe
 | POST | `/price-floor` | Tambah baris |
 | POST | `/price-floor/upload` | Upload xlsx; laporan per-baris, unggahan yang tak menyimpan apa pun dibalas galat |
 
+## Asisten Analisa (katalog, kiriman terjadwal, riwayat hasil)
+
+✅ **Di `main` sejak 2026-09-23** ([[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] irisan 1), lewat PR [#2003](https://github.com/bip-itteam-internal/bip-erp/pull/2003), [#2005](https://github.com/bip-itteam-internal/bip-erp/pull/2005), dan [#2013](https://github.com/bip-itteam-internal/bip-erp/pull/2013). ⚠️ **Status deploy belum diverifikasi — merged bukan deployed.** Enam rute, di luar hitungan enumerasi mana pun di § Deskripsi; hitung ulang pada enumerasi berikutnya.
+
+| Method | Path | Gerbang | Catatan |
+|---|---|---|---|
+| GET | `/template-analisa` | JWT gateway | Katalog analisa siap pilih. Lima entri: `ringkasan_laba`, `account_specialist`, `penggerus_peluang`, `video_boros`, `sesi_live`. Tiap entri menyebut sumber datanya beserta keterbatasannya, plus **`dapat_dijadwalkan`** — per 2026-09-23 hanya `ringkasan_laba` yang `true`, karena baru satu yang punya perakit. Nilai itu dibaca dari peta perakit, **bukan** daftar kedua yang dijaga tangan |
+| GET | `/jadwal-laporan` | `RequireMarketingReportAdmin` | Daftar kiriman, plus `kekerapan_tersedia` dan `jam_paling_awal` supaya FE tak menyalin daftarnya. Koleksi kosong → `rows: []` |
+| POST | `/jadwal-laporan` | `RequireMarketingReportAdmin` | Buat kiriman. Body: `kode[]` (daftar, minimal satu, tak boleh ganda), `lingkup` (id divisi, kosong = seluruh divisi), `nama`, `kekerapan`, `hari_ke`, `jam_wib`, `penerima[]{employee_id, nama}`, `aktif` (bawaan `true`). **Tak ada `dibuat_oleh`** — jejaknya dari header gateway. `jam_wib` < 4 → **400**: sebelum pukul 4 sinkronisasi mart belum selesai. Tak ada pilihan **harian**: mart disegarkan tiap 48 jam, jadi laporan harian mengirim angka yang sama dua kali. Bulanan dibatasi `hari_ke` 1..28, karena tanggal 29-31 tak ada di tiap bulan dan jadwalnya akan terlewat diam-diam |
+| PATCH | `/jadwal-laporan/:id` | `RequireMarketingReportAdmin` | Benar-benar SEBAGIAN: muatannya seluruhnya pointer, `nil` = jangan sentuh. `kode` yang disebut **mengganti** daftarnya, tidak menggabung. Validasi dijalankan atas hasil GABUNGAN, bukan atas perubahannya |
+| DELETE | `/jadwal-laporan/:id` | `RequireMarketingReportAdmin` | |
+| GET | `/hasil-analisa` | JWT gateway + saringan per baris | Riwayat hasil, terbaru dulu. `?batas=` bawaan 50, pagu 200. Tiap baris disaring lewat `BolehLihatHasil`; header identitas yang kosong atau rusak menghasilkan **nol baris**, bukan semua baris |
+
+⛔ **`RequireMarketingReportAdmin`, bukan `RequireMarketingLeader`** yang menggerbang sisa modul ini (`shared-library/common/roles.go`). Isinya `kyura` SPV/admin, `beauty_hacks` SPV/admin, dan `it` **admin** saja — `it` staff, `integration` supervisor, dan `insentive` adv leader sengaja dikeluarkan. Yang berhak MEMBACA angka marketing tidak dengan sendirinya berhak memutuskan angka itu dikirim ke siapa. Ditulis ulang, bukan dikomposisikan dari `marketingLeaderChecks`: ini subset, dan subset tak bisa dinyatakan dengan `append`. Perluasan daftar leader karena itu **tidak** ikut ke sini, dan itu disengaja.
+
+⚠️ **`lingkup` adalah penyaring TAMPILAN, bukan kontrol kerahasiaan.** Diukur di PROD 2026-09-23 dengan kontrol positif dan negatif: `/beranda`, `/summary`, dan `/returns/detail` membalas **200 berisi angka seluruh perusahaan** untuk pemanggil tanpa peran modul apa pun, sementara `/jadwal-laporan` membalas **403** untuk peran yang sama. Selama ketiganya belum digerbang, menyaring di sini tidak menyembunyikan apa pun dari siapa pun. Keputusannya menunggu di issue bip-erp [#2008](https://github.com/bip-itteam-internal/bip-erp/issues/2008).
+
+⚠️ **Kiriman tanpa `lingkup` hanya terbaca Direktur.** Lingkup kosong berarti seluruh divisi, dan `BolehLihatHasil` hanya membuka cakupan itu untuk Direktur — sementara `validasiJadwal` tak pernah mewajibkan `lingkup`. Akibatnya kiriman bawaan menghasilkan riwayat yang tak terbaca oleh SPV yang membuatnya sendiri. Arahnya tertutup (bukan kebocoran), tetapi ia terbaca sebagai "fiturnya tidak jalan". **Verifikasi end-to-end pertama wajib memakai kiriman yang lingkupnya terisi.** Belum diputuskan: wajibkan `lingkup`, atau longgarkan `BolehLihatHasil`.
+
+⚠️ **Seluruh baris hasil berstatus `narasi_status: menunggu`** sampai irisan 2 dipasang, karena belum ada yang menulis narasi. FE wajib merender `ringkasan` (teks yang ditulis KODE, selalu ada), **bukan** penanda menunggu — kalau tidak, tiap laporan tampil seolah sedang diproses padahal tidak ada yang memproses.
+
 ## Job, penjadwal & health
 
 | Method | Path | Catatan |

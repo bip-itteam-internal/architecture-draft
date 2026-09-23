@@ -78,6 +78,103 @@ try {
   $srcCmd = (Get-ChildItem (Join-Path $kitRoot 'commands') -Filter *.md).Count
   $cmdCount = (Get-ChildItem (Join-Path $claude 'commands') -Filter *.md).Count
   Check ($cmdCount -eq $srcCmd) "semua command kit tersalin ($cmdCount/$srcCmd berkas)"
+
+  # Triase (kit 1.28.0): aturan pemicu di team-memory.md. `rules/` TIDAK disalin init
+  # (init.ps1 tak punya cabang rules), jadi assert dibaca dari SUMBER kit, bukan dari $claude.
+  $tmPath = Join-Path $kitRoot 'rules/team-memory.md'
+  $tmIsi = Get-Content $tmPath -Raw -Encoding UTF8
+  $judulTriase = '## Triase task: keputusan dulu, atau langsung brief'
+  Check ($tmIsi -like "*$judulTriase*") 'team-memory punya bagian triase'
+
+  # Anggaran 8 baris tak-kosong. Bukan gaya: berkas ini auto-load tiap sesi, jadi blok yang
+  # membengkak dibayar berulang oleh SETIAP sesi. Tanpa penjaga, ia pasti tumbuh.
+  $barisTm = Get-Content $tmPath -Encoding UTF8
+  $iAwal = [array]::IndexOf($barisTm, $judulTriase)
+  $iAkhir = -1
+  if ($iAwal -ge 0) {
+    for ($i = $iAwal + 1; $i -lt $barisTm.Count; $i++) {
+      if ($barisTm[$i] -like '## *') { $iAkhir = $i; break }
+    }
+    if ($iAkhir -lt 0) { $iAkhir = $barisTm.Count }
+  }
+  $isiTriase = if ($iAwal -ge 0) { @($barisTm[$iAwal..($iAkhir - 1)] | Where-Object { $_.Trim() -ne '' }) } else { @() }
+  Check ($isiTriase.Count -ge 1 -and $isiTriase.Count -le 8) "blok triase $($isiTriase.Count) baris tak-kosong (batas 8)"
+
+  # Langkah 0 triase harus ikut TERSALIN init, bukan cuma ada di sumber kit.
+  # Nama $stTriase, BUKAN $st: $st sudah dipakai di bawah untuk isi settings.json. Sisipan ini
+  # kebetulan berada di atasnya sehingga urutannya selamat, tapi itu bergantung pada posisi --
+  # memindahkan blok ini ke bawah akan menimpa objek settings tanpa satu pun galat.
+  $stTriase = Get-Content (Join-Path $claude 'commands/start-task.md') -Raw -Encoding UTF8
+  Check ($stTriase -like '*## 0. Triase*') 'start-task punya langkah 0 triase'
+  # .Contains, BUKAN -like: backtick adalah karakter ESCAPE di pola wildcard PowerShell, jadi
+  # '*`yakin`*' terurai jadi "yakin" diikuti tanda bintang HARFIAH dan tak akan pernah cocok.
+  Check ($stTriase.Contains('`yakin`') -and $stTriase.Contains('`ragu`')) 'start-task menyebut tingkat yakin dan ragu'
+
+  # Field `Sumber` sudah ada di templates/brief.md sejak lama; yang dijaga di sini ARTINYA.
+  # Frasa 'turun ke `ragu`' sengaja spesifik: assertion atas kata 'Sumber' saja akan hijau
+  # untuk implementasi apa pun begitu kata itu muncul di kalimat lain, dan jadi vakum.
+  $bfTriase = Get-Content (Join-Path $claude 'commands/brief.md') -Raw -Encoding UTF8
+  Check ($bfTriase.Contains('`Sumber`') -and $bfTriase.Contains('turun ke `ragu`')) 'brief memberi arti Sumber dan aturan turun ke ragu'
+
+  # Grounding graf kode (2026-09-23): langkah 4 brief.md dulu menyuruh "satu dua Grep" saja,
+  # bertentangan dengan protokol SessionStart yang mewajibkan codebase-memory-mcp lebih dulu
+  # untuk eksplorasi kode. .Contains, BUKAN -like (backtick = escape di wildcard, lihat catatan
+  # di atas). Dua klaim wajib benar BERSAMA: alatnya (search_graph) DAN kewajiban menuliskan
+  # kesegaran graf ke Konteks -- bukan gerbang wajib yang memblokir (lihat Batas brief tugas ini).
+  Check ($bfTriase.Contains('search_graph') -and $bfTriase.Contains('kesegaran graf')) 'brief grounding menyebut search_graph dan kewajiban kesegaran graf'
+
+  # Log .task-plans/judge/<slug>-<n>.json ditulis /kerjakan Sec.3, BUKAN /judge (yang hanya
+  # menulis <slug>-gerbang.json dan <slug>-diff.patch). Menyunting judge.md tak berpengaruh apa pun.
+  $kjTriase = Get-Content (Join-Path $claude 'commands/kerjakan.md') -Raw -Encoding UTF8
+  Check ($kjTriase.Contains('keputusan_lanjut')) 'kerjakan mencatat keputusan_lanjut di log judge'
+  Check ($kjTriase.Contains('Dasar keputusan')) 'badan PR menyebut dasar keputusan'
+
+  # brief 2026-09-23 (ui-checklist-ke-judge): agen judge tak pernah diberi rules/ui-checklist.md,
+  # jadi kriteria UX (lima keadaan layar, umpan balik aksi, satu aksi utama per area, token+gelap,
+  # responsif, aksesibilitas) tak pernah dinilai -- hanya eksekutor (loop-fe.md) yang membacanya.
+  # .Contains, BUKAN -like (backtick = escape di wildcard, lihat catatan di atas).
+  $jdMd = Get-Content (Join-Path $claude 'commands/judge.md') -Raw -Encoding UTF8
+  Check ($jdMd.Contains('ui-checklist.md')) 'judge.md merujuk ui-checklist.md di prompt agen judge'
+  # Rujukannya wajib BERSYARAT (hanya saat diff menyentuh layar): mengirimnya tanpa syarat
+  # membakar konteks brief backend/docs yang tak punya layar sama sekali (Batas brief).
+  Check ($jdMd.Contains('menyentuh berkas layar')) 'rujukan ui-checklist.md bersyarat pada diff berlayar, bukan tanpa syarat'
+
+  # --- Sambungan antar-berkas, temuan review akhir 1.28.0 ---
+  # Kelas yang sama untuk kelimanya: tiap berkas benar sendiri-sendiri, yang salah sambungannya.
+
+  # Baris 'Flow wajib' disuntikkan hook SessionStart ke SETIAP sesi sebagai baris PERTAMA, dan
+  # kata 'wajib' membantah pemicu triase yang baru dipasang di team-memory.md. Paritas .ps1/.sh
+  # dijaga: mengubah satu sisi saja membuat jalur mac/linux menyimpang diam-diam.
+  $ssPs = Get-Content (Join-Path $claude 'hooks/session-start.ps1') -Raw -Encoding UTF8
+  $ssSh = Get-Content (Join-Path $claude 'hooks/session-start.sh') -Raw -Encoding UTF8
+  $cmGen = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw -Encoding UTF8
+  Check ($ssPs.Contains('triase')) 'session-start.ps1 mengkualifikasi flow wajib dengan triase'
+  Check ($ssSh.Contains('triase')) 'session-start.sh mengkualifikasi flow wajib dengan triase (paritas)'
+  Check ($cmGen.Contains('triase')) 'CLAUDE.md hasil generate menyebut triase'
+
+  # /kerjakan <teks bebas> menjalankan prosedur /brief lalu LANJUT tanpa syarat, sehingga brief
+  # ber-Sumber kosong melewati gerbang ragu yang baru dibuat brief.md.
+  Check ($kjTriase.Contains('brief `ragu` berhenti')) 'kerjakan: teks bebas yang jadi brief ragu berhenti'
+
+  # keputusan_lanjut tanpa aturan nilai cuma niat: buktinya ("ulangi tanpa pasangan log
+  # percobaan berikutnya = run terputus") runtuh bila nilainya tidak dipetakan ke keadaan.
+  Check ($kjTriase.Contains('`berhenti_lolos` bila')) 'kerjakan memetakan nilai keputusan_lanjut ke keadaan'
+
+  # Jalur vault (domain docs) push langsung ke main TANPA PR, jadi 'Dasar keputusan' yang cuma
+  # ada di badan gh pr create tak pernah terbit untuk brief docs.
+  $nDasar = ([regex]::Matches($kjTriase, 'Dasar keputusan')).Count
+  Check ($nDasar -ge 2) "kerjakan menulis Dasar keputusan di jalur PR DAN vault ($nDasar tempat)"
+
+  # Langkah 0 menuntut resolusi sumber 'dengan perintah' tapi prosedur pencariannya hanya
+  # dirujuk di langkah 2, yang justru dilewati saat task dialihkan ke brief.
+  $iLangkah = $stTriase.IndexOf('Langkah:')
+  $iVaultRet = $stTriase.IndexOf('vault-retrieval')
+  Check ($iVaultRet -ge 0 -and $iVaultRet -lt $iLangkah) 'start-task langkah 0 menunjuk vault-retrieval'
+
+  # Assertion keberadaan saja tidak menjaga URUTAN: memindahkan blok triase ke bawah tetap
+  # hijau sementara sifat "berhenti sebelum memuat arsitektur" hilang tanpa gejala.
+  $iTriase = $stTriase.IndexOf('## 0. Triase')
+  Check ($iTriase -ge 0 -and $iTriase -lt $iLangkah) 'langkah 0 triase berada SEBELUM daftar Langkah'
   Check (Test-Path (Join-Path $claude 'hooks/session-start.ps1')) 'hooks tersalin'
   Check (Test-Path (Join-Path $claude 'settings.json')) 'settings.json ada'
   $cm = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw -Encoding UTF8

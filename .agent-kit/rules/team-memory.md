@@ -271,5 +271,14 @@ Yang membuatnya bergejala: `DepartmentFilterOptions` sengaja MENGGANTI anggota g
 - **Bikin skill custom tim** (shareable): taruh `SKILL.md` di `.agent-kit/skills/<nama>/` → `init` menyalin ke `.claude/skills/`; bump versi kit → tim `git pull` + re-init.
 - **Update file ingatan-tim ini**: edit `.agent-kit/rules/team-memory.md` di vault → tim cukup `git pull architecture-draft` (di-import langsung sejak kit v1.3.0; **tanpa** re-init).
 
+## Triase task: keputusan dulu, atau langsung brief
+
+- **Keputusannya sudah diambil?** Ada ADR / dok domain / `ANALISA - *.md` yang bisa DITUNJUK →
+  `/brief` lalu `/kerjakan`, bukan flow manual. Belum ada, atau yang diminta justru memutuskan → manual.
+- **Bukan ukuran yang menentukan.** Diukur 2026-09-23 atas 20 rencana terakhir: task 200+ baris lintas
+  dua repo muat karena ADR-nya sudah ada; task 177 baris satu repo tidak muat karena intinya memutuskan.
+- **Sumber diresolusi, bukan diingat.** Menyebut ADR dari ingatan tanpa membuka berkasnya = `ragu`
+  (brief ditampilkan, tunggu persetujuan). Prosedur lengkap: `/start-task` langkah 0.
+
 ## Bahasa
 - Balasan AI ke user & dokumentasi: **Bahasa Indonesia**; istilah teknis lazim English biarkan English.
