@@ -22,17 +22,23 @@ Endpoint `POST` inspeksi area digerbang **server-side** terhadap `kepatuhan.satg
 - Bergantung pada: T1.
 - Selesai bila: petugas ber-izin bisa submit temuan+≤15 foto untuk sebuah department; non-petugas ditolak 403 berpesan; uji lewat **gateway** (bukan hanya unit).
 
-### T3 — (BE) Baca dua-arah + rekap per-department
+### T3 — (BE) Baca dua-arah + rekap per-department ✅ selesai di branch `feat/area-inspection-baca-rekap` (belum merged)
+`services/employee/area_inspection_read.go`: `GET /area-inspections?period` (roster petugas), `GET /area-inspections/rekap?period` (petugas semua / supervisor via `SupervisedDepartmentsStrict`+`ExpandToDepartmentGroup`, deny-by-default 403), `GET /area-inspections/:id/photos/:idx/preview`. Non-KPI. 9 test Fiber hijau. Cakupan SPV nyata diverifikasi lewat gateway (butuh DB+master) — belum.
+
 `GET` daftar department + status periode berjalan untuk **petugas**; `GET` rekap temuan untuk **supervisor** atas department yang diawasinya (`SupervisedDepartmentsStrict`, tanpa fallback; filter via `ResolveDepartmentFilter` + `ExpandToDepartmentGroup` — gotcha HRGA). **Tak ada** jalur "karyawan lihat dirinya" (objeknya ruangan). **Tidak** menulis `kpi_score`/`employee_warning`; **tidak** daftar ke calendar/feed.
 - Bergantung pada: T1.
 - Selesai bila: supervisor A hanya melihat department yang benar-benar diawasinya; petugas melihat 12 department; uji negatif (supervisor lain tak bocor).
 
-### T4 — (Mobile, `feat/faiz`) Mode "Area/Ruangan" di menu Satgas
+### T4 — (Mobile, `feat/faiz`) Mode "Area/Ruangan" di menu Satgas ✅ selesai di branch `feat/faiz` (belum diuji perangkat)
+Fitur `lib/src/features/area_inspection/*` (Clean Architecture + get_it DI + i18n arb id/en). Dijangkau dari AppBar menu Satgas (ikon gedung) saat `overview.allowed` — HANYA petugas. Isi: "Ada temuan?" + catatan + ≤15 foto dikompres <1MB, pola submit-dulu lalu unggah tiap foto. Endpoint **lokal di datasource** (bukan url.dart, disunting paralel). `dart analyze` bersih, `flutter test` penuh 1538 hijau. Uji perangkat + rilis (version name+code) belum.
+
 Tambah mode di permukaan Satgas MyBharata: daftar department → tap → "Ada temuan?" + **≤15 foto** + catatan → kirim (kontrak T2/T3). **Reuse** `SurveyFillView`/boolean/`survey_file_input`/kompres foto — **jangan** bikin komponen isi/unggah baru. i18n id+en (ADR 0010).
 - Bergantung pada: T2, T3 (kontrak BE live di dev).
 - Selesai bila: petugas `TEST-HR-STAFF` bisa memilih department, mengisi, mengirim ≤15 foto, dan hasilnya terbaca di rekap; dijalankan **sebagai orang**, bukan hanya curl.
 
-### T5 — (Web, koordinasi) Rekap area untuk supervisor
+### T5 — (Web, koordinasi) Rekap area untuk supervisor ✅ selesai di branch `feat/area-inspection-rekap-web` (belum merged)
+Tab baru "Inspeksi Area" di `hris/industrial-relation`, gate `canSatgasInput || isAnySupervisor(system_roles)` — peran modul HANYA menampilkan tab, cakupan department ditegakkan backend (T3), **tanpa klaim JWT baru** (keputusan: klaim is_supervisor ditunda, blast-radius auth). `area-inspection-rekap.tsx` + `use-area-inspection.ts`, foto via `openFileBlob`. i18n id+en. build + 27 test hijau.
+
 Rekap temuan area per-department di tab `hris/industrial-relation` untuk supervisor. **Koordinasi** dengan sesi `feat/satgas-input-web` & `feat/satgas-rekap` agar tak lahir dua model/menu. Reuse struktur tabel HRIS (MainTable + Banner bare).
 - Bergantung pada: T3.
 - Selesai bila: supervisor membaca temuan ruangannya di web; tak menabrak rekap per-PIC yang sudah ada.
@@ -41,8 +47,9 @@ Rekap temuan area per-department di tab `hris/industrial-relation` untuk supervi
 - **KPI**: sengaja **tidak** dipetakan. Bila HR/manajemen kelak ingin skor area memengaruhi KPI seseorang → ADR baru + peta department→penanggung jawab (belum ada). Jangan dikerjakan tanpa keputusan.
 - **Peringatan push ke SPV**: irisan-1 cukup rekap-saat-dibuka. Push = kategori inbox baru (notification-service + pengirim naik **bersama**) + ADR/revisi. Ditunda sampai rekap terbukti kurang.
 
-## Titik yang harus diputuskan saat `/plan`
-- Satu inspeksi per (department, periode) atau boleh banyak (mis. temuan lalu perbaikan)?
-- ≤15 foto: per-temuan atau per-department per-periode?
-- Izin: reuse `kepatuhan.satgas.input` (default) atau izin baru di modul `kepatuhan` bila petugas area ≠ petugas PIC.
-- Mobile: mode di dalam menu Satgas existing vs menu terpisah.
+## Titik yang sudah diputuskan (saat `/plan` + implementasi 2026-09-23)
+- **Satu inspeksi per (department, periode)** — upsert (index unik T2), tanpa alur cek-ulang temuan→perbaikan terpisah.
+- **≤15 foto per (department, periode)** (bukan per-temuan) — `MaxAreaInspectionPhotos`.
+- **Izin reuse `kepatuhan.satgas.input`** (petugas area = petugas PIC, orang sama). Tak ada izin baru.
+- **Mobile: fitur `area_inspection` tersendiri, dijangkau dari AppBar menu Satgas** (bukan mode-toggle di `SatgasView`). Hanya petugas.
+- **Visibilitas SPV web via peran modul + gerbang backend, TANPA klaim JWT `is_supervisor`** (ditunda; blast-radius auth ~7 jalur login). Rincian di ADR §Diputuskan saat implementasi.

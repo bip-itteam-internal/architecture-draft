@@ -1,4 +1,4 @@
-> **Status**: ⚠️ **Implemented sebagian** — disetujui 2026-09-21, dan **T2 mendarat di `origin/main` hari itu juga pukul 14:11 WIB** lewat `services/employee/area_inspection.go` (commit `6d5f4634`, "endpoint tulis + gerbang + upload foto area_inspection (ADR 0111 T2)"), terdaftar di `main.go`. ⚠️ Kalimat lama "kode belum ada" benar saat ditulis pagi itu dan **basi dalam hitungan jam**; diukur ulang 2026-09-21 ke `bip-erp` `6ef719e3`. T lain dan status deploy **belum diukur**. Menambah track KETIGA di payung Satgas/Industrial Relation; **tidak** mengubah track per-PIC (ADR 0090) maupun catatan per-orang (ADR 0085). Rincian di `## Deskripsi`.
+> **Status**: ⚠️ **Implemented sebagian, di BRANCH — belum merged, belum deploy.** T1+T2 (tulis+foto) mendarat di `origin/main` 2026-09-21 (`services/employee/area_inspection.go`, commit `6d5f4634`). **T3+T4+T5 dibuat 2026-09-23 dan di-push ke branch, BELUM merged ke `main`, BELUM prod, mobile BELUM diuji perangkat:** T3 baca/rekap di bip-erp `feat/area-inspection-baca-rekap` (`services/employee/area_inspection_read.go`, 9 test Fiber hijau); T5 rekap web SPV di erp-frontend `feat/area-inspection-rekap-web` (tab "Inspeksi Area", build + 27 test hijau); T4 mode isi petugas di my-bharata `feat/faiz` (`lib/src/features/area_inspection/*`, `dart analyze` bersih + `flutter test` 1538 hijau). T6 (KPI & push SPV) tetap **TBD**. Menambah track KETIGA di payung Satgas/Industrial Relation; **tidak** mengubah track per-PIC (ADR 0090) maupun catatan per-orang (ADR 0085). Rincian di `## Deskripsi`.
 
 ## Untuk Manajemen
 
@@ -16,12 +16,13 @@ Menambah cara inspeksi **5R per ruangan/area department** di aplikasi. Petugas C
 
 *Inspeksi 5R yang objeknya **ruangan/area sebuah department** (bukan seorang PIC), dicatat oleh petugas Culture & Industrial sebagai **sinyal pembinaan non-KPI** dengan hingga 15 foto per department per periode, dan dibaca supervisor department yang bersangkutan. Ia **meminjam POLA** [[ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI]] (gerbang petugas, visibilitas ke supervisor, foto bukti, entitas terpisah, non-KPI), tetapi subjeknya **department**, bukan karyawan. Berdiri di samping — bukan menggantikan — track per-PIC ber-KPI [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]].*
 
-- **Status**: 🟡 **Diusulkan**, kode belum ada. Artefak kerja: `Workspace/ANALISA - Inspeksi 5R Area per Department.md`
-- **Path di repo** (akan disentuh):
-  - bip-erp: `shared-library/models/employee/area_inspection.go` (baru) · `services/employee/area_inspection*.go` (baru) · registrasi rute employee-service (baru)
-  - my-bharata: `lib/src/features/satgas/*` (perluasan: mode "area/ruangan") **atau** `lib/src/features/area_inspection/*` (baru) — diputuskan saat `/plan`
-  - erp-frontend: rekap area di `src/app/(main)/hris/industrial-relation/*` (baru; **koordinasi** dengan sesi `feat/satgas-input-web` & `feat/satgas-rekap`)
-- **Tanggal**: 2026-09-21
+- **Status**: ⚠️ **Implemented sebagian, di branch** (lihat status baris pertama). T1–T5 ada di kode; T6 TBD. Artefak kerja: `Workspace/ANALISA - Inspeksi 5R Area per Department.md`
+- **Path di repo**:
+  - bip-erp (**T1+T2 merged `main`**): `shared-library/models/employee/area_inspection.go` · `services/employee/area_inspection.go` (tulis + foto) · registrasi di `main.go`
+  - bip-erp (**T3, branch `feat/area-inspection-baca-rekap`**): `services/employee/area_inspection_read.go` (roster petugas, rekap petugas/supervisor, preview foto) · `area_inspection_read_test.go` · `registerAreaInspectionReadRoutes` di `area_inspection.go`
+  - erp-frontend (**T5, branch `feat/area-inspection-rekap-web`**): `src/app/(main)/hris/industrial-relation/page.tsx` (tab "Inspeksi Area") · `src/features/hris/industrial-relation/components/area-inspection-rekap.tsx` · `.../hooks/use-area-inspection.ts` · `.../types/area-inspection.ts` · `src/features/erp/auth/hooks/use-auth.ts` (`isAnySupervisor`) · `src/i18n/locales/{id,en}.ts`
+  - my-bharata (**T4, branch `feat/faiz`**): `lib/src/features/area_inspection/*` (data/domain/presentation) · registrasi di `lib/src/core/config/di/*` · entri di `lib/src/features/satgas/presentation/pages/satgas_page.dart` (AppBar) · `lib/l10n/app_{id,en}.arb`. Endpoint didefinisikan **lokal di datasource**, bukan `Api/url.dart` (§Consequences).
+- **Tanggal**: 2026-09-21 (T3–T5 diimplementasikan 2026-09-23)
 
 ## Context
 
@@ -101,6 +102,13 @@ Objeknya sama-sama "Satgas 5R" dan petugasnya sama, jadi mode area sebaiknya **s
 - Tidak menulis `kpi_score`, tidak membuat SP, tidak menyentuh payroll.
 - Tidak ada notifikasi push/inbox pada irisan pertama (kategori inbox baru = deploy dua container + ADR).
 - Tidak ada master "area/ruangan" tersendiri di luar daftar department, sampai ada pemakai nyata yang menuntutnya (aturan "tunggu pemakai ketiga").
+
+### Diputuskan saat implementasi (2026-09-23)
+
+- **Visibilitas SPV di web TANPA klaim JWT baru.** §4/§5 menuntut supervisor department bisa membaca; diimplementasikan sebagai **gerbang backend** (`common.SupervisedDepartmentsStrict` + `employee.ExpandToDepartmentGroup`, deny-by-default 403 di `GET /area-inspections/rekap`) ditambah **tab web yang sekadar TAMPIL** bila pemanggil punya peran supervisor modul mana pun (`isAnySupervisor(system_roles)` di `use-auth.ts`). Usul menambah klaim `is_supervisor` ke JWT **ditolak/ditunda**: minting token tersebar di ~7 jalur login `api-gateway/main.go` (blast-radius auth tinggi), dan cakupan sebenarnya sudah ditegakkan server, jadi klaim FE hanya untuk menyembunyikan menu — cukup peran modul. Konsekuensi diterima: SPV yang tak berperan supervisor modul mana pun tak melihat tab walau backend mungkin mengizinkannya; bila kelak menggigit, klaim JWT adalah perbaikan durabelnya (ADR/task tersendiri).
+- **Mobile HANYA untuk petugas pencatat.** §7 diwujudkan sebagai fitur `area_inspection` tersendiri yang dijangkau dari **AppBar menu Satgas** (ikon gedung, muncul saat `overview.allowed`), bukan mode-toggle di dalam `SatgasView` (yang diuji ketat). SPV **tidak** mendapat menu mobile — ia membaca di web; notifikasi push ke SPV tetap ditunda (irisan berikutnya, §5).
+- **Endpoint mobile didefinisikan LOKAL di datasource**, bukan `Api`/`core/api/url.dart`, karena url.dart sedang disunting paralel di `feat/faiz`; commit mobile jadi swasembada (kompilasi tanpa perubahan sesi lain). Bila url.dart bebas, pindahkan mengikuti konvensi repo (task kecil tersendiri).
+- **Satu inspeksi per (department, periode)** dipastikan lewat **upsert** (index unik T2), tanpa alur cek-ulang temuan→perbaikan terpisah seperti track per-PIC. Submit ulang memperbarui `ada_temuan`/`catatan`; foto ditambah, tak menghapus yang lama.
 
 ## Dokumen Terkait
 
