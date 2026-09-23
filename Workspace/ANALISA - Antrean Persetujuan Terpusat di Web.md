@@ -56,9 +56,23 @@ Pesanan ERP, Payroll run, Rekrutmen. Ketiganya bukan antrean pribadi, jadi wajib
 
 ⛔ **Konsekuensinya prasyarat pindah ke SERVICE SUMBER, bukan ke agregator.** "Tahu siapa pegang modul apa" adalah aturan hak akses, dan menuliskannya di agregator dilarang [[ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service]] butir 7. Satu-satunya jalan yang bersih: ketiga endpoint itu **menggerbang dirinya sendiri**, lalu agregator menerima **403** untuk yang bukan pemegangnya — dan 403 memang sudah diperlakukan sebagai "bukan urusan saya", bukan `degraded`, oleh kerangka yang sudah ada.
 
-⚠️ Hari ini ketiganya **belum** menggerbang: `listPayrollRuns`, `listOffers`, dan `listRequisitions` memakai filter kosong sehingga seluruh baris terkirim ke siapa pun yang memanggil, dan yang menyaring selama ini penyaring di klien. Jadi T9 kini berisi tiga pekerjaan di tiga service sumber lebih dulu, bukan satu pekerjaan adapter. Pecah per service saat dibriefkan.
+⛔ **Paragraf lama di sini KELIRU dan sudah dicabut. Diukur ulang ke `origin/main` 2026-09-24.** Ia berbunyi *"ketiganya belum menggerbang: `listPayrollRuns`, `listOffers`, dan `listRequisitions` memakai filter kosong sehingga seluruh baris terkirim ke siapa pun yang memanggil"*, lalu menyimpulkan T9 berisi **tiga** pekerjaan gerbang di tiga service sebelum adapternya boleh ditulis. Dua dari tiga premisnya tidak benar, dan kesimpulannya ikut salah — biayanya nyata: tiga brief yang tak perlu.
 
-*Tergantung*: T7, plus gerbang per pemanggil di payroll-service, procurement, dan recruitment-service.
+Yang membuatnya keliru: pemeriksaannya berhenti di badan handler. `listPayrollRuns` memang membuka dengan `filter := bson.M{}`, dan dibaca sampai situ saja ia tampak seperti kebocoran yang meyakinkan. Gerbangnya ada satu lapis di atasnya, **di pendaftaran rutenya**.
+
+| Endpoint | Keadaan sebenarnya | Cukup untuk T9? |
+|---|---|---|
+| `GET /payroll-runs` (`services/payroll/routes.go:109`) | `gate(common.PermPayrollView, isHR)`. Kill-switch `PAYROLL_PERMISSION_ENFORCEMENT` pun jatuh ke `require(isHR)`, bukan ke terbuka. Membalas **403** | ✅ sudah |
+| `listRequisitions` (`services/recruitment/requisition_handlers.go:144`) | `bolehLihatSeluruhRequisition` = `isHR(id) \|\| izin RecruitmentView`; yang bukan pemegang jatuh ke `filter["requested_by"] = id.EmployeeID` | ✅ sudah, semantik pemegang modul |
+| `listOffers` (`services/recruitment/offer_menu_handlers.go:67`) | digerbang **cakupan perusahaan** (`idKandidatDalamCakupan`), bukan modul. Sudah memancarkan `CanApprove` per pemanggil lewat `bolehSetujuiOffer` | ⚠️ satu-satunya celah |
+
+Dan agregator **sudah** memperlakukan 401/403 sebagai "bukan urusan saya", bukan `degraded` (`hasilSumber`, `antrean_pengajuan.go`) — jadi untuk payroll dan requisition mekanismenya sudah lengkap hari ini, tanpa satu pun perubahan di service sumber.
+
+**T9 karena itu SATU brief adapter**, bukan tiga brief gerbang, dengan satu keputusan tersisa: offers digerbang perusahaan sehingga orang non-HR dalam perusahaan yang sama tetap melihatnya. Putuskan apakah `CanApprove` yang sudah ada dipakai sebagai syarat masuk antrean, atau gerbang modul ditambahkan di recruitment.
+
+⚠️ **Pelajaran yang lebih mahal daripada task ini**, dan alasan paragraf ini ditulis panjang: klaim "X belum digerbang" ditulis di sini tanpa memeriksa lapisan rutenya, lalu berdiri sebagai fakta sampai ada yang mengukurnya. Gerbang di bip-erp lazim dipasang di **pendaftaran rute**, bukan di kueri handler — membaca badan handler saja akan berulang kali menghasilkan tuduhan kebocoran yang keliru.
+
+*Tergantung*: T7. Gerbang per pemanggil **tidak** jadi prasyarat, kecuali keputusan offers di atas.
 
 **T10. Pelatihan dan Tiket ikut masuk.**
 Keduanya sudah ada di `registriRingkasan` sebagai angka; di sini mereka menyumbang baris.
