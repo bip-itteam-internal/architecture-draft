@@ -129,6 +129,16 @@ try {
   Check ($kjTriase.Contains('keputusan_lanjut')) 'kerjakan mencatat keputusan_lanjut di log judge'
   Check ($kjTriase.Contains('Dasar keputusan')) 'badan PR menyebut dasar keputusan'
 
+  # brief 2026-09-23 (ui-checklist-ke-judge): agen judge tak pernah diberi rules/ui-checklist.md,
+  # jadi kriteria UX (lima keadaan layar, umpan balik aksi, satu aksi utama per area, token+gelap,
+  # responsif, aksesibilitas) tak pernah dinilai -- hanya eksekutor (loop-fe.md) yang membacanya.
+  # .Contains, BUKAN -like (backtick = escape di wildcard, lihat catatan di atas).
+  $jdMd = Get-Content (Join-Path $claude 'commands/judge.md') -Raw -Encoding UTF8
+  Check ($jdMd.Contains('ui-checklist.md')) 'judge.md merujuk ui-checklist.md di prompt agen judge'
+  # Rujukannya wajib BERSYARAT (hanya saat diff menyentuh layar): mengirimnya tanpa syarat
+  # membakar konteks brief backend/docs yang tak punya layar sama sekali (Batas brief).
+  Check ($jdMd.Contains('menyentuh berkas layar')) 'rujukan ui-checklist.md bersyarat pada diff berlayar, bukan tanpa syarat'
+
   # --- Sambungan antar-berkas, temuan review akhir 1.28.0 ---
   # Kelas yang sama untuk kelimanya: tiap berkas benar sendiri-sendiri, yang salah sambungannya.
 

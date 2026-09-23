@@ -42,9 +42,15 @@ Argumen: `<path worktree>` (bawaan: repo di cwd), `--brief <path>` (bawaan: brie
 
    Dispatch `Agent` `subagent_type: loop-judge`, `run_in_background: false`, prompt berisi path
    absolut: brief, diff, hasil gerbang JSON, worktree, dan
-   `architecture-draft/.agent-kit/rules/review-checklist.md`. Ambil JSON di antara `<<VERDICT>>`
-   dan `<<END>>`. JSON tidak sah atau penanda tidak ada → `lolos: false`, `catatan: "verdict tidak
-   terurai"`; jangan menebak isinya.
+   `architecture-draft/.agent-kit/rules/review-checklist.md`. **Bila diff menyentuh berkas layar**
+   (halaman/komponen FE — erp-frontend, UI mybharata), sertakan juga path
+   `architecture-draft/.agent-kit/rules/ui-checklist.md` supaya judge menilai kriteria UX di sana
+   (lima keadaan layar, umpan balik aksi, satu aksi utama per area, token + mode gelap, responsif,
+   aksesibilitas) — rujuk **path-nya saja**, jangan salin isinya ke prompt. Diff yang tak
+   menyentuh layar (brief backend/docs) tidak perlu menyertakannya; mengirimnya tanpa syarat
+   membakar konteks judge untuk brief yang tak punya layar sama sekali. Ambil JSON di antara
+   `<<VERDICT>>` dan `<<END>>`. JSON tidak sah atau penanda tidak ada → `lolos: false`, `catatan:
+   "verdict tidak terurai"`; jangan menebak isinya.
 
 4. **Triangulasi dan laporan**
 
