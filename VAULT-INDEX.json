@@ -15559,9 +15559,9 @@
         "APP - Web ERP",
         "Microservices - Employee Service"
       ],
-      "hash": "30f1c97456a59e3f746cdf4840971e20dbaee8e5c9468ffc4675e8cd22e8440d",
-      "ukuran_kb": 10.7,
-      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk menyatukan seluruh antrean persetujuan ERP jadi satu halaman web, dipecah jadi irisan 1 (tayang tanpa menyentuh backend lewat /hr/requests?as=reviewer&include=booking) dan irisan 2 (agregator GET /pengajuan/antrean plus adapter tiap modul, termasuk mode riwayat yang belum dimiliki Pengajuan Barang dan Booking Ruang). Menjawab juga kapan menu persetujuan per-modul lama boleh dicabut dan kenapa urutannya tidak boleh dibalik, serta rute /persetujuan/* mana yang masih ada di menu Portal. Memuat dua task di luar ADR 0114: mengukur kenapa 119 pengajuan mati karena didiamkan, dan membuktikan apakah kartu pembelian di beranda portal selamanya degraded.",
+      "hash": "7bb98f85b2dbe7c799d1712e9b1556a46dab3d775ff326ae91badd7c8f2438cf",
+      "ukuran_kb": 11.7,
+      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk menyatukan seluruh antrean persetujuan ERP jadi satu halaman web, dipecah jadi irisan 1 (tayang tanpa menyentuh backend) dan irisan 2 (agregator GET /pengajuan/antrean plus adapter tiap modul, termasuk mode riwayat yang belum dimiliki Pengajuan Barang dan Booking Ruang). Menjawab juga siapa yang boleh melihat antrean daftar-modul (Pesanan ERP, Payroll, Rekrutmen): diputuskan hanya bagi pemegang modulnya, sehingga prasyaratnya pindah ke service sumber yang harus menggerbang dirinya sendiri, bukan ke agregator. Menjawab kapan menu persetujuan per-modul lama boleh dicabut dan kenapa urutannya tidak boleh dibalik. Memuat dua task di luar ADR 0114: mengukur kenapa 119 pengajuan mati karena didiamkan, dan membuktikan apakah kartu pembelian di beranda portal selamanya degraded.",
       "kata_kunci": [
         "antrean persetujuan",
         "approval queue",
@@ -15570,8 +15570,8 @@
         "agregator persetujuan",
         "cabut menu persetujuan",
         "mode riwayat",
+        "pemegang modul",
         "pengajuan barang",
-        "booking ruang",
         "ADR 0114"
       ]
     },
