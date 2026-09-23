@@ -624,26 +624,27 @@
         "ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support",
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
         "APP - MyBharata",
+        "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
         "ADR - 0106 Tema dan Teaser Live Support Disetor dan Diputus Penyetuju Departemen sebagai Dasar KPI",
         "ADR - 0108 Monitoring Sesi Live di Web Hanya Baca untuk Leader dan Live Support",
         "Microservices - Employee Service",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "26d55133059accd6252e001e30494666191d5d91c8ca5415b780f31a084888c9",
-      "ukuran_kb": 66.6,
-      "ringkasan": "Menjawab: rute apa saja yang disediakan marketing-analytics-service beserta parameter dan bentuk responsnya, mulai dari beranda dan ambang keputusan, laba per toko/produk/kampanye, video dan live, pencatatan sesi live host, setoran karya Live Support, retur, price floor, pagu iklan, sampai pengumpul KPI. Menjelaskan konvensi amplop respons (`rows`, `unavailable_channels`, `kolom_tidak_berlaku`), paginasi endpoint drill, dan aturan 400 untuk nilai enum yang tak dikenal. Memuat juga cara mengaudit ulang kelengkapan daftar rute ini terhadap kode.",
+      "hash": "917df2cde49b2e942f44a75e383b93b1408211223f6fa2b99ec2e6b1b4fe0539",
+      "ukuran_kb": 71.0,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service, apa parameter dan bentuk respons tiap rute (amplop rows/unavailable_channels, kolom_tidak_berlaku, paginasi limit/offset, enum tak dikenal jadi 400), serta rute mana yang digerbang role marketing leader. Juga menjawab: bagaimana vonis laba di /beranda dihitung terhadap ambang (lima keadaan: tanpa_data, belum_matang, rugi, waspada, sehat), bagaimana ambang dan pagu belanja iklan disimpan effective-dated/append-only, dan bagaimana rute pencatatan sesi live host, ambil alih sesi, setoran karya Live Support, price floor, asisten analisa, dan pengumpul KPI dipanggil. Memuat prosedur audit ulang kelengkapan daftar rute agar dokumen tidak menyimpang dari kode.",
       "kata_kunci": [
-        "marketing-analytics",
+        "marketing analytics",
         "endpoint",
-        "API",
+        "API reference",
+        "beranda",
+        "ambang ROAS",
+        "pagu iklan",
         "live shift",
         "sesi live",
-        "profit",
-        "laba",
-        "pagu iklan",
-        "ambang",
-        "ROAS"
+        "KPI marketing",
+        "gateway prefix"
       ]
     },
     {
@@ -2776,6 +2777,8 @@
         "Microservices - Attendance Service",
         "ADR - 0052 Status Sinkron per Toko",
         "Sales - ICC Affiliate Mapping",
+        "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
+        "ANALISA - Asisten Analisa Marketing",
         "IT - Background Jobs & Schedulers",
         "HRIS - Otomasi Skor KPI",
         "Microservices - Insentive Service",
@@ -2791,20 +2794,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "9db2f32c9d71532a57938c2eeab7b59ef0d9ca7597cb6cb36178c4d5418154af",
-      "ukuran_kb": 161.1,
-      "ringkasan": "Menjawab: bagaimana marketing-analytics-service membangun koleksi `mart_*` dari `integration_db` yang dibaca baca-saja, prinsip arsitektur yang wajib dijaga (penjaga tiga lapis anti-penulisan, `/health` degraded bila index unik gagal), penjadwal 48 jam, dan job sync-nya. Menjawab juga aturan pemakaian angka yang paling mudah salah: larangan hitung ganda antar level, arti `iklan_sia_sia`, `pembatalan`, dan tiga angka penjualan live yang mudah tertukar. Memuat semantik channel TikTok, Shopee, dan Lazada serta alur pencatatan sesi live host termasuk ambil alih dan tutup otomatis.",
+      "hash": "77026a3ec6522d2a671a0698e67896b808e84979d75c87e555216fc2245d2442",
+      "ukuran_kb": 169.0,
+      "ringkasan": "Menjawab: bagaimana Marketing Analytics Service dibangun (Go + Fiber, MongoDB marketing_analytics_db, port, prefix gateway) dan kenapa ia membaca integration_db hanya-baca dengan penjaga tiga lapis serta menurunkan /health jadi degraded saat index unik gagal. Menjawab juga: dari mana angka laba, video, live, retur, affiliate, dan price floor berasal, koleksi mart_* apa saja yang diisi job sync dan penjadwal 48 jam, serta aturan pemakaian angka agar tidak terjadi hitung ganda (vonis hanya dijumlahkan dari level shop, iklan_sia_sia, pembatalan, gmv_live_tanpa_performa, 24h_live_gmv). Berisi catatan kejujuran data per channel (TikTok vs Shopee vs Lazada), alur pencatatan sesi live host beserta ceklis kesiapan dan ambil alih, dan daftar yang belum diimplementasikan.",
       "kata_kunci": [
-        "marketing-analytics",
+        "marketing analytics service",
+        "microservice",
         "mart",
-        "agregasi",
-        "laba",
+        "job sync",
+        "integration_db baca-saja",
+        "hitung ganda",
         "profit attribution",
-        "sesi live",
         "live shift",
-        "TikTok",
-        "Shopee",
-        "hitung ganda"
+        "TikTok Shopee Lazada",
+        "arsitektur"
       ]
     },
     {
@@ -7692,8 +7695,8 @@
       "judul": "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": null,
-      "status_teks": null,
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)** — irisan 1 di `main` sejak 2026-09-23 (backend saja; merged bukan deployed, layar FE belum ada). Irisan 2 dan 3 belum. Rinciannya di § Realisasi.",
       "publik": true,
       "tautan": [
         "LOG - 2026-09-17 Audit Checklist Marketing dan Integration",
@@ -7701,23 +7704,24 @@
         "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
         "Microservices - Assistant Service",
         "Microservices - Marketing Analytics Service",
+        "API - Marketing Analytics Service",
         "IT - Server, VMs and Databases",
         "ANALISA - Asisten Analisa Marketing"
       ],
-      "hash": "419b6a2919788ce96bf7c99e7cc49d2ff9529137793204fc8d91621ce7420870",
-      "ukuran_kb": 10.3,
-      "ringkasan": "Menjawab: kenapa asisten analisa marketing ditempatkan sebagai menu di dalam ERP alih-alih harness agent di luar, dan kenapa irisan pertamanya (template analisa siap pilih + penjadwalan pengiriman ke Inbox ERP/MyBharata) sengaja dibangun tanpa AI sama sekali sebelum lapisan AI dan tanya-jawab bebas dikerjakan. Menjelaskan juga jebakan angka marketing yang membentuk keputusan ini (laba periode pendek selalu tampak rugi besar, revenue level video cuma terisi 8,9%, revenue level iklan nol secara struktural, retur yang terpotong dua kali), kenapa model tidak pernah diberi angka mentah dan keluarannya dikunci skema, kenapa daftar penerima laporan ditulis eksplisit dan tidak diturunkan dari peran RequireMarketingLeader, serta apa yang sengaja TIDAK dijanjikan (rekomendasi anggaran, analisa Harga & Diskon, Pelanggan & Cohort, metrik iklan TikTok rinci). Memuat kondisi berhenti yang ditetapkan di muka: evaluasi 30 hari, bila nol laporan dibuka fitur dihentikan.",
+      "hash": "638024d9c0553654d1b03652d72827c2d0490cacb7f62a370f045ce354631b33",
+      "ukuran_kb": 13.9,
+      "ringkasan": "Menjawab: kenapa asisten analisa marketing dibangun sebagai menu di dalam ERP dan bukan di harness agent luar (netmon/Hermes), serta bagaimana pekerjaannya dipecah jadi tiga irisan berurutan yang irisan pertamanya (template analisa siap pakai + penjadwalan laporan ke Inbox) sama sekali tanpa AI. Menjelaskan juga siapa penerima laporannya, kenapa daftar penerima ditulis eksplisit alih-alih diturunkan dari peran, dan kenapa model tidak pernah menerima angka mentah melainkan hanya hasil hitung backend beserta penanda ketidakpastiannya. Memuat empat jebakan angka yang sudah terukur (laba periode pendek tampak rugi besar, revenue video cuma terisi 8,9%, revenue nol di level iklan, retur terpotong dua kali) beserta analisa yang sengaja TIDAK dijanjikan karena sumber datanya kosong atau cakupannya di bawah satu persen.",
       "kata_kunci": [
-        "asisten analisa marketing",
+        "analisa otomatis marketing",
         "marketing analytics",
-        "analisa otomatis",
+        "asisten AI",
         "template analisa",
-        "penjadwalan laporan",
+        "jadwal laporan",
         "scheduled report",
-        "AI",
-        "inbox notifikasi",
+        "notifikasi inbox",
+        "laba matang",
         "belanja iklan",
-        "laba matang"
+        "ADR 0120"
       ]
     },
     {
@@ -15577,7 +15581,7 @@
       "area": "Workspace",
       "jenis": "workspace",
       "status_emoji": null,
-      "status_teks": "belum · **Memblokir**: seluruh irisan 1",
+      "status_teks": null,
       "publik": false,
       "tautan": [
         "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
@@ -15586,20 +15590,20 @@
         "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
         "Microservices - Marketing Analytics Service"
       ],
-      "hash": "c6aa07d3c783e5a20a0faec72efffdb3431e1142142c1bd9f4c89c8596bb70b5",
-      "ukuran_kb": 7.3,
-      "ringkasan": "Menjawab: apa saja yang harus diputuskan dan dikerjakan sebelum asisten analisa marketing dibangun, mulai dari empat gerbang penentu kelayakan (membuka layar yang sudah ada bersama pemilik permintaan, menyatukan target ROAS dashboard 4,5 vs KPI 3,2, menentukan siapa menyediakan daftar harga minimal, dan memutuskan kepemilikan data jadwal) sampai daftar task per irisan beserta dependensinya. Juga menjawab analisa mana yang boleh masuk katalog template dan mana yang tidak beserta sebab datanya, serta apa yang sengaja tidak dikerjakan seperti rekomendasi anggaran iklan dan blok tindakan di tab Video selain GMV Max.",
+      "hash": "083c17f41f39e0abe885464b099caaf6b8fc533b5dc4c2a4e8183fdf4b04b414",
+      "ukuran_kb": 9.2,
+      "ringkasan": "Menjawab: apa saja langkah kerja Asisten Analisa Marketing beserta urutan dan dependensinya — empat gerbang keputusan (buka layar bersama pemilik permintaan, satukan target ROAS 4,5 vs 3,2, tentukan penyedia daftar harga minimal, tentukan kepemilikan data jadwal) lalu task T1 sampai T9 untuk tiga irisan. Menjawab juga: template analisa mana yang boleh masuk katalog dan mana yang dilarang beserta sebab datanya (diskon, CPA TikTok, pola musiman, Pelanggan & Cohort, Harga & Diskon), serta hal apa yang masih terbuka — kiriman tanpa lingkup hanya terbaca Direktur, dan lingkup bukan kontrol kerahasiaan karena beberapa endpoint membalas angka seluruh perusahaan tanpa peran modul. Papan kerja ini berubah tiap item selesai; keputusannya sendiri ada di ADR 0120.",
       "kata_kunci": [
-        "analisa kebutuhan",
+        "ANALISA",
         "asisten analisa marketing",
         "papan kerja",
-        "gerbang keputusan",
+        "analisa-kebutuhan",
+        "jadwal laporan",
         "katalog template",
-        "penjadwal jadwal",
-        "kategori inbox",
-        "shared-library/ai",
-        "target ROAS",
-        "harga minimal"
+        "gerbang G1",
+        "irisan",
+        "ROAS target",
+        "lingkup akses"
       ]
     },
     {

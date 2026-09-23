@@ -9,6 +9,35 @@ apakah sisanya layak dikerjakan. G1 khususnya dapat membatalkan sebagian besar d
 
 ---
 
+## Keadaan per 2026-09-23
+
+**Irisan 1 backend mendarat di `main`**: G4, T1, T2, T3, T4 selesai lewat PR
+[#2003](https://github.com/bip-itteam-internal/bip-erp/pull/2003),
+[#2005](https://github.com/bip-itteam-internal/bip-erp/pull/2005), dan
+[#2013](https://github.com/bip-itteam-internal/bip-erp/pull/2013).
+**Merged bukan deployed**, dan **T5 (layar) belum ada** sehingga belum seorang pun bisa memakainya.
+
+⚠️ **G1 dilewati, dan itu menyimpang dari papan ini sendiri.** G1 ditandai "memblokir seluruh
+irisan 1", dan T1 menuliskan G1 sebagai dependensinya — tetapi T1 sampai T4 dikerjakan tanpa G1
+pernah dijalankan. Konsekuensinya nyata: katalog lima template disusun dari pengukuran data,
+**bukan** dari duduk bersama pemilik permintaan, jadi pertanyaan yang G1 dirancang untuk
+menjawab (apakah yang kurang bentuk kalimatnya, cara mengantarkannya, atau cakupannya) masih
+belum terjawab. Jalankan G1 **sebelum** T5, selagi layar masih murah diubah.
+
+⛔ **Dua keputusan terbuka yang lahir dari pengerjaan, bukan dari analisa awal:**
+
+1. **Kiriman tanpa lingkup hanya terbaca Direktur.** Lingkup kosong berarti seluruh divisi, dan
+   cakupan itu hanya terbuka untuk Direktur — sementara validasi tak pernah mewajibkan lingkup.
+   Kiriman bawaan karena itu menghasilkan riwayat yang tak terbaca SPV yang membuatnya sendiri.
+   Pilihannya: wajibkan lingkup saat membuat kiriman, atau longgarkan aturan bacanya.
+2. **Lingkup bukan kontrol kerahasiaan.** Terukur PROD 2026-09-23: `/beranda`, `/summary`, dan
+   `/returns/detail` membalas 200 berisi angka seluruh perusahaan untuk pemanggil tanpa peran
+   modul apa pun. Menunggu di issue bip-erp
+   [#2008](https://github.com/bip-itteam-internal/bip-erp/issues/2008). Sampai dijawab, jangan
+   menaruh apa pun di kiriman yang memang tidak boleh dibaca semua karyawan.
+
+---
+
 ## G1 — Buka layar yang sudah ada, bersama pemilik permintaan
 
 **Status**: belum · **Memblokir**: seluruh irisan 1
@@ -50,7 +79,7 @@ Finance atau Marketing, bukan IT.
 
 ## G4 — Putuskan kepemilikan data jadwal
 
-**Status**: belum · **Memblokir**: T2, T3
+**Status**: ✅ **selesai 2026-09-23** · **Memblokir**: T2, T3
 
 Asisten menyimpan jadwal, daftar penerima, dan riwayat kirim. Menaruhnya di marketing-analytics
 membuat modul itu tahu soal penjadwalan dan notifikasi, yang bukan urusannya; menaruhnya di
@@ -66,7 +95,7 @@ Memberi nilai penuh tanpa satu pun pemanggilan model.
 
 ## T1 — Katalog template analisa
 
-**Status**: belum · **Dependensi**: G1
+**Status**: ✅ **selesai 2026-09-23** · **Dependensi**: G1
 
 Daftar analisa siap pilih, dan setiap entri **wajib** menyebut sumber datanya beserta
 keterbatasannya. Yang boleh masuk hanya yang datanya benar-benar ada.
@@ -81,14 +110,14 @@ musiman (riwayat efektif 8 bulan), Pelanggan & Cohort serta Harga & Diskon (sumb
 
 ## T2 — Penyimpanan dan API jadwal
 
-**Status**: belum · **Dependensi**: G4, T1
+**Status**: ✅ **selesai 2026-09-23** · **Dependensi**: G4, T1
 
 Menyimpan template yang dipilih, kekerapan, penerima, dan status aktif. Penerima ditulis
 eksplisit, **tidak** diturunkan dari peran (ADR 0120 §6).
 
 ## T3 — Penjalan jadwal
 
-**Status**: belum · **Dependensi**: T2
+**Status**: ✅ **selesai 2026-09-23** · **Dependensi**: T2
 
 Harus tahan mati-hidup container dan tidak mengirim ganda. Perhatikan penjadwal mart yang sudah
 ada aman hanya pada replika tunggal.
@@ -98,7 +127,7 @@ paling umum di sistem ini.
 
 ## T4 — Kategori inbox dan pengiriman
 
-**Status**: belum · **Dependensi**: T3
+**Status**: ✅ **selesai 2026-09-23** (kode; deploy dua container belum) · **Dependensi**: T3
 
 ⛔ Kategori inbox baru hidup di daftar izin `shared-library`, sehingga marketing-analytics dan
 notification-service **wajib naik bersamaan**. Sudah menggigit dua kali; gagalnya senyap.
@@ -106,7 +135,7 @@ Tujuan notifikasi memakai rute aplikasi, bukan URL eksternal (tidak berfungsi di
 
 ## T5 — Layar menu di frontend
 
-**Status**: belum · **Dependensi**: T1, T2
+**Status**: belum · **BERIKUTNYA** · **Dependensi**: T1, T2
 
 Memilih template, mengatur jadwal, melihat riwayat kirim. Teks user-facing baru wajib lewat
 `react-i18next` di dua locale (ADR 0010).
