@@ -78,6 +78,27 @@ try {
   $srcCmd = (Get-ChildItem (Join-Path $kitRoot 'commands') -Filter *.md).Count
   $cmdCount = (Get-ChildItem (Join-Path $claude 'commands') -Filter *.md).Count
   Check ($cmdCount -eq $srcCmd) "semua command kit tersalin ($cmdCount/$srcCmd berkas)"
+
+  # Triase (kit 1.28.0): aturan pemicu di team-memory.md. `rules/` TIDAK disalin init
+  # (init.ps1 tak punya cabang rules), jadi assert dibaca dari SUMBER kit, bukan dari $claude.
+  $tmPath = Join-Path $kitRoot 'rules/team-memory.md'
+  $tmIsi = Get-Content $tmPath -Raw -Encoding UTF8
+  $judulTriase = '## Triase task: keputusan dulu, atau langsung brief'
+  Check ($tmIsi -like "*$judulTriase*") 'team-memory punya bagian triase'
+
+  # Anggaran 8 baris tak-kosong. Bukan gaya: berkas ini auto-load tiap sesi, jadi blok yang
+  # membengkak dibayar berulang oleh SETIAP sesi. Tanpa penjaga, ia pasti tumbuh.
+  $barisTm = Get-Content $tmPath -Encoding UTF8
+  $iAwal = [array]::IndexOf($barisTm, $judulTriase)
+  $iAkhir = -1
+  if ($iAwal -ge 0) {
+    for ($i = $iAwal + 1; $i -lt $barisTm.Count; $i++) {
+      if ($barisTm[$i] -like '## *') { $iAkhir = $i; break }
+    }
+    if ($iAkhir -lt 0) { $iAkhir = $barisTm.Count }
+  }
+  $isiTriase = if ($iAwal -ge 0) { @($barisTm[$iAwal..($iAkhir - 1)] | Where-Object { $_.Trim() -ne '' }) } else { @() }
+  Check ($isiTriase.Count -ge 1 -and $isiTriase.Count -le 8) "blok triase $($isiTriase.Count) baris tak-kosong (batas 8)"
   Check (Test-Path (Join-Path $claude 'hooks/session-start.ps1')) 'hooks tersalin'
   Check (Test-Path (Join-Path $claude 'settings.json')) 'settings.json ada'
   $cm = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw -Encoding UTF8
