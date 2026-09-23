@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-23",
+  "digenerate": "2026-09-24",
   "jumlah_dokumen": 473,
   "dokumen": [
     {
@@ -15564,20 +15564,20 @@
         "APP - Web ERP",
         "Microservices - Employee Service"
       ],
-      "hash": "7bb98f85b2dbe7c799d1712e9b1556a46dab3d775ff326ae91badd7c8f2438cf",
-      "ukuran_kb": 11.7,
-      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk menyatukan seluruh antrean persetujuan ERP jadi satu halaman web, dipecah jadi irisan 1 (tayang tanpa menyentuh backend) dan irisan 2 (agregator GET /pengajuan/antrean plus adapter tiap modul, termasuk mode riwayat yang belum dimiliki Pengajuan Barang dan Booking Ruang). Menjawab juga siapa yang boleh melihat antrean daftar-modul (Pesanan ERP, Payroll, Rekrutmen): diputuskan hanya bagi pemegang modulnya, sehingga prasyaratnya pindah ke service sumber yang harus menggerbang dirinya sendiri, bukan ke agregator. Menjawab kapan menu persetujuan per-modul lama boleh dicabut dan kenapa urutannya tidak boleh dibalik. Memuat dua task di luar ADR 0114: mengukur kenapa 119 pengajuan mati karena didiamkan, dan membuktikan apakah kartu pembelian di beranda portal selamanya degraded.",
+      "hash": "2777e2c478f855fdda47125cd3477c4a889e25d6108b98d96592b9fcf7db432d",
+      "ukuran_kb": 13.8,
+      "ringkasan": "Menjawab: task apa saja yang menyusun antrean persetujuan terpusat /portal/persetujuan, apa urutan ketergantungannya, dan kenapa sebuah menu persetujuan per-modul belum boleh dicabut. Memuat keputusan produk bahwa sumber 'daftar modul' (Payroll, Rekrutmen, Pesanan ERP) hanya tampil bagi pemegang modulnya, serta hasil ukur bahwa payroll-runs dan requisition sudah digerbang di lapisan rute sehingga adapternya tak menunggu pekerjaan gerbang. Menjelaskan pula kenapa mencabut menu tidak sama dengan mencabut rute, dan mana dua entri menu Portal yang benar-benar ada.",
       "kata_kunci": [
         "antrean persetujuan",
         "approval queue",
         "portal persetujuan",
-        "pengajuan antrean",
-        "agregator persetujuan",
-        "cabut menu persetujuan",
-        "mode riwayat",
-        "pemegang modul",
+        "agregator",
+        "aggregator",
         "pengajuan barang",
-        "ADR 0114"
+        "boleh_putus",
+        "pemegang modul",
+        "mode riwayat",
+        "cabut menu"
       ]
     },
     {
