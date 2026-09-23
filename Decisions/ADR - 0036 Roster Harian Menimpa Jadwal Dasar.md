@@ -1,5 +1,14 @@
 **Status**: ✅ Diputuskan 2026-08-05, **live di produksi 2026-08-06** dan sudah dipakai — Host Live Kyura sudah dinyalakan `roster_enabled`-nya. bip-erp PR #1012 (`79e95038`) + #1014, erp-frontend PR #805 (`5e1e61ae`) + #808 + #809. Backend prod di `92b2b914`, frontend prod di `6da8443c` (deploy manual; merge ke main hanya menurunkan ke DEV). Tombol Panduan in-app menyusul di erp-frontend #811.
 
+> ⚠️ **Diukur ulang di prod 2026-09-23: rosternya nyaris tak dipakai.** Hanya **2 dokumen
+> `work_schedule` di seluruh perusahaan** ber-`roster_enabled: true`, dan dari **14 orang
+> berposisi Host Live hanya 1** (Kyura, grup `HOSTLIVE-0226-WED-OFF-P3-GROUP-1`). Status di
+> atas yang berbunyi "Host Live Kyura sudah dinyalakan `roster_enabled`-nya" benar saat
+> ditulis, tetapi tidak lagi menggambarkan keadaan: sisanya tetap memakai grup rotasi. Ini
+> mengubah arti keputusan §9 dalam praktik — penutupan Tukar Shift bagi karyawan ber-roster
+> hari ini hanya mengenai satu orang, bukan satu departemen. Angka ini **keadaan yang
+> bergerak**, jadi ukur ulang sebelum dipakai memutuskan apa pun, jangan dikutip dari sini.
+
 ## Context
 
 Resolusi jadwal di [[Microservices - Attendance Service]] mengenal dua bentuk saja: `static` (satu dokumen `company_work_schedule`, jam per hari dalam seminggu) dan `pattern` (grup memutar daftar shift tiap X hari lewat `company_group_rotation`). Keduanya mengasumsikan hal yang sama, bahwa jadwal seseorang **punya pola**.
