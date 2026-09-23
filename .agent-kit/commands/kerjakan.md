@@ -128,12 +128,22 @@ Tulis log `.task-plans/judge/<slug>-<n>.json`:
 ```json
 { "brief": "<path>", "worktree": "<path>", "branch": "...", "percobaan": n, "waktu": "<UTC ISO>",
   "gerbang": <hasil gerbang.ps1>, "verdict": <JSON judge>, "lolos": true|false,
-  "skills_dibaca": ["..."], "agen": "<peran hasil §0, mis. loop-fe>" }
+  "skills_dibaca": ["..."], "agen": "<peran hasil §0, mis. loop-fe>",
+  "keputusan_lanjut": "ulangi" | "berhenti_lolos" | "berhenti_gagal" }
 ```
 
 Field `agen` ditulis apa adanya karena ia yang membuat angka pengulangan bisa dibandingkan
 antar-peran nanti: apakah spesialis lapisan benar-benar lebih jarang ditolak judge daripada
 eksekutor domain generik. Tanpa field itu, klaim "peran spesialis mempercepat" tak bisa diukur.
+
+`keputusan_lanjut` ditulis **saat log ini dibuat**, bukan di akhir run, dan itu seluruh gunanya.
+Status akhir memang sudah dicatat di `## Hasil` milik brief (§4 dan §5), tetapi catatan itu ditulis
+di ujung, jadi run yang terputus di tengah tak meninggalkan apa pun. Diperiksa 2026-09-23 atas tiga
+brief yang berhenti: dua menuliskannya dengan benar, satu masih memuat placeholder template.
+Dengan field ini, log percobaan-1 berbunyi `ulangi` yang tidak punya pasangan log percobaan-2
+**membuktikan** run-nya terputus — satu-satunya cara membedakan "sudah diulang dan tetap gagal"
+dari "tak pernah sempat diulang". Tanpa pembedaan itu mutu pemulihan kesalahan tak bisa
+dievaluasi sama sekali.
 
 ## 4. Loop perbaikan
 
@@ -179,6 +189,10 @@ Repo kode, di dalam worktree:
      `## Kontrak`: sebut PR pasangannya dan tegaskan **BE di-deploy sebelum FE**. Paralel di §2
      hanya soal waktu mengetik; yang menentukan aman atau tidaknya di produksi adalah urutan ini,
      dan ia harus terbaca oleh yang menekan tombol merge.
+   - `Dasar keputusan: <isi field Sumber brief>` — ADR/dok yang memutuskan, atau `tidak ada`.
+     Ia yang membuat gerbang merge berhenti jadi klik buta: yang menekan merge bisa membantah
+     premisnya di titik terakhir. Terukur 2026-09-23, nol `reviewDecision` tercatat pada 634 PR
+     dalam 30 hari.
    - Baris penutup: *Dibuat oleh AI Engineering Loop (agent-kit). Merge tetap keputusan manusia (ADR 0077 §1).*
 5. Cetak URL PR. Tambahkan `## Hasil` di brief: percobaan, verdict, URL PR. Kirim ke papan tim:
    ```

@@ -115,6 +115,12 @@ try {
   # untuk implementasi apa pun begitu kata itu muncul di kalimat lain, dan jadi vakum.
   $bfTriase = Get-Content (Join-Path $claude 'commands/brief.md') -Raw -Encoding UTF8
   Check ($bfTriase.Contains('`Sumber`') -and $bfTriase.Contains('turun ke `ragu`')) 'brief memberi arti Sumber dan aturan turun ke ragu'
+
+  # Log .task-plans/judge/<slug>-<n>.json ditulis /kerjakan Sec.3, BUKAN /judge (yang hanya
+  # menulis <slug>-gerbang.json dan <slug>-diff.patch). Menyunting judge.md tak berpengaruh apa pun.
+  $kjTriase = Get-Content (Join-Path $claude 'commands/kerjakan.md') -Raw -Encoding UTF8
+  Check ($kjTriase.Contains('keputusan_lanjut')) 'kerjakan mencatat keputusan_lanjut di log judge'
+  Check ($kjTriase.Contains('Dasar keputusan')) 'badan PR menyebut dasar keputusan'
   Check (Test-Path (Join-Path $claude 'hooks/session-start.ps1')) 'hooks tersalin'
   Check (Test-Path (Join-Path $claude 'settings.json')) 'settings.json ada'
   $cm = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw -Encoding UTF8
