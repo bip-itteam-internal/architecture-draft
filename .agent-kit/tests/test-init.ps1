@@ -180,6 +180,20 @@ try {
   $nDasar = ([regex]::Matches($kjTriase, 'Dasar keputusan')).Count
   Check ($nDasar -ge 2) "kerjakan menulis Dasar keputusan di jalur PR DAN vault ($nDasar tempat)"
 
+  # brief 2026-09-23 (prompt-eksekutor-file-line): eksekutor melaporkan membaca berkas UTUH
+  # (mis. test-init.ps1 581 baris) padahal brief sudah memuat rentang file:line relevan di
+  # bagian Konteks -- orkestrator yang mengukurnya sendiri sebelum menulis brief. §2 sekarang
+  # wajib meneruskan titik mulai itu ke prompt eksekutor. Dua fakta terpisah, dua assertion:
+  # (a) daftar isi prompt WAJIB punya satu baris anchor file:line dari Konteks brief,
+  # (b) teksnya eksplisit bilang anchor itu titik mulai, bukan pagar (eksekutor tetap boleh
+  # membaca lebih luas). $kjTriase sudah dibaca di atas (baris 'keputusan_lanjut'), dipakai ulang.
+  Check ($kjTriase.Contains('Titik mulai (file:line yang sudah diketahui dari bagian Konteks brief')) 'kerjakan §2: daftar prompt WAJIB membawa titik mulai file:line dari Konteks brief'
+  # Frasa 'titik mulai, bukan pagar' DAN 'tetap boleh membaca' wajib berdiri BERSAMA: menghapus
+  # klausa "bukan pagar" saja (tanpa menyentuh baris anchor di atas) harus menjatuhkan assertion
+  # ini sendirian, tanpa ikut menjatuhkan assertion anchor di atasnya -- itu bukti keduanya
+  # tidak vakum satu sama lain (lihat laporan kontrol negatif eksekutor).
+  Check ($kjTriase.Contains('titik mulai, bukan pagar') -and $kjTriase.Contains('tetap boleh membaca')) 'kerjakan §2: eksplisit anchor cuma titik mulai (bukan pagar), eksekutor tetap boleh membaca lebih luas'
+
   # Langkah 0 menuntut resolusi sumber 'dengan perintah' tapi prosedur pencariannya hanya
   # dirujuk di langkah 2, yang justru dilewati saat task dialihkan ke brief.
   $iLangkah = $stTriase.IndexOf('Langkah:')

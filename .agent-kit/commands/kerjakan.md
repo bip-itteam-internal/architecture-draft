@@ -66,8 +66,15 @@ Brief: <path brief>
 Worktree: <path worktree>   (atau: vault architecture-draft, branch main)
 Repo: <nama repo>  Branch: <branch>
 Skill yang relevan untuk dibaca dulu: <daftar .claude/skills/<x>/SKILL.md yang cocok, boleh kosong>
+Titik mulai (file:line yang sudah diketahui dari bagian Konteks brief, boleh kosong bila brief tak punya satu pun): <salin anchor file:line dari `## Konteks yang diketahui` brief>
 Percobaan: 1 dari 3
 ```
+
+**Anchor `file:line` itu titik mulai, bukan pagar.** Eksekutor tetap boleh membaca berkas utuh
+atau rentang lain bila perlu; jangan pernah menulis larangan "hanya baca rentang ini" ke prompt
+eksekutor, satu perbaikan yang salah karena konteks kurang jauh lebih mahal daripada token yang
+dihemat. Orkestrator sudah mengukur anchor itu sendiri saat menulis brief (bagian `## Konteks
+yang diketahui`); meneruskannya cuma memberi eksekutor tempat berpijak, bukan mekanisme baru.
 
 **Bila `Agent` menjawab "Agent type '<peran>' not found"**: sesi ini lahir sebelum kit yang
 memperkenalkan peran itu di-init (peran per lapisan masuk di 1.24.0, agen loop pertama di 1.15.0).
