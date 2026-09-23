@@ -28,6 +28,9 @@ program yang menghasilkan beberapa PR berurutan; deploy prod; audit atau riset t
 lolos-gagal.
 
 Lalu tentukan tingkatnya. ⛔ **Resolusikan sumbernya dengan perintah, jangan dari ingatan.**
+Prosedur pencariannya `architecture-draft/.agent-kit/rules/vault-retrieval.md` §1b (pencocokan
+`VAULT-INDEX.json`) — dipakai di sini juga, bukan hanya di Langkah 2, karena task yang dialihkan
+ke brief tidak pernah sampai ke Langkah 2.
 
 | Tingkat | Syarat | Yang kamu lakukan |
 |---|---|---|

@@ -8,7 +8,10 @@ push → PR. **Berhenti di PR.** Agent tidak merge (ADR 0077 §1): `main` pernah
 di produksi lewat jalur yang belum terverifikasi.
 
 Argumen: path brief (`.task-plans/briefs/...md`), atau teks bebas (→ jalankan prosedur `/brief`
-dulu, lalu lanjut dengan brief yang dihasilkan).
+dulu, lalu lanjut dengan brief yang dihasilkan). ⛔ **Kecuali brief itu `ragu`** — field `Sumber`
+kosong atau `tidak ada`, atau repo/domain bertanda `(ditebak)`. brief `ragu` berhenti di sini:
+tampilkan briefnya, tunggu persetujuan user, baru §1. Itu satu-satunya titik manusia di jalur ini,
+dan melewatinya membuat brief berpremis karangan berjalan sampai PR tanpa seorang pun melihatnya.
 
 Skrip pendukung ada di `.claude/hooks/` (Windows: `.ps1` lewat tool PowerShell; mac/linux:
 `.sh`). Di mesin dev Windows tool Bash tidak berfungsi, jangan dipakai.
@@ -145,6 +148,11 @@ Dengan field ini, log percobaan-1 berbunyi `ulangi` yang tidak punya pasangan lo
 dari "tak pernah sempat diulang". Tanpa pembedaan itu mutu pemulihan kesalahan tak bisa
 dievaluasi sama sekali.
 
+Pemetaannya ditetapkan, jangan ditebak: `berhenti_lolos` bila §3 menghasilkan lolos; `ulangi` bila
+gagal dan percobaan < 3; `berhenti_gagal` bila gagal pada percobaan ke-3. Nilai yang tidak jujur
+membatalkan seluruh gunanya — `ulangi` yang ditulis pada percobaan terakhir membuat run yang
+selesai wajar terbaca sebagai run yang terputus.
+
 ## 4. Loop perbaikan
 
 Bila **gagal** dan percobaan < 3: dispatch ulang **peran yang sama** dengan prompt yang sama plus
@@ -201,6 +209,12 @@ Repo kode, di dalam worktree:
 
 Vault (domain docs): stage **per nama berkas**, commit, `build-vault-index.py --check` (regenerasi
 lewat `/index-vault` bila basi), `git merge origin/main` bila remote maju, push `main`. Tanpa PR.
+
+⛔ **Jalur vault TIDAK berhenti di PR**, jadi ia tak punya tombol merge tempat seorang manusia bisa
+membantah premisnya, dan gerbang deterministiknya lolos lewat daftar-izin `RepoTanpaGerbang`.
+Karena itu badan commit vault **wajib** memuat `Dasar keputusan: <isi field Sumber brief>` — di
+jalur ini itu satu-satunya tempat premisnya tercatat. Brief vault ber-`Sumber: tidak ada` adalah
+`ragu`, dan `ragu` sudah berhenti menunggu persetujuan di §0.
 
 ## 6. Tutup
 

@@ -121,6 +121,43 @@ try {
   $kjTriase = Get-Content (Join-Path $claude 'commands/kerjakan.md') -Raw -Encoding UTF8
   Check ($kjTriase.Contains('keputusan_lanjut')) 'kerjakan mencatat keputusan_lanjut di log judge'
   Check ($kjTriase.Contains('Dasar keputusan')) 'badan PR menyebut dasar keputusan'
+
+  # --- Sambungan antar-berkas, temuan review akhir 1.28.0 ---
+  # Kelas yang sama untuk kelimanya: tiap berkas benar sendiri-sendiri, yang salah sambungannya.
+
+  # Baris 'Flow wajib' disuntikkan hook SessionStart ke SETIAP sesi sebagai baris PERTAMA, dan
+  # kata 'wajib' membantah pemicu triase yang baru dipasang di team-memory.md. Paritas .ps1/.sh
+  # dijaga: mengubah satu sisi saja membuat jalur mac/linux menyimpang diam-diam.
+  $ssPs = Get-Content (Join-Path $claude 'hooks/session-start.ps1') -Raw -Encoding UTF8
+  $ssSh = Get-Content (Join-Path $claude 'hooks/session-start.sh') -Raw -Encoding UTF8
+  $cmGen = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw -Encoding UTF8
+  Check ($ssPs.Contains('triase')) 'session-start.ps1 mengkualifikasi flow wajib dengan triase'
+  Check ($ssSh.Contains('triase')) 'session-start.sh mengkualifikasi flow wajib dengan triase (paritas)'
+  Check ($cmGen.Contains('triase')) 'CLAUDE.md hasil generate menyebut triase'
+
+  # /kerjakan <teks bebas> menjalankan prosedur /brief lalu LANJUT tanpa syarat, sehingga brief
+  # ber-Sumber kosong melewati gerbang ragu yang baru dibuat brief.md.
+  Check ($kjTriase.Contains('brief `ragu` berhenti')) 'kerjakan: teks bebas yang jadi brief ragu berhenti'
+
+  # keputusan_lanjut tanpa aturan nilai cuma niat: buktinya ("ulangi tanpa pasangan log
+  # percobaan berikutnya = run terputus") runtuh bila nilainya tidak dipetakan ke keadaan.
+  Check ($kjTriase.Contains('`berhenti_lolos` bila')) 'kerjakan memetakan nilai keputusan_lanjut ke keadaan'
+
+  # Jalur vault (domain docs) push langsung ke main TANPA PR, jadi 'Dasar keputusan' yang cuma
+  # ada di badan gh pr create tak pernah terbit untuk brief docs.
+  $nDasar = ([regex]::Matches($kjTriase, 'Dasar keputusan')).Count
+  Check ($nDasar -ge 2) "kerjakan menulis Dasar keputusan di jalur PR DAN vault ($nDasar tempat)"
+
+  # Langkah 0 menuntut resolusi sumber 'dengan perintah' tapi prosedur pencariannya hanya
+  # dirujuk di langkah 2, yang justru dilewati saat task dialihkan ke brief.
+  $iLangkah = $stTriase.IndexOf('Langkah:')
+  $iVaultRet = $stTriase.IndexOf('vault-retrieval')
+  Check ($iVaultRet -ge 0 -and $iVaultRet -lt $iLangkah) 'start-task langkah 0 menunjuk vault-retrieval'
+
+  # Assertion keberadaan saja tidak menjaga URUTAN: memindahkan blok triase ke bawah tetap
+  # hijau sementara sifat "berhenti sebelum memuat arsitektur" hilang tanpa gejala.
+  $iTriase = $stTriase.IndexOf('## 0. Triase')
+  Check ($iTriase -ge 0 -and $iTriase -lt $iLangkah) 'langkah 0 triase berada SEBELUM daftar Langkah'
   Check (Test-Path (Join-Path $claude 'hooks/session-start.ps1')) 'hooks tersalin'
   Check (Test-Path (Join-Path $claude 'settings.json')) 'settings.json ada'
   $cm = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw -Encoding UTF8

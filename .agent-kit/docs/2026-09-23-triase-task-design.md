@@ -126,12 +126,29 @@ Tambah satu baris di badan PR: `Dasar keputusan: <isi field Sumber>`. Murah, dan
 gerbang merge berhenti jadi klik buta: yang menekan merge bisa membantah premisnya di titik
 terakhir. Relevan karena terukur nol `reviewDecision` tercatat pada 634 PR dalam 30 hari.
 
-### 6e. `tests/test-init.ps1` — dua `Check` baru
+### 6e. `tests/test-init.ps1` — 15 `Check` baru (88 → 103)
 
-Pakai helper `Check <bool> <label>` yang sudah ada (lihat baris 74).
+Pakai helper `Check <bool> <label>` yang sudah ada (lihat baris 74). Angkanya ditulis di sini
+karena pembaca yang memangkas test "supaya cocok dengan spec" akan menghapus penjaga nyata.
 
-- `start-task.md` hasil salin memuat langkah triase.
-- `brief.md` hasil salin menyebut `Sumber` beserta aturan turun ke `ragu`.
+Empat kelompok:
+
+1. **Aturan ada dan tidak membengkak** — `team-memory.md` memuat bagian triase, dan isinya
+   maksimum 8 baris tak-kosong.
+2. **Tersalin `init`** — `start-task.md` memuat `## 0. Triase` **dan** menaruhnya SEBELUM daftar
+   `Langkah:`; `brief.md` menyebut `Sumber` beserta aturan turun ke `ragu`; `kerjakan.md` memuat
+   `keputusan_lanjut` dan `Dasar keputusan`.
+3. **Sambungan antar-berkas** (ditambahkan sesudah review akhir; tiap berkas benar sendiri-sendiri,
+   yang salah sambungannya) — `session-start.ps1`/`.sh` dan `CLAUDE.md` hasil generate
+   mengkualifikasi "Flow wajib" dengan triase; `/kerjakan` menghentikan brief `ragu` dari jalur
+   teks bebas; nilai `keputusan_lanjut` dipetakan ke keadaan; `Dasar keputusan` terbit di jalur PR
+   **dan** jalur vault.
+4. **Paritas `.ps1`/`.sh`** untuk `session-start`, karena mengubah satu sisi saja membuat jalur
+   mac/linux menyimpang diam-diam.
+
+⚠️ Dua di antaranya hijau sejak ditulis karena sifatnya memang sudah benar (urutan langkah 0).
+Itu penjaga regresi, bukan bukti perbaikan, dan diskriminasinya dibuktikan terpisah lewat mutasi
+di memori: teks asli `True`, teks yang blok triasenya dipindah ke bawah `False`.
 
 Test ini menahan kelas kegagalan yang nyata: langkah triase terhapus saat penyuntingan berikutnya
 dan tak ada yang berbunyi.
