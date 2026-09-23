@@ -50,8 +50,15 @@ Tinjau Setoran Live Support (`/live-support/karya/antrean`), Pengajuan Barang (`
 *Tergantung*: T7.
 
 **T9. Adapter tiga sumber "daftar modul".**
-Pesanan ERP, Payroll run, Rekrutmen. Ketiganya bukan antrean pribadi, jadi wajib bertahap "Pantauan modul" dan tidak ikut hitungan "menunggu Anda". Butuh keputusan produk lebih dulu: apakah ketiganya memang layak tampil bagi semua penyetuju, atau hanya bagi yang modulnya ia pegang.
-*Tergantung*: T7, plus keputusan produk.
+Pesanan ERP, Payroll run, Rekrutmen. Ketiganya bukan antrean pribadi, jadi wajib bertahap "Pantauan modul" dan tidak ikut hitungan "menunggu Anda".
+
+✅ **Keputusan produk diambil 2026-09-23: HANYA bagi pemegang modulnya.** Payroll tampil bagi orang Finance, Rekrutmen bagi HR, dan seterusnya — bukan bagi semua penyetuju.
+
+⛔ **Konsekuensinya prasyarat pindah ke SERVICE SUMBER, bukan ke agregator.** "Tahu siapa pegang modul apa" adalah aturan hak akses, dan menuliskannya di agregator dilarang [[ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service]] butir 7. Satu-satunya jalan yang bersih: ketiga endpoint itu **menggerbang dirinya sendiri**, lalu agregator menerima **403** untuk yang bukan pemegangnya — dan 403 memang sudah diperlakukan sebagai "bukan urusan saya", bukan `degraded`, oleh kerangka yang sudah ada.
+
+⚠️ Hari ini ketiganya **belum** menggerbang: `listPayrollRuns`, `listOffers`, dan `listRequisitions` memakai filter kosong sehingga seluruh baris terkirim ke siapa pun yang memanggil, dan yang menyaring selama ini penyaring di klien. Jadi T9 kini berisi tiga pekerjaan di tiga service sumber lebih dulu, bukan satu pekerjaan adapter. Pecah per service saat dibriefkan.
+
+*Tergantung*: T7, plus gerbang per pemanggil di payroll-service, procurement, dan recruitment-service.
 
 **T10. Pelatihan dan Tiket ikut masuk.**
 Keduanya sudah ada di `registriRingkasan` sebagai angka; di sini mereka menyumbang baris.
