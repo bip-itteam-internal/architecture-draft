@@ -99,6 +99,16 @@ try {
   }
   $isiTriase = if ($iAwal -ge 0) { @($barisTm[$iAwal..($iAkhir - 1)] | Where-Object { $_.Trim() -ne '' }) } else { @() }
   Check ($isiTriase.Count -ge 1 -and $isiTriase.Count -le 8) "blok triase $($isiTriase.Count) baris tak-kosong (batas 8)"
+
+  # Langkah 0 triase harus ikut TERSALIN init, bukan cuma ada di sumber kit.
+  # Nama $stTriase, BUKAN $st: $st sudah dipakai di bawah untuk isi settings.json. Sisipan ini
+  # kebetulan berada di atasnya sehingga urutannya selamat, tapi itu bergantung pada posisi --
+  # memindahkan blok ini ke bawah akan menimpa objek settings tanpa satu pun galat.
+  $stTriase = Get-Content (Join-Path $claude 'commands/start-task.md') -Raw -Encoding UTF8
+  Check ($stTriase -like '*## 0. Triase*') 'start-task punya langkah 0 triase'
+  # .Contains, BUKAN -like: backtick adalah karakter ESCAPE di pola wildcard PowerShell, jadi
+  # '*`yakin`*' terurai jadi "yakin" diikuti tanda bintang HARFIAH dan tak akan pernah cocok.
+  Check ($stTriase.Contains('`yakin`') -and $stTriase.Contains('`ragu`')) 'start-task menyebut tingkat yakin dan ragu'
   Check (Test-Path (Join-Path $claude 'hooks/session-start.ps1')) 'hooks tersalin'
   Check (Test-Path (Join-Path $claude 'settings.json')) 'settings.json ada'
   $cm = Get-Content (Join-Path $claude 'CLAUDE.md') -Raw -Encoding UTF8

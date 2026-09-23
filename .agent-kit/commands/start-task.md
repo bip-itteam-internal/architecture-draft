@@ -8,6 +8,37 @@ sampai konteks dipahami dan user mengonfirmasi.
 
 Task dari user: $ARGUMENTS
 
+## 0. Triase — keputusannya sudah ada, atau belum?
+
+Sebelum memuat apa pun, tentukan task ini mestinya lewat jalur mana. Memuat arsitektur untuk task
+yang mestinya jadi brief adalah pekerjaan yang dibuang.
+
+Muat jadi brief bila SELURUHNYA benar:
+
+1. Keputusannya sudah tertulis dan bisa **ditunjuk**: ADR, dok domain vault, atau
+   `Workspace/ANALISA - *.md`. "Sudah jelas" tidak cukup.
+2. Apa yang harus benar bisa dinyatakan tanpa memilih pendekatan.
+3. Ada kriteria yang bisa dibuktikan mesin DAN satu yang terlihat di layar.
+4. Ukuran S per brief. Lintas repo dipecah, BE dulu — lintas repo BUKAN diskualifikasi.
+5. Tidak menyentuh uang, sanksi, jatah cuti, atau ambang disiplin tanpa mengutip
+   `mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md`.
+
+Tetap manual bila salah satu benar: keputusannya belum ada dan yang diminta justru memutuskan;
+program yang menghasilkan beberapa PR berurutan; deploy prod; audit atau riset tanpa kriteria
+lolos-gagal.
+
+Lalu tentukan tingkatnya. ⛔ **Resolusikan sumbernya dengan perintah, jangan dari ingatan.**
+
+| Tingkat | Syarat | Yang kamu lakukan |
+|---|---|---|
+| `yakin` | Seluruh syarat di atas terpenuhi **dan** berkas sumber keputusan berhasil dibuka | `/brief`, lalu `/kerjakan` langsung. Cetak `Triase: yakin · dasar <sumber>` |
+| `ragu` | Syarat terpenuhi tapi sumber tak bisa ditunjuk, atau repo/domain `(ditebak)` | `/brief`, lalu **TAMPILKAN** briefnya dan tunggu persetujuan sebelum `/kerjakan` |
+| `tidak` | Ada satu syarat yang gagal | Lanjut ke Langkah 1 di bawah |
+
+Ragu antara `yakin` dan `ragu` berarti **`ragu`**. Gagal-tertutup, sama seperti `pre-commit-gate`.
+
+Bila dialihkan ke brief, `/start-task` **BERHENTI di sini**. Jangan memuat arsitektur.
+
 Langkah:
 1. Baca `.claude/CLAUDE.md`, ambil baris "Project aktif".
 2. Pilih dan baca dokumen arsitektur yang relevan dengan task ini. Ikuti
