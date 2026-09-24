@@ -1,10 +1,26 @@
 ## Deskripsi
 
+- **Status**: ⚠️ **SUPERSEDED per 2026-09-24.** Fiturnya sendiri hidup dan jauh lebih lengkap dari yang tertulis di sini, tetapi **dokumen ini tidak lagi menggambarkan sistem**: route, path repo, dan klaim "belum ada backend" semuanya sudah tidak berlaku. Jangan dipakai sebagai acuan; dok penggantinya disebut di bawah.
+
+> ⛔ **Tiga klaim pokok dokumen ini sudah terbantah** (diukur ke `origin/main` `bip-erp` dan `erp-frontend`, 2026-09-24):
+>
+> 1. **"Belum ada service maupun storage di backend" — SALAH.** form-builder punya **23 berkas `culture_*`** dan **9 koleksi** (`culture_clubs`, `culture_club_members`, `culture_programs`, `culture_attendance`, `culture_feedback`, `culture_terlaksana`, `culture_metrics`, `culture_club`, `culture_club_seed`), dengan grup rute `/culture` di `services/form-builder/routes.go`: `GET/POST/PUT/DELETE /culture/clubs*`, `/culture/clubs/:slug/members`, `/culture/programs*`, `/culture/attendance`, `/culture/feedback*`, `/culture/events`, `/culture/summary`.
+> 2. **"Seluruh data klub & dokumentasi masih konstanta di frontend" — SALAH.** erp-frontend memanggil backend lewat `src/features/form-builder/hooks/use-culture.ts`.
+> 3. **Route `/hris/community/{schedule,documentation}` SUDAH TIDAK ADA.** Folder `src/features/hris/community/*` juga tidak ada di `origin/main`. Penggantinya `/hris/program-culture/*` (7 halaman: beranda, `kelola`, `master`, `club`, `nilai`, `approval`, `[id]`).
+>
+> Selain itu sumber KPI **`program_culture`** sudah terdaftar (`services/employee/kpi_sumber_culture.go`).
+>
+> **Dokumen yang berlaku sekarang:** [[ADR - 0066 Modul Kelola Program Culture]] · [[ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program]] · [[ADR - 0093 Tipe Program Culture Non-Event Dinilai Terlaksana dengan Approval SPV HR, plus Jadwal di Master]] · [[Microservices - Form Builder Service]].
+>
+> ⚠️ **Sengaja tidak ditulis ulang di sini.** Menulis ulang menuntut survei penuh tujuh halaman baru beserta backend-nya, dan itu task tersendiri; mengarang isinya melanggar grounded-in-code (§1 rulebook vault). Yang dikerjakan sekarang hanya menghentikan dokumen ini menyesatkan pembaca. Isi di bawah dibiarkan utuh sebagai **catatan sejarah keadaan 2026-07-29**, bukan sebagai deskripsi sistem.
+
+*(Isi historis mulai di sini.)*
+
 *Menu **Pengembangan Organisasi** (Organization Development) di Web ERP: wadah program non-transaksional HR, yaitu komunitas minat karyawan (**Community of Interest**) dan perayaan **ulang tahun** karyawan. Berbeda dari menu HRIS lain yang berbasis transaksi (absensi, cuti, payroll), isi menu ini bersifat program dan budaya kerja. Sisi konsep engagement-nya bertaut ke [[HRIS - Retention]].*
 
 - **Stack**: Next.js App Router (client component) + shadcn/ui + Tailwind; `react-i18next` (id + en)
-- **Path di repo**: `erp-frontend`, yaitu `src/features/hris/community/*`, halaman `src/app/(main)/hris/community/{schedule,documentation}/page.tsx`, dan menu `src/components/layout/sidebar-menus.tsx`
-- **Status**: ⚠️ Implemented (ada catatan). UI jalan penuh, tetapi **seluruh data klub & dokumentasi masih konstanta di frontend**; belum ada service maupun storage di backend
+- **Path di repo** *(sudah tidak ada per 2026-09-24)*: `erp-frontend`, yaitu `src/features/hris/community/*`, halaman `src/app/(main)/hris/community/{schedule,documentation}/page.tsx`, dan menu `src/components/layout/sidebar-menus.tsx`
+- **Status historis (2026-07-29)**: ⚠️ Implemented (ada catatan). UI jalan penuh, tetapi seluruh data klub & dokumentasi masih konstanta di frontend
 - **Branch**: `feat/od-community-of-interest` (belum merge saat dok ini ditulis, 2026-07-29)
 
 ## Fitur (Sudah Diimplementasikan)

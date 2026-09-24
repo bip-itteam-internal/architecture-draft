@@ -10507,7 +10507,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Salinan setia data production per **2026-08-01**, dengan bab **Tech Development** disegarkan langsung dari `employee_db` prod **2026-08-28** (status arsip template, konfigurasi `auto` yang benar-benar terpasang, dan ketersediaan tiap sumbernya). Bukan rancangan dan bukan usulan; ini yang benar-benar dipakai menilai orang hari ini. **Ralat 2026-08-31**: 18 sel yang menyatakan \"TIDAK ADA modul Kaizen\" dan 1 sel yang menyatakan \"TIDAK ADA modul forecast\" **salah** dan sudah diperbaiki — rinciannya di bagian [[#Ralat 2026-08-31 Kaizen dan forecast kas]]. **Segar 2026-09-02**: bab **Recruitment & Onboarding** ditulis ulang dari `employee_db` + `recruitment_db` prod (template aktifnya sudah berganti jadi `Recruitment` dan dua metriknya berbeda dari yang tercatat sebelumnya), sel `PPIC / Inventory Turnover Ratio` diralat karena berisi verdict rekrutmen yang salah tempel, dan baris rekrutmen di `KPI Supervisor HRGA` disegarkan angkanya. **Segar 2026-09-12**: bab **Finance** ditulis ulang dari `employee_db` prod (template, konfigurasi `auto`, penetapan, dan skor 2026; rinciannya di bab itu). **Segar 2026-09-15**: bab **Training & Perfomance Officer** ditulis ulang dari `employee_db` + `learning_db` prod (template aktifnya sudah berganti jadi `People and Development` dengan 6 metrik, dan modul Training ternyata sudah punya post-test berskor yang belum dipakai; rinciannya di bab itu). **Segar 2026-09-15 sore**: sumber KPI `pelatihan` (tiga sub-metrik) live di produksi; baris metrik pelatihan di bab Training & Perfomance Officer dan Culture & Industrial disegarkan, dan **klasifikasinya tidak bergeser** karena konektor kini ada tetapi datanya masih kosong. **Dicatat 2026-09-16**: baris `Terlaksananya kegiatan training & performance officer sesuai dengan rencana` (bab Training & Perfomance Officer) disegarkan — sumber KPI baru `rencana_pelatihan` (Tahap 2 Training & Performance Officer) SUDAH DITULIS di employee-service, dan PR bip-erp #1903 serta #1904 sudah **merged** (diukur `gh pr view` 2026-09-17: bip-erp PR #1903 dan #1904 merged 2026-09-16 00:53Z; ter-deploy di prod, gerbang biner 2026-09-17); klasifikasi baris itu **tidak bergeser** dari *modul ada tapi datanya kosong*. **Ditambah 2026-09-16**: bab **Live Support** (Kyura) ditulis dari `employee_db` prod — template `Host Live Support Kyura` seluruhnya manual, satu karyawan, satu-satunya skor ada di 2026-07, dan Agustus belum dinilai; hitungan template departemen Kyura juga dicatat sudah tertinggal dari salinan 2026-08-01 (17 template, 12 aktif). **Dicatat 2026-09-17**: baris `Skor Penilaian Training All Karyawan > 70 ` (bab Training & Perfomance Officer) disegarkan untuk Tahap 3b (pre-test, kelulusan dari kenaikan skor, dan pilihan sumber kedua `peningkatan_post_test_persen` di samping `skor_post_test_persen`); kodenya di bip-erp PR #1913 + #1934, erp-frontend PR #1603 + #1619, my-bharata PR #151 + #153, semuanya merged; backend dan web ter-deploy di prod per 2026-09-17, MyBharata baru di `dev`. Klasifikasi **tidak bergeser**, dan angka prod 2026-09-15 di bab itu ditandai perlu diukur ulang. **Segar 2026-09-17 malam**: sub-bab GA Staff peran Building & Maintenance ditulis ulang dari `employee_db` + `task_management_db` prod (template aktifnya kini `Building and Maintenance Staff` 3 metrik; metrik kerusakan punya sumber `kinerja_tiket` / `selesai_dinilai` di bip-erp PR [#1962](https://github.com/bip-itteam-internal/bip-erp/pull/1962) + erp-frontend PR [#1638](https://github.com/bip-itteam-internal/erp-frontend/pull/1638), merged 2026-09-17, terverifikasi DEV lewat gateway, belum deploy PROD); hitungan bab General Affair tidak diukur ulang. **Dicatat 2026-09-18**: bab **Recruitment & Onboarding** dan baris rekrutmen di `KPI Supervisor HRGA` diberi catatan sumber KPI baru `rekrutmen` (enam metrik, bip-erp PR [#1967](https://github.com/bip-itteam-internal/bip-erp/pull/1967) + erp-frontend PR [#1644](https://github.com/bip-itteam-internal/erp-frontend/pull/1644), merged 2026-09-18) — **belum di-deploy, belum dipasang ke template mana pun**, jadi klasifikasi, angka, dan skor manual di kedua bab itu **tidak bergeser**.",
+      "status_teks": "Salinan setia data production per **2026-08-01**, dengan bab **Tech Development** disegarkan langsung dari `employee_db` prod **2026-08-28** (status arsip template, konfigurasi `auto` yang benar-benar terpasang, dan ketersediaan tiap sumbernya). Bukan rancangan dan bukan usulan; ini yang benar-benar dipakai menilai orang hari ini. **Ralat 2026-08-31**: 18 sel yang menyatakan \"TIDAK ADA modul Kaizen\" dan 1 sel yang menyatakan \"TIDAK ADA modul forecast\" **salah** dan sudah diperbaiki — rinciannya di bagian [[#Ralat 2026-08-31 Kaizen dan forecast kas]]. **Segar 2026-09-02**: bab **Recruitment & Onboarding** ditulis ulang dari `employee_db` + `recruitment_db` prod (template aktifnya sudah berganti jadi `Recruitment` dan dua metriknya berbeda dari yang tercatat sebelumnya), sel `PPIC / Inventory Turnover Ratio` diralat karena berisi verdict rekrutmen yang salah tempel, dan baris rekrutmen di `KPI Supervisor HRGA` disegarkan angkanya. **Segar 2026-09-12**: bab **Finance** ditulis ulang dari `employee_db` prod (template, konfigurasi `auto`, penetapan, dan skor 2026; rinciannya di bab itu). **Segar 2026-09-15**: bab **Training & Perfomance Officer** ditulis ulang dari `employee_db` + `learning_db` prod (template aktifnya sudah berganti jadi `People and Development` dengan 6 metrik, dan modul Training ternyata sudah punya post-test berskor yang belum dipakai; rinciannya di bab itu). **Segar 2026-09-15 sore**: sumber KPI `pelatihan` (tiga sub-metrik) live di produksi; baris metrik pelatihan di bab Training & Perfomance Officer dan Culture & Industrial disegarkan, dan **klasifikasinya tidak bergeser** karena konektor kini ada tetapi datanya masih kosong. **Dicatat 2026-09-16**: baris `Terlaksananya kegiatan training & performance officer sesuai dengan rencana` (bab Training & Perfomance Officer) disegarkan — sumber KPI baru `rencana_pelatihan` (Tahap 2 Training & Performance Officer) SUDAH DITULIS di employee-service, dan PR bip-erp #1903 serta #1904 sudah **merged** (diukur `gh pr view` 2026-09-17: bip-erp PR #1903 dan #1904 merged 2026-09-16 00:53Z; ter-deploy di prod, gerbang biner 2026-09-17); klasifikasi baris itu **tidak bergeser** dari *modul ada tapi datanya kosong*. **Ditambah 2026-09-16**: bab **Live Support** (Kyura) ditulis dari `employee_db` prod — template `Host Live Support Kyura` seluruhnya manual, satu karyawan, satu-satunya skor ada di 2026-07, dan Agustus belum dinilai; hitungan template departemen Kyura juga dicatat sudah tertinggal dari salinan 2026-08-01 (17 template, 12 aktif). **Dicatat 2026-09-17**: baris `Skor Penilaian Training All Karyawan > 70 ` (bab Training & Perfomance Officer) disegarkan untuk Tahap 3b (pre-test, kelulusan dari kenaikan skor, dan pilihan sumber kedua `peningkatan_post_test_persen` di samping `skor_post_test_persen`); kodenya di bip-erp PR #1913 + #1934, erp-frontend PR #1603 + #1619, my-bharata PR #151 + #153, semuanya merged; backend dan web ter-deploy di prod per 2026-09-17, MyBharata baru di `dev`. Klasifikasi **tidak bergeser**, dan angka prod 2026-09-15 di bab itu ditandai perlu diukur ulang. **Segar 2026-09-17 malam**: sub-bab GA Staff peran Building & Maintenance ditulis ulang dari `employee_db` + `task_management_db` prod (template aktifnya kini `Building and Maintenance Staff` 3 metrik; metrik kerusakan punya sumber `kinerja_tiket` / `selesai_dinilai` di bip-erp PR [#1962](https://github.com/bip-itteam-internal/bip-erp/pull/1962) + erp-frontend PR [#1638](https://github.com/bip-itteam-internal/erp-frontend/pull/1638), merged 2026-09-17, terverifikasi DEV lewat gateway, belum deploy PROD); hitungan bab General Affair tidak diukur ulang. **Dicatat 2026-09-18**: bab **Recruitment & Onboarding** dan baris rekrutmen di `KPI Supervisor HRGA` diberi catatan sumber KPI baru `rekrutmen` (enam metrik, bip-erp PR [#1967](https://github.com/bip-itteam-internal/bip-erp/pull/1967) + erp-frontend PR [#1644](https://github.com/bip-itteam-internal/erp-frontend/pull/1644), merged 2026-09-18) — **belum di-deploy, belum dipasang ke template mana pun**, jadi klasifikasi, angka, dan skor manual di kedua bab itu **tidak bergeser**. **Segar 2026-09-24**: catatan 2026-09-18 di atas **sudah tidak berlaku** — diukur ke `employee_db` prod, sumber `rekrutmen` kini ter-deploy DAN terpasang di template `Recruitment` (4 metrik, 0,75 bobot otomatis) dan sudah menilai di periode 2026-08; baris `pelatihan` di daftar sumber HRGA diralat (yang terpasang `peningkatan_post_test_persen`, bukan `skor_post_test_persen`; `Training Satisfaction Score` masih manual; Organizational Development seluruhnya manual) dan sumber `rencana_pelatihan` ditambahkan sebagai terpasang. Cakupan otomatis HRGA terukur **2,80 dari 11,00 bobot di 11 posisi**; papan kerja beserta rinciannya ada di `Workspace/ANALISA - Kesenjangan Alat Kerja dan KPI HRGA` (tidak ditautkan karena `Workspace/` tak terbit ke wiki).",
       "publik": true,
       "tautan": [
         "RUN - Menambah Metrik KPI Otomatis",
@@ -10546,19 +10546,20 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "1d6a37819deac2f6cad22c5fdbc306365998355265e9b9389f513d0aa54936ee",
-      "ukuran_kb": 281.2,
-      "ringkasan": "Menjawab: apa saja label metrik, bobot, dan target KPI yang benar-benar sedang dipakai menilai tiap posisi di tiap departemen, sebagai salinan setia data production koleksi kpi_template. Menjawab juga departemen dan posisi mana yang metriknya sudah otomatis, semi-otomatis, terblokir data, atau masih manual, sehingga dipakai sebagai dokumen kerja untuk mengotomatiskan metrik KPI per departemen.",
+      "hash": "dfff5ac4a1970969e039b9adff372f52faae0fdbe4fd4ec176e71d82db385d38",
+      "ukuran_kb": 283.1,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang dipakai menilai tiap posisi di production, berapa bobotnya, apa targetnya (isi field description, karena kpi_template tidak punya field target yang dapat dibaca mesin), dan metrik mana yang sudah otomatis, semi, terblokir data, atau masih manual per departemen. Memuat salinan setia koleksi kpi_template di employee_db beserta label yang ditulis persis seperti tersimpan (termasuk typo dan spasi ujung, karena label adalah kunci identitas metrik di kode), dipecah per departemen dari Beauty Hacks sampai Tech Development. Dipakai dev departemen sebagai dokumen kerja untuk memilih metrik mana yang akan diotomatiskan, dengan cara mengerjakannya di RUN - Menambah Metrik KPI Otomatis dan latar kelayakannya di HRIS - Otomasi Skor KPI.",
       "kata_kunci": [
         "KPI",
         "kpi_template",
-        "matriks KPI per departemen",
-        "otomasi KPI",
+        "matriks KPI",
         "bobot metrik",
         "target KPI",
-        "klasifikasi otomasi KPI",
-        "template KPI",
-        "HRIS"
+        "otomasi skor KPI",
+        "employee_db",
+        "penilaian karyawan",
+        "departemen",
+        "performance appraisal"
       ]
     },
     {
@@ -10804,33 +10805,36 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). UI jalan penuh, tetapi **seluruh data klub & dokumentasi masih konstanta di frontend**; belum ada service maupun storage di backend",
+      "status_teks": "**SUPERSEDED per 2026-09-24.** Fiturnya sendiri hidup dan jauh lebih lengkap dari yang tertulis di sini, tetapi **dokumen ini tidak lagi menggambarkan sistem**: route, path repo, dan klaim \"belum ada backend\" semuanya sudah tidak berlaku. Jangan dipakai sebagai acuan; dok penggantinya disebut di bawah.",
       "publik": true,
       "tautan": [
+        "ADR - 0066 Modul Kelola Program Culture",
+        "ADR - 0084 Kehadiran Program Culture via Scan Menggantikan Feedback, plus Master Program",
+        "ADR - 0093 Tipe Program Culture Non-Event Dinilai Terlaksana dengan Approval SPV HR, plus Jadwal di Master",
+        "Microservices - Form Builder Service",
         "HRIS - Retention",
         "Microservices - Employee Service",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
-        "ADR - 0093 Tipe Program Culture Non-Event Dinilai Terlaksana dengan Approval SPV HR, plus Jadwal di Master",
         "API - Form Builder Service",
         "APP - MyBharata",
         "APP - Web ERP",
         "HRIS - Personalia",
         "HRIS - Big Pictures"
       ],
-      "hash": "56fae53e688f3d0c756ccd64917fb2a92744e63fb005d95925738fcdf25d3c58",
-      "ukuran_kb": 6.4,
-      "ringkasan": "Menjawab: apa isi menu Pengembangan Organisasi (Organization Development) di Web ERP, yaitu Jadwal Club, Dokumentasi Kegiatan Club, dan Ulang Tahun karyawan, beserta route, sumber data, dan siapa yang bisa melihatnya (pemegang `system_roles.hris` dan IT supervisor, karyawan peserta klub belum termasuk). Menjawab juga klub apa saja yang rutin berjalan dan di hari apa, kenapa hari disimpan sebagai angka `getDay()` agar ikut i18n ADR 0010, dan bagian mana yang masih konstanta frontend tanpa backend sama sekali (klub, keanggotaan, foto kegiatan). Berisi peringatan bahwa jadwal klub kini punya dua sumber yang bisa menyimpang (master program culture yang dibaca MyBharata vs konstanta FE di layar web), plus daftar hal yang masih TBD seperti keanggotaan, absensi kegiatan, notifikasi, dan cakupan akses.",
+      "hash": "253a6f8933eea81a91d87f0bf58163ab35c8cb5f35b2753936708e0ae7ed4c3d",
+      "ukuran_kb": 8.7,
+      "ringkasan": "Menjawab: apa itu menu Pengembangan Organisasi (Organization Development) di Web ERP, yaitu Community of Interest (jadwal Bharata Club Community, dokumentasi kegiatan klub) plus halaman ulang tahun karyawan, siapa penggunanya, dan bagaimana akses serta i18n-nya diatur. Dokumen ini ditandai SUPERSEDED: route /hris/community/*, klaim belum ada backend, dan path repo src/features/hris/community sudah tidak berlaku, dan isinya sengaja dibiarkan sebagai catatan sejarah keadaan 2026-07-29. Berguna untuk menelusuri asal-usul fitur dan diarahkan ke dokumen penggantinya (ADR 0066, ADR 0084, ADR 0093, dan Microservices - Form Builder Service) yang menggambarkan modul Program Culture yang berlaku sekarang.",
       "kata_kunci": [
         "pengembangan organisasi",
         "organization development",
         "community of interest",
+        "program culture",
         "klub karyawan",
         "jadwal club",
         "Bharata Club Community",
-        "dokumentasi kegiatan",
         "ulang tahun karyawan",
         "birthdays",
-        "engagement retention"
+        "form-builder"
       ]
     },
     {
@@ -15960,23 +15964,22 @@
       "status_teks": null,
       "publik": false,
       "tautan": [],
-      "hash": "a623fee4eb38735a0850b74fd226e9dcd7015aed81ff2f3ec1ff626b8a93cd8b",
-      "ukuran_kb": 10.8,
-      "ringkasan": "Papan kerja yang menjawab: alat pendukung kerja dan penilaian KPI apa saja di HRGA yang belum ada, siapa yang mengerjakannya, dan dikerjakan dengan urutan apa. Memuat rencana lima tingkat yang diurutkan menurut bobot metrik yang dibuka per satuan usaha, dengan dua tingkat teratas yang tidak butuh satu baris kode pun, lembar keputusan per metrik untuk rapat pemilik KPI, dan daftar data yang harus diisi HR ke modul Training. Memuat juga koreksi dok yang sudah usang dan jebakan pencarian yang hampir menerbitkan temuan palsu.",
+      "hash": "cebceca148f8d5d931a6c59ec6e6365498df8a00bb89fb10dd7e7fa8c35d2d89",
+      "ukuran_kb": 17.7,
+      "ringkasan": "Menjawab: seberapa besar KPI HRGA (Human Resource, General Affair, dan dua posisi Procurement) yang benar-benar terhitung otomatis di production, sumber KPI apa yang terpasang di tiap posisi, dan apa yang menghambat sisanya. Memisahkan pekerjaan menurut siapa yang mengerjakan: golongan A belum ada kodenya (dev), golongan B kodenya sudah ada tetapi datanya kosong (HR dan GA, misalnya quiz_attempt dan training_plan_item yang nol sehingga metrik pelatihan tidak berbunyi), dan golongan C pemetaan yang belum diputuskan pemilik KPI tanpa satu baris kode. Juga memuat urutan pengerjaan bertingkat, koreksi atas dok vault yang sudah usang, dan jebakan pencarian yang terbukti menyesatkan saat mengukur. Papan kerja di Workspace, jadi dok yang terbit ke wiki dilarang menautkannya.",
       "kata_kunci": [
         "HRGA",
-        "kesenjangan",
-        "gap",
-        "backlog",
-        "rencana",
-        "prioritas",
-        "KPI",
+        "KPI HRGA",
+        "kesenjangan alat kerja",
+        "cakupan otomatis",
+        "sumber KPI",
+        "pelatihan",
+        "training",
+        "rekrutmen",
+        "recruitment",
         "General Affair",
-        "Procurement",
-        "Security",
-        "jobdesk",
-        "salah petak",
-        "Training"
+        "Human Resource",
+        "papan kerja"
       ]
     },
     {
