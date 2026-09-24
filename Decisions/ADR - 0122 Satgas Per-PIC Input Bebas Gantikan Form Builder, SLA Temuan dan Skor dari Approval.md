@@ -4,7 +4,7 @@
 
 Inspeksi Satgas 5R & K3 untuk Office Boy & Security **tidak lagi lewat form** yang harus dibuat dulu tiap periode. Petugas HR Culture & Industrial **mencatat temuan kapan saja, langsung dari menunya** — bebas menentukan kapan dan apa yang dinilai.
 
-**Apa yang berubah di layar:** petugas membuka menu Satgas, memilih orangnya (OB/Security), menulis temuan + foto, dan menetapkan **berapa hari** tenggat perbaikan. Bila lewat tenggat orangnya belum mengirim **foto bukti perbaikan**, petugas memilih tindakan: **(a) menahan clock-out** orang itu di aplikasi sampai ia menanggapi, atau **(b) memberi nilai otomatis 1 dari 10**. Bila ada balasan foto, petugas **menyetujui sambil memberi nilai**. Nilai KPI kebersihan orang itu di bulan tersebut dihitung **dari kasus temuan saja** — bulan tanpa temuan otomatis bernilai penuh.
+**Apa yang berubah di layar:** petugas membuka menu Satgas, memilih orangnya (OB/Security), menulis temuan + foto, dan menetapkan **berapa hari** tenggat perbaikan. Bila lewat tenggat orangnya belum mengirim **foto bukti perbaikan**, petugas memilih tindakan: **(a) menahan clock-out** orang itu di aplikasi sampai ia menanggapi, atau **(b) menutup temuan sebagai gagal ditanggapi**. Bila ada balasan foto, petugas **menyetujui bahwa temuan sudah diperbaiki** — **tanpa mengetik nilai**. Nilai KPI kebersihan orang itu **dihitung otomatis oleh sistem** dari temuan bulan itu (skala 0–100): **bulan tanpa temuan bernilai penuh (100)**; tiap temuan mengurangi nilai — sedikit bila diperbaiki tepat waktu, lebih besar (dan makin besar bila fotonya banyak) bila gagal ditanggapi.
 
 **Siapa yang terdampak:** petugas HR Culture & Industrial (mencatat & menilai), Office Boy & Security (menanggapi temuan dengan foto perbaikan).
 
@@ -46,7 +46,7 @@ Grounding ke kode (bip-erp, erp-frontend, my-bharata) dan vault, 2026-09-24 (emp
 
 ### 1. Entitas `satgas_finding` sendiri di employee-service, subjek ORANG, ber-KPI
 
-Koleksi baru `satgas_finding` di employee-service (service yang sama dengan `compliance_note`, `area_inspection`, dan sumber KPI). Satu dokumen = satu temuan atas satu orang: `(company_id, employee_id, dicatat_oleh, dicatat_pada, ada_temuan, catatan, foto[], sla_hari, deadline, tindakan, response{foto[], pada}, disetujui_oleh, disetujui_pada, nilai, status, period_key)`. **Bukan** di form-builder (mesinnya periodik/kaku), **bukan** menumpang `compliance_note` (sengaja non-KPI, mencampur skor mengaburkan batas ADR 0085), **bukan** `area_inspection` (subjek department). Pemisahan koleksi membuat batas **per-PIC-ber-KPI ≠ area ≠ catatan atribut ≠ SP** tetap struktural.
+Koleksi baru `satgas_finding` di employee-service (service yang sama dengan `compliance_note`, `area_inspection`, dan sumber KPI). Satu dokumen = satu temuan atas satu orang: `(company_id, employee_id, dicatat_oleh, dicatat_pada, ada_temuan, catatan, foto[], sla_hari, deadline, tindakan, response{foto[], pada}, disetujui_oleh, disetujui_pada, status, period_key)`. **Tak ada field `nilai` per temuan** — skor **diturunkan** dari kumpulan temuan saat baca KPI (§5); yang disimpan adalah faktanya (status penyelesaian + jumlah foto). **Bukan** di form-builder (mesinnya periodik/kaku), **bukan** menumpang `compliance_note` (sengaja non-KPI, mencampur skor mengaburkan batas ADR 0085), **bukan** `area_inspection` (subjek department). Pemisahan koleksi membuat batas **per-PIC-ber-KPI ≠ area ≠ catatan atribut ≠ SP** tetap struktural.
 
 ### 2. Pencatatan BEBAS menggantikan form + periode + sasaran
 
@@ -56,21 +56,25 @@ Petugas (`kepatuhan.satgas.input`, gerbang server yang sudah ada) memilih orang 
 
 Saat mencatat temuan, petugas menetapkan **`sla_hari`** (tenggat = `dicatat_pada + sla_hari`). Pengingat inbox dikirim (pola "peringatkan dulu, tahan belakangan" yang sudah ada). Bila lewat tenggat & belum ada `response`, petugas memilih **`tindakan`**:
 - **`kunci_clockout`** — temuan ini ikut dibaca `handleComplianceBlock` (`GET /internal/compliance-block`) sehingga attendance menahan clock-out orang itu **dengan gerbang yang persis sama** dengan Catatan Kepatuhan. Lepas saat `response` (foto) masuk. **Reuse, bukan gerbang attendance baru.**
-- **`nilai_1`** — status jadi terminal, `nilai = 1` (dari 10). Menutup kasus tanpa menunggu tanggapan.
+- **`tutup_gagal`** — status terminal "gagal ditanggapi": temuan dihitung **potongan penuh** (§5), tak bisa lagi turun jadi potongan ringan. Menutup kasus tanpa menunggu tanggapan.
 
 Kedua tindakan **pilihan petugas**, bukan otomatis saat tenggat lewat (petugas yang memutuskan, sesuai kebutuhan).
 
-### 4. Balas-dengan-FOTO lalu approve-dengan-NILAI
+### 4. Balas-dengan-FOTO lalu approve = KONFIRMASI perbaikan (bukan mengetik angka)
 
-Orang yang dinilai menanggapi temuan dengan **foto bukti perbaikan** (baru: balasan Catatan Kepatuhan sekarang text-only; Satgas menuntut foto). Petugas lalu **meng-approve sambil memberi `nilai` 1–10**. Skala 1–10 dipetakan ke 0–100 internal KPI (×10) — berbeda dari skala 1–5 lama form-builder, dan itu disengaja (angka "1/10" langsung dari kebutuhan).
+Orang yang dinilai menanggapi temuan dengan **foto bukti perbaikan** (baru: balasan Catatan Kepatuhan sekarang text-only; Satgas menuntut foto). Petugas lalu **meng-approve = mengonfirmasi temuan sudah diperbaiki** (menerima foto balasan) — **tidak mengetik nilai**. Skor **dihitung sistem otomatis** (§5); petugas tak memasukkan angka.
 
-### 5. KPI = dari kasus temuan saja, rata-rata, dibaca in-process
+### 5. KPI = skor OTOMATIS 0–100 dari temuan (potongan), dibaca in-process
 
-Skor KPI kebersihan OB/Security satu periode dihitung **hanya dari kasus temuan** periode itu: nilai approval, atau `1` untuk `nilai_1`. **Beberapa temuan → rata-rata** nilainya. **Tanpa temuan → penuh (100)**. Sumber `nilai_inspeksi_satgas` membaca `satgas_finding` **langsung di dalam proses employee-service**, memancarkan bentuk `Cuplikan` yang sama — **tanpa** panggilan HTTP lintas-service. Metrik yang disuapinya tetap: Office Boy "Kebersihan 3", Security "Kerapihan dan kebersihan Pos". Penulis `kpi_score` tetap `POST /kpi`.
+Skor kebersihan OB/Security satu periode **dihitung sistem**, bukan diketik petugas: **`max(0, 100 − Σ potongan tiap temuan)`**, **tanpa temuan → 100**. Potongan per temuan = penyelesaian × keparahan (**jumlah foto temuan**):
+- **Diperbaiki tepat waktu** (balas foto + approve sebelum deadline) → potongan **ringan = 5** (pernah ada temuan, tapi dibereskan).
+- **Tak ditanggapi / lewat SLA / `tutup_gagal`** → potongan **penuh = `15 + 5×(jumlah_foto−1)`, maks 30** (1 foto=15, 2=20, 3=25, 4+=30).
+
+Angka bisa disetel; strukturnya dikunci di sini (keputusan user 2026-09-24: **skor otomatis, hitung foto temuan**). **Menggantikan** rencana awal "petugas beri nilai 1–10" dan "auto 1/10". Sumber `nilai_inspeksi_satgas` membaca `satgas_finding` **langsung di dalam proses employee-service** — **tanpa** panggilan HTTP lintas-service. Metrik yang disuapinya tetap: Office Boy "Kebersihan 3", Security "Kerapihan dan kebersihan Pos". Penulis `kpi_score` tetap `POST /kpi`.
 
 ### 6. Kunci clock-out = NUDGE, bukan sanksi; 1/10 = skor KPI, bukan potong gaji
 
-Framing dipertahankan seperti mekanisme yang sudah ada: menahan clock-out adalah dorongan menanggapi, orangnya melepas sendiri dengan membalas. `nilai_1` memengaruhi KPI, tidak membaca/menulis payroll, tidak membuat `employee_warning`/SP. Tak ada perubahan dokumen regulasi; ADR ini catatan penyimpangannya (ADR 0071 §4). Bila kelak manajemen ingin menjadikannya sanksi gaji, itu **keputusan baru** + revisi `BUSINESS_LOGIC_IMPLEMENTATION.md`, bukan otomatis di sini.
+Framing dipertahankan seperti mekanisme yang sudah ada: menahan clock-out adalah dorongan menanggapi, orangnya melepas sendiri dengan membalas. Temuan yang gagal ditanggapi (`tutup_gagal`) menurunkan **skor KPI** lewat potongan (§5), tidak membaca/menulis payroll, tidak membuat `employee_warning`/SP. Tak ada perubahan dokumen regulasi; ADR ini catatan penyimpangannya (ADR 0071 §4). Bila kelak manajemen ingin menjadikannya sanksi gaji, itu **keputusan baru** + revisi `BUSINESS_LOGIC_IMPLEMENTATION.md`, bukan otomatis di sini.
 
 ### 7. Retire form-builder Satgas bertahap
 
@@ -87,7 +91,7 @@ Framing dipertahankan seperti mekanisme yang sudah ada: menahan clock-out adalah
 ### Yang memburuk atau tetap terbuka
 - ⚠️ **Prod belum diukur.** Berapa banyak temuan/inspeksi Satgas hidup di prod belum dihitung; keputusan migrasi (arsip vs pindah) menunggu pengukuran. Risiko: nol data mengecoh.
 - ⚠️ **Balas-dengan-foto & approve-dengan-nilai benar-benar baru** — bukan reuse; jalur unggah foto sisi karyawan + endpoint approval harus dibangun & diuji lewat gateway (jangan andalkan test fungsi murni).
-- ⚠️ **Agregasi rata-rata** dipilih; bila manajemen ingin "terburuk menang" itu satu baris ubah, tapi harus diputuskan sebelum orang membaca skornya.
+- ⚠️ **Skor otomatis (potongan) menggantikan nilai manual** (keputusan 2026-09-24). Angka potongan (5 / 15+5×foto, maks 30) **bisa disetel** tapi harus dikunci sebelum orang membaca skornya — nilai KPI yang berubah rumus di tengah jalan membingungkan. Petugas **tak lagi** menentukan angka, hanya mengonfirmasi perbaikan.
 - **Berdiri di atas mekanisme dev, bukan prod.** Gerbang clock-out & Catatan Kepatuhan live di dev, ADR 0090/0111 belum prod. Redesign ini menambah beban rilis di area yang belum stabil di prod.
 - **cek-ulang "sampai tanggal 5" hilang.** Siapa pun yang bergantung pada idiom itu (laporan bulanan) harus tahu skornya kini per-temuan, bukan kiriman-terakhir-periode.
 
