@@ -19,8 +19,8 @@ Model `shared-library/models/employee/satgas_finding.go` + koleksi di employee-s
 - Bergantung pada: —
 - Selesai bila: petugas ber-izin bisa mencatat temuan atas seorang OB/Security lengkap dengan foto & sla_hari; non-petugas 403; diuji lewat **gateway**. Fixture yang `employee_id`/`_id`-nya berbeda (gotcha ID).
 
-### T2 — (BE) Balas-dengan-foto + approve-dengan-nilai + mesin status
-Endpoint balasan karyawan (WAJIB **foto**, beda dari balasan Catatan Kepatuhan yang text-only): `POST /satgas-findings/:id/response` (owner-only, unggah foto). Endpoint approval petugas: memberi `nilai` 1–10 (→0–100). Status: `open` → `responded` → `approved` (atau `nilai_1`). Nilai final hanya dari `approved`/`nilai_1`.
+### T2 — (BE) Balas-dengan-foto + approve = KONFIRMASI + mesin status
+Endpoint balasan karyawan (WAJIB **foto** bukti perbaikan, beda dari balasan Catatan Kepatuhan yang text-only): `POST /satgas-findings/:id/response` (owner-only, unggah foto). Endpoint approval petugas = **mengonfirmasi temuan sudah diperbaiki** (menerima foto), **TANPA mengetik angka**. Status: `open` → `responded` → `approved` (atau `tutup_gagal`). **Skor tidak disimpan per temuan** — dihitung di T4 dari status + jumlah foto.
 - Bergantung pada: T1.
 - Selesai bila: karyawan bisa balas dengan foto; petugas approve dengan nilai; status & nilai tersimpan benar; uji jalur galat lewat `app.Test` (glue handler).
 
@@ -29,10 +29,10 @@ Pengingat inbox saat temuan dibuat (pola "peringatkan dulu"). Tindakan petugas s
 - Bergantung pada: T1, T2.
 - Selesai bila: petugas menandai kunci → clock-out orang itu ditahan di dev (403 `respond_compliance`), balas foto → lepas; `nilai_1` menutup kasus. **Deploy employee-service + attendance-service bersama**, picu satu clock-out nyata. Reuse, bukan gerbang baru.
 
-### T4 — (BE) Sumber KPI baca `satgas_finding` in-process
-`services/employee/kpi_sumber_inspeksi_satgas.go` diubah membaca `satgas_finding` **langsung** (bukan HTTP `/internal/satgas/metrics`). Agregasi: **rata-rata** nilai kasus temuan periode; **tanpa temuan = 100**. Emit `Cuplikan` bentuk sama (Office Boy "Kebersihan 3", Security "Kerapihan dan kebersihan Pos"). **Transisi**: boleh baca dua asal (finding baru + form-builder lama) sampai T7.
+### T4 — (BE) Sumber KPI: skor OTOMATIS dari `satgas_finding` in-process
+`services/employee/kpi_sumber_inspeksi_satgas.go` diubah membaca `satgas_finding` **langsung** (bukan HTTP `/internal/satgas/metrics`). Skor **dihitung sistem**: `max(0, 100 − Σ potongan)`; **tanpa temuan = 100**. Potongan per temuan: **diperbaiki tepat waktu = 5**; **tak ditanggapi / `tutup_gagal` = 15 + 5×(jumlah_foto−1), maks 30** (angka fungsi murni, teruji). Emit `Cuplikan` bentuk sama (Office Boy "Kebersihan 3", Security "Kerapihan dan kebersihan Pos"). **Transisi**: boleh baca dua asal (finding baru + form-builder lama) sampai T7.
 - Bergantung pada: T1, T2.
-- Selesai bila: skor KPI OB/Security muncul dari finding; test kontrak agregasi (rata-rata, no-temuan=100) hijau; **lepas `FORM_BUILDER_SERVICE_KEY`** dari jalur ini.
+- Selesai bila: skor KPI OB/Security muncul dari finding; test **fungsi murni** rumus potongan (no-temuan=100, diperbaiki=−5, gagal=−(15+5×(foto−1)) cap 30, floor 0) hijau; **lepas `FORM_BUILDER_SERVICE_KEY`** dari jalur ini.
 
 ### T5 — (Web) Input bebas + antrean approval beri-nilai + rekap
 Menu Satgas (`/hris/satgas`, tab Inspeksi Individu): ganti input form-builder dengan **sheet input bebas** meniru `area-inspection-fill-sheet.tsx` (pilih orang + catatan + foto + sla_hari). Antrean approval memakai `SkalaAngka` + pola footer approve (`request-approval-footer.tsx`/`capa-approval-cell.tsx`). Foto via `foto-satgas-dialog.tsx`/`openFileBlob`. Rekap membaca skor dari finding. i18n id+en.
@@ -55,9 +55,8 @@ Ukur di prod: berapa form Satgas & jawaban hidup, berapa OB/Security aktif. Putu
 - Selesai bila: keputusan migrasi tercatat (ADR/append) sebelum T7 dieksekusi di prod.
 
 ## Titik yang sudah diputuskan (saat `/analisa-kebutuhan` 2026-09-24)
-- **KPI dari kasus temuan saja**, agregasi **rata-rata**, tanpa temuan = **100** (penuh).
-- **Skala nilai 1–10** (→ 0–100 internal), beda dari 1–5 lama.
-- **Kunci clock-out = nudge** (reuse mekanisme Catatan Kepatuhan), **bukan** sanksi gaji; **1/10 = skor KPI**, bukan potong gaji.
+- **Skor KPI OTOMATIS 0–100** dari temuan: `max(0, 100 − Σ potongan)`, **tanpa temuan = 100**. Potongan/temuan: **diperbaiki tepat waktu = 5**; **gagal ditanggapi = 15 + 5×(foto−1), maks 30**. Petugas **tak mengetik nilai** (approve = konfirmasi perbaikan). Menggantikan rencana awal "nilai manual 1–10 / auto 1/10".
+- **Kunci clock-out = nudge** (reuse mekanisme Catatan Kepatuhan), **bukan** sanksi gaji; temuan `tutup_gagal` menurunkan **skor KPI** lewat potongan, bukan potong gaji.
 - **Reuse** gerbang `kepatuhan.satgas.input`, gerbang tahan-clock-out, pipeline foto, cetakan input bebas Inspeksi Area, komponen beri-nilai.
 - **satgas_finding di employee-service** → sumber KPI baca **in-process**, lepas kopling lintas-service.
 

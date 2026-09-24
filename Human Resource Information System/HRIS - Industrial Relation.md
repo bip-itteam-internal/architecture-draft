@@ -82,9 +82,9 @@ Track **Satgas per-PIC** (OB/Security, ber-KPI) **pindah dari Form Builder** ke 
 
 - **Pencatatan bebas**: petugas Culture & Industrial (`kepatuhan.satgas.input`) mencatat temuan atas seorang OB/Security **kapan saja** (pilih orang + catatan + foto), tanpa form/periode/sasaran pra-bangun. `period_key` diturunkan dari tanggal catat.
 - **SLA per temuan**: petugas menetapkan `sla_hari`. Lewat tenggat tanpa balasan, petugas memilih **`kunci_clockout`** (memakai ULANG mekanisme tahan-clock-out track Catatan Kepatuhan — `handleComplianceBlock` diperluas membaca `satgas_finding`, gerbang attendance yang sama) **atau** **`nilai_1`** (skor 1/10 terminal).
-- **Balas-dengan-FOTO → approve-dengan-NILAI**: karyawan menanggapi temuan dengan foto bukti perbaikan (baru — balasan Catatan Kepatuhan hari ini text-only); petugas approve sambil memberi nilai 1–10 (→0–100).
-- **KPI**: skor kebersihan OB/Security satu periode = **dari kasus temuan saja, rata-rata**; tanpa temuan = penuh (100). Sumber `nilai_inspeksi_satgas` membaca `satgas_finding` **in-process** — melepas kopling HTTP `/internal/satgas/metrics` + `FORM_BUILDER_SERVICE_KEY`.
-- **Non-sanksi**: kunci clock-out = nudge (bukan SP/potong gaji); 1/10 = skor KPI (bukan potong gaji). PP tak mengatur 5R; ADR 0122 catatan penyimpangannya (ADR 0071 §4).
+- **Balas-dengan-FOTO → approve = KONFIRMASI**: karyawan menanggapi temuan dengan foto bukti perbaikan (baru — balasan Catatan Kepatuhan hari ini text-only); petugas approve = **mengonfirmasi temuan sudah diperbaiki**, **tanpa mengetik nilai**.
+- **KPI = skor OTOMATIS 0–100**: dihitung sistem `max(0, 100 − Σ potongan)`; **tanpa temuan = 100**; potongan/temuan **diperbaiki tepat waktu = 5**, **gagal ditanggapi = 15 + 5×(foto−1) maks 30**. Sumber `nilai_inspeksi_satgas` membaca `satgas_finding` **in-process** — melepas kopling HTTP `/internal/satgas/metrics` + `FORM_BUILDER_SERVICE_KEY`.
+- **Non-sanksi**: kunci clock-out = nudge (bukan SP/potong gaji); temuan `tutup_gagal` menurunkan skor KPI (bukan potong gaji). PP tak mengatur 5R; ADR 0122 catatan penyimpangannya (ADR 0071 §4).
 - **Pemisahan tetap**: `satgas_finding` (per-PIC, KPI) ≠ `compliance_note` (atribut, non-KPI) ≠ `area_inspection` (department, non-KPI) ≠ `employee_warning` (SP).
 - **Daftar task**: `Workspace/ANALISA - Redesign Satgas Input Bebas dan SLA Temuan.md`.
 
