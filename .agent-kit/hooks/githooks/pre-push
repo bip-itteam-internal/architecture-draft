@@ -8,6 +8,11 @@
 #       (build dilewati bila AGENTKIT_SKIP_BUILD=1, dan itu DICETAK supaya tidak senyap)
 #   - repo Go multi-modul (services/<x>/go.mod): `go build ./...` per service yang tersentuh
 #       oleh commit yang dipush; semua service bila shared-library tersentuh
+#   - berkas compose (docker-compose*.yml, compose.yaml, di REPO MANA PUN) yang tersentuh:
+#       kunci ganda dalam satu mapping (hooks/gerbang-compose.py). YAML menolak kunci ganda dan
+#       `docker compose` gagal parse SELURUH berkas begitu itu terjadi, dan itu tak tertangkap
+#       lint/test/CI/pre-push manapun (bip-erp #2038). Menyala dari berkas yang TERSENTUH, bukan
+#       dari jenis repo.
 #   - vault agent-kit (.agent-kit/ di akar): test MILIK KIT SENDIRI, tetapi HANYA bila push-nya
 #       menyentuh .agent-kit/ atau Tools/ (ADR 0077 par 4; aturannya di hooks/gerbang-kit.py).
 #       Push dokumentasi biasa keluar seketika. Lewati sadar: AGENTKIT_SKIP_KIT_TESTS=1
@@ -15,6 +20,11 @@
 # Melewati dengan sadar: `git push --no-verify` (jejaknya tetap ada di riwayat shell Anda).
 
 remote="$1"
+# Direktori hook INI SENDIRI, ditangkap SEBELUM `cd "$top"` di bawah (top berbeda-beda per repo;
+# hooksPath absolut dipasang sama untuk semua repo di mesin ini, jadi companion script sebuah
+# gerbang wajib dicari relatif terhadap pre-push sendiri, bukan relatif $top -- $top bip-erp
+# tidak punya .agent-kit/, cuma vault yang punya).
+hookdir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd 2>/dev/null)" || hookdir="$(dirname "$0")"
 top="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
 cd "$top" || exit 0
 
@@ -86,6 +96,70 @@ if [ -d services ] && ls services/*/go.mod >/dev/null 2>&1; then
     echo "[agent-kit pre-push] go build services/$s ..."
     if ! (cd "services/$s" && go build ./...); then echo "[agent-kit pre-push] GAGAL: go build services/$s"; gagal=1; fi
   done
+fi
+
+# ---- Kunci ganda pada berkas compose (docker-compose*.yml / compose.yaml), REPO MANA PUN ----
+# YAML menolak kunci ganda dalam satu mapping, dan `docker compose` lalu GAGAL PARSE SELURUH
+# BERKAS begitu itu terjadi -- bukan cuma blok yang bersangkutan. bip-erp #2038: duplikat
+# INTEGRATION_MODULE_URL di blok employee-service, hidup dari 2026-09-23 16:07 (empat menit
+# sesudah container terakhir dibangun, semua tetap `healthy`) sampai deploy berikutnya gagal
+# berjam-jam kemudian. Nol pemeriksaan menangkapnya -- bukan lint, bukan test, bukan CI, bukan
+# pre-push -- karena gerbang Go di atas cuma menyala bila services/<x> tersentuh, dan hook ini
+# tak pernah menjalankan go test. Berkas compose ada di lebih dari satu repo dan bip-erp sendiri
+# punya lebih dari satu (docker-compose.yml, docker-compose.dev.yml, infra/*/docker-compose.yml),
+# jadi gerbang ini menyala dari BERKAS YANG TERSENTUH, bukan dari jenis repo (tidak digerbang
+# oleh `[ -d services ]` seperti blok Go di atas).
+# ⚠️ Yang diperiksa isi WORKING TREE berkas tersentuh (dibaca dari disk sesudah `cd "$top"` di
+# atas), BUKAN isi blob pada commit yang dipush -- sama seperti keterbatasan `pnpm`/`go build`
+# di dua blok sebelumnya (keduanya juga membangun dari disk), bukan cacat baru khusus di sini.
+compose_pat='(^|/)(docker-)?compose([.][A-Za-z0-9_.-]+)?\.ya?ml$'
+# $compose_pat SATU-SATUNYA definisi "apa itu berkas compose" -- KEDUA cabang di bawah wajib
+# menurunkan daftarnya darinya, bukan masing-masing punya daftar nama sendiri. Sebelumnya cabang
+# tak_tentu memakai daftar `-iname` terpisah yang diam-diam menyimpang dari $compose_pat:
+# compose.dev.yml lolos grep tapi terlewat -iname, docker-compose-prod.yml sebaliknya -- dan
+# arahnya terbalik dari yang diinginkan (cabang tak_tentu ADA justru karena daftarnya tak bisa
+# dipercaya, harusnya lebih LUAS, bukan lebih sempit). `find` di sini cuma mendaftar berkas;
+# `grep -E "$compose_pat"` yang memutuskan mana yang "berkas compose".
+if [ "$tak_tentu" -eq 1 ]; then
+  # Pola yang sama dengan svcs di atas: daftar berkas tak bisa dipercaya -> periksa SEMUA
+  # berkas compose yang ADA di repo ini, bukan melewati.
+  compose_sasaran="$(find . -type f -not -path './.git/*' -not -path '*/node_modules/*' \
+    -not -path '*/vendor/*' 2>/dev/null | sed 's#^\./##' | grep -E "$compose_pat" | sort -u)"
+else
+  compose_sasaran="$(printf '%s\n' "$touched" | grep -E "$compose_pat" 2>/dev/null | sort -u)"
+fi
+compose_sasaran="$(printf '%s\n' "$compose_sasaran" | sed '/^$/d')"
+if [ -n "$compose_sasaran" ]; then
+  py=""
+  for c in "Tools/.venv/Scripts/python.exe" "Tools/.venv/bin/python"; do
+    if [ -x "$c" ] && "$c" -c "import yaml" >/dev/null 2>&1; then py="$c"; break; fi
+  done
+  if [ -z "$py" ]; then
+    for c in python3 python py; do
+      command -v "$c" >/dev/null 2>&1 || continue
+      if "$c" -c "import yaml" >/dev/null 2>&1; then py="$c"; break; fi
+    done
+  fi
+  if [ -z "$py" ]; then
+    echo "[agent-kit pre-push] TIDAK ADA python+PyYAML untuk memeriksa kunci ganda pada berkas compose. Gerbang GAGAL, bukan dilewati."
+    echo "  Pasang: pip install pyyaml"
+    echo "  Lewati sadar (SELURUH pre-push, bukan cuma gerbang ini): git push --no-verify"
+    gagal=1
+  else
+    echo "[agent-kit pre-push] periksa kunci ganda pada berkas compose ..."
+    daftar_compose="$(mktemp 2>/dev/null || echo "${TMPDIR:-/tmp}/agentkit-compose-$$")"
+    printf '%s\n' "$compose_sasaran" > "$daftar_compose"
+    if ! "$py" "$hookdir/gerbang-compose.py" --berkas-file "$daftar_compose"; then
+      # ⚠️ gerbang-compose.py SENDIRI sudah mencetak sebab spesifiknya di atas (kunci ganda +
+      # dua nomor baris, ATAU galat parse YAML lain yang bukan kunci ganda). Baris di bawah ini
+      # idealnya netral terhadap sebab ("pemeriksaan kunci ganda compose GAGAL") alih-alih
+      # menegaskan "kunci ganda" seolah itu satu-satunya kemungkinan galat -- dicatat sebagai
+      # utang kecil, belum diubah supaya diff tetap minimal.
+      echo "[agent-kit pre-push] GAGAL: kunci ganda pada berkas compose"
+      gagal=1
+    fi
+    rm -f "$daftar_compose"
+  fi
 fi
 
 # ---- vault agent-kit (architecture-draft): test milik kit sendiri ----

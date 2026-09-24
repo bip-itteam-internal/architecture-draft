@@ -286,6 +286,123 @@ def test_gerbang_kit_hanya_putuskan_menyala_untuk_kit():
     assert "menyala" in rc.stdout.lower()
 
 
+# ---------------------------------------------------------------- gerbang-compose (kunci ganda)
+# bip-erp #2038: INTEGRATION_MODULE_URL dua kali di blok employee-service docker-compose.yml
+# membuat `docker compose` gagal parse SELURUH berkas, nol gerbang menangkapnya. Detektornya
+# dites lewat fungsi murni di sini (bukan cuma push sungguhan di sandbox terpisah) supaya
+# regresi berikutnya punya penjaga yang BERTAHAN, bukan sekali pakai.
+
+gc = _muat("githooks/gerbang-compose.py", "gerbang_compose")
+
+
+def _tulis_yaml(tmp_path, isi, nama="docker-compose.yml"):
+    p = tmp_path / nama
+    p.write_text(isi, encoding="utf-8")
+    return str(p)
+
+
+def test_gerbang_compose_duplikat_bersarang_dua_baris_benar(tmp_path):
+    # Duplikat di KEDALAMAN mapping mana pun (bukan cuma top-level services:) harus tertangkap,
+    # dengan DUA nomor baris yang benar -- itu yang membedakan pesan gerbang ini dari "YAML tidak
+    # sah" telanjang (kriteria brief: pesan menyebut kunci DAN kedua nomor barisnya).
+    p = _tulis_yaml(tmp_path, (
+        "services:\n"
+        "  employee-service:\n"
+        "    environment:\n"
+        "      TZ: Asia/Jakarta\n"
+        "      INTEGRATION_MODULE_URL: a\n"
+        "      FORM_BUILDER_MODULE_URL: b\n"
+        "      INTEGRATION_MODULE_URL: a\n"
+    ))
+    duplikat, galat_lain = gc.periksa_berkas(p, gc.muat_yaml())
+    assert duplikat == [("INTEGRATION_MODULE_URL", 5, 7)]
+    assert galat_lain is None
+
+
+def test_gerbang_compose_berkas_bersih_nol_temuan(tmp_path):
+    p = _tulis_yaml(tmp_path, (
+        "services:\n"
+        "  a:\n"
+        "    environment:\n"
+        "      TZ: Asia/Jakarta\n"
+        "      PORT: \"8080\"\n"
+    ))
+    duplikat, galat_lain = gc.periksa_berkas(p, gc.muat_yaml())
+    assert duplikat == []
+    assert galat_lain is None
+
+
+def test_gerbang_compose_merge_key_dengan_penimpaan_lokal_nol_temuan(tmp_path):
+    # ⛔ KRITIS ditemukan judge percobaan 1: `<<: *anchor` adalah fitur Compose BAKU (extension
+    # fields/fragments -- bip-erp sudah memakainya lewat `x-mongo-logging: &mongolog`), dan
+    # berkas ini SAH tanpa keraguan (dibuktikan lagi di bawah lewat yaml.safe_load sungguhan).
+    # Fixture disiapkan koordinator, disalin persis: dua jebakan sekaligus -- service `b` MENIMPA
+    # `restart` warisannya secara sengaja. Kalau perbaikannya menambal lewat `flatten_mapping`
+    # (yang menyisipkan pasangan hasil merge DI DEPAN node.value), `restart` di situ akan terbaca
+    # dua kali dan lolos jadi positif palsu BARU -- persis kegagalan yang gerbang ini seharusnya
+    # mencegah, bukan menambahnya.
+    p = _tulis_yaml(tmp_path, (
+        "x-common: &common\n"
+        "  restart: unless-stopped\n"
+        "  environment:\n"
+        "    TZ: Asia/Jakarta\n"
+        "\n"
+        "services:\n"
+        "  a:\n"
+        "    <<: *common\n"
+        "    image: alpha\n"
+        "  b:\n"
+        "    <<: *common\n"
+        "    image: beta\n"
+        "    restart: \"no\"\n"
+    ))
+    yaml_mod = gc.muat_yaml()
+    duplikat, galat_lain = gc.periksa_berkas(p, yaml_mod)
+    assert duplikat == []
+    assert galat_lain is None
+    # Kontrol positif atas PARSER SESUNGGUHNYA, bukan cuma detektor kita: membuktikan fixture-nya
+    # bukan "kebetulan lolos" melainkan YAML sah yang merge-nya benar-benar bekerja.
+    with open(p, encoding="utf-8") as f:
+        doc = yaml_mod.safe_load(f)
+    assert doc["services"]["b"]["restart"] == "no"
+    assert doc["services"]["b"]["environment"]["TZ"] == "Asia/Jakarta"
+
+
+def test_gerbang_compose_merge_key_tidak_mematikan_deteksi_duplikat_asli(tmp_path):
+    # Perbaikan merge-key TIDAK BOLEH membuat detektornya berhenti mendeteksi duplikat sungguhan
+    # -- memperbaiki positif palsu dengan cara yang mematikan deteksinya adalah kegagalan yang
+    # lolos semua test lain. Fixture sama dengan di atas plus `image` ditulis dua kali di service
+    # `a` (baris 9 dan 10).
+    p = _tulis_yaml(tmp_path, (
+        "x-common: &common\n"
+        "  restart: unless-stopped\n"
+        "  environment:\n"
+        "    TZ: Asia/Jakarta\n"
+        "\n"
+        "services:\n"
+        "  a:\n"
+        "    <<: *common\n"
+        "    image: alpha\n"
+        "    image: alpha-lagi\n"
+        "  b:\n"
+        "    <<: *common\n"
+        "    image: beta\n"
+        "    restart: \"no\"\n"
+    ))
+    duplikat, galat_lain = gc.periksa_berkas(p, gc.muat_yaml())
+    assert duplikat == [("image", 9, 10)]
+    assert galat_lain is None
+
+
+def test_gerbang_compose_yaml_rusak_sebab_lain_mengisi_galat(tmp_path):
+    # Bukan soal kunci ganda -- flow sequence yang tak ditutup. Harus mengisi galat_lain, BUKAN
+    # dilaporkan sebagai kunci ganda (pesannya beda, dan konsumennya membedakan lewat ini).
+    p = _tulis_yaml(tmp_path, "services: [a, b\n")
+    duplikat, galat_lain = gc.periksa_berkas(p, gc.muat_yaml())
+    assert duplikat == []
+    assert galat_lain is not None
+
+
 def test_gerbang_kit_paksa_menyala_walau_berkas_tak_relevan():
     # Daftar berkas yang tak bisa ditentukan harus MENYALAKAN gerbang, bukan mematikannya.
     # Terukur 2026-09-21: `$rsha` di pre-push bisa menunjuk commit yang belum ada di sini, lalu
