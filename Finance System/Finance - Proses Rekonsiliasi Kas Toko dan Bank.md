@@ -18,7 +18,7 @@ Saldo kas toko direkonsiliasi mingguan terhadap Accurate beserta analisis selisi
 
 ## Sudah ada di ERP
 
-Layar Rekonsiliasi kas toko tiga tab, rekap, rincian, dan akumulasi (`erp-frontend/src/app/(main)/integration-accurate/rekonsiliasi/page.tsx:39`); rute rekonsiliasi dompet dan income (P3). Impor mutasi rekening bank **belum ada**: `git grep` 2026-09-17 atas `services/finance`, `services/integration`, dan `services/procurement` hanya menemukan rekening koran sebagai lampiran bukti audit internal.
+Layar Rekonsiliasi kas toko empat tab: rekap, rincian, akumulasi, dan **Neraca** (`erp-frontend/src/app/(main)/integration-accurate/rekonsiliasi/page.tsx:69-80`). Neraca menyandingkan saldo Seller Center, ERP, dan Accurate per akun kas toko pada satu tanggal, beserta jam sync MP terakhir karena sisi MP diperbarui tiap 30 menit, bukan real-time. Saldo MP = saldo pembukaan per toko + mutasi sejak tanggal cutover toko itu; mekanisme dan angkanya di [[Microservices - Integration Service]], butir Buku Besar Rekonsiliasi Kas. Keadaan prod 2026-09-23: pembukaan diisi dari saldo Seller Center 31 Agustus 2026 dan cutover 1 September. Juli sampai Agustus sudah disesuaikan manual di Accurate dan **tidak** diulang atau dikirim ulang. Posisi 17 September: 36 dari 56 akun bernol selisih, nol akun ber-saldo MP negatif, dan sisa terbesarnya 11 penarikan September yang belum dijurnal di Accurate (Rp1.065.093.727). Ukur ulang sebelum dipakai. rute rekonsiliasi dompet dan income (P3). Impor mutasi rekening bank **belum ada**: `git grep` 2026-09-17 atas `services/finance`, `services/integration`, dan `services/procurement` hanya menemukan rekening koran sebagai lampiran bukti audit internal.
 
 ## Alur target
 
@@ -27,6 +27,7 @@ Satu pelaku rekonsiliasi per jenis saldo memakai satu format di ERP → selisih 
 ## Celah
 
 - **B** Format layar rekonsiliasi kas toko disesuaikan dengan kerja rekonsiliasi. Format yang dibutuhkan belum dirinci (**TBD**, minta contoh format kerja yang dipakai sekarang).
+- **B** Saldo tersedia TikTok tak bisa diambil langsung dari marketplace: Partner API SEA tak menyediakan saldo (`Get Payments` tak tersedia), jadi sisi MP selalu hasil hitung dan hanya sama dengan Seller Center bila saldo pembukaan terisi dan mutasinya lengkap. Lazada juga dihitung, karena `closing_balance` payout adalah saldo akhir satu statement, bukan saldo akun.
 - **C** Impor mutasi rekening dan rekonsiliasi bank (T9). Lingkup T9 kini rekening CV; rekening PT dan kas toko masuk atau jadi task sendiri belum diputuskan.
 
 ## Kontrol wajib

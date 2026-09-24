@@ -18,7 +18,7 @@ Penjualan diekspor dari ERP ke basis data kerja setiap hari; tiap awal bulan das
 
 ## Sudah ada di ERP
 
-Sinkron order marketplace dan pengiriman faktur harian, retur, serta penerimaan ke Accurate ([[Microservices - Integration Service]]); rute rekonsiliasi income dan rekap kuantitas (`bip-erp/services/integration/main.go:1780-1783`); dompet marketplace dengan saldo, penarikan, dan rekonsiliasi settlement (`main.go:1905-1907`).
+Sinkron order marketplace dan pengiriman faktur harian, retur, serta penerimaan ke Accurate ([[Microservices - Integration Service]]); rute rekonsiliasi income dan rekap kuantitas (`bip-erp/services/integration/main.go:1780-1783`); dompet marketplace dengan saldo, penarikan, dan rekonsiliasi settlement (`main.go:1905-1907`). Halaman **Auto-Sync Penerimaan** (`erp-frontend/src/app/(main)/integration-accurate/receipts/page.tsx`) punya tab **Perlu Tindakan** berisi penerimaan `FAILED` sejak 1 September 2026 (`SEJAK_PERLU_TINDAKAN`, `receipts/lib/receipt-tabs.ts`; sebelum tanggal itu sudah disesuaikan manual). Jumlahnya tampil di badge tab, dan kolom Error diberi satu kalimat tindakan di atas galat teknisnya (`tindakanReceipt`, `receipts/lib/tindakan-receipt.ts`; erp-frontend #1705). Contoh: selisih nilai terhadap dana cair (beserta arah dan nominalnya, diperbaiki lewat Koreksi Manual lalu Retry), gangguan Accurate (cukup Retry), diubah manual di Accurate, atau menunggu settlement. Isi galat menang atas `hold_reason`, karena label `ACCURATE_OUTAGE` pernah menempel pada penerimaan yang sebenarnya tak balance. Pemberitahuannya sengaja di halaman ini, bukan Telegram (ditolak Finance) dan bukan menu Rekonsiliasi.
 
 ## Alur target
 
@@ -30,6 +30,7 @@ Toko dipetakan ke entitas CV di master CV → sistem menghasilkan penjualan, pot
 - **C** Aturan kolom yang tidak boleh dijumlahkan ikut tertulis di rancangan ([[Finance - Buku Besar CV]] § Gerbang kolom).
 - **TBD** Isi, aturan, dan pemilik alat web rekap penarikan CV ditelusuri sebelum T8 dirancang, supaya tidak membangun tandingannya dari nol.
 - **TBD** Income yang belum masuk sinkron dan masih diinput manual: kanal dan penyebabnya belum diukur.
+- **B** Penerimaan TikTok gagal tak balance karena potongan statement `DEDUCTIONS_INCURRED_BY_SELLER` pada order RETURNED tak terbawa ke penerimaan. Terukur prod 2026-09-23: penerimaan 16 dan 22 September, masing-masing selisih Rp10.000. Titik putusnya di penyusunan penerimaan belum ditemukan (**TBD**). Jalan sementaranya Koreksi Manual lalu Retry, sesuai kalimat tindakan di tab Perlu Tindakan. Dua penerimaan lain berselisih −Rp198.000 dan −Rp99.000 dengan sebab yang belum diurai (**TBD**).
 - **B** Beban ongkir Shopee salah hitung pada pesanan yang punya `final_shipping_fee` — akun ongkir kelebihan dan kelebihannya mendarat di beban admin. Terukur prod 2026-09-22: **3.865 pesanan, Rp98.260.427**, masih bertambah ±Rp16 jt/bulan. Kas tidak terpengaruh, jadi tak pernah memunculkan galat. 🟡 [[ADR - 0118 Ongkir Shopee Dihitung Aktual Dikurangi Bagian Pembeli dan Subsidi]] (diusulkan, belum di kode).
 
 ## Kontrol wajib

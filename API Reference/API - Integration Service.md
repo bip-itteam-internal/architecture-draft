@@ -286,6 +286,9 @@
 | GET | `/wallet/balances` | Saldo kas toko semua toko (Shopee aktual dari `current_balance`; TikTok estimasi anchor+Σ, flag `estimated`/`anchor_missing`/`sync_stale`) |
 | GET | `/wallet/withdrawals` | Riwayat penarikan (filter shop/channel/type/status/tanggal WIB). Meta paginasi HANYA sisi TikTok; Shopee = list grup penuh + `completed_total` |
 | GET | `/wallet/mutations` | Mutasi wallet Shopee ("Saldo Saya") + saldo berjalan, paginasi normal. `channel=LAZADA` → mutasi Lazada (`lazada_account_transactions`, Deposit/Withdrawal/Payment; amount bertanda, TAK punya `current_balance`/`order_sn`) |
+| GET | `/wallet/kpi` | KPI kas toko per toko untuk rentang (`date_from`/`date_to` wajib, hanya toko bermutasi). Saldo Lazada dihitung (pembukaan + Σ mutasi sejak awal jendela), bukan `closing_balance` payout |
+| GET | `/wallet/saldo` | Snapshot saldo tersedia per toko SAAT INI, tanpa rentang, semua toko. Shopee `current_balance` terbaru; Lazada dihitung seperti `/wallet/kpi` (bip-erp #2030); TikTok tak punya API saldo → `available=false` |
+| GET | `/accounting/kas/rekonsiliasi/buku-besar` | Buku besar rekonsiliasi kas tiga sisi (Seller Center, ERP, Accurate) per transaksi + saldo berjalan, dasar tab **Neraca**. `shop_id` + `dari`/`sampai` wajib; `akun_kas`, `page`, `page_size` (≤1000) opsional. Field `akumulasi` = Σ sejak awal jendela MP (cutover toko) ditambah saldo pembukaan MP |
 | GET | `/wallet/reconciliation` | Laporan uang masuk per toko basis `income.paid_at` (`paid_from/paid_to` wajib; `order_from/order_to` opsional — cross-periode) |
 | GET | `/wallet/reconciliation/export` | Export Excel laporan |
 | PUT | `/wallet/opening-balance/:shopId` | Set anchor saldo awal TikTok (`{amount, as_of}`) |
