@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-24",
-  "jumlah_dokumen": 479,
+  "jumlah_dokumen": 480,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -9292,9 +9292,9 @@
         "HRIS - Matriks KPI per Departemen",
         "GA - Checklist Management",
         "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
+        "ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor",
         "GA - Ronda Security",
         "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI",
-        "ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor",
         "GA - Guestbook System (Complete)",
         "Microservices - Procurement Service",
         "REF - Layout Dashboard erp-frontend",
@@ -9303,21 +9303,20 @@
         "GA - Procurement System",
         "GA - Building Maintenance"
       ],
-      "hash": "f6fe1c5db8318018917d47ad7f05acad542c7593eeb572c7dff40016bc929780",
-      "ukuran_kb": 14.6,
-      "ringkasan": "Menjawab: tiap posisi General Affair dan Procurement dinilai dari metrik apa, metrik mana yang sudah punya sumber data, dan posisi mana yang belum layak dibuatkan dashboard beserta alasannya. Memuat peringatan metrik yang tersambung ke sumber keliru (dua metrik Staff Inventory berbobot 0,6 menunjuk data iklan TikTok, metrik rebate menunjuk kontrak karyawan) dan pembeda tiga track inspeksi 5R yang namanya mirip tetapi hanya satu yang menilai KPI.",
+      "hash": "e45c46b746604e7ee0640310b366098426d0a075fb819929dd7082a21c5278b9",
+      "ukuran_kb": 16.3,
+      "ringkasan": "Menjawab: apa isi dashboard yang pantas untuk tiap posisi di divisi General Affair (Admin General Service, GA Staff building & asset, Office Boy, Security) dan Procurement, metrik KPI apa saja yang menilai posisi itu beserta bobotnya, dan sumber data mana yang sudah tersedia versus yang masih kosong. Menjelaskan juga penghambat terbesarnya (modul checklist berjadwal, angka dari inventory_db, master anggaran GA yang belum ada) berikut berapa metrik dan posisi yang terkunci pada masing-masing, serta kenapa satu nama posisi dipakai dua peran berbeda sehingga lembarnya tak bisa dipisah tanpa HR memecah master data. Berguna saat memutuskan posisi mana yang layak dibuatkan dashboard sekarang dan pekerjaan backend mana yang paling besar daya ungkitnya.",
       "kata_kunci": [
-        "dashboard",
-        "KPI",
+        "dashboard per posisi",
         "General Affair",
+        "GA",
         "Procurement",
+        "pengadaan",
+        "KPI",
         "Office Boy",
         "Security",
-        "Admin",
-        "GA Staff",
-        "metrik",
-        "salah petak",
-        "5R"
+        "checklist berjadwal",
+        "inventory"
       ]
     },
     {
@@ -15729,6 +15728,36 @@
         "ROAS",
         "kategori inbox",
         "irisan"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Atribusi Temuan Area dan KPI Office Boy.md",
+      "judul": "ANALISA - Atribusi Temuan Area dan KPI Office Boy",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor",
+        "ADR - 0093 Tipe Program Culture Non-Event Dinilai Terlaksana dengan Approval SPV HR, plus Jadwal di Master",
+        "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
+        "ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval"
+      ],
+      "hash": "8fabc7b5e30ec1c2e523f6013f74b2b6aba950e83c80a1e0af28d81116014e70",
+      "ukuran_kb": 7.6,
+      "ringkasan": "Menjawab: temuan kondisi di ruang bersama (mis. lorong) masuknya ke mana, siapa yang bisa dianggap bertanggung jawab, dan kenapa pertanyaan itu belum punya jawaban di model data mana pun. Menjelaskan bahwa penugasan area Office Boy berpindah dan tidak tersimpan di service mana pun sehingga tiga metrik KPI berbobot total 0,70 menilai kondisi ruang yang atribusinya ke perorangan tak bisa diperiksa, lalu mengusulkan arah 'ukur perbuatan bukan kondisi' sekaligus menegaskan bahwa perumusan ulang metrik adalah kewenangan pemilik KPI (HRD), bukan tim teknis. Memuat juga peta tiga jalur penyaluran temuan (Satgas per-PIC, Inspeksi Area, tiket Building Maintenance) yang belum punya aturan pemilihan, temuan K3 yang buntu tanpa alur tindak lanjut, dan hasil pengukuran produksi yang menunjukkan koleksi-koleksi terkait masih kosong.",
+      "kata_kunci": [
+        "atribusi temuan",
+        "area inspection",
+        "inspeksi area",
+        "Office Boy",
+        "OB",
+        "KPI",
+        "Satgas 5R",
+        "K3",
+        "ruang bersama",
+        "compliance note"
       ]
     },
     {
