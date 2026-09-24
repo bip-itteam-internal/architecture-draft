@@ -2,6 +2,14 @@
 
 > Daftar task turunan [[ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval]]. Papan kerja — berubah tiap item selesai. Bukan rencana per-berkas (itu `/plan`). Menggantikan pendekatan lama di [[ANALISA - Inspeksi Satgas 5R dan K3]] (form-builder).
 
+## Status implementasi (2026-09-24)
+
+**T1–T6 SELESAI di branch, belum merged/deploy, mobile belum diuji perangkat.** T7–T8 belum.
+- **T1–T4 + preview** → bip-erp `feat/satgas-finding` (pushed). Endpoint catat/foto/rekap/me/response/approve/**escalate**/preview; SLA+eskalasi (`kunci_clockout`/`tutup_gagal`) union ke `handleComplianceBlock`; kategori inbox `satgas-temuan`; skor KPI in-process. **Attendance tak berubah** (union cukup).
+- **T5** → erp-frontend `feat/satgas-finding-web` (pushed). Tab Individu jadi `SatgasPerPicView` (catat bebas + approve + eskalasi + rekap pembaca), foto via `openFileBlob`.
+- **T6** → my-bharata `feat/satgas-finding-mobile` (pushed). Layar "Temuan Saya" OB/Security balas-dengan-foto; notifikasi `satgas-temuan` dipetakan. TANPA bump versi (feat/faiz sudah 1.23.0+172).
+- ⚠️ **Menyimpang dari rencana awal papan ini (ADR yang menang):** tindakan kedua = **`tutup_gagal`** (bukan `nilai_1`); approve = **konfirmasi TANPA mengetik nilai** (bukan "approve dengan nilai"); skor `open` yang **masih dalam tenggat = MENUNGGU** (tak dihukum); tanpa dokumen sama sekali = **belum dapat dihitung** (bukan 100). Form-builder Satgas kini **dead code** (cleanup = task terpisah, bagian T7).
+
 ## Ringkas keputusan (baca ADR untuk detail)
 
 - Satgas per-PIC (OB/Security) **lepas dari form-builder** → entitas `satgas_finding` di **employee-service**, subjek **orang**, **ber-KPI**. Pencatatan **bebas** (kapan & siapa saja).
