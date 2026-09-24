@@ -66,7 +66,7 @@ Track **ketiga** di payung Satgas/Industrial Relation, petugas yang sama (**Cult
 
 | Track | Objek | KPI? | Sumber |
 |---|---|---|---|
-| Satgas per-PIC | Office Boy/Security (orang) | **Ya** (KPI individual) | [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] |
+| Satgas per-PIC | Office Boy/Security (orang) | **Ya** (KPI individual) | [[ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval]] (redesign, 🟡) — menggantikan mekanisme [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] |
 | Catatan Kepatuhan | Karyawan (atribut) | Tidak | [[ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI]] (dok ini di atas) |
 | **5R Area** | **Ruangan department** | **Tidak** (catatan + peringatan SPV) | [[ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor]] |
 
@@ -76,10 +76,23 @@ Track **ketiga** di payung Satgas/Industrial Relation, petugas yang sama (**Cult
 - **Meminjam POLA** modul Catatan Kepatuhan (§Cara Kerja di atas): gerbang petugas server-side, resolusi supervisor, foto bukti, rekap per-department. **Bukan** memakai koleksinya.
 - **Daftar task**: `Workspace/ANALISA - Inspeksi 5R Area per Department.md`.
 
+## Perubahan: Redesign Satgas Per-PIC ke Input Bebas + SLA (ADR 0122, 🟡 diusulkan)
+
+Track **Satgas per-PIC** (OB/Security, ber-KPI) **pindah dari Form Builder** ke **entitas sendiri `satgas_finding` di employee-service** — dianggap form-builder terlalu kaku (harus rakit form + periode + sasaran dulu). Objek & tujuan KPI **tidak berubah**; cara mencatat dan menilainya yang berubah. Keputusan & alasan: [[ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval]].
+
+- **Pencatatan bebas**: petugas Culture & Industrial (`kepatuhan.satgas.input`) mencatat temuan atas seorang OB/Security **kapan saja** (pilih orang + catatan + foto), tanpa form/periode/sasaran pra-bangun. `period_key` diturunkan dari tanggal catat.
+- **SLA per temuan**: petugas menetapkan `sla_hari`. Lewat tenggat tanpa balasan, petugas memilih **`kunci_clockout`** (memakai ULANG mekanisme tahan-clock-out track Catatan Kepatuhan — `handleComplianceBlock` diperluas membaca `satgas_finding`, gerbang attendance yang sama) **atau** **`nilai_1`** (skor 1/10 terminal).
+- **Balas-dengan-FOTO → approve-dengan-NILAI**: karyawan menanggapi temuan dengan foto bukti perbaikan (baru — balasan Catatan Kepatuhan hari ini text-only); petugas approve sambil memberi nilai 1–10 (→0–100).
+- **KPI**: skor kebersihan OB/Security satu periode = **dari kasus temuan saja, rata-rata**; tanpa temuan = penuh (100). Sumber `nilai_inspeksi_satgas` membaca `satgas_finding` **in-process** — melepas kopling HTTP `/internal/satgas/metrics` + `FORM_BUILDER_SERVICE_KEY`.
+- **Non-sanksi**: kunci clock-out = nudge (bukan SP/potong gaji); 1/10 = skor KPI (bukan potong gaji). PP tak mengatur 5R; ADR 0122 catatan penyimpangannya (ADR 0071 §4).
+- **Pemisahan tetap**: `satgas_finding` (per-PIC, KPI) ≠ `compliance_note` (atribut, non-KPI) ≠ `area_inspection` (department, non-KPI) ≠ `employee_warning` (SP).
+- **Daftar task**: `Workspace/ANALISA - Redesign Satgas Input Bebas dan SLA Temuan.md`.
+
 ## Dokumen Terkait
 
 - [[ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor]] — track 5R area (di atas)
-- [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] — track per-PIC ber-KPI
+- [[ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval]] — redesign track per-PIC (menggantikan mekanisme 0090)
+- [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] — track per-PIC ber-KPI (mekanisme lama, digantikan 0122)
 - [[ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI]] — keputusan & alasan (daftar task: `Workspace/ANALISA - Industrial Relation.md`)
 - [[HRIS - Disciplinary (Surat Peringatan)]] · [[HRIS - Key Performance Index]] · [[HRIS - Conflict Management]]
 - [[HRIS - Kepatuhan Peraturan Perusahaan]] · [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]
