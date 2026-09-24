@@ -74,20 +74,24 @@ Dari **24 metrik General Affair, sembilan terkunci pada satu hal yang sama**: ti
 
 ## Office Boy
 
-**Dinilai dari** (template `Office Boy Team`, 4 metrik):
+**Dinilai dari** (diukur ulang 2026-09-24 ke `employee_db` prod: template aktifnya kini **`Office Boy & Girl Staff HRGA`**, bukan `Office Boy Team` yang berhenti menilai di 2026-07):
 
-| Bobot | Metrik | Sumber |
-|---:|---|---|
-| 0,3 | Rating pelayanan dan kebersihan | modul checklist belum ada |
-| 0,3 | Kondisi kebersihan area yang ditugaskan | modul checklist belum ada |
-| 0,25 | Perawatan barang, perabotan, tanaman | modul checklist belum ada |
-| 0,15 | Pelaksanaan 5R area pantry | modul checklist belum ada |
+| Bobot | Metrik | Sumber | Keadaan |
+|---:|---|---|---|
+| 0,3 | Rating Pelayanan dan Kebersihan (1-10) | `nilai_layanan_pribadi`, diisi form "Pelayanan Tim Office Boy" (**694** jawaban, aktif sampai 2026-09) | ✅ **otomatis dan hidup** |
+| 0,3 | Kondisi kebersihan area yang ditugaskan | — | ⛔ manual, atribusinya bermasalah (di bawah) |
+| 0,25 | Perawatan barang, perabotan, tanaman di area yang ditugaskan | — | ⛔ sama |
+| 0,15 | Pelaksanaan 5R Area Pantry dan Area Tanggung Jawab | `nilai_inspeksi_satgas` tersedia tetapi **belum dipasang**; nol form Satgas di prod | ⛔ manual |
+
+⛔ **Tiga metrik berbobot total 0,70 menilai kondisi ruang yang tidak bisa diatribusikan.** Ketiganya berbunyi "area yang ditugaskan", tetapi penugasan Office Boy **berpindah-pindah** (dinyatakan pemilik proses 2026-09-24) dan **tidak tersimpan di mana pun**: `area_tanggung_jawab` / `area_assignment` / `penugasan_area` nol di seluruh `services/`, dan `services/attendance` tidak mengenal konsep area sama sekali. Ruang bersama seperti lorong karena itu tidak punya pemilik di model data mana pun — bukan orang, bukan departemen. Temuan hari Rabu di lorong yang Senin dan Selasa dibersihkan orang berbeda jatuh ke siapa pun yang dipilih petugas.
+
+Ini sekaligus menguatkan [[ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor]]: keputusan menjadikan inspeksi area **non-KPI** berdiri di atas alasan yang lebih kuat daripada yang tertulis di sana. ⚠️ Perumusan ulang ketiga metrik itu **hak pemilik KPI**, bukan keputusan teknis, karena isi metrik diatur SK.
 
 ⛔ **Tidak direkomendasikan dibuatkan dashboard**, sesuai [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]] §4.
 
-Keempat metriknya, bobot penuh 1,0, terkunci pada satu modul yang sama dan belum ada. Posisi ini juga tidak punya antrean, tenggat, atau persetujuan di sistem mana pun, jadi sumbu kedua ADR itu pun kosong. Layar yang dibangun sekarang akan seluruhnya panel menunggu.
+⚠️ **Diperbarui 2026-09-24**: kalimat lama "keempat metriknya terkunci pada satu modul yang sama dan belum ada" **sudah tidak berlaku** — rating pelayanan 0,30 kini otomatis dan hidup. Yang tersisa 0,70, dan penghalangnya **bukan** modul checklist melainkan atribusi: ruang bersama yang penugasannya berpindah tidak bisa dinilai per orang, sebanyak apa pun modul dibangun. Posisi ini juga tetap tidak punya antrean, tenggat, atau persetujuan di sistem mana pun, jadi sumbu kedua ADR itu masih kosong.
 
-**Yang membalikkan keputusan ini**: modul checklist berjadwal berdiri dan dipakai. Satu hal, dan seluruh posisi ini langsung terukur penuh.
+**Yang membalikkan keputusan ini**: pemilik KPI merumuskan ulang ketiga metrik sisanya menjadi perbuatan yang bisa dibuktikan (giliran dikerjakan dan tercatat), bukan kondisi ruang. Membangun modul checklist saja **tidak cukup**, dan itu koreksi terhadap catatan sebelumnya di dokumen ini.
 
 ## Security
 
