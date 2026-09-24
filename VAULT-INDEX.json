@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-24",
-  "jumlah_dokumen": 477,
+  "jumlah_dokumen": 479,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -2723,6 +2723,7 @@
         "ADR - 0052 Status Sinkron per Toko",
         "ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya",
         "Manufacture - Issue Code Audit 2026-06",
+        "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok",
         "Microservices - Employee Service",
         "GA - Procurement System",
         "ADR - 0001 Akuntansi via Accurate",
@@ -2731,22 +2732,21 @@
         "DB - Overview and Notes",
         "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace"
       ],
-      "hash": "99af890ddddce9c733ab256d0848db1a1f1b1c196608f34a4cd9f063707d3655",
-      "ukuran_kb": 66.7,
-      "ringkasan": "Menjawab: bagaimana WMS/manufacture-service mengelola master bahan baku dan produk, stok per gudang, transaksi in/out, formula/BOM, produksi, PO, proposal koreksi, dan audit log. Menjelaskan dari mana master datang sekarang (bahan & angka stok dari Accurate, barang jadi & bundle dari data HPP integration, formula dari import Excel, sync Google Sheets sudah dihapus), cara kerja push pergerakan WMS ke Accurate lewat outbox penyesuaian persediaan beserta kill switch dan akar kegagalan format transDate, serta mekanisme saldo awal/akhir bulanan yang idempoten. Juga menyebut stack, port, database `manufacture_db`, dan tautan ke daftar rute lengkap.",
+      "hash": "29154382588b53de0f444e592c721a9e0ad7f809aa385f5901e46ec0513c2d79",
+      "ukuran_kb": 67.6,
+      "ringkasan": "Menjawab: bagaimana WMS manufaktur mencatat masuk-keluar barang jadi dan bahan baku, bagaimana feed retur marketplace dijoin ke transaksi gudang beserta arti badge Belum Dicatat, Sudah Dicatat, dan Tanpa Barang Balik, serta siapa yang boleh membuka tab mana. Menjelaskan juga kenapa qty Reject pada retur memang ikut menambah stok FG (keputusan 21-22 Juli 2026, kondisinya label informasi dan bukan bug), bagaimana pemetaan SKU serta penyelarasan HPP dijalankan, dan bagaimana konfirmasi gudang yang gagal terkirim dipulihkan tanpa menambah stok dua kali.",
       "kata_kunci": [
-        "manufacture service",
+        "manufacture",
         "WMS",
-        "warehouse",
-        "gudang",
+        "gudang barang jadi",
+        "retur",
+        "return ekspedisi",
+        "reuse rework reject",
         "stok",
-        "master bahan",
-        "bundle",
-        "formula",
-        "BOM",
-        "Accurate push",
-        "saldo awal",
-        "HPP"
+        "SKU mapping",
+        "HPP",
+        "RBAC tab",
+        "Accurate"
       ]
     },
     {
@@ -7836,6 +7836,40 @@
         "KPI GA",
         "foto bukti",
         "ADR 0123"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok.md",
+      "judul": "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-09-24, kode belum ada. Berdiri di atas pengukuran langsung produksi 2026-09-24 dan pembacaan `origin/main`.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
+        "Microservices - Manufacture Service",
+        "APP - Web ERP",
+        "ADR - 0100 Penerimaan Beda dengan Accurate Diputus di Halaman Penerimaan",
+        "ADR - 0069 Perlengkapan Per-Unit Opsional di inventory dengan Guard Anti-Kontaminasi",
+        "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
+        "Manufacture - Stock & Material Management",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
+      ],
+      "hash": "7f4aa0644723fdf1dd00f0db04e76d460e3d86be8dbd8971c8c7085b0e69215f",
+      "ukuran_kb": 13.9,
+      "ringkasan": "Menjawab: kenapa pencatatan kondisi retur gudang adalah beban ketikan manusia terbesar yang terukur di ERP tetapi tetap tidak boleh langsung dibangun perbaikannya, dan kenapa jawabannya bukan AI. Menetapkan pengukuran komposisi siklus sebagai gerbang yang boleh membatalkan seluruh pekerjaan, lalu membatasi perbaikannya pada konfirmasi massal khusus paket yang seluruh barisnya sudah cocok dengan klaim marketplace. Menjelaskan juga kenapa formulirnya sudah berbasis pengecualian sehingga menambah nilai bawaan bukan lagi pekerjaan yang tersisa.",
+      "kata_kunci": [
+        "retur gudang",
+        "input pengecualian",
+        "konfirmasi massal",
+        "beban kerja manusia",
+        "otomasi",
+        "AI",
+        "reuse rework reject",
+        "manufacture",
+        "i18n",
+        "gerbang pengukuran"
       ]
     },
     {
@@ -16161,6 +16195,36 @@
         "varians anggaran",
         "analisa kebutuhan",
         "modul Tax"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Kurangi Siklus Input Retur Gudang.md",
+      "judul": "ANALISA - Kurangi Siklus Input Retur Gudang",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok",
+        "Microservices - Manufacture Service",
+        "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "ADR - 0077 Koreksi Faktur via Impor Rekap Lengkap Mengalir ke Master-Data, Bukan Override per Baris"
+      ],
+      "hash": "febdafe149d97951dcc11215ea118323b0e5742d22438af17b587063f9c845c1",
+      "ukuran_kb": 8.9,
+      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk mengurangi siklus input retur gudang, mana yang berstatus gerbang, dan apa dependensinya. Memuat dua gerbang pengukuran produksi yang boleh membatalkan pelaksanaan, daftar kode yang belum sempat diverifikasi langsung karena kuota model habis, serta alasan tertulis kenapa verifikasi kas kecil, permintaan barang, dan pemetaan SKU sengaja tidak masuk papan ini.",
+      "kata_kunci": [
+        "daftar task",
+        "retur gudang",
+        "konfirmasi massal",
+        "gerbang pengukuran",
+        "kas kecil",
+        "permintaan barang",
+        "pemetaan SKU",
+        "manufacture",
+        "analisa kebutuhan"
       ]
     },
     {
