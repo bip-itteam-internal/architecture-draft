@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan** (2026-09-24) — kode belum ada. Mengikuti **cetakan arsitektur** [[ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval]] (entitas sendiri per subjek, bukan form-builder; approve-dengan-nilai), tetapi **sengaja berbeda pada model skornya** — lihat Decision §5. Tidak menyentuh [[ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor]], [[ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI]], maupun [[ADR - 0112 Ronda Security di Attendance Service, GPS Membuktikan Lokasi Bukan Titik]].
+> **Status**: 🟡 **Diusulkan** (2026-09-24) — kode belum ada. Mengikuti **cetakan arsitektur** [[ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval]] (entitas sendiri per subjek, bukan form-builder; approve sebagai **konfirmasi** dan skor **dihitung sistem**, bukan diketik), tetapi **sengaja berbeda pada model skornya** — lihat Decision §5. Tidak menyentuh [[ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor]], [[ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI]], maupun [[ADR - 0112 Ronda Security di Attendance Service, GPS Membuktikan Lokasi Bukan Titik]].
 
 ## Untuk Manajemen
 
@@ -10,7 +10,7 @@ Perawatan berkala gedung dan alat (servis AC, cek panel, genset) sekarang dinila
 
 **Apa yang TIDAK dijanjikan:** bobot, target, dan arah metrik **tidak diubah** — itu diatur SK, bukan keputusan ini. Ini **bukan** sistem sanksi dan tidak menyentuh gaji. Ia juga **tidak** menggantikan pencatatan perbaikan kerusakan, yang sudah berjalan lewat tiket dan sudah dinilai terpisah. Dan ia **tidak** menjawab patroli Security tiap 3 jam, yang bentuknya berbeda dan sudah punya keputusan sendiri.
 
-**Perkiraan besaran kerja:** sedang. Dua penyimpanan baru dan satu layar, ditambah satu sambungan ke KPI. Sebagian bahannya sudah ada: daftar aset, unggah foto, dan pola "setujui sambil menilai" yang sedang dibangun untuk Satgas. Backend rilis lebih dulu, lalu web.
+**Perkiraan besaran kerja:** sedang. Dua penyimpanan baru dan satu layar, ditambah satu sambungan ke KPI. Sebagian bahannya sudah ada: daftar aset, unggah foto, dan pola "atasan mengonfirmasi, angkanya dihitung sistem" yang sedang dibangun untuk Satgas. Backend rilis lebih dulu, lalu web.
 
 ## Deskripsi
 
@@ -46,7 +46,7 @@ Diukur ke `origin/main` `bip-erp` `7b767ec9` dan ke **database produksi**, 2026-
 
 10. **Gerbang aturan bisnis: lolos.** `mybharata-app/docs/development/BUSINESS_LOGIC_IMPLEMENTATION.md` (menang atas perilaku sistem) **tidak menyebut KPI sama sekali**, dan Peraturan Perusahaan tidak mengatur perawatan berkala. Jadi tidak ada aturan yang dilanggar. Struktur dan bobot KPI sendiri diatur **SK**, sehingga keputusan ini hanya boleh mengubah **cara angkanya lahir**.
 
-11. **Berdiri sebagian di atas rencana, bukan kenyataan.** [[ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval]] berstatus 🟡 dan kodenya belum ada, jadi pola "approve-dengan-nilai" yang dipakai ulang di sini masih rancangan. [[GA - Checklist Management]] dan [[GA - Building Maintenance]] juga 🟡. Yang **nyata** dan sudah berjalan: metrik 0,35 di template yang sama sudah otomatis lewat sumber `kinerja_tiket` metrik `selesai_dinilai` dan benar-benar menghasilkan angka.
+11. **Berdiri sebagian di atas rencana, bukan kenyataan.** [[ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval]] berstatus 🟡 dan kodenya belum ada, jadi pola "atasan mengonfirmasi, sistem menghitung" yang dipakai ulang di sini masih rancangan. ⚠️ ADR itu juga **direvisi pada hari yang sama** (skornya semula diketik petugas 1–10, kini otomatis dari potongan); rujukan di sini mengikuti versi 2026-09-24 dan perlu diperiksa ulang bila ia berubah lagi. [[GA - Checklist Management]] dan [[GA - Building Maintenance]] juga 🟡. Yang **nyata** dan sudah berjalan: metrik 0,35 di template yang sama sudah otomatis lewat sumber `kinerja_tiket` metrik `selesai_dinilai` dan benar-benar menghasilkan angka.
 
 ## Decision
 
@@ -72,7 +72,7 @@ Satu realisasi tidak sah tanpa foto. Tanpa kewajiban ini, "menandai selesai" kem
 
 SPV GA **tidak** memberi angka. Ia hanya menetapkan satu realisasi `diverifikasi` atau `ditolak` beserta alasannya. Perannya menjaga bukti, bukan menaksir kinerja — dan itu yang membedakan cacahan dari pendapat.
 
-Ini memakai ulang pola **approve** dari [[ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval]], tetapi **tanpa** bagian "dengan nilai": di sana penilaian memang subjektif (kebersihan), di sini yang dinilai adalah fakta terjadi atau tidak.
+Ini sejalan dengan [[ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval]] §4 versi 2026-09-24, yang juga menetapkan approve sebagai **konfirmasi** dan bukan tempat mengetik angka. Kedua keputusan berangkat dari alasan yang sama: begitu manusia mengetik angkanya, yang tersimpan adalah pendapat, dan tak ada yang bisa memeriksanya kemudian.
 
 ### 5. ⛔ Skor BERBASIS PENYELESAIAN, bukan pengecualian
 
@@ -80,7 +80,9 @@ Ini memakai ulang pola **approve** dari [[ADR - 0122 Satgas Per-PIC Input Bebas 
 Realisasi PM = realisasi terverifikasi ÷ jatuh tempo pada periode × 100
 ```
 
-**Ini sengaja berbeda dari [[ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval]] §5**, yang menetapkan "tanpa temuan → penuh 100". Model itu benar untuk inspeksi kebersihan, karena yang diukur adalah ada-tidaknya pelanggaran. Untuk perawatan berkala ia **terbalik arah**: "tidak ada yang mencatat" akan bernilai **100**, padahal justru itu keadaan gagalnya.
+**Ini sengaja berbeda dari [[ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval]] §5**, yang menghitung `max(0, 100 − Σ potongan tiap temuan)` sehingga **tanpa temuan bernilai 100**. Model potongan itu benar untuk inspeksi kebersihan, karena yang diukur ada-tidaknya pelanggaran dan tidak adanya pelanggaran memang kabar baik.
+
+Untuk perawatan berkala ia **terbalik arah**. Tidak adanya catatan bukan kabar baik, melainkan justru keadaan gagalnya: dengan model potongan, aset yang tak pernah disentuh siapa pun akan bernilai **100**. Karena itu PM berangkat dari **nol dan naik dengan bukti**, bukan dari 100 dan turun dengan temuan.
 
 Karena itu: **tanpa bukti bernilai nol, bukan seratus.** Siapa pun yang kelak menyeragamkan kedua model ini akan menghidupkan kembali persis masalah yang keputusan ini perbaiki.
 
