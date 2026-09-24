@@ -46,7 +46,7 @@ Grounding ke kode (bip-erp, erp-frontend, my-bharata) dan vault, 2026-09-24 (emp
 
 ### 1. Entitas `satgas_finding` sendiri di employee-service, subjek ORANG, ber-KPI
 
-Koleksi baru `satgas_finding` di employee-service (service yang sama dengan `compliance_note`, `area_inspection`, dan sumber KPI). Satu dokumen = satu temuan atas satu orang: `(company_id, employee_id, dicatat_oleh, dicatat_pada, ada_temuan, catatan, foto[], sla_hari, deadline, tindakan, response{foto[], pada}, disetujui_oleh, disetujui_pada, status, period_key)`. **Tak ada field `nilai` per temuan** — skor **diturunkan** dari kumpulan temuan saat baca KPI (§5); yang disimpan adalah faktanya (status penyelesaian + jumlah foto). **Bukan** di form-builder (mesinnya periodik/kaku), **bukan** menumpang `compliance_note` (sengaja non-KPI, mencampur skor mengaburkan batas ADR 0085), **bukan** `area_inspection` (subjek department). Pemisahan koleksi membuat batas **per-PIC-ber-KPI ≠ area ≠ catatan atribut ≠ SP** tetap struktural.
+Koleksi baru `satgas_finding` di employee-service (service yang sama dengan `compliance_note`, `area_inspection`, dan sumber KPI). Satu dokumen = satu temuan atas satu orang: `(company_id, employee_id, dicatat_oleh, dicatat_pada, catatan, foto[], sla_hari, deadline, tindakan, response{foto[], pada}, disetujui_oleh, disetujui_pada, status, period_key)`. **Tak ada field `ada_temuan`** (pencatatan = temuan) dan **tak ada field `nilai` per temuan** — skor **diturunkan** dari kumpulan temuan saat baca KPI (§5); yang disimpan adalah faktanya (status penyelesaian + jumlah foto). **Bukan** di form-builder (mesinnya periodik/kaku), **bukan** menumpang `compliance_note` (sengaja non-KPI, mencampur skor mengaburkan batas ADR 0085), **bukan** `area_inspection` (subjek department). Pemisahan koleksi membuat batas **per-PIC-ber-KPI ≠ area ≠ catatan atribut ≠ SP** tetap struktural.
 
 ### 2. Pencatatan BEBAS menggantikan form + periode + sasaran
 
@@ -76,9 +76,9 @@ Angka bisa disetel; strukturnya dikunci di sini (keputusan user 2026-09-24: **sk
 
 Framing dipertahankan seperti mekanisme yang sudah ada: menahan clock-out adalah dorongan menanggapi, orangnya melepas sendiri dengan membalas. Temuan yang gagal ditanggapi (`tutup_gagal`) menurunkan **skor KPI** lewat potongan (§5), tidak membaca/menulis payroll, tidak membuat `employee_warning`/SP. Tak ada perubahan dokumen regulasi; ADR ini catatan penyimpangannya (ADR 0071 §4). Bila kelak manajemen ingin menjadikannya sanksi gaji, itu **keputusan baru** + revisi `BUSINESS_LOGIC_IMPLEMENTATION.md`, bukan otomatis di sini.
 
-### 7. Retire form-builder Satgas bertahap
+### 7. Retire form-builder Satgas — PENUH, sekarang
 
-`metric_key: inspeksi_satgas` dipensiunkan **setelah** `satgas_finding` + sumber KPI in-process live. Selama transisi sumber KPI boleh membaca dua asal (form-builder lama + finding baru) agar skor tak kosong mendadak. Jawaban form Satgas historis dibiarkan sebagai arsip (tidak dimigrasi), kecuali pengukuran prod menuntut lain.
+⚠️ **Revisi keputusan (user 2026-09-24): retire PENUH, bukan bertahap.** Rencana awal "transisi baca dua asal" **dibatalkan** — karena sumber KPI baru membaca `satgas_finding` in-process dan tak pernah lagi memanggil form-builder, tak ada gunanya mempertahankan jalur lama. `metric_key: inspeksi_satgas` dan seluruh endpoint/UI form-builder Satgas dihapus di branch ini (lihat Catatan implementasi). Jawaban form Satgas historis dibiarkan sebagai arsip di koleksi form-builder (tidak dimigrasi, tidak dibaca lagi), kecuali pengukuran prod menuntut lain.
 
 ## Consequences
 
@@ -105,12 +105,14 @@ Framing dipertahankan seperti mekanisme yang sudah ada: menahan clock-out adalah
 - **BE sebelum FE** (kontrak baru).
 - ✅ **Attendance TIDAK perlu di-deploy** — ternyata `handleComplianceBlock` cukup meng-**union** temuan Satgas ke daftar `blocking` yang sudah dikonsumsi attendance apa adanya (`compliance_gate.go` memblokir bila daftar non-kosong). Yang wajib naik bersama: **`notification-service` (kategori `satgas-temuan` baru) + `employee-service`**, notification-service dulu; lalu picu satu clock-out/notifikasi nyata untuk membuktikan.
 - Tanpa env baru (`satgas_finding` di employee-service; KPI baca in-process; tak butuh `FORM_BUILDER_SERVICE_KEY`).
-- Retire form-builder Satgas **setelah** finding + sumber KPI live; jangan cabut `metric_key` sebelum itu (skor kosong).
+- Form-builder Satgas diretire PENUH di branch ini (§7); karena tak ada transisi baca-dua-asal, urutan rilisnya: employee-service (satgas_finding + KPI in-process + config area) live DULU, baru form-builder yang sudah dipangkas menyusul — supaya skor tak kosong di jendela antara.
 
-### Catatan implementasi (2026-09-24, dari kode di branch)
-- **Skor**: `max(0,100−Σ)`; tak ada temuan → 100. Potongan per temuan: **approved ATAU responded → 5** (karyawan sudah membalas dianggap beres, approval tinggal konfirmasi); **tutup_gagal ATAU open yang tenggatnya sudah lewat → `15 + 5×(foto−1)` maks 30**; **open yang masih dalam tenggat → MENUNGGU, tak dihukum** (skor bulan berjalan tak menghukum sebelum tenggat). Tanpa dokumen sama sekali (belum diinspeksi) → **belum dapat dihitung** (bukan 100 palsu), supaya skor otomatis lain orang itu tak ikut hilang.
+### Catatan implementasi (2026-09-24, dari kode di branch — termasuk penyempurnaan keputusan user)
+- ⛔ **TAK ADA toggle "Ada temuan?" / status `clean`** (keputusan user 2026-09-24: "adanya pencatatan artinya ada penemuan"). SETIAP dokumen `satgas_finding` = satu TEMUAN (SLA wajib). Tak ada temuan sebulan → tak ada dokumen.
+- **Skor**: `max(0,100−Σ)`. **Tanpa temuan sebulan → skor PENUH 100 OTOMATIS, terisi di riwayat** (bukan "belum dapat dihitung" — di track ini absennya temuan adalah sinyal positif). Potongan per temuan: **approved ATAU responded → 5**; **tutup_gagal ATAU open yang tenggatnya sudah lewat → `15 + 5×(foto−1)` maks 30**; **open yang masih dalam tenggat → MENUNGGU, tak dihukum**.
+- **Sumber department Inspeksi Area PINDAH dari form-builder ke pengaturan sendiri** (koleksi `area_inspection_config` di employee-service; `GET/PUT /area-inspections/departments-config`, dialog "Pengaturan Departemen" di menu). Kosong = SEMUA master department, subset = hanya itu. Melepas kopling form-builder untuk Area.
 - **Rekap dibaca `kepatuhan.satgas.view` ATAU `.input`** (pembaca + petugas); aksi tulis tetap `.input`. Foto (temuan & perbaikan) dibuka lewat `GET /satgas-findings/:id/photos/:idx/preview?kind=finding|response` (proxy byte, pola area_inspection), gerbang pembaca/petugas ATAU pemilik.
-- **Form-builder Satgas kini dead code** di FE (`SatgasTab` cs. tak lagi terpasang di menu) dan endpoint `/internal/satgas/metrics` tak lagi dikonsumsi — dibersihkan sebagai task terpisah setelah branch ini merged.
+- ✅ **Form-builder Satgas DIRETIRE PENUH** (keputusan user 2026-09-24 "retire penuh sekarang"): dihapus di bip-erp `services/form-builder` (metrics/area-departments/rekap/me/scoring/cek-ulang/gate/preview + `metric_key=inspeksi_satgas`), erp-frontend (toggle "Inspeksi Satgas" di editor form + UI `hris/satgas` lama), dan my-bharata (modul `features/satgas` + menu/rute). Fitur baru `satgas_finding` / "Temuan Saya" utuh.
 
 ## Dokumen Terkait
 - [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]] — mekanisme yang **digantikan** (form-builder + cek-ulang); tujuan KPI-nya dipertahankan

@@ -8,7 +8,12 @@
 - **T1–T4 + preview** → bip-erp `feat/satgas-finding` (pushed). Endpoint catat/foto/rekap/me/response/approve/**escalate**/preview; SLA+eskalasi (`kunci_clockout`/`tutup_gagal`) union ke `handleComplianceBlock`; kategori inbox `satgas-temuan`; skor KPI in-process. **Attendance tak berubah** (union cukup).
 - **T5** → erp-frontend `feat/satgas-finding-web` (pushed). Tab Individu jadi `SatgasPerPicView` (catat bebas + approve + eskalasi + rekap pembaca), foto via `openFileBlob`.
 - **T6** → my-bharata `feat/satgas-finding-mobile` (pushed). Layar "Temuan Saya" OB/Security balas-dengan-foto; notifikasi `satgas-temuan` dipetakan. TANPA bump versi (feat/faiz sudah 1.23.0+172).
-- ⚠️ **Menyimpang dari rencana awal papan ini (ADR yang menang):** tindakan kedua = **`tutup_gagal`** (bukan `nilai_1`); approve = **konfirmasi TANPA mengetik nilai** (bukan "approve dengan nilai"); skor `open` yang **masih dalam tenggat = MENUNGGU** (tak dihukum); tanpa dokumen sama sekali = **belum dapat dihitung** (bukan 100). Form-builder Satgas kini **dead code** (cleanup = task terpisah, bagian T7).
+- ⚠️ **Menyimpang dari rencana awal papan ini (ADR yang menang):** tindakan kedua = **`tutup_gagal`** (bukan `nilai_1`); approve = **konfirmasi TANPA mengetik nilai**; skor `open` masih-dalam-tenggat = **MENUNGGU**.
+
+### Penyempurnaan keputusan user (2026-09-24, sesudah review) — SELESAI di branch
+- ⛔ **Toggle "Ada temuan?" DIBUANG**: setiap pencatatan = satu temuan (SLA wajib), tak ada status `clean`. **Tanpa temuan sebulan → skor 100 OTOMATIS, terisi di riwayat** (bukan "belum dapat dihitung" seperti tertulis di draf sebelumnya).
+- **Sumber department Inspeksi Area pindah dari form-builder** → koleksi `area_inspection_config` + dialog "Pengaturan Departemen" (employee-service). Kosong = semua, subset = hanya itu.
+- ✅ **T7 (retire form-builder Satgas) SELESAI PENUH sekarang** (bukan bertahap): dihapus di bip-erp `services/form-builder`, erp-frontend (toggle editor + UI `hris/satgas` lama), my-bharata (modul `features/satgas`). Transisi "baca dua asal" dibatalkan (KPI in-process tak perlu form-builder).
 
 ## Ringkas keputusan (baca ADR untuk detail)
 
