@@ -1,6 +1,6 @@
 # ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI
 
-> **Status**: ⚠️ **Implemented (ada catatan)** — irisan 1 **hidup di PRODUKSI** sejak 2026-09-23, backend saja; layar FE belum ada. Irisan 2 dan 3 belum. Rinciannya di § Realisasi.
+> **Status**: ⚠️ **Implemented (ada catatan)** — irisan 1 **hidup di PRODUKSI** sejak 2026-09-23, backend saja; layar FE belum ada. Irisan 2 dan 3 belum. Rinciannya di § Realisasi. **§5 dan §7 digantikan** [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] (2026-09-25).
 
 %% Status ditulis DI SINI, bukan sebagai bullet di ## Deskripsi seperti ADR lain, dan itu
 bukan gaya bebas: `## Untuk Manajemen` mendorong bagian Deskripsi melewati baris ke-15, dan
@@ -130,6 +130,8 @@ menghasilkan angka masuk akal yang salah, tanpa galat dan tanpa test yang menang
 
 ### §5 Sistem mengurutkan, orang memutuskan
 
+> ⛔ **Digantikan 2026-09-25** oleh [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]]: Direktur memutuskan laporan membawa keputusan tindakan yang dijalankan atau ditolak orang. Yang tetap: sistem tidak mengeksekusi apa pun sendiri, dan tidak ada besaran rupiah anggaran. Teks di bawah dipertahankan sebagai jejak alasan semula.
+
 Ditegaskan ulang dari [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]]
 §5. Tidak ada penghentian atau penambahan belanja iklan otomatis. Rekomendasi anggaran juga
 tidak dijanjikan: simulasi alokasi sengaja dimatikan sejak 2026-08-15 karena hubungan belanja
@@ -144,6 +146,8 @@ sebagai daftar kirim, 31 orang non-marketing ikut menerima laba seluruh toko.
 Gerbang akses **menu** tetap memakai peran; daftar **penerima laporan** ditulis sendiri.
 
 ### §7 Kondisi berhenti ditetapkan di muka
+
+> ⛔ **Digantikan 2026-09-25** oleh [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] §9: irisan 2 dikerjakan tanpa menunggu 30 hari pemakaian irisan 1 (keputusan Direktur), dan ukuran berhentinya kini jawaban jalankan/tolak atas keputusan AI. Semangatnya tetap: fitur ini punya kondisi berhenti tertulis.
 
 Irisan 1 dinilai setelah 30 hari dengan satu ukuran: berapa laporan yang benar-benar dibuka,
 dan berapa tindakan yang mengikutinya. Bila nol, fitur dihentikan dan irisan 2 tidak
@@ -211,6 +215,7 @@ Kedua, laporannya mencetak `Laba kotor: -Rp112.322.242` dengan `Status: belum_ma
 
 ## Terkait
 
+- [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]]
 - [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]]
 - [[ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library]]
 - [[Microservices - Assistant Service]]

@@ -125,6 +125,8 @@ Tidak ada ambang, bobot, atau koefisien yang boleh ditulis tangan lalu dipakai m
 
 ### 5. Sistem mengurutkan, orang memutuskan
 
+> ⚠️ **Pengecualian 2026-09-25**: untuk laporan Asisten Analisa Marketing saja, keluaran model boleh berupa keputusan tindakan yang dijalankan atau ditolak orang ([[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]]). Eksekusi otomatis tetap dilarang di mana pun, dan kapabilitas lain di ADR ini tetap terikat penuh.
+
 Keluaran model adalah urutan perhatian, bukan tindakan. Pemotongan anggaran, penghentian iklan, dan keputusan produksi tetap dijalankan orang. Alasannya bukan kehati-hatian umum melainkan sifat datanya: riwayat delapan bulan tanpa siklus tahunan tidak layak diberi kewenangan mengeksekusi sendiri.
 
 ### 6. Kapabilitas prediktif pertama adalah peringatan dini belanja iklan video

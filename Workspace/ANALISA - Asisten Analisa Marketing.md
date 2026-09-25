@@ -170,38 +170,82 @@ Angka ini juga bahan utama merancang irisan 3.
 
 ---
 
-# Irisan 2 — AI merangkai
+# Irisan 2 — Keputusan AI, orang menjalankan atau menolak
 
-**Bersyarat**: hanya dikerjakan bila T6 menunjukkan laporan irisan 1 benar-benar dibaca.
+Diputuskan ulang 2026-09-25 di [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]]:
+laporan membawa keputusan "lakukan X", bukan narasi, dan **tidak lagi menunggu T6** (keputusan
+Direktur, menggantikan ADR 0120 §7). Urutan di bawah sengaja menaruh semua yang TANPA AI lebih
+dulu: kelayakan tindakan adalah kode, dan kodenya bisa diuji tanpa satu panggilan model pun.
 
-## T7 — Skema keluaran dan aturan kolom
+## T7 — Ukur laporan produksi dan jadwal aktif (gerbang)
 
-**Status**: belum
+**Status**: belum · **Dependensi**: tidak ada · **Dikerjakan**: manusia
 
-Model menerima hasil hitung beserta penanda ketidakpastiannya, tidak pernah angka mentah
-(ADR 0120 §4). Keluaran dikunci skema supaya dapat divalidasi sebelum dikirim.
+Jalankan `.task-plans/cek-hasil-analisa-prod.ps1` (baca-saja; baca prod ditolak dari sesi agent).
+Hasilnya menjawab dua hal yang belum terukur: isi laporan sungguhan per template, dan jumlah
+kiriman per pekan (dasar hitung ongkos). Bila ternyata nol jadwal aktif, catat, karena §9 ADR 0127
+lalu tak akan pernah punya data.
 
-Aturan yang wajib ikut: nilai pakai laba matang; `roas` null berarti tidak terhitung, bukan nol;
-nol di level video dan level iklan berarti tidak diketahui; retur sudah terpotong di settlement.
+## T8 — Katalog tindakan dan kelayakannya, TANPA AI
 
-## T8 — Integrasi klien AI
+**Status**: belum · **Dependensi**: tidak ada · **Repo**: bip-erp
 
-**Status**: belum · **Dependensi**: T7
+Enam tindakan dan syarat kelayakannya persis tabel ADR 0127 §3, dihitung dari ember yang sudah
+ada (`klasifikasiVideoBoros`, `pilihPenggerus`/`pilihPeluang`, kelompok Account Specialist, vonis
+`susunKeputusan`), **jangan** ditulis ulang. Keluarannya: per kiriman, himpunan (sasaran id,
+tindakan layak, keyakinan). Fungsi murni + uji tabel. Wajib ada uji negatif untuk dua larangan
+keras: `hentikan_iklan` dari ember "belum diketahui" dan dari laba `belum_matang` → tidak layak.
+`kurangi_belanja`/`naikkan_belanja` dimatikan lewat satu saklar sampai G2 diputuskan.
 
-Memakai `shared-library/ai` yang sudah ada, dipanggil dari service pemilik data. Pola asinkron
-yang sudah terbukti ada di recruitment: goroutine terpisah, status tiga keadaan, dan penyaringan
-ulang keluaran model meski skemanya sudah mengunci pilihan.
+## T9 — Skema keluaran dan validator
 
-⚠️ Env `AI_*` dibaca saat container **dibuat**, jadi deploy menuntut `--force-recreate`. Saat ini
-env itu hanya diinjeksikan ke blok recruitment di compose.
+**Status**: belum · **Dependensi**: T8 · **Repo**: bip-erp
+
+Skema `json_schema strict` (tindakan enum, sasaran id, alasan, rujukan bukti) dan validator lapis
+kedua meniru `screeningDariHasil` recruitment: tolak tindakan di luar katalog, sasaran di luar
+himpunan T8, tindakan yang tak layak untuk sasarannya, dan keputusan tanpa rujukan bukti.
+Keyakinan dipasang dari T8, tidak dari model. Masukan model: hasil hitung + penanda, tak pernah
+angka mentah (ADR 0120 §4 tetap).
+
+## T10 — Pasang ke penjalan, dengan jaring gagal
+
+**Status**: belum · **Dependensi**: T9 · **Repo**: bip-erp
+
+Satu panggilan `shared-library/ai` per kiriman, **sebelum** notifikasi dikirim, dengan batas waktu
+per kiriman dan tanpa retry di tik yang sama. Gagal/habis waktu/semua ditolak validator → kiriman
+tetap jalan dengan `Ringkasan`, `narasi_status` = `gagal`, percobaan masuk `NarasiJejak`.
+⚠️ `SimpanHasil` memakai `$set` + upsert tanpa `$unset`: penulis wajib membawa baris utuh.
+Tambah env `AI_*` ke blok marketing-analytics `docker-compose.yml` dan `docker-compose.dev.yml`.
+Uji jalur gagal wajib: klien AI yang melempar galat tetap menghasilkan kiriman terkirim.
+
+## T11 — Catat jawaban jalankan/tolak
+
+**Status**: belum · **Dependensi**: T10 · **Repo**: bip-erp lalu erp-frontend
+
+BE: endpoint menandai satu keputusan dijalankan/ditolak (siapa, kapan, alasan tolak opsional),
+hanya oleh penerima laporan itu. FE: tombolnya di layar riwayat laporan. **BE sebelum FE.**
+⚠️ Dua PR erp-frontend sedang menyentuh `src/features/marketing-analytics/`; koordinasikan dulu.
+
+## T12 — Deploy dan ukur ongkos pekan pertama
+
+**Status**: belum · **Dependensi**: T10 (T11 boleh menyusul) · **Dikerjakan**: manusia untuk PROD
+
+Deploy pertama klien AI di mana pun: `--force-recreate`, lalu picu satu kiriman sungguhan sebagai
+bukti dan baca model yang tercatat di `NarasiJejak`. Sepekan kemudian hitung token × kiriman
+per pekan dan catat di [[Microservices - Marketing Analytics Service]].
+
+## T13 — Penilaian 30 hari (ADR 0127 §9)
+
+**Status**: belum · **Dependensi**: T11 hidup di prod
+
+Nol keputusan dijawab → matikan keputusan AI. Lebih dari separuh ditolak → tinjau katalog T8.
 
 ---
-
 # Irisan 3 — Tanya-jawab bebas
 
 **Bersyarat**: hanya bila T6 menunjukkan orang bertanya di luar template.
 
-## T9 — Putuskan bentuk dan penghalangnya
+## T14 — Putuskan bentuk dan penghalangnya
 
 **Status**: belum
 
@@ -219,14 +263,16 @@ Rancangan yang sudah ada di [[Microservices - Assistant Service]] menjadi bahan 
   1.232 video yang 1.138 di antaranya juga muncul di tab GMV Max, VSA murni tinggal 94 video
   dengan belanja nol, dan seluruh belanja VSA 0,26% dari total. Hasilnya pengulangan, bukan
   cakupan baru. Alasan yang tertulis di kode sudah dikoreksi lewat erp-frontend #1680.
-- **Rekomendasi anggaran iklan.** Simulasi alokasi sengaja dimatikan sejak 2026-08-15 karena
-  hubungan belanja ke laba (R² 0,258) jauh lebih lemah daripada ke revenue (0,714).
+- **Besaran rupiah anggaran iklan.** Simulasi alokasi sengaja dimatikan sejak 2026-08-15 karena
+  hubungan belanja ke laba (R² 0,258) jauh lebih lemah daripada ke revenue (0,714). Keputusan
+  AI (ADR 0127) menyebut ARAH (hentikan/kurangi/naikkan), tidak pernah besarannya.
 - **Harness di netmon sebagai bagian produk.** Ia tetap alat uji (ADR 0120 §1).
 
 ---
 
 ## Terkait
 
+- [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]]
 - [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]]
 - [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]]
 - [[Microservices - Marketing Analytics Service]]
