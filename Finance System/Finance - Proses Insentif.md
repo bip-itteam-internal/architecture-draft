@@ -28,7 +28,7 @@ Insentif karyawan dicantumkan sebagai pekerjaan oleh Junior Accountant dan Cost 
 
 ## Alur target
 
-Master data lengkap (atribusi toko ke ICC, beban non-gaji per proyek karyawan, HPP) → target ditetapkan satu pintu → profit dan insentif dihitung otomatis per periode → Finance memeriksa lalu menyetujui, dan periode dibekukan → dibayar (jalur pembayarannya TBD) → penerima melihat rinciannya di MyBharata.
+Master data lengkap (atribusi toko ke ICC, beban non-gaji per proyek karyawan, HPP) → target ditetapkan satu pintu → profit dan insentif dihitung otomatis per periode → periode final (akhir tanggal 25 bulan berikutnya) → Finance **membekukan** periode menjadi snapshot per orang lalu **menyetujuinya** → snapshot yang disetujui masuk slip gaji sebagai komponen **Insentif** (terpisah dari Bonus) pada run pertama sesudah persetujuan, dan ditandai terbayar saat run di-publish → Finance mencocokkan disetujui dengan terbayar → penerima melihat rinciannya di MyBharata. Keputusannya: 🟡 [[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]] (belum di kode).
 
 ## Celah
 
@@ -39,11 +39,14 @@ Master data lengkap (atribusi toko ke ICC, beban non-gaji per proyek karyawan, H
 - **TBD** HPP yang dipakai perhitungan menunggu Finance melengkapinya; kaitannya dengan costing di [[Finance - Proses Costing HPP Produk]].
 - **TBD** Keputusan terbuka untuk Finance: PPN di dalam profit, target sebelum atau sesudah opex, dan jadwal bayar menurut SK (tanggal 1 atau 5) terhadap cutoff pencairan tanggal 25.
 - **TBD** Hierarki tim insentif sebagai turunan HRIS atau pemilik untuk konteksnya sendiri ([[REF - Kepemilikan Data]] § Duplikasi).
-- **TBD** Jalur pembayaran insentif: ikut run payroll atau transfer terpisah.
+- **C** Jalur pembayaran insentif **diputuskan 2026-09-25**: lewat slip gaji, komponen `Insentif`, dari snapshot yang disetujui Finance ([[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]]). Hari ini (prod 2026-09-25) HR mengetik angka insentif ke kolom Bonus di sheet gaji HRD yang lalu diimpor; satu-satunya run payroll di prod memuat satu baris Bonus dari 174 slip. Yang belum ada: snapshot dan persetujuan skema profit (dashboard dihitung saat dibuka, cache 15 menit; `disetujui` pada target tak pernah `true`), komponen Insentif, dan pemeriksaan impor terhadap snapshot.
+- **TBD** Perlakuan PPh 21 dan dasar BPJS untuk komponen Insentif, tahap persetujuan pertama oleh Supervisor, dan tanggal tutup payroll (dikonfirmasi Finance dan HR; lihat ADR 0125 §3, §7, §8).
 
 ## Kontrol wajib
 
-Penetap target bukan penerima insentif atas target itu; perubahan target di periode berjalan beralasan dan tercatat; beban karyawan per orang hanya terlihat oleh Finance; hasil insentif disetujui sebelum dibayar.
+Penetap target bukan penerima insentif atas target itu; perubahan target di periode berjalan beralasan dan tercatat; beban karyawan per orang hanya terlihat oleh Finance; hasil insentif disetujui sebelum dibayar. Sejak [[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]] ditambah: penyetuju akhir adalah Finance dan bukan penerima snapshot itu; penetap target (Supervisor marketing) bukan pemberi persetujuan bayar; insentif profit hanya dibayar lewat komponen Insentif, tidak lewat Bonus; satu snapshot terbayar paling banyak satu kali.
+
+> ⛔ **Komponen Insentif tidak pernah diisi di master gaji.** Nilai master ikut ke `/employer-cost`, sehingga insentif akan menjadi beban gaji yang mengurangi profit insentif itu sendiri (melingkar, kelas yang sama dengan akun Accurate 6102 di [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]]). Insentif hanya masuk sebagai baris per periode di run.
 
 ## Ukuran efisiensi
 
@@ -60,4 +63,4 @@ Sumber data baseline: Dashboard Insentif dan Master Target per periode.
 ## Dokumen Terkait
 
 - [[Finance - Proses Bisnis dan Kebutuhan Sistem]] · [[Finance - Kalender dan Rantai Tenggat]] · [[Finance - Sambungan dan Permintaan Data Lintas Departemen]] · [[Finance - FAT Persona]]
-- [[Finance - Incentive]] · [[Microservices - Insentive Service]] · [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] · [[ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji]] · [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]] · [[REF - Kepemilikan Data]]
+- [[Finance - Incentive]] · [[Microservices - Insentive Service]] · [[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]] · [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] · [[ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji]] · [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]] · [[REF - Kepemilikan Data]]

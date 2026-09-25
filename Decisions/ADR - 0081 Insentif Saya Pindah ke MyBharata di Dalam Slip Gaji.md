@@ -56,6 +56,8 @@ Rincian memanggil `GET /profit-dashboard/saya?periode=` apa adanya. Tangga tarif
 
 ### 4. Insentif dan slip adalah dua tahap, bukan dua uang
 
+> ⚠️ **Diamandemen 2026-09-25** oleh [[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]] §9: insentif profit kini dibayar lewat slip gaji sebagai komponen `Insentif` (bukan Bonus), dari snapshot yang disetujui Finance. Label "dibayar terpisah" tidak lagi benar. Kartu Insentif tetap rincian hitungan; bila snapshot periode itu sudah terbayar, kartu boleh menyebut "dibayarkan melalui slip gaji \<bulan run\>" dari **tanda terbayar di server**, bukan dari mencocokkan angka di aplikasi. Kalimat asli di bawah dipertahankan sebagai riwayat.
+
 Aplikasi **tidak pernah** menjumlahkan, mengurangkan, atau membandingkan angka insentif dengan gaji bersih, dan tidak menyatakan apakah insentif sudah dibayar. Kartu Insentif berlabel hitungan yang dibayar terpisah. Bila Finance membayar insentif lewat komponen Bonus di slip bulan berikutnya, angka itu tampil di slip sebagai uang yang diterima, dan aplikasi tidak menautkannya ke kartu Insentif. Aturan ini dikunci test.
 
 ### 5. Halaman web dicabut belakangan, mengikuti preseden
@@ -96,11 +98,11 @@ Semua teks kartu dan rincian lewat `context.l10n` dengan kunci di `app_id.arb` d
 - **Tidak membuat menu terpisah** di Quick Access; keputusan pemilik produk, dengan alasan orang mencari uangnya di satu tempat.
 - **Tidak menampilkan status "belum final" di kartu** sebelum PIN; status itu menyingkap keadaan angka, dan kartu tanpa nominal adalah syarat gerbang, bukan gaya.
 - **Tidak mengikutkan Host Live, affiliate, CRM**; skema mereka belum punya sumber angka di sistem, dan kartu yang selalu kosong lebih menyesatkan daripada tak ada.
-- **Tidak menyandingkan insentif dengan komponen Bonus payroll**; payroll tidak membaca insentive-service, dan penyandingan otomatis adalah salinan fakta yang belum diputuskan pemiliknya.
+- **Tidak menyandingkan insentif dengan komponen Bonus payroll**; payroll tidak membaca insentive-service, dan penyandingan otomatis adalah salinan fakta yang belum diputuskan pemiliknya. *(Pemiliknya sudah memutuskan 2026-09-25: [[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]]. Penautannya lewat tanda terbayar pada snapshot, dan tetap tidak lewat komponen Bonus.)*
 
 ## Dokumen Terkait
 
 - [[APP - MyBharata]] §Payroll dan §Pengajuan Pelatihan & Tugas Onboarding (preseden pemindahan) · [[APP - Web ERP]] §Incentive
 - [[Finance - Incentive]] · [[Microservices - Insentive Service]] · [[API - Insentive Service]] · [[Microservices - Payroll Service]]
-- [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] · [[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]] · [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]] · [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]
+- [[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]] (mengamandemen §4) · [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] · [[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]] · [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]] · [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]
 - [[HRIS - Payroll Persona]] · [[IT - CI-CD]] (jalur rilis Codemagic)
