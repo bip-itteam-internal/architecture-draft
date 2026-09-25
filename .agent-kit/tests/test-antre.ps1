@@ -1,6 +1,10 @@
 # test-antre.ps1 - antrean kerja berat lintas sesi (kit 1.30.0): klasifikasi perintah, hook penolak,
 # Mutex per slot dengan PROSES NYATA, dan kunci per langkah di gerbang-lib. Dipanggil test-init.ps1.
 #
+# Ambang waktu sengaja LONGGAR dan dikaitkan ke durasi pemegang: yang dijaga "menunggu" /
+# "tidak menunggu penuh", bukan kecepatan spawn. Terukur 2026-09-25: suite yang ~60 dtk di mesin
+# sepi makan 316 dtk saat CPU 91%, dan ambang 5/15 dtk lama merah tanpa ada perilaku yang salah.
+#
 # Nama Mutex dan folder status dibuat UNIK per run (AGENTKIT_ANTRE_NAMA / AGENTKIT_ANTRE_DIR), supaya
 # test ini tidak mengantre di belakang gerbang sesi Claude sungguhan yang sedang berjalan di mesin
 # yang sama, dan sebaliknya tidak menahan mereka.
@@ -27,12 +31,12 @@ function Start-Pemegang([int]$detik) {
     -RedirectStandardOutput $o -RedirectStandardError ($o + '.err') -NoNewWindow -PassThru
   # tunggu sampai ia benar-benar MEMEGANG (berkas status berkeadaan pegang), bukan sekadar hidup
   $sw = [Diagnostics.Stopwatch]::StartNew()
-  while ($sw.Elapsed.TotalSeconds -lt 20) {
+  while ($sw.Elapsed.TotalSeconds -lt 90) {
     $f = Join-Path $env:AGENTKIT_ANTRE_DIR ([string]$p.Id + '.json')
     if (Test-Path $f) { try { if ((Get-Content $f -Raw | ConvertFrom-Json).keadaan -eq 'pegang') { return $p } } catch {} }
     Start-Sleep -Milliseconds 100
   }
-  throw 'pemegang tidak pernah memegang slot dalam 20 detik'
+  throw 'pemegang tidak pernah memegang slot dalam 90 detik'
 }
 function Invoke-Antre([string[]]$argsAntre, [int]$batasDetik = 60) {
   $o = Join-Path $tmp ('antre-' + [guid]::NewGuid().ToString('N') + '.txt')
@@ -102,11 +106,11 @@ try {
   $r = Invoke-Antre @('cmd', '/d', '/c', 'exit 3')
   Check ($r.selesai -and $r.exit -eq 3) "antre: exit code anak diteruskan (dapat $($r.exit))"
 
-  $a = Start-Pemegang 5
+  $a = Start-Pemegang 15
   try {
-    $r = Invoke-Antre @('cmd', '/d', '/c', 'exit 0')
+    $r = Invoke-Antre @('cmd', '/d', '/c', 'exit 0') 120
     Check ($r.selesai -and $r.exit -eq 0) 'antre: penunggu akhirnya jalan'
-    Check ($r.detik -ge 2.5) ("antre: penunggu MENUNGGU pemegang ({0:N1} dtk)" -f $r.detik)
+    Check ($r.detik -ge 5) ("antre: penunggu MENUNGGU pemegang ({0:N1} dtk)" -f $r.detik)
     Check ($r.err -match 'menunggu') 'antre: penunggu mencetak status menunggu'
     Check ($r.err -match [string]$a.Id) 'antre: status menunggu menyebut PID pemegang'
   } finally { Stop-Pohon $a }
@@ -115,18 +119,18 @@ try {
   $sw = [Diagnostics.Stopwatch]::StartNew()
   Start-Sleep -Milliseconds 500
   Stop-Process -Id $a.Id -Force   # pemegang mati TANPA melepas: Mutex jadi abandoned
-  $r = Invoke-Antre @('cmd', '/d', '/c', 'exit 0') 30
-  Check ($r.selesai -and $r.exit -eq 0 -and $r.detik -lt 15) ("antre: slot pemegang yang di-kill diambil alih ({0:N1} dtk)" -f $r.detik)
+  $r = Invoke-Antre @('cmd', '/d', '/c', 'exit 0') 100
+  Check ($r.selesai -and $r.exit -eq 0 -and $r.detik -lt 60) ("antre: slot pemegang yang di-kill diambil alih ({0:N1} dtk)" -f $r.detik)
   Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" | Where-Object { $_.CommandLine -like '*Start-Sleep 120*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 
-  $r = Invoke-Antre @('powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"' + $antre + '"'), '--', 'cmd', '/d', '/c', 'exit 0') 30
+  $r = Invoke-Antre @('powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"' + $antre + '"'), '--', 'cmd', '/d', '/c', 'exit 0') 90
   Check ($r.selesai -and $r.exit -eq 0) 'antre: antre bersarang tidak deadlock'
 
   $env:AGENTKIT_ANTRE_SLOT = '2'
-  $a = Start-Pemegang 8
+  $a = Start-Pemegang 60
   try {
-    $r = Invoke-Antre @('cmd', '/d', '/c', 'exit 0')
-    Check ($r.selesai -and $r.detik -lt 5) ("antre: 2 slot, penunggu kedua langsung jalan ({0:N1} dtk)" -f $r.detik)
+    $r = Invoke-Antre @('cmd', '/d', '/c', 'exit 0') 90
+    Check ($r.selesai -and $r.detik -lt 40) ("antre: 2 slot, penunggu kedua langsung jalan ({0:N1} dtk)" -f $r.detik)
   } finally { Stop-Pohon $a; $env:AGENTKIT_ANTRE_SLOT = '1' }
 
   # papan-sesi menampilkan pemegang yang HIDUP (dan tidak menampilkan bagian antrean saat kosong)
@@ -151,22 +155,22 @@ try {
 
   # ---- 4. kunci per langkah di gerbang-lib ----
   . (Join-Path $hooks 'gerbang-lib.ps1')
-  $a = Start-Pemegang 4
+  $a = Start-Pemegang 15
   try {
     $sw = [Diagnostics.Stopwatch]::StartNew()
     $g = Invoke-Gerbang 'uji' $tmp 'cmd /d /c exit 0'
     $sw.Stop()
-    Check ($sw.Elapsed.TotalSeconds -ge 2) ("Invoke-Gerbang menunggu slot ({0:N1} dtk)" -f $sw.Elapsed.TotalSeconds)
+    Check ($sw.Elapsed.TotalSeconds -ge 5) ("Invoke-Gerbang menunggu slot ({0:N1} dtk)" -f $sw.Elapsed.TotalSeconds)
     Check ($g.lolos) 'Invoke-Gerbang tetap lolos sesudah menunggu'
-    Check ($g.durasi_detik -lt 2) ("Invoke-Gerbang: durasi_detik tidak memuat waktu antre ({0})" -f $g.durasi_detik)
+    Check ($g.durasi_detik -lt 8) ("Invoke-Gerbang: durasi_detik tidak memuat waktu antre ({0})" -f $g.durasi_detik)
   } finally { Stop-Pohon $a }
-  $a = Start-Pemegang 5
+  $a = Start-Pemegang 25
   try {
     $sw = [Diagnostics.Stopwatch]::StartNew()
-    $g = Invoke-GerbangBatas 'uji' $tmp 'ping -n 2 127.0.0.1 >nul' 3
+    $g = Invoke-GerbangBatas 'uji' $tmp 'ping -n 2 127.0.0.1 >nul' 10
     $sw.Stop()
-    Check ($sw.Elapsed.TotalSeconds -ge 2.5) ("Invoke-GerbangBatas menunggu slot ({0:N1} dtk)" -f $sw.Elapsed.TotalSeconds)
-    Check ($g.lolos) "Invoke-GerbangBatas: waktu antre TIDAK dihitung ke batas 3 dtk (exit $($g.exit))"
+    Check ($sw.Elapsed.TotalSeconds -ge 10) ("Invoke-GerbangBatas menunggu slot ({0:N1} dtk)" -f $sw.Elapsed.TotalSeconds)
+    Check ($g.lolos) "Invoke-GerbangBatas: waktu antre TIDAK dihitung ke batas 10 dtk (exit $($g.exit))"
   } finally { Stop-Pohon $a }
   Check (-not $env:AGENTKIT_ANTRE_PEGANG) 'gerbang-lib: env pemegang dibersihkan sesudah langkah'
 
