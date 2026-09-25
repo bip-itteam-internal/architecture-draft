@@ -223,10 +223,18 @@ yang berubah, menurut hari penerimaannya:
 penerimaan berstatus **FAILED** — kompensasinya belum pernah masuk Accurate. Jadi tak ada
 angka Agustus yang bisa berubah; yang perlu dilakukan **memasukkan**, bukan **merevisi**.
 
-⚠️ **Isi kv = keputusan atas 7 pesanan itu**, bukan sekadar saklar teknis: `2026-09-01`
-berarti dikoreksi otomatis, tanggal deploy berarti dibiarkan. Dan pilihan "dikoreksi" punya
-tenggat — penerimaan September tertua keluar dari jendela 45 hari sekitar **17 Oktober 2026**.
-Menunda = memilih "dibiarkan", sebagian demi sebagian.
+✅ **DIPUTUSKAN finance 2026-09-25: kv diisi `2026-09-01`, ketujuh pesanan berpencairan
+September DIPERBAIKI SISTEM.** Dinyatakan tiga kali dengan bentuk berbeda dan konsisten:
+*"diterapin di bulan September aja"*, *"yang pencairannya bulan September"*, dan — untuk
+pesanan `585673721052759108` — *"yang tanggal 13 September itu masuk ke pendapatan
+lain-lain"*.
+
+Isi kv itu **adalah** keputusannya, bukan saklar teknis: `2026-09-01` berarti dikoreksi
+otomatis, tanggal deploy berarti dibiarkan dan seluruhnya jadi koreksi manual.
+
+⚠️ Pilihan "dikoreksi" punya tenggat — penerimaan September tertua keluar dari jendela
+pindai 45 hari sekitar **17 Oktober 2026**. Lewat itu kv `2026-09-01` pun tak lagi
+menyentuh dokumennya, dan hasilnya jadi campuran yang sulit ditelusuri.
 
 ### 6. Hanya TikTok; aturan Shopee tidak ikut berubah
 
