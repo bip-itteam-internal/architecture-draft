@@ -393,20 +393,20 @@
         "Finance - Incentive",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "cf22054c5df04fc97243330b8448ab49e29b3f67ae77db616c433445146b26e2",
+      "hash": "8b758e6bcb0025946b27bd69fb8a401e7905e9015f11e269c8e33bd1447a1094",
       "ukuran_kb": 12.0,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan insentive-service untuk skema insentif profit-based (dashboard profit, dashboard milik sendiri, keanggotaan level, target, opex, struktur tim), parameter dan kode status tiap endpoint, serta siapa yang boleh menulis target. Juga menjelaskan kontrak snapshot insentif (bekukan dan setujui) serta rute warisan skema KPI-multiplier yang kini menolak.",
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki insentive-service untuk skema insentif profit (dashboard per level ICC/Leader/Supervisor, insentif milik sendiri, keanggotaan level, target, opex, struktur tim), parameter dan kode status apa yang dikembalikan, serta siapa yang boleh menulis target. Juga menjawab bagaimana snapshot insentif dibekukan dan disetujui Finance, dan rute warisan skema KPI-multiplier mana yang masih terdaftar atau menolak.",
       "kata_kunci": [
         "insentif",
         "incentive",
         "profit-dashboard",
+        "snapshot insentif",
         "target profit",
         "opex",
-        "snapshot insentif",
-        "bekukan",
-        "approval Finance",
-        "keanggotaan",
-        "insentive-service"
+        "ICC",
+        "bekukan setujui",
+        "insentive-service",
+        "API endpoint"
       ]
     },
     {
@@ -1929,20 +1929,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "26c0fee3564babec8b23ab57be85baa1ad3b47e173832087c6b0b64aac01c85c",
-      "ukuran_kb": 134.2,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja dalam tiga sumbu (modul, tingkat aksi, cakupan data), bagaimana paket hak (permission set) ditempelkan ke posisi/jabatan, dan di mana izin ditegakkan di gateway, service, dan frontend. Juga menjawab katalog modul mana yang terdaftar, cara resolusi izin ke JWT, fallback ke tier system_roles, dan status fase dua.",
+      "hash": "a1311ed690425b4b4ccad26d5bbe488d6651951e27b0c0b6020178f30416db0b",
+      "ukuran_kb": 134.3,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja lewat tiga sumbu (modul, tingkat aksi, cakupan data), bagaimana paket hak (permission set) ditempel ke posisi/jabatan dan di-resolve jadi klaim JWT, serta di mana izin ditegakkan (gateway, service, frontend). Juga menjawab modul mana yang sudah punya katalog izin, cara menambah katalog modul baru, apa itu tier fallback dan menu terbatas, dan celah yang belum selesai.",
       "kata_kunci": [
         "RBAC",
         "hak akses",
         "permission set",
         "paket hak",
-        "katalog permission",
+        "katalog izin",
         "system_roles",
         "tier fallback",
-        "reach",
-        "cakupan",
-        "menu terbatas"
+        "menu terbatas",
+        "JWT permissions",
+        "posisi jabatan"
       ]
     },
     {
@@ -2483,20 +2483,20 @@
         "Sales - Incentive",
         "HRIS - Key Performance Index"
       ],
-      "hash": "2431b8df474dd1b6ff4a3bcf058081cdc5244d613ac2805f2879e7a4cd0d8f5e",
+      "hash": "4f9918783e10200ea2f659dcf4373c7447891b274bb233ccb43bb88e37b7ca62",
       "ukuran_kb": 24.2,
-      "ringkasan": "Menjawab: bagaimana insentive-service menghitung insentif profit-based (rumus profit, tangga tarif, gerbang retur 7%, target turun dari Supervisor ke Leader dan ICC), dari mana sumber datanya (integration, payroll, Accurate), dan bagaimana cache dashboard serta pembuangannya bekerja. Juga menjelaskan dua jendela periode (hangus vs bergeser untuk KPI), penurunan Leader/Supervisor dari hierarki HRIS, dan apa yang belum siap untuk pembayaran.",
+      "ringkasan": "Menjawab: bagaimana insentive-service menghitung insentif profit marketing (rumus profit, tangga tarif, gerbang retur 7%, target), dari mana datanya diambil (integration, payroll, Accurate), dan bagaimana cache dashboard serta pre-warm bekerja. Juga menjawab bagaimana Leader dan Supervisor diturunkan dari hierarki HRIS, beda jendela periode insentif (hangus) dan KPI (bergeser), serta apa yang masih menahan angka layak dibayar.",
       "kata_kunci": [
-        "insentif",
-        "incentive",
-        "profit-based",
+        "insentive service",
+        "insentif profit",
+        "incentive engine",
         "tarif insentif",
         "gerbang retur",
-        "ICC",
-        "Leader",
-        "Supervisor",
         "cache dashboard",
-        "biaya operasional"
+        "hierarki HRIS",
+        "jendela periode",
+        "biaya operasional",
+        "ICC Leader Supervisor"
       ]
     },
     {
@@ -7868,7 +7868,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, disetujui pemilik produk 2026-09-25 lewat percakapan `/analisa-kebutuhan`. **T1 (snapshot + persetujuan Finance) di kode, belum merged** per 2026-09-25: branch `feat/insentif-snapshot` bip-erp; kontraknya di [[API - Insentive Service]]. T2 sampai T8 belum. Daftar task: `Workspace/ANALISA - Insentif Dibayar lewat Slip Gaji.md` (papan kerja, bukan dok terbit).",
+      "status_teks": "**Diusulkan**, disetujui pemilik produk 2026-09-25 lewat percakapan `/analisa-kebutuhan`. **T1 (snapshot + persetujuan Finance) merged** (bip-erp PR #2062, 2026-09-25), **live DEV**, prod belum; kontraknya di [[API - Insentive Service]]. T2 sampai T8 belum. Daftar task: `Workspace/ANALISA - Insentif Dibayar lewat Slip Gaji.md` (papan kerja, bukan dok terbit).",
       "publik": true,
       "tautan": [
         "Finance - Proses Insentif",
@@ -7887,20 +7887,20 @@
         "HRIS - Payroll",
         "HRIS - Payroll Persona"
       ],
-      "hash": "cbc98f08bf1216d5b58188a1a7b027b9dee9a221b2907142853a0ae96b689123",
+      "hash": "badb49fa0df6ad3d957c6ef957e3908fbb642ea10359907cb7abe1d8b65bfa53",
       "ukuran_kb": 17.6,
-      "ringkasan": "Menjawab: bagaimana insentif profit marketing dibayar lewat slip gaji, kenapa komponen Insentif dipisah dari Bonus, dan kenapa sumber angkanya harus snapshot yang dibekukan lalu disetujui Finance. Juga menjawab siapa penyetuju akhir, larangan menyetujui insentif sendiri, kenapa komponen Insentif tak boleh ada di master gaji, perlakuan pajak/BPJS, waktu bayar, dan amandemen ADR 0081.",
+      "ringkasan": "Menjawab: bagaimana insentif profit marketing dibayarkan (lewat slip gaji sebagai komponen Insentif terpisah dari Bonus), kenapa angka bayar harus berasal dari snapshot yang dikunci dan disetujui Finance, dan siapa yang boleh menyetujui. Juga menjawab kenapa komponen Insentif dilarang ada di master gaji, bagaimana payroll memeriksa baris Insentif agar dibayar sekali, serta perlakuan pajak, BPJS, dan waktu bayar yang masih menunggu konfirmasi.",
       "kata_kunci": [
-        "insentif",
-        "slip gaji",
-        "payslip",
-        "payroll",
+        "ADR 0125",
+        "insentif slip gaji",
+        "incentive payroll",
         "snapshot insentif",
         "persetujuan Finance",
         "approval",
+        "komponen Insentif",
         "Bonus",
-        "PPh 21",
-        "ADR 0125"
+        "dibayar sekali",
+        "PPh 21"
       ]
     },
     {
@@ -8296,18 +8296,18 @@
         "Finance - Bridging App",
         "HRIS - Compensation & Benefits"
       ],
-      "hash": "07ddcb83c351c6851f696bb1d0b9f87410126af11a82b6f4ff5cecd2664b1844",
+      "hash": "653fcf54e8666be3e4eb182ce955c5ff9929a1e3eae15d792bbd21826a24b23b",
       "ukuran_kb": 34.1,
-      "ringkasan": "Menjawab: aturan insentif marketing yang berlaku menurut SK 010 dan 011/2026 (rumus profit, tabel tarif, gerbang retur, aturan target dan hangus tanggal 25), siapa yang boleh melihat Dashboard, Master Data, dan Insentif Saya, serta cara membaca layar saat angka tampak tidak masuk. Juga menyimpan riwayat skema KPI-multiplier lama per jabatan (SPV, Adv, ICC, Host Live, Affiliator, CS, CRM) yang sudah dicabut.",
+      "ringkasan": "Menjawab: aturan insentif marketing yang berlaku menurut SK 010 dan 011/2026 (rumus profit, tabel tarif per pencapaian, gerbang retur 7%, order hangus tanggal 25), siapa yang boleh melihat dashboard, master data, dan Insentif Saya, serta siapa yang membekukan dan menyetujui insentif. Juga menjawab cara membaca layar dashboard saat angka tampak tidak cocok, dan menyimpan riwayat skema KPI-multiplier lama per jabatan yang sudah dicabut.",
       "kata_kunci": [
-        "insentif",
+        "insentif marketing",
         "incentive",
-        "SK insentif",
+        "SK 010 011",
         "tarif profit",
         "retur 7%",
-        "Dashboard Insentif",
         "Insentif Saya",
-        "Adv",
+        "Dashboard Insentif",
+        "menu terbatas insentif",
         "SPV Marketing",
         "ICC"
       ]
@@ -11838,7 +11838,7 @@
       "area": "IT",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)**, agent-kit **1.15.0** (2026-09-06), terakhir berubah di **1.27.0** (2026-09-21, Kantor Agent dibagi jadi pos per departemen); bagian lain diperiksa ulang ke kit 1.19.0 pada 2026-09-15. Sumber: `architecture-draft/.agent-kit/` (`agents/`, `commands/`, `hooks/`, `baseline/`), disebar lewat `init` + restart sesi. Catatan: (1) gerbang lokal bisa dilewati `--no-verify`, disadari; (2) papan sesi berkas satu mesin; (3) baseline test diukur sekali 2026-09-06 dan wajib diukur ulang saat `main` bergerak jauh; (4) `/supervise` menulis draft, tidak pernah auto-apply; (5) agent berhenti di PR, merge tetap manusia; (6) ✅ gerbang kit atas dirinya sendiri **berjalan sejak 1.25.0** lewat `pre-push` vault, tetapi ia menyala hanya bila push menyentuh `.agent-kit/` atau `Tools/` dan bisa dilewati sadar lewat `AGENTKIT_SKIP_KIT_TESTS=1`; `tests/kantor-agent-browser.ps1` sengaja tetap manual; (7) ✅ **nol gerbang tidak lagi dihitung lulus sejak 1.25.0**, jenis `flutter` dikenali dan `node` menerima lockfile apa pun, tetapi logikanya masih punya **dua implementasi** (`.ps1` untuk Windows, `.py` untuk mac/linux) yang dijaga test paritas alih-alih disatukan; (8) **Kantor Agent membaca dua format internal Claude Code**, registri sesi `~/.claude/sessions` dan transkrip, jadi bisa patah di rilis mana pun; kerusakannya tampil sebagai banner (registri dicocokkan dengan `claude agents --json` yang terdokumentasi), bukan kantor kosong.",
+      "status_teks": "**Implemented (ada catatan)**, agent-kit **1.15.0** (2026-09-06), terakhir berubah di **1.30.0** (2026-09-25, antrean kerja berat lintas sesi, butir 9); Kantor Agent terakhir di 1.27.0 (2026-09-21, pos per departemen); bagian lain diperiksa ulang ke kit 1.19.0 pada 2026-09-15. Sumber: `architecture-draft/.agent-kit/` (`agents/`, `commands/`, `hooks/`, `baseline/`), disebar lewat `init` + restart sesi. Catatan: (1) gerbang lokal bisa dilewati `--no-verify`, disadari; (2) papan sesi berkas satu mesin; (3) baseline test diukur sekali 2026-09-06 dan wajib diukur ulang saat `main` bergerak jauh; (4) `/supervise` menulis draft, tidak pernah auto-apply; (5) agent berhenti di PR, merge tetap manusia; (6) ✅ gerbang kit atas dirinya sendiri **berjalan sejak 1.25.0** lewat `pre-push` vault, tetapi ia menyala hanya bila push menyentuh `.agent-kit/` atau `Tools/` dan bisa dilewati sadar lewat `AGENTKIT_SKIP_KIT_TESTS=1`; `tests/kantor-agent-browser.ps1` sengaja tetap manual; (7) ✅ **nol gerbang tidak lagi dihitung lulus sejak 1.25.0**, jenis `flutter` dikenali dan `node` menerima lockfile apa pun, tetapi logikanya masih punya **dua implementasi** (`.ps1` untuk Windows, `.py` untuk mac/linux) yang dijaga test paritas alih-alih disatukan; (8) **Kantor Agent membaca dua format internal Claude Code**, registri sesi `~/.claude/sessions` dan transkrip, jadi bisa patah di rilis mana pun; kerusakannya tampil sebagai banner (registri dicocokkan dengan `claude agents --json` yang terdokumentasi), bukan kantor kosong.",
       "publik": false,
       "tautan": [
         "ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak",
@@ -11852,20 +11852,20 @@
         "ADR - 0034 Papan Aktivitas Developer di Luar Arsitektur ERP",
         "IT - SOP Dokumentasi Vault"
       ],
-      "hash": "700cf66052397e5c38258bcac661824fee2e4528894fd039d26ca33456d242e0",
-      "ukuran_kb": 40.6,
-      "ringkasan": "Menjawab: gerbang otomatis apa yang menahan commit dan push di repo kode ERP (hook pre-commit Claude Code dan git pre-push lewat core.hooksPath), kenapa gerbangnya dipasang lokal di mesin developer alih-alih di GitHub Actions, dan bagaimana cara melewatinya secara sadar (AGENTKIT_SKIP_BUILD, AGENTKIT_SKIP_KIT_TESTS, --no-verify). Menjawab juga: bagaimana loop otonom /brief ke /kerjakan berjalan sampai PR dengan merge tetap di tangan manusia, serta bagaimana papan sesi, dashboard, dan Kantor Agent menampilkan sesi Claude Code yang sedang hidup beserta alat yang sedang dipakainya. Memuat jebakan yang sudah terbukti menggigit, antara lain lingkungan GIT_* yang diwariskan git hook sehingga skrip test sandbox justru mengubah repo nyata, dan daftar berkas yang tak bisa ditentukan harus menyalakan gerbang, bukan mematikannya.",
+      "hash": "9cc5ee781fb6e104999d637870fa99363fcd6fc09cae1ffd986c73cc4ce83710",
+      "ukuran_kb": 43.7,
+      "ringkasan": "Menjawab: gerbang lokal apa yang menolak commit di branch utama dan push yang gagal pemeriksaan (hook pre-commit Claude Code, git pre-push, gerbang kit atas dirinya sendiri), dan kenapa tidak ada CI yang menggerbangi repo. Juga menjawab cara kerja papan sesi, Kantor Agent, dashboard, serta loop otonom /brief ke /kerjakan yang berhenti di PR, beserta batas dan jebakannya (mis. variabel GIT_* yang diwariskan hook).",
       "kata_kunci": [
         "agent-kit",
-        "gerbang lokal",
+        "pre-push",
         "pre-commit hook",
-        "pre-push hook",
-        "git hook",
+        "gerbang lokal",
         "papan sesi",
         "Kantor Agent",
         "AI Engineering Loop",
-        "loop otonom /brief /kerjakan",
-        "ADR 0077"
+        "/kerjakan",
+        "judge",
+        "git hooks"
       ]
     },
     {
@@ -16006,20 +16006,19 @@
         "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
         "Finance - Proses Insentif"
       ],
-      "hash": "731b0c8afe93b76e3903c9f16c21a9357d6b99ee1054635662d7ac3a26f65d08",
-      "ukuran_kb": 5.7,
-      "ringkasan": "Menjawab: bagaimana insentif profit dibayar lewat slip gaji dari snapshot yang dibekukan dan disetujui Finance, task apa saja (BE insentive, payroll, FE, mobile) beserta urutan dan dependensinya, dan konfirmasi apa yang masih ditunggu dari Finance/HR (PPh 21, BPJS, tahap approval, tanggal tutup payroll). Juga mencatat pekerjaan terpisah: pencabutan peran system_roles.insentive beserta seluruh pembacanya dan rute legacy insentive yang tak bergerbang RBAC.",
+      "hash": "e016dab018904a4e55c1b724665e474d37cb4915a873493c733395a83f3567c9",
+      "ukuran_kb": 6.6,
+      "ringkasan": "Menjawab: task apa saja (T1 sampai T8) untuk mewujudkan pembayaran insentif lewat slip gaji sesuai ADR 0125, urutan dan dependensinya, serta konfirmasi bisnis apa yang masih ditunggu dari Finance, HR, dan pemilik produk. Juga menjawab temuan terkait yang sengaja dipisah, seperti pencabutan peran insentive, rute legacy insentive tanpa gerbang, dan ketidaksinkronan gerbang FE vs BE.",
       "kata_kunci": [
-        "insentif",
-        "incentive",
-        "slip gaji",
-        "payslip",
-        "payroll",
+        "analisa insentif",
+        "insentif slip gaji",
+        "daftar task",
         "snapshot insentif",
-        "persetujuan Finance",
-        "approval",
+        "payroll Insentif",
+        "peran insentive",
+        "konfirmasi Finance",
         "ADR 0125",
-        "system_roles insentive"
+        "incentive payroll"
       ]
     },
     {

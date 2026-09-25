@@ -17,7 +17,7 @@
 | GET/POST | `/profit/opex` | Biaya operasional manual — kini **cadangan** (gaji dari payroll, non-gaji dari Accurate). Penulisan membuang cache dashboard periode itu (#1748); unik per `{level, entity_id, periode}` (#1822) |
 | POST | `/profit/opex/distribusi` | Bagi satu angka divisi ke tiap entitas (pro-rata, metode sisa-terbesar). Membuang cache dashboard periode itu (#1748) |
 
-### Snapshot insentif: bekukan & setujui (🟡 branch `feat/insentif-snapshot`, belum merged per 2026-09-25)
+### Snapshot insentif: bekukan & setujui (⚠️ merged PR #2062 2026-09-25, **live DEV**, prod belum)
 
 [[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]] T1. Snapshot = salinan baris `/profit-dashboard` yang dibekukan, satu-satunya sumber angka bayar. Izin: `finance.insentif.freeze` / `finance.insentif.approve` dengan fallback tier `finance` (lihat [[CORE - RBAC dan Permission Set]]).
 
