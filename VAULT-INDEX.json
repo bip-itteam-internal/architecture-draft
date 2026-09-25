@@ -8723,20 +8723,23 @@
         "Finance - Sambungan dan Permintaan Data Lintas Departemen",
         "Microservices - Insentive Service"
       ],
-      "hash": "821e8e99cf1dbfe0c4458c3352150a8e80e7165902f3eec288259758cc78ea88",
-      "ukuran_kb": 8.6,
-      "ringkasan": "Menjawab: bagaimana proses insentif profit (P12) berjalan dari sisi Finance, apa yang sudah ada di ERP (rumus, opex, target satu pintu, periode, akses layar), dan bagaimana alur dari target sampai snapshot disetujui lalu dibayar lewat slip gaji. Juga menjawab celah yang masih terbuka (atribusi toko, beban non-gaji, target Leader, keputusan pajak), kontrol wajib, dan ukuran efisiensinya.",
+      "hash": "3247d553923fefedba9b110d7ad40f1221addd5e42ae9554ddab49928ddecc7a",
+      "ukuran_kb": 8.8,
+      "ringkasan": "Menjawab: bagaimana insentif profit dihitung (rumus, tarif bertingkat, level ICC/Leader/Supervisor, biaya operasional dari payroll dan Accurate), bagaimana alur target-bekukan-setujui-bayar bekerja lewat slip gaji, dan celah apa yang masih menahan pemakaian (atribusi toko ke ICC, beban non-gaji per karyawan, target Leader kosong, keputusan PPh 21/BPJS yang belum diputuskan). Juga menjawab siapa yang berwenang menetapkan dan menyetujui target/hasil insentif serta kontrol apa yang wajib dijaga supaya penetap target tidak menyetujui insentifnya sendiri.",
       "kata_kunci": [
-        "proses insentif",
-        "incentive process",
-        "P12",
-        "Finance",
+        "insentif",
+        "incentive",
+        "profit",
         "target profit",
-        "persetujuan insentif",
-        "celah",
-        "kontrol",
-        "Cost Control",
-        "slip gaji"
+        "ICC",
+        "HPP",
+        "beban iklan",
+        "snapshot",
+        "persetujuan Finance",
+        "slip gaji",
+        "payroll",
+        "Dashboard Insentif",
+        "Master Target"
       ]
     },
     {
@@ -16110,20 +16113,22 @@
         "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
         "Finance - Proses Insentif"
       ],
-      "hash": "86d14be3b8fcca8e1337ce9ce5fd76a56008553862d84f0d27d803061675f929",
-      "ukuran_kb": 7.5,
-      "ringkasan": "Menjawab: bagaimana insentif profit dibayar lewat slip gaji dari snapshot yang dibekukan dan disetujui Finance, task apa saja (snapshot, komponen Insentif payroll, impor diperiksa, tanda terbayar, pencocokan) dan urutan dependensinya, serta konfirmasi apa yang masih ditunggu dari Finance/HR (PPh 21, BPJS, tahap approval, tanggal tutup payroll). Juga mencatat isu terpisah: pencabutan peran system_roles insentive, rute legacy insentive tanpa gerbang, dan akses Direktur yang 403.",
+      "hash": "a585547fd73256a6ac528d47f9747a593d48b235c201e2e383f3849e3f075534",
+      "ukuran_kb": 9.2,
+      "ringkasan": "Menjawab: apa saja task (T1 sampai T8) untuk memindahkan pembayaran insentif profit ke komponen Insentif di slip gaji, status dan bukti verifikasi tiap task per 2026-09-25 (BE snapshot+persetujuan, FE dashboard, komponen payroll, pencocokan impor), serta konfirmasi apa (K1 sampai K5) yang masih ditunggu dari Finance/HR sebelum kode ini bisa dianggap selesai. Juga mencatat pekerjaan yang sengaja dipisah dan belum dikerjakan, seperti pencabutan peran RBAC `system_roles.insentive` dan menunggu keputusan persetujuan payroll bertingkat.",
       "kata_kunci": [
         "insentif",
         "incentive",
         "slip gaji",
         "payroll",
-        "snapshot insentif",
+        "snapshot",
         "persetujuan Finance",
-        "approval",
         "ADR 0125",
-        "insentive-service",
-        "bayar ganda"
+        "task plan",
+        "komponen Insentif",
+        "PPh 21",
+        "BPJS",
+        "system_roles.insentive"
       ]
     },
     {
