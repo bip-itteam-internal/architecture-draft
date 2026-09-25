@@ -34,6 +34,9 @@ tim marketing, leader iklan, dan Direktur. Tidak ada penerima baru.
   keputusan iklan untuk Lazada (tidak ada data iklannya).
 - Tidak ada kotak tanya bebas. Itu tetap tahap berikutnya.
 
+**Masa uji.** Satu sampai dua pekan pertama, keputusan hanya dikirim ke pemilik produk untuk
+dinilai. Penerima lain baru menerimanya setelah pemilik produk menyatakan keputusannya layak.
+
 **Perkiraan besaran kerja.** Sekitar dua sampai tiga pekan kerja satu orang backend, ditambah
 satu layar kecil di web untuk tombol jalankan/tolak. Ongkos AI per laporan belum pernah diukur
 dan akan diukur pada pekan pertama berjalan.
@@ -224,9 +227,19 @@ bahwa keputusan AI tidak tersedia kali ini, `narasi_status` = `gagal`, dan perco
 Dijalankan atau ditolak, oleh siapa, kapan, dan alasan tolak opsional. Tanpa catatan ini
 keputusan AI tidak bisa dinilai sama sekali, dan fitur yang tak bisa dinilai hidup selamanya.
 
+### §8a Mode bayangan sebelum sampai ke semua penerima
+
+Selama **1-2 pekan pertama** di produksi, bagian keputusan hanya dikirim ke **pemilik produk**;
+penerima lain tetap menerima laporan seperti sekarang (`Ringkasan`). Pemilik produk menjawab tiap
+keputusan jalankan/tolak dengan alasan, sehingga keputusan yang keliru ditemukan oleh orang yang
+bisa memperbaikinya, bukan pertama kali terbaca oleh Direktur. Keputusan dibuka ke semua penerima
+hanya bila pemilik produk menyatakannya layak berdasarkan jawaban-jawaban itu; bila tidak,
+katalog §3 atau jendela §3a diperbaiki dulu dan mode bayangan diulang. Penerima bayangan adalah
+daftar eksplisit pada kiriman (ADR 0120 §6), bukan diturunkan dari peran.
+
 ### §9 Kondisi berhenti pengganti ADR 0120 §7
 
-Dinilai 30 hari sejak laporan berkeputusan pertama terkirim di produksi:
+Dinilai 30 hari sejak keputusan pertama dibuka ke **semua** penerima (sesudah §8a):
 - **Nol keputusan dijawab** → keputusan AI dimatikan, laporan kembali ke `Ringkasan` saja.
 - **Lebih dari separuh keputusan yang dijawab ditolak** → katalog §3 dan syarat kelayakannya
   ditinjau sebelum berjalan lagi.

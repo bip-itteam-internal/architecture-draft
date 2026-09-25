@@ -241,9 +241,17 @@ Deploy pertama klien AI di mana pun: `--force-recreate`, lalu picu satu kiriman 
 bukti dan baca model yang tercatat di `NarasiJejak`. Sepekan kemudian hitung token × kiriman
 per pekan dan catat di [[Microservices - Marketing Analytics Service]].
 
+## T12a — Mode bayangan (ADR 0127 §8a)
+
+**Status**: belum · **Dependensi**: T11, T12
+
+1-2 pekan: bagian keputusan hanya untuk pemilik produk (daftar eksplisit pada kiriman), penerima
+lain tetap `Ringkasan`. Pemilik produk menjawab tiap keputusan jalankan/tolak beserta alasan, lalu
+menyatakan layak dibuka ke semua penerima atau tidak. Bila tidak, perbaiki T8 lalu ulangi.
+
 ## T13 — Penilaian 30 hari (ADR 0127 §9)
 
-**Status**: belum · **Dependensi**: T11 hidup di prod
+**Status**: belum · **Dependensi**: T12a selesai dan keputusan dibuka ke semua penerima
 
 Nol keputusan dijawab → matikan keputusan AI. Lebih dari separuh ditolak → tinjau katalog T8.
 
