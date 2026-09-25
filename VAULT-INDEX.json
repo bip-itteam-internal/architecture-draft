@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-25",
-  "jumlah_dokumen": 484,
+  "jumlah_dokumen": 485,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -2774,6 +2774,7 @@
         "Sales - ICC Affiliate Mapping",
         "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
         "ANALISA - Asisten Analisa Marketing",
+        "ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak",
         "IT - Background Jobs & Schedulers",
         "HRIS - Otomasi Skor KPI",
         "Microservices - Insentive Service",
@@ -2789,20 +2790,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "31b5ed79c9ba10d14aeb1de4b690216b4d53ba96380790f14b78f688d79ea696",
-      "ukuran_kb": 171.7,
-      "ringkasan": "Menjawab: bagaimana service Marketing Analytics disusun — stack Go/Fiber + MongoDB marketing_analytics_db, path repo, port, prefix gateway, penjadwal internal 48 jam, job sync, dan koleksi mart_* yang dipakai supaya dashboard tak menghitung ulang tiap request. Menerangkan dua prinsip arsitektur yang wajib dijaga (integration_db baca-saja dengan tiga lapis penjaga termasuk uji AST, dan /health turun jadi degraded 503 bila index unik gagal dibuat), serta kenapa vonis laba hanya dijumlahkan dari level shop agar satu order tak dihitung tiga kali. Juga sumber jawaban untuk aturan pemakaian angka yang mudah salah: iklan_sia_sia, pembatalan, 24h_live_gmv, tiga angka penjualan live, kejujuran data revenue TikTok vs Shopee, dan semantik channel TikTok/Shopee/Lazada.",
+      "hash": "7d3a9d0309d119647096e5f58922b54e3a4a462851f32bdae3ad1edb558f1ddd",
+      "ukuran_kb": 173.2,
+      "ringkasan": "Menjawab: bagaimana laba dan performa marketing dihitung per toko, produk, kampanye, iklan, video, dan live dari integration_db ke koleksi mart_*, endpoint apa saja yang tersedia (beranda, ambang, pagu, KPI live, pencatatan sesi live host, Asisten Analisa terjadwal), dan bagaimana penjadwal 48 jam serta job sync bekerja. Juga menjelaskan aturan pemakaian angka agar tidak terjadi hitung ganda (iklan_sia_sia, pembatalan, revenue setelah diskon, laba belum matang) dan penjaga baca-saja terhadap database service lain.",
       "kata_kunci": [
-        "marketing analytics service",
-        "microservice",
-        "mart",
-        "job sync",
-        "penjadwal",
+        "marketing analytics",
+        "laba marketing",
         "profit attribution",
-        "hitung ganda",
+        "mart",
+        "sesi live",
         "live shift",
-        "integration_db baca-saja",
-        "hari WIB"
+        "ROAS",
+        "Asisten Analisa",
+        "TikTok Shopee",
+        "hitung ganda"
       ]
     },
     {
@@ -5128,23 +5129,24 @@
         "Sales - TikTok Sentiment Pipeline",
         "CORE - OCR Document Service",
         "Microservices - Marketing Analytics Service",
+        "ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak",
         "API - Marketing Analytics Service",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "34ad3f7307fffb98d9eb44741dcddc295d6b74086856bacee7f3b1d0a2690186",
-      "ukuran_kb": 16.8,
-      "ringkasan": "Menjawab: kenapa kelayakan pekerjaan AI di bip-erp ditentukan oleh kelayakan datanya, tiga syarat gerbang sebelum model boleh dibangun, kenapa model menumpang service pemilik data, dan kandidat mana yang ditolak beserta angkanya. Memuat koreksi 2026-09-14: label retur semula diambil dari koleksi yang salah (412 dari transaction_orders, padahal 5.742 order kembali ke gudang menurut accurate_daily_returns) dan pembatalan oleh sistem sesudah dikirim ternyata paket COD gagal antar dengan ongkos nyata, sehingga prediksi paket COD gagal antar berubah dari ditolak menjadi ditinjau ulang, beserta hasil uji aturan riwayat pembeli yang dihitung dari waktu kejadian dan alasan koreksinya dilakukan di tempat.",
+      "hash": "3e272db428e7c2073f8bf450d62d8245ada31c2975909a0f2bd736efde3a1b07",
+      "ukuran_kb": 17.2,
+      "ringkasan": "Menjawab: kapan fitur AI atau machine learning layak dibangun di bip-erp, syarat data apa yang harus terpenuhi, dan kenapa model menumpang service pemilik data alih-alih service AI terpisah. Juga menjawab kandidat prediksi mana yang ditolak atau ditunda beserta angkanya (retur, pembatalan/COD gagal antar, resign, penilaian pelamar), dan kenapa kapabilitas prediktif pertama adalah peringatan dini belanja iklan video.",
       "kata_kunci": [
-        "ADR 0058",
         "AI",
         "machine learning",
-        "gerbang kelayakan data",
-        "label historis",
+        "ML",
+        "kelayakan data",
+        "prediksi",
+        "peringatan dini iklan",
+        "COD gagal antar",
         "retur",
-        "paket COD gagal antar",
-        "pembatalan sistem",
-        "koreksi ADR",
-        "prediktif"
+        "belanja iklan video",
+        "model"
       ]
     },
     {
@@ -7693,9 +7695,10 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)** — irisan 1 **hidup di PRODUKSI** sejak 2026-09-23, backend saja; layar FE belum ada. Irisan 2 dan 3 belum. Rinciannya di § Realisasi.",
+      "status_teks": "**Implemented (ada catatan)** — irisan 1 **hidup di PRODUKSI** sejak 2026-09-23, backend saja; layar FE belum ada. Irisan 2 dan 3 belum. Rinciannya di § Realisasi. **§5 dan §7 digantikan** [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] (2026-09-25).",
       "publik": true,
       "tautan": [
+        "ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak",
         "LOG - 2026-09-17 Audit Checklist Marketing dan Integration",
         "ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library",
         "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
@@ -7706,20 +7709,19 @@
         "IT - Server, VMs and Databases",
         "ANALISA - Asisten Analisa Marketing"
       ],
-      "hash": "e268cee0ead34dc8a0f54a8b8e55c8121068e67aedf2e9b81d273f639c890833",
-      "ukuran_kb": 15.9,
-      "ringkasan": "Menjawab: kenapa asisten analisa marketing dibangun sebagai menu di dalam ERP alih-alih memakai harness agent di VM netmon, dan kenapa lapisan AI sengaja ditunda sampai template + penjadwalan tanpa AI terbukti dipakai. Merinci tiga irisan berurutan (template dan jadwal tanpa AI, AI merangkai dengan keluaran terkunci skema, lalu tanya-jawab bebas), aturan bahwa model tak pernah menerima angka mentah, penerima laporan ditulis eksplisit bukan diturunkan dari peran, sistem hanya mengurutkan sementara orang yang memutuskan, dan kondisi berhenti yang ditetapkan di muka. Memuat pula empat jebakan angka yang mendasari keputusan itu: laba periode pendek tampak rugi besar, revenue level video cuma terisi 8,9%, revenue nol struktural di level iklan, dan retur yang sudah terpotong di settlement sehingga tak boleh dikurangi dua kali.",
+      "hash": "3d7f924a341665594aad9f9d0381be0d08e2c5bea6264feea8ffa7b7d629104a",
+      "ukuran_kb": 16.8,
+      "ringkasan": "Menjawab: kenapa asisten analisa marketing dibangun sebagai menu di dalam ERP dan bukan di harness agent luar, bagaimana urutan tiga irisannya (template dan jadwal tanpa AI, AI merangkai, tanya-jawab bebas), dan kenapa model tidak boleh menerima angka mentah. Juga mencatat siapa penerima laporan terjadwal, jebakan angka laba yang harus dihindari, dan realisasi irisan 1 yang sudah jalan di produksi.",
       "kata_kunci": [
-        "ADR 0120",
-        "asisten analisa",
-        "marketing",
-        "AI",
+        "Asisten Analisa",
+        "laporan terjadwal",
+        "scheduled report",
         "template analisa",
+        "marketing",
+        "inbox",
+        "AI",
         "jadwal laporan",
-        "notifikasi inbox",
-        "laba matang",
-        "ROAS",
-        "keputusan arsitektur"
+        "ADR 0120"
       ]
     },
     {
@@ -7938,6 +7940,37 @@
         "penghitung atomik",
         "counter",
         "create-employee"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak.md",
+      "judul": "ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan** — diputuskan 2026-09-25, kode belum ada. Menggantikan [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] §5 dan §7, serta [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] §5 **khusus untuk laporan Asisten Analisa Marketing**.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
+        "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
+        "CORE - OCR Document Service",
+        "ANALISA - Asisten Analisa Marketing",
+        "ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library",
+        "Microservices - Marketing Analytics Service"
+      ],
+      "hash": "3b642a7758597dd22752fb71e93d96d1380528c5b80d7b37cf337cf644f71e9e",
+      "ukuran_kb": 13.9,
+      "ringkasan": "Menjawab: kenapa laporan Asisten Analisa Marketing kini membawa keputusan tindakan dari AI (hentikan, kurangi, naikkan belanja iklan) yang penerimanya tandai dijalankan atau ditolak, dan bagaimana keputusan itu dipagari: katalog tindakan tertutup, kelayakan dihitung backend, model hanya memilih, mengurutkan, dan menjelaskan. Juga menjawab apa yang tidak dijanjikan (sistem tidak mengeksekusi, tidak ada besaran rupiah), kondisi berhenti, dan prasyarat satu target ROAS.",
+      "kata_kunci": [
+        "keputusan AI",
+        "AI decision",
+        "Asisten Analisa",
+        "jalankan tolak",
+        "katalog tindakan",
+        "target ROAS",
+        "belanja iklan",
+        "rekomendasi",
+        "ADR 0127"
       ]
     },
     {
@@ -15789,24 +15822,24 @@
       "tautan": [
         "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
         "LOG - 2026-09-17 Audit Checklist Marketing dan Integration",
+        "ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak",
+        "Microservices - Marketing Analytics Service",
         "Microservices - Assistant Service",
-        "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
-        "Microservices - Marketing Analytics Service"
+        "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi"
       ],
-      "hash": "307c6529c8b1f01545aa6c24a8d85adc58610f4302026209a03d1f258a0d1292",
-      "ukuran_kb": 10.3,
-      "ringkasan": "Menjawab: apa saja item kerja Asisten Analisa Marketing, urutannya, dan apa yang memblokir apa — empat gerbang murah (G1 buka layar bersama pemilik permintaan, G2 satukan target ROAS, G3 pemilik daftar harga minimal, G4 kepemilikan data jadwal) lalu task T1 sampai T9 di tiga irisan. Menjelaskan alasan tiap task ada dan batasannya, mis. template mana yang boleh masuk katalog beserta yang dilarang karena datanya tak ada (diskon penggerus laba, CPA iklan TikTok, pola musiman, cohort, harga minimal), kewajiban penjalan tahan mati-hidup container tanpa kirim ganda, dan kategori inbox baru yang menuntut marketing-analytics + notification-service naik bersamaan. Memuat juga dua keputusan terbuka hasil pengerjaan: kiriman tanpa lingkup hanya terbaca Direktur, dan lingkup bukan kontrol kerahasiaan karena beberapa endpoint membalas angka seluruh perusahaan ke pemanggil tanpa peran modul.",
+      "hash": "c3cdfb9fb9da36fc1c854b2ccc36eab27d4cef115ed98519cbd8c0034fb6a0ce",
+      "ukuran_kb": 13.2,
+      "ringkasan": "Menjawab: sampai mana pekerjaan Asisten Analisa Marketing, gerbang apa yang masih terbuka (sesi bersama pemilik permintaan, satu target ROAS, daftar harga minimal), dan task apa yang tersisa per irisan (layar FE, ukur pemakaian, keputusan AI jalankan/tolak, tanya-jawab bebas). Juga mencatat keputusan terbuka soal lingkup kiriman dan kebocoran angka seluruh perusahaan ke pemanggil tanpa peran.",
       "kata_kunci": [
-        "asisten analisa marketing",
-        "analisa kebutuhan",
-        "papan kerja",
-        "workspace",
-        "template analisa",
-        "penjadwalan laporan",
+        "Asisten Analisa",
+        "daftar task",
         "gerbang",
-        "ROAS",
-        "kategori inbox",
-        "irisan"
+        "irisan",
+        "target ROAS",
+        "laporan terjadwal",
+        "layar menu",
+        "lingkup kiriman",
+        "analisa kebutuhan"
       ]
     },
     {
