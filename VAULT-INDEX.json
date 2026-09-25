@@ -16006,20 +16006,20 @@
         "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
         "Finance - Proses Insentif"
       ],
-      "hash": "b85b2917b193d4dcddca7c2f30f1f0bb8f8b23ca843248318762ddf784d43585",
-      "ukuran_kb": 5.5,
-      "ringkasan": "Menjawab: task apa saja (T1 sampai T8) untuk mewujudkan pembayaran insentif lewat slip gaji, urutan dan dependensinya, serta konfirmasi bisnis apa yang masih ditunggu dari Finance, HR, dan pemilik produk. Juga mencatat pekerjaan terpisah seperti pencabutan peran insentive, rute legacy tanpa gerbang, dan ketidaksinkronan gerbang FE vs BE.",
+      "hash": "731b0c8afe93b76e3903c9f16c21a9357d6b99ee1054635662d7ac3a26f65d08",
+      "ukuran_kb": 5.7,
+      "ringkasan": "Menjawab: bagaimana insentif profit dibayar lewat slip gaji dari snapshot yang dibekukan dan disetujui Finance, task apa saja (BE insentive, payroll, FE, mobile) beserta urutan dan dependensinya, dan konfirmasi apa yang masih ditunggu dari Finance/HR (PPh 21, BPJS, tahap approval, tanggal tutup payroll). Juga mencatat pekerjaan terpisah: pencabutan peran system_roles.insentive beserta seluruh pembacanya dan rute legacy insentive yang tak bergerbang RBAC.",
       "kata_kunci": [
-        "analisa kebutuhan",
         "insentif",
+        "incentive",
         "slip gaji",
+        "payslip",
         "payroll",
-        "snapshot",
-        "task list",
-        "peran insentive",
-        "rute legacy",
-        "konfirmasi Finance",
-        "ADR 0125"
+        "snapshot insentif",
+        "persetujuan Finance",
+        "approval",
+        "ADR 0125",
+        "system_roles insentive"
       ]
     },
     {
