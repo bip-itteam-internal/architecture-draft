@@ -2790,20 +2790,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "7d3a9d0309d119647096e5f58922b54e3a4a462851f32bdae3ad1edb558f1ddd",
-      "ukuran_kb": 173.2,
-      "ringkasan": "Menjawab: bagaimana laba dan performa marketing dihitung per toko, produk, kampanye, iklan, video, dan live dari integration_db ke koleksi mart_*, endpoint apa saja yang tersedia (beranda, ambang, pagu, KPI live, pencatatan sesi live host, Asisten Analisa terjadwal), dan bagaimana penjadwal 48 jam serta job sync bekerja. Juga menjelaskan aturan pemakaian angka agar tidak terjadi hitung ganda (iklan_sia_sia, pembatalan, revenue setelah diskon, laba belum matang) dan penjaga baca-saja terhadap database service lain.",
+      "hash": "1f7593548be0d270bc91727b05c7dfeed465d74b18bcaf625e39641aaea337a0",
+      "ukuran_kb": 173.4,
+      "ringkasan": "Menjawab: service apa yang menghitung laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live, bagaimana ia membaca integration_db baca-saja lalu menyimpan mart_* pre-agregasi, dan endpoint apa saja yang tersedia (beranda, ambang ROAS/CPA, pagu, KPI host live dan Live Support, pencatatan sesi live, Asisten Analisa terjadwal). Juga menjawab aturan pemakaian angka agar tidak hitung ganda (iklan_sia_sia, pembatalan, GMV live), kejujuran data per channel TikTok/Shopee/Lazada, dan penjadwal sync 48 jam.",
       "kata_kunci": [
         "marketing analytics",
         "laba marketing",
         "profit attribution",
-        "mart",
+        "mart_profit_attribution",
         "sesi live",
-        "live shift",
+        "live shifts",
         "ROAS",
+        "Live Support",
         "Asisten Analisa",
-        "TikTok Shopee",
-        "hitung ganda"
+        "TikTok Shopee"
       ]
     },
     {
@@ -7958,19 +7958,20 @@
         "ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library",
         "Microservices - Marketing Analytics Service"
       ],
-      "hash": "3b642a7758597dd22752fb71e93d96d1380528c5b80d7b37cf337cf644f71e9e",
-      "ukuran_kb": 13.9,
-      "ringkasan": "Menjawab: kenapa laporan Asisten Analisa Marketing kini membawa keputusan tindakan dari AI (hentikan, kurangi, naikkan belanja iklan) yang penerimanya tandai dijalankan atau ditolak, dan bagaimana keputusan itu dipagari: katalog tindakan tertutup, kelayakan dihitung backend, model hanya memilih, mengurutkan, dan menjelaskan. Juga menjawab apa yang tidak dijanjikan (sistem tidak mengeksekusi, tidak ada besaran rupiah), kondisi berhenti, dan prasyarat satu target ROAS.",
+      "hash": "57d773fb44e4a06293cdd8c126c33444e5c1f3094538f322a0a68b9df640332f",
+      "ukuran_kb": 18.4,
+      "ringkasan": "Menjawab: kenapa laporan terjadwal Asisten Analisa Marketing kini membawa daftar keputusan tindakan dari AI (hentikan, kurangi, naikkan) yang cukup ditandai dijalankan atau ditolak, dan bagaimana keputusan itu dipagari: katalog tindakan tertutup, kelayakan dihitung aturan backend, model hanya memilih, mengurutkan, dan menjelaskan. Juga menjawab apa yang tidak dijanjikan (sistem tidak mengeksekusi iklan, tanpa besaran rupiah, laba belum matang tak jadi dasar) dan prasyarat satu target ROAS dari manajemen.",
       "kata_kunci": [
         "keputusan AI",
         "AI decision",
-        "Asisten Analisa",
-        "jalankan tolak",
+        "Asisten Analisa Marketing",
+        "jalankan atau tolak",
         "katalog tindakan",
+        "laporan terjadwal",
         "target ROAS",
-        "belanja iklan",
-        "rekomendasi",
-        "ADR 0127"
+        "laba belum matang",
+        "ADR 0120",
+        "ADR 0058"
       ]
     },
     {
@@ -15827,19 +15828,20 @@
         "Microservices - Assistant Service",
         "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi"
       ],
-      "hash": "c3cdfb9fb9da36fc1c854b2ccc36eab27d4cef115ed98519cbd8c0034fb6a0ce",
-      "ukuran_kb": 13.2,
-      "ringkasan": "Menjawab: sampai mana pekerjaan Asisten Analisa Marketing, gerbang apa yang masih terbuka (sesi bersama pemilik permintaan, satu target ROAS, daftar harga minimal), dan task apa yang tersisa per irisan (layar FE, ukur pemakaian, keputusan AI jalankan/tolak, tanya-jawab bebas). Juga mencatat keputusan terbuka soal lingkup kiriman dan kebocoran angka seluruh perusahaan ke pemanggil tanpa peran.",
+      "hash": "326d76e32c0fa2d0e93f53944f24cbb7be5385ecfc53f3ce38a019e9773ced0f",
+      "ukuran_kb": 13.9,
+      "ringkasan": "Menjawab: apa saja gerbang dan task untuk membangun Asisten Analisa Marketing (template, jadwal, pengiriman inbox, layar FE, keputusan AI, tanya-jawab bebas), mana yang sudah selesai dan mana yang masih menunggu keputusan. Juga menjawab keputusan terbuka seperti penyatuan target ROAS 4,5 vs 3,2, siapa menyediakan daftar harga minimal, lingkup kiriman yang hanya terbaca Direktur, dan kenapa kekerapan bawaan sebaiknya mingguan.",
       "kata_kunci": [
-        "Asisten Analisa",
-        "daftar task",
-        "gerbang",
+        "Asisten Analisa Marketing",
+        "analisa kebutuhan",
+        "template analisa",
+        "jadwal laporan",
+        "kiriman terjadwal",
         "irisan",
         "target ROAS",
-        "laporan terjadwal",
-        "layar menu",
-        "lingkup kiriman",
-        "analisa kebutuhan"
+        "inbox notifikasi",
+        "keputusan AI",
+        "task board"
       ]
     },
     {
