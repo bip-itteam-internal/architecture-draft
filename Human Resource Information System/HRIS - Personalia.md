@@ -2,7 +2,7 @@
 
 *Administrasi kepegawaian (personalia) — mengelola data administratif karyawan sepanjang masa kerja: data personal, kontrak (PKWT), BPJS, dokumen, riwayat masa kerja, hingga off-boarding/exit clearance. Beririsan dengan subsistem off-boarding di [[HRIS - Analysis]].*
 
-- **Status**: ⚠️ Sebagian diimplementasikan — **pencatatan resign & penonaktifan akun ✅ live di produksi 2026-08-05**; **riwayat kontrak ✅** (koleksi `employee_contract`, halaman `/hris/contract`); **pengingat kontrak habis ✅ live DEV 2026-09-11 dan PROD 2026-09-12**; sisa off-boarding (exit clearance) masih 🟡 konsep
+- **Status**: ⚠️ Sebagian diimplementasikan — **pencatatan resign & penonaktifan akun ✅ live di produksi 2026-08-05**; **riwayat kontrak ✅** (koleksi `employee_contract`, halaman `/hris/contract`); **pengingat kontrak habis ✅ live DEV 2026-09-11 dan PROD 2026-09-12**; sisa off-boarding (exit clearance) masih 🟡 konsep; **ID karyawan otomatis dan pengangkatan magang 🟡 diusulkan** ([[ADR - 0126 employee_id Diterbitkan Sistem, Magang yang Diangkat Mendapat ID Reguler dengan Migrasi Riwayat]], kode belum ada)
 
 ## Ruang Lingkup & Data
 
@@ -11,6 +11,33 @@ Dokumen/data yang dikelola (sebagian sudah ada di [[Microservices - Employee Ser
 - **Kontrak / PKWT** (mis. BIP-203-0525): riwayat kontrak per karyawan, perpanjangan, dan lampiran PDF bertanda tangan sudah ada (rute di [[API - Employee Service]] §Kontrak Kerja). Kebutuhan: **notifikasi 1 bulan sebelum masa kontrak habis** → follow up ke SPV. Dijawab pengingat kontrak habis: ringkasan harian ke supervisor HR (saat kontrak masuk "segera berakhir", H-30, H-7, dan kontrak kedaluwarsa pada karyawan aktif sekali per minggu) dan pesan H-14 ke atasan langsung untuk penilaian kinerja. ✅ Merged 2026-09-11 (bip-erp PR #1851), naik di DEV 2026-09-11 dan PROD 2026-09-12; jalan PROD pertama 2026-09-13 07:00 WIB belum dibaca. Rinciannya di [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] §Pengingat Kontrak Habis. Digitalisasi tanda tangan & e-Meterai kontrak di dok yang sama (🟡 direncanakan)
 - **BPJS**
 - **Riwayat masa kerja** (history)
+
+## ID Karyawan & Pengangkatan Magang (🟡 diusulkan)
+
+Keputusan dan alasannya di [[ADR - 0126 employee_id Diterbitkan Sistem, Magang yang Diangkat Mendapat ID Reguler dengan Migrasi Riwayat]]; papan kerjanya [[ANALISA - ID Karyawan Otomatis dan Pengangkatan Magang]]. Bagian ini menjelaskan cara kerjanya.
+
+**Hari ini (diukur prod 2026-09-25):** ID diketik HR di form Tambah Karyawan, dan hanya diperiksa keunikannya. Akibatnya 6 pasang nomor urut dipakai dua orang, dan 5 magang September ber-ID tanpa `MG` karena input 3-4-2-2 tak bisa menampungnya. Nomor tertinggi reguler 0264, magang 1012.
+
+**Sesudah ADR 0126:**
+
+| | Reguler | Magang |
+|---|---|---|
+| Bentuk | `<KODE>-<NNNN>-<MM>-<YY>` | `<KODE>-MG-<NNNN>-<MM>-<YY>` |
+| Deret ditentukan oleh | `employment_type` kontrak pertama bukan `Magang` | `employment_type` kontrak pertama = `Magang` |
+| `MM-YY` | bulan-tahun `join_date` (WIB) | sama |
+| Nomor | penghitung reguler per awalan | penghitung magang per awalan, blok 1000-an |
+
+- Nomor dialokasikan employee-service secara atomik saat simpan. HR tidak mengetik dan tidak bisa mengubahnya; ID tampil di ringkasan sesudah tersimpan.
+- ⚠️ **Jangan menyimpulkan magang dari awalan ID** di kode baru. Yang menentukan tetap `employment_type` (payroll sudah begitu, [[Microservices - Payroll Service]]). Awalan `MG` untuk manusia yang membaca ID, bukan untuk mesin.
+
+**Pengangkatan magang ke PKWT/PKWTT:**
+
+1. HR meminta pengangkatan ke tim IT untuk satu angkatan.
+2. Tim IT menjalankan alat migrasi (runbook menyusul, task T4 papan kerja): ID reguler baru dialokasikan dari penghitung reguler, lalu seluruh rujukan ID magang di semua database diganti. Dry-run, `mongodump`, dan gerbang sisa nol wajib.
+3. HR menutup kontrak Magang dan membuat kontrak PKWT di `/hris/contract`. Karena ID sudah satu, riwayat Magang lalu PKWT tampil berurutan di panel riwayat yang sama.
+4. Karyawan login ulang di MyBharata dengan ID baru dan mengaktifkan ulang biometrik. Finance mengganti proyek Accurate yang bernomor ID lama, bila ada.
+
+**Yang tidak berubah:** promosi, mutasi, dan mutasi antar-perusahaan tetap mempertahankan ID ([[ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id]]). Berkas foto dan dokumen lama tetap di folder MinIO ber-ID lama dan tetap terbuka.
 
 ## Off-boarding / Exit Clearance
 
@@ -56,7 +83,7 @@ Implementasi: [[Microservices - Employee Service]] · endpoint: [[API - Employee
 ## Dependensi / Dokumen Terkait
 
 - [[HRIS - Big Pictures]]
-- [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]] · [[API - Employee Service]] · [[APP - Web ERP]] · [[IT - Employee System]]
+- [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]] · [[ADR - 0126 employee_id Diterbitkan Sistem, Magang yang Diangkat Mendapat ID Reguler dengan Migrasi Riwayat]] · [[API - Employee Service]] · [[APP - Web ERP]] · [[IT - Employee System]]
 - [[HRIS - Analysis]] · [[HRIS - Attrition]]
 - [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] — digitalisasi TTE + e-Meterai kontrak (🟡 direncanakan) dan pengingat kontrak habis (✅ DEV dan PROD sejak 2026-09-12)
 - [[Microservices - Employee Service]] · [[GA - Inventory Management]]
