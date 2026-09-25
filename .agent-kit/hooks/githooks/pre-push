@@ -61,12 +61,29 @@ fi
 gagal=0
 echo "[agent-kit pre-push] repo: $top"
 
+# ---- antrean kerja berat (kit 1.30.0) ----
+# pnpm tsc/lint/build dan go build di bawah mengantre di antre.ps1 bersama gerbang dan run penuh
+# sesi Claude lain di mesin ini, supaya tak berebut CPU. Langsung jalan (tanpa antre) bila: bukan
+# Windows (mac/linux sengaja no-op), antre.ps1 tak ada, atau proses ini SUDAH anak pemegang slot
+# (AGENTKIT_ANTRE_PEGANG) -- mengambil kunci lagi di sana berarti deadlock. Push yang menunggu
+# giliran mencetak "[antre] menunggu ..." ke stderr; dari agent, jalankan push di background.
+antre_ps1="$hookdir/../antre.ps1"
+berat() {
+  if [ -z "${AGENTKIT_ANTRE_PEGANG:-}" ] && [ -f "$antre_ps1" ] && command -v powershell.exe >/dev/null 2>&1; then
+    antre_win="$antre_ps1"
+    command -v cygpath >/dev/null 2>&1 && antre_win="$(cygpath -w "$antre_ps1")"
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$antre_win" -- "$@"
+  else
+    "$@"
+  fi
+}
+
 # ---- Node (erp-frontend dkk) ----
 if [ -f package.json ] && [ -f pnpm-lock.yaml ]; then
   for s in tsc typecheck lint; do
     if grep -q "\"$s\"[[:space:]]*:" package.json; then
       echo "[agent-kit pre-push] pnpm $s ..."
-      if ! pnpm "$s"; then echo "[agent-kit pre-push] GAGAL: pnpm $s"; gagal=1; fi
+      if ! berat pnpm "$s"; then echo "[agent-kit pre-push] GAGAL: pnpm $s"; gagal=1; fi
     fi
   done
   if [ "$gagal" -eq 0 ] && grep -q "\"build\"[[:space:]]*:" package.json; then
@@ -74,7 +91,7 @@ if [ -f package.json ] && [ -f pnpm-lock.yaml ]; then
       echo "[agent-kit pre-push] pnpm build DILEWATI (AGENTKIT_SKIP_BUILD=1). Jalankan sendiri sebelum merge."
     else
       echo "[agent-kit pre-push] pnpm build ... (lewati sadar: AGENTKIT_SKIP_BUILD=1)"
-      if ! pnpm build; then echo "[agent-kit pre-push] GAGAL: pnpm build"; gagal=1; fi
+      if ! berat pnpm build; then echo "[agent-kit pre-push] GAGAL: pnpm build"; gagal=1; fi
     fi
   fi
 fi
@@ -94,7 +111,7 @@ if [ -d services ] && ls services/*/go.mod >/dev/null 2>&1; then
   for s in $svcs; do
     [ -f "services/$s/go.mod" ] || continue
     echo "[agent-kit pre-push] go build services/$s ..."
-    if ! (cd "services/$s" && go build ./...); then echo "[agent-kit pre-push] GAGAL: go build services/$s"; gagal=1; fi
+    if ! (cd "services/$s" && berat go build ./...); then echo "[agent-kit pre-push] GAGAL: go build services/$s"; gagal=1; fi
   done
 fi
 

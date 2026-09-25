@@ -61,6 +61,27 @@ Write-Host ("PAPAN SESI  {0} WIB   aktif {1} | basi(>{2}j) {3} | selesai 24j {4}
 if ($baris.Count -eq 0) { Write-Host 'Belum ada sesi terdaftar. Hook SessionStart menulisnya; pastikan kit >= 1.15.0 sudah di-init dan sesi di-restart.' }
 else { $baris | Select-Object keadaan, sesi, tahap, task, branch, worktree, terakhir, senyap | Format-Table -AutoSize | Out-String -Width 200 | Write-Host }
 
+# Antrean kerja berat (1.30.0): siapa memegang slot, siapa menunggu. Berkas status ditulis
+# antre-lib.ps1 per PID; milik proses yang sudah mati dibuang di Get-AntreStatus, jadi yang tampil
+# selalu hidup. Sesi dicocokkan lewat worktree (best-effort: antrean tak tahu session_id).
+. (Join-Path $PSScriptRoot 'antre-lib.ps1')
+if (-not $env:AGENTKIT_ANTRE_DIR) { $env:AGENTKIT_ANTRE_DIR = Join-Path $ws '.task-plans\antre' }
+$antrean = @(Get-AntreStatus | Sort-Object @{ Expression = { if ($_.keadaan -eq 'pegang') { 0 } else { 1 } } }, mulai)
+if ($antrean.Count -gt 0) {
+  Write-Host ("ANTREAN KERJA BERAT  slot {0} | pegang {1} | menunggu {2}" -f (Get-AntreSlot), @($antrean | Where-Object { $_.keadaan -eq 'pegang' }).Count, @($antrean | Where-Object { $_.keadaan -eq 'menunggu' }).Count)
+  $antrean | ForEach-Object {
+    $a = $_
+    $cocok = @($sesi | Where-Object { $_.worktree -and ([string]$a.cwd).StartsWith([string]$_.worktree, [StringComparison]::OrdinalIgnoreCase) } | Select-Object -First 1)
+    [pscustomobject]@{
+      keadaan = $a.keadaan.ToUpper(); pid = $a.pid
+      sesi = if ($cocok.Count -gt 0) { ([string]$cocok[0].session_id).Substring(0, 8) } else { '?' }
+      sejak = Wib $(if ($a.pegang_sejak) { $a.pegang_sejak } else { $a.mulai })
+      lama = Umur $(if ($a.pegang_sejak) { $a.pegang_sejak } else { $a.mulai })
+      perintah = $a.perintah; cwd = $a.cwd
+    }
+  } | Format-Table -AutoSize | Out-String -Width 220 | Write-Host
+}
+
 if ($TanpaHtml) { exit 0 }
 # HTML: satu penulis UI (dashboard.template.html lewat dashboard.ps1); di sini pakai cache PR supaya cepat
 & (Join-Path $PSScriptRoot 'dashboard.ps1') -Workspace $ws -TanpaGh | Out-Null

@@ -3,6 +3,11 @@
 # (vitest --reporter=json, go test -json). Bentuk nama test yang disimpan di baseline dan yang
 # dibandingkan gerbang HARUS keluar dari fungsi yang sama; dua salinan berarti baseline dan
 # gerbang bisa menyimpang diam-diam dan gerbang menolak yang benar.
+#
+# Tiap langkah (Invoke-Gerbang / Invoke-GerbangBatas) mengantre di antre-lib.ps1 (kit 1.30.0):
+# kunci PER LANGKAH, bukan sepanjang gerbang, supaya sesi lain bisa menyelip di antara tsc dan
+# build alih-alih menunggu seluruh gerbang 2 jam. Waktu antre TIDAK masuk durasi_detik maupun batas.
+. (Join-Path $PSScriptRoot 'antre-lib.ps1')
 
 function Get-KitRoot([string]$scriptRoot) {
   # dipanggil dari .agent-kit/hooks (sumber) atau .claude/hooks (salinan init)
@@ -149,6 +154,7 @@ function Get-ServicesTersentuh([string]$top, [string[]]$berkas) {
 
 function Invoke-Gerbang([string]$nama, [string]$dir, [string]$cmd) {
   # jalankan satu perintah; simpan seluruh keluaran (untuk pengurai) dan ekornya (untuk manusia)
+  $kunci = Enter-Antre ('gerbang ' + $nama + ': ' + $cmd) $dir
   $sw = [Diagnostics.Stopwatch]::StartNew()
   $out = @(); $rc = 1
   try {
@@ -156,6 +162,7 @@ function Invoke-Gerbang([string]$nama, [string]$dir, [string]$cmd) {
     try { $out = @(Invoke-Expression ($cmd + ' 2>&1') | ForEach-Object { [string]$_ }); $rc = $LASTEXITCODE }
     finally { Pop-Location }
   } catch { $out += [string]$_; $rc = 1 }
+  finally { Exit-Antre $kunci }
   $sw.Stop()
   if ($null -eq $rc) { $rc = 0 }
   return [pscustomobject]@{
@@ -175,6 +182,8 @@ function Invoke-GerbangBatas([string]$nama, [string]$dir, [string]$cmd, [int]$ba
   # proses dart sisa menahannya sampai batas 300 detik habis. `/v:on` dipakai supaya !ERRORLEVEL!
   # diperluas SESUDAH perintahnya jalan (%ERRORLEVEL% diperluas saat baris diurai, jadi selalu
   # memberi nilai sebelum-jalan). Konsekuensinya perintah ber-`!` tidak boleh dilewatkan ke sini.
+  # Kunci antre diambil SEBELUM stopwatch dan batas mulai: menunggu giliran bukan lewat batas.
+  $kunci = Enter-Antre ('gerbang ' + $nama + ': ' + $cmd) $dir
   $sw = [Diagnostics.Stopwatch]::StartNew()
   $outF = [IO.Path]::GetTempFileName(); $errF = [IO.Path]::GetTempFileName()
   $rc = 1; $lewat = $false
@@ -187,6 +196,7 @@ function Invoke-GerbangBatas([string]$nama, [string]$dir, [string]$cmd, [int]$ba
       & taskkill /T /F /PID $p.Id 2>&1 | Out-Null
     }
   } catch { $rc = 1 }
+  finally { Exit-Antre $kunci }
   # dibaca dengan FileShare ReadWrite: proses sisa bisa masih memegang handle berkasnya
   $out = @()
   foreach ($f in @($outF, $errF)) {

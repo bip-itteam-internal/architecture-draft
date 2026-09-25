@@ -116,6 +116,17 @@ if (-not $NoPreCommitHook) {
     @{ matcher = 'PowerShell'; hooks = @(@{ type = 'command'; command = $gateCmd; 'if' = 'PowerShell(*commit*)' }) }
   )
 }
+# Antrean kerja berat (1.30.0): antre-gate.ps1 menolak run penuh test/build/tsc/lint yang tidak
+# lewat antre.ps1. Dipasang TERLEPAS dari -NoPreCommitHook (dua gerbang yang berbeda). Satu handler
+# per pola `if` (tak bisa digabung "|"), jadi proses hook hanya di-spawn untuk perintah yang memuat
+# nama alat berat. ⚠️ Daftar pola ini WAJIB mencakup setiap alat yang dikenali Get-KelasPerintah
+# (hooks/antre-lib.ps1): alat yang dikenali skrip tapi tak ada di sini tak pernah sampai ke sana.
+$polaAntre = @('*pnpm *', '*vitest*', '*tsc*', '*eslint*', '*next build*', '*go test*', '*go build*', '*flutter test*', '*flutter build*')
+$antreCmd = HookCmd 'antre-gate.ps1'
+$antreEntri = @(foreach ($tool in 'Bash', 'PowerShell') {
+  @{ matcher = $tool; hooks = @($polaAntre | ForEach-Object { @{ type = 'command'; command = $antreCmd; 'if' = ('{0}({1})' -f $tool, $_) } }) }
+})
+$hooks['PreToolUse'] = @(@($hooks['PreToolUse']) + $antreEntri | Where-Object { $_ })
 # Plugin WAJIB tim, di-enable lewat settings SCOPE PROJECT supaya berlaku bagi siapa pun yang
 # clone + trust workspace ini — tak perlu tiap orang ingat menyalakannya sendiri.
 # Sengaja hanya yang WAJIB; rekomendasi lain tetap opsional lewat /skills.
@@ -167,6 +178,7 @@ Write-Host "Project aktif: $active"
 Write-Host "Flow: /start-task -> /plan -> /implement -> /review -> /sync-docs -> /wrap"
 Write-Host "Loop: /brief -> /kerjakan (judge otomatis) -> PR | /papan-sesi | /supervise | /ekstrak-skill"
 if ($NoPreCommitHook) { Write-Host "(gerbang pre-commit: NONAKTIF)" } else { Write-Host "(gerbang pre-commit: aktif, Bash+PowerShell, disaring 'if' isi command sebelum spawn)" }
+Write-Host ("(antrean kerja berat: aktif, {0} slot; run penuh test/build/tsc/lint lewat .claude\hooks\antre.ps1)" -f $(if ($env:AGENTKIT_ANTRE_SLOT) { $env:AGENTKIT_ANTRE_SLOT } else { 1 }))
 if ($hookDipasang.Count -gt 0) { Write-Host ("(pre-push terpasang: {0})" -f ($hookDipasang -join ', ')) }
 if ($hookDilewati.Count -gt 0) { Write-Host ("(pre-push DILEWATI: {0})" -f ($hookDilewati -join ', ')) }
 Write-Host "Restart sesi Claude Code supaya hook baru terbaca."

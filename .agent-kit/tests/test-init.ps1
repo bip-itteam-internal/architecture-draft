@@ -229,7 +229,10 @@ try {
   Check ($cm.Contains($arrow)) 'CLAUDE.md panah utuh (UTF-8 tidak korup)'
   $st = Get-Content (Join-Path $claude 'settings.json') -Raw | ConvertFrom-Json
   Check ($null -ne $st.hooks.SessionStart) 'settings punya SessionStart'
-  Check ($null -eq $st.hooks.PreToolUse) 'NoPreCommitHook menghapus PreToolUse'
+  # 1.30.0: -NoPreCommitHook hanya membuang gerbang COMMIT; gerbang antrean kerja berat tetap ada
+  $ptuNo = @($st.hooks.PreToolUse)
+  Check (@($ptuNo | Where-Object { @($_.hooks | Where-Object { $_.command -match 'pre-commit-gate' }).Count -gt 0 }).Count -eq 0) 'NoPreCommitHook menghapus gerbang commit dari PreToolUse'
+  Check (@($ptuNo | Where-Object { @($_.hooks | Where-Object { $_.command -match 'antre-gate' }).Count -gt 0 }).Count -eq 2) 'NoPreCommitHook TIDAK membuang gerbang antrean (Bash + PowerShell)'
   $kv = (Get-Content (Join-Path $claude '.kit-version') -Raw).Trim()
   $ver = (Get-Content (Join-Path $kitRoot 'VERSION') -Raw).Trim()
   Check ($kv -eq $ver) '.kit-version sama dgn VERSION'
@@ -592,8 +595,22 @@ try {
   # mesin pencocokan `if` milik Claude Code) -- yang diperiksa di sini cuma BENTUK konfigurasi.
   & (Join-Path $svVault '.agent-kit/init.ps1') -Workspace $tmp -ActiveProject 'demo-proj' | Out-Null
   $st2 = Get-Content (Join-Path $claude 'settings.json') -Raw | ConvertFrom-Json
-  $ptu = @($st2.hooks.PreToolUse)
-  Check ($ptu.Count -eq 2) "PreToolUse punya 2 entri terpisah, Bash dan PowerShell ($($ptu.Count))"
+  # 1.30.0: entri gerbang antrean (antre-gate) hidup berdampingan; yang dipatok di sini entri COMMIT
+  $ptuSemua = @($st2.hooks.PreToolUse)
+  $ptu = @($ptuSemua | Where-Object { @($_.hooks | Where-Object { $_.command -match 'pre-commit-gate' }).Count -gt 0 })
+  Check ($ptu.Count -eq 2) "PreToolUse punya 2 entri gerbang commit terpisah, Bash dan PowerShell ($($ptu.Count))"
+  $antreE = @($ptuSemua | Where-Object { @($_.hooks | Where-Object { $_.command -match 'antre-gate' }).Count -gt 0 })
+  Check ((($antreE.matcher | Sort-Object) -join ',') -eq 'Bash,PowerShell') "gerbang antrean terpasang untuk Bash DAN PowerShell ($($antreE.matcher -join ','))"
+  $polaHarap = @('*pnpm *', '*vitest*', '*tsc*', '*eslint*', '*next build*', '*go test*', '*go build*', '*flutter test*', '*flutter build*')
+  foreach ($e in $antreE) {
+    $ifs = @($e.hooks | ForEach-Object { $_.'if' })
+    $harap = @($polaHarap | ForEach-Object { '{0}({1})' -f $e.matcher, $_ })
+    Check ((@($harap | Where-Object { $ifs -ccontains $_ }).Count -eq $harap.Count) -and $ifs.Count -eq $harap.Count) ("antre-gate {0}: pola 'if' PERSIS daftar alat berat ({1})" -f $e.matcher, ($ifs -join ' '))
+  }
+  # test perilaku antrean (klasifikasi, hook, Mutex proses nyata, gerbang-lib, pre-push) di berkasnya sendiri
+  $antreTest = Join-Path $kitRoot 'tests/test-antre.ps1'
+  $rcAntre = Invoke-Ps $antreTest @()
+  Check ($rcAntre -eq 0) "tests/test-antre.ps1 lulus (exit $rcAntre; jalankan langsung untuk rinciannya)"
   $bashEntry = $ptu | Where-Object { $_.matcher -eq 'Bash' }
   $psEntry   = $ptu | Where-Object { $_.matcher -eq 'PowerShell' }
   Check ($null -ne $bashEntry -and $null -ne $psEntry) "gerbang terpasang untuk tool Bash DAN PowerShell (matcher: $($ptu.matcher -join ', '))"

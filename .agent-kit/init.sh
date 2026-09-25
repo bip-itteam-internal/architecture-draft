@@ -58,6 +58,10 @@ plugins_json='"superpowers@claude-plugins-official": true'
 # di sini. TIDAK DIUJI: mesin dev ini tidak bisa menjalankan .sh (tool Bash mati di Windows),
 # jadi cermin ini belum pernah dijalankan; siapa pun di mac/linux yang pertama memakainya adalah
 # penguji pertamanya.
+# Antrean kerja berat (1.30.0, hooks/antre-gate.ps1) SENGAJA TIDAK dipasang di mac/linux
+# (keputusan 2026-09-25: masalah perebutan CPU diukur di mesin dev Windows; implementasi posix
+# ditunda sampai ada pemakainya). hooks/antre.sh ada supaya perintah `antre -- <cmd>` yang ditulis
+# di dok tetap jalan, tanpa mengantre.
 if [ "$no_precommit" -eq 1 ]; then
   cat > "$claude/settings.json" <<JSON
 {

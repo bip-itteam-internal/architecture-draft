@@ -113,6 +113,12 @@ Caranya: dispatch kedua `Agent` **dalam satu pesan** (dua tool call sekaligus), 
 
 Batasnya satu mesin: dua eksekutor wajar, lebih dari itu mereka berebut CPU dan ada yang gagal
 karena timeout, bukan karena kodenya salah. **Jangan menjalankan lebih dari dua brief sekaligus.**
+Sejak kit 1.30.0 run PENUH (suite test, build, tsc, lint, `go build/test ./...`) dari sesi mana
+pun **mengantre** satu per satu di mesin ini: gerbang dan `pre-push` sudah otomatis, sedangkan
+perintah langsung agent ditolak hook `antre-gate` sampai dijalankan lewat
+`.claude\hooks\antre.ps1 -- <perintah>` dengan `run_in_background: true`. Yang paralel tinggal
+waktu mengetik dan test tertarget; gerbang yang "lambat" bisa berarti sedang menunggu giliran,
+lihat bagian antrean di `/papan-sesi` sebelum menyimpulkan macet.
 
 Paralel di sini soal waktu MENGETIK, bukan waktu deploy. Untuk perubahan kontrak, BE tetap
 di-deploy sebelum FE, dan itu ditulis di badan PR (§5).
