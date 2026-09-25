@@ -11,7 +11,7 @@ Terukur di produksi 25 September 2026: **11 pesanan senilai Rp1.328.198** yang p
 *Penyesuaian statement TikTok dipisah oleh **dua pembeda**: pesanannya sudah pernah menerima uang atau belum, lalu punya Retur Penjualan atau tidak. Belum pernah ada uang masuk → kompensasi melunasi faktur (perilaku sekarang, dari [[ADR - 0056 Penyesuaian Statement TikTok Menambah Payout Order]]). Sudah ada uang masuk tapi ADA retur → tetap income biasa. Sudah ada uang masuk dan TANPA retur → kompensasi jadi baris Pendapatan Lain-lain tanpa menyentuh bayar faktur. Gerbang retur memakai pembeda pertama yang sama, dan seluruhnya digerbangi kv tanggal per hari penerimaan.*
 
 - **Status**: ⚠️ **Implemented (ada catatan)** — kode selesai di branch `feat/tiktok-kompensasi-payout` (2026-09-25), **belum merge, belum deploy, kv cutover belum diisi**. Selama kv kosong perilakunya persis seperti sebelum ADR ini ada. Aturannya diputuskan finance (tiket "Revisi Sistem Income" + penegasan 2026-09-22, 09-24, dan 09-25).
-- **Path di repo**: `bip-erp/services/integration/internal/usecase/kompensasi_tiktok.go` **(baru)** · `internal/usecase/accurate_rts_usecase.go` (`diserapPenyesuaianStatement`) · `internal/usecase/accurate_receipt_usecase.go` (`processTiktokStatement`) · `internal/usecase/accurate_receipt_export_detail.go` (`dikompensasi`) · `internal/usecase/penyesuaian_tanpa_order.go` (`tempelPotonganPendapatanLain`, mekanik dipakai bersama) · `internal/domain/entity/accurate.go` (kv `tiktok-kompensasi-cutover-date`) · `internal/usecase/accurate_receipt_kompensasi_tiktok_test.go` + `..._orkestrasi_test.go` **(baru)**
+- **Path di repo**: `bip-erp/services/integration/internal/usecase/kompensasi_tiktok.go` **(baru)** · `internal/usecase/accurate_rts_usecase.go` (`diserapPenyesuaianStatement`) · `internal/usecase/accurate_receipt_usecase.go` (`processTiktokStatement`) · `internal/usecase/accurate_receipt_export_detail.go` (`dikompensasi`) · `internal/usecase/penyesuaian_tanpa_order.go` (`tempelPotonganPendapatanLain`, mekanik dipakai bersama) · `internal/domain/entity/accurate.go` (kv `tiktok-kompensasi-cutover-date`) · `internal/domain/entity/transaction.go` (`PayoutSebelumPenyesuaian`, `PayoutCair`) · `internal/infrastructure/repository/transaction_repo.go` (`terapkanPenyesuaian`, `incomeHanyaPenyesuaian` — pengisi penanda payout) · `internal/usecase/accurate_receipt_kompensasi_tiktok_test.go` + `..._orkestrasi_test.go` **(baru)**
 - **Tanggal**: 2026-09-22 (diamandemen 2026-09-25)
 
 ## Context
@@ -116,6 +116,39 @@ cuma menggantikan refund yang keluar.
 menolkan seluruh angka income termasuk refund untuk pesanan yang ditarik lewat jalur
 "kompensasi datang di statement lebih baru", sehingga refund di situ **selalu 0** dan pesanan
 ber-retur akan salah digolongkan. Sub-dokumen `Return` tak tersentuh penggantian income mana pun.
+
+### ⛔ Payout WAJIB dibawa terpisah — kompensasi datang di statement LAIN, 11 dari 11
+
+Kelas kegagalan yang nyaris membuat seluruh ADR ini **no-op**, ditemukan 2026-09-25 dari
+screenshot finance, bukan dari test.
+
+Kompensasi TikTok hampir selalu terbit di statement yang **berbeda** dari penjualannya.
+Untuk statement kompensasi itu pesanannya tak punya baris transaksi, jadi ditarik lewat
+`incomeHanyaPenyesuaian` — yang sengaja **menolkan seluruh angka income kecuali
+kompensasinya**, dan itu benar: memakai income tersimpan akan membukukan ulang penjualan
+yang sudah dibukukan di statement lain (ADR-0056 §2).
+
+Akibatnya pembeda yang dihitung sebagai `TotalSettlementAmount − PenyesuaianStatement`
+membaca **0** untuk pesanan yang uangnya jelas sudah cair:
+
+```
+585673721052759108   penjualan cair 30/08  statement 7679250248153171713  INC/2026/08/30/023-BH
+                     kompensasi cair 14/09  statement 7684810541168150279  INC/2026/09/14/029-BH
+                     payout asli Rp159.790 · kompensasi Rp198.000
+                     selisih settlement = 198.000 − 198.000 = 0   <-- SALAH
+```
+
+Diukur: **11 dari 11** pesanan terdampak lewat jalur ini. Nol yang se-statement. Jadi
+rumus selisih itu bukan "kurang tepat di kasus pinggir" — ia salah untuk **seluruh
+populasi**, tanpa satu pun galat maupun test merah.
+
+**Yang benar**: payout dibawa terpisah lewat `TransactionIncome.PayoutSebelumPenyesuaian`
+(transient, `bson:"-"`), diisi repo selagi income tersimpan masih utuh — direkam sebelum
+penggantian porsi, lalu dipasang oleh `terapkanPenyesuaian` dan `incomeHanyaPenyesuaian`.
+
+⚠️ **Godaan menyederhanakannya kembali ke selisih akan terlihat benar**, karena fixture
+se-statement memang lolos. Dikunci `TestPayoutSebelumKompensasiBukanSelisihSettlement`,
+yang fixture-nya sengaja membuat kedua cara memberi jawaban berbeda.
 
 ### 2. Gerbang retur memakai pembeda yang SAMA
 

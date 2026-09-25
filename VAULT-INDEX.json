@@ -7663,20 +7663,20 @@
         "Microservices - Integration Service",
         "Finance - Proses Retur dan Piutang Marketplace"
       ],
-      "hash": "4f9e2039e5c5392a4f245cb2fefcf23f8e146ec22cbec3d43f3f40e3a23ffae0",
-      "ukuran_kb": 18.3,
-      "ringkasan": "Menjawab: kapan kompensasi (penyesuaian statement) TikTok boleh melunasi faktur dan kapan ia harus dicatat sebagai Pendapatan Lain-lain tanpa mengisi nilai bayar, dengan dua pembeda berurutan — pesanannya sudah pernah menerima uang atau belum, lalu ada tidaknya dokumen Retur Penjualan. Menjelaskan kenapa keputusan ini menyempitkan ADR-0056 alih-alih membatalkannya, kenapa gerbang skip retur wajib memakai pembeda yang sama dan berubah dalam satu perubahan (kalau tidak, penjualan tidak terbalik sama sekali), serta kenapa tidak dibuat penahanan cicilan seperti kanal Shopee. Juga menjawab bagaimana aturan digerbangi kv tanggal cutover per hari penerimaan sehingga berlaku maju saja, dan kenapa lingkupnya hanya TikTok sementara aturan Shopee tidak ikut berubah.",
+      "hash": "1043beab00e5529a0c2da058ce52d08a0a10032c7131157b711c3a65cca1a4fe",
+      "ukuran_kb": 20.3,
+      "ringkasan": "Menjawab: kapan kompensasi (penyesuaian statement) TikTok boleh melunasi faktur dan kapan ia hanya dicatat sebagai Pendapatan Lain-lain tanpa mengisi nilai bayar, memakai dua pembeda berurutan — pesanan sudah pernah menerima uang atau belum, lalu ada atau tidaknya dokumen Retur Penjualan. Menjelaskan juga kenapa gerbang skip Retur Penjualan wajib memakai pembeda yang sama dan berubah bersamaan, kenapa aturan ini menyempitkan ADR-0056 alih-alih membatalkannya, dan bagaimana perilakunya digerbangi kv tanggal cutover per hari penerimaan sehingga berlaku maju saja. Memuat angka populasi prod yang terdampak versus yang sengaja tidak disentuh, alasan tidak dibuat penahanan cicilan seperti Shopee, dan penegasan bahwa aturan Shopee tidak ikut berubah.",
       "kata_kunci": [
         "kompensasi TikTok",
         "penyesuaian statement",
         "Pendapatan Lain-lain",
+        "other income",
         "payout",
+        "bayar faktur",
         "retur penjualan",
         "sales return",
-        "Accurate",
-        "piutang AR",
-        "cutover date",
-        "dobel bayar"
+        "dobel bayar",
+        "integration-service"
       ]
     },
     {
