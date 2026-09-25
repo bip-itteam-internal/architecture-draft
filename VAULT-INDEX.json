@@ -7958,20 +7958,20 @@
         "ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library",
         "Microservices - Marketing Analytics Service"
       ],
-      "hash": "c649caba243fc0a8179fcc5df9f50e8987757c27b5f5a9883d95b9d29fb716d1",
-      "ukuran_kb": 19.3,
-      "ringkasan": "Menjawab: mengapa laporan terjadwal Asisten Analisa Marketing kini membawa daftar keputusan tindakan dari AI (hentikan, kurangi, naikkan) yang cukup ditandai dijalankan atau ditolak oleh penerimanya, dan bagaimana keputusan itu dipagari: katalog tindakan tertutup, kelayakan dihitung backend, model hanya memilih, mengurutkan, dan menjelaskan tanpa menerima angka mentah. Juga menjawab apa yang tidak dijanjikan (sistem tidak mengeksekusi di TikTok/Shopee, tanpa besaran rupiah, laba belum matang tak jadi dasar), prasyarat satu target ROAS, mode bayangan, dan kondisi berhenti pengganti ADR 0120 §7.",
+      "hash": "b133eb089e5d15541649d395d18d0604f215402b59175f1147b0d071c857c064",
+      "ukuran_kb": 21.9,
+      "ringkasan": "Menjawab: apakah laporan terjadwal Asisten Analisa Marketing boleh membawa keputusan tindakan dari AI (hentikan, kurangi, naikkan iklan) dan bagaimana penerima menjalankan atau menolaknya, serta mengapa ini menyimpang dari ADR 0120 dan ADR 0058. Juga menjawab batasannya: sistem tidak mengeksekusi di TikTok/Shopee, tindakan dipilih dari katalog tertutup yang kelayakannya dihitung backend, laba belum matang tak jadi dasar, keputusan anggaran menunggu satu target ROAS, mode bayangan, satu laporan gabungan mingguan, dan kondisi berhentinya.",
       "kata_kunci": [
-        "Asisten Analisa Marketing",
+        "asisten analisa marketing",
         "keputusan AI",
-        "rekomendasi tindakan",
+        "AI recommendation",
         "jalankan atau tolak",
-        "katalog tindakan tertutup",
+        "katalog tindakan",
         "target ROAS",
         "laba belum matang",
         "mode bayangan",
-        "ADR 0120",
-        "ADR 0058"
+        "shadow mode",
+        "marketing-analytics"
       ]
     },
     {
@@ -15828,20 +15828,20 @@
         "Microservices - Assistant Service",
         "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi"
       ],
-      "hash": "cf434f6a830fbcea5be0d4764c117715d17cb08c8b82593c85857d96cbf9a2b7",
-      "ukuran_kb": 14.3,
-      "ringkasan": "Menjawab: apa saja gerbang dan task untuk membangun Asisten Analisa Marketing (template analisa, jadwal kirim, notifikasi inbox, layar menu, lalu keputusan AI dan tanya-jawab bebas), mana yang sudah dikerjakan beserta PR-nya, dan apa yang masih menunggu keputusan manajemen seperti satu target ROAS (4,5 vs 3,2), daftar harga minimal, dan lingkup kiriman. Juga menjawab template apa yang boleh dan tidak boleh masuk katalog karena keterbatasan data, serta apa yang sengaja tidak dikerjakan.",
+      "hash": "911176a3332fc4b3135490071f8d0bce7d1fdab4dde3190f871dad950f7d9c9d",
+      "ukuran_kb": 15.0,
+      "ringkasan": "Menjawab: apa saja daftar pekerjaan (gerbang G1-G4 dan task T1-T14) untuk Asisten Analisa Marketing, mana yang sudah selesai, dependensinya, dan keputusan terbuka yang tersisa seperti penyatuan target ROAS 4,5 vs 3,2, lingkup kiriman, dan daftar harga minimal. Juga menjawab isi tiap irisan: template dan penjadwalan laporan tanpa AI, keputusan AI jalankan/tolak (ADR 0127), tanya-jawab bebas, serta yang sengaja tidak dikerjakan.",
       "kata_kunci": [
-        "Asisten Analisa Marketing",
-        "laporan terjadwal",
-        "scheduled report",
+        "asisten analisa marketing",
+        "papan kerja analisa",
         "template analisa",
-        "target ROAS",
+        "jadwal laporan",
+        "scheduled report",
         "kategori inbox",
-        "marketing-analytics",
+        "target ROAS",
         "irisan",
-        "keputusan AI",
-        "papan kerja"
+        "ADR 0120",
+        "ADR 0127"
       ]
     },
     {
