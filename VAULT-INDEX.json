@@ -164,7 +164,7 @@
         "DB - Overview and Notes"
       ],
       "hash": "74e111edc846c202c76f0b0415ed5b76ef7784574ee262f321bf0a7c24592d5c",
-      "ukuran_kb": 1.5,
+      "ukuran_kb": 1.6,
       "ringkasan": "Menjawab: bagaimana upload/download/preview/hapus file dilakukan lewat proxy MinIO, cara mendapatkan presigned URL untuk upload/preview internal antar-service, dan otorisasi apa yang berlaku (service key vs JWT) per direktori. Juga menjawab batas ukuran upload dan status pending soal RBAC berbasis role pada akses file.",
       "kata_kunci": [
         "file service",
@@ -517,7 +517,7 @@
         "Microservices - Employee Service"
       ],
       "hash": "cc96229bac738516c213e99417c3cf2c7a0cb5224a86bab536f3109778b016cd",
-      "ukuran_kb": 0.9,
+      "ukuran_kb": 1.0,
       "ringkasan": "Menjawab: endpoint apa yang dipakai tim IT untuk mengelola akun karyawan (reset password, aktivasi/nonaktifkan, ubah status), mengatur role/hak akses sistem, dan mengelola jaringan (WiFi) kantor dari satu titik orchestrator.",
       "kata_kunci": [
         "IT orchestrator",
@@ -1147,7 +1147,7 @@
         "Microservices - Attendance Service"
       ],
       "hash": "15c2c1f114291fb80fb16af9c0cff4aa274d39a421af277afc035efc674f7b23",
-      "ukuran_kb": 3.6,
+      "ukuran_kb": 3.7,
       "ringkasan": "Menjawab: bagaimana aplikasi listener fingerprint (Python/pyzk) mendengarkan dan mengirim event mesin absensi ke ERP, spesifikasi teknis dan lokasi tiap perangkat (X105 di kantor, X609 di gudang), serta masalah/quirk perangkat yang sudah diketahui (batas koneksi port, reset memori). Juga menjawab bagaimana ekspor data fingerprint dan sinkronisasi waktu mesin dilakukan, serta mekanisme disaster recovery listener.",
       "kata_kunci": [
         "fingerprint listener",
@@ -1292,7 +1292,7 @@
         "CORE - API Master Gateway"
       ],
       "hash": "2cbfe00d4596477b8561d3e5d3950f4e3408a0c3f5008e57a1642220afd5a27d",
-      "ukuran_kb": 5.0,
+      "ukuran_kb": 5.1,
       "ringkasan": "Menjawab: bagaimana video iklan pendek dibuat dari foto produk memakai engine Veo 3.1/Gemini, apa bedanya alur manual (Dari Nol/Quick Generate) dengan automation layer berbasis LangGraph (discover tren sampai publish dengan human-in-the-loop), dan engine AI apa yang dipakai untuk image/video/LLM/scraping tren TikTok. Juga menjawab fase automation mana yang sudah selesai vs masih WIP.",
       "kata_kunci": [
         "Ideamills",
@@ -1426,7 +1426,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "4dfe203214f1f0e09ea6a415753c63b461d5b5ba3cf0dfb8574df9a63f1315e4",
-      "ukuran_kb": 3.8,
+      "ukuran_kb": 3.9,
       "ringkasan": "Menjawab: bagaimana komentar TikTok kompetitor di-scrape lewat Apify dan dianalisis sentimen/temanya memakai Claude AI, endpoint dashboard untuk kelola target scraping, menjalankan scrape/analyze, dan melihat statistik/insight. Juga menjawab bagaimana tema keluhan pelanggan disintesis jadi ide produk baru dan mengapa proses scrape & analyze sengaja dipisah (kontrol biaya).",
       "kata_kunci": [
         "TikTok sentiment",
@@ -1591,7 +1591,7 @@
         "Sales - Big Pictures"
       ],
       "hash": "fa7aaca9eed83b93a4662fbc6da126f18a74d48a8a7ff1bb7355c5a023094b7b",
-      "ukuran_kb": 5.4,
+      "ukuran_kb": 5.5,
       "ringkasan": "Menjawab: fitur apa saja di website korporat publik (katalog produk/brand, berita, karir, form kemitraan/kontak, halaman statis), bagaimana stack teknis monorepo pnpm (Next.js + Go + PostgreSQL) tersusun, dan status fitur belanja ringan (harga produk + tombol beli ke marketplace tanpa checkout). Juga menjawab bahwa situs ini berdiri sendiri, tidak terhubung ke API Master Gateway/SSO bip-erp.",
       "kata_kunci": [
         "website korporat",
@@ -1852,7 +1852,7 @@
         "REF - Kepemilikan Data"
       ],
       "hash": "68b0acedc72aae6a224bf4823aa573a21407459a76543b2df3b5117988be6abd",
-      "ukuran_kb": 17.5,
+      "ukuran_kb": 17.9,
       "ringkasan": "Menjawab: apakah OCR/ekstraksi dokumen bisa dibangun sekarang, apa yang benar-benar dibutuhkan tiap konsumen (Inventory, Waste, Recruitment CV screening, faktur supplier), dan mengapa blueprint RAG (embedding, FAISS, Ollama) yang ada di bagian bawah dokumen sebagian besar tidak diperlukan. Bagian 'Temuan terukur 2026-09-08' MENGOREKSI blueprint dengan angka: ekstraksi terstruktur sudah jalan hari ini lewat endpoint AI internal yang menerima gambar (faktur Bahasa Indonesia terbaca persis, kontrol negatif lolos), overhead tetap 2.061 token membuat rencana 'OCR dulu supaya hemat token' tidak terbayar, dan prod Biznet TIDAK punya GPU (8 core, 15 GB RAM, 52 container) sehingga model 3B kelas Unlimited-OCR tak muat. Juga menjawab batasan kepatuhan data: GET /v1/models mengembalikan nol model lokal, jadi semua yang dikirim ke endpoint itu keluar dari perusahaan — OCR lokal tidak menyelesaikan syarat 'dokumen tidak boleh keluar' selama ekstraksinya masih memanggil endpoint itu.",
       "kata_kunci": [
         "OCR",
@@ -2102,7 +2102,7 @@
         "APP - Web ERP"
       ],
       "hash": "11e72059269b7487c65ca2b1a9718f5e7097359a1311a0696021595641d1cbf5",
-      "ukuran_kb": 14.3,
+      "ukuran_kb": 14.4,
       "ringkasan": "Menjawab: bagaimana asisten tanya-jawab di Web ERP dirancang supaya ia merutekan pertanyaan ke endpoint yang sudah menghitung angkanya, bukan menghitung sendiri, dan kenapa tool-nya memanggil lewat gateway dengan JWT orang yang bertanya sehingga hak aksesnya identik dengan hak akses orang itu di layar. Juga menjawab kenapa Tool Runner dipilih ketimbang LangGraph, tool apa yang sengaja tidak dibuat (bash, query bebas Mongo, tool tulis), empat penjaga supaya tidak lahir angka karangan, dan kenapa cara mengantar jawaban masih terbuka karena gateway tidak meneruskan stream dan berbatas 30 detik.",
       "kata_kunci": [
         "assistant service",
@@ -2346,7 +2346,7 @@
         "APP - MyBharata"
       ],
       "hash": "4aeebaf057ebbb23a9e0d7e14423cbfae4d198dd7cc30d1ab9950f85932dd46e",
-      "ukuran_kb": 12.0,
+      "ukuran_kb": 12.2,
       "ringkasan": "Menjawab: bagaimana berkas disimpan dan diberi izin di ERP, sepuluh prefix apa saja yang terdaftar dan mana yang punya kunci baca, serta kenapa berkas berizin dibaca lewat proxy sisi server alih-alih presigned URL. Menjelaskan perakitan peta access key yang melewati env kosong dan membuang kedua entri saat kunci bertabrakan, beserta alasan keduanya bukan panic. Memuat pula kelas kegagalan yang sudah tiga kali terjadi tanpa dilaporkan siapa pun: prefix yang terdaftar di kode tetapi env-nya lupa diisi, sehingga modulnya mati senyap berbulan-bulan, lengkap dengan daftar periksa dan cara membuktikannya dari hitungan prefix di log boot.",
       "kata_kunci": [
         "file-service",
@@ -2436,7 +2436,7 @@
         "ADR - 0002 Database-per-Service"
       ],
       "hash": "1616e39aeb296dd4b7779ef6c78a99037f207afc0faa55b3bdd07c64424ae4f5",
-      "ukuran_kb": 5.1,
+      "ukuran_kb": 5.2,
       "ringkasan": "Menjawab: bagaimana HRD Document Service mengelola dokumen HRD (SOP, Syarat & Ketentuan, kebijakan, guideline) dengan model title+body Markdown, penyasaran (targets) polimorfik ke semua/posisi/departemen/jenis-pengajuan/karyawan, versioning immutable, dan acknowledgment per-versi. Juga menjawab endpoint kelola HR (draft, publish, versi), self-service karyawan (my/documents, ack, S&K saat pengajuan), model data collection, dan bagian yang belum ada (enforcement ack di BE, FE employee-facing, arsip).",
       "kata_kunci": [
         "HRD document",
@@ -2529,6 +2529,7 @@
         "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
         "ADR - 0104 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres",
         "ADR - 0056 Penyesuaian Statement TikTok Menambah Payout Order",
+        "ADR - 0119 Kompensasi TikTok Dipisah Menurut Sudah atau Belum Ada Uang Masuk",
         "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
         "ADR - 0017 Tanggal Retur TikTok via order_update_date",
         "ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah",
@@ -2548,7 +2549,6 @@
         "Sales - ICC Affiliate Mapping",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "ANALISA - Redesign ACL AllowedShops Berbasis Department Shops",
-        "ADR - 0119 Kompensasi TikTok Dipisah Menurut Sudah atau Belum Ada Uang Masuk",
         "ADR - 0097 Kompensasi Shopee Susulan Ditahan dan Dicatat AR lewat Koreksi Manual ERP",
         "API - Index",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
@@ -2567,21 +2567,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "341e5f1961c2110b79913954f217444f681f191c517ca7a123ab2ec32688fe6f",
-      "ukuran_kb": 426.9,
-      "ringkasan": "Menjawab: apa peran integration-service sebagai penghubung marketplace (TikTok Shop, TikTok Ads, Shopee, Lazada) ke Accurate, bagaimana order dinormalkan jadi model transaksi terpadu, serta fitur seperti GMV Max monitoring, ICC account mapping, shop ACL, kepemilikan toko per departemen, profit per produk, dan ulasan marketplace. Juga menjelaskan worker cron, ketahanan sinkron Shopee, status sinkron per toko, dan rencana Meta Ads.",
+      "hash": "f80fabb202cf1169ed950dca786de94a3be95fe49339ab89f64f56eef99d1c5b",
+      "ukuran_kb": 427.9,
+      "ringkasan": "Menjawab: marketplace mana saja yang tersambung ke ERP (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) dan lewat jalur apa order masuk (webhook direct per platform, auth HMAC Shopee, kredensial OAuth per marketplace), lalu bagaimana order dinormalkan jadi model transaction terpadu dan dijembatani ke Accurate Online sebagai Sales Invoice dan Sales Return. Juga menjawab endpoint report iklan apa yang tersedia beserta cara hitungnya (GMV Max monitoring dan overview per produk, ROAS/ROI, ICC video metrics), bagaimana automasi auto-ship/auto-approve sadar hari libur, siapa boleh melihat toko mana (shop ACL, department_shops, ICC account mapping), serta cron/worker dan index MongoDB jalur panas apa saja yang berjalan. Dipakai saat menelusuri asal data marketplace, kredensial integrasi, status sinkron per toko, atau saat angka iklan/ROI terlihat menyimpang.",
       "kata_kunci": [
         "integration service",
         "marketplace",
-        "sinkron order",
-        "order sync",
-        "Accurate",
-        "TikTok",
+        "TikTok Shop",
+        "TikTok Business Ads",
         "Shopee",
         "Lazada",
+        "webhook",
+        "Accurate Online",
         "GMV Max",
-        "ICC",
-        "Meta Ads"
+        "OAuth kredensial"
       ]
     },
     {
@@ -3018,7 +3017,7 @@
         "HRIS - Dashboard per Posisi"
       ],
       "hash": "02c53b9949cf202a330825aae1bec632bc7d85e0e4d4e1a579c919ab3d3ae34b",
-      "ukuran_kb": 102.2,
+      "ukuran_kb": 102.3,
       "ringkasan": "Menjawab: bagaimana siklus rekrutmen berjalan di sistem, dari permintaan posisi (job requisition) dan approval-nya, pembukaan lowongan, apply publik kandidat, babak seleksi (interview, psikotes, technical test, background check), sampai offer dan handoff onboarding. Menjelaskan juga bentuk data di `recruitment_db`, bagaimana hasil tes menggerakkan progress/status kandidat (SP-Wiring), peran `form_type` babak dalam menentukan form penilaian di frontend, scoping multi-perusahaan lewat `company_id` dan paket izin, serta bahan KPI rekrutmen. Memuat catatan operasional penting: deploy dev manual (merge bukan berarti deploy) dan urutan BE sebelum FE untuk perubahan kontrak.",
       "kata_kunci": [
         "recruitment",
@@ -3100,7 +3099,7 @@
         "Sales - GMV Creative"
       ],
       "hash": "d58f57cef046e6541fcc9446e4a2a8842634ad3ee478bc655dbde12e8a851538",
-      "ukuran_kb": 1.7,
+      "ukuran_kb": 1.8,
       "ringkasan": "Stub kosong untuk Microservices - TikTok Shop Service. Belum ada isi.",
       "kata_kunci": []
     },
@@ -3122,7 +3121,7 @@
         "IT - Server, VMs and Databases"
       ],
       "hash": "7edde99c67a9d99aedc8050b574e780773b85ad4c97a451d660020b1f8c9f8e8",
-      "ukuran_kb": 26.8,
+      "ukuran_kb": 27.0,
       "ringkasan": "Menjawab: kenapa vault arsitektur dibuka ke Claude lewat MCP server sendiri, bagaimana alur autentikasinya menumpang SSO ERP, dan kenapa server ini menerbitkan token OAuth sendiri alih-alih meneruskan ERP JWT (audience binding RFC 8707, TTL 72 jam tanpa refresh token). Juga menjawab kenapa service ini sengaja tidak lewat API Master Gateway melainkan dipapar langsung lewat Nginx Proxy Manager, siapa yang boleh mengaksesnya (daftar-izin employee_id eksplisit, bukan turunan system_roles), dan bagaimana tulisan manager mendarat di vault sebagai commit git ber-author. Memuat pula alasan service ini tidak pernah menulis ke VAULT-INDEX.json dan konsekuensi yang harus ditutup pencarian.",
       "kata_kunci": [
         "vault MCP",
@@ -3663,7 +3662,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "076b1a4fb212adebd3801ec7b3443d492438a6a76da2345516b17d06f0ada9bb",
-      "ukuran_kb": 4.9,
+      "ukuran_kb": 4.8,
       "ringkasan": "Menjawab sumber tanggal yang dipakai untuk membukukan retur TikTok ke Accurate: kenapa update_time menyesatkan (ikut mundur karena settle refund) dan kenapa order_update_date dipilih sebagai gantinya, serta perbaikan zona waktu WIB untuk penomoran dokumen retur (RTR).",
       "kata_kunci": [
         "tanggal retur",
@@ -3971,7 +3970,7 @@
         "API - Notification Service"
       ],
       "hash": "bd5e71dd55a567d8321ad43ee9b70c7b3eb955f5f7f979a6a4be3cf7eefb2a8b",
-      "ukuran_kb": 5.0,
+      "ukuran_kb": 5.1,
       "ringkasan": "Menjawab: kenapa email transaksional (konfirmasi lamaran, jadwal interview, offer letter) dikirim lewat Resend dan bukan mail server self-hosted seperti Mailu, apa perbedaan mendasar antara layanan pengiriman email (ESP) versus mail server sendiri, dan kapan Mailu tetap masuk akal dipakai (mis. kotak surat internal tim, menerima email balasan, kebutuhan data di dalam negeri). Juga menjawab risiko deliverability dari VPS tanpa reputasi IP, konsekuensi ketergantungan pihak ketiga, serta syarat minimum (SPF/DKIM/DMARC/PTR/IP warming) bila suatu saat ingin pindah ke server sendiri.",
       "kata_kunci": [
         "ADR 0026",
@@ -4158,7 +4157,7 @@
         "APP - Web ERP"
       ],
       "hash": "9947764052dfc4ef4c0f6cb313276520e6a858a6fea06d7490fa051fdc2101d7",
-      "ukuran_kb": 8.4,
+      "ukuran_kb": 8.5,
       "ringkasan": "Menjawab: mengapa prefix /internal/ pada rute bip-erp bukan batas keamanan, mekanisme apa yang menyebabkannya (catch-all /:module/* di gateway plus Reroute yang mengisi sendiri gateway key), dan bukti apa yang ditemukan di employee-service. Juga menjawab aturan yang kini berlaku (setiap rute wajib menggerbangi dirinya sendiri, kode mati dihapus bukan digerbangi, pemberian peran dipisah dari pembuatan akun, pengecualian didaftarkan di uji penjaga) serta apa yang belum dikerjakan: gateway belum memblokir /internal dari luar, service lain belum disapu, dan system_authentication masih tanpa jejak audit.",
       "kata_kunci": [
         "ADR 0031",
@@ -4309,7 +4308,7 @@
         "HRIS - Adaptasi ERPGo HRM"
       ],
       "hash": "ee057da202016bf0d7b30b828e3316bad6cc7904f67543072000fb4c5ed4c80c",
-      "ukuran_kb": 11.5,
+      "ukuran_kb": 11.6,
       "ringkasan": "Menjawab: siapa yang boleh menonaktifkan akun karyawan dan mengapa pencatatan resign menjadi milik HR alih-alih dikirim sebagai permintaan ke IT. Menjelaskan koleksi employee_resign (kategori, tanggal efektif, alasan) sebagai penjelas mengapa akun mati, aturan satu tempat penulisan is_active lewat terapkanStatusAkun, cron harian yang menerapkan resign jatuh tempo, serta mengapa pembatalan hanya menghidupkan akun yang dimatikan catatan itu sendiri. Juga menjawab konsekuensi yang sengaja diterima: tanpa maker-checker, staf HR bisa menonaktifkan siapa pun di perusahaannya, karyawan non-aktif lenyap dari sejumlah kueri, dan JWT yang sudah beredar tetap sah sampai TTL habis.",
       "kata_kunci": [
         "resign",
@@ -4349,7 +4348,7 @@
         "IT - Background Jobs & Schedulers"
       ],
       "hash": "450b9e7d59489b355213629c8884b5e9ec97350c49cf03fa889af8108be0cdb0",
-      "ukuran_kb": 13.3,
+      "ukuran_kb": 13.4,
       "ringkasan": "Menjawab: kenapa jadwal kerja boleh ditentukan per orang per tanggal lewat roster, bagaimana roster menumpuk di atas jadwal dasar `static`/`pattern` tanpa menggantikannya, dan apa urutan menang antara event perusahaan, roster, hari libur, dan jadwal dasar. Menjelaskan saklar `roster_enabled` per karyawan, sentinel `ROSTER` yang sengaja tanpa dokumen `company_work_schedule`, tanggal lampau yang read-only, serta kenapa Tukar Shift ditutup bagi karyawan ber-roster. Memuat konsekuensi operasional yang menjebak, antara lain arah satu-arah `SyncCollection` untuk `roster_enabled`, allowlist proyeksi employee-service, dan slice Go yang terserialisasi `null`.",
       "kata_kunci": [
         "roster",
@@ -4391,7 +4390,7 @@
         "RUN - Menambah Metrik KPI Otomatis"
       ],
       "hash": "ddca0201da7959b033620b4d876a8b18d58d146a1dd721bf9d3f6b75c917f3ec",
-      "ukuran_kb": 15.2,
+      "ukuran_kb": 15.1,
       "ringkasan": "Menjawab: bagaimana aset GA di ERP direkonsiliasi terhadap Aktiva Tetap di Accurate untuk menghasilkan skor KPI akurasi input aset staff GA, dan kenapa pencocokannya per-item lewat ceklis manual berbantuan (bukan agregat per-golongan) dengan `accurate_asset_no` disimpan agar periode berikutnya cocok otomatis. Menjelaskan pula kenapa aset yang belum ada di Accurate dihitung 100% (antrean tanggung jawab Finance, bukan GA) sementara Cakupan wajib tampil berdampingan dengan Akurasi, tiga tab modul Aset, penempatan yang menghormati batas service (inventory menyimpan nomor Accurate, feed KPI lewat employee-service), serta bagian mana yang di-supersede ADR-0049.",
       "kata_kunci": [
         "rekonsiliasi aset",
@@ -4632,7 +4631,7 @@
         "APP - Web ERP"
       ],
       "hash": "0c0909f5041fb2e4f35871dcf3468f5f711732f1249e9711ba8779344cd580f6",
-      "ukuran_kb": 19.7,
+      "ukuran_kb": 19.8,
       "ringkasan": "Menjawab: apa yang terjadi pada data seorang karyawan ketika ia pindah badan usaha di dalam Bharata Group, dan kenapa `employee_id`-nya tidak pernah diterbitkan ulang sehingga prefix perusahaan pada ID berhenti menandakan tenant. Menjelaskan koleksi `employee_movement`, aturan bahwa departemen dan jabatan tujuan wajib sudah ada di perusahaan TUJUAN, serta apa yang ikut pindah (masa kerja, kuota cuti, BPJS) dan apa yang tidak (kontrak baru). Memuat juga perpindahan nyata pertama ELT ke BIP yang sudah dijalankan di produksi 2026-08-19 berikut urutan langkah yang terbukti: backup dulu, gandakan WiFi kantor sebelum orangnya pindah agar clock-in tidak dibalas 403, baru pindahkan riwayat, dan buang WiFi lama paling akhir. Menyebut pula apa yang ternyata tidak perlu disentuh (jadwal, karena resolusi memakai schedule_id unik global) dan titik paling rapuhnya (`position_key` basi yang bisa memindahkan orang ke jabatan salah tanpa satu pun galat).",
       "kata_kunci": [
         "mutasi",
@@ -4710,7 +4709,7 @@
         "ADR - 0002 Database-per-Service"
       ],
       "hash": "b6c95fcf6596e6ea2e4239d7957c1064ff27074ea0e921b5b025c2df0f35600a",
-      "ukuran_kb": 19.6,
+      "ukuran_kb": 19.8,
       "ringkasan": "Menjawab: kenapa pengajuan Sakit/Izin/Cuti/Dinas atau koreksi absen yang ditolak (400) tidak meninggalkan jejak sama sekali di server sehingga alasan penolakannya tak bisa ditelusuri, dipicu insiden prod 20 Agustus 2026 (15 dari 18 percobaan pengajuan ditolak tanpa jejak). Menjelaskan rancangan koleksi `submission_attempt` yang mencatat tiap percobaan (berhasil maupun ditolak) lewat middleware tingkat rute alih-alih panggilan helper di tiap cabang handler, memakai kode alasan penolakan yang stabil (bukan cocokkan teks pesan), dan pembagian empat potongan implementasi (server, permukaan baca HR, telemetri app, retensi/privasi).",
       "kata_kunci": [
         "submission_attempt",
@@ -4745,7 +4744,7 @@
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
       ],
       "hash": "de910701c13dd48ab563d508035fc7fc18b13023c2809d400fa3e42fd47b297a",
-      "ukuran_kb": 9.3,
+      "ukuran_kb": 9.4,
       "ringkasan": "Menjawab: kenapa halaman baca jejak percobaan pengajuan (`submission_attempt`) ditaruh di modul IT tapi digerbang departemen Tech Development (`employee.DeptIT`), bukan peran `system_roles.it` seperti gerbang IT lain, dan siapa saja empat pemegang peran IT yang jadi kehilangan akses akibat keputusan itu. Juga menjawab bentuk dua endpoint yang disediakan (daftar berpaginasi dan ringkasan agregat terpisah), kenapa rentang tanggal bawaan 7 hari harus diumumkan lewat `range.default_applied`, dan kenapa kode alasan penolakan ditampilkan mentah tanpa terjemahan i18n.",
       "kata_kunci": [
         "jejak pengajuan",
@@ -4847,7 +4846,7 @@
         "APP - Web ERP"
       ],
       "hash": "f852623884e498be231f5bff58dc448fd0874666159ecc95e2110d44fa9a8c73",
-      "ukuran_kb": 8.7,
+      "ukuran_kb": 8.8,
       "ringkasan": "Menjawab: mengapa setiap dokumen inbox kini mendorong push ke browser dan ponsel sekaligus tanpa penyaringan kategori, dan mengapa `PushWebCategories` beserta `IsPushWebCategory` dicabut dari shared-library sementara `IsInboxCategoryValid` tetap ada untuk menolak kategori salah-ketik. Menjawab juga mengapa fan-out dipusatkan di `POST /inbox/send` alih-alih dibiarkan di tiap service pengirim, mengapa `/fcm/send-*` tetap hidup untuk pengingat presensi yang tidak menulis inbox, dan mengapa urutan deploy task-management, attendance, dan employee harus mendahului notification-service supaya tidak terjadi dobel-kirim. Berisi angka pengukuran volume notifikasi prod yang menjadi dasar keputusan, plus tiga bug yang ikut terbongkar: perulangan inbox per-departemen yang tak pernah jalan karena spasi pada nama departemen, broadcast ganda `cronReminderKPI`, dan panic `GetCollection` saat DB nil.",
       "kata_kunci": [
         "ADR 0050",
@@ -4880,7 +4879,7 @@
         "APP - Web ERP"
       ],
       "hash": "dc7dfb2baf7041ff28ea84495fd9c2363b7d0d64627c08ebc7e583c09079ba20",
-      "ukuran_kb": 9.7,
+      "ukuran_kb": 9.8,
       "ringkasan": "Menjawab: kenapa fitur Tampilan Menu per posisi (menu_hidden) dicabut seluruhnya, dan kenapa aturan tampil = (boleh menurut izin) DAN (tidak ada di menu_hidden) membuat permission set yang sudah dipasang tak pernah terlihat. Memuat angka pemakaian nyata di produksi (10 posisi memakainya sebagai whitelist terbalik), dampak nyata pencabutannya yang jauh lebih kecil daripada jumlah entrinya, dan apa yang sengaja tidak disediakan sebagai pengganti.",
       "kata_kunci": [
         "menu_hidden",
@@ -5088,7 +5087,7 @@
         "Microservices - Notification Service"
       ],
       "hash": "a9e6f7460e228c5a99621b1f1e6db30e1cd6142c1b031d40f4890aa6bf67d652",
-      "ukuran_kb": 9.8,
+      "ukuran_kb": 9.9,
       "ringkasan": "Menjawab: bagaimana penyetuju tiap tahap Pengajuan Pembelian ditetapkan dari layar master, dan mengapa penunjukan itu hanya menyempitkan himpunan yang sudah dibuka RBAC sehingga secara struktural tak bisa memberi hak baru (pemberian izin tetap milik IT lewat permission set). Menjawab juga tiga aturan jatuh-balik supaya tak ada dokumen mandek (tahap tanpa penunjukan jatuh ke seluruh pemegang izin, `spv_divisi` tetap dari resolver atasan, supervisor IT lolos lewat `superAksesIT`), mengapa gerbang dan antrean wajib memakai satu fungsi yang sama, dan mengapa endpoint baru `GET /internal/permission-holders` dibutuhkan agar pemilih hanya menawarkan orang yang memang berizin. Menerangkan pula arah kegagalan yang sengaja berbeda: penyimpanan penunjukan gagal-tertutup, sedangkan pembacaan penyempitan saat menindak atau membuka antrean gagal-terbuka.",
       "kata_kunci": [
         "ADR 0057",
@@ -5125,7 +5124,7 @@
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
       "hash": "34ad3f7307fffb98d9eb44741dcddc295d6b74086856bacee7f3b1d0a2690186",
-      "ukuran_kb": 16.8,
+      "ukuran_kb": 17.0,
       "ringkasan": "Menjawab: kenapa kelayakan pekerjaan AI di bip-erp ditentukan oleh kelayakan datanya, tiga syarat gerbang sebelum model boleh dibangun, kenapa model menumpang service pemilik data, dan kandidat mana yang ditolak beserta angkanya. Memuat koreksi 2026-09-14: label retur semula diambil dari koleksi yang salah (412 dari transaction_orders, padahal 5.742 order kembali ke gudang menurut accurate_daily_returns) dan pembatalan oleh sistem sesudah dikirim ternyata paket COD gagal antar dengan ongkos nyata, sehingga prediksi paket COD gagal antar berubah dari ditolak menjadi ditinjau ulang, beserta hasil uji aturan riwayat pembeli yang dihitung dari waktu kejadian dan alasan koreksinya dilakukan di tempat.",
       "kata_kunci": [
         "ADR 0058",
@@ -5263,7 +5262,7 @@
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id"
       ],
       "hash": "7b9bee3a9c09c297951ed6e7c83b5c3928f5b3a24700e1eaf9bbcf789aabf74e",
-      "ukuran_kb": 18.6,
+      "ukuran_kb": 18.8,
       "ringkasan": "Menjawab: kenapa jatah cuti tahunan diputuskan terbit otomatis di ulang tahun kontrak tiap karyawan (bukan diketik HR per orang dan bukan serentak 1 Januari), apa patokan tanggalnya (start_date kontrak paling awal yang sudah lepas masa evaluasi), dan bagaimana saldo dicatat sebagai ledger kejadian vacation_ledger dengan work_data.vacation turun jadi salinan ringkas. Menjelaskan asal-usul angka kuota 5 hari (12 hari Pasal 15 dikurangi 7 hari kerja Cuti Bersama) yang selama ini hanya hidup di kepala HR, plus temuan pengukuran data produksi 2026-08-29: 15 orang sudah lebih dari setahun tetapi berkuota 0 sehingga tidak bisa mengajukan cuti sama sekali, dan 23 orang sudah berkuota padahal belum genap setahun. Juga mencatat jebakan join_date bertipe BSON campur (date dan string) yang membuat filter Mongo melewatkan separuh karyawan tanpa galat, serta apa saja yang sengaja tidak dijanjikan (tidak mencabut jatah terlanjur, tidak backfill mundur, Cuti Bersama tetap tidak dipotong sistem).",
       "kata_kunci": [
         "cuti tahunan",
@@ -5326,7 +5325,7 @@
         "Microservices - Employee Service"
       ],
       "hash": "2dad8806bf5fc42fc5a720b1a6e561d859ad6a52860167e8a553e7e9907c52f6",
-      "ukuran_kb": 7.8,
+      "ukuran_kb": 7.9,
       "ringkasan": "Menjawab: kenapa kewenangan mengajukan Job Requisition untuk departemen mana pun digerbang jenjang jabatan (level_key berjenjang direktur pada master_department.position_items) alih-alih daftar nama jabatan seperti SetaraDirektur, dan kenapa Corporate Secretary sengaja dikeluarkan dari kewenangan itu. Juga menjawab batas pemakaian jenjang yang diizinkan (hanya mengajukan, tidak pernah menyetujui, tidak boleh jadi gerbang rute atau sumbu izin modul), kenapa pembandingnya kesamaan dan bukan urutan rank, kenapa level_key ditanyakan lintas-service ke employee-service alih-alih dititipkan di JWT, dan kenapa gagal memastikan jenjang dibalas 503 bukan diturunkan jadi tidak berhak. Memuat angka kesiapan data level_key di prod dan dev beserta konsekuensi yang diterima.",
       "kata_kunci": [
         "ADR 0062",
@@ -5393,7 +5392,7 @@
         "CORE - SSO Flow"
       ],
       "hash": "26b448727ddc5233b461d15c7e831982462f75305c64b706721415fa9fd904ee",
-      "ukuran_kb": 5.4,
+      "ukuran_kb": 5.5,
       "ringkasan": "Menjawab: mengapa seluruh commit hasil tulisan manager lewat Vault MCP memakai satu alamat email dari env VAULT_MCP_AUTHOR_EMAIL walau nama author tetap per-manager, dan apa yang hilang karenanya (git blame tak lagi membedakan manager lewat identitas terverifikasi; yang tersisa hanya kemudahan git revert). Menjelaskan sebab teknisnya: ERP JWT tidak memuat klaim email, email hanya ada di personal_data.email_address tanpa omitempty, dan satu-satunya rute internal yang membawanya juga mengembalikan password hash serta pin. Berguna untuk menjawab apa yang harus dikerjakan bila keputusan ini kelak dicabut dan mengapa env kosong berarti tool tulis tidak didaftarkan alih-alih service gagal naik.",
       "kata_kunci": [
         "ADR 0064",
@@ -5550,7 +5549,7 @@
         "External - Accurate"
       ],
       "hash": "140f2789e531f6209bfdfc17bceca336e6f6048522951825a418bd4a22e2da22",
-      "ukuran_kb": 10.5,
+      "ukuran_kb": 10.4,
       "ringkasan": "Menjawab: mengapa opname perlengkapan GA dibuat sebagai perluasan tab Data Accurate (lewat pemilih tipe Aset Tetap/Perlengkapan) alih-alih modul baru, bagaimana perlengkapan dicocokkan per-KUANTITAS (hitung fisik GA vs qty Accurate) bukan per-unit, dan bagaimana skor akurasi opname dihitung untuk KPI staff GA. Menjelaskan juga koleksi ga_opname + endpoint /perlengkapan-opname, penangkapan kategori item Accurate saat sync, serta amandemen 2026-09-02 yang mengubah tab FE dari form opname jadi explorer padanan read-only (BE dibiarkan dormant).",
       "kata_kunci": [
         "opname perlengkapan",
@@ -5659,7 +5658,7 @@
         "ADR - 0002 Database-per-Service"
       ],
       "hash": "e64e34f63cd93fd2f73409392fa832a98573382c59b9ee821707374be26d6d13",
-      "ukuran_kb": 21.2,
+      "ukuran_kb": 21.4,
       "ringkasan": "Menjawab: kenapa riwayat gaji yang sudah dibayar lewat spreadsheet HRD dimasukkan ke sistem sebagai jenis run ketiga yang angkanya DISALIN dan bukan dihitung ulang, dan apa saja konsekuensi yang diterima sadar karenanya. Menjelaskan rekonsiliasi sebagai satu-satunya pengganti penjaga uang, kenapa kolom ambigu (JABATAN, PPh 21, TOTAL TK, ABSENSI) sengaja tidak ditebak, dari mana kop slip diambil, kenapa komponen dan karyawan non-aktif ikut ditawarkan di layar impor, serta kenapa penerbitan run kedua di satu periode ditahan tanpa memutuskan run mana yang menang. Juga memuat bukti aritmetika dari sheet produksi dan pelajaran bahwa data dummy bisa memalsukan bukti.",
       "kata_kunci": [
         "impor payroll",
@@ -5730,7 +5729,7 @@
         "Sales - Incentive"
       ],
       "hash": "4400195b872cb32860c50e20c24d59b093f1fd586de00e6e52ce55abebcb0b2f",
-      "ukuran_kb": 8.4,
+      "ukuran_kb": 8.5,
       "ringkasan": "Menjawab: siapa yang boleh menyusun jadwal siaran Host Live dan kenapa kewenangan itu dibuat sebagai IZIN yang ditugaskan lewat layar Hak per Posisi, bukan sebagai daftar peran. Menjelaskan kenapa izinnya harus hidup di modul `jadwal` tersendiri dan bukan di dalam `hris` (prefiks izin ikut menentukan kategori sidebar di frontend, sehingga prefiks yang salah memunculkan menu HRIS yang memantul di gerbangnya sendiri), kenapa gerbang lama tetap berlaku berdampingan sehingga staf HR tidak kehilangan apa pun, dan batas apa saja yang berlaku bagi pemegang izin (kategori shift wajib hostlive, departemen wajib punya jadwal host live, penugasan jadwal statis ditolak). Memuat juga temuan yang baru muncul saat implementasi: cache kategori shift lima menit menolak pola yang baru dibuat dengan pesan yang tidak benar lalu sembuh sendiri, dan kenapa nama jabatan tidak dipakai menyaring siapa pun. Dipakai saat menambah modul izin baru atau saat menanyakan kenapa jadwal host live tak lagi dikerjakan HR. Status implementasinya di produksi tercatat hasil ukur 2026-09-17.",
       "kata_kunci": [
         "jadwal host live",
@@ -6049,7 +6048,7 @@
         "APP - Web ERP"
       ],
       "hash": "99b776b09f03cf404beb4bfecefbbb7dcf98d2675e86bf5975ba4102d34c0757",
-      "ukuran_kb": 23.3,
+      "ukuran_kb": 23.4,
       "ringkasan": "Menjawab: kenapa target profit tim marketing hanya ditulis di satu tempat (koleksi target insentive-service) dan KPI membacanya, siapa yang berwenang menulis target tiap level (SPV Marketing untuk icc/leader divisinya, Finance/IT/Direktur untuk SPV, tak seorang pun menulis targetnya sendiri), dan apa artinya bila target belum diisi (metrik tidak dinilai, bukan bawaan). Juga menjawab kenapa alur target-marketing berjenjang Finance-SPV-Direktur dipensiunkan, apa yang tidak dijanjikan (skor beku tak dihitung ulang, realisasi tetap dua angka), serta PR dan status tiap task T1 sampai T7.",
       "kata_kunci": [
         "ADR 0079",
@@ -6083,7 +6082,7 @@
         "Microservices - Employee Service"
       ],
       "hash": "dd36b3cdc78c068f5ecd329321923e8a72920b2a7c1ad0377f22269d9724eae1",
-      "ukuran_kb": 8.9,
+      "ukuran_kb": 9.0,
       "ringkasan": "Menjawab: siapa yang boleh mengajukan Job Requisition untuk departemen lain dan kenapa gerbangnya dipindah dari jenjang jabatan direktur (ADR 0062) ke izin `recruitment.requisition_cross_dept` lewat paket `recruitment_pengaju_lintas`. Juga menjawab kenapa izin itu aditif dan tidak ikut tier maupun paket admin, kenapa peralihannya dua tahap, serta konsekuensinya: SPV HRD bisa menyetujui pengajuannya sendiri, izin baru berlaku setelah login ulang, dan perubahan katalog menuntut deploy dua container.",
       "kata_kunci": [
         "requisition lintas departemen",
@@ -6121,7 +6120,7 @@
         "IT - CI-CD"
       ],
       "hash": "8794187e34a05fe833ef2f62ac9f0dbea20d4ecc3efc6ccc0358d3500e72b4fd",
-      "ukuran_kb": 17.0,
+      "ukuran_kb": 17.1,
       "ringkasan": "Menjawab: kenapa dan bagaimana layar Insentif Saya dipindah dari web ERP ke MyBharata sebagai kartu di halaman Slip Gaji ber-PIN, siapa yang berhak melihat kartu Insentif, dan endpoint apa yang dipakai (keanggotaan tanpa angka dan /profit-dashboard/saya). Juga menjelaskan urutan rilis, kapan menu web dicabut, dan apa yang sengaja tidak dijanjikan (notifikasi, penjumlahan ke gaji).",
       "kata_kunci": [
         "insentif saya",
@@ -6151,7 +6150,7 @@
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi"
       ],
       "hash": "3fb512fd51ee0af00ab8787aeb92f70332ae7df9f1dd977d0e7298f7334f3484",
-      "ukuran_kb": 6.1,
+      "ukuran_kb": 6.2,
       "ringkasan": "Menjawab: bagaimana bip-erp mengintegrasikan LLM/AI untuk pertama kalinya (paket tipis `shared-library/ai/` dengan satu fungsi `GenerateJSON`, bukan microservice tersendiri), kenapa `stream:false` ditanam mati dan balasan dipaksa `json_schema strict`, dan bagaimana draf lowongan otomatis dibuat asinkron saat Job Requisition disetujui tanpa pernah menggagalkan persetujuannya. Juga menjawab jebakan endpoint internal `code.bharatainternasional.com` (stream default true yang membalas 200 ber-`choices` null, overhead sekitar 2.030 token dari prefiks `cc/`), kenapa benefit lowongan dikunci enum di skema, syarat deploy (`--force-recreate`, rotasi kunci API), dan apa yang sengaja belum dibangun (kuota, cache, multi-provider).",
       "kata_kunci": [
         "AI",
@@ -6404,7 +6403,7 @@
         "Microservices - Inventory Service"
       ],
       "hash": "2ce5d71a739740e936dd4bb22b59415e9cfe7003830f8ada60faa1aae6f91235",
-      "ukuran_kb": 10.3,
+      "ukuran_kb": 10.2,
       "ringkasan": "Menjawab: kenapa barang perlengkapan yang sama bisa tampil dobel di explorer GA saat Accurate mengganti nomor item, dan bagaimana sistem memindahkan padanan (accurate_item_no) secara otomatis lewat ID internal Accurate tanpa konfirmasi manusia. Menjelaskan juga syarat aman migrasi otomatis (tepat satu kandidat cocok via AccurateID, masa tenggang 3 jam sebelum dianggap rename, audit trail) serta limitasinya (item yang benar-benar terhapus di Accurate tetap jadi baris stale, kandidat ambigu tak ditindak).",
       "kata_kunci": [
         "auto-migrasi padanan",
@@ -7311,7 +7310,7 @@
         "ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift"
       ],
       "hash": "db50a5cc8bbca7e12a68498043c3927773c97b4a765a4a875f39b31b394a7a53",
-      "ukuran_kb": 10.8,
+      "ukuran_kb": 10.9,
       "ringkasan": "Menjawab: kenapa metrik kesiapan siaran (kesiapan_live) berhenti dibatasi departemen dan bagaimana atribusinya kini murni lewat live_shifts.pendukung[], termasuk kapan dan bagaimana marketing-analytics mengisi pendukung secara otomatis lewat employee-service saat hanya ada satu pemegang posisi Live Support. Menjelaskan juga aturan gagal-terbuka (siaran tak boleh terhambat), batas waktu resolusi 3 detik, serta perubahan nama field sesi_departemen_tanpa_pendukung -> sesi_tanpa_pendukung dan toko_diminta -> sesi_seluruhnya.",
       "kata_kunci": [
         "kesiapan live",
@@ -7421,7 +7420,7 @@
         "ANALISA - Actual vs Planning MPP"
       ],
       "hash": "91c74f8d98fb2dea90cdf163c1383b46bb0963fc9ef6c38f86708ec7881faff2",
-      "ukuran_kb": 14.7,
+      "ukuran_kb": 14.8,
       "ringkasan": "Menjawab: kenapa kolom Actual pada lembar MPP diputuskan dihitung sistem alih-alih diketik HRD tiap bulan, bagaimana jumlah karyawan akhir bulan didefinisikan dan direkonstruksi per orang lewat employee_movement, dan kenapa bulan lampau menolak menjawab selama masih ada akun non-aktif tanpa tanggal keluar. Juga menjawab kenapa Divisi lahir sebagai master data tersendiri, apa akibatnya bagi rencana MPP bersumbu bulan, dan bagaimana pekerjaannya dipecah berurutan dari T1 sampai T6.",
       "kata_kunci": [
         "MPP",
@@ -7458,7 +7457,7 @@
         "Microservices - Employee Service"
       ],
       "hash": "084332753e0e1994501b34ad199173ff5dbdd57041593c16c5b808739f1ce825",
-      "ukuran_kb": 19.8,
+      "ukuran_kb": 20.0,
       "ringkasan": "Menjawab: kenapa penyetuju di web mendapat satu tabel seragam berisi seluruh antrean keputusan miliknya, siapa yang menyediakan datanya (agregator GET /pengajuan/antrean di employee-service, bukan attendance), dan kenapa gerbang tiap baris tetap milik service asalnya lewat penerusan identitas pemanggil. Menjawab juga apa arti 'riwayat' di endpoint itu, yaitu keputusan pemanggil sendiri dan bukan 'sudah diputus siapa pun', beserta penanda per baris yang dituntutnya, serta kenapa riwayat pengajuan milik sendiri sengaja TIDAK masuk ke sana dan layar webnya dicabut lagi. Memuat penyimpangan irisan 1 yang ditandai di tempatnya masing-masing: kolom Nilai tak dibangun, hitungan judul satu angka bukan dua, baris Booking mengantar ke halaman lain, dan menu tampil tanpa gerbang.",
       "kata_kunci": [
         "antrean persetujuan",
@@ -7527,7 +7526,7 @@
         "Finance - Proses Penjualan Marketplace dan Uang Masuk"
       ],
       "hash": "27dd4d2eb753184128139f2df31833476dfa541795f284657e2cef2e589aef3b",
-      "ukuran_kb": 15.9,
+      "ukuran_kb": 16.1,
       "ringkasan": "Menjawab: kenapa biaya marketplace (ongkir, proteksi pengiriman, PPh 22) sering mendarat di Biaya Admin, dan kenapa penyebabnya bukan salah pemetaan melainkan keranjang sisa TotalAdjustment yang berbagi akun 6112 dengan laci service-fee. Menjelaskan siapa yang boleh mengubah pemetaan akun di tab Setelan Akun Config Accurate (staf mengusulkan, SPV FAT menyetujui), kenapa keenam rute kv-config hari ini tanpa gerbang peran dan tanpa updated_by atau koleksi riwayat, serta apa bedanya akun 611701 (nilai barang sampel) dan 611704 (ongkir sampel). Memuat sembilan keputusan: gerbang peran, alur usul lalu setujui berjejak, validasi nilai akun, larangan keranjang sisa berbagi akun dengan kategori bernama, daftar komponen biaya yang belum punya akun, pratinjau transaksi terdampak, plus batasan bahwa koreksi di Accurate dan dimensi per marketplace tidak termasuk.",
       "kata_kunci": [
         "setelan akun marketplace",
@@ -7561,7 +7560,7 @@
         "APP - Web ERP"
       ],
       "hash": "74f566f16ed99d8da982af75348c5bdc3b53d593cfc08f0882c6a0f2a235906a",
-      "ukuran_kb": 10.1,
+      "ukuran_kb": 10.0,
       "ringkasan": "Menjawab: kenapa metrik KPI Engagement Quantity selalu bernilai 0 (field `volume_realisasi` tak punya penulis mana pun), dan bagaimana keputusan memperbaikinya — jenis pekerjaan dan target dipindah dari tingkat tiket ke tiap baris URL, lalu pengerja melaporkan angka tercapai per URL per jenis. Menjelaskan endpoint realisasi `PUT /engagement/tickets/:id/items/:itemId/realisasi`, siapa yang boleh mengisi (pengerja pemegang tiket dan admin/supervisor dalam cakupan, requester tidak), jendela pengisian yang terbuka sampai akhir bulan KPI walau tiket sudah ditutup, dan kenapa `409` dipakai saat target berubah di antara baca dan tulis. Juga menjawab bagaimana KPI memperlakukan tiket yang realisasinya belum dilaporkan: keluar dari penyebut sebagai cakupan, bukan dihitung nol, plus kosakata sembilan jenis pekerjaan yang divalidasi backend.",
       "kata_kunci": [
         "ADR 0117",
@@ -7600,7 +7599,7 @@
         "Sales - ICC Account Manager Mapping"
       ],
       "hash": "bc8c3d836e3f2c19bfeeb8bf97ccb861a77073dc37227bbfe66d943349604995",
-      "ukuran_kb": 19.7,
+      "ukuran_kb": 19.9,
       "ringkasan": "Menjawab: kenapa riwayat komplain produk digabung jadi satu tabel baca untuk pemegang akun toko, leader, dan SPV sementara register gudang dan register QC tetap terpisah, dan kenapa agregatornya ditaruh di employee-service. Juga menjawab kenapa kedua register masih nol dokumen — paket izin `marketing_akuntoko_pemegang` belum dipasang ke satu pun dari 36 Account Specialist sehingga menunya tak terlihat — serta bagaimana dua kosakata status dipetakan di agregator dan bukan di layar.",
       "kata_kunci": [
         "komplain produk",
@@ -7632,7 +7631,7 @@
         "APP - Web ERP"
       ],
       "hash": "739bcf07d1ffe96ea4cfcb7f7c9f80aece6d2471d0bb99b37fc7ccd990f1b835",
-      "ukuran_kb": 19.9,
+      "ukuran_kb": 19.8,
       "ringkasan": "Menjawab: kenapa beban ongkir Shopee tercatat lebih besar daripada Subtotal Ongkos Kirim di Seller Center (3.870 pesanan, Rp96.826.227, +~Rp16 juta/bulan) dan kelebihannya mendarat di akun Beban Admin E-Commerce, serta rumus mana yang benar — beban ongkir = actual_shipping_fee − buyer_paid_shipping_fee + proteksi kirim + reverse_shipping_fee, sementara final_shipping_fee tidak dipakai sama sekali (terbukti == −(actual − rebate) pada 90.194 dari 90.194 dokumen escrow prod) dan shopee_shipping_rebate SENGAJA tidak dikurangkan karena sudah ditangani mekanisme 'Potongan Ongkos Kirim dari Shopee' di lapisan penerimaan. Menjelaskan juga kenapa gerbangnya PER-ORDER (rumusOngkirBaruBerlaku, ShopeeHariSudahDibukukan, OpsiTransformShopee{RumusOngkirBaru}, transformShopeeIncome) alih-alih kv tanggal, kenapa keterpercayaan bacaan paid_at dioper terpisah, dan amandemen 2026-09-23 yang menambah kv shopee-ongkir-rumus-cutover-date plus cmd/ongkirbackfillsep untuk backfill 644 order September (koreksi −Rp15.943.750 di 137 hari-penerimaan; Agustus tetap terlarang). Berguna saat menelusuri residual/total_adjustment yang tak bernama, fixture TestShopeeTransformIncomeIdentity_RealSample yang kehilangan actual_shipping_fee, atau saat finance melihat beban ongkir naik dan beban admin turun tanpa kas berubah sepeser pun.",
       "kata_kunci": [
         "ongkir Shopee",
@@ -7652,8 +7651,8 @@
       "judul": "ADR - 0119 Kompensasi TikTok Dipisah Menurut Sudah atau Belum Ada Uang Masuk",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** — belum ada di kode. Aturannya sudah diputuskan finance (tiket \"Revisi Sistem Income\" + penegasan staf finance 2026-09-22); populasinya diukur ke prod 2026-09-22.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)** — kode selesai di branch `feat/tiktok-kompensasi-payout` (2026-09-25), **belum merge, belum deploy, kv cutover belum diisi**. Selama kv kosong perilakunya persis seperti sebelum ADR ini ada. Aturannya diputuskan finance (tiket \"Revisi Sistem Income\" + penegasan 2026-09-22, 09-24, dan 09-25).",
       "publik": true,
       "tautan": [
         "ADR - 0056 Penyesuaian Statement TikTok Menambah Payout Order",
@@ -7664,20 +7663,20 @@
         "Microservices - Integration Service",
         "Finance - Proses Retur dan Piutang Marketplace"
       ],
-      "hash": "a63f7e5ac8e65ed3d1a57cc19ead83e12d75db44e3b7fe156b81346778783910",
-      "ukuran_kb": 9.4,
-      "ringkasan": "Menjawab: bagaimana kompensasi (penyesuaian statement) TikTok diperlakukan berbeda menurut apakah pesanannya sudah pernah menerima uang — payout nol tetap melunasi faktur seperti sekarang, payout di atas nol dicatat sebagai Pendapatan Lain-lain tanpa mengisi nilai bayar. Juga menjawab kenapa gerbang retur wajib memakai pembeda yang sama dan berubah dalam satu perubahan, kenapa ini menyempitkan alih-alih membatalkan ADR 0056, dan kenapa mekanisme penahanan cicilan ala Shopee sengaja tidak dibuat untuk TikTok.",
+      "hash": "4f9e2039e5c5392a4f245cb2fefcf23f8e146ec22cbec3d43f3f40e3a23ffae0",
+      "ukuran_kb": 18.3,
+      "ringkasan": "Menjawab: kapan kompensasi (penyesuaian statement) TikTok boleh melunasi faktur dan kapan ia harus dicatat sebagai Pendapatan Lain-lain tanpa mengisi nilai bayar, dengan dua pembeda berurutan — pesanannya sudah pernah menerima uang atau belum, lalu ada tidaknya dokumen Retur Penjualan. Menjelaskan kenapa keputusan ini menyempitkan ADR-0056 alih-alih membatalkannya, kenapa gerbang skip retur wajib memakai pembeda yang sama dan berubah dalam satu perubahan (kalau tidak, penjualan tidak terbalik sama sekali), serta kenapa tidak dibuat penahanan cicilan seperti kanal Shopee. Juga menjawab bagaimana aturan digerbangi kv tanggal cutover per hari penerimaan sehingga berlaku maju saja, dan kenapa lingkupnya hanya TikTok sementara aturan Shopee tidak ikut berubah.",
       "kata_kunci": [
         "kompensasi TikTok",
         "penyesuaian statement",
-        "payout",
-        "piutang minus",
-        "retur",
         "Pendapatan Lain-lain",
-        "gerbang retur",
+        "payout",
+        "retur penjualan",
+        "sales return",
         "Accurate",
-        "AR",
-        "finance"
+        "piutang AR",
+        "cutover date",
+        "dobel bayar"
       ]
     },
     {
@@ -7700,7 +7699,7 @@
         "ANALISA - Asisten Analisa Marketing"
       ],
       "hash": "e268cee0ead34dc8a0f54a8b8e55c8121068e67aedf2e9b81d273f639c890833",
-      "ukuran_kb": 15.9,
+      "ukuran_kb": 16.1,
       "ringkasan": "Menjawab: kenapa asisten analisa marketing dibangun sebagai menu di dalam ERP alih-alih memakai harness agent di VM netmon, dan kenapa lapisan AI sengaja ditunda sampai template + penjadwalan tanpa AI terbukti dipakai. Merinci tiga irisan berurutan (template dan jadwal tanpa AI, AI merangkai dengan keluaran terkunci skema, lalu tanya-jawab bebas), aturan bahwa model tak pernah menerima angka mentah, penerima laporan ditulis eksplisit bukan diturunkan dari peran, sistem hanya mengurutkan sementara orang yang memutuskan, dan kondisi berhenti yang ditetapkan di muka. Memuat pula empat jebakan angka yang mendasari keputusan itu: laba periode pendek tampak rugi besar, revenue level video cuma terisi 8,9%, revenue nol struktural di level iklan, dan retur yang sudah terpotong di settlement sehingga tak boleh dikurangi dua kali.",
       "kata_kunci": [
         "ADR 0120",
@@ -7809,7 +7808,7 @@
         "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan"
       ],
       "hash": "4bf55c01062f37df5413c13ea93652d5c49957b02bcbbd6e49a90835e7bfea4d",
-      "ukuran_kb": 17.8,
+      "ukuran_kb": 17.9,
       "ringkasan": "Menjawab: di mana perawatan berkala (preventive maintenance) gedung dan alat disimpan dan kenapa di inventory-service alih-alih form-builder, employee-service, atau ceklis KPI. Menjelaskan bagaimana nilai KPI-nya dihitung dari dua koleksi baru (`pm_jadwal` sebagai penyebut jatuh tempo, `pm_realisasi` sebagai pembilang berbukti foto), kenapa atasan hanya menolak bukti dan tidak memberi angka, dan kenapa skornya berbasis penyelesaian sehingga tanpa bukti bernilai nol bukan seratus. Juga menjawab apa yang sengaja tidak diputuskan: bobot, target, arah metrik, catatan perbaikan kerusakan, dan patroli Security.",
       "kata_kunci": [
         "preventive maintenance",
@@ -7843,7 +7842,7 @@
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
       ],
       "hash": "7f4aa0644723fdf1dd00f0db04e76d460e3d86be8dbd8971c8c7085b0e69215f",
-      "ukuran_kb": 13.9,
+      "ukuran_kb": 14.1,
       "ringkasan": "Menjawab: kenapa pencatatan kondisi retur gudang adalah beban ketikan manusia terbesar yang terukur di ERP tetapi tetap tidak boleh langsung dibangun perbaikannya, dan kenapa jawabannya bukan AI. Menetapkan pengukuran komposisi siklus sebagai gerbang yang boleh membatalkan seluruh pekerjaan, lalu membatasi perbaikannya pada konfirmasi massal khusus paket yang seluruh barisnya sudah cocok dengan klaim marketplace. Menjelaskan juga kenapa formulirnya sudah berbasis pengecualian sehingga menambah nilai bawaan bukan lagi pekerjaan yang tersisa.",
       "kata_kunci": [
         "retur gudang",
@@ -7884,7 +7883,7 @@
         "HRIS - Payroll Persona"
       ],
       "hash": "81b13c782feaa227e18cf03c7a89cfb6cbc705874a4275473c532ab20e6f9990",
-      "ukuran_kb": 16.9,
+      "ukuran_kb": 17.1,
       "ringkasan": "Menjawab: bagaimana insentif profit marketing dibayar (komponen Insentif di slip gaji, terpisah dari Bonus), dari mana angkanya berasal (snapshot per periode yang dibekukan lalu disetujui Finance), dan siapa yang boleh menyetujui. Juga menjelaskan kenapa komponen Insentif dilarang di master gaji, bagaimana payroll memeriksa impor terhadap snapshot agar terbayar sekali, serta perlakuan pajak, BPJS, dan waktu bayar yang masih terbuka.",
       "kata_kunci": [
         "insentif profit",
@@ -8059,7 +8058,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "ee317d4d8664cf3c5227bcf8d3d018f9648ff0b9fdc9228e35cc31d4144a5c89",
-      "ukuran_kb": 16.3,
+      "ukuran_kb": 15.9,
       "ringkasan": "Menjawab endpoint dan alur kerja Finance Bridging versi Golang (penulisan ulang dari sistem Java): bagaimana membuat dan mengirim ringkasan transaksi Sales/Income/Return ke Accurate, halaman FE terkait per channel, status ringkasan, serta setting toko dan mapping produk.",
       "kata_kunci": [
         "Finance Bridging Golang",
@@ -8086,7 +8085,7 @@
         "Finance - Incentive"
       ],
       "hash": "8a3dba53269a5104fd1106064d8ed8159f96a7207b2c5a97ffc4a66f7a399504",
-      "ukuran_kb": 19.6,
+      "ukuran_kb": 19.5,
       "ringkasan": "Menjawab fitur dan struktur sistem Finance lama (Java/PostgreSQL/ReactJS) sebagai jembatan antara Accurate dan marketplace: master data, upload Excel per platform (TikTok/Shopee/Lazada/Tokopedia/KiriminAja), sinkronisasi ke Accurate, dan lokasi repositori kodenya.",
       "kata_kunci": [
         "Finance Bridging lama",
@@ -8413,7 +8412,7 @@
         "ANALISA - Setelan Akun Marketplace dan Komponen Tak Dikenal"
       ],
       "hash": "232eb1feb9737b21891422c0ba5290d0e8581d1cc8a7aa86ec46ca848eded854",
-      "ukuran_kb": 10.9,
+      "ukuran_kb": 11.0,
       "ringkasan": "Menjawab: komponen biaya dan pendapatan Shopee, TikTok, dan Lazada diterjemahkan jadi baris berakun apa di Accurate, di mana pemetaannya hidup, dan siapa yang boleh mengubahnya. Memuat daftar sebelas laci akun beserta artinya (service-fee, discount, affiliate-commision, shipping-cost, advertising-cost, settlement-adjustment, other-income, tax-pph, insurance-fee, sample-adjustment-account, sample-shipping-account), termasuk kenapa dua laci sampel 611701 dan 611704 bukan pengganti satu sama lain. Menjawab juga kolom mana yang aman dijumlahkan dan mana yang himpunan bagian sehingga menghitung rupiah dua kali, kenapa residual jadi sumber keluhan berulang, berapa jenis komponen yang beredar per marketplace, dan komponen apa saja yang memang sengaja tidak dipetakan.",
       "kata_kunci": [
         "pemetaan komponen marketplace",
@@ -9221,7 +9220,7 @@
         "BASE - Enterance Point"
       ],
       "hash": "854c23f0ae664fb8cdce2c41b1763ecd6fd039a289e9994a743bcb0adca87f3b",
-      "ukuran_kb": 3.4,
+      "ukuran_kb": 3.5,
       "ringkasan": "Menjawab: subsistem apa saja yang diminta General Affairs untuk dibangun, dan dokumen mana yang memuat rinciannya. Daftar 18 butir mulai dari inventory, e-procurement, APD dan K3, checklist per peralatan, sampai audit internal dan peminjaman ruang, masing-masing tertaut ke dokumen domainnya.",
       "kata_kunci": [
         "General Affairs",
@@ -9294,7 +9293,7 @@
         "GA - Risk Management"
       ],
       "hash": "46b6bb29a91046e001d069672c9a78b1007a5c8ed111097bdac3478e2818ddbb",
-      "ukuran_kb": 3.3,
+      "ukuran_kb": 3.4,
       "ringkasan": "Menjawab: bagian mana dari kebutuhan checklist GA yang sudah terjawab mekanisme yang ada dan bagian mana yang benar-benar masih kosong. Menjelaskan bahwa nilai_inspeksi_satgas dan ceklis_kpi sudah menutup sebagian lingkup, sehingga yang tersisa hanya inspeksi berjadwal lebih rapat dari mingguan, dan kenapa menambah satuan sub-harian ke form-builder bukan jalan keluarnya.",
       "kata_kunci": [
         "checklist",
@@ -9402,7 +9401,7 @@
         "APP - Web ERP"
       ],
       "hash": "c85ecce1852497751f65de676002865039c037249fe43bfb2d253debb2ab8658",
-      "ukuran_kb": 4.5,
+      "ukuran_kb": 4.6,
       "ringkasan": "Menjawab: bagaimana alur pengunjung mengisi buku tamu lewat scan QR (validasi token per-kunjungan, halaman /visit/<token>, form, /success, /invalid), endpoint mana yang dipakai (POST /public/guestbook dan validate=token lewat API Gateway ke Attendance Service), serta siapa yang mengirim notifikasi ke host. Menjelaskan juga pembagian kategori tamu: personal dan group ditangani aplikasi Astro ini, sedangkan kategori internal (karyawan terlambat) ditulis dari MyBharata dan berdampak ke pengunciannya pengajuan koreksi presensi serta angka kartu Terlambat. Memuat batasan yang sudah diketahui: tidak ada halaman admin di aplikasi tamu, QR di-generate di tempat lain, README usang, dan risiko duplikat baris yang memengaruhi angka yang dibaca HR.",
       "kata_kunci": [
         "guestbook",
@@ -9576,7 +9575,7 @@
         "REF - Kepemilikan Data"
       ],
       "hash": "fc1830929b261d1120d39603d5de4517132b5816bbd5fbbac82025c0654c628e",
-      "ukuran_kb": 13.8,
+      "ukuran_kb": 14.0,
       "ringkasan": "Menjawab: bagaimana ronda security dicatat, dibuktikan, dan diubah jadi angka KPI, serta alat kerja Security apa saja yang sudah ada di sistem dan mana yang belum. Memuat model data dua koleksi, batas tegas apa yang GPS boleh klaim, inventaris alat kerja Security beserta tiga false positive pencarian yang hampir menerbitkan temuan palsu, dan alasan kenapa kelengkapan alat kerjanya tidak bisa dijawab sistem selama jobdesk per posisi belum tersimpan di mana pun.",
       "kata_kunci": [
         "ronda",
@@ -9780,7 +9779,7 @@
         "ADR - 0013 HRD Documents"
       ],
       "hash": "928a8df27545abb7875b64db719c9a8d46382d533c96be92602cd4d57a73b8a3",
-      "ukuran_kb": 22.0,
+      "ukuran_kb": 22.2,
       "ringkasan": "Menjawab: fitur HRM ERPGo mana yang sudah tercakup bip-erp, mana yang baru sebagian, mana yang masih dokumen konsep, dan mana yang sebaiknya dibuang, memakai legenda verdict Ambil / Sesuaikan / Buang. Memuat hasil bedah route, handler, dan model dari lima service HR (employee, attendance, payroll, hrd-document, notification), sehingga bisa dipakai menjawab kapabilitas riil tiap service tanpa membuka kode, termasuk cuti embedded di work_data, pola request-approval leave, dan targeting dokumen HRD. Juga memuat kandidat perluasan seperti Announcements, Awards, kalender perusahaan, dan kasbon, plus daftar diskrepansi dokumen vault terhadap kode untuk bahan sync-docs.",
       "kata_kunci": [
         "ERPGo",
@@ -9885,7 +9884,7 @@
         "HRIS - Big Pictures"
       ],
       "hash": "23f1c03b5fb939b0c0267f25e93c4df967405d12e4fdb7b0a527afe809a92449",
-      "ukuran_kb": 24.5,
+      "ukuran_kb": 24.8,
       "ringkasan": "Menjawab: bagaimana karyawan mengajukan koreksi absen saat lupa clock-in, clock-out, keduanya, atau menyengketakan status telat, dan dari mana waktu clock diisi saat koreksi disetujui (snapshot jadwal kerja, bukan input manual). Juga menjawab siapa reviewernya untuk empat kombinasi peran pemohon (karyawan biasa, SPV non-HR, staff HR, SPV HR), bagaimana status akhir diturunkan dari review_1 dan review_2, aturan anti-self-approval, auto-ignore pengajuan yang menggantung lebih dari 24 jam beserta reminder di T+18 jam, dan bagaimana guard anti-fraud mencocokkan koreksi dengan catatan security di guestbook. Memuat model data koleksi attendance_correction_request, daftar endpoint /api/attendance/correction/*, serta parameter filter ongoing/past dan as=reviewer/reviewed.",
       "kata_kunci": [
         "koreksi absen",
@@ -10246,7 +10245,7 @@
         "HRIS - Conflict Management"
       ],
       "hash": "8f0f317582a987fa831d7f0c08cbff28061455ebd483d01e51308a5f0b30e52e",
-      "ukuran_kb": 9.6,
+      "ukuran_kb": 9.7,
       "ringkasan": "Menjawab: bagaimana Surat Peringatan SP1/SP2/SP3 diterbitkan HR, kategori pelanggaran apa saja yang tersedia, kenapa alasan wajib diisi untuk semua kategori, bagaimana masa berlaku 6 bulan dihitung, dan bagaimana SP dicabut serta dinotifikasikan ke karyawan. Menjelaskan dasar aturannya (Peraturan Perusahaan Pasal 19, 20, 53, 55, 56 yang sumbernya di luar vault) dan bagaimana usulan otomatis SP1 disusun dari akumulasi keterlambatan lewat `GET /internal/late-recap`, termasuk definisi telat yang dihitung (`status = Terlambat` dan `late_hour > 0`) dan periode payroll 26 sampai 25. Juga menjawab siapa yang boleh melihat SP (HR, karyawan sendiri, atasan atas departemen bawahannya via `SupervisedDepartmentsStrict`), kenapa status diturunkan saat baca alih-alih disimpan, kenapa fitur ini sengaja tidak mendaftar feed ke Calendar Service, dan apa yang belum diputuskan soal pemicu SP2/SP3.",
       "kata_kunci": [
         "surat peringatan",
@@ -10493,7 +10492,7 @@
         "ADR - 0061 Jatah Cuti Tahunan Terbit Otomatis di Ulang Tahun Kontrak"
       ],
       "hash": "9992d460eebfe5c3f5a8b362cf99b41e15c2b367836d51624e77d1396f961b02",
-      "ukuran_kb": 12.3,
+      "ukuran_kb": 12.4,
       "ringkasan": "Menjawab: pasal mana dari Peraturan Perusahaan yang benar-benar dijalankan sistem, di mana nilainya tinggal (konstanta Go, config yang disunting HR dari layar, atau master data per karyawan), berapa nilainya di produksi, dan di titik mana sistem menyimpang dari aturan. Memuat peta per area: potongan kehadiran dan mangkir (Pasal 20), ambang keterlambatan dan pengunduran diri (Pasal 19), sanksi SP sampai denda (Pasal 53-56), cuti dan izin (Pasal 15-18), serta lembur (Pasal 25), lengkap dengan dampak rupiah yang sudah terukur. Berguna saat HRD atau manajemen bertanya berapa potongan yang sebenarnya diterapkan sistem, atau saat perlu tahu aturan mana yang belum punya implementasi sama sekali.",
       "kata_kunci": [
         "kepatuhan",
@@ -10891,7 +10890,7 @@
         "Microservices - Attendance Service"
       ],
       "hash": "baffb3b8bf0b5c1d99216637706850c1c2e20b3a467b33fc31c3c4cccbfe295e",
-      "ukuran_kb": 7.5,
+      "ukuran_kb": 7.6,
       "ringkasan": "Menjawab: siapa yang memakai alur payroll run, apa yang boleh dikerjakan tiap peran, dan bagaimana urutan langkahnya dari membuat run sampai karyawan membuka slipnya sendiri. Memuat skenario gagal beserta apa yang dilihat orang saat gagal, termasuk kegagalan impor spreadsheet dan tiga hal yang perlu diketahui HR sebelum unggah pertama.",
       "kata_kunci": [
         "payroll",
@@ -11008,7 +11007,7 @@
         "HRIS - Attendance System"
       ],
       "hash": "9247ca464ae95227fa12ad4910666d40d8b033285511ed9401b4a3bfddea2da0",
-      "ukuran_kb": 7.2,
+      "ukuran_kb": 7.3,
       "ringkasan": "Menjawab: bagaimana cara mengajukan perjalanan dinas (business trip) beserta detail perjalanan, logistik, dan estimasi anggaran, apa bedanya dengan subtipe Dinas pada Leave Request, siapa yang menyetujui (Atasan Langsung lalu HRD), dan format penomoran dokumen perjadin.",
       "kata_kunci": [
         "perjalanan dinas",
@@ -11136,7 +11135,7 @@
         "APP - Web ERP"
       ],
       "hash": "85ef83494de23c018276560918c8bb6be05d1f86f8e1c627b0fca42f561e6cc0",
-      "ukuran_kb": 15.5,
+      "ukuran_kb": 15.8,
       "ringkasan": "Menjawab: bagaimana rencana eksekusi task-by-task (gaya TDD) untuk menyederhanakan pipeline recruitment jadi status 6-nilai, langkah implementasi detail tiap slice BE/FE (kode, test, commit), dan urutan wajib deploy backend sebelum frontend.",
       "kata_kunci": [
         "recruitment pipeline redesign",
@@ -11421,7 +11420,7 @@
         "HRIS - Big Pictures"
       ],
       "hash": "a7aec073fca1ee20854e656a7a403955cb6b9d5eb668c38e2829cd4934abb23a",
-      "ukuran_kb": 30.7,
+      "ukuran_kb": 31.0,
       "ringkasan": "Menjawab: bagaimana karyawan mengubah jadwal kerjanya secara formal lewat dua sub-fitur, Tukar Shift (swap slot jam dengan rekan) dan Tukar Hari (geser hari kerja/libur sendiri), siapa saja yang menyetujui, dan apa dampaknya pada data kehadiran. Menjelaskan siapa yang berhak mengajukan (hanya karyawan berbasis shift: Security, Production, Host Live), alur tiga langkah consent rekan lalu atasan lalu HRD, tenggat pengajuan H+1 untuk Tukar Shift dan H+3 untuk Tukar Hari, larangan menyetujui tanggal yang sudah lewat, auto-ignore dan reminder pengajuan basi. Memuat juga struktur koleksi `schedule_exchange_request`, discriminator `type`, endpoint `/schedule-exchange/*`, integrasi katalog hr-request, implementasi frontend web dan MyBharata, serta known limitation dan TBD yang belum diputuskan.",
       "kata_kunci": [
         "tukar jadwal kerja",
@@ -11468,7 +11467,7 @@
         "APP - Web ERP"
       ],
       "hash": "494d023cf05bb603f0dc51baa4eeba7344d78483515ae8f373876149d72eedcc",
-      "ukuran_kb": 11.2,
+      "ukuran_kb": 11.4,
       "ringkasan": "Menjawab: bagaimana rencana menyatukan penilaian KPI kuantitatif dengan review kualitatif menjadi satu Review Cycle (menghindari duplikasi sistem), fitur apa dari Performance Management Mekari Talenta yang diadopsi vs ditunda (OKR, peer/360, IDP, succession), dan bagaimana alur siklus review bulanan yang diusulkan (SPV mengisi lalu review lalu diteruskan ke HR).",
       "kata_kunci": [
         "work review",
@@ -11664,7 +11663,7 @@
         "RUN - Menambah Metrik KPI Otomatis"
       ],
       "hash": "cab19bfd6de4531a75472b99a2257b7ce1d84a31fa836ad834fe123603ddd59b",
-      "ukuran_kb": 13.4,
+      "ukuran_kb": 13.6,
       "ringkasan": "Menjawab: apa isi dashboard yang dirancang untuk tiap posisi di divisi Tech Development (Leader, Fullstack Developer, IT Support), metrik KPI apa yang menilai tiap posisi beserta bobot, sumber otomatis, dan targetnya. Menjelaskan juga kenapa rancangan lembar per posisi ditinggalkan setelah ditemukan `/portal/kpi` sudah melayani ketiga posisi lewat kaskade persona, apa yang dibangun sebagai gantinya (blok uptime periode penilaian dan tautan dari kartu KPI tim), serta kenapa empat posisi bertemplate arsip tanpa akun aktif sengaja tidak dirancang. Berguna sebagai cetakan pengecekan sebelum merancang dashboard posisi untuk divisi lain, termasuk konsekuensi utang `position_key` yang belum mengalir ke frontend sehingga pencocokan masih lewat nama posisi.",
       "kata_kunci": [
         "dashboard per posisi",
@@ -11729,7 +11728,7 @@
         "IT - Big Pictures"
       ],
       "hash": "314794f2d1bd6862a111246ed625d3fd0c8a97b8ef34b4fa11a5ab934f3c8b2b",
-      "ukuran_kb": 5.2,
+      "ukuran_kb": 5.3,
       "ringkasan": "Menjawab: apa saja yang bisa dilakukan tim IT di dalam ERP terhadap akun karyawan, yaitu mengaktifkan atau menonaktifkan akun, reset akun beserta pembersihan device (kebijakan satu akun satu perangkat), membaca dan menyetel system_roles, serta mengelola allow-list WiFi kantor untuk validasi clock-in. Juga menjawab kenapa penonaktifan akun bukan lagi jalur eksklusif IT setelah HR punya jalur catatan resign, bagaimana keduanya tetap memakai fungsi penulis yang sama, dan peran IT sebagai pengelola helpdesk serta monitoring login.",
       "kata_kunci": [
         "IT",
@@ -11812,7 +11811,7 @@
         "ROADMAP"
       ],
       "hash": "ced666362bb109558f6f9f67623821a82a0ee975f9a538765479eae2a0d46345",
-      "ukuran_kb": 12.6,
+      "ukuran_kb": 12.7,
       "ringkasan": "Menjawab: kenapa Form Builder dibuat, seberapa jauh scope yang dieksekusi berbeda dari rencana awalnya, dan keputusan produk apa saja yang menyertainya. Mencakup identitas responden yang ditampilkan penuh, skor gabungan yang berhenti di layar analisa, indeks layanan departemen beserta penyimpangan sadarnya, intersep presensi, arah RBAC per jabatan, dan daftar hal yang belum diputuskan.",
       "kata_kunci": [
         "form builder",
@@ -11912,7 +11911,7 @@
         "IT - Employee System"
       ],
       "hash": "f747154614e7d6de974a2261dc505e588b64ed2d2f64a1c967d5897cf7cd80f9",
-      "ukuran_kb": 2.3,
+      "ukuran_kb": 2.4,
       "ringkasan": "Menjawab: monitoring tools apa saja yang dipakai perusahaan, untuk memantau apa masing-masing, dan di mana mengaksesnya (Terrabit untuk internet dari ISP, Beszel untuk perangkat dan VM, Uptime Kuma untuk API service internal dan eksternal, Zabbix untuk bandwidth dan uplink). Memuat URL publik maupun alamat internal tempat tiap tool di-host beserta kredensial aplikasinya. Menyebut juga tools mana yang notifikasinya terhubung ke grup WhatsApp IT lewat webhook dan bahwa webhook itu bisa dinonaktifkan sesuai kebutuhan.",
       "kata_kunci": [
         "monitoring tools",
@@ -11979,7 +11978,7 @@
         "DEVELOPER GUIDE"
       ],
       "hash": "6d9647c7bd689945d31776c8e3ab6355dd808d9f4373370196dbd37517dd29dd",
-      "ukuran_kb": 8.0,
+      "ukuran_kb": 8.1,
       "ringkasan": "Menjawab: apa itu papan aktivitas developer (dev-activity-board) untuk organisasi GitHub bip-itteam-internal, angka apa saja yang ditampilkan per developer, per repo, dan per service bip-erp (commit, baris, PR merged, review, lead time, kepemilikan komponen), serta bagaimana angka itu dihitung (hanya branch integrasi, merge commit dan review PR sendiri tidak dihitung, semua waktu WIB, rollup dihitung ulang dari data mentah). Juga menjawab bagaimana ingest loop otonom dari mesin developer bekerja (POST /loop/ingest, HMAC-SHA256 dengan LOOP_INGEST_SECRET, opt-in via ~/.agent-kit/loop-ingest.json), cara menghidupkan dan mengukurnya di Cloudflare Workers lewat wrangler dan pnpm run deploy, serta apa saja batasan yang wajib disebut saat memakai angkanya (volume bukan mutu, waktu commit ditulis ulang oleh rebase/squash, tanpa autentikasi, tanpa panel admin).",
       "kata_kunci": [
         "papan aktivitas developer",
@@ -12020,7 +12019,7 @@
         "IT - Server, VMs and Databases"
       ],
       "hash": "9828fa1d35c0ccdce2e34b2462193683bb0ad31790c23406163bc2924f038750",
-      "ukuran_kb": 4.7,
+      "ukuran_kb": 4.8,
       "ringkasan": "Menjawab: langkah operasional apa yang harus dijalankan untuk skenario rutin IT, terutama menambah fitur, men-deploy tiap aplikasi, dan melakukan rollback saat rilis bermasalah. Berisi ringkasan alur deploy per aplikasi (bip-erp, erp-frontend, mybharata-app) beserta app dir dan pemicunya, dengan catatan mana yang sudah usang dan mana yang kini manual.",
       "kata_kunci": [
         "runbook",
@@ -12156,7 +12155,7 @@
         "CORE - IT Orchestrator"
       ],
       "hash": "e159dd152c3b226a7142f8f2a8ee8da3f51920d4c48e3ca5fce201479cff054d",
-      "ukuran_kb": 6.3,
+      "ukuran_kb": 6.4,
       "ringkasan": "Menjawab: temuan apa saja yang muncul dari audit otorisasi employee-service pada 30 Juli 2026, tingkat keparahannya, dan PR mana yang menutup masing-masing. Juga menjawab bagaimana lubangnya dibuktikan di produksi tanpa mengubah data, hasil forensik access log Nginx (nol permintaan ke rute rentan selain probe audit), sensus pemegang peran admin pusat dan modul it, serta alasan keputusan tidak melakukan reset password massal beserta dua batas kesimpulannya.",
       "kata_kunci": [
         "audit otorisasi",
@@ -12257,7 +12256,7 @@
         "HRIS - Leave Request"
       ],
       "hash": "e3f868b2499a68e7dd18b3ec9c779f3e11384d566c1ff41bd35a26aa95d103be",
-      "ukuran_kb": 4.5,
+      "ukuran_kb": 4.6,
       "ringkasan": "Menjawab: kenapa karyawan shift Produksi gagal clock-in dengan error 404 \"schedule not found\", apa akar masalah yang dicurigai (data company_work_schedule tidak sinkron dengan setup.go, atau schedule_id lama di entry attendance), dan langkah verifikasi/usulan fix yang direkomendasikan.",
       "kata_kunci": [
         "clock-in gagal",
@@ -12283,7 +12282,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "2cebb7f430e5ab49d3b890076c3c6942b69d31cc4da84d9d7d6eac9462bbbf09",
-      "ukuran_kb": 10.1,
+      "ukuran_kb": 10.4,
       "ringkasan": "Menjawab: apa isi permintaan kenaikan rate limit API Shopee (get_gms_item_performance, get_gms_campaign_performance) yang diajukan ke tim OpenAPI Shopee untuk sinkronisasi performa iklan, dan data penggunaan/contoh error apa yang dilampirkan sebagai bukti pendukung.",
       "kata_kunci": [
         "Shopee API",
@@ -12318,7 +12317,7 @@
         "WH - Fulfillment Flow & WMS Tinggarjaya"
       ],
       "hash": "bc1bdb534631682324dd8059af8297fb660f73df04c2239786008dd7f1fca731",
-      "ukuran_kb": 9.5,
+      "ukuran_kb": 9.7,
       "ringkasan": "Menjawab: apa isi dashboard untuk delapan posisi divisi Manufaktur (Warehouse Staff, Warehouse Leader, Admin Warehouse dua lokasi, Admin/Leader/Supervisor/Operator Production, PPIC), metrik KPI dan bobotnya, serta sumber data mana yang siap dipakai (manufacture_resi, fulfillment_orders, manufacture_stok, accurate_daily_returns). Menjelaskan kenapa divisi ini terbelah dua: sisi gudang bisa dibangun sekarang sementara 11 metrik sisi produksi terkunci koleksi Batch Record & Production Log yang kosong di produksi, penghambat yang sama dengan divisi Quality. Memuat peringatan salah petak yang harus diperiksa sebelum dipakai: OTIF PPIC dipetakan ke data iklan TikTok, factory utilization ke tracker BPOM/CAPA, dua metrik over-dispensing Warehouse Leader kembar berbobot 0,15 masing-masing, dan metrik bernama Kaizen di Leader Production yang sebenarnya mengukur CAPA dan kualitas SOP QC.",
       "kata_kunci": [
         "dashboard per posisi",
@@ -12515,7 +12514,7 @@
         "Manufacture - Issue Code Audit 2026-06"
       ],
       "hash": "465590d512d99f9e3dff92193e309599e6d6fffa28a20502a47e759f7c75e86c",
-      "ukuran_kb": 10.5,
+      "ukuran_kb": 10.6,
       "ringkasan": "Menjawab: apa itu Material Order (MO) di WMS, yaitu lembar SPK formula yang menurunkan kebutuhan tiap bahan dari BOM berdasarkan produk jadi dan target qty, siapa yang boleh membuatnya, dan bagaimana MO menjadi hulu rantai No. Batch menuju dokumen produksi batch dan Laporan Produksi. Menjelaskan bentuk data (target_qty, ingredients dengan qty_needed_total, no_batch_reference), ketiga endpoint GET/POST/DELETE beserta gerbang tab orders_po, dan mengapa MO tidak menyentuh stok. Memuat gap yang sudah terbukti: tak ada endpoint update, tak ada status/approval, nomor MO dan No. Batch dibuat acak di browser sehingga No. Batch kembar menyatu diam-diam di dropdown dossier, qty dihitung frontend tanpa dihitung ulang server, varian Formula 2 hanya jejak teks di keterangan, dan read-only Procurement belum bergerbang di backend.",
       "kata_kunci": [
         "material order",
@@ -12550,7 +12549,7 @@
         "Microservices - Manufacture Service"
       ],
       "hash": "eeef3e31a47dc8ac407d70531b2c84159360c0d2b025db9678c7596cf8710914",
-      "ukuran_kb": 1.9,
+      "ukuran_kb": 2.0,
       "ringkasan": "Menjawab: bagaimana alur order produksi di sisi Accurate digambarkan secara visual, mulai dari input target qty barang jadi, pembuatan Work Order, pembacaan BOM aktif, kalkulasi dan simulasi kebutuhan bahan, sampai rilis produksi final, dalam bentuk sumber diagram Mermaid. Menegaskan bahwa dokumen ini BUKAN dokumentasi menu Material Order (MO) di WMS, yang punya koleksi dan endpoint sendiri, karena dok ini sempat jadi sasaran wikilink beralias Material Order.",
       "kata_kunci": [
         "flowchart",
@@ -12631,7 +12630,7 @@
         "External - Accurate"
       ],
       "hash": "0b5bc0030e2cf153fff44d5ae28248be5d65190853bdd0e96cbe40db95d38853",
-      "ukuran_kb": 1.5,
+      "ukuran_kb": 1.6,
       "ringkasan": "Menjawab: bagaimana alur pengecekan stok fisik di gudang berjalan, dari hitung fisik, input item rusak/ED via MyBharata dengan foto, pindah ke gudang karantina, pencetakan berita acara, hingga penyesuaian inventaris di Accurate, dalam bentuk sumber diagram Mermaid.",
       "kata_kunci": [
         "stock opname",
@@ -12691,7 +12690,7 @@
         "HOMEPAGE"
       ],
       "hash": "bdaab1385d2f49bf409eb19c1384588024a8a2f28f02d0d652fe49de2e8ef01e",
-      "ukuran_kb": 2.4,
+      "ukuran_kb": 2.5,
       "ringkasan": "Menjawab: apa saja area fungsi Quality Assurance/Regulatory Affairs (QA/RA) farmasi yang perlu didokumentasikan untuk Bharata (kepatuhan CPOB, registrasi BPOM/izin edar, batch record & traceability, deviation & CAPA, ED & recall), dan bagian mana yang masih perlu diisi tim QA/RA dari SOP/sertifikat nyata.",
       "kata_kunci": [
         "QA",
@@ -12747,7 +12746,7 @@
         "REF - Glossary"
       ],
       "hash": "c36fde06eb46b9b7b2a427815658a589154602cc6cb74e8b77461506549a7a03",
-      "ukuran_kb": 1.4,
+      "ukuran_kb": 1.5,
       "ringkasan": "Stub kosong untuk QA - CPOB (GMP). Belum ada isi.",
       "kata_kunci": []
     },
@@ -12771,7 +12770,7 @@
         "Manufacture - Dashboard per Posisi"
       ],
       "hash": "057b8d345f3dfe77c1a990f7f4656f2fdeefde84409d24dcc3439d1e3786e420",
-      "ukuran_kb": 6.7,
+      "ukuran_kb": 6.8,
       "ringkasan": "Menjawab: apa isi dashboard yang layak dibuat untuk empat posisi divisi Quality (Quality Supervisor, QA Leader, QC Assistant, QC Production), metrik KPI mana yang sudah punya sumber data dan mana yang terkunci, serta visual apa yang sebaiknya ditampilkan per posisi. Menjelaskan bahwa dua penghambat mengunci 10 dari 18 metrik, yaitu koleksi Batch Record & Production Log yang ada di kode tapi kosong di produksi (kasus \"fitur ada, data nol\", bukan permintaan fitur) dan ketiadaan tracker audit internal/CAPA/izin BPOM. Memuat daftar kebutuhan backend terurut daya ungkit plus peringatan salah petak, misalnya metrik bernama \"Kaizen dan Growth\" milik QA Leader yang sebenarnya mengukur review SOP dan WI, bukan ide Kaizen.",
       "kata_kunci": [
         "dashboard per posisi",
@@ -13039,7 +13038,7 @@
         "RUN - Menambah Metrik KPI Otomatis"
       ],
       "hash": "a81fceac0d683a21cc730f1c8d28be52f7610efd99eee3e79dedf746d98306f9",
-      "ukuran_kb": 12.7,
+      "ukuran_kb": 12.8,
       "ringkasan": "Menjawab: posisi apa saja yang ada di tiap divisi, berapa metrik KPI yang benar-benar sudah otomatis di produksi versus yang masih dinilai manual, dan dokumen rancangan dashboard mana yang mengurus divisi tertentu. Menjawab juga penghambat mana yang mengunci paling banyak metrik lintas divisi (dan mana yang sebenarnya bukan pekerjaan kode melainkan keputusan pemilik KPI atau pengisian data), metrik mana yang salah petak sehingga sumbernya menjawab pertanyaan lain, serta posisi mana yang sengaja dinyatakan tidak direkomendasikan dibuatkan dashboard beserta syarat yang membalikkannya.",
       "kata_kunci": [
         "dashboard per posisi",
@@ -13353,7 +13352,7 @@
         "HOMEPAGE"
       ],
       "hash": "ef62dbfaa8910d6df3f6e07d49c2578ee672bfd1e7d3e62364487d3986ed2f01",
-      "ukuran_kb": 14.4,
+      "ukuran_kb": 14.5,
       "ringkasan": "Menjawab: departemen X didokumentasikan di dok vault mana, apa kunci modul (deptKeyToNames) dan kategori sidebar-nya, berapa karyawan dan template KPI-nya menurut sensus produksi, dan departemen mana yang belum punya dok induk beserta alasannya. Juga menjawab selisih nama Printing vs Percetakan dan akibatnya pada picker jadwal kerja serta pratinjau template KPI, dan kunci mana yang terdengar seperti departemen padahal bukan (kategori marketing, label HRGA).",
       "kata_kunci": [
         "peta departemen",
@@ -13523,7 +13522,7 @@
         "IT - SOP Dokumentasi Vault"
       ],
       "hash": "6b8e111e6a8b105e65ba933ec8b852adbdc40fc8eb8d9d6ccde05e00da4f6319",
-      "ukuran_kb": 15.1,
+      "ukuran_kb": 15.2,
       "ringkasan": "Menjawab: apakah vault punya PRD ERP dan di dokumen mana tiap dari delapan bagian PRD enterprise (Business Process, User Roles, Workflow Roles atau approval flow, Functional Modules, Security Requirements, Integration Requirements, Infrastructure Architecture, UAT dan Maintenance) sudah tertulis. Juga menjawab seberapa lengkap tiap bagian, gap mana yang masih terbuka (UAT formal, kebijakan keamanan terpusat, audit trail lintas modul), dan ke mana manajemen, auditor, atau vendor harus melompat untuk membaca proses bisnis, peran pengguna, alur persetujuan, keamanan, integrasi, dan infrastruktur tanpa membaca ratusan dok.",
       "kata_kunci": [
         "PRD",
@@ -13610,7 +13609,7 @@
         "HRIS - Roadmap"
       ],
       "hash": "1e7d1e6afc8f9d6bf35c0b151f395578f1c1f70f1898716aacd3994126bd5aad",
-      "ukuran_kb": 2.4,
+      "ukuran_kb": 2.5,
       "ringkasan": "Menjawab: apa arah dan prioritas pengembangan ERP Bharata, kandidat fitur atau service apa saja yang terdaftar (Recruitment, Form Builder, Contract Management, Budget Planner, Goal/OKR, CRM internal) dan dokumen sumber mana yang membahas tiap item. Juga menjawab item infra/teknis yang masih menggantung seperti shared-library standalone dan pemisahan `docker-compose` serta `.env` per service, plus pertanyaan bisnis yang menahan keputusan (ada tidaknya kanal B2B/wholesale, fungsi distribusi CDOB). Menjelaskan pula bahwa prioritas dan target tanggal ditetapkan Product Owner, dan backlog operasional harian disimpan di Dynamic Task Tracker, bukan di sini.",
       "kata_kunci": [
         "roadmap",
@@ -13760,7 +13759,7 @@
         "APP - Web ERP"
       ],
       "hash": "442dff81f3fa27020309fe26a33e9ef6a73192505d4dd15e6164300e2f121cfb",
-      "ukuran_kb": 3.4,
+      "ukuran_kb": 3.5,
       "ringkasan": "Menjawab: bagaimana cara men-deploy erp-frontend ke produksi sekarang setelah seluruh workflow GitHub Actions-nya dimatikan, memakai host, user SSH, dan app dir mana. Memuat perintah manualnya, gerbang verifikasi yang menolak docker ps sebagai bukti (mengharuskan kontrol negatif berupa string lama yang harus nol), langkah rollback, dan jebakan deploy-prod.yml yang masih menarget VM pensiun tanpa runner.",
       "kata_kunci": [
         "deploy",
@@ -13844,7 +13843,7 @@
         "APP - Dynamic Task Tracker"
       ],
       "hash": "12b6a9b98b02dbd0bb7748cf3bfadef0afdf502f30cb6125669a741c55fa95be",
-      "ukuran_kb": 8.3,
+      "ukuran_kb": 8.5,
       "ringkasan": "Menjawab bagaimana men-deploy service task-management bip-erp ke environment baru/produksi, env var kritikal yang wajib diisi (MONGO_TASK_MANAGEMENT_DB, TASK_MANAGEMENT_MODULE_URL, dll), cara migrasi data dari BE lama (mongodump/restore + normalisasi audit), setup WebSocket ingress dan RBAC 3-role, sampai tabel troubleshooting gejala-ke-akar-ke-fix.",
       "kata_kunci": [
         "task management",
@@ -13949,7 +13948,7 @@
         "RUN - Deploy Microservices bip-erp"
       ],
       "hash": "f633d40d8f3a76ae741c1f865e7e9853f8dba617a00ea8c53e98e847ebbb9998",
-      "ukuran_kb": 10.8,
+      "ukuran_kb": 10.9,
       "ringkasan": "Menjawab: bagaimana seorang manager menyambungkan Claude (Desktop atau claude.ai) ke vault arsitektur sebagai custom connector, apa saja yang harus diminta lebih dulu ke IT (URL, OAuth Client ID, Client Secret), dan bagaimana membuktikan sambungan itu benar-benar bisa membaca sekaligus menulis. Juga menjawab bagaimana IT memberi dan mencabut akses per employee_id lewat VAULT_MCP_ALLOWED_EMPLOYEES beserta perintah membuat ulang containernya, dan apa arti tiap pesan galat yang mungkin muncul (hanya diberi hak baca, alamat kembali tidak sah, data vault basi, perubahan belum terdorong, dokumen sedang disunting orang lain). Memuat cara mengukur ulang keadaan adopsi dari koleksi mcp_sessions.",
       "kata_kunci": [
         "menyambungkan Claude",
@@ -13984,7 +13983,7 @@
         "APP - Web ERP"
       ],
       "hash": "0115ceffe21b522769faac6e9286fe16c1737ff46d15d0f58ff2e9333c9cd7f0",
-      "ukuran_kb": 14.2,
+      "ukuran_kb": 14.0,
       "ringkasan": "Menjawab: bagaimana menerbitkan akun ERP untuk vendor, mitra, atau kontraktor tanpa menjadikannya karyawan, lalu memberinya akses ke modul tertentu. Menjelaskan cara memilih antara dua sumbu hak akses yang paling sering tertukar (Paket Hak vs Role Modul), cara memperpanjang dan menutup akses beserta batasnya, serta gejala umum saat vendor sudah dibuat tapi tetap tak bisa masuk.",
       "kata_kunci": [
         "akun eksternal",
@@ -14345,7 +14344,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "75c74ef49a435c174e48258fd67cd3d0fa6cb9dff17bc745fc4e9631fef56625",
-      "ukuran_kb": 12.5,
+      "ukuran_kb": 12.8,
       "ringkasan": "Menjawab rancangan tech-spec dashboard omnichannel multi-akun/multi-platform (TikTok/Shopee/Meta/Google Ads) termasuk stack backend-frontend, entity, masalah teknis yang harus diantisipasi (rate-limit API, token multi-akun, bulk upload, reliability DB), estimasi waktu development, dan draft ERD/flowchart.",
       "kata_kunci": [
         "dashboard omnichannel",
@@ -14920,7 +14919,7 @@
         "CORE - SSO Flow"
       ],
       "hash": "296e4f6e79ed0da1dc9f3cbfdba795fb09f2dc3aba1e13305403626aa762b046",
-      "ukuran_kb": 1.5,
+      "ukuran_kb": 1.6,
       "ringkasan": "Menjawab pertanyaan tentang bagaimana pipeline otomatis Ideamills mengubah temuan tren TikTok menjadi video iklan siap-kirim tanpa operator menyetir tiap langkah, apa itu titik persetujuan human-in-the-loop (HITL), dan apa bedanya dengan alur manual Veo/Ideamills yang sudah matang.",
       "kata_kunci": [
         "Ideamills",
@@ -14950,7 +14949,7 @@
         "CORE - API Master Gateway"
       ],
       "hash": "5f5cc1509cc11b8fd87067f91add113f2391a967e5e9760407524d23297c5b2a",
-      "ukuran_kb": 2.0,
+      "ukuran_kb": 2.1,
       "ringkasan": "Menjawab pertanyaan tentang latar belakang dan alasan dibangunnya Ideamills sebagai platform AI internal pembuat video iklan (kebutuhan konten yang mengandalkan editor manusia), alur manual dari foto produk sampai video, dan engine AI yang dipakai (Veo 3.1 Google/Gemini, bukan Sora).",
       "kata_kunci": [
         "Ideamills",
@@ -14978,7 +14977,7 @@
         "CORE - SSO Flow"
       ],
       "hash": "3abd840890a55dba27fddce02b56dc55eb93eca0c247d20dff5ebc5bdadcec92",
-      "ukuran_kb": 3.0,
+      "ukuran_kb": 3.1,
       "ringkasan": "Menjawab pertanyaan tentang bagaimana tim development ERP Bharata bekerja dari product backlog sampai rilis (peran Product Owner/Scrum Master/QA, alur sprint planning-daily-product increment), aturan branching feature-ke-dev-ke-main, dan kapan deploy otomatis ke production terjadi.",
       "kata_kunci": [
         "scrum",
@@ -15029,7 +15028,7 @@
         "Dok konsep/domain terkait"
       ],
       "hash": "f0fb25734b8bff8f1654579b9c3dc5d8fb16ad98f35dfea9be8d00dfd87112be",
-      "ukuran_kb": 2.2,
+      "ukuran_kb": 2.3,
       "ringkasan": "Menjawab pertanyaan tentang format standar dokumentasi service/implementasi untuk prefix Microservices-/CORE-/DB-/APP-/BASE-, termasuk bagian wajib apa saja (persona, endpoint yang sudah diimplementasikan, gap, dependensi) dan aturan grounded-in-code saat menulis dok baru.",
       "kata_kunci": [
         "template",
@@ -15055,7 +15054,7 @@
         "Dok implementasi / dok terkait"
       ],
       "hash": "91ba0ebe3c9eb74da2dfdb605c1b675a91601c1172d4ec47217eac54e6bd1d3b",
-      "ukuran_kb": 2.1,
+      "ukuran_kb": 2.2,
       "ringkasan": "Menjawab pertanyaan tentang format standar dokumentasi konsep/domain bisnis untuk prefix Sales-/HRIS-/GA-/WH-/Finance-/IT-, termasuk bagian latar belakang, ruang lingkup, persona/pengguna, dan cara menandai keputusan yang belum diambil (TBD).",
       "kata_kunci": [
         "template",
@@ -15078,7 +15077,7 @@
         "Dok terkait"
       ],
       "hash": "40c799d9ec208c390997dbff1398ff71b8b41e0388227a60d501acc17d615dd8",
-      "ukuran_kb": 1.1,
+      "ukuran_kb": 1.2,
       "ringkasan": "Menjawab pertanyaan tentang format log operasional (prefix LOG-, folder Logs) untuk korespondensi vendor, dump access-log, atau catatan insiden, dan kenapa jenis dokumen ini dikecualikan dari aturan grounded-in-code/status marker dokumentasi arsitektur biasa.",
       "kata_kunci": [
         "template",
@@ -15146,7 +15145,7 @@
       "publik": false,
       "tautan": [],
       "hash": "c100bf2ad004772bfea56f70b361ac788bef5371aa9cbf3fb8a0dcc675121539",
-      "ukuran_kb": 1.1,
+      "ukuran_kb": 1.2,
       "ringkasan": "Menjawab pertanyaan tentang format runbook operasional non-kode (prefix RUN-) seperti prosedur troubleshooting atau onboarding, mencakup bagian prasyarat, langkah konkret, cara verifikasi keberhasilan, dan langkah rollback bila gagal.",
       "kata_kunci": [
         "template",
@@ -15277,7 +15276,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "81a0ed93d2b020bd76c411be38e1f094e6015ea8e3a66f185a5a16729f9e4eb5",
-      "ukuran_kb": 0.4,
+      "ukuran_kb": 0.5,
       "ringkasan": "Menjawab pertanyaan singkat tentang sistem webhook yang menerima purchase order dari berbagai e-store dan meneruskannya ke Finance/Big Pictures untuk keperluan akuntansi.",
       "kata_kunci": [
         "CRM",
@@ -15310,7 +15309,7 @@
         "APP - Audit Internal"
       ],
       "hash": "997867a8b9cb4122f840b04984cb7913c431bca40f4dc2375cbb1885e0d58757",
-      "ukuran_kb": 8.8,
+      "ukuran_kb": 8.9,
       "ringkasan": "Menjawab: apakah tujuh posisi Kesekretariatan (QA RND, Internal Audit, Company Branding, Corporate Secretary, Graphic Design, Personal Assistant, Video Editor) layak dibuatkan dashboard, metrik KPI mana yang punya sumber data, dan metrik mana yang salah petak (mis. Internal Audit ke data absensi, Personal Assistant ke chat marketplace). Juga menjawab kebutuhan backend yang perlu dibangun lebih dulu, terurut dari daya ungkit tertinggi, seperti tracker garapan desain dan video, modul Audit Internal, dan tracker izin BPOM & Halal.",
       "kata_kunci": [
         "dashboard per posisi",
@@ -15352,7 +15351,7 @@
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi"
       ],
       "hash": "77e58b13332f4bfc463e5e177a75d82e5baafcd267f4343c5beb771e59659e80",
-      "ukuran_kb": 12.4,
+      "ukuran_kb": 12.5,
       "ringkasan": "Menjawab: jabatan apa saja di departemen Kesekretariatan (key secretary), modul sistem yang dipakai tiap jabatan (Legal, R&D Regulatory, Internal Audit, Ruang Direktur), dan dok detail mana yang memilikinya. Juga menjawab bagaimana katalog izin secretary.legal dan secretary.rnd, peran turunan dari jabatan, sidebar SEKRETARIAT, dan kesetaraan Corporate Secretary dengan Direktur dalam persetujuan bekerja, kenapa system_roles.secretary tidak membuka Legal maupun R&D, dan kenapa Legal serta R&D dilebur ke modul secretary.",
       "kata_kunci": [
         "Kesekretariatan",
@@ -15517,7 +15516,7 @@
         "APP - Web ERP"
       ],
       "hash": "c4637f8509f5c1a5a4144b1a335e575e34704efa5110b9829b98aa991eb3b130",
-      "ukuran_kb": 8.5,
+      "ukuran_kb": 8.4,
       "ringkasan": "Menjawab: apa rencana penyatuan menu-menu gudang yang kini terpecah per-tahap (Perlu Diproses, Antrian Pesanan, Pengambilan, Pengemasan, Riwayat Cetak Resi, Serah Terima) menjadi satu layar omnichannel \"Kelola Pesanan\" ala Desty tanpa mengubah backend, dan apa beda pratinjau Beta FE-only (data dummy, aksi mati) dengan menu produksi yang sudah wired ke endpoint nyata. Juga menjelaskan pemetaan tiap tab/sub-tab \"Siap Dikirim\" ke endpoint warehouse/integration, rencana mutasi bertahap fase 0-5 sampai cutover, gerbang dan nuansa yang wajib dipertahankan saat \"cuma ganti UI\" (gerbang rekon `exported_at`, kode packer T1/T2, guard TikTok `package_id` kosong, batch cap 100), persona pengguna dan RBAC-nya, serta hal yang belum diputuskan (tab Belum Dibayar, cakupan Sadewa, nasib menu lama).",
       "kata_kunci": [
         "Kelola Pesanan",
@@ -15545,7 +15544,7 @@
         "WH - Outbound (Sending)"
       ],
       "hash": "8365a24628641dea83f07ad14a6a161ee6c702c9567879f61e7c39535bc1516a",
-      "ukuran_kb": 1.5,
+      "ukuran_kb": 1.6,
       "ringkasan": "Menjawab pertanyaan tentang rencana konsep sistem manajemen gudang (dashboard stok, pencarian barang, pembuatan entri SKU/barcode baru) yang masih berupa contoh spreadsheet, beserta pertanyaan terbuka seperti siapa PIC sistem dan apakah dispatch order akan diimplementasikan.",
       "kata_kunci": [
         "warehouse management system",
@@ -15568,7 +15567,7 @@
         "WH - Management System"
       ],
       "hash": "e13f67baaf9fc6a8d1d5a00b741e8facc841de124d5dadbaab76361bc090ef67",
-      "ukuran_kb": 0.6,
+      "ukuran_kb": 0.7,
       "ringkasan": "Menjawab pertanyaan tentang rencana konsep logging barang outbound/pengiriman gudang (dashboard shipping, log barang keluar + status pengiriman) yang masih berupa contoh spreadsheet dan belum diimplementasikan sebagai sistem.",
       "kata_kunci": [
         "outbound",
@@ -15625,7 +15624,7 @@
         "REF - Kepemilikan Data"
       ],
       "hash": "2d00a49173147cbf736e56fdcc4db3764bcb76fbbc66bf2060cee3f89ea7e65a",
-      "ukuran_kb": 7.7,
+      "ukuran_kb": 7.8,
       "ringkasan": "Menjawab: pekerjaan apa saja yang harus dikerjakan untuk mewujudkan lembar Actual vs Planning MPP, dipecah jadi enam butir berurutan (jejak keluar bertanggal, master Divisi, perhitungan Actual per periode, rencana MPP bersumbu bulan, layar Aktual vs Rencana, pengisian data MPP 2026) beserta kriteria selesai tiap butir dan urutan yang mengikat di antaranya. Juga merekam keputusan teknis yang diambil saat mengerjakannya (metode rekonstruksi per orang, gerbang lintas tenant, rehire, seed divisi) dan apa yang sengaja ditaruh di luar lingkup.",
       "kata_kunci": [
         "MPP",
@@ -15653,7 +15652,7 @@
         "HRIS - Leave Request"
       ],
       "hash": "8008b26e46dfbb3b104acdddb6d4b5ad85d2c9803d8858732308915c345db075",
-      "ukuran_kb": 8.1,
+      "ukuran_kb": 8.2,
       "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk mewujudkan akrual cuti tahunan otomatis, dalam urutan mana, dan apa prasyarat tiap item. Memuat sepuluh task bergelombang mulai dari koersi tipe tanggal di employee-service dan koleksi vacation_ledger, resolver tanggal patokan, cron akrual harian, ringkasan ke work_data.vacation, pemotongan berbasis hari kerja di attendance-service, koreksi HR jadi entri ledger, layar Kelola Cuti, backfill, sampai verifikasi lewat gateway sebagai satu perjalanan orang. Juga mendaftar lima cacat yang jadi akar masalah, tiga TBD yang harus dijawab manusia (kontrak yang tidak nyambung dengan join_date, akun tanpa work_data, kuota dan used yang janggal), hal-hal yang belum diverifikasi sehingga tidak boleh diklaim, serta konsekuensi deploy (employee dan attendance naik bersama, MyBharata tidak perlu rilis).",
       "kata_kunci": [
         "akrual cuti tahunan",
@@ -15717,7 +15716,7 @@
         "Microservices - Employee Service"
       ],
       "hash": "2777e2c478f855fdda47125cd3477c4a889e25d6108b98d96592b9fcf7db432d",
-      "ukuran_kb": 13.8,
+      "ukuran_kb": 13.9,
       "ringkasan": "Menjawab: task apa saja yang menyusun antrean persetujuan terpusat /portal/persetujuan, apa urutan ketergantungannya, dan kenapa sebuah menu persetujuan per-modul belum boleh dicabut. Memuat keputusan produk bahwa sumber 'daftar modul' (Payroll, Rekrutmen, Pesanan ERP) hanya tampil bagi pemegang modulnya, serta hasil ukur bahwa payroll-runs dan requisition sudah digerbang di lapisan rute sehingga adapternya tak menunggu pekerjaan gerbang. Menjelaskan pula kenapa mencabut menu tidak sama dengan mencabut rute, dan mana dua entri menu Portal yang benar-benar ada.",
       "kata_kunci": [
         "antrean persetujuan",
@@ -15748,7 +15747,7 @@
         "Microservices - Marketing Analytics Service"
       ],
       "hash": "307c6529c8b1f01545aa6c24a8d85adc58610f4302026209a03d1f258a0d1292",
-      "ukuran_kb": 10.3,
+      "ukuran_kb": 10.5,
       "ringkasan": "Menjawab: apa saja item kerja Asisten Analisa Marketing, urutannya, dan apa yang memblokir apa — empat gerbang murah (G1 buka layar bersama pemilik permintaan, G2 satukan target ROAS, G3 pemilik daftar harga minimal, G4 kepemilikan data jadwal) lalu task T1 sampai T9 di tiga irisan. Menjelaskan alasan tiap task ada dan batasannya, mis. template mana yang boleh masuk katalog beserta yang dilarang karena datanya tak ada (diskon penggerus laba, CPA iklan TikTok, pola musiman, cohort, harga minimal), kewajiban penjalan tahan mati-hidup container tanpa kirim ganda, dan kategori inbox baru yang menuntut marketing-analytics + notification-service naik bersamaan. Memuat juga dua keputusan terbuka hasil pengerjaan: kiriman tanpa lingkup hanya terbaca Direktur, dan lingkup bukan kontrol kerahasiaan karena beberapa endpoint membalas angka seluruh perusahaan ke pemanggil tanpa peran modul.",
       "kata_kunci": [
         "asisten analisa marketing",
@@ -15778,7 +15777,7 @@
         "ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval"
       ],
       "hash": "8fabc7b5e30ec1c2e523f6013f74b2b6aba950e83c80a1e0af28d81116014e70",
-      "ukuran_kb": 7.6,
+      "ukuran_kb": 7.7,
       "ringkasan": "Menjawab: temuan kondisi di ruang bersama (mis. lorong) masuknya ke mana, siapa yang bisa dianggap bertanggung jawab, dan kenapa pertanyaan itu belum punya jawaban di model data mana pun. Menjelaskan bahwa penugasan area Office Boy berpindah dan tidak tersimpan di service mana pun sehingga tiga metrik KPI berbobot total 0,70 menilai kondisi ruang yang atribusinya ke perorangan tak bisa diperiksa, lalu mengusulkan arah 'ukur perbuatan bukan kondisi' sekaligus menegaskan bahwa perumusan ulang metrik adalah kewenangan pemilik KPI (HRD), bukan tim teknis. Memuat juga peta tiga jalur penyaluran temuan (Satgas per-PIC, Inspeksi Area, tiket Building Maintenance) yang belum punya aturan pemilihan, temuan K3 yang buntu tanpa alur tindak lanjut, dan hasil pengukuran produksi yang menunjukkan koleksi-koleksi terkait masih kosong.",
       "kata_kunci": [
         "atribusi temuan",
@@ -15845,7 +15844,7 @@
         "ADR - 0074 Audit Internal Dipisah jadi Service dan Aplikasi Sendiri"
       ],
       "hash": "f7c5c009bdd2c12ac6496fa1811067088f7c3f4a95a19ff7aafab3d8c3fb2a32",
-      "ukuran_kb": 11.1,
+      "ukuran_kb": 11.2,
       "ringkasan": "Papan kerja yang menjawab: task apa saja yang harus dikerjakan supaya auditor bisa melampirkan dokumen pembanding, urutan dan ketergantungannya, dan apa yang sudah selesai versus belum. Memecah pekerjaan jadi tiga fase: tempat menaruh bukti, penjalan untuk sebelas uji yang belum punya mesinnya, dan pembacaan otomatis yang belum boleh dimulai. Mencatat dua prasyarat di luar kode yang menahan verifikasi akhir, yaitu paket izin audit yang belum ditempel ke posisi mana pun dan aplikasi audit yang belum ter-deploy.",
       "kata_kunci": [
         "audit internal",
@@ -15884,7 +15883,7 @@
         "HRIS - Matriks KPI per Departemen"
       ],
       "hash": "40fc66504bd5b5de21edf67be51a27363c1192e5b09149a251ddca84b5dd90db",
-      "ukuran_kb": 8.8,
+      "ukuran_kb": 8.9,
       "ringkasan": "Menjawab: apa urutan pengerjaan keluarga dokumen dashboard per posisi, item mana yang tiket developer dan mana yang permintaan ke tim non-IT, serta apa daya ungkit tiap item. Memuat lima gelombang kerja mulai dari perbaikan metrik salah petak dan pemetaan 47 metrik yang belum bersumber (nol kode), membangun layar untuk data yang sudah ada, pengisian modul yang sudah jadi tapi kosong (Batch Record, Training, master anggaran), pembangunan modul baru, sampai integrasi baru. Menjelaskan juga apa yang sengaja tidak dikerjakan beserta alasannya, terutama Kaizen yang manual karena keputusan.",
       "kata_kunci": [
         "analisa dashboard per posisi",
@@ -15946,7 +15945,7 @@
         "IT - CI-CD"
       ],
       "hash": "c8000559f7aa56d9df947f7670819b969bc8d3dbf184815d6231727319b27eff",
-      "ukuran_kb": 11.3,
+      "ukuran_kb": 11.4,
       "ringkasan": "Papan kerja hasil /analisa-kebutuhan yang melacak status tiap task pembangunan gerbang repo dan papan sesi (T1 sampai T13) beserta bukti kontrol negatif tiap item; menjawab task mana yang sudah selesai, mana yang masih berupa PR terbuka, dan mana yang belum dikerjakan sama sekali.",
       "kata_kunci": [
         "analisa kebutuhan",
@@ -16117,7 +16116,7 @@
         "CORE - Kapabilitas AI dan Machine Learning"
       ],
       "hash": "64a74bd1d83535b09d62b5987730caeafa07bd3c79f1e700b0ef110fa18507fc",
-      "ukuran_kb": 10.4,
+      "ukuran_kb": 10.6,
       "ringkasan": "Menjawab: task apa saja untuk mewujudkan kapabilitas AI prediktif, mana yang berstatus gerbang, mana prasyarat pipeline, dan bagaimana dependensinya. Menjawab juga bahwa pembukaan accurate_daily_returns sudah selesai dan membalik putusan soal retur, serta dua gerbang bisnis baru sebelum prediksi paket COD gagal antar boleh dibangun, yaitu ongkos per paket yang gagal diantar dan tindakan yang tersedia bagi toko terhadap order COD berisiko.",
       "kata_kunci": [
         "daftar task",
@@ -16146,7 +16145,7 @@
         "HRIS - Disciplinary (Surat Peringatan)"
       ],
       "hash": "52682ff34e3c24c3db274374fd8d26770f8f31007899fedebbdc5a157b740da4",
-      "ukuran_kb": 5.7,
+      "ukuran_kb": 5.8,
       "ringkasan": "Papan kerja hasil /analisa-kebutuhan 2026-09-01 yang menjawab: tindak lanjut apa saja yang harus dikerjakan setelah audit kepatuhan, mana yang keputusan orang dan bukan task kode, serta urutan prioritasnya. Memuat sembilan task (T1 sampai T9): konfirmasi HRD soal pengali mangkir sehari (2 versus 1,5) yang memblokir perbaikan config produksi selagi payroll run masih draft, penerbitan ADR untuk dua penyimpangan sadar (ambang 4 jam uang makan dan SP1 yang hanya diusulkan), verifikasi ulang baris cuti dan ambang keterlambatan, klarifikasi perusahaan acuan payroll, sampai aturan lembur Pasal 25. Juga mencatat kenapa usulan MCP baca kode backend dan MCP baca data ERP tidak jadi dikerjakan.",
       "kata_kunci": [
         "analisa kebutuhan",
@@ -16171,7 +16170,7 @@
       "publik": false,
       "tautan": [],
       "hash": "cebceca148f8d5d931a6c59ec6e6365498df8a00bb89fb10dd7e7fa8c35d2d89",
-      "ukuran_kb": 17.7,
+      "ukuran_kb": 17.9,
       "ringkasan": "Menjawab: seberapa besar KPI HRGA (Human Resource, General Affair, dan dua posisi Procurement) yang benar-benar terhitung otomatis di production, sumber KPI apa yang terpasang di tiap posisi, dan apa yang menghambat sisanya. Memisahkan pekerjaan menurut siapa yang mengerjakan: golongan A belum ada kodenya (dev), golongan B kodenya sudah ada tetapi datanya kosong (HR dan GA, misalnya quiz_attempt dan training_plan_item yang nol sehingga metrik pelatihan tidak berbunyi), dan golongan C pemetaan yang belum diputuskan pemilik KPI tanpa satu baris kode. Juga memuat urutan pengerjaan bertingkat, koreksi atas dok vault yang sudah usang, dan jebakan pencarian yang terbukti menyesatkan saat mengukur. Papan kerja di Workspace, jadi dok yang terbit ke wiki dilarang menautkannya.",
       "kata_kunci": [
         "HRGA",
@@ -16272,7 +16271,7 @@
         "RUN - Menambah Metrik KPI Otomatis"
       ],
       "hash": "be81914a5fae6c6d81ff3a35d3044797cbdaa56787979933db52901decd468b2",
-      "ukuran_kb": 15.9,
+      "ukuran_kb": 16.0,
       "ringkasan": "Menjawab: apa yang sebenarnya dibutuhkan posisi Tax dari matriks KPI yang datang dari manajemen, kenapa modul Tax belum dibangun meski rancangannya sudah ada, dan dua keputusan pemilik metrik (input berstruktur vs unggah dokumen, serta pola tenggat per jenis pajak) yang menahannya. Berisi keadaan terukur di produksi per 2026-08-31 (isi koleksi anggaran_opex, realisasi_opex, accurate_ppn_masukan, dan ketiadaan penanda deductible), tiga koreksi terhadap vonis lama, masalah pada penamaan metrik templatenya sendiri, serta komponen yang bisa dipakai ulang dari calendar-service, form-builder, dan task-management. Papan kerja hasil /analisa-kebutuhan, bukan dokumen arsitektur.",
       "kata_kunci": [
         "KPI Tax",
@@ -16303,7 +16302,7 @@
         "ADR - 0077 Koreksi Faktur via Impor Rekap Lengkap Mengalir ke Master-Data, Bukan Override per Baris"
       ],
       "hash": "febdafe149d97951dcc11215ea118323b0e5742d22438af17b587063f9c845c1",
-      "ukuran_kb": 8.9,
+      "ukuran_kb": 9.1,
       "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk mengurangi siklus input retur gudang, mana yang berstatus gerbang, dan apa dependensinya. Memuat dua gerbang pengukuran produksi yang boleh membatalkan pelaksanaan, daftar kode yang belum sempat diverifikasi langsung karena kuota model habis, serta alasan tertulis kenapa verifikasi kas kecil, permintaan barang, dan pemetaan SKU sengaja tidak masuk papan ini.",
       "kata_kunci": [
         "daftar task",
@@ -16364,7 +16363,7 @@
         "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate"
       ],
       "hash": "6f6cd612dcf4fc4874ac136ac76efaa353f37d9b5ac0937a87fd6ffcdf63b8ff",
-      "ukuran_kb": 7.5,
+      "ukuran_kb": 7.6,
       "ringkasan": "Menjawab: apa saja yang sudah selesai dan apa yang masih menahan pemakaian modul audit internal di finance-service, sebagai papan kerja pendamping ADR 0073. Merinci gerbang kelayakan yang masih terbuka (probe jejak audit Accurate, matriks hak akses Accurate, rekening penerima di dokumen Bayar Uang), item backend dan layar yang sudah dikerjakan, serta utang dari review yang wajib selesai sebelum dipakai — dua endpoint `/internal/audit/*` di procurement dan employee, dan kontrak `SetelanSampel.Akun` yang didokumentasikan sebagai nama tetapi dipakai sebagai nomor. Juga memuat daftar verifikasi yang belum dijalankan (perjalanan utuh sebagai orang, kontrol negatif per uji, urutan deploy) dan hal-hal yang sengaja tidak masuk lingkup.",
       "kata_kunci": [
         "ANALISA",
@@ -16452,7 +16451,7 @@
       "publik": false,
       "tautan": [],
       "hash": "f71a435b6a65cf404eb26f960d784249da6cf68405a01b6930e90050d5d1cc17",
-      "ukuran_kb": 7.1,
+      "ukuran_kb": 7.2,
       "ringkasan": "Menjawab: apa saja task untuk membangun Preventive Maintenance berjadwal per aset, urutannya, dan mana yang saling bergantung (T0 sampai T8). Menjelaskan mana yang bukan pekerjaan dev (GA menyusun daftar perawatan per aset, dan pemasangan sumber ke template KPI), jebakan teknis tiap task seperti fungsi murni penurunan jatuh tempo, nama koleksi literal untuk penjaga soft-delete, dan balasan kosong yang bukan `null`. Juga menjawab urutan deploy, bukti verifikasi end-to-end yang diterima, ukuran keberhasilan berupa dokumen Google teknisi berhenti dipakai, serta apa yang sengaja di luar lingkup seperti metrik biaya dan patroli Security.",
       "kata_kunci": [
         "daftar task",
@@ -16540,7 +16539,7 @@
         "API - Integration Service"
       ],
       "hash": "15311d96ce19afd582bf5609ce8312b1a5433f1db782391b9b5f1d1bfe023c1f",
-      "ukuran_kb": 15.9,
+      "ukuran_kb": 15.8,
       "ringkasan": "Menjawab: bagaimana mekanisme ACL yang membatasi daftar toko marketplace yang boleh dilihat staf marketing (AllowedShops di endpoint GET /transactions/master/shops, integration-service) bekerja, kenapa sumber datanya bisa dipindah dari team_members/team_shops ke department_shops + work_data.department, dan bug apa yang sempat membuat staf non-marketing menerima daftar toko kosong. Mencatat status FINAL: redesign merge+deploy+live (PR #1727, 2026-09-05) DAN Fase Contract-nya SENDIRI SUDAH SELESAI (2026-09-15, bip-erp PR #1888 + erp-frontend PR #1579) — team_shops/team_members/menu Teams/CRUD-nya sudah dicabut fisik dari kode. Juga mencatat batas lingkup keputusan yang sengaja tidak diubah (gate rute RequireIntegrationStaff, exemption admin/supervisor integration).",
       "kata_kunci": [
         "AllowedShops",
@@ -16602,7 +16601,7 @@
         "ADR - 0116 Setelan Akun Marketplace Bergerbang dan Berjejak, Komponen Tak Dikenal Wajib Terlihat"
       ],
       "hash": "502459db9078ed7439df8748be1bfdda0af7c4bf4e9fbcd046d5f84fcb04c1cf",
-      "ukuran_kb": 8.0,
+      "ukuran_kb": 7.9,
       "ringkasan": "Menjawab: seberapa besar dampak dua masalah yang dilaporkan tiket finance \"Revisi Sistem Income\" (ongkir Shopee salah pos 3.870 pesanan senilai Rp96.826.227 dan masih bertambah sekitar Rp16 juta per bulan, versus kompensasi TikTok atas pesanan yang sudah cair 14 pesanan senilai Rp1.610.697, dengan 360 pesanan kompensasi yang sudah benar sebagai kontrol), kenapa Shopee didahulukan, dan apa urutan kerja T1 sampai T5 beserta mana yang eksekusi prod-nya dijalankan manusia. Juga memuat 10 pertanyaan terbuka untuk Finance/FAT yang menahan penerapan (akun tersendiri untuk baris Penyesuaian yang kini berbagi akun dengan Beban Admin E-Commerce 6112, pos yang benar untuk ongkir pengembalian barang, proteksi pengiriman Rp7,4 juta di 21.148 pesanan, 208 dokumen retur menggantung, 54 penyesuaian TikTok tanpa pesanan padanan) serta daftar utang di luar lingkup tiket. Menjelaskan pula cara mengukur ulang angkanya secara read-only di VPS Biznet lewat `docker exec Integration-MongoDB mongosh` dan kenapa `10.10.10.120` tidak boleh dipakai sebagai pembanding.",
       "kata_kunci": [
         "Revisi Sistem Income",
@@ -16632,7 +16631,7 @@
         "REF - Kepemilikan Data"
       ],
       "hash": "48096618767b8688ad592adb3139a2ab74498b5e42b61d661a2c6d1937b6b0cd",
-      "ukuran_kb": 11.9,
+      "ukuran_kb": 12.1,
       "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk mewujudkan halaman riwayat komplain produk terpusat (T1 sampai T8), mana yang bisa jalan paralel, dan mana yang prasyarat keras sebelum halamannya boleh tayang. Juga menjawab kenapa memasang paket izin `marketing_akuntoko_pemegang` jadi pekerjaan pertama, jebakan dua item posisi (`icc` vs `account_specialist`) yang membuat 33 orang mudah terlewat, cara menangani pemegang toko di luar kedua item itu, serta gerbang verifikasi tiap task.",
       "kata_kunci": [
         "komplain produk",
@@ -16695,7 +16694,7 @@
         "ADR - 0097 Kompensasi Shopee Susulan Ditahan dan Dicatat AR lewat Koreksi Manual ERP"
       ],
       "hash": "c3c9604eb087073c7190f74d54e79abfaa274cbfc39d49afe5e8595734c0b0c3",
-      "ukuran_kb": 9.7,
+      "ukuran_kb": 9.8,
       "ringkasan": "Menjawab: pekerjaan apa saja yang perlu dikerjakan untuk membenahi setelan akun marketplace, dalam urutan dan dependensi apa. Memuat sembilan task (mengukur pemakai layar Setelan Akun, gerbang peran dan validasi nilai pada rute kv-config, jejak perubahan laci, alur usul lalu setujui, larangan residual berbagi akun, daftar komponen belum berakun per marketplace, tampilan transaksi terdampak, i18n layar Config Accurate, pencatatan pemilik) lengkap dengan isi, test, dan cara verifikasinya. Menjawab juga prasyarat non-kode yang menunggu keputusan orang (akun tersendiri untuk residual dari SPV FAT, penetapan peran penyetuju, daftar komponen yang memang bukan biaya) dan urutan deploy yang mengikat.",
       "kata_kunci": [
         "daftar task",
@@ -16905,7 +16904,7 @@
       "publik": false,
       "tautan": [],
       "hash": "3d3e16a4db72e842c8b6dd75dad55f4bed07d65e0b779ae83407791ee597410c",
-      "ukuran_kb": 0.2,
+      "ukuran_kb": 0.3,
       "ringkasan": "Contoh/template daily note kosong di folder Inbox (tanggal 2026-06-25), tidak berisi catatan substantif, hanya ilustrasi format tangkap-cepat.",
       "kata_kunci": [
         "daily note",
@@ -17004,7 +17003,7 @@
       "publik": false,
       "tautan": [],
       "hash": "c5a93e790cb9a16f39a5b82c0bc97e8158edfa6103a11958e78b92b6222bd0e9",
-      "ukuran_kb": 26.6,
+      "ukuran_kb": 27.3,
       "ringkasan": "Menjawab: langkah rencana implementasi task-per-task (gaya TDD) untuk membuat backend bip-erp sadar-perusahaan sebagai fondasi multi-tenant tanpa mengubah perilaku BIP. Menjawab detail tiap task: helper common.CompanyID + konstanta header BIP-Company-ID, JWT membawa company_id, gateway meneruskan header, WorkData.CompanyID + login menstempel perusahaan, migrasi backfill company_id=BIP, master Company beserta CRUD, create-employee menyetel company_id, dan gerbang regresi. Berisi kode contoh, file target konkret, dan langkah commit.",
       "kata_kunci": [
         "rencana",
@@ -17031,7 +17030,7 @@
       "publik": false,
       "tautan": [],
       "hash": "fe78e3347ed1e433f4ccdd42988279b6c25196dc0a145ed0e280b9761b23617e",
-      "ukuran_kb": 15.2,
+      "ukuran_kb": 15.5,
       "ringkasan": "Menjawab: rencana implementasi task-per-task untuk menyaring seluruh data dan alur presensi per-perusahaan di attendance-service dan notification (prasyarat Rencana 1). Menjawab detail tiap task: tambah field company_id ke koleksi presensi, sync work_schedule membawa perusahaan, migrasi backfill BIP, helper pure companyFilter/withCompany, cap company_id saat create, saring /entries //today/mood/report/HR admin/review, cron sweeper per perusahaan, fingerprint dan wifi per perusahaan, notification anti-bocor lintas-tenant, plus gerbang isolasi dan regresi.",
       "kata_kunci": [
         "rencana",
@@ -17058,7 +17057,7 @@
       "publik": false,
       "tautan": [],
       "hash": "e75c926e10bf4081c378b92e07308e4e26fae6a13168a80f90029d86f7dde931",
-      "ukuran_kb": 8.1,
+      "ukuran_kb": 8.2,
       "ringkasan": "Menjawab: rencana implementasi task-per-task untuk membuat web HR (erp-frontend) sadar-perusahaan (prasyarat Rencana 1 dan 2, deploy BE sebelum FE). Menjawab detail tiap task: peran admin pusat + override ?company= di backend attendance, plumbing cookie company_id di FE, halaman Kelola Perusahaan (master tenant) meniru departments-manager, pemilih/switcher perusahaan untuk admin pusat, field Perusahaan di Buat Karyawan, dan verifikasi/regresi. Menyertakan file target, i18n dua bahasa, dan reuse komponen.",
       "kata_kunci": [
         "rencana",
@@ -17142,7 +17141,7 @@
         "WH - Warehouse Sadewa"
       ],
       "hash": "256b39d712a784b9ff443d528747ca065ab9eb8bbe91a08ffc13607cc07cb67a",
-      "ukuran_kb": 17.9,
+      "ukuran_kb": 17.7,
       "ringkasan": "Menjawab kenapa sidebar erp-frontend memicu request polling 30 detik ke endpoint warehouse/sadewa/accurate untuk semua karyawan tanpa peduli role atau halaman yang dibuka, dan rencana perbaikannya lewat gerbang enabled yang diturunkan dari menu yang benar-benar tampil. Memuat dua pembaruan 2026-08-29 yang menandai sebagian rencana ini usang lalu sebagian lagi sudah dikerjakan lewat jalan lain: branch fix/badge-sidebar-per-halaman memilih gerbang HALAMAN, sehingga Task 4 (kuartet refetch) gugur karena keduanya alternatif bukan pelengkap, Task 1 dan 3 turun prioritas, dan Task 5 tetap berdiri sendiri.",
       "kata_kunci": [
         "sidebar",
@@ -17171,7 +17170,7 @@
         "Finance - Incentive"
       ],
       "hash": "e150a02e68352ba0ef33372fde7717c199724978fc5a380e12428d8b7c0333db",
-      "ukuran_kb": 2.8,
+      "ukuran_kb": 2.9,
       "ringkasan": "Menjawab pertanyaan seputar apakah Finance Bridging App sebaiknya memakai platform omnichannel Desty (Mekari) atau tetap sistem internal untuk sinkronisasi sales, income, dan retur TikTok, lengkap dengan perbandingan mekanisme upload/sync sales antar kedua opsi. Juga menjawab pertimbangan awal investigasi rewrite Bridging App ke Golang.",
       "kata_kunci": [
         "Desty",
@@ -17201,7 +17200,7 @@
         "External - Accurate"
       ],
       "hash": "55d5c413e5401e1ecb96549673d6d5cb36737c5d80a964be96088eff62cbce95",
-      "ukuran_kb": 6.8,
+      "ukuran_kb": 7.0,
       "ringkasan": "Menjawab: dari mana sumber data untuk menghitung insentif tiap role marketing (SPV Marketing, ADV Leader, ADV Meta, ICC, Host Live, Affiliator, CRM), bagaimana rancangan arsitektur sistem insentif (gabung ke ERP, pakai MongoDB), dan parameter apa saja (profit, konversi, skor KPI, GMV, kualitas video) yang jadi dasar perhitungan. Juga menjawab pertimbangan memakai Desty omnichannel vs TikTok Dashboard sebagai sumber data insentif.",
       "kata_kunci": [
         "insentif",
@@ -17229,7 +17228,7 @@
         "MTG - 2026-06-27 Pertanyaan Klarifikasi HRD - Tukar Shift & Tukar Hari"
       ],
       "hash": "e1f4ac60f5f75e11c56ec90256b724617bbe8c7b59c8546071ded55eea55a9c5",
-      "ukuran_kb": 6.8,
+      "ukuran_kb": 6.9,
       "ringkasan": "Menjawab: siapa saja aktor (pemohon, rekan, atasan, HRD) dalam redesign fitur Tukar Jadwal Kerja, bagaimana alur persetujuan Tukar Shift (swap antar-rekan 3 langkah) dibanding Tukar Hari (unilateral tanpa rekan), dan skenario gagal/ditolak apa saja yang bisa terjadi di tiap langkah. Juga memuat daftar poin yang masih perlu diputuskan (TBD) seperti kesamaan lokasi rekan, coverage, dan minimum staffing.",
       "kata_kunci": [
         "tukar jadwal kerja",
@@ -17278,7 +17277,7 @@
         "HRIS - Tukar Jadwal Kerja"
       ],
       "hash": "af32a2fea58c6ae1282d6a6403a5144f475540d65852eaec0716ebf73bd3741b",
-      "ukuran_kb": 5.7,
+      "ukuran_kb": 5.8,
       "ringkasan": "Menjawab: bagaimana alur persetujuan koreksi presensi & tukar shift yang berjalan di kode saat ini (reviewer untuk karyawan biasa vs SPV vs staff/SPV HR), siapa yang boleh mengajukan tukar hari vs ganti jam shift, berapa batas hari mundur koreksi presensi, dan bagaimana penanganan koreksi/tukar shift yang melewati cutoff gaji. Juga menjawab aturan anti-fraud koreksi keterlambatan (guestbook) dan efeknya ke status kehadiran, sebagai bahan kunci kebijakan HRD.",
       "kata_kunci": [
         "koreksi presensi",
@@ -17337,7 +17336,7 @@
         "HRIS - Tukar Jadwal Kerja"
       ],
       "hash": "f731f32599de067c5cb740aad196683776ff2c3757be939ea005f8f29e4d5622",
-      "ukuran_kb": 3.5,
+      "ukuran_kb": 3.6,
       "ringkasan": "Menjawab: apa saja keputusan kebijakan HR terbaru (izin kantor vs pribadi yang potong gaji, pewarnaan status report cuti di web, auto-approve SPV HRD tahap-1, batas koreksi presensi 7 hari, tukar shift shift-only) beserta status penerapannya masing-masing di kode. Jadi rujukan untuk melacak follow-up teknis dari rapat kebijakan koreksi presensi & tukar shift sebelumnya.",
       "kata_kunci": [
         "keputusan HRD",
@@ -17394,7 +17393,7 @@
         "HRIS - Tukar Jadwal Kerja"
       ],
       "hash": "7f7fba38e30d4081a74e13ca189b543845aa6bc9b74798ee1a12688950a00dc9",
-      "ukuran_kb": 5.1,
+      "ukuran_kb": 5.2,
       "ringkasan": "Menjawab: apa perbedaan konsep Tukar Shift (swap antar-rekan dengan consent) dan Tukar Hari (unilateral tanpa pengganti) hasil klarifikasi HRD, siapa yang memilih rekan tukar, dan apakah pengajuan boleh dibatalkan setelah disetujui. Juga memuat daftar pertanyaan terbuka soal coverage/minimum staffing, swap lintas-role, dobel-shift, dan dampak ke tunjangan shift/payroll yang menentukan besar-kecilnya pekerjaan redesign.",
       "kata_kunci": [
         "tukar shift",
