@@ -32,6 +32,21 @@
 
 Seluruh rute membalas **503** berpesan bila Mongo belum tersambung (bukan panik). `/profit-dashboard` kini ikut membawa `cutoff_at` dan `final` dari integration (aditif); `final` sengaja tak dikirim bila integration tak menyebutnya.
 
+### Rute internal untuk payroll (⚠️ branch `feat/insentif-payroll-snapshot`, belum merged per 2026-09-25)
+
+[[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]] T4. Dipanggil payroll-service langsung (bukan lewat gateway), tapi `/internal/` tetap terjangkau lewat gateway ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]), jadi tiap rute digerbang **izin payroll** dari identitas yang diteruskan: `BIP-System-Roles` **dan** `BIP-Permissions` (payroll meneruskan keduanya; tanpa yang kedua, pemegang paket "Payroll: Penyetuju" tanpa admin HR ditolak di sini walau lolos publish).
+
+| Method | Path | Gerbang | Fungsi |
+|---|---|---|---|
+| GET | `/internal/snapshot/layak-klaim?employee_ids=` | `payroll.work` | Snapshot `disetujui`, aktif, **belum diklaim**, dalam bentuk **sempit** (`SnapshotLayakKlaim`: id, employee_id, insentif, periode, level, entity_name). ⛔ **Tanpa `rincian`**: rincian memuat biaya_gaji dan komponen profit per orang |
+| POST | `/internal/snapshot/klaim` | `payroll.work` | Body `{run_id, snapshot_ids}`. Klaim atomik per snapshot (`diklaim_run_id`), idempoten untuk run yang sama, **all-or-nothing**: satu gagal → yang baru diklaim di panggilan itu dilepas lagi, 409 `{data:{gagal[]}}` |
+| POST | `/internal/snapshot/lepas-klaim` | `payroll.work` | Body `{run_id}`. Melepas klaim run itu (dipanggil saat draft impor dihapus). Idempoten |
+| POST | `/internal/snapshot/tandai-terbayar` | `payroll.approve` | Body `{run_id, snapshot_ids}`. `disetujui` → `terbayar` **hanya bila diklaim run itu sendiri**; idempoten untuk run yang sama; yang lain dilaporkan per snapshot (409) |
+
+⛔ **Snapshot yang sedang diklaim run payroll tidak bisa dibatalkan** (`POST /profit/snapshot/:id/batalkan` → 409 menyebut run-nya; hapus draft impor dulu). Syaratnya ada di filter tulis atomik, bukan hanya di pemeriksaan sebelumnya. Inilah penjaga utama bayar ganda: tanpa itu S1 bisa dibatalkan setelah diklaim, S2 dibekukan ulang untuk orang dan periode yang sama, lalu keduanya terbayar. Field baru di snapshot: `diklaim_run_id`, `diklaim_pada` (omitempty).
+
+⚠️ **Klaim yatim** mungkin tertinggal bila payroll mati tepat di antara klaim dan penghapusan run draft yang gagal. Snapshotnya lalu tak muncul di `layak-klaim` dan tak bisa dibatalkan; pelepasannya lewat `lepas-klaim` dengan `run_id` itu (belum ada tombol di layar).
+
 > Sumber angka: komponen profit & beban non-gaji dari [[API - Integration Service]] (`/profit/incentive/summary`, `/profit/incentive/opex`), beban karyawan dari payroll-service `GET /employer-cost`.
 
 > ⚠️ **`mode=bergeser` — dua angka profit yang sah berbeda.** Bawaan (tanpa parameter) memakai aturan insentif: order yang uangnya cair setelah tanggal 25 bulan berikutnya HANGUS. `mode=bergeser` memasukkannya ke periode berikutnya, dan itulah yang diminta adaptor KPI `insentif_profit` — insentif membayar periode yang sudah tertutup, KPI menilai kerja yang hasilnya baru cair terlambat. Terukur prod 2026-08-27: selisihnya +0,151% (Juli) dan +0,093% (Agustus). **Mode ikut kunci cache**; dua mode berbagi kunci akan membuat dashboard insentif menampilkan angka bergeser. Pre-warm menghangatkan KEDUA mode — tanpa itu panggilan KPI pertama memicu komputasi dingin ~2 menit lalu habis waktu di gateway. PR #1503, merged 2026-08-28.

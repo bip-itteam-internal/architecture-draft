@@ -387,26 +387,27 @@
         "ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya",
         "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
         "CORE - RBAC dan Permission Set",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "API - Integration Service",
         "IT - Background Jobs & Schedulers",
         "HRIS - Key Performance Index",
         "Finance - Incentive",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "8b758e6bcb0025946b27bd69fb8a401e7905e9015f11e269c8e33bd1447a1094",
-      "ukuran_kb": 12.0,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan insentive-service (profit-dashboard, insentif saya, keanggotaan level, target, opex, snapshot bekukan/setujui), parameter dan bentuk balasannya, serta kode status galatnya. Juga menjelaskan siapa yang boleh menulis target profit, kapan cache dashboard dibuang, dan rute warisan skema KPI-multiplier mana yang sekarang menolak.",
+      "hash": "44b29dc22c57318694db3d087c27cade880e9d6fa3d4f5e51d903ee31fa23101",
+      "ukuran_kb": 14.4,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki insentive-service untuk skema insentif profit (dashboard per level, insentif milik sendiri, keanggotaan level, struktur tim, target, opex), siapa yang boleh menulis target dan apa arti status 400/403/409/503-nya. Juga menjelaskan rute snapshot bekukan dan setujui Finance, rute internal untuk payroll, serta rute warisan skema KPI-multiplier yang kini menolak.",
       "kata_kunci": [
         "insentif",
         "incentive",
-        "insentive-service",
         "profit-dashboard",
+        "insentif saya",
         "target profit",
+        "opex",
         "snapshot insentif",
         "bekukan setujui",
-        "opex",
-        "endpoint API",
-        "ICC leader supervisor"
+        "freeze approve",
+        "ICC Leader Supervisor"
       ]
     },
     {
@@ -692,6 +693,8 @@
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "CORE - API Master Gateway",
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
+        "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
+        "API - Insentive Service",
         "Microservices - Employee Service",
         "Microservices - Calendar Service",
         "Finance - Buku Besar CV",
@@ -700,20 +703,20 @@
         "Microservices - Attendance Service",
         "Microservices - Insentive Service"
       ],
-      "hash": "ac5f0f389b8dd0ec257f2da53c3aa2c6d669821a20d5efa4257180da22ee052a",
-      "ukuran_kb": 17.4,
-      "ringkasan": "Menjawab: endpoint apa saja yang ada di payroll-service untuk konfigurasi (BPJS, PPh21 TER, potongan kehadiran), master komponen gaji dan badan usaha, penetapan gaji per karyawan, payroll run bulanan dan THR, impor run, slip self-service, serta rute internal. Juga menjawab izin permission-set mana (`payroll.view`, `manage`, `work`, `approve`, `salary.write`) yang menggerbang tiap rute beserta fallback tier HR, dan kenapa publish menahan periode ganda. Menunjuk aturan Peraturan Perusahaan yang wajib dibaca sebelum mengubah angka potongan.",
+      "hash": "936586b33bdaa602bd8606986728ad23e238ed9d10a70192429944c64cd878cd",
+      "ukuran_kb": 19.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan payroll-service (konfigurasi BPJS/pajak/potongan kehadiran, badan usaha, komponen gaji, gaji per karyawan, payroll run dan THR, impor run, slip self-service, rute internal) dan izin RBAC permission-set mana yang menggerbang tiap rute. Juga menjawab kenapa payroll.salary.write dipisah, bagaimana penjaga periode ganda saat publish bekerja, dan kenapa /employer-cost tanpa gate.",
       "kata_kunci": [
-        "payroll-service",
+        "payroll",
         "penggajian",
-        "payroll run",
         "slip gaji",
-        "payslip",
+        "payroll run",
         "THR",
         "BPJS",
-        "PPh21",
-        "komponen gaji",
-        "salary"
+        "PPh21 TER",
+        "employer-cost",
+        "permission-set",
+        "impor payroll"
       ]
     },
     {
@@ -2483,9 +2486,9 @@
         "Sales - Incentive",
         "HRIS - Key Performance Index"
       ],
-      "hash": "4f9918783e10200ea2f659dcf4373c7447891b274bb233ccb43bb88e37b7ca62",
-      "ukuran_kb": 24.2,
-      "ringkasan": "Menjawab: bagaimana insentive-service menghitung insentif marketing berbasis profit (rumus profit, tangga tarif, gerbang retur 7%), dari mana komponen profit, beban gaji, dan opex diambil, serta bagaimana Leader dan Supervisor diturunkan dari hierarki HRIS. Juga menjelaskan cache dashboard dan pembuangannya, dua jendela periode (hangus vs bergeser untuk KPI), dan apa yang masih menahan angka dipakai membayar.",
+      "hash": "9d5498ec1ef7bf6761d499fd893da384e533f8925c768aced66ed198e459e628",
+      "ukuran_kb": 24.6,
+      "ringkasan": "Menjawab: bagaimana insentif marketing dihitung dengan skema profit-based (rumus profit, tangga tarif, gerbang retur 7%, target turun Supervisor ke Leader ke ICC), dari mana service mengambil komponen profit, beban gaji, dan opex, serta bagaimana cache dashboard dan pembuangannya bekerja. Juga menjelaskan dua jendela periode (insentif menghanguskan, KPI menggeser), hierarki Leader/Supervisor dari HRIS, dan apa yang masih menahan angkanya dipakai membayar.",
       "kata_kunci": [
         "insentif",
         "incentive",
@@ -2493,10 +2496,10 @@
         "profit-based",
         "tarif insentif",
         "gerbang retur",
+        "target profit",
         "cache dashboard",
         "hierarki HRIS",
-        "biaya operasional",
-        "opex"
+        "SK insentif"
       ]
     },
     {
@@ -2925,18 +2928,18 @@
         "ADR - 0002 Database-per-Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "ad76ecfe76d1198f2a12dfd7ccea71aaea51cac418600d3b7fab2c2061c3b404",
-      "ukuran_kb": 60.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki payroll-service (config BPJS/pajak/potongan kehadiran, master badan usaha, komponen gaji, gaji per karyawan, payroll run, THR, slip PDF, impor run dari sheet HRD), bagaimana engine menghitung PPh21 TER, BPJS, dan potongan kehadiran, serta di mana aturan bisnisnya bersumber. Juga menjelaskan model data payroll_db, batasan multi-perusahaan, kondisi pemakaian di produksi, dan dependensi ke service lain.",
+      "hash": "e21b1559677362ef5d0812404a88e5bf71de98b5630c87e6c8f555bcfb777dff",
+      "ukuran_kb": 61.3,
+      "ringkasan": "Menjawab: apa cakupan payroll-service (komponen gaji, BPJS, PPh21 TER, penetapan gaji, payroll run, THR, PDF slip, impor dari spreadsheet HRD), bagaimana potongan kehadiran, periode kehadiran, lingkup run, dan pembulatan BPJS dihitung, serta bagaimana badan usaha penggaji disematkan ke slip. Juga menjawab di mana aturan bisnis sumbernya (BUSINESS_LOGIC_IMPLEMENTATION.md di repo mobile) dan bagaimana kondisi pemakaiannya di produksi.",
       "kata_kunci": [
         "payroll",
         "penggajian",
+        "gaji",
         "slip gaji",
-        "payslip",
-        "payroll run",
-        "PPh21 TER",
-        "BPJS",
+        "komponen gaji",
         "potongan kehadiran",
+        "BPJS",
+        "PPh21",
         "THR",
         "badan usaha"
       ]
@@ -7868,7 +7871,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, disetujui pemilik produk 2026-09-25 lewat percakapan `/analisa-kebutuhan`. **T1 (snapshot + persetujuan Finance) merged** (bip-erp PR #2062, 2026-09-25), **live DEV**, prod belum; kontraknya di [[API - Insentive Service]]. T2 sampai T8 belum. Daftar task: `Workspace/ANALISA - Insentif Dibayar lewat Slip Gaji.md` (papan kerja, bukan dok terbit).",
+      "status_teks": "**Diusulkan**, disetujui pemilik produk 2026-09-25 lewat percakapan `/analisa-kebutuhan`. **T1 (snapshot + persetujuan Finance) merged** (bip-erp PR #2062, 2026-09-25), **live DEV**, prod belum; kontraknya di [[API - Insentive Service]]. **T3 (komponen Insentif) merged** (PR #2073), live DEV. **T4 (impor dicocokkan snapshot + klaim + tanda terbayar) di kode, belum merged** (branch `feat/insentif-payroll-snapshot`). T2, T5 sampai T8 belum. Daftar task: `Workspace/ANALISA - Insentif Dibayar lewat Slip Gaji.md` (papan kerja, bukan dok terbit).",
       "publik": true,
       "tautan": [
         "Finance - Proses Insentif",
@@ -7879,6 +7882,7 @@
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
         "Finance - Incentive",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "API - Payroll Service",
         "Microservices - Payroll Service",
         "Finance - Proses Gaji dan Iuran BPJS",
         "Finance - Proses Pajak",
@@ -7887,9 +7891,9 @@
         "HRIS - Payroll",
         "HRIS - Payroll Persona"
       ],
-      "hash": "badb49fa0df6ad3d957c6ef957e3908fbb642ea10359907cb7abe1d8b65bfa53",
-      "ukuran_kb": 17.6,
-      "ringkasan": "Menjawab: bagaimana insentif profit marketing dibayarkan lewat slip gaji, kenapa komponen Insentif dipisah dari Bonus, dan kenapa snapshot yang dibekukan dan disetujui Finance menjadi satu-satunya sumber angka bayar. Juga menjelaskan siapa penyetujunya (Finance, tidak boleh menyetujui insentif sendiri), kenapa Insentif tak boleh ada di master gaji, perlakuan pajak/BPJS, waktu bayar, dan amandemen ADR 0081.",
+      "hash": "e7739cff5b1dc390a9b3499f4a56c7e92753d92af527c1f0bd1cee541ab98f6a",
+      "ukuran_kb": 18.7,
+      "ringkasan": "Menjawab: bagaimana insentif profit marketing dibayar (lewat slip gaji sebagai komponen Insentif terpisah dari Bonus), kenapa snapshot yang dibekukan dan disetujui Finance menjadi satu-satunya sumber angka bayar, dan kenapa penerima tak boleh menyetujui insentifnya sendiri. Juga menjawab kenapa komponen Insentif dilarang di master gaji (melingkar ke employer-cost), bagaimana perlakuan pajak/BPJS dan waktu bayar, serta amandemen ADR 0081.",
       "kata_kunci": [
         "ADR 0125",
         "insentif slip gaji",
@@ -7899,8 +7903,8 @@
         "approval",
         "komponen Insentif",
         "Bonus",
-        "payroll",
-        "PPh 21 BPJS"
+        "bayar sekali",
+        "employer-cost"
       ]
     },
     {
@@ -8685,20 +8689,20 @@
         "Finance - Sambungan dan Permintaan Data Lintas Departemen",
         "Microservices - Insentive Service"
       ],
-      "hash": "3e2cb56b03717742c211aa04d041518cd7376d1d27dac97948d9988dad7dbf08",
-      "ukuran_kb": 8.4,
-      "ringkasan": "Menjawab: bagaimana proses insentif berbasis profit (P12) berjalan di Finance hari ini dan di ERP, apa rumus dan periodenya secara ringkas, siapa menetapkan target, bagaimana alur target sampai insentif masuk slip gaji, serta celah dan kontrol wajibnya. Juga memuat ukuran efisiensi dan keputusan terbuka seperti HPP, PPN, dan jadwal bayar.",
+      "hash": "821e8e99cf1dbfe0c4458c3352150a8e80e7165902f3eec288259758cc78ea88",
+      "ukuran_kb": 8.6,
+      "ringkasan": "Menjawab: bagaimana proses insentif profit (P12) berjalan dari sisi Finance, apa yang sudah ada di ERP (rumus, opex, target satu pintu, periode, akses layar), dan bagaimana alur dari target sampai snapshot disetujui lalu dibayar lewat slip gaji. Juga menjawab celah yang masih terbuka (atribusi toko, beban non-gaji, target Leader, keputusan pajak), kontrol wajib, dan ukuran efisiensinya.",
       "kata_kunci": [
         "proses insentif",
-        "incentive",
+        "incentive process",
         "P12",
+        "Finance",
         "target profit",
-        "Dashboard Insentif",
-        "Master Target",
-        "ICC",
-        "Account Specialist",
+        "persetujuan insentif",
+        "celah",
         "kontrol",
-        "Finance"
+        "Cost Control",
+        "slip gaji"
       ]
     },
     {
@@ -16071,18 +16075,18 @@
         "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
         "Finance - Proses Insentif"
       ],
-      "hash": "ce0bbbfc62f8725b463af6e0f81c6dbbcca90405925c58dc74c5be32c50816db",
-      "ukuran_kb": 7.2,
-      "ringkasan": "Menjawab: task apa saja (T1 sampai T8) untuk membayar insentif lewat slip gaji sesuai ADR 0125, urutan dan dependensinya, serta konfirmasi apa yang masih ditunggu dari Finance, HR, dan pemilik produk. Juga mencatat pekerjaan terpisah seperti pencabutan peran insentive, rute legacy tanpa gerbang, dan ketidaksinkronan gerbang FE vs BE dashboard.",
+      "hash": "d5a3faf2b96428173939f2c832bd789148c549f803aae1f83bdbf21e46d031b0",
+      "ukuran_kb": 7.7,
+      "ringkasan": "Menjawab: task apa saja (T1 sampai T8) untuk menjalankan ADR 0125 insentif dibayar lewat slip gaji, urutan dan dependensinya, serta konfirmasi bisnis apa yang masih ditunggu dari Finance, HR, dan pemilik produk. Juga mencatat pekerjaan terpisah seperti pencabutan peran system_roles.insentive, rute legacy insentive tanpa gerbang peran, dan ketidaksinkronan gerbang FE vs BE.",
       "kata_kunci": [
-        "analisa kebutuhan",
-        "insentif slip gaji",
-        "incentive payroll",
-        "daftar task",
+        "analisa insentif",
+        "task insentif payroll",
         "snapshot insentif",
         "komponen Insentif",
+        "impor payroll",
+        "tanda terbayar",
         "peran insentive",
-        "konfirmasi Finance",
+        "pencocokan Finance",
         "ADR 0125"
       ]
     },
