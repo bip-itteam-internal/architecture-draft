@@ -177,26 +177,33 @@ laporan membawa keputusan "lakukan X", bukan narasi, dan **tidak lagi menunggu T
 Direktur, menggantikan ADR 0120 §7). Urutan di bawah sengaja menaruh semua yang TANPA AI lebih
 dulu: kelayakan tindakan adalah kode, dan kodenya bisa diuji tanpa satu panggilan model pun.
 
-## T7 — Ukur laporan produksi dan jadwal aktif (gerbang)
+## T7 — Ukur laporan produksi dan isi DB marketing (gerbang)
 
-**Status**: belum · **Dependensi**: tidak ada · **Dikerjakan**: manusia
+**Status**: ✅ 2026-09-25 · **Hasil**: tabel di ADR 0127 §Context
 
-Jalankan `.task-plans/cek-hasil-analisa-prod.ps1` (baca-saja; baca prod ditolak dari sesi agent).
-Hasilnya menjawab dua hal yang belum terukur: isi laporan sungguhan per template, dan jumlah
-kiriman per pekan (dasar hitung ongkos). Bila ternyata nol jadwal aktif, catat, karena §9 ADR 0127
-lalu tak akan pernah punya data.
-
+Terukur baca-saja (`.task-plans/cek-db-marketing-prod.js`, `cek-db-marketing-cakupan-prod.js`):
+3 jadwal aktif (dua mingguan, satu bulanan), 3 baris `hasil_analisa`, seluruhnya
+`ringkasan_laba` berstatus `menunggu`. ⛔ **Kiriman mingguan 2026-09-25 memuat lima analisa tetapi
+hanya menyimpan `ringkasan_laba`, berperiode 2 hari, dan tanpa baris "Keputusan:"** — prod
+tertinggal dari `origin/main` (#2067/#2075/#2080). Cocokkan ke umur image lewat skill
+`deploy-bip-erp` sebelum T10; keputusan AI di atas build lama tidak punya empat analisa lainnya.
 ## T8 — Katalog tindakan dan kelayakannya, TANPA AI
 
 **Status**: belum · **Dependensi**: tidak ada · **Repo**: bip-erp
 
-Enam tindakan dan syarat kelayakannya persis tabel ADR 0127 §3, dihitung dari ember yang sudah
+Sepuluh tindakan dan syarat kelayakannya persis tabel ADR 0127 §3, dihitung dari ember yang sudah
 ada (`klasifikasiVideoBoros`, `pilihPenggerus`/`pilihPeluang`, kelompok Account Specialist, vonis
-`susunKeputusan`), **jangan** ditulis ulang. Keluarannya: per kiriman, himpunan (sasaran id,
-tindakan layak, keyakinan). Fungsi murni + uji tabel. Wajib ada uji negatif untuk dua larangan
-keras: `hentikan_iklan` dari ember "belum diketahui" dan dari laba `belum_matang` → tidak layak.
-`kurangi_belanja`/`naikkan_belanja` dimatikan lewat satu saklar sampai G2 diputuskan.
+`susunKeputusan`), **jangan** ditulis ulang. Dua tindakan kebersihan data (`lengkapi_hpp`,
+`tetapkan_penanggung_jawab`) bersumber dari fakta yang hari ini hanya hidup sebagai teks catatan
+sync profit: jadikan terstruktur di sumbernya, jangan mengurai teksnya. Keluarannya: per
+kiriman, himpunan (sasaran id, tindakan layak, keyakinan). Fungsi murni + uji tabel. Uji negatif
+wajib: `hentikan_iklan` dari ember "belum diketahui", dari laba `belum_matang`, dari level `ad`
+TikTok, dan untuk Lazada → tidak layak. `kurangi_belanja`/`naikkan_belanja` dimatikan lewat satu
+saklar sampai G2 ditegaskan.
 
+**Jendela matang (ADR 0127 §3a)**: ukur dulu dari `mart_profit_attribution` berapa hari mundur
+yang dibutuhkan sampai porsi settlement cair memadai, lalu pakai angka terukur itu. Uji: jendela
+laporan 2 hari dengan 0% cair tidak pernah menerbitkan keputusan laba.
 ## T9 — Skema keluaran dan validator
 
 **Status**: belum · **Dependensi**: T8 · **Repo**: bip-erp

@@ -10,8 +10,8 @@ tak terbaca VAULT-INDEX.json. %%
 
 **Apa yang berubah di layar.** Laporan terjadwal Marketing tidak lagi berhenti di angka dan
 kalimat "perlu ditinjau". Di bagian atasnya muncul daftar keputusan yang sudah diurutkan, misalnya
-"Hentikan iklan video C", "Kurangi belanja toko A", "Naikkan belanja produk B", atau "Periksa
-data toko D". Tiap keputusan menyebut alasannya dan seberapa kuat dasarnya. Penerima cukup
+"Hentikan iklan video C", "Kurangi belanja toko A", "Naikkan belanja produk B", "Lengkapi
+harga pokok produk E", atau "Perbaiki kecepatan balas chat toko F". Tiap keputusan menyebut alasannya dan seberapa kuat dasarnya. Penerima cukup
 menandai tiap keputusan **dijalankan** atau **ditolak**.
 
 **Siapa yang terdampak.** Penerima laporan terjadwal yang sudah ada: pemegang toko, supervisor
@@ -24,10 +24,14 @@ tim marketing, leader iklan, dan Direktur. Tidak ada penerima baru.
   delapan bulan terakhir menunjukkan belanja iklan hanya menjelaskan sekitar seperempat dari
   naik-turunnya laba, jadi angka "naikkan Rp X" tidak punya dasar yang bisa dipertahankan.
   Keputusan "naikkan belanja" selalu ditandai **dasar terbatas**.
-- Laba yang belum matang **tidak pernah** menjadi dasar keputusan "hentikan". Minus ratusan juta
-  pada periode pendek sering berarti uangnya belum cair, bukan rugi.
-- Keputusan "kurangi" dan "naikkan" belanja **belum bisa terbit** sampai manajemen menetapkan
-  **satu** angka target ROAS. Hari ini beredar dua angka (4,5 di dashboard, 3,2 di KPI Leader).
+- Laba yang belum matang **tidak pernah** menjadi dasar keputusan apa pun. Laporan 25 September
+  mencetak laba minus Rp212 juta untuk dua hari, padahal uang yang sudah cair saat itu **nol
+  persen**: itu belum matang, bukan rugi. Karena itu keputusan soal laba selalu memakai periode
+  yang uangnya sudah cair, bukan beberapa hari terakhir.
+- Keputusan "kurangi" dan "naikkan" belanja **belum bisa terbit** sampai manajemen menegaskan
+  **satu** angka target ROAS. Sistem menyimpan 4,5; KPI Leader memakai 3,2.
+- Tidak ada keputusan soal harga, diskon, atau pelanggan berulang (datanya kosong), dan tidak ada
+  keputusan iklan untuk Lazada (tidak ada data iklannya).
 - Tidak ada kotak tanya bebas. Itu tetap tahap berikutnya.
 
 **Perkiraan besaran kerja.** Sekitar dua sampai tiga pekan kerja satu orang backend, ditambah
@@ -95,9 +99,31 @@ karena keluarannya kini perintah, bukan urutan: laba periode pendek tampak rugi;
 video hanya terisi 8,9%; level iklan revenue nol secara struktural; retur sudah terpotong di
 settlement (pernah membuat laba TikTok Rp 669.007.085 lebih kecil sebulan).
 
+**Isi `marketing_analytics_db` PRODUKSI, diukur 2026-09-25** (baca-saja, skrip di
+`.task-plans/cek-db-marketing-prod.js` dan `cek-db-marketing-cakupan-prod.js`). Kekayaannya nyata
+tetapi tidak merata, dan ketidakmerataan itu yang membentuk katalog §3:
+
+| Sumber | Terukur | Arti untuk keputusan |
+|---|---|---|
+| `mart_profit_attribution` level shop/product/campaign, TikTok + Shopee | Sejak 2026-04-05; revenue > 0 di 75–95% baris | Dasar kuat untuk keputusan iklan per toko, produk, kampanye |
+| level `video`, TikTok | 867.183 baris; revenue > 0 hanya **94.218 (10,9%)**, ads_cost > 0 di 94% | Hentikan iklan video hanya dari yang revenue-nya tercatat; sisanya "periksa" |
+| level `ad`, TikTok | revenue > 0 di **0 dari 29.644** baris | Nol struktural (jebakan ke-3 ADR 0120), tak pernah jadi dasar |
+| Lazada | ads_cost > 0 di **0** baris seluruh level | Tak ada keputusan iklan Lazada |
+| `sync_state` catatan profit | 6–8 SKU per hari tanpa HPP berlaku ("laba LEBIH BESAR dari sebenarnya"); mapping penanggung jawab mencakup 64 toko | Keputusan kebersihan data: benar hampir pasti, dan memperbaiki angka laba itu sendiri |
+| `mart_cs_sla_daily` | Shopee saja, 9 toko, sejak 2026-09-09; membawa `target_rate` | Keputusan layanan chat, terhadap target yang sudah tertulis |
+| `mart_komplain_bulanan` | 2025-05 .. 2026-09, per bulan | Hanya layak di kiriman bulanan |
+| `mart_live_sessions` | 7.375 sesi sejak 2026-07-03; GMV > 0 hanya **854 (11,6%)**, penonton > 0 hanya 406 | Terlalu tipis untuk keputusan jam tayang; **tidak** masuk katalog |
+| `mart_buyer_cohort`, `mart_price_floor` | **0 baris** | Tak ada keputusan harga, diskon, maupun pelanggan |
+| `mart_ambang` | Satu dokumen `global`, `roas_min` 4,5, berlaku 2026-08-01 | Ambang yang dipakai sistem; 3,2 hanya hidup di KPI Leader |
+
+⛔ **Laporan produksi yang sudah terkirim membuktikan jebakan pertama masih lolos.** Kiriman
+mingguan 2026-09-25 09:10 WIB mencetak `Laba kotor: -Rp212.372.304` untuk periode **2 hari**
+(23–24 Sep) dengan settlement cair **0%** di 52 variasi order. Kiriman itu juga hanya menyimpan
+analisa `ringkasan_laba` padahal jadwalnya memuat lima, periodenya 2 hari padahal kekerapannya
+mingguan, dan ringkasannya tanpa baris "Keputusan:" dari bip-erp #2075 — tanda kuat build prod
+tertinggal dari `origin/main` (belum dicocokkan ke umur image).
+
 **Yang belum terukur, dan dinyatakan sebagai asumsi:**
-- Isi laporan produksi sungguhan dan jumlah jadwal aktif. Baca prod ditolak dari sesi analisa;
-  skrip baca-saja disiapkan di `.task-plans/cek-hasil-analisa-prod.ps1` untuk dijalankan manusia.
 - Ongkos per laporan. Yang diketahui hanya overhead tetap ~2.030 token system prompt per
   panggilan akibat prefiks `cc/` (ADR 0082). Belum ada harga rupiah untuk endpoint internal.
 - Endpoint `code.bharatainternasional.com` adalah relay ke penyedia luar, jadi angka hasil hitung
@@ -121,16 +147,27 @@ ADR 0058 §5 dan tidak ikut digantikan.
 
 ### §3 Tindakan dipilih dari katalog tertutup
 
-Enam tindakan, dan hanya enam:
+Katalognya tertutup tetapi **boleh tumbuh**: menambah tindakan cukup satu baris katalog + satu
+aturan kelayakan + uji negatifnya, dengan syarat datanya terukur cukup (tabel §Context). Isi awal
+sepuluh tindakan:
 
 | Tindakan | Syarat kelayakan (dihitung backend, bukan model) | Keyakinan |
 |---|---|---|
-| `hentikan_iklan` | Video **terbukti** berbelanja tanpa hasil (revenue > 0 dan laba < 0), atau penggerus dengan laba **matang** negatif | tinggi |
-| `kurangi_belanja` | ROAS di bawah ambang, laba matang | tinggi |
+| `hentikan_iklan` | Video **terbukti** berbelanja tanpa hasil (revenue > 0 dan laba < 0), atau kampanye/produk penggerus dengan laba **matang** negatif. TikTok dan Shopee saja | tinggi |
+| `kurangi_belanja` | Toko/produk/kampanye dengan ROAS di bawah ambang, laba matang | tinggi |
 | `naikkan_belanja` | Vonis sehat, ROAS di atas ambang, laba matang (ember "layak ditambah" / peluang yang sudah ada) | **terbatas**, selalu |
+| `lengkapi_hpp` | SKU tanpa HPP berlaku pada periode itu (sudah dicatat sync profit; laba terhitung lebih besar dari sebenarnya) | tinggi |
+| `tetapkan_penanggung_jawab` | Toko beraktivitas yang tidak tercakup mapping penanggung jawab | tinggi |
+| `perbaiki_layanan_chat` | Toko Shopee dengan `response_rate` di bawah `target_rate`-nya sendiri pada periode itu | sedang |
+| `tangani_komplain` | Toko dengan komplain belum selesai tinggi di bulan terakhir; **hanya di kiriman bulanan** | sedang |
 | `periksa` | Data tak lengkap: video "belum diketahui", catatan perkiraan, status tak dikenal | — |
 | `tunda_penilaian` | Laba belum matang | — |
 | `pertahankan` | Sehat, tanpa sinyal lain | — |
+
+**Sengaja TIDAK di katalog, dengan ukurannya:** jam tayang live (hanya 11,6% sesi ber-GMV),
+harga dan diskon (`mart_price_floor` 0 baris), pelanggan berulang (`mart_buyer_cohort` 0 baris),
+keputusan iklan Lazada (ads_cost nol di seluruh level), dan apa pun di level `ad` TikTok
+(revenue nol struktural). Masing-masing boleh masuk kelak bila ukurannya berubah.
 
 Sasaran keputusan wajib **entitas yang ada di hasil hitung** (toko, produk, kampanye, video,
 orang), dirujuk dengan id-nya. Model yang menyebut sasaran di luar himpunan itu, atau tindakan
@@ -141,6 +178,18 @@ mencatat `maxLength` dan sejenisnya tidak ditegakkan keras oleh endpoint.
 ⛔ **`hentikan_iklan` tidak pernah layak dari ember "belum diketahui" maupun dari laba belum
 matang.** Keduanya jebakan §Context yang paling mungkin menerbitkan perintah salah yang
 terdengar yakin.
+
+### §3a Keputusan soal laba memakai jendela yang sudah matang
+
+Jendela laporan hari ini berakhir **kemarin** (2, 7, atau 30 hari), sehingga sebagian besar
+settlement di dalamnya belum cair; kiriman 2026-09-25 membuktikannya dengan 0% cair. Keputusan
+yang bergantung pada laba (`hentikan_iklan` dari laba, `kurangi_belanja`, `naikkan_belanja`) karena
+itu dihitung atas **jendela terpisah yang bergeser mundur** sampai porsi settlement cairnya
+memadai, bukan atas jendela laporan. Tanpa ini, setiap keputusan laba jatuh ke
+`tunda_penilaian` dan fiturnya tampak hidup tanpa pernah memutuskan apa pun. Panjang mundur dan
+ambang "memadai" ditetapkan dari data saat perencanaan (lihat task T8 di ANALISA), **bukan**
+ditulis tangan di sini, sesuai ADR 0058 §4. Tindakan kebersihan data dan layanan tidak butuh
+jendela ini.
 
 ### §4 Pembagian kerja: aturan menentukan kelayakan, model memilih, mengurutkan, menjelaskan
 
@@ -184,10 +233,13 @@ Dinilai 30 hari sejak laporan berkeputusan pertama terkirim di produksi:
 
 ### §10 Prasyarat keputusan manajemen: satu target ROAS
 
-`kurangi_belanja` dan `naikkan_belanja` bergantung pada ambang ROAS, dan hari ini ada dua (4,5
-dan 3,2). Sampai satu angka ditetapkan (gerbang G2 di [[ANALISA - Asisten Analisa Marketing]]),
-kedua tindakan itu **tidak diterbitkan**. `hentikan_iklan` untuk video terbukti, `periksa`, dan
-`tunda_penilaian` tidak bergantung pada ambang dan boleh berjalan lebih dulu.
+`kurangi_belanja` dan `naikkan_belanja` bergantung pada ambang ROAS. Sistem hanya menyimpan
+satu (`mart_ambang` `global`, `roas_min` 4,5, terukur prod 2026-09-25), tetapi KPI Leader memakai
+3,2. Yang dibutuhkan karena itu bukan menetapkan angka dari nol, melainkan **penegasan
+manajemen** bahwa 4,5 yang berlaku untuk keputusan (gerbang G2 di
+[[ANALISA - Asisten Analisa Marketing]]). Sampai ditegaskan, kedua tindakan itu **tidak
+diterbitkan**. Tindakan lain di §3 tidak bergantung pada ambang ROAS dan boleh berjalan lebih
+dulu.
 
 ## Consequences
 
