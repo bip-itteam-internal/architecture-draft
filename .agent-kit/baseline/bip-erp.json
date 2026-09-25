@@ -1,10 +1,10 @@
 {
     "repo":  "bip-erp",
     "jenis":  "go",
-    "tanggal":  "2026-09-24T09:23:05.9238531Z",
-    "commit":  "57c3bafd",
-    "path_ukur":  "C:/Users/irfan/wt/be-baseline",
-    "jumlah_test":  19208,
+    "tanggal":  "2026-09-25T07:31:44.9495084Z",
+    "commit":  "f14f1864",
+    "path_ukur":  "C:/Users/irfan/wt/basis-jmo",
+    "jumlah_test":  19127,
     "jumlah_gagal":  16,
     "gagal":  [
                   "services/employee:employee.(paket gagal)",
@@ -24,7 +24,7 @@
                   "services/integration:integration/internal/worker/tasks.(paket gagal)",
                   "services/integration:integration/internal/worker/tasks.TestRunPenundaanDanKegagalanBersamaanTetapGalat"
               ],
-    "durasi_detik":  2274.3,
+    "durasi_detik":  836.4,
     "catatan":  [
 
                 ],
