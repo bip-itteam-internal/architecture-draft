@@ -34,6 +34,11 @@ tim marketing, leader iklan, dan Direktur. Tidak ada penerima baru.
   keputusan iklan untuk Lazada (tidak ada data iklannya).
 - Tidak ada kotak tanya bebas. Itu tetap tahap berikutnya.
 
+**Satu laporan untuk semua.** Direktur dan semua supervisor menerima laporan yang sama. Paling
+atas: status keputusan pekan lalu per tim (dijalankan, ditolak, belum dijawab). Lalu paling banyak
+lima keputusan terbesar. Lalu keputusan per tim. Tiap keputusan menyebut siapa pelaksananya.
+Dikirim mingguan di awal pekan.
+
 **Masa uji.** Satu sampai dua pekan pertama, keputusan hanya dikirim ke pemilik produk untuk
 dinilai. Penerima lain baru menerimanya setelah pemilik produk menyatakan keputusannya layak.
 
@@ -226,6 +231,41 @@ bahwa keputusan AI tidak tersedia kali ini, `narasi_status` = `gagal`, dan perco
 
 Dijalankan atau ditolak, oleh siapa, kapan, dan alasan tolak opsional. Tanpa catatan ini
 keputusan AI tidak bisa dinilai sama sekali, dan fitur yang tak bisa dinilai hidup selamanya.
+
+### §8b Satu laporan gabungan untuk semua penerima
+
+Keputusan pemilik produk 2026-09-25: **tidak dipisah per pembaca**. Semua penerima menerima
+laporan yang sama dan melihat seluruh isinya, supaya Direktur dan tiap SPV membaca gambaran yang
+sama dan tahu apa yang diminta dari tim lain. Karena satu laporan melayani dua jenis pembaca,
+urutannya yang membedakan, bukan isinya:
+
+1. **Status keputusan periode sebelumnya, per tim**: dijalankan, ditolak, belum dijawab. Bagian
+   yang paling dibutuhkan Direktur, jadi paling atas.
+2. **Keputusan utama**: paling banyak lima keputusan dengan dampak rupiah terbesar lintas tim,
+   ditambah keputusan yang hanya dapat diambil Direktur (misalnya penegasan target ROAS).
+3. **Keputusan per tim**: seluruh keputusan layak lainnya, dikelompokkan per tim lalu per
+   penanggung jawab, supaya tiap SPV langsung menemukan bagian timnya.
+
+Kekerapan kiriman gabungan **mingguan** di awal pekan (bulanan tetap boleh); **bukan** dua
+harian, karena jendela pendek selalu tampak rugi (ADR 0120 §Realisasi).
+Empat syarat berlaku untuk seluruh isi:
+
+1. **Pelaksana disebut.** Tiap keputusan membawa penanggung jawab sasarannya dari mapping
+   penanggung jawab. Sasaran tanpa penanggung jawab menerbitkan `tetapkan_penanggung_jawab`
+   lebih dulu, bukan keputusan yang tak punya pelaksana.
+2. **Dampak berupa fakta yang sudah terjadi, bukan ramalan.** Belanja dan laba matang sasaran
+   pada jendela §3a boleh dikutip; proyeksi hasil tindakan tidak boleh (ADR 0120 §5, R² 0,258).
+3. **Tindak lanjut periode sebelumnya** (bagian 1 di atas) dihitung dari keputusan kiriman
+   sebelumnya pada jadwal yang sama. Ini menuntut pembacaan hasil lama per `jadwal_id`, yang **belum ada**
+   (`hasil_analisa_store.go` hanya `DaftarHasil` tanpa filter, `jadwal_id` tak pernah di-query).
+4. **Bahasa bisnis, angka sama dengan layar.** Istilah teknis diterjemahkan ("uang belum cair",
+   bukan `belum_matang`), dan tautan tiap keputusan membuka layar pada periode yang sama dengan
+   angka yang dibekukan.
+
+Konsekuensi yang diterima sadar: tiap SPV melihat angka dan keputusan tim lain. Ini sejalan
+dengan keadaan hari ini, karena endpoint angka laba memang terbuka untuk siapa pun yang login
+(ADR 0120 §Realisasi, issue bip-erp #2008); bila kelak #2008 memutuskan menutupnya, bentuk
+gabungan ini wajib ditinjau ulang.
 
 ### §8a Mode bayangan sebelum sampai ke semua penerima
 

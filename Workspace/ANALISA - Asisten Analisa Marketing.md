@@ -241,6 +241,16 @@ Deploy pertama klien AI di mana pun: `--force-recreate`, lalu picu satu kiriman 
 bukti dan baca model yang tercatat di `NarasiJejak`. Sepekan kemudian hitung token × kiriman
 per pekan dan catat di [[Microservices - Marketing Analytics Service]].
 
+## T11a — Satu laporan gabungan bersusun (ADR 0127 §8b)
+
+**Status**: belum · **Dependensi**: T10 (bagian 1 butuh T11) · **Repo**: bip-erp
+
+Semua penerima menerima laporan yang sama, disusun tiga bagian: (1) status keputusan kiriman
+sebelumnya per tim, yang menuntut query `hasil_analisa` per `jadwal_id` (baru) beserta indeksnya;
+(2) paling banyak lima keputusan berdampak rupiah terbesar lintas tim; (3) keputusan lainnya
+dikelompokkan per tim lalu per penanggung jawab. Penanggung jawab diambil dari mapping yang sudah
+dipakai `sync-profit-attribution`, jangan salinan kedua. Kekerapan bawaan mingguan; tolak atau
+peringatkan `dua_harian` untuk kiriman berkeputusan.
 ## T12a — Mode bayangan (ADR 0127 §8a)
 
 **Status**: belum · **Dependensi**: T11, T12
