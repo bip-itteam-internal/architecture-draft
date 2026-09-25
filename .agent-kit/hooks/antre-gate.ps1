@@ -13,7 +13,9 @@ $raw = [Console]::In.ReadToEnd()
 try { $data = $raw | ConvertFrom-Json } catch { exit 0 }
 $cmd = [string]$data.tool_input.command
 if (-not $cmd) { exit 0 }
-if ($cmd -match 'antre\.(ps1|sh)') { exit 0 }
+# Perintah yang SUDAH lewat antre.ps1 tidak dikecualikan lewat pencocokan teks (itu meloloskan
+# `Get-Content antre.ps1; pnpm build`): segmennya berawal `&`/`powershell` + path antre, dan
+# Get-KelasPerintah membacanya sebagai 'bukan' karena alat berat tak berada di posisi perintah.
 if ($cmd -match 'AGENTKIT_ANTRE_LEWATI\s*=\s*1') { exit 0 }
 . (Join-Path $PSScriptRoot 'antre-lib.ps1')
 if ((Get-KelasPerintah $cmd) -ne 'penuh') { exit 0 }

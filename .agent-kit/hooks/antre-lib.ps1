@@ -20,6 +20,11 @@
 # AGENTKIT_ANTRE_DIR, AGENTKIT_ANTRE_INTERVAL (detik antar cetak status, default 60).
 $script:AntreLibDir = $PSScriptRoot
 
+# Pola `if` hook antre-gate (dibaca init.ps1). Claude Code hanya men-spawn antre-gate.ps1 untuk
+# perintah yang cocok salah satunya, jadi SETIAP alat yang dikenali Get-KelasAlat/Get-KelasPm di
+# bawah wajib punya pola di sini; alat yang dikenali tapi tak berpola tak pernah sampai diperiksa.
+$script:AntrePolaHook = @('*pnpm *', '*vitest*', '*tsc*', '*eslint*', '*next build*', '*go test*', '*go build*', '*flutter test*', '*flutter build*')
+
 # ---------- klasifikasi: 'penuh' | 'tertarget' | 'bukan' ----------
 # Hanya run PENUH yang mengantre (keputusan 2026-09-25): test satu berkas saat TDD yang harus
 # menunggu suite 40 menit mematikan siklusnya. Meleset ke 'bukan' hanya mengembalikan keadaan

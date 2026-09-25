@@ -119,9 +119,10 @@ if (-not $NoPreCommitHook) {
 # Antrean kerja berat (1.30.0): antre-gate.ps1 menolak run penuh test/build/tsc/lint yang tidak
 # lewat antre.ps1. Dipasang TERLEPAS dari -NoPreCommitHook (dua gerbang yang berbeda). Satu handler
 # per pola `if` (tak bisa digabung "|"), jadi proses hook hanya di-spawn untuk perintah yang memuat
-# nama alat berat. ⚠️ Daftar pola ini WAJIB mencakup setiap alat yang dikenali Get-KelasPerintah
-# (hooks/antre-lib.ps1): alat yang dikenali skrip tapi tak ada di sini tak pernah sampai ke sana.
-$polaAntre = @('*pnpm *', '*vitest*', '*tsc*', '*eslint*', '*next build*', '*go test*', '*go build*', '*flutter test*', '*flutter build*')
+# nama alat berat. Daftar polanya SATU tempat, `$script:AntrePolaHook` di hooks/antre-lib.ps1,
+# bersebelahan dengan klasifikasi yang harus dicakupnya.
+. (Join-Path $kitRoot 'hooks\antre-lib.ps1')
+$polaAntre = $script:AntrePolaHook
 $antreCmd = HookCmd 'antre-gate.ps1'
 $antreEntri = @(foreach ($tool in 'Bash', 'PowerShell') {
   @{ matcher = $tool; hooks = @($polaAntre | ForEach-Object { @{ type = 'command'; command = $antreCmd; 'if' = ('{0}({1})' -f $tool, $_) } }) }

@@ -24,7 +24,9 @@ Argumen: `<path worktree>` (bawaan: repo di cwd), `--brief <path>` (bawaan: brie
    ```
    powershell -NoProfile -ExecutionPolicy Bypass -File .claude/hooks/gerbang.ps1 -Path "<wt>" -Keluaran ".task-plans/judge/<slug>-gerbang.json"
    ```
-   (mac/linux: `gerbang.sh`). Exit 0 = semua lolos. Tampilkan tabel: nama gerbang, lolos, durasi,
+   (mac/linux: `gerbang.sh`). Jalankan dengan **`run_in_background: true`**: sejak kit 1.30.0 tiap
+   langkahnya mengantre di belakang run penuh sesi lain, jadi bisa melampaui batas 10 menit tool
+   (status "[antre] menunggu ..." tercetak ke stderr; `/papan-sesi` menampilkan pemegangnya). Exit 0 = semua lolos. Tampilkan tabel: nama gerbang, lolos, durasi,
    `gagal_baru` untuk test. Perhatikan `catatan`: **"TIDAK ADA BASELINE"** berarti test tidak
    dibandingkan dengan apa pun; sebutkan itu terang di verdict, jangan diam.
 
