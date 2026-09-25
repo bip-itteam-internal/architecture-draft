@@ -4,13 +4,7 @@
 
 **Saat magang diangkat menjadi karyawan kontrak**, ia mendapat ID reguler baru, dan seluruh datanya (absen, cuti, KPI, kontrak, payroll, formulir, notifikasi) ikut dipindah ke ID baru itu. Riwayat kontrak Magang dan PKWT-nya terlihat berurutan di halaman Kontrak yang sudah ada. Pemindahan ini dijalankan tim IT per angkatan atas permintaan HR, bukan tombol di layar HR.
 
-**Siapa yang terdampak.** HR (tidak lagi mengetik ID), karyawan magang yang diangkat (harus login ulang di MyBharata dengan ID baru dan mengaktifkan ulang sidik jari/wajah), tim IT (menjalankan pemindahan per angkatan), dan Finance bila magang yang diangkat punya proyek di Accurate.
-
-**Yang TIDAK dijanjikan.**
-- Tombol "Angkat Karyawan" yang bisa dijalankan HR sendiri. Pemindahan data tetap lewat tim IT.
-- Mengganti nomor proyek di Accurate. Itu tetap langkah manual Finance.
-- Merapikan 6 pasang nomor urut lama yang dobel. ID-nya tetap unik, jadi dibiarkan.
-- Memindah folder foto dan dokumen lama. Berkasnya tetap terbuka dari folder lamanya.
+**Siapa yang terdampak.** HR (tidak lagi mengetik ID), karyawan magang yang diangkat (harus login ulang di MyBharata dengan ID baru dan mengaktifkan ulang sidik jari/wajah), tim IT (menjalankan pemindahan per angkatan), dan Finance bila magang yang diangkat punya proyek di Accurate. **Yang TIDAK dijanjikan:** tombol "Angkat Karyawan" yang bisa dijalankan HR sendiri (pemindahan tetap lewat tim IT); mengganti nomor proyek di Accurate (tetap langkah manual Finance); merapikan 6 pasang nomor urut lama yang dobel (ID-nya tetap unik, jadi dibiarkan); memindah folder foto dan dokumen lama (berkasnya tetap terbuka dari folder lamanya).
 
 **Perkiraan besaran.** ID otomatis: dua perubahan (backend lalu frontend), beberapa hari kerja. Alat pemindahan ID dan panduannya: satu sampai dua hari termasuk uji di server development. Sesudah itu tiap angkatan pengangkatan butuh sekitar satu jam kerja tim IT.
 
