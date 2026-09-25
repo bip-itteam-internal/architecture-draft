@@ -209,6 +209,29 @@ try {
   # bukan gerbang -- dua klausa itu wajib bisa gagal SENDIRI-SENDIRI (kontrol negatif di laporan).
   Check ($kjTriase.Contains('deskriptif, bukan gerbang') -and $kjTriase.Contains('bukan kegagalan')) 'kerjakan §3: titik_mulai eksplisit deskriptif bukan gerbang, kosong bukan kegagalan'
 
+  # brief 2026-09-25 (loop-pakai-graf-kode): diukur nol panggilan codebase-memory-mcp di seluruh
+  # transkrip sesi/subagent, padahal brief.md langkah 4 sudah lama mewajibkan search_graph/
+  # trace_path untuk ORKESTRATOR yang menulis brief -- kewajiban itu tak pernah turun ke agen yang
+  # benar-benar menyentuh kode saat /kerjakan berjalan. Dua fakta wajib naik BERSAMA ke tiap agen
+  # eksekutor lapisan kode DAN ke kerjakan.md sendiri: (a) alatnya (search_graph/trace_path),
+  # (b) kewajiban menuliskan KESEGARAN graf yang dipakai ke laporan. .Contains, BUKAN -like
+  # (backtick = escape di wildcard, lihat catatan test lain di berkas ini). Bukan gerbang wajib
+  # yang memblokir loop (Batas brief ini: MCP mati/basi turun ke git grep, bukan berhenti) --
+  # itu diperiksa lewat prosa "bukan alasan berhenti" di §1b, bukan lewat assertion di sini.
+  $agenEksekutorKode = @('loop-be', 'loop-fe', 'loop-mobile', 'loop-fix', 'loop-refactor', 'loop-test')
+  foreach ($nmAg in $agenEksekutorKode) {
+    $pAg = Join-Path $claude ('agents/' + $nmAg + '.md')
+    $isiAg = Get-Content $pAg -Raw -Encoding UTF8
+    Check ($isiAg.Contains('search_graph') -and $isiAg.Contains('kesegaran graf')) "agents/$nmAg.md menyebut search_graph dan kewajiban kesegaran graf"
+  }
+  # loop-judge (read-only, tanpa MCP) dan loop-docs/loop-devops (di luar lingkup brief ini)
+  # SENGAJA tidak diperiksa -- lihat Batas brief 2026-09-25 dan §0 kerjakan.md (peta eksekutor).
+  Check ($kjTriase.Contains('search_graph') -and $kjTriase.Contains('kesegaran graf')) 'kerjakan.md menyebut search_graph dan kewajiban kesegaran graf'
+  # Kriteria lolos brief #2: TIDAK ADA jalur dispatch tanpa nama project ATAU catatan
+  # ketidaktersediaan. Diperiksa lewat frasa eksplisit "tidak ada jalur" (bukan cuma dua fakta
+  # berdiri sendiri-sendiri, yang bisa hijau untuk prosedur yang punya jalur ketiga tak tertulis).
+  Check ($kjTriase.Contains('Tidak ada jalur ketiga') -and $kjTriase.Contains('tidak ada jalur di mana eksekutor')) 'kerjakan.md: §1b/§2 eksplisit tidak ada jalur dispatch tanpa graf ATAU catatan ketidaktersediaan'
+
   # Langkah 0 menuntut resolusi sumber 'dengan perintah' tapi prosedur pencariannya hanya
   # dirujuk di langkah 2, yang justru dilewati saat task dialihkan ke brief.
   $iLangkah = $stTriase.IndexOf('Langkah:')

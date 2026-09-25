@@ -56,6 +56,55 @@ Untuk `architecture-draft` (domain docs): **tanpa worktree**, kerja langsung di 
 Dua brief berarti **dua worktree**, satu per repo, dibuat lebih dulu sebelum §2. Keduanya berdiri
 sendiri, jadi tak ada berkas yang diperebutkan dan tak ada stash yang perlu dipakai bersama.
 
+## 1b. Graf kode untuk worktree
+
+Untuk repo kode dari §1 (bukan `architecture-draft`, yang tak punya worktree): sebelum dispatch
+eksekutor, pastikan `codebase-memory-mcp` punya graf yang mencerminkan **worktree ini**, bukan
+checkout utama atau `origin/main` basi. Worktree baru = `root_path` baru yang tak pernah
+ter-index (team-memory.md § Memori & sumber kebenaran — hook `[codebase-memory]` menyala hanya
+bila **cwd sesi** berada DI DALAM `root_path` proyek yang ter-index, `hook_augment.c:785-883`;
+bukan dipilih dari berkas yang disentuh), jadi graf milik checkout utama TIDAK mewakili apa yang
+sedang dikerjakan di sini.
+
+```
+mcp__codebase-memory-mcp__index_repository(repo_path: "<path worktree dari §1>", mode: "full")
+```
+
+- **Mode selalu `full`.** Jangan `moderate` (diam-diam membuang `services/integration`, service
+  terbesar bip-erp) dan jangan `cross-repo-intelligence` (mode itu untuk menyambungkan proyek
+  yang SUDAH ter-index, bukan untuk meng-index satu proyek).
+- **`repo_path` selalu path worktree dari §1**, bukan `<path repo>` induk dan bukan akar `erp\`
+  (akar `erp\` = satu proyek raksasa berisi semua repo + vault + `node_modules`, dilarang Batas
+  brief 2026-09-25).
+- Catat nama project dari hasil panggilan itu (atau `list_projects` bila hasilnya tak
+  menyebutkannya eksplisit, cocokkan `root_path` = path worktree) — dipakai §2 sebagai `project`
+  untuk `search_graph`/`trace_path` eksekutor. Worktree ini baru dibuat dari `origin/main` yang
+  baru saja di-fetch (§1), jadi graf hasil index ini **segar** — itulah **kesegaran graf** yang
+  dijamin langkah ini, beda dari checkout utama yang bisa basi berhari-hari tanpa siapa pun sadar.
+- ⚠️ **Kesegaran ini snapshot di titik §1b, bukan langsung ikut tiap sunting eksekutor.** Begitu
+  eksekutor mulai mengubah berkas di worktree ini, graf tidak otomatis menyusul — ia tetap
+  memotret **titik awal** worktree (branch baru dari `origin/main`), bukan hasil percobaan yang
+  sedang atau sudah berjalan. Lihat §4: pada percobaan ke-2 dan ke-3 graf yang dipakai eksekutor
+  MASIH graf percobaan-1, dan itu wajib disebut apa adanya, bukan dilaporkan "segar" begitu saja.
+- **MCP mati, timeout, atau index gagal BUKAN alasan berhenti** (sama seperti `brief.md` langkah
+  4): catat baris eksplisit di laporan loop — graf tidak tersedia beserta alasannya (mis. "MCP
+  codebase-memory-mcp tidak terhubung", "index_repository gagal: <pesan>") — lalu lanjut ke §2
+  tanpa nama project; eksekutor jatuh ke `git grep`. **Tidak ada jalur ketiga**: §2 selalu
+  dispatch dengan salah satu dari dua ini di tangan (nama project ter-index, atau catatan
+  ketidaktersediaan), tak pernah tanpa keduanya.
+- ⚠️ **TBD, belum diimplementasikan** (bukan "tidak mungkin"). Tiap worktree menambah satu
+  project graf **penuh** (bip-erp ~180 ribu node) yang menganggur di `codebase-memory-mcp`
+  selamanya kecuali dihapus. Mekanismenya **sudah ada** dan bisa dipanggil dari skrip headless
+  tanpa konteks agent lewat CLI `codebase-memory-mcp`: `codebase-memory-mcp cli delete_project
+  '{"project":"<nama>"}'` (CLI yang sama juga menjalankan `list_projects`, `index_repository`,
+  dst. satu tool per panggilan) — tapi `worktree-bersih.ps1` (§6, dipanggil sesudah PR merged)
+  **belum** memanggilnya. Sampai diimplementasikan, bersihkan manual: `codebase-memory-mcp cli
+  list_projects` lalu `codebase-memory-mcp cli delete_project '{"project":"<nama>"}'` untuk
+  project yang worktree-nya sudah dihapus oleh `worktree-bersih.ps1`.
+
+Dua brief paralel (§2 di bawah) berarti langkah ini diulang **per worktree**, sebelum kedua
+eksekutor di-dispatch.
+
 ## 2. Eksekutor
 
 Dispatch `Agent` dengan `subagent_type` = peran hasil §0, `run_in_background: false`. Prompt wajib
@@ -67,6 +116,7 @@ Worktree: <path worktree>   (atau: vault architecture-draft, branch main)
 Repo: <nama repo>  Branch: <branch>
 Skill yang relevan untuk dibaca dulu: <daftar .claude/skills/<x>/SKILL.md yang cocok, boleh kosong>
 Titik mulai (file:line yang sudah diketahui dari bagian Konteks brief, boleh kosong bila brief tak punya satu pun): <salin anchor file:line dari `## Konteks yang diketahui` brief>
+Graf kode: proyek "<nama project dari §1b>" (root_path = worktree ini) — pakai search_graph/trace_path project=<nama> sebelum Grep untuk cari konsumen lain, lalu tulis kesegaran graf yang kamu pakai di laporanmu.  (atau, bila §1b gagal: Graf kode: tidak tersedia: <alasan dari §1b> — lanjutkan dengan git grep, tetap tulis "tidak tersedia" di laporan)
 Percobaan: 1 dari 3
 ```
 
@@ -75,6 +125,11 @@ atau rentang lain bila perlu; jangan pernah menulis larangan "hanya baca rentang
 eksekutor, satu perbaikan yang salah karena konteks kurang jauh lebih mahal daripada token yang
 dihemat. Orkestrator sudah mengukur anchor itu sendiri saat menulis brief (bagian `## Konteks
 yang diketahui`); meneruskannya cuma memberi eksekutor tempat berpijak, bukan mekanisme baru.
+
+**Baris `Graf kode` datang dari §1b, apa adanya.** Untuk repo kode ini WAJIB ada di prompt (nama
+project ter-index, atau catatan ketidaktersediaan + alasan) — tidak ada jalur di mana eksekutor
+di-dispatch tanpa satu pun dari dua itu. Untuk `architecture-draft` (domain docs, tanpa worktree)
+baris ini dihapus dari prompt; `loop-docs` tidak termasuk kewajiban graf kode brief ini.
 
 **Bila `Agent` menjawab "Agent type '<peran>' not found"**: sesi ini lahir sebelum kit yang
 memperkenalkan peran itu di-init (peran per lapisan masuk di 1.24.0, agen loop pertama di 1.15.0).
@@ -146,6 +201,7 @@ Tulis log `.task-plans/judge/<slug>-<n>.json`:
   "gerbang": <hasil gerbang.ps1>, "verdict": <JSON judge>, "lolos": true|false,
   "skills_dibaca": ["..."], "agen": "<peran hasil §0, mis. loop-fe>",
   "keputusan_lanjut": "ulangi" | "berhenti_lolos" | "berhenti_gagal",
+  "graf_kode": "<nama project dari §1b>" | "tidak tersedia: <alasan>",
   "titik_mulai": "<anchor file:line dari §2, apa adanya>" | "kosong" }
 ```
 
@@ -161,6 +217,12 @@ Dengan field ini, log percobaan-1 berbunyi `ulangi` yang tidak punya pasangan lo
 **membuktikan** run-nya terputus — satu-satunya cara membedakan "sudah diulang dan tetap gagal"
 dari "tak pernah sempat diulang". Tanpa pembedaan itu mutu pemulihan kesalahan tak bisa
 dievaluasi sama sekali.
+
+`graf_kode` mencatat hasil §1b apa adanya: nama project ter-index (graf segar, mencerminkan
+worktree ini), atau `"tidak tersedia: <alasan>"` bila indexing gagal. Field ini juga
+**deskriptif, bukan gerbang** — sama seperti `titik_mulai`, ketidaktersediaan tidak menahan
+apa pun (Batas brief 2026-09-25: graf kode dilarang jadi gerbang yang memblokir loop). Gunanya
+membuktikan §1b benar-benar dijalankan tiap run, bukan cuma tertulis di prosedur ini.
 
 Pemetaannya ditetapkan, jangan ditebak: `berhenti_lolos` bila §3 menghasilkan lolos; `ulangi` bila
 gagal dan percobaan < 3; `berhenti_gagal` bila gagal pada percobaan ke-3. Nilai yang tidak jujur
@@ -180,6 +242,16 @@ membawa anchor dan run mana yang fieldnya kosong, bukan menuntut brief selalu pu
 Bila **gagal** dan percobaan < 3: dispatch ulang **peran yang sama** dengan prompt yang sama plus
 bagian **"Yang harus diperbaiki (dari judge)"** berisi temuan `kritis`, kriteria yang tidak
 terpenuhi, dan `gagal_baru` gerbang, apa adanya. Lalu kembali ke §3 dengan `percobaan+1`.
+
+**Baris `Graf kode` TIDAK diindeks ulang di sini** — ia tetap menyebut nama project yang sama
+dari §1b/percobaan-1 (index ulang setiap percobaan membakar beberapa menit per percobaan, dan
+Batas brief 2026-09-25 melarang graf kode jadi gerbang yang memperlambat loop). Karena itu, pada
+percobaan ke-2 dan ke-3 **tulis eksplisit di prompt** bahwa graf ini memotret **titik awal
+worktree** (state saat §1b, sebelum percobaan-1 mengubah apa pun), bukan hasil sunting percobaan
+sebelumnya — supaya eksekutor tidak melaporkan "segar" untuk graf yang sebenarnya sudah
+tertinggal dari worktree-nya sendiri. Index ulang (`index_repository` dengan `repo_path` yang
+sama) boleh dilakukan sebelum dispatch ulang bila brief menuntut ketepatan tinggi, tapi tidak
+wajib.
 
 Bila **gagal 3 kali**: berhenti. Worktree **dibiarkan utuh** supaya manusia melanjutkan di tempat
 yang sama. Laporkan:

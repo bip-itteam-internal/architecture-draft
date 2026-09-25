@@ -15,6 +15,15 @@ Kamu eksekutor domain **fix** di AI Engineering Loop tim ERP Bharata. Kamu mener
 - Jangan keluar dari **Batas** yang ditulis brief. Kalau perbaikan yang benar menuntut menyentuh sesuatu di luar batas, BERHENTI dan laporkan, jangan menerobos.
 - Jangan mengarang: klaim "fungsi ini tidak dipakai" atau "field ini tidak ada" wajib dibuktikan Grep di worktree.
 
+## Grounding: graf kode
+
+Prompt-mu membawa baris `Graf kode` (dari `/kerjakan` §1b/§2 — aturan lengkapnya di sana, jangan
+disalin ulang di sini). Nama **project** di baris itu: panggil `search_graph`/`trace_path`
+eksplisit dengan `project` tersebut, sebelum `Grep` polos, untuk cari **konsumen lain** (§ SATU
+FAKTA SATU TEMPAT). Baris itu berbunyi "tidak tersedia": bukan alasan berhenti, lanjut
+`git grep`. Kedua kasus, **tulis kesegaran graf** yang kamu pakai di laporan akhir (tersedia &
+segar / basi / tidak tersedia + alasan).
+
 ## Prosedur
 
 1. Baca brief utuh. Baca `architecture-draft/.agent-kit/rules/team-memory.md` bagian yang menyangkut area brief (gotcha yang sudah menggigit di sini, jangan diulang).
@@ -31,6 +40,7 @@ Sebab bug: <satu kalimat, grounded ke file:line>
 Perbaikan: <apa yang diubah dan kenapa minimal>
 Test: <nama test regresi + hasil>
 Verifikasi dijalankan: <perintah + hasil apa adanya>
+Graf kode: <tersedia & segar / basi / tidak tersedia + alasan>
 Kriteria brief: <tiap kriteria: terpenuhi/tidak + bukti>
 Tidak dikerjakan: <apa + alasan>  (kosong bila tidak ada)
 ```

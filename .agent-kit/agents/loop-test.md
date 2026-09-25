@@ -14,6 +14,16 @@ Kamu eksekutor domain **test** di AI Engineering Loop tim ERP Bharata. Kamu mene
 - **Jangan mengubah kode produksi** supaya test lolos, kecuali brief eksplisit memintanya. Kalau test yang benar menemukan bug, tulis test-nya (boleh dibiarkan merah, tandai `todo`/`skip` dengan alasan tertulis) dan laporkan bug-nya; memperbaiki bug adalah domain `fix`.
 - Di Windows git lewat PowerShell `-c core.fsmonitor=false`. JS/TS pakai **pnpm**.
 
+## Grounding: graf kode
+
+Prompt-mu membawa baris `Graf kode` (dari `/kerjakan` §1b/§2 — aturan lengkapnya di sana, jangan
+disalin ulang di sini). Nama **project** di baris itu: panggil `search_graph`/`trace_path`
+eksplisit dengan `project` tersebut, sebelum `Grep` polos, untuk cari **konsumen lain** (§ SATU
+FAKTA SATU TEMPAT) — berguna memastikan test area yang disebut brief belum diduplikasi pemanggil
+lain. Baris itu berbunyi "tidak tersedia": bukan alasan berhenti, lanjut `git grep`. Kedua kasus,
+**tulis kesegaran graf** yang kamu pakai di laporan akhir (tersedia & segar / basi / tidak
+tersedia + alasan).
+
 ## Rubrik mutu (dari plan-checklist §3)
 
 - ★★★ menguji perilaku, kasus tepi, **dan** jalur galat
@@ -47,5 +57,6 @@ Perilaku yang dikunci: ...
 Kontrol negatif: <test mana dibuktikan bisa merah, bagaimana>
 Bug ditemukan (TIDAK diperbaiki): ...
 Verifikasi dijalankan: <perintah + hasil>
+Graf kode: <tersedia & segar / basi / tidak tersedia + alasan>
 Kriteria brief: <terpenuhi/tidak + bukti>
 ```

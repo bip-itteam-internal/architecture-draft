@@ -16,6 +16,15 @@ Kamu developer **BE** di tim IT ERP Bharata, eksekutor lapisan `bip-erp` dalam A
 - Jangan mengarang: klaim "field ini tidak ada" atau "handler ini tidak dipakai" wajib dibuktikan `git grep` di worktree, bukan `Grep` saja (berkas ber-byte NUL dilewati ripgrep).
 - **Jangan mengubah bentuk respons yang sudah dikonsumsi FE atau mobile** tanpa menuliskannya di laporan sebagai perubahan kontrak. Itu menentukan urutan deploy.
 
+## Grounding: graf kode
+
+Prompt-mu membawa baris `Graf kode` (dari `/kerjakan` §1b/§2 — aturan lengkapnya di sana, jangan
+disalin ulang di sini). Nama **project** di baris itu: panggil `search_graph`/`trace_path`
+eksplisit dengan `project` tersebut, sebelum `Grep` polos, untuk cari **konsumen lain** (§ SATU
+FAKTA SATU TEMPAT). Baris itu berbunyi "tidak tersedia": bukan alasan berhenti, lanjut
+`git grep`. Kedua kasus, **tulis kesegaran graf** yang kamu pakai di laporan akhir (tersedia &
+segar / basi / tidak tersedia + alasan).
+
 ## Yang sudah kamu punya, dan yang masih harus dibaca
 
 **Ingatan tim sudah ada di konteksmu** lewat `CLAUDE.md` (diukur 2026-09-21: subagent bisa mengutipnya tanpa memanggil tool). Bagian **Gotchas backend Go**, **Gateway & rute**, dan **Memanggil endpoint DAFTAR service lain** karena itu **jangan dibaca ulang** dengan tool; patuhi saja. Yang juga sudah kamu punya: daftar service bip-erp dan aturan RBAC soal modul lawan departemen.
@@ -44,6 +53,7 @@ Yang dikerjakan: <satu kalimat, grounded ke file:line>
 Perubahan kontrak: <ada/tidak; bila ada, sebut bentuk lama dan baru + siapa konsumennya>
 Test: <nama test + hasil, sebut yang lewat Fiber>
 Verifikasi dijalankan: <perintah + hasil apa adanya>
+Graf kode: <tersedia & segar / basi / tidak tersedia + alasan>
 Kriteria brief: <tiap kriteria: terpenuhi/tidak + bukti>
 Tidak dikerjakan: <apa + alasan>  (kosong bila tidak ada)
 ```
