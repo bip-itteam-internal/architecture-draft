@@ -449,20 +449,20 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "717cc27ece5f369ae624f43d25d002a17ec2b6d33fba44d53d2a13e5c1c1b8b4",
-      "ukuran_kb": 103.6,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service (webhook marketplace, order/transaksi, TikTok Shop/Business, Shopee, Accurate, dashboard FAT /accounting, kas toko, ulasan, ICC mapping, worker/jobs), parameter dan bentuk responsnya, serta endpoint mana yang publik tanpa gateway key. Berguna saat mencari cara menarik daftar order, feed retur untuk WMS, aging piutang, packet tracking, atau filter atribusi afiliasi Shopee.",
+      "hash": "f29580ea175f0b59e33812835156d52c6870f300448038a9a9bfdf9b3111f6f1",
+      "ukuran_kb": 104.0,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service lewat gateway /api/integration (order terpadu, export, aging piutang, feed retur untuk WMS, packet tracking, TikTok Shop/Business, Shopee, Accurate, dashboard akuntansi FAT, profit, ICC mapping, kas toko, ulasan, status sinkron toko, worker/jobs), parameter filternya, dan bentuk respons tiap endpoint. Juga menjawab endpoint mana yang publik (webhook /ext/webhook) dan mana yang butuh gateway key, serta jebakan pemakaian seperti filter atribusi Shopee yang hanya berlaku untuk channel SHOPEE.",
       "kata_kunci": [
         "integration-service",
-        "API endpoint",
-        "marketplace",
-        "TikTok Shop",
-        "Shopee",
-        "Accurate",
-        "webhook",
+        "endpoint marketplace",
         "order",
         "piutang",
-        "packet tracking"
+        "accounts receivable",
+        "retur",
+        "packet tracking",
+        "webhook",
+        "Accurate",
+        "atribusi afiliasi Shopee"
       ]
     },
     {
@@ -1548,6 +1548,7 @@
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
         "Microservices - Notification Service",
         "ANALISA - Komplain dari Ulasan Marketplace",
+        "ADR - 0117 Riwayat Komplain Produk Terpusat di Satu Tabel, Register Tetap Dua",
         "API - Procurement Service",
         "CORE - API Master Gateway",
         "RUN - Deploy Microservices bip-erp",
@@ -1561,19 +1562,19 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "59b552341b7eabe16428b9989841853144e6412ef583bc723b1a3dbd42cc560d",
-      "ukuran_kb": 565.1,
-      "ringkasan": "Menjawab: apa itu portal web ERP internal Bharata (erp-frontend / \"One Bharata\"), stack apa yang dipakainya, dan bagaimana login, refresh token, serta SSO Identity Provider ke aplikasi lain bekerja. Menjelaskan bagaimana sidebar dan halaman digerbang oleh system_roles per modul plus paket izin, bagaimana menu HRIS dikelompokkan lewat menu induk bersarang (bukan field group), dan bagaimana mode multi-perusahaan (CompanySwitcher, kelola perusahaan/departemen/shift/WiFi, rekrutmen lintas perusahaan) berperilaku. Juga memuat konvensi wajib data-fetching TanStack Query (hook sidebar ber-enabled, badge pakai refetchOnWindowFocus, pencacah membalas angka) dan konvensi bagan Recharts dengan ChartContainer.",
+      "hash": "0027a8f12532cd69ac2ead6d8622ea9f6044919267a5d6d0d949652c652c7f50",
+      "ukuran_kb": 568.8,
+      "ringkasan": "Menjawab: apa itu portal web ERP (One Bharata / erp-frontend), stack yang dipakai, bagaimana login, SSO identity provider, dan role gating sidebar lewat system_roles bekerja, serta modul dan halaman apa saja yang sudah ada. Juga menjawab konvensi frontend seperti data-fetching TanStack Query, konvensi bagan Recharts, struktur menu Pengaturan HRGA, dan fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan).",
       "kata_kunci": [
+        "Web ERP",
         "erp-frontend",
-        "hris-dashboard",
         "One Bharata",
-        "frontend web ERP",
-        "Next.js App Router",
-        "SSO identity provider",
+        "hris-dashboard",
+        "SSO",
         "system_roles",
-        "role gating sidebar",
-        "multi-perusahaan multi-tenant",
+        "sidebar",
+        "multi-tenant",
+        "Pengaturan HRGA",
         "TanStack Query"
       ]
     },
@@ -2571,20 +2572,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "f80fabb202cf1169ed950dca786de94a3be95fe49339ab89f64f56eef99d1c5b",
-      "ukuran_kb": 427.9,
-      "ringkasan": "Menjawab: marketplace mana saja yang tersambung ke ERP (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) dan lewat jalur apa order masuk (webhook direct per platform, auth HMAC Shopee, kredensial OAuth per marketplace), lalu bagaimana order dinormalkan jadi model transaction terpadu dan dijembatani ke Accurate Online sebagai Sales Invoice dan Sales Return. Juga menjawab endpoint report iklan apa yang tersedia beserta cara hitungnya (GMV Max monitoring dan overview per produk, ROAS/ROI, ICC video metrics), bagaimana automasi auto-ship/auto-approve sadar hari libur, siapa boleh melihat toko mana (shop ACL, department_shops, ICC account mapping), serta cron/worker dan index MongoDB jalur panas apa saja yang berjalan. Dipakai saat menelusuri asal data marketplace, kredensial integrasi, status sinkron per toko, atau saat angka iklan/ROI terlihat menyimpang.",
+      "hash": "f60411e7d97b5b220f7c1598c7ffce0b275530009bbe31ba8c256e426932d555",
+      "ukuran_kb": 428.2,
+      "ringkasan": "Menjawab: bagaimana integration-service menghubungkan ERP ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) lewat webhook dan cron, menormalkan order jadi transaksi terpadu, lalu mem-bridge ke Accurate (sales invoice, sales return). Juga menjawab cara kerja fitur seperti GMV Max monitoring, ICC account mapping, shop ACL, kepemilikan toko per departemen, profit per produk, ulasan marketplace, status sinkron per toko, observability Shopee, serta rencana Meta Ads dan catatan legacy Desty.",
       "kata_kunci": [
         "integration service",
         "marketplace",
         "TikTok Shop",
-        "TikTok Business Ads",
         "Shopee",
-        "Lazada",
+        "Accurate",
         "webhook",
-        "Accurate Online",
         "GMV Max",
-        "OAuth kredensial"
+        "ICC",
+        "sinkron toko",
+        "Desty"
       ]
     },
     {
