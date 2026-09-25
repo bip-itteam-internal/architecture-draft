@@ -17,6 +17,21 @@
 | GET/POST | `/profit/opex` | Biaya operasional manual — kini **cadangan** (gaji dari payroll, non-gaji dari Accurate). Penulisan membuang cache dashboard periode itu (#1748); unik per `{level, entity_id, periode}` (#1822) |
 | POST | `/profit/opex/distribusi` | Bagi satu angka divisi ke tiap entitas (pro-rata, metode sisa-terbesar). Membuang cache dashboard periode itu (#1748) |
 
+### Snapshot insentif: bekukan & setujui (🟡 branch `feat/insentif-snapshot`, belum merged per 2026-09-25)
+
+[[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]] T1. Snapshot = salinan baris `/profit-dashboard` yang dibekukan, satu-satunya sumber angka bayar. Izin: `finance.insentif.freeze` / `finance.insentif.approve` dengan fallback tier `finance` (lihat [[CORE - RBAC dan Permission Set]]).
+
+| Method | Path | Fungsi |
+|---|---|---|
+| POST | `/profit/snapshot/bekukan` | Body `{periode}`. **Asinkron**: 202 + `job_id`. Menyusun tiga level dengan cutoff & mode BAWAAN (override `cutoff_day`/`mode` tak berlaku). Periode belum `final` → job `gagal` menyebut tanggal cutoff. Snapshot aktif tak ditimpa (dihitung `dilewati`). 409 bila pembekuan periode itu sedang berjalan. Izin freeze |
+| GET | `/profit/snapshot/bekukan/:job_id` | Status job: `berjalan` / `selesai` / `gagal`, `dibuat`, `dilewati`, `galat`. Job yang terputus restart ditandai `gagal` saat boot. Izin freeze |
+| GET | `/profit/snapshot?periode=&level=&semua=1` | Daftar snapshot (bawaan hanya `aktif`; `semua=1` menyertakan yang dibatalkan). Gerbang sama dengan dashboard (`RequireMenu`), karena `rincian` membawa `biaya_gaji` |
+| POST | `/profit/snapshot/setujui-periode` | Body `{periode, level?}`. Setujui seluruh snapshot `dibekukan` yang lolos; balasan `{disetujui, dilewati[{id, level, entity_name, alasan}], peringatan[]}`. Izin approve |
+| POST | `/profit/snapshot/:id/setujui` | Setujui satu baris. Ditolak: penerima = penyetuju (403, termasuk staf Finance), penerima tak diketahui (409, gagal-tertutup), belum layak dibayar/gugur (409 menyebut sebabnya), status bukan `dibekukan` (409). Menulis `disetujui: true` pada target entitas itu. Izin approve |
+| POST | `/profit/snapshot/:id/batalkan` | Body `{alasan}` ≥ `AlasanMinimal` (10). `dibekukan` butuh izin freeze; `disetujui` butuh izin approve dan membuka lagi target entitas; `terbayar` ditolak 409. Snapshot lama tetap tersimpan (`aktif:false`), bekukan ulang membuat yang baru |
+
+Seluruh rute membalas **503** berpesan bila Mongo belum tersambung (bukan panik). `/profit-dashboard` kini ikut membawa `cutoff_at` dan `final` dari integration (aditif); `final` sengaja tak dikirim bila integration tak menyebutnya.
+
 > Sumber angka: komponen profit & beban non-gaji dari [[API - Integration Service]] (`/profit/incentive/summary`, `/profit/incentive/opex`), beban karyawan dari payroll-service `GET /employer-cost`.
 
 > ⚠️ **`mode=bergeser` — dua angka profit yang sah berbeda.** Bawaan (tanpa parameter) memakai aturan insentif: order yang uangnya cair setelah tanggal 25 bulan berikutnya HANGUS. `mode=bergeser` memasukkannya ke periode berikutnya, dan itulah yang diminta adaptor KPI `insentif_profit` — insentif membayar periode yang sudah tertutup, KPI menilai kerja yang hasilnya baru cair terlambat. Terukur prod 2026-08-27: selisihnya +0,151% (Juli) dan +0,093% (Agustus). **Mode ikut kunci cache**; dua mode berbagi kunci akan membuat dashboard insentif menampilkan angka bergeser. Pre-warm menghangatkan KEDUA mode — tanpa itu panggilan KPI pertama memicu komputasi dingin ~2 menit lalu habis waktu di gateway. PR #1503, merged 2026-08-28.

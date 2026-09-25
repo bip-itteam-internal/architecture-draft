@@ -46,6 +46,7 @@ bip-erp [#1449](https://github.com/bip-itteam-internal/bip-erp/pull/1449)). Rute
 | **Insentif Saya** | siapa pun berperan `insentive` — **sengaja di luar whitelist**, karena halamannya hanya memuat baris milik pemegang token. 🟡 **Pindah ke MyBharata di dalam Slip Gaji** ([[ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji]], 2026-09-07): kartu per bulan tanpa nominal, PIN saat kartu ditekan; menu web dicabut setelah rilis aplikasi terpasang luas. Terukur prod: dari 78 pemegang role hanya 37 punya baris profit |
 | **Panduan Insentif** | finance, atasan marketing, atau siapa pun berperan `insentive` |
 | **Rincian beban karyawan** di dalam Dashboard | **hanya `finance`**, terpisah dari dan di atas whitelist |
+| **Bekukan periode / setujui insentif** (🟡 di kode, belum merged per 2026-09-25) | Bekukan: `finance.insentif.freeze` (staf Finance ke atas). Setujui: `finance.insentif.approve` (supervisor/admin Finance, termasuk Direktur). Tidak seorang pun menyetujui insentif miliknya sendiri; atasan marketing tidak lagi menyetujui. [[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]] |
 
 Alasan dashboard dibatasi: tiap baris membawa `biaya_gaji`, beban perusahaan atas SATU
 orang, yang dengan aturan gaji-orang-itu-sendiri praktis adalah gaji orang tersebut.
