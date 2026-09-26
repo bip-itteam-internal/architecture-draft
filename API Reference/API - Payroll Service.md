@@ -148,6 +148,28 @@ Hak bawaan tiap karyawan atas datanya sendiri, ditegakkan lewat `employee_id` da
 
 ⚠️ **Penjaga "hanya published" hidup di satu fungsi** (`findMyPayslipLine`) yang dipakai bersama versi JSON dan PDF. Penjaga yang hidup di dua tempat cepat atau lambat berubah di satu tempat saja, dan yang bocor adalah slip yang belum disetujui.
 
+## Persetujuan bertingkat dan bayar per badan usaha (ADR 0129)
+
+🟡 **Belum di `main`.** Rute di bawah ada di tumpukan PR bip-erp #2103 (P2), #2105 (P3), dan #2108 (P4+P5), diukur dari `services/payroll/routes.go` ujung tumpukan 2026-09-27. Seluruhnya di belakang flag **`PAYROLL_JENJANG_AKTIF`**: selama flag mati, rute tulis, daftar bayar, dan email slip membalas **409**, `antrean-saya` mengembalikan seluruh run (perilaku pantauan lama), dan `approve`/`publish` berperilaku seperti alur lama. Keputusannya [[ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit]]; cara menyalakannya [[RUN - Menyalakan Persetujuan Payroll Bertingkat]].
+
+| Method | Path | Gerbang | Catatan |
+|---|---|---|---|
+| GET | `/payroll-runs/antrean-saya` | `requireAuth` | Run yang menunggu tanda tangan **pemanggil** (tahap berjalan = izin tahapnya, belum pernah menandatangani, bukan penyusunnya). ⚠️ Didaftarkan **sebelum** `/payroll-runs/:id`; membaliknya membuat rute ini tertelan dan membalas 200 berisi run ber-id "antrean-saya" |
+| POST | `/payroll-runs/:id/ajukan` | `gate(PermPayrollWork, isHRSupervisor)` | `draft` atau `dikembalikan` → `dalam_persetujuan`. Ajukan ulang melanjutkan dari tahap yang mengembalikan, tanda tangan sebelumnya tetap berlaku |
+| POST | `/payroll-runs/:id/setujui-tahap` | izin tahap yang sedang berjalan (`payroll.approve.cost_control` / `.hrd` / `.finance` / `.direksi`) | Siapa pun yang pernah `ajukan`/`ajukan_ulang` run itu ditolak; satu orang satu tanda tangan per run. Tahap Direksi yang lolos → `approved` |
+| POST | `/payroll-runs/:id/kembalikan` | idem | Wajib beralasan; catatan per baris boleh dari tahap mana pun |
+| POST | `/payroll-runs/:id/lines/:employeeId/koreksi` | `gate(PermPayrollWork, isHRSupervisor)` | Hanya saat `dikembalikan`; nilai sebelum/sesudah masuk `riwayat[]`, baris ditandai berubah sesudah ditandatangani |
+| GET | `/payroll-runs/:id/pembayaran` | pemegang izin lihat atau bayar | Status lunas per badan usaha. **Tanpa amplop `data`** |
+| POST | `/payroll-runs/:id/badan-usaha/:companyId/lunas` · `/batal-lunas` · `/tandai-insentif` | `payroll.bayar` yang ditugaskan pada CV badan usaha itu (dibaca dari finance), atau `payroll.bayar.semua` | `:companyId` kosong ditulis **`-`** di path (bucket tanpa badan usaha, hanya bisa ditandai pemegang bayar-semua) |
+| GET | `/payroll-runs/:id/badan-usaha/:companyId/daftar-bayar` | idem | Nama, gaji bersih, rekening (dari employee), total. **Tanpa amplop `data`**. `rekening_gagal_dimuat: true` bila employee tak terjangkau; daftar tetap terkirim |
+| POST | `/payroll-runs/:id/publish` | `payroll.publish` | Flag hidup: ditolak selama ada badan usaha belum lunas; sesudah terbit, karyawan aktif dikabari inbox, karyawan nonaktif dikirimi email slip PDF terkunci (sandi tanggal lahir `DDMMYYYY`). Gagal email tak menggagalkan publish |
+| GET | `/payroll-runs/:id/slip-email` | `gate(PermPayrollView, isHR)` | Jejak kiriman email per karyawan (koleksi `payroll_slip_email`) |
+| POST | `/payroll-runs/:id/slip-email/:employeeId/kirim-ulang` | `payroll.publish` | Satu karyawan, **sinkron** (hasilnya langsung terbaca di respons). Run wajib sudah `published`; status aktif karyawan dibaca ulang dari employee, tak terjangkau = **502** |
+
+Notifikasi inbox (best-effort, di goroutine sesudah tulis): kategori `payroll-tanda-tangan`, `payroll-dikembalikan`, `payroll-siap-bayar`, `payslip`. Pelaku aksi tak pernah menerima notifikasinya sendiri. Kategori baru berarti **notification-service naik lebih dulu** (daftar-izin terkompilasi).
+
+Service lain yang dibaca payroll untuk fitur ini, semuanya berkunci layanan dan **di luar** `ValidateInternalURL`: employee `GET /payroll/rekening-karyawan` dan `GET /payroll/kontak-slip` (kunci `EMPLOYEE_SERVICE_KEY`; sengaja tanpa prefix `/internal/`), finance `GET /internal/cv/pemegang-badan-usaha` (kunci `FINANCE_SERVICE_KEY`).
+
 ## Rute internal (tanpa `gate()`, berkunci layanan)
 
 | Method | Path | Gerbang | Catatan |

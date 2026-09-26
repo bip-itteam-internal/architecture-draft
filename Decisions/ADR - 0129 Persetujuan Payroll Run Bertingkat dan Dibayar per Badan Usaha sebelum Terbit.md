@@ -12,7 +12,7 @@
 
 *Payroll run disetujui berurutan oleh Cost Control, SPV HRD, SPV Finance, dan Direktur, masing-masing lewat izin tahapnya sendiri, dengan jejak keputusan per tahap. Sesudah tahap terakhir, pembayaran dicatat per badan usaha penggaji di dalam run oleh pemegang CV yang ditugaskan, dan penerbitan slip terkunci sampai seluruh badan usaha dalam run itu lunas. Saat terbit, karyawan yang akunnya nonaktif dikirimi PDF slip terkunci ke email pribadinya. Mengganti persetujuan satu langkah `payroll.approve` yang selama ini menutup setujui sekaligus terbitkan, dan memindahkan tanda insentif terbayar dari [[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]] ke saat badan usaha karyawan itu lunas.*
 
-- **Status**: 🟡 **Diusulkan**, disetujui pemilik produk 2026-09-26 lewat percakapan `/analisa-kebutuhan`. **P1 (izin per tahap + paket) merged** (bip-erp PR #2095, 2026-09-26), live DEV, prod belum; gerbang rute belum dipindah (P2). Daftar task: `Workspace/ANALISA - Persetujuan Payroll Bertingkat.md` (papan kerja, bukan dok terbit).
+- **Status**: 🟡 **Diusulkan**, disetujui pemilik produk 2026-09-26 lewat percakapan `/analisa-kebutuhan`. **P1 (izin per tahap + paket) merged** (bip-erp PR #2095, 2026-09-26), live DEV, prod belum. **P2 sampai P5 di PR bertumpuk** bip-erp #2103 → #2105 → #2108 (2026-09-27, gerbang lolos, menunggu merge), semuanya di belakang flag `PAYROLL_JENJANG_AKTIF` (prod mati). P6 (layar FE) dikerjakan; P7 prosedurnya [[RUN - Menyalakan Persetujuan Payroll Bertingkat]]. Daftar task: `Workspace/ANALISA - Persetujuan Payroll Bertingkat.md` (papan kerja, bukan dok terbit).
 - **Path di repo**: `bip-erp/shared-library/common/catalog_payroll.go` (izin per tahap + paket) · `bip-erp/services/payroll/models_payroll_run.go` (tahap, riwayat, pembayaran per badan usaha) · `bip-erp/services/payroll/run_jenjang*.go` (baru) · `bip-erp/services/payroll/run_approve.go` · `bip-erp/services/payroll/run_publish.go` · `bip-erp/services/payroll/payslip_pdf.go` (proteksi kata sandi) · `bip-erp/services/payroll/slip_email*.go` (baru) · `bip-erp/services/payroll/routes.go` · `bip-erp/shared-library/models/notification/models.go` (kategori inbox) · `bip-erp/services/insentive/snapshot_internal.go` (gerbang tandai-terbayar) · `erp-frontend/src/features/hris/payroll/` · `erp-frontend/src/features/direktur/hooks/use-payroll-menunggu.ts`
 - **Tanggal**: 2026-09-26
 
@@ -78,6 +78,7 @@ Keputusan pemilik produk: bila satu penanda tangan menemukan angka salah, **hany
 
 - **Cost Control boleh menulis catatan per baris** (karyawan + potongan yang dipersoalkan) saat mengembalikan. *(Keputusan atas saran analis, 2026-09-26.)*
 - Koreksi baris saat run `dalam_persetujuan` dicatat di riwayat sebagai `koreksi` beserta nilai sebelum dan sesudahnya, dan ditampilkan kepada **penanda tangan berikutnya** sebagai "berubah sesudah ditandatangani <tahap>". Penanda tangan sebelumnya diberi notifikasi, tetapi tidak dituntut menandatangani ulang.
+- *(Dirinci 2026-09-26 di P2, pemilik produk mendelegasikan "langkah terbaik".)* Koreksi **hanya boleh saat run dikembalikan** ke staf HR, bukan kapan saja selama persetujuan: penanda tangan tak pernah membaca angka yang berubah di bawah tangannya. Setelah dikoreksi, staf HR **mengajukan ulang** dan run **melanjutkan dari tahap yang mengembalikan**, bukan dari Cost Control. Bentuk koreksi mengikuti jenis run: run bulanan dihitung ulang **untuk satu karyawan** dari master dan absensi, run impor **disunting nilainya** (baris pendapatan dan potongan). Catatan per baris boleh ditulis penanda tangan di **tahap mana pun** saat mengembalikan, tidak hanya Cost Control.
 
 ### 4. Pembayaran dicatat per badan usaha di dalam run
 
@@ -98,6 +99,8 @@ Saat run diterbitkan, baris yang karyawannya berakun nonaktif (`system_authentic
 Kategori inbox baru untuk payroll: "run menunggu tanda tangan Anda", "run dikembalikan", "run siap dibayar", dan "run terbit". Penerima dihitung dari pemegang izin tahap berikutnya (irisan dengan pemegang CV untuk tahap bayar). Pengiriman best-effort; antrean di layar tetap sumber kebenarannya.
 
 ## Consequences
+
+- **Pemutus rilis `PAYROLL_JENJANG_AKTIF`** (env payroll-service, bawaan mati; P2). Selama mati, alur lama berjalan persis seperti sebelum ADR ini dan rute jenjang menolak dengan penjelasan; selama hidup, rute `/approve` lama menolak dan jenjang berlaku. Prod baru dinyalakan setelah layar tanda tangan (P6), paket terpasang ke jabatan (P7), dan notifikasi (P4) siap: layar lama memanggil `/approve`, jadi menyalakannya lebih dulu membuat gaji tak bisa disetujui siapa pun.
 
 - **Run lama tidak disentuh.** Run `published` tetap; run `draft` yang ada ikut alur baru saat diajukan. Tidak ada migrasi status.
 - **Kontrak status berubah, jadi backend naik sebelum web**, dan antrean Direktur di web wajib ikut diubah di rilis yang sama. Tombol di web akhirnya digerbang izin per tahap.
