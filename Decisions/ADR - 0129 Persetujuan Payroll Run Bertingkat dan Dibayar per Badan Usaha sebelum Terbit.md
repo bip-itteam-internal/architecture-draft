@@ -55,7 +55,19 @@ Status run menjadi `draft → dalam_persetujuan → approved → published`. Pos
 
 ### 2. Izin per tahap, bukan satu `payroll.approve`
 
-Izin baru di katalog payroll: `payroll.approve.cost_control`, `payroll.approve.hrd`, `payroll.approve.finance`, `payroll.approve.direksi`, `payroll.bayar` (menandai lunas), `payroll.publish` (menerbitkan). Diberikan lewat paket bernama yang menempel di jabatan ([[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]): Cost Control, SPV HRD, SPV Finance, Direktur dan Corporate Secretary, Junior Accountant pemegang CV, dan staf HR untuk publish. `payroll.approve` lama dipensiunkan setelah paket baru terpasang; tier fallback untuk izin baru ditetapkan di task pertama dan **tidak** boleh memberi dua tahap berurutan kepada satu tier tanpa disadari.
+Izin baru di katalog payroll: `payroll.approve.cost_control`, `payroll.approve.hrd`, `payroll.approve.finance`, `payroll.approve.direksi`, `payroll.bayar` (menandai lunas), `payroll.publish` (menerbitkan). Diberikan lewat paket bernama yang menempel di jabatan ([[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]): Cost Control, SPV HRD, SPV Finance, Direktur dan Corporate Secretary, Junior Accountant pemegang CV, dan staf HR untuk publish. `payroll.approve` lama dipensiunkan setelah paket baru terpasang.
+
+**Fallback tier dan isi paket** (diputuskan 2026-09-26 di `/start-task` P1):
+- `payroll.approve.*` dan `payroll.bayar` **tanpa fallback tier sama sekali**, hanya lewat paket: pemegang aslinya (Cost Control, SPV Finance, Direktur, accounting CV) bukan orang HR, jadi tier `hris` memang tak pernah menjangkau mereka.
+- `payroll.publish` masuk fallback tier `hris` supervisor dan admin.
+- Tier admin dan paket `payroll_admin` berhenti memakai "seluruh katalog" dan menjadi daftar eksplisit tanpa izin tahap. Tanpa itu, menambah izin ke katalog diam-diam memberi HR admin keempat tahap sekaligus.
+- Paket tanda tangan (Cost Control, SPV HRD, SPV Finance, Direksi) memuat izin tahapnya **plus `payroll.view`**: penanda tangan memang perlu membaca seluruh run, termasuk rincian potongan per karyawan dan dasar potongan kehadiran.
+- Paket **Pembayar CV berisi `payroll.bayar` saja, tanpa `payroll.view`**: accounting CV hanya boleh melihat karyawan CV yang ditugaskan kepadanya, lewat daftar bayar sempit (§4), bukan gaji seluruh 40 badan usaha dan master gaji semua orang.
+
+**Jalan masuk layar.** Izin payroll tidak membuka kategori sidebar mana pun (menu Payroll Run menumpang di kategori HRIS), sehingga SPV Finance, Cost Control, Direktur, dan accounting CV tak melihat menu payroll. Tidak ditambah menu baru dan tidak dibuat alias `payroll → hris` (alias itu membuka seluruh kategori HRIS). Jalan masuknya:
+- **Portal → Persetujuan** (antrean terpadu, terbuka untuk semua karyawan) menampilkan run payroll hanya kepada orang yang sedang gilirannya, dengan tahap dan tanda boleh-putus; barisnya membuka detail run.
+- **Accounting CV** memakai menu yang sudah ada, **Finance → Accounting CV → CV Ditugaskan**, rumah antrean transfer kas CV: ditambah bagian **Gaji** per CV (run menunggu bayar, daftar bayar sempit, tandai lunas, status "N dari M lunas" tanpa rincian CV lain). Baris antreannya per CV yang ditugaskan.
+- Notifikasi inbox (§7) mengarah ke tempat yang sama.
 
 - **Satu orang, satu tanda tangan per run.** Orang yang sudah menyetujui satu tahap ditolak di tahap berikutnya pada run yang sama, walau memegang kedua izin. Pengaju ditolak di semua tahap persetujuan.
 - **Gerbang dan antrean memakai fungsi yang sama**, supaya run tak pernah tampil di antrean orang yang lalu ditolak saat menekan tombol.
@@ -69,7 +81,7 @@ Keputusan pemilik produk: bila satu penanda tangan menemukan angka salah, **hany
 
 ### 4. Pembayaran dicatat per badan usaha di dalam run
 
-Setelah run `approved`, run memuat daftar badan usaha yang ada di baris-barisnya (dari `CompanySnapshot.ID`). Tiap badan usaha ditandai **lunas** oleh pemegang `payroll.bayar` yang **ditugaskan pada CV itu** (penugasan pemegang CV yang sudah ada, dipetakan lewat `payroll_company_id`); pemegang izin pengawas boleh semua CV. Tanda lunas mencatat pelaku dan waktu, dan bisa dibatalkan selama run belum terbit. Transfer banknya tetap di luar sistem.
+Setelah run `approved`, run memuat daftar badan usaha yang ada di baris-barisnya (dari `CompanySnapshot.ID`). Tiap badan usaha ditandai **lunas** oleh pemegang `payroll.bayar` yang **ditugaskan pada CV itu** (penugasan pemegang CV yang sudah ada, dipetakan lewat `payroll_company_id`); pemegang izin pengawas boleh semua CV. Tanda lunas mencatat pelaku dan waktu, dan bisa dibatalkan selama run belum terbit. Transfer banknya tetap di luar sistem. Accounting CV membaca **daftar bayar sempit** per CV: hanya karyawan CV itu (nama, gaji bersih, rekening bila tersimpan, total transfer, ekspor), dan untuk badan usaha lain hanya status lunas atau belum, tanpa angka.
 
 **Terbitkan hanya bila seluruh badan usaha dalam run itu lunas** (keputusan pemilik produk: semua menunggu). Publish dilakukan manual oleh pemegang `payroll.publish`, bukan otomatis saat CV terakhir lunas, supaya ada satu titik keputusan yang terlihat.
 
@@ -93,7 +105,7 @@ Kategori inbox baru untuk payroll: "run menunggu tanda tangan Anda", "run dikemb
 - **Konfigurasi wajib sebelum dipakai**: paket izin dipasang ke lima jabatan dan penugasan pemegang CV untuk 40 badan usaha. Tanpa itu run tertahan di tahap pertama atau di pembayaran. `permission-holders` tidak memakai fallback tier, jadi notifikasi hanya sampai ke pemegang paket.
 - **Penerbitan jadi lebih lambat** menurut desain: sampai 40 tanda lunas per run. Keadaan sebagian (misalnya 38 dari 40 lunas) harus terbaca di layar, bukan disimpulkan.
 - **Satu orang yang memegang dua jabatan** (mis. merangkap SPV) hanya bisa menandatangani satu tahap per run; tahap lainnya butuh orang lain.
-- **TBD**: fallback tier untuk izin baru; perilaku insentif bila tanda lunas dibatalkan; apakah run THR yang kecil boleh memakai jenjang yang sama tanpa pengecualian (asumsi: sama); pengirim email khusus payroll atau memakai pengirim umum.
+- **TBD**: perilaku insentif bila tanda lunas dibatalkan; apakah run THR yang kecil boleh memakai jenjang yang sama tanpa pengecualian (asumsi: sama); pengirim email khusus payroll atau memakai pengirim umum.
 
 ## Dokumen Terkait
 
