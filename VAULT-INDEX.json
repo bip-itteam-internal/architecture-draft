@@ -704,23 +704,21 @@
         "Microservices - Attendance Service",
         "Microservices - Insentive Service"
       ],
-      "hash": "77f41dc90bd29dcdbf062be552ec334f12109389e2263fffa3c22ad770323c5a",
-      "ukuran_kb": 20.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di Payroll Service, izin (permission set) apa yang menggerbang tiap rute, dan bagaimana model RBAC per-aksi untuk payroll bekerja (fallback tier per predikat, kill-switch enforcement). Juga menjawab: bagaimana konfigurasi BPJS/pajak (termasuk tabel TER)/potongan kehadiran diatur, bagaimana gaji per karyawan ditetapkan dan diisi massal, serta rute Payroll Run & THR mana yang sudah live di produksi vs yang masih di branch belum merged.",
+      "hash": "bea27e62b7066c9b6457fb30a1a8170f7cbb6ea8198d955ba06351e088e6fc4a",
+      "ukuran_kb": 20.6,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki Payroll Service (konfigurasi BPJS/pajak/potongan kehadiran, master data, gaji per karyawan, payroll run, THR, impor payroll run, slip self-service, rute internal), izin/gerbang RBAC apa yang menjaga tiap endpoint, dan status enam izin persetujuan berjenjang baru (P1 ADR 0129) yang sudah ada di katalog tapi belum menggerbang rute.",
       "kata_kunci": [
         "payroll",
         "gaji",
-        "API endpoint",
-        "RBAC",
-        "permission set",
-        "gate",
-        "izin",
-        "BPJS",
-        "PPh21",
-        "pajak",
+        "API payroll",
+        "endpoint payroll",
+        "RBAC payroll",
+        "permission-set",
         "payroll run",
         "THR",
-        "slip gaji"
+        "slip gaji",
+        "BPJS",
+        "PPh21"
       ]
     },
     {
@@ -1937,20 +1935,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "6ef91ad0455e3b6e0d90dcb6cc21b8e86d92f3a35388372e8fd6d0b0224f66ee",
-      "ukuran_kb": 135.3,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja lewat tiga sumbu (modul, tingkat aksi, cakupan/reach), bagaimana paket hak (permission set) menempel ke posisi, dan di mana izin ditegakkan (gateway, service, frontend). Menjelaskan modul mana yang sudah punya katalog dan penegakan per-aksi, cara mendaftarkan katalog baru, API katalog/daftar modul untuk layar Master Data, fallback tier system_roles, serta riwayat fase dua yang sempat dinyalakan lalu dicabut.",
+      "hash": "371168d0caf63730b8bd3352dbd2b3aa2fc237604c37d8ec5468420a4a47feb4",
+      "ukuran_kb": 135.8,
+      "ringkasan": "Menjawab: bagaimana mekanisme hak akses (RBAC) tiga sumbu bekerja di seluruh bip-erp (modul, tingkat aksi, cakupan data/reach), modul mana saja yang sudah menegakkan permission-set per-aksi versus masih memakai tier lama, bagaimana paket hak bernama menempel ke posisi/jabatan dan diresolusi jadi klaim JWT saat login, serta daftar katalog izin per modul yang terdaftar beserta status fase dua yang sempat dinyalakan lalu dicabut.",
       "kata_kunci": [
         "RBAC",
-        "hak akses",
         "permission set",
+        "hak akses",
         "paket hak",
+        "izin",
+        "posisi jabatan",
         "katalog izin",
-        "system_roles",
-        "tier fallback",
-        "reach",
-        "BIP-Permissions",
-        "Siapa Boleh Apa"
+        "gate",
+        "access control",
+        "reach"
       ]
     },
     {
@@ -8019,7 +8017,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, disetujui pemilik produk 2026-09-26 lewat percakapan `/analisa-kebutuhan`. **P1 (izin per tahap + paket) di PR bip-erp #2095**, belum merged; gerbang rute belum dipindah (P2). Daftar task: `Workspace/ANALISA - Persetujuan Payroll Bertingkat.md` (papan kerja, bukan dok terbit).",
+      "status_teks": "**Diusulkan**, disetujui pemilik produk 2026-09-26 lewat percakapan `/analisa-kebutuhan`. **P1 (izin per tahap + paket) merged** (bip-erp PR #2095, 2026-09-26), live DEV, prod belum; gerbang rute belum dipindah (P2). Daftar task: `Workspace/ANALISA - Persetujuan Payroll Bertingkat.md` (papan kerja, bukan dok terbit).",
       "publik": true,
       "tautan": [
         "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
@@ -8034,22 +8032,20 @@
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
         "REF - Alur Persetujuan"
       ],
-      "hash": "51aac3e7cbc646260ca59d02ba3b6fa428b0d13caf2287c26b6edb7ab1c84bb3",
-      "ukuran_kb": 19.3,
-      "ringkasan": "Menjawab: kenapa dan bagaimana persetujuan payroll run diubah dari satu langkah menjadi empat tahap berurutan (Cost Control, SPV HRD, SPV Finance, Direktur), masing-masing dengan izin tahapnya sendiri dan jejak riwayat. Juga menjawab: bagaimana pembayaran per badan usaha (PT dan 39 CV) mengunci penerbitan slip sampai seluruh badan usaha lunas, bagaimana karyawan resign/nonaktif tetap menerima slip lewat email pribadi berkata sandi, dan apa konsekuensinya terhadap izin RBAC, notifikasi, serta tanda insentif terbayar.",
+      "hash": "706cead48097204985d15c738754118d7d3526a825545d0120e3927aff969e1e",
+      "ukuran_kb": 19.4,
+      "ringkasan": "Menjawab: kenapa dan bagaimana persetujuan payroll run diubah dari satu langkah menjadi berjenjang empat tahap berurutan (Cost Control, SPV HRD, SPV Finance, Direktur), bagaimana pembayaran dicatat per badan usaha (PT dan puluhan CV) sebelum slip boleh diterbitkan, kapan tanda insentif terbayar berpindah, dan bagaimana karyawan yang sudah nonaktif menerima slip lewat email pribadi berkata sandi tanggal lahir.",
       "kata_kunci": [
-        "payroll approval",
-        "persetujuan berjenjang",
+        "ADR 0129",
+        "persetujuan payroll",
+        "approval payroll berjenjang",
         "payroll run",
-        "Cost Control",
-        "SPV HRD",
-        "SPV Finance",
-        "Direktur",
         "badan usaha",
         "CV",
-        "slip gaji",
-        "email slip",
-        "ADR 0129"
+        "cost control",
+        "direktur",
+        "slip gaji email",
+        "jenjang persetujuan"
       ]
     },
     {
@@ -16675,20 +16671,17 @@
       "tautan": [
         "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit"
       ],
-      "hash": "727b55b29b02d157d04db5c13a3874eb25f9245f69c14af513858f6b12f5bde2",
-      "ukuran_kb": 7.1,
-      "ringkasan": "Menjawab: apa urutan task (P1 sampai P7) untuk mengimplementasikan ADR 0129 persetujuan payroll bertingkat, task mana yang sudah berjalan atau punya PR terkait, dan dependensi antar-task mulai dari izin backend, jenjang tahap persetujuan, pembayaran per badan usaha, notifikasi, email slip untuk karyawan nonaktif, layar FE, sampai konfigurasi akhir. Juga menjawab: asumsi apa yang dipakai dalam implementasi ini dan hal apa yang masih belum diputuskan.",
+      "hash": "3e4ccbf8ad562f0e7391794f8c70ea3a4e32d83d9e7d6adb2aefb03ffb5943f7",
+      "ukuran_kb": 7.3,
+      "ringkasan": "Menjawab: apa saja urutan task implementasi (P1 sampai P7) untuk mewujudkan persetujuan payroll berjenjang dan pembayaran per badan usaha dari ADR 0129, task mana yang sudah selesai (P1) dan mana yang masih tertunda, dependensi antar-task, serta asumsi dan hal yang belum diputuskan.",
       "kata_kunci": [
-        "payroll",
-        "persetujuan bertingkat",
-        "task plan",
+        "ANALISA payroll",
+        "task payroll bertingkat",
+        "papan kerja",
+        "persetujuan payroll",
         "ADR 0129",
-        "izin payroll",
-        "jenjang tahap",
-        "pembayaran badan usaha",
-        "notifikasi payroll",
-        "slip email",
-        "workspace analisa"
+        "rencana implementasi",
+        "P1 P2 P3"
       ]
     },
     {
