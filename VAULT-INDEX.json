@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-26",
-  "jumlah_dokumen": 491,
+  "digenerate": "2026-09-27",
+  "jumlah_dokumen": 492,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -14342,6 +14342,36 @@
       ]
     },
     {
+      "path": "Runbooks/RUN - Pengangkatan Magang ke ID Reguler.md",
+      "judul": "RUN - Pengangkatan Magang ke ID Reguler",
+      "area": "Runbooks",
+      "jenis": "runbook",
+      "status_emoji": "🟡",
+      "status_teks": "Diusulkan (kode dalam tiga PR yang belum merged per 2026-09-27: rute ganti-ID di tiap service bip-erp [#2106](https://github.com/bip-itteam-internal/bip-erp/pull/2106), koordinator di employee-service bip-erp [#2107](https://github.com/bip-itteam-internal/bip-erp/pull/2107), tombol erp-frontend [#1760](https://github.com/bip-itteam-internal/erp-frontend/pull/1760)). Sampai ketiganya live, pengangkatan masih lewat alat IT (§6). Keputusannya [[ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service]].",
+      "publik": true,
+      "tautan": [
+        "ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service",
+        "ADR - 0126 employee_id Diterbitkan Sistem, Magang yang Diangkat Mendapat ID Reguler dengan Migrasi Riwayat",
+        "RUN - Deploy Microservices bip-erp",
+        "HRIS - Personalia"
+      ],
+      "hash": "453df308281fac51869c34004479751f9f3fc874bab068274d15c0d751e33bfe",
+      "ukuran_kb": 8.0,
+      "ringkasan": "Menjawab: bagaimana HR mengangkat karyawan magang ke PKWT/PKWTT dan menerbitkan ID reguler dari halaman Kontrak tanpa IT, apa yang terjadi sesudahnya (login ulang karyawan, tugas Finance untuk proyek Accurate), dan apa yang dilakukan bila status gagal (Ulangi, bukan pengangkatan baru). Juga menjawab arti tiap pesan galat bagi IT, cara pembalikan lewat pemetaan tersimpan, dan prasyarat serta urutan deploy.",
+      "kata_kunci": [
+        "pengangkatan magang",
+        "promosi magang ke PKWT",
+        "ganti employee_id",
+        "ID reguler",
+        "ID karyawan MG",
+        "tombol Angkat",
+        "Ulangi pengangkatan",
+        "ADR 0128",
+        "internship promotion",
+        "pembalikan ID"
+      ]
+    },
+    {
       "path": "Runbooks/RUN - Selaraskan Kode Bahan WMS ke Accurate.md",
       "judul": "RUN - Selaraskan Kode Bahan WMS ke Accurate",
       "area": "Runbooks",
@@ -16676,22 +16706,21 @@
       "tautan": [
         "ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service",
         "HRIS - Personalia",
-        "ANALISA - ID Karyawan Otomatis dan Pengangkatan Magang"
+        "ANALISA - ID Karyawan Otomatis dan Pengangkatan Magang",
+        "RUN - Pengangkatan Magang ke ID Reguler"
       ],
-      "hash": "fc641816bec1b13e429137bdd80dde24f517e17a0c00e5030294aa2ca44f8be3",
-      "ukuran_kb": 5.9,
-      "ringkasan": "Menjawab: bagaimana HR mengangkat karyawan magang (ID ber-MG) menjadi PKWT/PKWTT langsung dari ERP tanpa IT, termasuk penggantian employee_id di seluruh database tiap service, dan kenapa opsi nomor induk terpisah ditolak. Berisi urutan task (fungsi ganti ID di shared-library, rute internal per service, koordinator di employee-service, tombol Angkat di halaman Kontrak, runbook, deploy) beserta grounding tempat employee_id tampil dan konfirmasi Finance soal Accurate.",
+      "hash": "1d5b11aa881b9c2d4e34f964957a11f54569a2ffadd339dde20738420b3073a9",
+      "ukuran_kb": 7.5,
+      "ringkasan": "Menjawab: apa saja task pembangunan fitur pengangkatan magang ke ID reguler (fungsi ganti ID bersama, rute per service, koordinator, tombol FE, runbook, deploy), status dan PR tiap task, urutan merge, serta temuan judge yang mengubah rancangan. Juga menjawab kasus nyata yang menunggu (karyawan magang yang siap diangkat).",
       "kata_kunci": [
-        "pengangkatan magang",
-        "angkat magang",
-        "intern conversion",
-        "employee_id",
-        "ganti ID karyawan",
-        "PKWT",
-        "PKWTT",
+        "papan kerja pengangkatan",
+        "ANALISA pengangkatan magang",
+        "ganti employee_id",
+        "idreplace",
+        "koordinator pengangkatan",
+        "urutan deploy",
         "ADR 0128",
-        "MG",
-        "idreplace"
+        "status PR"
       ]
     },
     {
