@@ -14171,19 +14171,20 @@
         "ANALISA - Persetujuan Payroll Bertingkat",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "f06fb4b804ba77d870074cc7686308f17af9bf3eae158a9da6bdfc74c7cb416e",
-      "ukuran_kb": 9.8,
-      "ringkasan": "Menjawab: bagaimana urutan dan langkah menyalakan fitur persetujuan payroll bertingkat (ADR 0129) di produksi, container mana saja yang harus di-deploy lebih dulu beserta gerbang verifikasinya, dan bagaimana memasang paket izin ke jabatan penanda tangan sebelum flag PAYROLL_JENJANG_AKTIF dinyalakan. Juga mencakup cara memverifikasi satu perjalanan approval nyata dan cara mematikan kembali fitur bila bermasalah.",
+      "hash": "192343d77a3e323259e71e7aa51b6125e36077d1ffbb1968c24acc8682e1a0d4",
+      "ukuran_kb": 10.3,
+      "ringkasan": "Menjawab: bagaimana urutan deploy fitur persetujuan payroll bertingkat ke prod (container mana naik dalam urutan apa, dan gerbang verifikasi tiap fase), bagaimana memasang paket izin tahap ke jabatan lewat skrip sekali-jalan, dan kapan serta bagaimana menyalakan flag PAYROLL_JENJANG_AKTIF dengan aman tanpa mengganggu run payroll yang sedang berjalan.",
       "kata_kunci": [
-        "runbook deploy payroll",
-        "PAYROLL_JENJANG_AKTIF",
+        "payroll",
         "persetujuan bertingkat",
-        "rollout produksi",
-        "feature flag",
-        "paket izin",
-        "gerbang verifikasi deploy",
-        "payroll run",
-        "docker compose"
+        "PAYROLL_JENJANG_AKTIF",
+        "deploy payroll",
+        "approval payroll",
+        "flag jenjang",
+        "runbook payroll",
+        "badan usaha",
+        "jenjang persetujuan gaji",
+        "ADR 0129"
       ]
     },
     {
@@ -16796,20 +16797,20 @@
         "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
         "RUN - Menyalakan Persetujuan Payroll Bertingkat"
       ],
-      "hash": "d4807983b40e079da5327078588e7be4fe98e114f774fea797d6bd062fda41cf",
-      "ukuran_kb": 9.2,
-      "ringkasan": "Menjawab: apa urutan pengerjaan task (P1 sampai P7) untuk fitur persetujuan payroll bertingkat sesuai ADR 0129, PR bip-erp/erp-frontend mana yang sudah merged untuk tiap tahap (izin per tahap, jenjang empat tahap, pembayaran per badan usaha, notifikasi, slip email, layar FE, konfigurasi), dan mana yang masih dikerjakan atau belum diverifikasi di DEV/prod. Berfungsi sebagai papan kerja teknis yang melacak progres implementasi, bukan dokumen keputusan arsitektur itu sendiri.",
+      "hash": "1aa84b4870dc0e864375c82b90ca53db2baf6b9fe1b9e8f674ae0e09c0831c97",
+      "ukuran_kb": 9.7,
+      "ringkasan": "Menjawab: apa saja tahapan kerja (P1 sampai P7) untuk membangun fitur persetujuan payroll bertingkat, PR mana yang mengimplementasikan tiap tahap beserta status dan dependensinya, dan keputusan teknis apa yang diambil di tiap bagian (izin per tahap, jenjang empat tahap, pembayaran per badan usaha, notifikasi, slip email, layar FE).",
       "kata_kunci": [
-        "ANALISA payroll",
+        "payroll bertingkat",
+        "persetujuan payroll",
+        "P1 P2 P3 P4 P5 P6 P7",
+        "ADR 0129",
+        "jenjang persetujuan gaji",
+        "pembayaran per badan usaha",
+        "izin payroll",
         "papan kerja",
-        "persetujuan payroll bertingkat",
-        "P1-P7",
-        "task list",
-        "PR",
-        "payroll jenjang tahap",
-        "izin per tahap",
-        "status implementasi",
-        "ADR 0129"
+        "task breakdown payroll",
+        "analisa kebutuhan"
       ]
     },
     {

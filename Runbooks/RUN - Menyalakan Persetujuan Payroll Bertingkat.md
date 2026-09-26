@@ -113,13 +113,19 @@ Sesudahnya, **klaim izin terbit saat login**: pemegang jabatan harus login ulang
 
 Lakukan di **awal siklus payroll**, saat tidak ada run yang sedang dalam proses setujui. Run yang sudah `approved` di bawah alur lama tetap bisa diterbitkan dengan jalur lama; jangan menyalakan flag di tengah run yang separuh jalan.
 
-1. Buka PR bip-erp satu baris: `PAYROLL_JENJANG_AKTIF: "false"` menjadi `"true"` di blok `payroll-service` **`docker-compose.yml`**. Nilainya sengaja literal, bukan `${...}` dari `.env`, supaya perubahan flag tercatat di git dan lewat review.
-2. Setelah merged, di server:
+Compose membaca flag dari `.env` dengan bawaan `false` (`"${PAYROLL_JENJANG_AKTIF:-false}"`, bip-erp PR `fix/payroll-flag-jenjang-env`). ⚠️ Jangan menyunting nilai di `docker-compose.dev.yml`: VM dev pun membangun dari `docker-compose.yml`, jadi berkas `.dev.yml` tidak dibaca siapa pun di sana.
+
+1. Pastikan frontend yang memuat layar jenjang (erp-frontend #1761) **sudah naik** di lingkungan itu. Flag hidup dengan layar lama membuat tak seorang pun bisa menyetujui gaji.
+2. Tambahkan satu baris ke `.env` server:
+   ```
+   PAYROLL_JENJANG_AKTIF=true
+   ```
+3. Buat ulang container dan buktikan:
    ```
    docker compose up -d --force-recreate --no-deps payroll-service
    docker exec Payroll-Service printenv PAYROLL_JENJANG_AKTIF
    ```
-   Harus `true`. `restart` **tidak cukup**, karena env dibaca saat container dibuat.
+   Harus `true`. `restart` **tidak cukup**, karena env dibaca saat container dibuat. Catat tanggal dan orang yang menyalakannya di papan [[ANALISA - Persetujuan Payroll Bertingkat]], karena perubahan `.env` tidak meninggalkan jejak git.
 
 ### 3a. Gerbang verifikasi fase 3: satu perjalanan utuh sebagai orang
 
@@ -137,7 +143,7 @@ Lakukan di **awal siklus payroll**, saat tidak ada run yang sedang dalam proses 
 
 ### 3b. Mematikan kembali
 
-Bila alur bertingkat bermasalah, PR balik ke `"false"` lalu `--force-recreate` yang sama. Run yang sedang `dalam_persetujuan` **tidak otomatis kembali** ke alur lama; periksa statusnya satu per satu sebelum mematikan.
+Bila alur bertingkat bermasalah, hapus baris itu dari `.env` (atau ubah ke `false`) lalu `--force-recreate` yang sama. Run yang sedang `dalam_persetujuan` **tidak otomatis kembali** ke alur lama; periksa statusnya satu per satu sebelum mematikan.
 
 ---
 
