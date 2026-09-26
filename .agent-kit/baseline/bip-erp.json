@@ -1,11 +1,11 @@
 {
     "repo":  "bip-erp",
     "jenis":  "go",
-    "tanggal":  "2026-09-25T07:31:44.9495084Z",
-    "commit":  "f14f1864",
-    "path_ukur":  "C:/Users/irfan/wt/basis-jmo",
-    "jumlah_test":  19127,
-    "jumlah_gagal":  16,
+    "tanggal":  "2026-09-26T18:32:27.8002547Z",
+    "commit":  "5f95f5ba",
+    "path_ukur":  "C:/Users/irfan/wt/be-baseline",
+    "jumlah_test":  18346,
+    "jumlah_gagal":  17,
     "gagal":  [
                   "services/employee:employee.(paket gagal)",
                   "services/employee:employee.TestMetrikTanpaIklanGagalTerbacaPadaServiceLama",
@@ -22,9 +22,10 @@
                   "services/integration:integration/internal/usecase.TestTerjemahkanDiffReceipt_GeserAlokasi",
                   "services/integration:integration/internal/usecase.TestTerjemahkanDiffReceipt_GeserBanyakFakturSeimbang",
                   "services/integration:integration/internal/worker/tasks.(paket gagal)",
-                  "services/integration:integration/internal/worker/tasks.TestRunPenundaanDanKegagalanBersamaanTetapGalat"
+                  "services/integration:integration/internal/worker/tasks.TestRunPenundaanDanKegagalanBersamaanTetapGalat",
+                  "services/procurement:procurement.(paket gagal)"
               ],
-    "durasi_detik":  836.4,
+    "durasi_detik":  1285.7,
     "catatan":  [
 
                 ],
