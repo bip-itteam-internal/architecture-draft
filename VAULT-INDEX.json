@@ -7926,19 +7926,19 @@
         "Microservices - Employee Service",
         "Microservices - Recruitment Service"
       ],
-      "hash": "3d588b1658c599119047d2c89f431e168965c93742d58c2b4ec3b13a639e9fb8",
-      "ukuran_kb": 13.8,
-      "ringkasan": "Menjawab: bagaimana employee_id karyawan baru dibuat otomatis oleh sistem (format reguler vs magang BIP-MG, penghitung atomik per perusahaan dan deret, tanpa override manual), dan kenapa HR tidak lagi mengetik ID. Juga menjawab apa yang terjadi saat magang diangkat jadi karyawan kontrak: ID reguler baru, seluruh rujukan lintas database dimigrasi per angkatan oleh tim IT, dampaknya ke login MyBharata, cache gateway, MinIO, dan nomor proyek Accurate, serta kenapa ini pengecualian atas ADR 0044.",
+      "hash": "4721fc91e7e8b679b9d942fa65750840ff15d945a37ce875b87aa6f1c40fdcdd",
+      "ukuran_kb": 15.1,
+      "ringkasan": "Menjawab: bagaimana employee_id karyawan dibuat otomatis oleh sistem (format reguler vs magang BIP-MG-, penghitung atomik per awalan dan deret, bulan-tahun dari join_date), kenapa HR tidak lagi mengetik ID, dan apa yang terjadi saat magang diangkat jadi karyawan kontrak. Juga menjelaskan migrasi ID lama ke ID reguler baru beserta radius dampaknya (koleksi Mongo, login MyBharata, cache gateway, proyek Accurate) dan kenapa ini pengecualian atas ADR 0044.",
       "kata_kunci": [
         "employee_id",
         "ID karyawan otomatis",
         "nomor induk karyawan",
         "magang",
         "intern",
-        "pengangkatan karyawan",
-        "migrasi ID",
+        "pengangkatan magang",
+        "BIP-MG",
         "penghitung atomik",
-        "counter",
+        "migrasi ID",
         "create-employee"
       ]
     },
@@ -16053,20 +16053,20 @@
         "ADR - 0126 employee_id Diterbitkan Sistem, Magang yang Diangkat Mendapat ID Reguler dengan Migrasi Riwayat",
         "HRIS - Personalia"
       ],
-      "hash": "ef4d1450b5d0652215319b91f34a91de24e9877f84c8e1f488234db8a498d3fb",
-      "ukuran_kb": 4.8,
-      "ringkasan": "Menjawab: task apa saja (berurutan, beserta dependensinya) untuk membuat employee_id diterbitkan sistem lewat alokator atomik dan menghapus field ID dari form Tambah Karyawan, serta bagaimana magang yang diangkat berganti dari ID BIP-MG- ke ID reguler lewat alat migrasi dan runbook tanpa kehilangan riwayat. Juga memuat konfirmasi yang masih ditunggu dari HR dan Finance (dasar aturan nomor induk baru, proyek Accurate) dan hal terkait yang sengaja dipisah (regex kas Accurate, hardcode ID, nomor urut dobel).",
+      "hash": "d188c1136f99c51c61c331ab15d4550cdcfe689a6cd8ed44306cbf8b557b532c",
+      "ukuran_kb": 5.4,
+      "ringkasan": "Menjawab: task apa saja (backend alokator ID, hapus field ID di form FE, pemindaian koleksi besar, alat migrasi pengangkatan, rapikan nomor urut dobel) yang dibutuhkan untuk menerapkan ID karyawan otomatis dan pengangkatan magang, urutan dan dependensinya, serta konfirmasi apa yang masih ditunggu dari HR dan Finance. Juga mencatat hal terpisah seperti regex kas Accurate yang menolak BIP-MG dan hardcode ID di service.",
       "kata_kunci": [
-        "employee_id",
         "ID karyawan otomatis",
-        "nomor induk karyawan",
-        "magang",
-        "intern",
+        "employee_id",
         "pengangkatan magang",
-        "BIP-MG",
+        "intern promotion",
         "migrasi ID",
-        "alokator ID",
-        "ADR 0126"
+        "nomor urut dobel",
+        "duplicate employee ID",
+        "runbook",
+        "papan kerja analisa",
+        "BIP-MG"
       ]
     },
     {
