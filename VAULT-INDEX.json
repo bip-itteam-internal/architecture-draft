@@ -691,6 +691,7 @@
         "Microservices - Payroll Service",
         "API - Index",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
         "CORE - API Master Gateway",
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
         "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
@@ -703,20 +704,20 @@
         "Microservices - Attendance Service",
         "Microservices - Insentive Service"
       ],
-      "hash": "936586b33bdaa602bd8606986728ad23e238ed9d10a70192429944c64cd878cd",
-      "ukuran_kb": 19.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan payroll-service (konfigurasi BPJS/pajak/potongan kehadiran, badan usaha, komponen gaji, gaji per karyawan, payroll run dan THR, impor run, slip self-service, rute internal) dan izin RBAC permission-set mana yang menggerbang tiap rute. Juga menjawab kenapa payroll.salary.write dipisah, bagaimana penjaga periode ganda saat publish bekerja, dan kenapa /employer-cost tanpa gate.",
+      "hash": "7762cdfbe7f2d1b03c3cec3d6e501f12fe662f9381c52bf33de81975c49b35ce",
+      "ukuran_kb": 20.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan payroll service (config BPJS/pajak/potongan kehadiran, master komponen gaji, gaji per karyawan, payroll run & THR, impor run, slip self-service, rute internal), dan izin atau tier apa yang menggerbang tiap endpoint. Juga menjelaskan kenapa payroll.salary.write dipisah dari payroll.work, izin tahap persetujuan bertingkat per badan usaha, serta jebakan seperti upsert penuh gaji dan ReadBufferSize 32 KB untuk header BIP-Permissions.",
       "kata_kunci": [
         "payroll",
         "penggajian",
-        "slip gaji",
+        "API payroll",
         "payroll run",
         "THR",
+        "slip gaji",
+        "payslip",
         "BPJS",
         "PPh21 TER",
-        "employer-cost",
-        "permission-set",
-        "impor payroll"
+        "payroll.salary.write"
       ]
     },
     {
@@ -1894,6 +1895,7 @@
         "ADR - 0062 Jenjang Jabatan Menggerbangi Pengajuan Requisition Lintas-Departemen",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
+        "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
         "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko",
         "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
@@ -1932,9 +1934,9 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "a1311ed690425b4b4ccad26d5bbe488d6651951e27b0c0b6020178f30416db0b",
-      "ukuran_kb": 134.3,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja lewat tiga sumbu (modul, tingkat aksi, cakupan data), bagaimana paket hak (permission set) dipasang ke posisi/jabatan, dan modul mana yang sudah menegakkan izin per aksi. Juga menjelaskan katalog izin yang terdaftar, resolusi izin ke klaim JWT, penegakan di gateway/service/frontend, fallback tier system_roles, dan menu terbatas.",
+      "hash": "6ef91ad0455e3b6e0d90dcb6cc21b8e86d92f3a35388372e8fd6d0b0224f66ee",
+      "ukuran_kb": 135.3,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja lewat tiga sumbu (modul, tingkat aksi, cakupan/reach), bagaimana paket hak (permission set) menempel ke posisi, dan di mana izin ditegakkan (gateway, service, frontend). Menjelaskan modul mana yang sudah punya katalog dan penegakan per-aksi, cara mendaftarkan katalog baru, API katalog/daftar modul untuk layar Master Data, fallback tier system_roles, serta riwayat fase dua yang sempat dinyalakan lalu dicabut.",
       "kata_kunci": [
         "RBAC",
         "hak akses",
@@ -1943,9 +1945,9 @@
         "katalog izin",
         "system_roles",
         "tier fallback",
-        "menu terbatas",
-        "reach cakupan",
-        "posisi jabatan"
+        "reach",
+        "BIP-Permissions",
+        "Siapa Boleh Apa"
       ]
     },
     {
@@ -16617,20 +16619,20 @@
         "HRIS - Personalia",
         "ANALISA - ID Karyawan Otomatis dan Pengangkatan Magang"
       ],
-      "hash": "d441af72fef97ead728f275189d3f0680716a449e3c0b03c2b0d365cbc0f483b",
-      "ukuran_kb": 5.0,
-      "ringkasan": "Menjawab: urutan task membangun pengangkatan magang mandiri dari ERP (fungsi ganti ID di shared-library, rute internal per service, koordinator di employee-service, tombol Angkat di halaman Kontrak, runbook, deploy), kenapa nomor induk terpisah ditolak, dan konfirmasi Finance soal API Accurate. Juga memuat grounding kode: tempat employee_id tampil atau dipakai (slip gaji, ekspor, impor payroll/BPJS, login, QR, MyBharata).",
+      "hash": "fc641816bec1b13e429137bdd80dde24f517e17a0c00e5030294aa2ca44f8be3",
+      "ukuran_kb": 5.9,
+      "ringkasan": "Menjawab: bagaimana HR mengangkat karyawan magang (ID ber-MG) menjadi PKWT/PKWTT langsung dari ERP tanpa IT, termasuk penggantian employee_id di seluruh database tiap service, dan kenapa opsi nomor induk terpisah ditolak. Berisi urutan task (fungsi ganti ID di shared-library, rute internal per service, koordinator di employee-service, tombol Angkat di halaman Kontrak, runbook, deploy) beserta grounding tempat employee_id tampil dan konfirmasi Finance soal Accurate.",
       "kata_kunci": [
-        "ANALISA",
         "pengangkatan magang",
-        "intern promotion",
-        "ganti employee_id",
-        "koordinator",
-        "rute internal",
-        "halaman Kontrak",
-        "shared-library",
-        "grounding",
-        "Accurate"
+        "angkat magang",
+        "intern conversion",
+        "employee_id",
+        "ganti ID karyawan",
+        "PKWT",
+        "PKWTT",
+        "ADR 0128",
+        "MG",
+        "idreplace"
       ]
     },
     {
