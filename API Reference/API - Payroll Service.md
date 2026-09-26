@@ -150,7 +150,7 @@ Hak bawaan tiap karyawan atas datanya sendiri, ditegakkan lewat `employee_id` da
 
 ## Persetujuan bertingkat dan bayar per badan usaha (ADR 0129)
 
-🟡 **Belum di `main`.** Rute di bawah ada di tumpukan PR bip-erp #2103 (P2), #2105 (P3), dan #2108 (P4+P5), diukur dari `services/payroll/routes.go` ujung tumpukan 2026-09-27. Seluruhnya di belakang flag **`PAYROLL_JENJANG_AKTIF`**: selama flag mati, rute tulis, daftar bayar, dan email slip membalas **409**, `antrean-saya` mengembalikan seluruh run (perilaku pantauan lama), dan `approve`/`publish` berperilaku seperti alur lama. Keputusannya [[ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit]]; cara menyalakannya [[RUN - Menyalakan Persetujuan Payroll Bertingkat]].
+⚠️ **Merged ke `main` 2026-09-27** lewat bip-erp #2103 (P2), #2105 (P3), dan #2108 (P4+P5); diukur dari `services/payroll/routes.go`. DEV belum terverifikasi lewat gateway, prod belum. Seluruhnya di belakang flag **`PAYROLL_JENJANG_AKTIF`**: selama flag mati, rute tulis, daftar bayar, dan email slip membalas **409**, `antrean-saya` mengembalikan seluruh run (perilaku pantauan lama), dan `approve`/`publish` berperilaku seperti alur lama. Keputusannya [[ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit]]; cara menyalakannya [[RUN - Menyalakan Persetujuan Payroll Bertingkat]].
 
 | Method | Path | Gerbang | Catatan |
 |---|---|---|---|
