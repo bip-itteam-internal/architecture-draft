@@ -691,6 +691,7 @@
         "Microservices - Payroll Service",
         "API - Index",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
         "CORE - API Master Gateway",
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
         "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
@@ -703,20 +704,21 @@
         "Microservices - Attendance Service",
         "Microservices - Insentive Service"
       ],
-      "hash": "936586b33bdaa602bd8606986728ad23e238ed9d10a70192429944c64cd878cd",
-      "ukuran_kb": 19.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan payroll-service (konfigurasi BPJS/pajak/potongan kehadiran, badan usaha, komponen gaji, gaji per karyawan, payroll run dan THR, impor run, slip self-service, rute internal) dan izin RBAC permission-set mana yang menggerbang tiap rute. Juga menjawab kenapa payroll.salary.write dipisah, bagaimana penjaga periode ganda saat publish bekerja, dan kenapa /employer-cost tanpa gate.",
+      "hash": "bea27e62b7066c9b6457fb30a1a8170f7cbb6ea8198d955ba06351e088e6fc4a",
+      "ukuran_kb": 20.6,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki Payroll Service (konfigurasi BPJS/pajak/potongan kehadiran, master data, gaji per karyawan, payroll run, THR, impor payroll run, slip self-service, rute internal), izin/gerbang RBAC apa yang menjaga tiap endpoint, dan status enam izin persetujuan berjenjang baru (P1 ADR 0129) yang sudah ada di katalog tapi belum menggerbang rute.",
       "kata_kunci": [
         "payroll",
-        "penggajian",
-        "slip gaji",
+        "gaji",
+        "API payroll",
+        "endpoint payroll",
+        "RBAC payroll",
+        "permission-set",
         "payroll run",
         "THR",
+        "slip gaji",
         "BPJS",
-        "PPh21 TER",
-        "employer-cost",
-        "permission-set",
-        "impor payroll"
+        "PPh21"
       ]
     },
     {
@@ -1894,6 +1896,7 @@
         "ADR - 0062 Jenjang Jabatan Menggerbangi Pengajuan Requisition Lintas-Departemen",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
+        "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
         "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko",
         "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
@@ -8011,7 +8014,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, disetujui pemilik produk 2026-09-26 lewat percakapan `/analisa-kebutuhan`. Kode belum ada. Daftar task: `Workspace/ANALISA - Persetujuan Payroll Bertingkat.md` (papan kerja, bukan dok terbit).",
+      "status_teks": "**Diusulkan**, disetujui pemilik produk 2026-09-26 lewat percakapan `/analisa-kebutuhan`. **P1 (izin per tahap + paket) merged** (bip-erp PR #2095, 2026-09-26), live DEV, prod belum; gerbang rute belum dipindah (P2). Daftar task: `Workspace/ANALISA - Persetujuan Payroll Bertingkat.md` (papan kerja, bukan dok terbit).",
       "publik": true,
       "tautan": [
         "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
@@ -8026,25 +8029,20 @@
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
         "REF - Alur Persetujuan"
       ],
-      "hash": "5afc79e2954f5fe1cf370d6c981457ab46009450bf74805290275c953e6e1e68",
-      "ukuran_kb": 19.3,
-      "ringkasan": "Menjawab: bagaimana alur persetujuan payroll run berjenjang bekerja (berurutan lewat Cost Control, SPV HRD, SPV Finance, lalu Direktur), kenapa slip gaji baru boleh terbit setelah seluruh badan usaha dalam run itu (PT dan 39 CV) tercatat lunas oleh accounting masing-masing, dan bagaimana karyawan yang sudah resign/akunnya nonaktif tetap menerima slipnya lewat email pribadi sebagai PDF berkata sandi tanggal lahir. Juga menjelaskan izin baru per tahap (menggantikan satu izin `payroll.approve` lama), penjaga pengaju-tidak-boleh-menyetujui-sendiri, catatan koreksi baris sesudah tanda tangan, dan perpindahan saat insentif profit ditandai terbayar (dari snapshot disetujui Finance ke saat badan usaha karyawan lunas).",
+      "hash": "706cead48097204985d15c738754118d7d3526a825545d0120e3927aff969e1e",
+      "ukuran_kb": 19.4,
+      "ringkasan": "Menjawab: kenapa dan bagaimana persetujuan payroll run diubah dari satu langkah menjadi berjenjang empat tahap berurutan (Cost Control, SPV HRD, SPV Finance, Direktur), bagaimana pembayaran dicatat per badan usaha (PT dan puluhan CV) sebelum slip boleh diterbitkan, kapan tanda insentif terbayar berpindah, dan bagaimana karyawan yang sudah nonaktif menerima slip lewat email pribadi berkata sandi tanggal lahir.",
       "kata_kunci": [
+        "ADR 0129",
+        "persetujuan payroll",
+        "approval payroll berjenjang",
         "payroll run",
-        "persetujuan berjenjang",
-        "approval bertingkat",
-        "Cost Control",
-        "SPV HRD",
-        "SPV Finance",
-        "Direktur",
         "badan usaha",
         "CV",
-        "slip gaji",
-        "payslip PDF",
-        "email karyawan nonaktif",
-        "payroll.approve",
-        "ADR 0129",
-        "insentif terbayar"
+        "cost control",
+        "direktur",
+        "slip gaji email",
+        "jenjang persetujuan"
       ]
     },
     {
@@ -16642,20 +16640,20 @@
         "HRIS - Personalia",
         "ANALISA - ID Karyawan Otomatis dan Pengangkatan Magang"
       ],
-      "hash": "d441af72fef97ead728f275189d3f0680716a449e3c0b03c2b0d365cbc0f483b",
-      "ukuran_kb": 5.0,
-      "ringkasan": "Menjawab: urutan task membangun pengangkatan magang mandiri dari ERP (fungsi ganti ID di shared-library, rute internal per service, koordinator di employee-service, tombol Angkat di halaman Kontrak, runbook, deploy), kenapa nomor induk terpisah ditolak, dan konfirmasi Finance soal API Accurate. Juga memuat grounding kode: tempat employee_id tampil atau dipakai (slip gaji, ekspor, impor payroll/BPJS, login, QR, MyBharata).",
+      "hash": "fc641816bec1b13e429137bdd80dde24f517e17a0c00e5030294aa2ca44f8be3",
+      "ukuran_kb": 5.9,
+      "ringkasan": "Menjawab: bagaimana HR mengangkat karyawan magang (ID ber-MG) menjadi PKWT/PKWTT langsung dari ERP tanpa IT, termasuk penggantian employee_id di seluruh database tiap service, dan kenapa opsi nomor induk terpisah ditolak. Berisi urutan task (fungsi ganti ID di shared-library, rute internal per service, koordinator di employee-service, tombol Angkat di halaman Kontrak, runbook, deploy) beserta grounding tempat employee_id tampil dan konfirmasi Finance soal Accurate.",
       "kata_kunci": [
-        "ANALISA",
         "pengangkatan magang",
-        "intern promotion",
-        "ganti employee_id",
-        "koordinator",
-        "rute internal",
-        "halaman Kontrak",
-        "shared-library",
-        "grounding",
-        "Accurate"
+        "angkat magang",
+        "intern conversion",
+        "employee_id",
+        "ganti ID karyawan",
+        "PKWT",
+        "PKWTT",
+        "ADR 0128",
+        "MG",
+        "idreplace"
       ]
     },
     {
@@ -16698,21 +16696,17 @@
       "tautan": [
         "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit"
       ],
-      "hash": "1c14c205aa7389f21c69f3d867c131099d2c6c4311a69c749b7fd946a1b2286d",
-      "ukuran_kb": 6.7,
-      "ringkasan": "Menjawab: apa saja task teknis (P1 sampai P7) untuk mengimplementasikan [[ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit]], urutan pengerjaannya (izin lebih dulu, lalu jenjang backend, lalu pembayaran/notifikasi/email paralel, baru layar FE, lalu konfigurasi dan verifikasi), dan dependensi antar-task beserta service/berkas yang tersentuh. Juga mencatat asumsi kerja yang dipakai (mis. Direktur mencakup Corporate Secretary, publish ditekan manual) dan hal yang belum diputuskan (perilaku insentif bila tanda lunas dibatalkan, pengirim email khusus payroll).",
+      "hash": "3e4ccbf8ad562f0e7391794f8c70ea3a4e32d83d9e7d6adb2aefb03ffb5943f7",
+      "ukuran_kb": 7.3,
+      "ringkasan": "Menjawab: apa saja urutan task implementasi (P1 sampai P7) untuk mewujudkan persetujuan payroll berjenjang dan pembayaran per badan usaha dari ADR 0129, task mana yang sudah selesai (P1) dan mana yang masih tertunda, dependensi antar-task, serta asumsi dan hal yang belum diputuskan.",
       "kata_kunci": [
         "ANALISA payroll",
+        "task payroll bertingkat",
         "papan kerja",
-        "task plan",
-        "P1-P7",
-        "izin per tahap",
-        "jenjang persetujuan payroll",
-        "pembayaran badan usaha",
-        "CV ditugaskan",
-        "slip lewat email",
-        "/analisa-kebutuhan",
-        "ADR 0129"
+        "persetujuan payroll",
+        "ADR 0129",
+        "rencana implementasi",
+        "P1 P2 P3"
       ]
     },
     {
