@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-26",
-  "jumlah_dokumen": 489,
+  "jumlah_dokumen": 490,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1227,28 +1227,27 @@
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "HRIS - Matriks KPI per Departemen",
         "Finance - Dashboard per Posisi (FAT)",
+        "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya",
+        "Finance - Buku Besar CV",
         "IT - Server, VMs and Databases",
         "Microservices - Integration Service",
         "External - Accurate",
         "Finance - Bridging App New Golang",
         "Finance - Big Pictures",
-        "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
-        "Finance - Buku Besar CV"
+        "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi"
       ],
-      "hash": "c61fb8375758e4263e5aac3678d04fc019397221aad1cbfbbc74c8d35fcca2f1",
-      "ukuran_kb": 20.8,
-      "ringkasan": "Menjawab: apa itu aplikasi CV FINCON, di mana repo dan database-nya (repo pribadi di luar org, Supabase, di luar ERP dan gateway), serta modul apa saja yang dimilikinya: jurnal kas, piutang, utang, umum, penyesuaian, saldo awal, buku besar, laporan keuangan, aset tetap, dan konsolidasi 40 CV dengan jurnal eliminasi. Juga menjawab siapa penggunanya dan pembagian CV per akun, bagaimana jurnal kas didorong ke Google Sheets, model data Supabase, titik temunya dengan ERP, serta catatan risiko teknis seperti otorisasi hanya di klien dan simpan optimistik tanpa transaksi.",
+      "hash": "fefd660e02f2d99e46177b44bfb7e4da6531563fdeaaf4bc46a9a84d233d376a",
+      "ukuran_kb": 21.0,
+      "ringkasan": "Menjawab: apa itu aplikasi CV FINCON, kenapa ia hidup di luar ERP (repo pribadi + Supabase, bukan Accurate), modul apa saja yang sudah ada (jurnal, buku besar, konsolidasi 40 CV), dan bagaimana ia berkaitan dengan posisi Accounting CV/Senior Accountant setelah dashboard FAT diringkas 2026-09-26 (bekas layar posisi Accounting CV dihapus, bukan menuju sini).",
       "kata_kunci": [
-        "FINCON",
-        "buku besar CV",
-        "general ledger",
-        "konsolidasi 40 CV",
-        "jurnal eliminasi",
-        "Supabase",
+        "CV FINCON",
         "consolidated-accounting-app",
-        "aset tetap",
-        "penyusutan",
-        "laporan keuangan"
+        "buku besar konsolidasi",
+        "40 CV",
+        "Supabase",
+        "Accounting CV",
+        "konsolidasi intercompany",
+        "Accurate"
       ]
     },
     {
@@ -1503,11 +1502,12 @@
         "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
         "Microservices - Task Management Service",
         "ADR - 0038 Hak Per-Objek Admin Space Task Management",
+        "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya",
         "API - Integration Service",
+        "API - Finance Service",
         "Microservices - Insentive Service",
         "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
         "Finance - Buku Besar CV",
-        "API - Finance Service",
         "Microservices - Integration Service",
         "Microservices - Procurement Service",
         "ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual",
@@ -1565,20 +1565,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "0027a8f12532cd69ac2ead6d8622ea9f6044919267a5d6d0d949652c652c7f50",
-      "ukuran_kb": 568.8,
-      "ringkasan": "Menjawab: apa itu portal web ERP (One Bharata / erp-frontend), stack yang dipakai, bagaimana login, SSO identity provider, dan role gating sidebar lewat system_roles bekerja, serta modul dan halaman apa saja yang sudah ada. Juga menjawab konvensi frontend seperti data-fetching TanStack Query, konvensi bagan Recharts, struktur menu Pengaturan HRGA, dan fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan).",
+      "hash": "99fa552c214c98e705c9377a719108b87a27b89fe08baf505ed396b8e5416935",
+      "ukuran_kb": 572.7,
+      "ringkasan": "Menjawab: menu dan halaman apa saja yang ada di erp-frontend per modul (HRIS, Finance, Marketing, Task Management, dst), status implementasi dan gate izin tiap halaman, dan riwayat perubahan sidebar/menu bertanggal. Bagian Finance memuat peringkasan dashboard FAT 2026-09-26 (Ringkasan Divisi + Kamus, Tim Accounting baru, Pembukuan dan Anggaran & Cost Control menggantikan menu lama, Entitas CV disembunyikan dari sidebar).",
       "kata_kunci": [
-        "Web ERP",
         "erp-frontend",
-        "One Bharata",
-        "hris-dashboard",
-        "SSO",
-        "system_roles",
-        "sidebar",
-        "multi-tenant",
-        "Pengaturan HRGA",
-        "TanStack Query"
+        "sidebar menu",
+        "dashboard FAT",
+        "Pembukuan",
+        "Anggaran & Cost Control",
+        "Tim Accounting",
+        "CV Ditugaskan",
+        "menu terbatas",
+        "Accounts Receivable",
+        "Jurnal"
       ]
     },
     {
@@ -1910,6 +1910,7 @@
         "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
         "LOG - 2026-07-30 Audit Otorisasi Employee Service",
         "ADR - 0038 Hak Per-Objek Admin Space Task Management",
+        "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya",
         "Microservices - Form Builder Service",
         "ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor",
         "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
@@ -1932,20 +1933,18 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "a1311ed690425b4b4ccad26d5bbe488d6651951e27b0c0b6020178f30416db0b",
-      "ukuran_kb": 134.3,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja lewat tiga sumbu (modul, tingkat aksi, cakupan data), bagaimana paket hak (permission set) dipasang ke posisi/jabatan, dan modul mana yang sudah menegakkan izin per aksi. Juga menjelaskan katalog izin yang terdaftar, resolusi izin ke klaim JWT, penegakan di gateway/service/frontend, fallback tier system_roles, dan menu terbatas.",
+      "hash": "bcee9699c868a27461efb90ef70daa703cb1561154729b2f6e6b66358bb72f74",
+      "ukuran_kb": 134.4,
+      "ringkasan": "Menjawab: bagaimana model RBAC tiga sumbu (posisi, paket, tier) bekerja di seluruh service bip-erp, modul mana yang sudah berkatalog penuh vs belum, dan peta izin ke menu/halaman finance (termasuk catatan 2026-09-26 bahwa peta rute lama /finance/gl dan /finance/cost-control sudah usang setelah dashboard FAT diringkas).",
       "kata_kunci": [
         "RBAC",
-        "hak akses",
         "permission set",
-        "paket hak",
-        "katalog izin",
         "system_roles",
-        "tier fallback",
-        "menu terbatas",
-        "reach cakupan",
-        "posisi jabatan"
+        "paket izin",
+        "ADR 0030",
+        "FinanceModuleGuard",
+        "katalog modul",
+        "tier"
       ]
     },
     {
@@ -4457,6 +4456,7 @@
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0047 Jejak Pengajuan Dibaca Modul IT, Digerbang Departemen Bukan Peran",
+        "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - RBAC dan Permission Set",
         "ADR - 0051 Pencabutan Tampilan Menu per Posisi",
@@ -4466,20 +4466,17 @@
         "APP - Web ERP",
         "API - Integration Service"
       ],
-      "hash": "eea55a2a424aea94c57bdf994bae3a142b17b3cfa014565ce7f636b92db971c1",
-      "ukuran_kb": 18.1,
-      "ringkasan": "Menjawab: kenapa menu terbatas dirancang default terbuka lalu mengunci begitu ada akun yang di-assign, bagaimana penanda kunci $menulock diterbitkan employee-service saat token terbit, dan bagaimana celah akun-tanpa-permission-set akhirnya ditutup. Menjelaskan kenapa fallback gerbang backend dipatok true demi panggilan service-ke-service, kenapa super-akses sidebar perlu dikecualikan per kunci, dan apa yang masih harus diverifikasi di lingkungan nyata.",
+      "hash": "6acfcedb8196cf8f6a8b0a3f679f172c9876e3c494605c1bac12c7e04b340405",
+      "ukuran_kb": 19.6,
+      "ringkasan": "Menjawab: bagaimana mekanisme menu terbatas (whitelist per akun, default terbuka sampai ada assignment) bekerja untuk Laporan Keuangan dan Insentif, apa celah keamanannya dan status penutupannya, dan sejak 2026-09-26 di mana lokasi gerbang menu.finance.laporan berpindah (dari halaman /finance/accounting ke tab Pembukuan).",
       "kata_kunci": [
         "menu terbatas",
-        "menulock",
-        "whitelist menu",
-        "default terbuka",
-        "penanda kunci",
         "menu.finance.laporan",
-        "menu.finance.insentif",
-        "fallback",
-        "super-akses",
-        "klaim kosong"
+        "menulock",
+        "Laporan Keuangan",
+        "whitelist akun",
+        "Pembukuan",
+        "default terbuka"
       ]
     },
     {
@@ -8097,6 +8094,38 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya.md",
+      "judul": "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "✅",
+      "status_teks": "**Implemented** — merged ke `main` erp-frontend 2026-09-26; deploy prod **belum diverifikasi** (ukur ulang sebelum dipakai). Perbaikan terjemahan menu Tim Accounting yang hilang saat merge: erp-frontend #1753. PR 1 `feat/finance-rapikan-tab` (erp-frontend #1750, merge `cba2bf1bd`), PR 2 `feat/finance-rapikan-sidebar` (erp-frontend #1751, merge `70e7c13bf`). Linear BHA-274 (induk), BHA-275, BHA-276.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "Finance - Dashboard per Posisi (FAT)",
+        "ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi",
+        "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
+        "Finance - FAT Persona",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "APP - Web ERP",
+        "REF - Dashboard per Posisi (Indeks Cakupan)"
+      ],
+      "hash": "9cf17fe03e5c9e12928671b03f0f17372088f64260e9db913a6b2ab64d8b9df0",
+      "ukuran_kb": 11.0,
+      "ringkasan": "Menjawab: kenapa dashboard /finance diringkas dari sebelas tab jadi dua (Ringkasan Divisi + Kamus), ke mana isi tiap tab lama pindah (AR, Tim Accounting, Pajak, AP, Anggaran & Cost Control, atau dibuang), dan bagaimana portal /dashboard tetap per posisi memakai komponen asli modul kerja.",
+      "kata_kunci": [
+        "dashboard FAT diringkas",
+        "Tim Accounting",
+        "Pembukuan",
+        "Anggaran & Cost Control",
+        "CV Ditugaskan",
+        "RUANG_KERJA_FAT",
+        "ADR 0076",
+        "ADR 0105"
+      ]
+    },
+    {
       "path": "Finance System/Finance - Audit Internal.md",
       "judul": "Finance - Audit Internal",
       "area": "Finance System",
@@ -8270,6 +8299,7 @@
         "Microservices - Payroll Service",
         "Microservices - Integration Service",
         "Finance - Dashboard per Posisi (FAT)",
+        "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya",
         "ADR - 0078 Klasifikasi Fee Lazada Mengikuti Pemetaan COA Finance",
         "Finance - FAT Persona",
         "HRIS - Matriks KPI per Departemen",
@@ -8279,20 +8309,17 @@
         "CORE - RBAC dan Permission Set",
         "API - Payroll Service"
       ],
-      "hash": "fcfc0ae190537f203504adbf6fa086c1cd65e5ae100e944f94fc907492a927d0",
-      "ukuran_kb": 17.1,
-      "ringkasan": "Menjawab: bagaimana modul buku besar 40 CV di ERP bekerja, mulai dari master entitas CV (semai kode CV01 sampai CV40, rujukan badan usaha payroll dan rekening Accurate 1299xx), laporan kecocokan, penugasan pemegang CV, dan aturan cakupan tulis per CV. Juga menjelaskan rancangan bagan akun (COA) bersama, jenis jurnal dan format nomor voucher BKK/BKM, sumber jurnal otomatis per dokumen asal beserta prasyaratnya, laporan keuangan per CV, konsolidasi, tutup buku dan rekonsiliasi, serta hal yang belum diputuskan.",
+      "hash": "3ee713f82e11da5025f43bff355dfeb020c7cbffb921044b64f12fae40b0ff5b",
+      "ukuran_kb": 17.5,
+      "ringkasan": "Menjawab: bagaimana rancangan buku besar CV di dalam ERP (bukan CV FINCON eksternal) seharusnya bekerja — model data, gerbang kolom, tutup buku, dan siapa konsumen datanya (KPI Accounting CV, Tax Officer) — termasuk catatan 2026-09-26 bahwa bekas kartu dashboard posisi yang dirujuknya sudah dilebur/dihapus.",
       "kata_kunci": [
         "buku besar CV",
-        "entitas CV",
-        "chart of accounts",
-        "COA",
-        "penugasan pemegang CV",
-        "cakupan tulis",
-        "jurnal",
-        "voucher BKK",
-        "konsolidasi",
-        "tutup buku"
+        "rekonsiliasi kas CV",
+        "tutup buku CV",
+        "CV Ditugaskan",
+        "Accounting CV",
+        "PPh final PP 55",
+        "gerbang kolom"
       ]
     },
     {
@@ -8301,9 +8328,11 @@
       "area": "Finance System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implementasi (FE), sebagian besar elemen masih menunggu penyambungan data backend.** Dashboard keuangan per posisi (FAT) di `erp-frontend`, hidup dan dipakai. Marker sebelumnya `🟢` yang bukan anggota himpunan sah, sehingga dokumen ini tercatat TANPA status di `VAULT-INDEX.json`; diperbaiki 2026-09-04.",
+      "status_teks": "**Implementasi (FE), diringkas 2026-09-26 — isi per posisi pindah ke modul kerjanya.** Dashboard `/finance` bukan lagi sebelas tab per posisi, tapi dua tab **Ringkasan Divisi** dan **Kamus & Catatan**; ruang kerja per posisi di portal (`/dashboard`) tetap ada tapi kini memuat komponen yang ASLI dari modul kerjanya. Lihat [[ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya]].",
       "publik": true,
       "tautan": [
+        "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya",
+        "APP - Web ERP",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "Finance - FAT Persona",
         "External - Accurate",
@@ -8319,20 +8348,18 @@
         "Finance - Big Pictures",
         "Finance - Incentive"
       ],
-      "hash": "7696aad29a2978164edb2c927218c499db4023b6db0a6fc98bf35d9e859a8e58",
-      "ukuran_kb": 10.0,
-      "ringkasan": "Menjawab: bagaimana dashboard per posisi Finance/Accounting/Tax (FAT) di erp-frontend disusun (perender data-driven, rute `/finance/posisi/<posisi>`, pustaka bagan lokal), grafik dan indikator apa per posisi yang memakai data nyata beserta hook sumbernya, dan elemen mana yang dirender sebagai panel \"menunggu penyambungan\". Juga menjelaskan prinsip tanpa angka palsu, ambang pass/fail, serta rancangan isi menurut ADR 0076: 61 metrik KPI, penghambat log 1-on-1 dan Kaizen, kandidat visual utama, metrik salah petak, dan kebutuhan backend.",
+      "hash": "9904dcac4ae0cf7b56a51e25e96d17948dfb64ecabecf3a305210f18bf3aa3fd",
+      "ukuran_kb": 13.2,
+      "ringkasan": "Menjawab: bagaimana dashboard keuangan per posisi (FAT) bekerja setelah diringkas 2026-09-26 — dua tab /finance, ke mana isi tiap bekas tab posisi pindah (tabel lokasi baru), bagaimana portal /dashboard tetap per posisi, dan analisis kesenjangan metrik KPI per posisi menurut ADR 0076.",
       "kata_kunci": [
         "dashboard FAT",
-        "dashboard per posisi",
-        "finance accounting tax",
-        "AR staff",
-        "cost control",
-        "aging piutang",
-        "aging utang",
-        "erp-frontend finance",
+        "Ringkasan Divisi",
+        "Kamus & Catatan",
+        "Tim Accounting",
+        "RUANG_KERJA_FAT",
+        "ADR 0130",
         "ADR 0076",
-        "menunggu penyambungan"
+        "posisi Finance"
       ]
     },
     {
@@ -13185,6 +13212,7 @@
         "REF - Layout Dashboard erp-frontend",
         "IT - Dashboard per Posisi",
         "Finance - Dashboard per Posisi (FAT)",
+        "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya",
         "HRIS - Dashboard per Posisi",
         "GA - Dashboard per Posisi",
         "Manufacture - Dashboard per Posisi",
@@ -13197,20 +13225,17 @@
         "HRIS - Otomasi Skor KPI",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "a81fceac0d683a21cc730f1c8d28be52f7610efd99eee3e79dedf746d98306f9",
-      "ukuran_kb": 12.7,
-      "ringkasan": "Menjawab: posisi apa saja yang ada di tiap divisi, berapa metrik KPI yang benar-benar sudah otomatis di produksi versus yang masih dinilai manual, dan dokumen rancangan dashboard mana yang mengurus divisi tertentu. Menjawab juga penghambat mana yang mengunci paling banyak metrik lintas divisi (dan mana yang sebenarnya bukan pekerjaan kode melainkan keputusan pemilik KPI atau pengisian data), metrik mana yang salah petak sehingga sumbernya menjawab pertanyaan lain, serta posisi mana yang sengaja dinyatakan tidak direkomendasikan dibuatkan dashboard beserta syarat yang membalikkannya.",
+      "hash": "4de666c6715865a09f3bbd4902bf835ced2769d20194bfee294dd5fd92d755f8",
+      "ukuran_kb": 12.9,
+      "ringkasan": "Menjawab: posisi mana saja di seluruh perusahaan yang sudah/belum punya dashboard, penghambat lintas divisi yang menahan otomasi KPI (Kaizen, log 1-on-1, master anggaran, dll), dan salah petak metrik yang sudah tercatat — termasuk catatan 2026-09-26 bahwa dashboard FAT Finance sudah diringkas dari sembilan posisi bertab jadi dua tab.",
       "kata_kunci": [
-        "dashboard per posisi",
-        "position dashboard",
-        "indeks cakupan",
-        "cakupan KPI",
-        "KPI otomatis",
+        "indeks dashboard posisi",
+        "ADR 0076",
+        "penghambat KPI",
         "salah petak metrik",
-        "penghambat",
-        "blocker",
-        "matriks KPI per departemen",
-        "ADR 0076"
+        "Kaizen",
+        "log 1-on-1",
+        "master anggaran"
       ]
     },
     {

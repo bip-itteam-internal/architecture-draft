@@ -130,7 +130,7 @@ Ini bagian yang paling menentukan. **40 CV di aplikasi ini bukan entitas asing �
 
 1. **Satu fakta, dua tempat.** Laba per CV kini bisa dihitung dua kali dengan hasil berbeda: dari jurnal Supabase aplikasi ini, dan dari `/accounting/profit-loss` Accurate yang **sudah dipakai menilai KPI**. Tak ada yang merekonsiliasi keduanya, dan tak ada satu pun test di sisi mana pun yang akan berbunyi bila keduanya menyimpang.
 2. **Ada metrik KPI yang justru menunggu sistem ini.** [[HRIS - Matriks KPI per Departemen]] mencatat templat **`KPI Accounting CV`** (Junior Accountant, 6 metrik) dengan baris berbobot **0,30** — *"Menyusun laporan keuangan … akurat dan tepat waktu max tgl 4 bulan berikutnya"* — berstatus **"Belum dipetakan"**. Laporan itu **inilah** yang diproduksi di sini. Selama sistemnya tak dikenal ERP, metrik berbobot terbesar di templat itu tak akan pernah bisa otomatis.
-3. **Posisi "Accounting CV" sudah punya layar di ERP, tapi kosong.** [[Finance - Dashboard per Posisi (FAT)]] menyediakan rute `/finance/posisi/cv`, dan satu-satunya elemen hidupnya "Penjualan per toko". Orang yang memakai layar itu adalah orang yang sehari-hari bekerja di aplikasi ini.
+3. ⚠️ **Bekas layar posisi "Accounting CV" DIHAPUS 2026-09-26**, bukan lagi "punya layar tapi kosong". [[Finance - Dashboard per Posisi (FAT)]] dulu menyediakan tab posisi di `/finance` dengan rute `/finance/posisi/cv`; satu-satunya elemen hidupnya ("Penjualan per toko") **dibuang** saat dashboard FAT diringkas ([[ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya]]), bukan dipindah ke modul kerja lain. `/finance/posisi/cv` kini `redirect()` ke `/finance/entitas-cv`. Orang yang bekerja di sistem ini (Junior Accountant pemegang CV) memakai [[Finance - Buku Besar CV]] (`/finance/entitas-cv/saya`, "CV Ditugaskan") sebagai layar kerjanya — bukan lagi dashboard posisi.
 
 ## Belum Diimplementasikan / Catatan
 
@@ -179,7 +179,7 @@ Temuan review kode 2026-08-31, seluruhnya terverifikasi ke berkas & barisnya.
 - [[ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate]] — keputusan yang menentukan nasib sistem ini (🟡 Proposed)
 - [[ADR - 0001 Akuntansi via Accurate]] — keputusan yang dilanggar keberadaan sistem ini
 - [[Finance - Big Pictures]] — peta domain Finance System
-- [[Finance - Dashboard per Posisi (FAT)]] — layar `/finance/posisi/cv` untuk posisi Accounting CV
+- [[Finance - Dashboard per Posisi (FAT)]] — bekas layar `/finance/posisi/cv` (dihapus 2026-09-26, lihat § di atas)
 - [[Finance - Rancangan Finance Service]] — modul finance yang direncanakan di ERP
 - [[API - Integration Service]] — endpoint `/accounting/*` yang membaca Accurate hari ini
 - [[External - Accurate]] · [[Microservices - Payroll Service]] · [[HRIS - Matriks KPI per Departemen]]

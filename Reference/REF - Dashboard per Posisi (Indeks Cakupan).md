@@ -25,7 +25,7 @@
 | Divisi | Posisi | Metrik | Dok rancangan | Keadaan layar |
 |---|---:|---:|---|---|
 | Tech Development | 7 | 30 | [[IT - Dashboard per Posisi]] | ringkasan divisi, tanpa tab posisi. **Lembar per posisi DIBATALKAN**, lihat catatan di bawah |
-| Finance | 8 | 61 | [[Finance - Dashboard per Posisi (FAT)]] | 9 posisi bertab, hidup |
+| Finance | 8 | 61 | [[Finance - Dashboard per Posisi (FAT)]] | ⚠️ **diringkas 2026-09-26**: `/finance` kini 2 tab (Ringkasan + Kamus), bukan 9 posisi bertab — isinya pindah ke modul kerja masing-masing, portal (`/dashboard`) tetap per posisi. [[ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya]] |
 | Human Resource | 5 | 31 | [[HRIS - Dashboard per Posisi]] | 5 posisi bertab, hidup |
 | General Affair | 4 | 24 | [[GA - Dashboard per Posisi]] | 3 posisi bertab, hidup |
 | Procurement | 2 | 10 | [[GA - Dashboard per Posisi]] | belum ada |

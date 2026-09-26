@@ -1,18 +1,34 @@
-**Status**: ⚠️ **Implementasi (FE), sebagian besar elemen masih menunggu penyambungan data backend.** Dashboard keuangan per posisi (FAT) di `erp-frontend`, hidup dan dipakai. Marker sebelumnya `🟢` yang bukan anggota himpunan sah, sehingga dokumen ini tercatat TANPA status di `VAULT-INDEX.json`; diperbaiki 2026-09-04.
+**Status**: ⚠️ **Implementasi (FE), diringkas 2026-09-26 — isi per posisi pindah ke modul kerjanya.** Dashboard `/finance` bukan lagi sebelas tab per posisi, tapi dua tab **Ringkasan Divisi** dan **Kamus & Catatan**; ruang kerja per posisi di portal (`/dashboard`) tetap ada tapi kini memuat komponen yang ASLI dari modul kerjanya. Lihat [[ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya]].
 
 ## Deskripsi
 
-Menu **Finance** menyediakan **dashboard per posisi** (Finance/Accounting/Tax — "FAT") supaya tiap peran bisa mengambil keputusan **hanya dengan melihat layar**: kartu deviasi + grafik ringkas, bukan tabel mentah. Satu perender data-driven merender dua belas halaman dari deskripsinya, sehingga perbaikan tata letak dikerjakan sekali.
+Menu **Finance** dulu menyediakan **dashboard per posisi** (Finance/Accounting/Tax — "FAT") lewat sebelas tab di `/finance`. Sejak diringkas (2026-09-26, erp-frontend #1750/#1751), `/finance` hanya dua tab — **Ringkasan Divisi** (angka divisi + bagian khusus Supervisor bagi yang berhak) dan **Kamus & Catatan** — dan isi tab lama pindah ke halaman modul kerja masing-masing:
+
+| Bekas tab `/finance` | Pindah ke |
+|---|---|
+| Supervisor FAT | Dilebur ke Ringkasan Divisi; bagian khususnya (piutang B2B >60, utang lewat jatuh tempo, beban non-operasional, persetujuan menunggu, beban per kelompok, kotak masuk persetujuan) tampil hanya bila `lihatSemuaFinance` (supervisor mana pun atau anggota IT) |
+| AR Leader, AR Staf | Tab **Penagihan · Retur · Uang Masuk** di [[APP - Web ERP]] `/finance/ar` (bergabung dengan tab kanal piutang yang sudah ada di sana) |
+| Senior + Junior Accounting | Halaman baru `/finance/tim-accounting`, menu sidebar **"Tim Accounting"** |
+| Tax Officer | Kartu unik ("Beban pajak efektif", "PPN Masukan") pindah ke `/finance/pajak` |
+| Accounting Payable | Kartu unik ("Costing HPP Valid") pindah ke `/finance/ap` |
+| Cost Control | Dihapus — isinya (varians OPEX) sudah ada di `/finance/anggaran` |
+| Accounting CV | Dihapus — satu-satunya elemen hidupnya ("Penjualan per toko", `useFetchPenjualanToko`/endpoint `GET /transactions/orders/summary/shops`) **dibuang, bukan dipindah**: keputusan user 2026-09-26 saat review rencana. Endpoint itu kini tanpa konsumen FE. |
+| Kamus | Tetap tab `/finance` |
+
+Rute lama `/finance/posisi/<slug>/page.tsx` **tidak dihapus** — semuanya jadi `redirect()` ke tujuan barunya (peta tunggal `posisi/lib/tujuan-posisi-lama.ts`), supaya tautan dan penanda buku lama tak putus.
 
 Kode: `erp-frontend/src/features/finance/posisi/`
-- `components/halaman-posisi.tsx` — perender generik (kartu/bagan/tabel/peringatan) dari `data/<posisi>.ts`.
-- `components/isi-<posisi>.tsx` — isi tiap posisi; yang hook-nya sudah tersambung merender kartu/grafik **nyata** lewat slot `atas`, judulnya didaftarkan ke `elemenDilewati` agar tak dobel dengan panel "menunggu penyambungan".
-- `components/bagan/` — pustaka grafik lokal: `BaganBatang`, `BaganBatangHorizontal`, `BaganGaris`, `BaganPersen`, `BaganDonat` (donat komposisi, SVG + legenda). Warna dari token tema `WARNA_SERI` (`var(--fat-*)`), bukan heksa.
-- Rute: `app/(main)/finance/posisi/<posisi>/page.tsx` (guard izin di pemanggil). Posisi: `spv`, `ar-staf`, `ar-leader`, `junior-accounting`, `senior-accounting`, `cost-control`, `tax`, `ap`, `cv`.
+- `lib/daftar-posisi.ts` (`KELOMPOK_POSISI`) — SATU sumber isi tab `/finance`: kini hanya Ringkasan + Kamus.
+- `lib/tab-untuk-posisi.ts` (`PETA_POSISI`, `slugUntukPosisi`) — memetakan **nama posisi** (dari `work_data`) ke **slug ruang kerja** (`ringkasan` | `ar-leader` | `ar-staf` | `tim-accounting`). Dipakai portal `/dashboard` (via `RUANG_KERJA_FAT`) dan kartu Skor KPI (`skor-kpi-posisi.ts`) — **satu peta**, bukan dua, supaya "siapa pemegang posisi X" tak bisa menyimpang antara kedua pemakai.
+- `components/isi-tab.tsx` — dua peta yang SENGAJA dipisah: `ISI_KHUSUS` (isi tab `/finance`, kini tinggal Ringkasan) dan `RUANG_KERJA_FAT` (isi ruang kerja portal per slug posisi, komponennya diimpor langsung dari modul kerja masing-masing — bukan salinan).
+- `components/isi-ringkasan-divisi.tsx` — Ringkasan Divisi, menyerap bagian Supervisor lewat `components/bagian-supervisor.tsx` (dirender hanya bila `lib/lihat-semua.ts` `lihatSemuaFinance()` true).
+- `components/halaman-posisi.tsx` — perender generik (kartu/bagan/tabel/peringatan) dari deskripsi statis, kini dipakai tab Kamus dan halaman Tim Accounting.
+- `components/bagan/` — pustaka grafik lokal: `BaganBatang`, `BaganBatangHorizontal`, `BaganGaris`, `BaganPersen`, `BaganDonat`. Warna dari token tema `WARNA_SERI` (`var(--fat-*)`), bukan heksa.
+- Rute aktif: `app/(main)/finance/page.tsx` (tab `?posisi=`), `app/(main)/finance/tim-accounting/page.tsx` (guard `finance.accounting.view`). Rute pengalih: `app/(main)/finance/posisi/*/page.tsx`.
 
 Hak akses per posisi mengikuti model RBAC yang hak-nya menempel di posisi — lihat [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]].
 
-Siapa pemegang tiap posisi di produksi, akses nyatanya, dan bagaimana pekerjaan mengalir antar posisi dicatat di [[Finance - FAT Persona]] (diukur prod 2026-09-12). Temuan terpentingnya bagi layar ini: Account Payable dan Tax Officer di prod belum memegang izin apa pun, sehingga dashboard posisinya belum bisa mereka buka.
+Siapa pemegang tiap posisi di produksi, akses nyatanya, dan bagaimana pekerjaan mengalir antar posisi dicatat di [[Finance - FAT Persona]] (diukur prod 2026-09-12, **belum diukur ulang setelah peringkasan 2026-09-26** — path kode `posisi/data/<posisi>.ts` dan `posisi/components/isi-<posisi>.tsx` yang disebutnya sudah dihapus untuk posisi yang isinya pindah/dibuang; TBD naikkan dok itu). Temuan lama yang masih berlaku: Account Payable dan Tax Officer di prod belum memegang izin apa pun, sehingga halaman kerjanya belum bisa mereka buka.
 
 ## Prinsip data (penting)
 
@@ -20,32 +36,32 @@ Siapa pemegang tiap posisi di produksi, akses nyatanya, dan bagaimana pekerjaan 
 - **Pass/fail hanya untuk target yang sudah tertulis di kode.** Indikator target‑vs‑aktual dipasang di ambang yang memang ada (AR Staf: piutang >14 hari & retur >14 hari, "maks 5%"). Ambang yang masih parameter manusia tanpa master (mis. SPV "beban non‑operasional ≤2%") **sengaja tidak** dijadikan lampu lulus/gagal.
 - Sumber angka lintas modul; akuntansi via [[External - Accurate]] (laba rugi, saldo, varians anggaran).
 
-## Grafik & indikator yang sudah hidup
+## Grafik & indikator yang sudah hidup (per lokasi baru, diukur 2026-09-26)
 
-Per pembaruan **2026-08-07** (FE), grafik hidup dari data yang hook‑nya sudah dimuat:
+Isi per posisi tidak hilang saat diringkas — dipindah utuh ke halaman modul kerjanya. Tabel di bawah menggantikan tabel lama "per posisi", yang lokasinya sudah usang:
 
-| Posisi | Elemen hidup | Sumber |
+| Elemen | Lokasi sekarang | Sumber |
 |---|---|---|
-| Ringkasan Divisi | Aging piutang & Aging utang (donat komposisi); OPEX anggaran vs realisasi (batang) | `useFetchPiutangSummary`, `useAgingUtang`, `useFetchVariansEnamBulan` |
-| SPV | Tren AR >60 hari (garis); Beban per kelompok (persen); **Aging piutang** (donat); kotak persetujuan | agregator persetujuan, laba rugi & piutang Accurate |
-| AR Staf | Status penyelesaian retur (batang); Belum dicocokkan per kanal (persen); indikator target **Piutang >14 hari** & **Retur >14 hari** (maks 5%) | `useFetchReturnStats`, `useFetchMissingAgregat` |
-| AR Leader | Uang tertagih per minggu (batang); **Komposisi piutang per umur** (persen) | `useFetchReceiptMingguan`, `useFetchPiutangSummary` |
-| Cost Control | Varians per pos biaya (batang‑horizontal); **Anggaran vs Realisasi per pos** (batang 2 seri) | `useFetchVariansAnggaran` |
-| Junior Acc | **Transaksi hari ini vs rata‑rata** (batang) | `useFetchJurnal` |
-| AP | Aging utang (batang) | `useAgingUtang` |
-| Accounting CV | Penjualan per toko (bilah, 8 teratas) | `useFetchPenjualanToko` |
-| Senior Acc | Komposisi aset tetap (donat: nilai buku vs penyusutan) | `useFetchAsetTetap` |
-| Tax | Beban per kelompok (donat) | `useFetchLabaRugi` |
+| Aging piutang & Aging utang (donat); OPEX anggaran vs realisasi (batang) | Ringkasan Divisi (`/finance`) | `useFetchPiutangSummary`, `useAgingUtang`, `useFetchVariansEnamBulan` |
+| Tren AR >60 hari (garis); Beban per kelompok (persen); Aging piutang (donat); kotak persetujuan — hanya tampil bagi supervisor/IT | Ringkasan Divisi, bagian Supervisor (`bagian-supervisor.tsx`) | agregator persetujuan, laba rugi & piutang Accurate |
+| Status penyelesaian retur (batang); Belum dicocokkan per kanal (persen); indikator target **Piutang >14 hari** & **Retur >14 hari** (maks 5%) | `/finance/ar` tab Retur + Uang Masuk; kartu Piutang >14 Hari juga di ruang kerja portal AR Staff | `useFetchReturnStats`, `useFetchMissingAgregat` |
+| Uang tertagih per minggu (batang); Komposisi piutang per umur (persen) | `/finance/ar` tab Penagihan | `useFetchReceiptMingguan`, `useFetchPiutangSummary` |
+| Varians per pos biaya (batang‑horizontal); Anggaran vs Realisasi per pos (batang 2 seri) | `/finance/anggaran` (tab Master) | `useFetchVariansAnggaran` |
+| Transaksi hari ini vs rata‑rata (batang); Komposisi aset tetap (donat); Skor KPI | `/finance/tim-accounting` | `useFetchJurnal`, `useFetchAsetTetap`, `skorUntukPosisi` |
+| Aging utang (batang) | `/finance/ap` | `useAgingUtang` |
+| Costing HPP Valid (persen SKU ber-HPP) | `/finance/ap` (`kartu-costing-hpp.tsx`) | `useFetchRasioHpp` |
+| Beban pajak efektif, PPN Masukan | `/finance/pajak` (`kartu-pajak-lanjutan.tsx`) | `useFetchLabaRugi` (perhitungan lokal) |
+| ~~Penjualan per toko (Accounting CV)~~ | **Dibuang**, tanpa pengganti (keputusan 2026-09-26) | ~~`useFetchPenjualanToko`~~ |
 
 Komponen indikator: `components/kartu-indikator-target.tsx` (pil hijau/amber/merah + bar target), status dihitung `lib/status-ambang.ts` (`statusAmbang({nilai,target,arah})` → `sehat|waspada|kritis`). Transform data grafik ada di `lib/bagan-*.ts` (murni, ber‑unit test).
 
 ## TBD (menunggu backend)
 
-Masih panel jujur "menunggu penyambungan": AR Leader "hasil penagihan per cara hubung", Junior "koreksi per jenis transaksi", Senior "umur selisih rekonsiliasi", Cost Control "forecast kas" & "penghematan terealisasi", Tax "biaya non‑deductible per penyebab". Butuh endpoint/agregat backend baru sebelum bisa dijadikan grafik.
+Masih panel jujur "menunggu penyambungan" di lokasi barunya masing-masing: AR "hasil penagihan per cara hubung", Tim Accounting "koreksi per jenis transaksi" & "umur selisih rekonsiliasi", Anggaran & Cost Control "forecast kas" & "penghematan terealisasi", Pajak "biaya non‑deductible per penyebab". Butuh endpoint/agregat backend baru sebelum bisa dijadikan grafik.
 
 ## Rancangan isi menurut ADR 0076
 
-*Ditambahkan 2026-09-04. Bagian di atas merekam apa yang SUDAH tergambar; bagian ini menilai isinya terhadap [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]], sejajar dengan sembilan divisi lain. Angka KPI diukur 2026-08-28 dari [[HRIS - Matriks KPI per Departemen]]; ukur ulang sebelum dipakai mengambil keputusan.*
+*Ditambahkan 2026-09-04, **path layar di bawah belum diperbarui** setelah peringkasan 2026-09-26 — tabel "Grafik & indikator yang sudah hidup" di atas memuat lokasi baru; bagian ini merekam analisis KPI apa adanya karena masih berlaku, terlepas dari layar mana yang merendernya. Analisisnya dinilai terhadap [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]], sejajar dengan sembilan divisi lain. Angka KPI diukur 2026-08-28 dari [[HRIS - Matriks KPI per Departemen]]; ukur ulang sebelum dipakai mengambil keputusan.*
 
 Divisi ini punya **61 metrik di 8 posisi**, jumlah terbanyak di perusahaan. Yang sudah menyala otomatis di produksi baru satu: `Performance Monitoring Team` milik Finance Supervisor.
 
@@ -95,6 +111,7 @@ Empat posisi AR adalah kelompok paling siap, dan ketiganya sudah punya elemen hi
 
 ## Dokumen Terkait
 
+- [[ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya]] — keputusan peringkasan 2026-09-26 dan peta pemindahan
 - [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]] — prinsip penurunan isi dashboard posisi
 - [[REF - Layout Dashboard erp-frontend]] — cara menyusunnya di layar
 - [[HRIS - Matriks KPI per Departemen]] — sumber angka bagian rancangan

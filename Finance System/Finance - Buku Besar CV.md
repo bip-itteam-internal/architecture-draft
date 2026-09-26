@@ -72,7 +72,7 @@
 ### Tutup buku dan rekonsiliasi
 
 - Kunci periode per CV dan daftar periksa tutup buku.
-- Rekonsiliasi kas buku CV terhadap mutasi rekening yang diimpor. Kartu selisih rekening koran di dashboard posisi Accounting CV dan Senior Accountant hari ini menandai modul itu belum ada ([[Finance - Dashboard per Posisi (FAT)]]).
+- Rekonsiliasi kas buku CV terhadap mutasi rekening yang diimpor. ⚠️ Kartu selisih rekening koran yang dulu menandai modul ini belum ada hidup di bekas tab posisi Accounting CV dan Senior Accountant di dashboard FAT — tab itu sudah dilebur/dihapus 2026-09-26 ([[Finance - Dashboard per Posisi (FAT)]], [[ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya]]); modul rekonsiliasi rekening koran sendiri **tetap TBD**, kini tanpa penanda layar mana pun.
 - Rekonsiliasi bulanan kas buku CV terhadap rekening CV 1299xx di Accurate PT (makna rekening itu TBD).
 
 ### Gerbang kolom
@@ -114,7 +114,7 @@ Klasifikasi fee Lazada ke akun Accurate mengikuti [[ADR - 0078 Klasifikasi Fee L
 ## Konsumen Data
 
 - [[HRIS - Matriks KPI per Departemen]]: baris KPI Accounting CV berbobot 0,30 (laporan keuangan akurat maksimal tanggal 4 bulan berikutnya), hari ini belum dipetakan.
-- [[Finance - Dashboard per Posisi (FAT)]]: kartu posisi Accounting CV dan Senior Accountant yang menunggu data per entitas.
+- ⚠️ [[Finance - Dashboard per Posisi (FAT)]]: bekas kartu posisi Accounting CV dan Senior Accountant yang menunggu data per entitas — tab Accounting CV **dihapus** dan tab Senior Accountant **dilebur ke `/finance/tim-accounting`** 2026-09-26 ([[ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya]]); layar kerja pemegang CV kini halaman ini sendiri (`/finance/entitas-cv/saya`, "CV Ditugaskan").
 - Tax Officer: omzet per CV untuk PPh final PP 55.
 
 ## Kendala
@@ -150,7 +150,7 @@ Keputusan user 2026-09-15 (`/review` T1) yang diterima tanpa kode:
 
 ## Dokumen Terkait
 
-- [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] · [[ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate]] · [[ADR - 0001 Akuntansi via Accurate]]
+- [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] · [[ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate]] · [[ADR - 0001 Akuntansi via Accurate]] · [[ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya]]
 - [[APP - Buku Besar Konsolidasi CV FINCON]] · [[Finance - FAT Persona]] · [[Finance - Big Pictures]]
 - [[Microservices - Procurement Service]] · [[Microservices - Payroll Service]] · [[Microservices - Integration Service]] · [[External - Accurate]]
 - [[REF - Kepemilikan Data]] · [[CORE - RBAC dan Permission Set]] · [[API - Finance Service]] · [[API - Payroll Service]] · [[APP - Web ERP]]
