@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-26",
-  "jumlah_dokumen": 485,
+  "jumlah_dokumen": 487,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -7921,25 +7921,26 @@
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "ANALISA - ID Karyawan Otomatis dan Pengangkatan Magang",
         "Microservices - Payroll Service",
+        "ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service",
         "HRIS - Personalia",
         "HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)",
         "Microservices - Employee Service",
         "Microservices - Recruitment Service"
       ],
-      "hash": "93e847b66a2d0641d9340b8c645e96ff30ce2952e356c05ed8d6284695b30faa",
-      "ukuran_kb": 16.6,
-      "ringkasan": "Menjawab: siapa yang menerbitkan employee_id karyawan baru (sistem, bukan HR), apa format ID reguler dan magang (BIP-NNNN-MM-YY vs BIP-MG-NNNN-MM-YY), dan bagaimana penghitung atomik per awalan dan deret mencegah ID kembar. Juga menjelaskan apa yang terjadi saat magang diangkat jadi karyawan kontrak: ia mendapat ID reguler baru dan seluruh riwayat (absen, cuti, KPI, payroll, form) dimigrasi oleh tim IT per angkatan, serta dampaknya ke login MyBharata, cache gateway, dan nomor proyek Accurate.",
+      "hash": "19a56785dfea35ff7cbb863a3b02d3b720ea168a64be1d890a72a91fe7319309",
+      "ukuran_kb": 17.0,
+      "ringkasan": "Menjawab: kenapa ID karyawan tidak lagi diketik HR, bagaimana format ID reguler dan magang (awalan MG, nomor urut, bulan-tahun join_date) diterbitkan penghitung atomik, dan apa yang terjadi pada ID serta riwayat data saat magang diangkat ke kontrak. Juga menjelaskan temuan data prod (nomor urut dobel, magang tanpa MG), radius migrasi ganti ID lintas database, dan tempat ID hidup di luar Mongo (login, JWT, MinIO, proyek Accurate).",
       "kata_kunci": [
         "employee_id",
         "ID karyawan otomatis",
         "nomor induk karyawan",
         "magang",
-        "internship",
-        "pengangkatan karyawan",
-        "migrasi ID",
-        "counter atomik",
+        "intern",
         "BIP-MG",
-        "create-employee"
+        "penghitung atomik",
+        "counter",
+        "pengangkatan",
+        "migrasi ID"
       ]
     },
     {
@@ -7972,6 +7973,38 @@
         "mode bayangan",
         "shadow mode",
         "marketing-analytics"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service.md",
+      "judul": "ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan** 2026-09-26, disetujui pemilik produk lewat `/analisa-kebutuhan`. Kode belum ada. Papan kerja: [[ANALISA - Pengangkatan Magang dari ERP]]",
+      "publik": true,
+      "tautan": [
+        "ADR - 0126 employee_id Diterbitkan Sistem, Magang yang Diangkat Mendapat ID Reguler dengan Migrasi Riwayat",
+        "ANALISA - Pengangkatan Magang dari ERP",
+        "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
+        "ADR - 0002 Database-per-Service",
+        "HRIS - Personalia",
+        "HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)"
+      ],
+      "hash": "dec9da9b4566493b13c72995246c5aef0ba4eafc0cb7698be6c60e92f413c8e7",
+      "ukuran_kb": 8.2,
+      "ringkasan": "Menjawab: bagaimana HR mengangkat magang ke PKWT/PKWTT sendiri dari halaman Kontrak tanpa tim IT, bagaimana employee-service mengoordinasi penggantian employee_id sementara tiap service mengganti ID di databasenya sendiri lewat fungsi bersama shared-library, dan kenapa opsi nomor induk terpisah ditolak. Juga menjelaskan status pengangkatan, penanganan gagal/ulang, tugas inbox Finance untuk proyek Accurate, dan konsekuensinya (login putus sekali, service baru wajib mendaftarkan rute ganti-ID).",
+      "kata_kunci": [
+        "pengangkatan magang",
+        "intern promotion",
+        "ganti employee_id",
+        "rename ID",
+        "PKWT",
+        "PKWTT",
+        "koordinator",
+        "shared-library",
+        "database-per-service",
+        "Accurate"
       ]
     },
     {
@@ -11113,6 +11146,8 @@
         "HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)",
         "ANALISA - ID Karyawan Otomatis dan Pengangkatan Magang",
         "Microservices - Payroll Service",
+        "ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service",
+        "ANALISA - Pengangkatan Magang dari ERP",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "GA - Inventory Management",
         "HRIS - Attrition",
@@ -11123,19 +11158,19 @@
         "Microservices - Notification Service",
         "HRIS - Big Pictures"
       ],
-      "hash": "8e97fa71d385277f540a2fe60f97ce7c916ba183d5ea57a78db35922674ed7cd",
-      "ukuran_kb": 9.1,
-      "ringkasan": "Menjawab: data administrasi kepegawaian apa saja yang dikelola HRIS (data personal, kontrak PKWT, BPJS, riwayat masa kerja), bagaimana pengingat kontrak habis bekerja, dan bagaimana ID karyawan serta pengangkatan magang ditangani. Juga menjawab alur off-boarding/exit clearance, cara HR mencatat resign sekaligus menonaktifkan akun, dan cara menambal akun nonaktif yang tak punya catatan keluar.",
+      "hash": "941ce3d2a4bbb2727776296239999dd48001753bc7dce09a7f092d7643401b27",
+      "ukuran_kb": 9.9,
+      "ringkasan": "Menjawab: data administratif karyawan apa saja yang dikelola personalia (data personal, kontrak PKWT, BPJS, riwayat masa kerja), bagaimana pengingat kontrak habis bekerja, dan bagaimana ID karyawan diterbitkan serta langkah pengangkatan magang di layar. Juga menjawab urutan off-boarding/exit clearance, cara HR mencatat resign sekaligus menonaktifkan akun, dan penanganan akun nonaktif tanpa catatan keluar.",
       "kata_kunci": [
         "personalia",
         "administrasi kepegawaian",
-        "kontrak PKWT",
+        "kontrak kerja",
+        "PKWT",
         "resign",
         "off-boarding",
         "exit clearance",
         "nonaktif akun",
-        "pengingat kontrak habis",
-        "employee_id",
+        "ID karyawan",
         "pengangkatan magang"
       ]
     },
@@ -16051,22 +16086,24 @@
       "publik": false,
       "tautan": [
         "ADR - 0126 employee_id Diterbitkan Sistem, Magang yang Diangkat Mendapat ID Reguler dengan Migrasi Riwayat",
-        "HRIS - Personalia"
+        "HRIS - Personalia",
+        "ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service",
+        "ANALISA - Pengangkatan Magang dari ERP"
       ],
-      "hash": "794d309641cc79aa6fa39e98edeb583c5c56ec82b725d7c7792f660cd2fc2549",
-      "ukuran_kb": 6.6,
-      "ringkasan": "Menjawab: task apa saja yang diperlukan untuk menerapkan ADR 0126 (alokator employee_id di backend, penghapusan field ID di form Tambah Karyawan, pemindaian koleksi besar, alat migrasi ganti ID dan runbook-nya), urutan dan dependensinya, serta konfirmasi apa yang masih ditunggu dari HR dan Finance. Juga mencatat rename magang September ke awalan MG, perapian enam pasang nomor urut dobel, dan rencana pengangkatan magang pertama beserta hal terkait yang sengaja dipisahkan (regex kas Accurate, hardcode ID).",
+      "hash": "09398fad808cd6e5f9aacc4b7e32e9630f23e3992e49b2a6fa408ec1f6358d32",
+      "ukuran_kb": 6.9,
+      "ringkasan": "Menjawab: task apa saja untuk menerapkan ID karyawan otomatis dan pengangkatan magang (alokator atomik, penghapusan field ID di form, pemindaian koleksi besar, alat migrasi), konfirmasi apa yang masih ditunggu dari HR dan Finance, serta migrasi prod yang sudah dijalankan (rename 5 magang September ke BIP-MG, perapian 6 pasang nomor dobel). Juga mencatat pengangkatan Fitri sebagai kasus pertama dan hal terpisah seperti hardcode ID dan regex proyek Accurate di procurement.",
       "kata_kunci": [
+        "ANALISA",
+        "papan kerja",
         "ID karyawan otomatis",
         "employee_id",
-        "pengangkatan magang",
-        "internship promotion",
+        "nomor dobel",
+        "magang",
+        "BIP-MG",
         "migrasi ganti ID",
-        "nomor urut dobel",
-        "duplicate employee ID",
         "runbook",
-        "Accurate",
-        "papan kerja"
+        "task list"
       ]
     },
     {
@@ -16520,6 +16557,35 @@
         "pemilih tipe",
         "ADR 0067",
         "hitung fisik"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Pengangkatan Magang dari ERP.md",
+      "judul": "ANALISA - Pengangkatan Magang dari ERP",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service",
+        "HRIS - Personalia",
+        "ANALISA - ID Karyawan Otomatis dan Pengangkatan Magang"
+      ],
+      "hash": "d441af72fef97ead728f275189d3f0680716a449e3c0b03c2b0d365cbc0f483b",
+      "ukuran_kb": 5.0,
+      "ringkasan": "Menjawab: urutan task membangun pengangkatan magang mandiri dari ERP (fungsi ganti ID di shared-library, rute internal per service, koordinator di employee-service, tombol Angkat di halaman Kontrak, runbook, deploy), kenapa nomor induk terpisah ditolak, dan konfirmasi Finance soal API Accurate. Juga memuat grounding kode: tempat employee_id tampil atau dipakai (slip gaji, ekspor, impor payroll/BPJS, login, QR, MyBharata).",
+      "kata_kunci": [
+        "ANALISA",
+        "pengangkatan magang",
+        "intern promotion",
+        "ganti employee_id",
+        "koordinator",
+        "rute internal",
+        "halaman Kontrak",
+        "shared-library",
+        "grounding",
+        "Accurate"
       ]
     },
     {
