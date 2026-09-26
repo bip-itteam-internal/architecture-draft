@@ -16053,20 +16053,20 @@
         "ADR - 0126 employee_id Diterbitkan Sistem, Magang yang Diangkat Mendapat ID Reguler dengan Migrasi Riwayat",
         "HRIS - Personalia"
       ],
-      "hash": "d188c1136f99c51c61c331ab15d4550cdcfe689a6cd8ed44306cbf8b557b532c",
-      "ukuran_kb": 5.4,
-      "ringkasan": "Menjawab: task apa saja (backend alokator ID, hapus field ID di form FE, pemindaian koleksi besar, alat migrasi pengangkatan, rapikan nomor urut dobel) yang dibutuhkan untuk menerapkan ID karyawan otomatis dan pengangkatan magang, urutan dan dependensinya, serta konfirmasi apa yang masih ditunggu dari HR dan Finance. Juga mencatat hal terpisah seperti regex kas Accurate yang menolak BIP-MG dan hardcode ID di service.",
+      "hash": "82cebadca6daa0a01d491256c1c5b3cdc9f26406cbd504310d3115096ba2fbff",
+      "ukuran_kb": 6.0,
+      "ringkasan": "Menjawab: task apa saja yang diperlukan agar employee_id diterbitkan sistem lewat penghitung atomik (bukan diketik HR), bagaimana magang yang diangkat berganti dari ID BIP-MG- ke ID reguler tanpa kehilangan riwayat, dan konfirmasi apa yang masih ditunggu dari HR dan Finance. Juga mencatat migrasi yang sudah dijalankan di prod (rename 5 magang ke BIP-MG-, perapian 6 pasang nomor urut dobel) beserta langkah manual sesudahnya seperti login ulang dan proyek Accurate.",
       "kata_kunci": [
-        "ID karyawan otomatis",
-        "employee_id",
-        "pengangkatan magang",
-        "intern promotion",
-        "migrasi ID",
+        "employee_id otomatis",
+        "ID karyawan",
+        "nomor induk karyawan",
+        "magang",
+        "intern",
+        "pengangkatan karyawan",
+        "BIP-MG",
         "nomor urut dobel",
-        "duplicate employee ID",
-        "runbook",
-        "papan kerja analisa",
-        "BIP-MG"
+        "migrasi ID",
+        "ADR 0126"
       ]
     },
     {
