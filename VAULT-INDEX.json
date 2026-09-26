@@ -8723,20 +8723,20 @@
         "Finance - Sambungan dan Permintaan Data Lintas Departemen",
         "Microservices - Insentive Service"
       ],
-      "hash": "150e14f6e330119beb64d839d9aaa49fde72a440b79f116f05740de249c864d0",
+      "hash": "06ebd7b2c55ccadce2c440995ba611459fb2dbd48447c3db43f84e4a59d6f57b",
       "ukuran_kb": 8.8,
-      "ringkasan": "Menjawab: bagaimana insentif profit dihitung dari profit toko (rumus, tarif bertingkat, level ICC/Leader/Supervisor), siapa yang menetapkan target dan menyetujuinya, dan bagaimana hasilnya akhirnya dibayarkan lewat slip gaji. Juga memetakan status implementasi tiap bagian (atribusi toko ke ICC, beban operasional dari Accurate, target Leader, snapshot dan persetujuan periode) beserta celah dan keputusan yang masih terbuka.",
+      "ringkasan": "Menjawab: bagaimana insentif profit dihitung (rumus tarif bertingkat atas profit, dinilai per level ICC/Leader/Supervisor, gerbang retur 7%), siapa yang menetapkan target dan bagaimana alur pembekuan periode sampai persetujuan Finance dan pembayaran lewat slip gaji. Juga menjawab celah data apa yang masih menahan pemakaian (atribusi toko ke ICC, beban non-gaji per proyek Accurate, target Leader kosong) dan kontrol wajib yang harus dijaga (penetap target bukan penerima, persetujuan sebelum bayar).",
       "kata_kunci": [
         "insentif",
         "incentive",
         "profit",
-        "target profit",
-        "ICC",
-        "komisi",
-        "Dashboard Insentif",
-        "Master Target",
+        "target insentif",
+        "snapshot periode",
+        "persetujuan Finance",
         "slip gaji",
-        "snapshot periode"
+        "dashboard insentif",
+        "master target",
+        "HPP"
       ]
     },
     {
@@ -16110,20 +16110,20 @@
         "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
         "Finance - Proses Insentif"
       ],
-      "hash": "25f28823a422525e178003adf033f3546b0497ce45395c08aa4520db9800cf93",
-      "ukuran_kb": 9.3,
-      "ringkasan": "Menjawab: apa saja task teknis (T1 sampai T8) untuk mewujudkan pembayaran insentif profit lewat slip gaji sesuai ADR 0125, sejauh mana tiap task dikerjakan (snapshot & persetujuan BE, layar bekukan/setujui FE, komponen payroll Insentif, pencocokan impor terhadap snapshot), dan konfirmasi apa saja (K1 sampai K5) yang masih ditunggu dari Finance/HR sebelum lanjut. Papan kerja hasil /analisa-kebutuhan, bukan dokumen keputusan final.",
+      "hash": "fc9a8882791f3b8cb269fa6798f5c8ff0e78c3130e5d384cd1fc4f814d21e1c5",
+      "ukuran_kb": 9.6,
+      "ringkasan": "Menjawab: apa saja task teknis (T1 sampai T8, BE snapshot & persetujuan, FE dashboard, komponen payroll Insentif, pencocokan impor, kolom run payroll) dan konfirmasi bisnis yang masih terbuka (K1 sampai K5: PPh 21/BPJS, tahap persetujuan, tanggal tutup payroll) untuk mewujudkan pembayaran insentif profit lewat slip gaji sesuai ADR 0125. Juga memuat status terkini tiap task (merged, live DEV, atau belum prod) dan dependensi antar-task.",
       "kata_kunci": [
         "insentif",
-        "incentive",
         "slip gaji",
-        "payroll",
         "ADR 0125",
         "snapshot",
-        "persetujuan Finance",
-        "task plan",
+        "papan kerja",
         "analisa kebutuhan",
-        "komponen Insentif"
+        "payroll",
+        "persetujuan Finance",
+        "komponen Insentif",
+        "task tracking"
       ]
     },
     {
