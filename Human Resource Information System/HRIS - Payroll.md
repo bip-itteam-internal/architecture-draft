@@ -4,7 +4,7 @@
 
 [Contoh dari sistem ini](https://drive.google.com/drive/folders/17RNDBtMwKCU_tuAiLZbwCgFp-xwwmzuz)
 
-- **Status**: ⚠️ **Fase 1 (Setup) + Fase 2 (Payroll Run + publish + slip self-service) + Fase 2b (PPh21 TER) + Fase 4 (THR) + Fase 5 (PDF slip) sudah di kode dan live di produksi** ([[Microservices - Payroll Service]]) — komponen gaji, config BPJS/pajak, assign gaji per karyawan, + **payroll run** (kalkulasi gross → BPJS → potongan kehadiran → **PPh21 TER** → net; lifecycle **draft → approved → published**; karyawan lihat **slip sendiri** via self-service, kini juga sebagai **PDF**). Penggajian **bulanan** (tak ada mingguan). Prorata Tunjangan Kehadiran lewat *supplement* attendance sudah **diganti potongan eksplisit 4 baris** (merged 2026-08-20, lihat §Potongan Kehadiran Eksplisit). Scope: **sampai terbitkan slip, tanpa pembayaran**. · ⛔ **Belum pernah dipakai menggaji seorang pun**: kedua `payroll_run` di prod masih `draft` dan nol slip pernah terbit (2026-08-26). Yang menahan bukan kode, melainkan data gaji dan dua keputusan HRD — rinciannya di §Kondisi Pemakaian di Produksi pada [[Microservices - Payroll Service]].
+- **Status**: ⚠️ **Fase 1 (Setup) + Fase 2 (Payroll Run + publish + slip self-service) + Fase 2b (PPh21 TER) + Fase 4 (THR) + Fase 5 (PDF slip) sudah di kode dan live di produksi** ([[Microservices - Payroll Service]]) — komponen gaji, config BPJS/pajak, assign gaji per karyawan, + **payroll run** (kalkulasi gross → BPJS → potongan kehadiran → **PPh21 TER** → net; lifecycle **draft → approved → published**; karyawan lihat **slip sendiri** via self-service, kini juga sebagai **PDF**). Penggajian **bulanan** (tak ada mingguan). Prorata Tunjangan Kehadiran lewat *supplement* attendance sudah **diganti potongan eksplisit 4 baris** (merged 2026-08-20, lihat §Potongan Kehadiran Eksplisit). Scope: **sampai terbitkan slip, tanpa pembayaran**. · Pemakaian prod (diukur 2026-09-26, ukur ulang sebelum dipakai): dua run, "GAJI BULAN AGUSTUS 2026" (`import`, **`published`**, 174 baris) dan "Gaji September 2026" (`draft`, 173 baris); keduanya memuat karyawan dari 40 badan usaha dalam satu run. Persetujuan hari ini satu langkah; alur bertingkat yang diputuskan ada di §Persetujuan Bertingkat di bawah.
 
 ## Sudah Diimplementasikan (komponen attendance)
 
@@ -139,8 +139,23 @@ sengaja lahir non-aktif supaya tak pernah ikut run engine.
 bukan lagi pertanyaan data. Rincian lengkap berikut bukti aritmetikanya:
 [[ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji]].
 
+## Persetujuan Bertingkat dan Pembayaran per Badan Usaha (🟡 Direncanakan)
+
+Keputusannya [[ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit]] (2026-09-26); kodenya belum ada. Hari ini run disetujui dan diterbitkan oleh satu pemegang `payroll.approve` lewat dua tombol berurutan.
+
+Alur yang diputuskan (langkah orang):
+
+1. **Staf HR** merekap run lalu **mengajukan** (`draft → dalam_persetujuan`). Run terkunci dari hitung ulang dan hapus.
+2. **Cost Control** mengecek silang potongan per karyawan; boleh menulis catatan per baris dan mengembalikan run ke staf HR. Staf HR mengoreksi **baris itu saja**.
+3. **SPV HRD**, lalu **SPV Finance**, lalu **Direktur** (atau Corporate Secretary) menandatangani berurutan. Tanda tangan yang sudah diberikan tetap berlaku bila satu baris dikoreksi sesudahnya, tetapi koreksinya tampil kepada penanda tangan berikutnya. Satu orang hanya satu tanda tangan per run, dan pengaju tidak boleh menandatangani.
+4. Setelah Direktur, run `approved` dan menampilkan daftar **badan usaha** di dalamnya (hari ini sampai 40: PT Bharata Internasional + 39 CV dalam satu run). **Accounting CV** menandai CV-nya **lunas** setelah transfer dilakukan di luar sistem.
+5. Setelah **seluruh** badan usaha lunas, staf HR **menerbitkan** slip (`published`). Karyawan melihat slipnya di MyBharata seperti sekarang; karyawan yang akunnya sudah nonaktif (resign) dikirimi PDF slip ke email pribadinya, dikunci kata sandi tanggal lahir `DDMMYYYY`.
+
+Setiap langkah punya izinnya sendiri (`payroll.approve.cost_control`, `.hrd`, `.finance`, `.direksi`, `payroll.bayar`, `payroll.publish`) lewat paket di jabatan, dan tercatat di riwayat run. Penanda tangan berikutnya mendapat notifikasi inbox. Tanda insentif `terbayar` ([[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]]) pindah dari saat terbit ke saat badan usaha karyawan itu lunas.
+
 ## Dokumen Terkait
 
+- [[ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit]] (alur tanda tangan dan pembayaran per badan usaha)
 - [[ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji]] (backfill riwayat)
 - [[Microservices - Payroll Service]] (implementasi Fase 1) · [[Microservices - Attendance Service]] (`payroll-supplement`) · [[Microservices - Employee Service]] (`payroll-approx`) · [[CORE - HRIS Orchestrator]]
 - [[HRIS - Overtime]] · [[HRIS - Compensation & Benefits]] · [[Finance - Big Pictures]] · [[ADR - 0001 Akuntansi via Accurate]]
