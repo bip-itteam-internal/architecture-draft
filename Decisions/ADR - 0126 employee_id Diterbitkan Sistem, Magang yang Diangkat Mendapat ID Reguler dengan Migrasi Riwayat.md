@@ -68,6 +68,10 @@ magang  : <KODE>-MG-<NNNN>-<MM>-<YY>     BIP-MG-1013-10-26
 
 Magang yang diangkat ke PKWT atau PKWTT mendapat ID dari **penghitung reguler**, dan seluruh rujukan ke ID magangnya di semua database diganti ke ID baru. Riwayat kontraknya (Magang, lalu PKWT) berada di bawah satu ID dan tampil di `/hris/contract` tanpa layar baru.
 
+**Bulan-tahun ID baru = bulan-tahun TANGGAL DIANGKAT** (mulai kontrak PKWT/PKWTT), bukan `join_date` awal magang (keputusan pemilik produk 2026-09-26, kasus pertama Fitri Baniaturrohmah `BIP-MG-1004-06-26` → `BIP-0271-09-26`). Alasannya: nomor induk baru menandai sejak kapan orang itu menjadi karyawan; masa kerja sejak magang tetap terbaca dari riwayat kontrak.
+
+⚠️ **Riwayat kontrak hanya utuh bila kontrak Magang DITAMBAH, bukan diubah.** Pada kasus pertama, satu-satunya kontrak Fitri adalah PKWT (Evaluasi) 2026-09-26 s/d 2027-03-25 bernomor `001/Magang/BIP/VI/2026`: kontrak magangnya ditimpa jadi PKWT, sehingga masa magang lenyap dari riwayat tanpa satu pun galat. Pengangkatan yang benar di `/hris/contract` adalah **Perpanjang** (dokumen kontrak baru), bukan **Perbaiki**.
+
 **Ini membatasi cakupan [[ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id]], tidak membatalkannya.** Promosi, mutasi, dan mutasi antar-perusahaan tetap mempertahankan ID. Pengangkatan magang satu-satunya peristiwa yang menerbitkan ID ulang, dengan alasan yang tidak dimiliki mutasi: ia mengubah status kepegawaian yang dibaca manusia dari ID-nya.
 
 ### 5. Migrasi dijalankan manusia per angkatan, lewat alat yang memindai, bukan daftar tangan
@@ -85,6 +89,8 @@ Alatnya wajib:
 7. **Menutup dengan daftar langkah manual** yang tak bisa dikerjakan skrip: karyawan login ulang dan mengaktifkan ulang biometrik; username yang sama dengan ID lama diganti; proyek Accurate bernomor ID lama diganti Finance; cache gateway basi sampai TTL habis.
 
 Prosedurnya ditulis sebagai runbook di vault. Yang menekan enter di prod tetap manusia.
+
+**Alatnya ada sejak 2026-09-26**: `.task-plans/jalankan-migrasi-ganti-id.ps1 -Konfig <berkas.json>` + `migrasi-ganti-id.js`, diturunkan dari skrip T7 yang dijalankan di PROD. Satu berkas konfigurasi per run (`.task-plans/ganti-id/*.json`: daftar `{lama, nama, akhiran}`, teks konfirmasi, langkah manual). Target ditemukan dari nilai PERSIS ID lama di koleksi mana pun; potongan teks hanya boleh di path berkas MinIO/foto dan teks notifikasi; koleksi besar dipindai per field ber-ID dari sampel; nomor dipesan atomik bersyarat dari penghitung; backup hanya database yang terkena. Uji dry pengangkatan pertama menangkap dua field yang tak ada di daftar tangan migrasi September (`system_authentication.web_browser[].employee_id`, `forms.audience.employee_ids[]`).
 
 ### 6. Data lama
 
