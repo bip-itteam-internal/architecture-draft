@@ -16793,18 +16793,20 @@
         "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
         "RUN - Menyalakan Persetujuan Payroll Bertingkat"
       ],
-      "hash": "3a495adb68891fe13b44389b8eb52a1aaf323bedb9add4bdfb9f13e216bc6613",
-      "ukuran_kb": 9.0,
-      "ringkasan": "Menjawab: task apa saja yang perlu dikerjakan untuk mewujudkan ADR 0129 (persetujuan payroll bertingkat), urutan pengerjaannya dari P1 sampai P7, dependensi antar-task, serta status dan nomor PR masing-masing saat ini. Berfungsi sebagai papan kerja teknis turunan ADR, bukan dokumen keputusan final.",
+      "hash": "09183e56cc7ce89afba5a977fc95f0e9d72420e1802973d34b078be81ac2ea07",
+      "ukuran_kb": 9.2,
+      "ringkasan": "Menjawab: apa saja tahapan kerja (P1 sampai P7) untuk membangun persetujuan payroll run bertingkat sesuai ADR 0129, izin dan paket apa yang ditambahkan untuk tiap penyetuju (Cost Control, SPV HRD, SPV Finance, Direktur), bagaimana pembayaran gaji dipecah dan digerbang per badan usaha (CV) sebelum run boleh diterbitkan, serta bagaimana notifikasi dan pengiriman slip gaji lewat email untuk karyawan nonaktif ditangani. Juga memuat urutan dependensi antar-task, pranala PR terkait di bip-erp/erp-frontend, dan rencana `.task-plans/` masing-masing.",
       "kata_kunci": [
-        "papan kerja",
-        "ANALISA payroll",
-        "task list implementasi",
-        "persetujuan payroll bertingkat",
+        "payroll",
+        "persetujuan bertingkat",
+        "approval workflow",
         "ADR 0129",
-        "P1 sampai P7",
-        "pull request",
-        "roadmap"
+        "izin payroll",
+        "payroll.approve",
+        "badan usaha",
+        "CV",
+        "tanda tangan berjenjang",
+        "slip gaji email"
       ]
     },
     {
