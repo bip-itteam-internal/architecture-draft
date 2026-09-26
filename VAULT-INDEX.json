@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-26",
-  "jumlah_dokumen": 487,
+  "jumlah_dokumen": 489,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -7879,6 +7879,7 @@
         "Finance - Proses Insentif",
         "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
         "API - Insentive Service",
+        "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
         "ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya",
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
@@ -7893,20 +7894,20 @@
         "HRIS - Payroll",
         "HRIS - Payroll Persona"
       ],
-      "hash": "e7739cff5b1dc390a9b3499f4a56c7e92753d92af527c1f0bd1cee541ab98f6a",
-      "ukuran_kb": 18.7,
-      "ringkasan": "Menjawab: bagaimana insentif profit marketing dibayar (lewat slip gaji sebagai komponen Insentif terpisah dari Bonus), kenapa snapshot yang dibekukan dan disetujui Finance menjadi satu-satunya sumber angka bayar, dan kenapa penerima tak boleh menyetujui insentifnya sendiri. Juga menjawab kenapa komponen Insentif dilarang di master gaji (melingkar ke employer-cost), bagaimana perlakuan pajak/BPJS dan waktu bayar, serta amandemen ADR 0081.",
+      "hash": "8a729071e7723b89c93f0342d89b3916b324aa0e9d8283c23da724a90ee389ee",
+      "ukuran_kb": 19.1,
+      "ringkasan": "Menjawab: bagaimana insentif profit marketing dibayar lewat slip gaji sebagai komponen `Insentif` yang terpisah dari `Bonus`, mengapa snapshot periode yang dikunci dan disetujui Finance menjadi satu-satunya sumber angka bayar, siapa yang berhak menyetujui (dan kenapa penerima tidak boleh menyetujui insentifnya sendiri), serta bagaimana perlakuan pajak, BPJS, dan waktu pembayaran diputuskan.",
       "kata_kunci": [
-        "ADR 0125",
-        "insentif slip gaji",
-        "incentive payroll",
-        "snapshot insentif",
+        "insentif",
+        "incentive",
+        "slip gaji",
+        "payslip",
+        "snapshot",
         "persetujuan Finance",
         "approval",
-        "komponen Insentif",
         "Bonus",
-        "bayar sekali",
-        "employer-cost"
+        "profit marketing",
+        "ADR 0125"
       ]
     },
     {
@@ -8005,6 +8006,43 @@
         "shared-library",
         "database-per-service",
         "Accurate"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit.md",
+      "judul": "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, disetujui pemilik produk 2026-09-26 lewat percakapan `/analisa-kebutuhan`. Kode belum ada. Daftar task: `Workspace/ANALISA - Persetujuan Payroll Bertingkat.md` (papan kerja, bukan dok terbit).",
+      "publik": true,
+      "tautan": [
+        "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
+        "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
+        "HRIS - Payroll",
+        "Microservices - Payroll Service",
+        "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "HRIS - Payroll Persona",
+        "API - Payroll Service",
+        "Finance - Proses Gaji dan Iuran BPJS",
+        "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
+        "REF - Alur Persetujuan"
+      ],
+      "hash": "1ffcefe783f58e07c295bbc34037d8cd56dd6cd032a525f380ea117e501fc9bb",
+      "ukuran_kb": 17.3,
+      "ringkasan": "Menjawab: bagaimana payroll run disetujui secara berjenjang berurutan oleh Cost Control, SPV HRD, SPV Finance, lalu Direktur, bagaimana pembayaran dicatat per badan usaha (PT dan puluhan CV) sebagai syarat sebelum slip bisa diterbitkan, dan bagaimana slip dikirim ke karyawan yang sudah nonaktif lewat email pribadi berkata sandi.",
+      "kata_kunci": [
+        "payroll approval",
+        "persetujuan berjenjang",
+        "badan usaha",
+        "legal entity",
+        "CV",
+        "publish payroll",
+        "Cost Control",
+        "Direktur",
+        "slip gaji",
+        "ADR 0129"
       ]
     },
     {
@@ -11022,7 +11060,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Fase 1 (Setup) + Fase 2 (Payroll Run + publish + slip self-service) + Fase 2b (PPh21 TER) + Fase 4 (THR) + Fase 5 (PDF slip) sudah di kode dan live di produksi** ([[Microservices - Payroll Service]]) — komponen gaji, config BPJS/pajak, assign gaji per karyawan, + **payroll run** (kalkulasi gross → BPJS → potongan kehadiran → **PPh21 TER** → net; lifecycle **draft → approved → published**; karyawan lihat **slip sendiri** via self-service, kini juga sebagai **PDF**). Penggajian **bulanan** (tak ada mingguan). Prorata Tunjangan Kehadiran lewat *supplement* attendance sudah **diganti potongan eksplisit 4 baris** (merged 2026-08-20, lihat §Potongan Kehadiran Eksplisit). Scope: **sampai terbitkan slip, tanpa pembayaran**. · ⛔ **Belum pernah dipakai menggaji seorang pun**: kedua `payroll_run` di prod masih `draft` dan nol slip pernah terbit (2026-08-26). Yang menahan bukan kode, melainkan data gaji dan dua keputusan HRD — rinciannya di §Kondisi Pemakaian di Produksi pada [[Microservices - Payroll Service]].",
+      "status_teks": "**Fase 1 (Setup) + Fase 2 (Payroll Run + publish + slip self-service) + Fase 2b (PPh21 TER) + Fase 4 (THR) + Fase 5 (PDF slip) sudah di kode dan live di produksi** ([[Microservices - Payroll Service]]) — komponen gaji, config BPJS/pajak, assign gaji per karyawan, + **payroll run** (kalkulasi gross → BPJS → potongan kehadiran → **PPh21 TER** → net; lifecycle **draft → approved → published**; karyawan lihat **slip sendiri** via self-service, kini juga sebagai **PDF**). Penggajian **bulanan** (tak ada mingguan). Prorata Tunjangan Kehadiran lewat *supplement* attendance sudah **diganti potongan eksplisit 4 baris** (merged 2026-08-20, lihat §Potongan Kehadiran Eksplisit). Scope: **sampai terbitkan slip, tanpa pembayaran**. · Pemakaian prod (diukur 2026-09-26, ukur ulang sebelum dipakai): dua run, \"GAJI BULAN AGUSTUS 2026\" (`import`, **`published`**, 174 baris) dan \"Gaji September 2026\" (`draft`, 173 baris); keduanya memuat karyawan dari 40 badan usaha dalam satu run. Persetujuan hari ini satu langkah; alur bertingkat yang diputuskan ada di §Persetujuan Bertingkat di bawah.",
       "publik": true,
       "tautan": [
         "Microservices - Payroll Service",
@@ -11032,25 +11070,26 @@
         "HRIS - Payroll Persona",
         "ADR - 0001 Akuntansi via Accurate",
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
+        "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
+        "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
         "HRIS - Overtime",
         "HRIS - Compensation & Benefits",
         "Finance - Big Pictures"
       ],
-      "hash": "91c0ca8e85a0c7fa9996d6ffd7f127fc8aa2c31f9918d1db166b4d446b640b0c",
-      "ukuran_kb": 11.4,
-      "ringkasan": "Menjawab: bagaimana konsep penggajian Bharata bekerja, komponen gaji apa saja yang ada, bagaimana potongan kehadiran dan iuran BPJS diperlakukan, dan bagaimana pajak PPh21 dihitung. Juga menjelaskan kenapa riwayat gaji lama dimasukkan lewat impor spreadsheet alih-alih dihitung ulang engine.",
+      "hash": "dfb16e347abd2dd9bf45819a6dec4842b4da0d6a5ee1a04a613a5dc1e88c2e97",
+      "ukuran_kb": 13.5,
+      "ringkasan": "Menjawab: bagaimana payroll-service menghitung gaji dari komponen dan config sampai net (BPJS, PPh21 metode TER, potongan kehadiran, THR, PDF slip), apa saja tarif dan dasar tiap baris potongan kehadiran (telat, izin, mangkir, uang makan), dan bagaimana rencana persetujuan bertingkat per badan usaha akan bekerja.",
       "kata_kunci": [
         "payroll",
-        "penggajian",
         "gaji",
-        "komponen gaji",
-        "tunjangan",
-        "potongan",
+        "slip gaji",
+        "payslip",
         "BPJS",
         "PPh21",
-        "slip gaji",
+        "TER",
+        "potongan kehadiran",
         "THR",
-        "impor riwayat"
+        "komponen gaji"
       ]
     },
     {
@@ -16145,22 +16184,23 @@
       "publik": false,
       "tautan": [
         "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
-        "Finance - Proses Insentif"
+        "Finance - Proses Insentif",
+        "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit"
       ],
-      "hash": "fc9a8882791f3b8cb269fa6798f5c8ff0e78c3130e5d384cd1fc4f814d21e1c5",
-      "ukuran_kb": 9.6,
-      "ringkasan": "Menjawab: apa saja task teknis (T1 sampai T8, BE snapshot & persetujuan, FE dashboard, komponen payroll Insentif, pencocokan impor, kolom run payroll) dan konfirmasi bisnis yang masih terbuka (K1 sampai K5: PPh 21/BPJS, tahap persetujuan, tanggal tutup payroll) untuk mewujudkan pembayaran insentif profit lewat slip gaji sesuai ADR 0125. Juga memuat status terkini tiap task (merged, live DEV, atau belum prod) dan dependensi antar-task.",
+      "hash": "6119dae77f944792db3b5bc7dcae66bf3752e5bf773dd9dad2f072d61836cd91",
+      "ukuran_kb": 9.8,
+      "ringkasan": "Menjawab: apa saja task berurutan (T1 sampai T8) untuk mewujudkan pembayaran insentif lewat slip gaji sesuai ADR 0125, konfirmasi apa yang masih ditunggu dari Finance dan HR (perlakuan pajak, BPJS, jalur persetujuan Supervisor, tanggal tutup payroll), dan dependensi antar-task.",
       "kata_kunci": [
         "insentif",
-        "slip gaji",
-        "ADR 0125",
-        "snapshot",
+        "incentive",
         "papan kerja",
-        "analisa kebutuhan",
-        "payroll",
-        "persetujuan Finance",
-        "komponen Insentif",
-        "task tracking"
+        "task board",
+        "ANALISA",
+        "Finance",
+        "HR",
+        "konfirmasi",
+        "snapshot",
+        "payroll"
       ]
     },
     {
@@ -16615,6 +16655,31 @@
         "file-service",
         "force-recreate",
         "rollout pelatihan"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Persetujuan Payroll Bertingkat.md",
+      "judul": "ANALISA - Persetujuan Payroll Bertingkat",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit"
+      ],
+      "hash": "f32d0f22066a33e8792ee90836519abb262b7a24ff0ab5b12b2da99c18fc4825",
+      "ukuran_kb": 5.8,
+      "ringkasan": "Menjawab: apa saja task berurutan (P1 sampai P7) untuk membangun persetujuan payroll run bertingkat dan pembayaran per badan usaha sesuai ADR 0129, urutan pengerjaan backend lalu frontend, serta asumsi dan hal yang belum diputuskan (tier fallback izin, perilaku insentif bila lunas dibatalkan).",
+      "kata_kunci": [
+        "payroll",
+        "persetujuan bertingkat",
+        "multi-level approval",
+        "badan usaha",
+        "CV",
+        "papan kerja",
+        "task board",
+        "ANALISA"
       ]
     },
     {
