@@ -30,12 +30,15 @@ Keputusan dan alasannya di [[ADR - 0126 employee_id Diterbitkan Sistem, Magang y
 - Nomor dialokasikan employee-service secara atomik saat simpan. HR tidak mengetik dan tidak bisa mengubahnya; ID tampil di ringkasan sesudah tersimpan.
 - ⚠️ **Jangan menyimpulkan magang dari awalan ID** di kode baru. Yang menentukan tetap `employment_type` (payroll sudah begitu, [[Microservices - Payroll Service]]). Awalan `MG` untuk manusia yang membaca ID, bukan untuk mesin.
 
-**Pengangkatan magang ke PKWT/PKWTT:**
+**Pengangkatan magang ke PKWT/PKWTT** (🟡 diusulkan, [[ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service]]; papan kerja [[ANALISA - Pengangkatan Magang dari ERP]]):
 
-1. HR meminta pengangkatan ke tim IT untuk satu angkatan.
-2. Tim IT menjalankan alat migrasi (runbook menyusul, task T4 papan kerja): ID reguler baru dialokasikan dari penghitung reguler, lalu seluruh rujukan ID magang di semua database diganti. Dry-run, `mongodump`, dan gerbang sisa nol wajib.
-3. HR menutup kontrak Magang dan membuat kontrak PKWT di `/hris/contract`. Karena ID sudah satu, riwayat Magang lalu PKWT tampil berurutan di panel riwayat yang sama.
-4. Karyawan login ulang di MyBharata dengan ID baru dan mengaktifkan ulang biometrik. Finance mengganti proyek Accurate yang bernomor ID lama, bila ada.
+1. HR membuka riwayat kontrak di `/hris/contract` dan memakai **Perpanjang** (dokumen kontrak baru) untuk kontrak PKWT/PKWTT mulai tanggal diangkat. ⚠️ **Bukan Perbaiki**: Perbaiki menimpa kontrak Magang sehingga masa magang lenyap dari riwayat.
+2. Tombol **"Angkat dan terbitkan ID reguler"** muncul untuk karyawan ber-ID magang yang kini punya kontrak PKWT/PKWTT. HR menekannya pada waktu yang ia pilih (login orangnya akan putus).
+3. employee-service menerbitkan ID reguler (bulan-tahun = tanggal diangkat), lalu meminta **tiap service mengganti ID di databasenya sendiri**; status per service tampil di layar dan bisa diulang bila ada yang gagal.
+4. Finance menerima tugas di kotak masuk untuk mengganti nomor proyek Accurate, bila orang itu punya proyek.
+5. Karyawan login ulang sekali di MyBharata (username tetap) dan mengaktifkan ulang PIN/biometrik.
+
+**Sampai fitur itu live:** tim IT menjalankan `.task-plans/jalankan-migrasi-ganti-id.ps1 -Konfig <berkas>` atas permintaan HR ([[ADR - 0126 employee_id Diterbitkan Sistem, Magang yang Diangkat Mendapat ID Reguler dengan Migrasi Riwayat]] §5). Langkah 1, 4, dan 5 sama.
 
 **Yang tidak berubah:** promosi, mutasi, dan mutasi antar-perusahaan tetap mempertahankan ID ([[ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id]]). Berkas foto dan dokumen lama tetap di folder MinIO ber-ID lama dan tetap terbuka.
 
@@ -83,7 +86,7 @@ Implementasi: [[Microservices - Employee Service]] · endpoint: [[API - Employee
 ## Dependensi / Dokumen Terkait
 
 - [[HRIS - Big Pictures]]
-- [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]] · [[ADR - 0126 employee_id Diterbitkan Sistem, Magang yang Diangkat Mendapat ID Reguler dengan Migrasi Riwayat]] · [[API - Employee Service]] · [[APP - Web ERP]] · [[IT - Employee System]]
+- [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]] · [[ADR - 0126 employee_id Diterbitkan Sistem, Magang yang Diangkat Mendapat ID Reguler dengan Migrasi Riwayat]] · [[ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service]] · [[API - Employee Service]] · [[APP - Web ERP]] · [[IT - Employee System]]
 - [[HRIS - Analysis]] · [[HRIS - Attrition]]
 - [[HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)]] — digitalisasi TTE + e-Meterai kontrak (🟡 direncanakan) dan pengingat kontrak habis (✅ DEV dan PROD sejak 2026-09-12)
 - [[Microservices - Employee Service]] · [[GA - Inventory Management]]

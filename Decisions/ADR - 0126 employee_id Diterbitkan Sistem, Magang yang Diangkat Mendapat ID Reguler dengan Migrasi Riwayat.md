@@ -76,6 +76,8 @@ Magang yang diangkat ke PKWT atau PKWTT mendapat ID dari **penghitung reguler**,
 
 ### 5. Migrasi dijalankan manusia per angkatan, lewat alat yang memindai, bukan daftar tangan
 
+> ⛔ **DIGANTIKAN untuk pengangkatan magang oleh [[ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service]] (2026-09-26).** Pemilik produk memutuskan HR mengangkat sendiri dari ERP tanpa IT; tiap service mengganti ID di databasenya sendiri lewat fungsi bersama. Alat di bawah tetap sah sampai fitur itu live, dan untuk penggantian ID di luar pengangkatan (mis. perapian nomor §6).
+
 Bukan fitur di layar HR. Alasannya ukuran: fitur mandiri menuntut endpoint ganti-ID di 16+ service beserta penanganan kegagalan sebagian, persis risiko yang ditolak ADR 0044, untuk peristiwa yang terjadi per angkatan bootcamp beberapa kali setahun.
 
 Alatnya wajib:
