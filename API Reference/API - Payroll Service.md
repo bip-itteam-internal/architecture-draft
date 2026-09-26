@@ -18,7 +18,9 @@ Payroll adalah modul **pertama sesudah ticket** yang menegakkan izin **per-aksi*
 | `isHRAdmin` | Admin HR — config sensitif | idem |
 | `isApprover` | Persetujuan final (Direktur) — **saat ini identik `isHRAdmin`** | idem |
 
-Empat izin permission-set: `payroll.view` · `payroll.manage` · `payroll.work` · `payroll.approve` · `payroll.salary.write`. Identitas kosong → **401**; predikat gagal → **403**.
+Lima izin permission-set yang **ditegakkan** hari ini: `payroll.view` · `payroll.manage` · `payroll.work` · `payroll.approve` · `payroll.salary.write`. Identitas kosong → **401**; predikat gagal → **403**.
+
+🟡 **Enam izin baru ada di katalog tetapi belum menggerbang rute apa pun** ([[ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit]] P1, PR [#2095](https://github.com/bip-itteam-internal/bip-erp/pull/2095), belum merged): `payroll.approve.cost_control` · `payroll.approve.hrd` · `payroll.approve.finance` · `payroll.approve.direksi` (empat tahap tanda tangan) · `payroll.bayar` (tandai lunas per badan usaha) · `payroll.publish` (terbitkan). Rute approve/publish baru pindah ke izin-izin ini di P2. Fallback tier: izin tahap dan `bayar` **tidak** punya fallback (hanya lewat paket); `publish` jatuh ke tier `hris` supervisor dan admin. Tier admin dan paket `payroll_admin` kini daftar eksplisit, bukan "seluruh katalog", supaya HR admin tidak diam-diam memegang keempat tahap. Paket baru: `payroll_ttd_cost_control`, `payroll_ttd_hrd`, `payroll_ttd_finance`, `payroll_ttd_direksi` (tahap + `payroll.view`), `payroll_pembayar_cv` (`payroll.bayar` saja, tanpa view), `payroll_penerbit` (publish + view).
 
 ⚠️ **`payroll.salary.write` sengaja berdiri sendiri**, tidak dilebur ke `payroll.work`: staf HR boleh menyetel gaji tetapi **tidak** boleh membuat run, dan pemisahan itulah alasan izin ini ada. Melebur keduanya diam-diam memberi staf HR kemampuan menerbitkan payroll.
 
