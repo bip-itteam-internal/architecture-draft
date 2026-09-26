@@ -104,6 +104,52 @@ Terukur di prod 2026-08-27, `work_data.employment_type`: PKWT **195** · PKWT (E
 - ⚠️ **Batasnya jujur**: `employment_type` adalah master data bebas-teks. Perbandingannya case-insensitive, tapi bila kelak HR menuliskannya "Internship", orang itu jatuh ke kelompok karyawan.
 - **Run THR belum ikut disaring**; run THR selalu berlingkup semua.
 
+### Pengecualian Karyawan Resign (🟡 belum merge — branch `fix/payroll-exclude-resign-before-period`)
+
+`computeRunLines` sebelumnya menghitung SELURUH `employee_salary` tanpa menyaring status
+resign — [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]] sudah mencatat celah ini
+sejak 2026-08-05 sebagai "belum ditangani" untuk basis payroll. Ditemukan lewat data prod
+2026-09-26: 4 dari 173 baris run "Gaji September 2026" adalah karyawan yang resign
+**sebelum** periode (26 Agustus) mulai, potensi salah bayar ±Rp 12,7 juta.
+
+Sumber datanya `employee_resign` (employee-service) lewat endpoint BARU
+`GET /internal/resign/applied` ([[API - Employee Service]] §Resign / Non-Aktif Karyawan),
+bukan menumpang `/internal/export/all` yang juga dipakai THR — supaya field resign tak
+ikut mengubah bentuk respons endpoint itu untuk konsumen lain.
+
+- **Hanya resign SEBELUM ATAU TEPAT PADA hari pertama periode (`PayPeriodStart`) yang
+  dikecualikan TOTAL** dari run — bukan cuma komponen kehadirannya. `effective_date`
+  (dikirim UTC oleh employee-service) dikonversi ke WIB dulu sebelum dibandingkan per
+  KALENDER HARI (`sudahResignSebelumPeriode`, `resign_filter.go`); tanpa konversi ini
+  perbandingannya meleset sehari persis di titik yang menentukan pengecualian.
+- **Resign DI TENGAH periode dibiarkan PENUH** — hanya komponen kehadiran (`payout_pct`,
+  §Potongan Kehadiran di bawah) yang otomatis prorata seperti sudah berjalan. Ini keputusan
+  produk eksplisit, bukan celah yang tersisa: prorata gaji pokok/tunjangan tetap untuk
+  resign tengah periode belum diputuskan HR/Finance dan sengaja di luar lingkup perbaikan
+  ini.
+- **Fail-closed selalu**: gagal mengambil data resign, atau `PayPeriodStart` tak valid,
+  membatalkan run (`fmt.Errorf`, bukan menghitungnya tanpa pengecualian) — sejalan dengan
+  penanganan kegagalan identitas untuk Lingkup Run di atas.
+- **Independen (AND) dari Lingkup Run** tepat di atas — dua pemeriksaan `continue` terpisah
+  di loop yang sama, bukan pengganti satu sama lain.
+- Gerbang endpoint sumbernya **dual-axis**: role `hris` ATAU izin `payroll.work`
+  (`common.RequireHRISOrPayrollWork`, `shared-library/common/roles.go`) — pola yang sama
+  dengan `gerbangNonAktif` (employee-service, `daftar_karyawan_nonaktif.go`) untuk masalah
+  yang sama: `computeRunLines` dipanggil dari `createPayrollRun`/`recalculatePayrollRun`
+  yang digerbang `payroll.work`, bukan selalu role `hris`. ⚠️ **Fakta yang sama kini
+  terekspresikan di DUA tempat** (`gerbangNonAktif` inline vs `RequireHRISOrPayrollWork`
+  shared) — belum dikonsolidasi, dicatat sebagai utang follow-up dari `/review`.
+- **Urutan deploy wajib employee-service dulu, baru payroll-service** — payroll yang naik
+  lebih dulu memanggil rute yang belum ada di employee-service (fail-closed dengan pesan
+  galat, bukan senyap, tapi pembuatan/penghitungan-ulang run akan gagal sampai
+  employee-service menyusul).
+- **Di luar lingkup, dicatat sebagai utang terpisah**: baris `employee_salary` yatim milik
+  `BIP-2005-08-27` (identitas sudah terhapus total dari `employee_db`/`attendance_db` lewat
+  `.task-plans/hapus-BIP-2005-08-27.ps1` 2026-08-19, tapi `payroll_db` tak ikut dibersihkan
+  saat itu) — bukan kasus resign, sehingga tak tersaring perbaikan ini, dan akan terus
+  muncul lagi di run bulan berikutnya sampai dibersihkan terpisah.
+- Rencana lengkap, bukti data prod, dan hasil review: `.task-plans/2026-09-26-payroll-exclude-karyawan-resign-sebelum-periode.md`.
+
 ### Potongan Kehadiran (✅ merged 2026-08-20 — [#1318](https://github.com/bip-itteam-internal/bip-erp/pull/1318) bersama [#1317](https://github.com/bip-itteam-internal/bip-erp/pull/1317); FE erp-frontend [#1109](https://github.com/bip-itteam-internal/erp-frontend/pull/1109))
 
 Menggantikan prorata `payout_pct`. Alasannya bukan ketepatan melainkan **keterbacaan**: HRD

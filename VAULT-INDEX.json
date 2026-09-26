@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-26",
-  "jumlah_dokumen": 490,
+  "jumlah_dokumen": 491,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -134,20 +134,22 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "23ec241836ea67de7c254a319e1975083c185da72d8459e8cb3d84095e98cc95",
-      "ukuran_kb": 84.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang dilayani employee-service lewat gateway /api/employee/*, path dan gerbang RBAC mana yang menjaga tiap grup rute (login dan onboarding, personal dan work data, akun sistem, master departemen/divisi/system role, KPI, kontrak, resign, promosi dan mutasi, surat peringatan, komplain QC), serta bentuk body dan kode galat yang dikembalikan. Dipakai saat perlu memanggil atau mengubah rute HRIS inti, mencari rute master data (/data-type/*, /master/*), atau memastikan peran mana yang boleh memanggil sebuah endpoint.",
+      "hash": "2053631da3b8e45192cfdce0302521b9448ea41375c9034961eac2dfdac098b7",
+      "ukuran_kb": 85.3,
+      "ringkasan": "Menjawab endpoint apa saja yang disediakan employee-service: login/auth (termasuk PIN dan biometrik), CRUD data personal & pekerjaan karyawan, kelola akun (aktif/nonaktif, device, session), master data departemen dan system role (termasuk pengelompokan supervisi seperti HRGA), akun vendor/mitra, kontrak kerja, resign, promosi/mutasi, dan surat peringatan. Berguna saat perlu tahu path, method, dan RBAC persis sebuah endpoint HRIS inti sebelum memanggilnya dari service atau frontend lain.",
       "kata_kunci": [
         "employee-service",
-        "API endpoint",
-        "HRIS",
+        "auth",
+        "login",
         "RBAC",
         "master data",
-        "data-type",
-        "master departments",
-        "work_data",
-        "auth login",
-        "gateway"
+        "departemen",
+        "system role",
+        "kontrak kerja",
+        "resign",
+        "surat peringatan",
+        "onboarding",
+        "KPI"
       ]
     },
     {
@@ -1239,7 +1241,7 @@
         "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi"
       ],
       "hash": "fefd660e02f2d99e46177b44bfb7e4da6531563fdeaaf4bc46a9a84d233d376a",
-      "ukuran_kb": 21.0,
+      "ukuran_kb": 21.2,
       "ringkasan": "Menjawab: apa itu aplikasi CV FINCON, kenapa ia hidup di luar ERP (repo pribadi + Supabase, bukan Accurate), modul apa saja yang sudah ada (jurnal, buku besar, konsolidasi 40 CV), dan bagaimana ia berkaitan dengan posisi Accounting CV/Senior Accountant setelah dashboard FAT diringkas 2026-09-26 (bekas layar posisi Accounting CV dihapus, bukan menuju sini).",
       "kata_kunci": [
         "CV FINCON",
@@ -1568,7 +1570,7 @@
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
       "hash": "99fa552c214c98e705c9377a719108b87a27b89fe08baf505ed396b8e5416935",
-      "ukuran_kb": 572.7,
+      "ukuran_kb": 574.1,
       "ringkasan": "Menjawab: menu dan halaman apa saja yang ada di erp-frontend per modul (HRIS, Finance, Marketing, Task Management, dst), status implementasi dan gate izin tiap halaman, dan riwayat perubahan sidebar/menu bertanggal. Bagian Finance memuat peringkasan dashboard FAT 2026-09-26 (Ringkasan Divisi + Kamus, Tim Accounting baru, Pembukuan dan Anggaran & Cost Control menggantikan menu lama, Entitas CV disembunyikan dari sidebar).",
       "kata_kunci": [
         "erp-frontend",
@@ -1936,18 +1938,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "bcee9699c868a27461efb90ef70daa703cb1561154729b2f6e6b66358bb72f74",
-      "ukuran_kb": 134.4,
-      "ringkasan": "Menjawab: bagaimana model RBAC tiga sumbu (posisi, paket, tier) bekerja di seluruh service bip-erp, modul mana yang sudah berkatalog penuh vs belum, dan peta izin ke menu/halaman finance (termasuk catatan 2026-09-26 bahwa peta rute lama /finance/gl dan /finance/cost-control sudah usang setelah dashboard FAT diringkas).",
+      "hash": "b3a94d2e080a8b17f371405d9277ca5417a4b1fc07bfce6807611a8c5b7e5c60",
+      "ukuran_kb": 136.5,
+      "ringkasan": "Menjawab bagaimana mekanisme hak akses (RBAC) bip-erp bekerja di tiga sumbu: modul, tingkat aksi, dan cakupan data (own/division/all), serta bagaimana paket hak (permission set) dirakit dari katalog per modul lalu ditempelkan ke posisi/jabatan. Menjelaskan modul mana saja yang sudah ditegakkan penuh, mana yang masih bertumpu pada tier lama (fallback), dan bagaimana penegakannya ditransportasikan lewat JWT dari gateway sampai ke frontend.",
       "kata_kunci": [
         "RBAC",
         "permission set",
-        "system_roles",
-        "paket izin",
-        "ADR 0030",
-        "FinanceModuleGuard",
-        "katalog modul",
-        "tier"
+        "hak akses",
+        "izin",
+        "catalog",
+        "modul",
+        "tier fallback",
+        "posisi",
+        "jabatan",
+        "access control"
       ]
     },
     {
@@ -2916,6 +2920,8 @@
         "APP - Web ERP",
         "Microservices - Employee Service",
         "Microservices - Attendance Service",
+        "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
+        "API - Employee Service",
         "Microservices - Insentive Service",
         "HRIS - Payroll Persona",
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
@@ -2931,20 +2937,22 @@
         "ADR - 0002 Database-per-Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "e21b1559677362ef5d0812404a88e5bf71de98b5630c87e6c8f555bcfb777dff",
-      "ukuran_kb": 61.3,
-      "ringkasan": "Menjawab: apa cakupan payroll-service (komponen gaji, BPJS, PPh21 TER, penetapan gaji, payroll run, THR, PDF slip, impor dari spreadsheet HRD), bagaimana potongan kehadiran, periode kehadiran, lingkup run, dan pembulatan BPJS dihitung, serta bagaimana badan usaha penggaji disematkan ke slip. Juga menjawab di mana aturan bisnis sumbernya (BUSINESS_LOGIC_IMPLEMENTATION.md di repo mobile) dan bagaimana kondisi pemakaiannya di produksi.",
+      "hash": "0a16509b68a3eaeef084111461ba2832b3db6c36ca64737f5f0264db8cbc1186",
+      "ukuran_kb": 64.8,
+      "ringkasan": "Menjawab bagaimana payroll service menghitung dan menerbitkan gaji: setup komponen gaji dan konfigurasi BPJS/PPh21 (metode TER), cara payroll run berjalan dari kalkulasi sampai terbit slip, aturan potongan kehadiran (telat/izin/mangkir/uang makan), perhitungan THR, dan bagaimana penggajian atas nama badan usaha (PT/CV) berbeda dari tenant presensi ditangani.",
       "kata_kunci": [
         "payroll",
         "penggajian",
         "gaji",
-        "slip gaji",
-        "komponen gaji",
-        "potongan kehadiran",
         "BPJS",
         "PPh21",
+        "TER",
+        "payroll run",
+        "slip gaji",
         "THR",
-        "badan usaha"
+        "potongan kehadiran",
+        "badan usaha",
+        "CV"
       ]
     },
     {
@@ -4313,25 +4321,26 @@
         "CORE - SSO Flow",
         "ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal",
         "API - Employee Service",
+        "Microservices - Payroll Service",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "Microservices - File Service",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "HRIS - Adaptasi ERPGo HRM"
       ],
-      "hash": "ee057da202016bf0d7b30b828e3316bad6cc7904f67543072000fb4c5ed4c80c",
-      "ukuran_kb": 11.5,
-      "ringkasan": "Menjawab: siapa yang boleh menonaktifkan akun karyawan dan mengapa pencatatan resign menjadi milik HR alih-alih dikirim sebagai permintaan ke IT. Menjelaskan koleksi employee_resign (kategori, tanggal efektif, alasan) sebagai penjelas mengapa akun mati, aturan satu tempat penulisan is_active lewat terapkanStatusAkun, cron harian yang menerapkan resign jatuh tempo, serta mengapa pembatalan hanya menghidupkan akun yang dimatikan catatan itu sendiri. Juga menjawab konsekuensi yang sengaja diterima: tanpa maker-checker, staf HR bisa menonaktifkan siapa pun di perusahaannya, karyawan non-aktif lenyap dari sejumlah kueri, dan JWT yang sudah beredar tetap sah sampai TTL habis.",
+      "hash": "bc3bc433d951a08b0ac07027cdf3ca5b8739fa2fd2162cad13c86612cb40303d",
+      "ukuran_kb": 13.5,
+      "ringkasan": "Menjawab kenapa dan bagaimana penonaktifan akun karyawan mengikuti catatan resign yang dibuat HR (bukan permintaan manual ke tim IT), termasuk fungsi satu-satunya yang boleh menulis status aktif akun, aturan pembatalan resign yang keliru, dan celah yang masih terbuka seperti karyawan non-aktif yang tetap tersaring dari beberapa query listing.",
       "kata_kunci": [
         "resign",
-        "off-boarding",
-        "akun non-aktif",
-        "deactivate account",
+        "nonaktif akun",
         "is_active",
+        "offboarding",
         "employee_resign",
+        "HR",
+        "IT",
+        "deaktivasi akun",
         "terminasi",
-        "attrition",
-        "turnover",
-        "exit clearance"
+        "ADR 0035"
       ]
     },
     {
@@ -4470,7 +4479,7 @@
         "API - Integration Service"
       ],
       "hash": "6acfcedb8196cf8f6a8b0a3f679f172c9876e3c494605c1bac12c7e04b340405",
-      "ukuran_kb": 19.6,
+      "ukuran_kb": 19.7,
       "ringkasan": "Menjawab: bagaimana mekanisme menu terbatas (whitelist per akun, default terbuka sampai ada assignment) bekerja untuk Laporan Keuangan dan Insentif, apa celah keamanannya dan status penutupannya, dan sejak 2026-09-26 di mana lokasi gerbang menu.finance.laporan berpindah (dari halaman /finance/accounting ke tab Pembukuan).",
       "kata_kunci": [
         "menu terbatas",
@@ -6745,6 +6754,7 @@
         "ADR - 0001 Akuntansi via Accurate",
         "Finance - Buku Besar CV",
         "ADR - 0014 Accurate Token DB-backed via OAuth",
+        "ADR - 0131 Tanda Tangan Direktur-Sekutu pada BKK Otomatis Tanpa Approval",
         "REF - Kepemilikan Data",
         "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
         "CORE - RBAC dan Permission Set",
@@ -6762,20 +6772,19 @@
         "External - Accurate",
         "HRIS - Matriks KPI per Departemen"
       ],
-      "hash": "88ba1999a76da79609c6e5fdb7b0ae5da7b5108fd2a8e7b08826932538679fc5",
-      "ukuran_kb": 21.7,
-      "ringkasan": "Menjawab: kenapa pembukuan 40 CV grup dibangun di dalam ERP sementara PT tetap di Accurate, apa peran aplikasi FINCON sebagai spesifikasi dan sumber migrasi, serta bug FINCON mana yang wajib diperbaiki saat dibangun ulang. Juga menjelaskan satu identitas CV, cakupan akses per CV yang ditegakkan server, aturan pembukuan (penomoran voucher, kunci periode, pemeriksa), tahapan dari antrean transfer kas CV sampai jurnal otomatis dari pembayaran, kas kecil, payroll, dan marketplace, serta apa yang sengaja tidak dijanjikan (koneksi API bank, Coretax, konsolidasi PT).",
+      "hash": "3afe0cd889f9a9845c1c3f7467b281daea500fdece39343c97fdf9dfbf953ca7",
+      "ukuran_kb": 22.8,
+      "ringkasan": "Menjawab kenapa dan bagaimana buku besar 40 CV grup dibangun di dalam bip-erp (bukan tetap di aplikasi FINCON terpisah maupun dipindah ke Accurate), tahapan pengerjaannya dari entitas CV, penugasan pemegang CV, antrean pembayaran per CV, sampai jurnal otomatis dari marketplace, serta bug perhitungan FINCON yang sengaja tidak ikut disalin ke ERP.",
       "kata_kunci": [
         "buku besar CV",
-        "general ledger",
-        "konsolidasi 40 CV",
         "FINCON",
+        "konsolidasi 40 CV",
+        "akuntansi CV",
         "Accurate",
-        "Junior Accountant",
-        "transfer kas CV",
-        "jurnal otomatis",
-        "ADR 0068",
-        "amandemen ADR 0001"
+        "ADR 0096",
+        "entitas CV",
+        "jurnal",
+        "procurement CV"
       ]
     },
     {
@@ -8029,20 +8038,81 @@
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
         "REF - Alur Persetujuan"
       ],
-      "hash": "706cead48097204985d15c738754118d7d3526a825545d0120e3927aff969e1e",
-      "ukuran_kb": 19.4,
-      "ringkasan": "Menjawab: kenapa dan bagaimana persetujuan payroll run diubah dari satu langkah menjadi berjenjang empat tahap berurutan (Cost Control, SPV HRD, SPV Finance, Direktur), bagaimana pembayaran dicatat per badan usaha (PT dan puluhan CV) sebelum slip boleh diterbitkan, kapan tanda insentif terbayar berpindah, dan bagaimana karyawan yang sudah nonaktif menerima slip lewat email pribadi berkata sandi tanggal lahir.",
+      "hash": "3a123fe572f3d2fc4288ad3a9689d1fc76ace7ff3b04b6a7472862a9ee74e073",
+      "ukuran_kb": 20.5,
+      "ringkasan": "Menjawab bagaimana alur persetujuan payroll run berjenjang bekerja (Cost Control lalu SPV HRD lalu SPV Finance lalu Direktur), kenapa penerbitan slip menunggu seluruh badan usaha (PT dan 39 CV) tercatat lunas dibayar oleh accounting masing-masing, dan bagaimana mantan karyawan yang akunnya sudah nonaktif tetap menerima slip lewat email pribadi berkata sandi.",
       "kata_kunci": [
-        "ADR 0129",
-        "persetujuan payroll",
-        "approval payroll berjenjang",
         "payroll run",
+        "persetujuan bertingkat",
+        "approval jenjang",
+        "Cost Control",
+        "SPV HRD",
+        "SPV Finance",
+        "Direktur",
         "badan usaha",
+        "slip gaji",
+        "email slip",
+        "ADR 0129"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya.md",
+      "judul": "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "✅",
+      "status_teks": "**Implemented** — merged ke `main` erp-frontend 2026-09-26; deploy prod **belum diverifikasi** (ukur ulang sebelum dipakai). Perbaikan terjemahan menu Tim Accounting yang hilang saat merge: erp-frontend #1753. PR 1 `feat/finance-rapikan-tab` (erp-frontend #1750, merge `cba2bf1bd`), PR 2 `feat/finance-rapikan-sidebar` (erp-frontend #1751, merge `70e7c13bf`). Linear BHA-274 (induk), BHA-275, BHA-276.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "Finance - Dashboard per Posisi (FAT)",
+        "ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi",
+        "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
+        "Finance - FAT Persona",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "APP - Web ERP",
+        "REF - Dashboard per Posisi (Indeks Cakupan)"
+      ],
+      "hash": "9cf17fe03e5c9e12928671b03f0f17372088f64260e9db913a6b2ab64d8b9df0",
+      "ukuran_kb": 11.0,
+      "ringkasan": "Menjawab: kenapa dashboard /finance diringkas dari sebelas tab jadi dua (Ringkasan Divisi + Kamus), ke mana isi tiap tab lama pindah (AR, Tim Accounting, Pajak, AP, Anggaran & Cost Control, atau dibuang), dan bagaimana portal /dashboard tetap per posisi memakai komponen asli modul kerja.",
+      "kata_kunci": [
+        "dashboard FAT diringkas",
+        "Tim Accounting",
+        "Pembukuan",
+        "Anggaran & Cost Control",
+        "CV Ditugaskan",
+        "RUANG_KERJA_FAT",
+        "ADR 0076",
+        "ADR 0105"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0131 Tanda Tangan Direktur-Sekutu pada BKK Otomatis Tanpa Approval.md",
+      "judul": "ADR - 0131 Tanda Tangan Direktur-Sekutu pada BKK Otomatis Tanpa Approval",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": true,
+      "tautan": [
+        "ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR",
+        "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi"
+      ],
+      "hash": "0a3ca361f107624845e86f09c7ec4a6d63523c7491ed63e31da85211ef920c9b",
+      "ukuran_kb": 4.7,
+      "ringkasan": "Menjawab kenapa BKK (Bukti Kas Keluar) dan form request boleh mencetak gambar tanda tangan direktur/sekutu badan usaha (CV/PT) secara otomatis tanpa tahap approval baru, dan kenapa ini secara sadar menyimpang dari aturan ADR 0089 yang melarang gambar tanda tangan tercetak sebelum approval sungguhan terjadi.",
+      "kata_kunci": [
+        "BKK",
+        "bukti kas keluar",
+        "tanda tangan direktur",
+        "sekutu",
+        "signatory",
+        "ADR 0131",
         "CV",
-        "cost control",
-        "direktur",
-        "slip gaji email",
-        "jenjang persetujuan"
+        "PT",
+        "form request",
+        "AP"
       ]
     },
     {
@@ -8089,38 +8159,6 @@
         "workflow",
         "konvensi git",
         "pnpm"
-      ]
-    },
-    {
-      "path": "Decisions/ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya.md",
-      "judul": "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya",
-      "area": "Decisions",
-      "jenis": "adr",
-      "status_emoji": "✅",
-      "status_teks": "**Implemented** — merged ke `main` erp-frontend 2026-09-26; deploy prod **belum diverifikasi** (ukur ulang sebelum dipakai). Perbaikan terjemahan menu Tim Accounting yang hilang saat merge: erp-frontend #1753. PR 1 `feat/finance-rapikan-tab` (erp-frontend #1750, merge `cba2bf1bd`), PR 2 `feat/finance-rapikan-sidebar` (erp-frontend #1751, merge `70e7c13bf`). Linear BHA-274 (induk), BHA-275, BHA-276.",
-      "publik": true,
-      "tautan": [
-        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
-        "Finance - Dashboard per Posisi (FAT)",
-        "ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi",
-        "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
-        "Finance - FAT Persona",
-        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
-        "APP - Web ERP",
-        "REF - Dashboard per Posisi (Indeks Cakupan)"
-      ],
-      "hash": "9cf17fe03e5c9e12928671b03f0f17372088f64260e9db913a6b2ab64d8b9df0",
-      "ukuran_kb": 11.0,
-      "ringkasan": "Menjawab: kenapa dashboard /finance diringkas dari sebelas tab jadi dua (Ringkasan Divisi + Kamus), ke mana isi tiap tab lama pindah (AR, Tim Accounting, Pajak, AP, Anggaran & Cost Control, atau dibuang), dan bagaimana portal /dashboard tetap per posisi memakai komponen asli modul kerja.",
-      "kata_kunci": [
-        "dashboard FAT diringkas",
-        "Tim Accounting",
-        "Pembukuan",
-        "Anggaran & Cost Control",
-        "CV Ditugaskan",
-        "RUANG_KERJA_FAT",
-        "ADR 0076",
-        "ADR 0105"
       ]
     },
     {
@@ -8308,7 +8346,7 @@
         "API - Payroll Service"
       ],
       "hash": "3ee713f82e11da5025f43bff355dfeb020c7cbffb921044b64f12fae40b0ff5b",
-      "ukuran_kb": 17.5,
+      "ukuran_kb": 17.7,
       "ringkasan": "Menjawab: bagaimana rancangan buku besar CV di dalam ERP (bukan CV FINCON eksternal) seharusnya bekerja — model data, gerbang kolom, tutup buku, dan siapa konsumen datanya (KPI Accounting CV, Tax Officer) — termasuk catatan 2026-09-26 bahwa bekas kartu dashboard posisi yang dirujuknya sudah dilebur/dihapus.",
       "kata_kunci": [
         "buku besar CV",
@@ -8347,7 +8385,7 @@
         "Finance - Incentive"
       ],
       "hash": "9904dcac4ae0cf7b56a51e25e96d17948dfb64ecabecf3a305210f18bf3aa3fd",
-      "ukuran_kb": 13.2,
+      "ukuran_kb": 13.3,
       "ringkasan": "Menjawab: bagaimana dashboard keuangan per posisi (FAT) bekerja setelah diringkas 2026-09-26 — dua tab /finance, ke mana isi tiap bekas tab posisi pindah (tabel lokasi baru), bagaimana portal /dashboard tetap per posisi, dan analisis kesenjangan metrik KPI per posisi menurut ADR 0076.",
       "kata_kunci": [
         "dashboard FAT",
@@ -13224,7 +13262,7 @@
         "RUN - Menambah Metrik KPI Otomatis"
       ],
       "hash": "4de666c6715865a09f3bbd4902bf835ced2769d20194bfee294dd5fd92d755f8",
-      "ukuran_kb": 12.9,
+      "ukuran_kb": 13.1,
       "ringkasan": "Menjawab: posisi mana saja di seluruh perusahaan yang sudah/belum punya dashboard, penghambat lintas divisi yang menahan otomasi KPI (Kaizen, log 1-on-1, master anggaran, dll), dan salah petak metrik yang sudah tercatat — termasuk catatan 2026-09-26 bahwa dashboard FAT Finance sudah diringkas dari sembilan posisi bertab jadi dua tab.",
       "kata_kunci": [
         "indeks dashboard posisi",
@@ -16696,17 +16734,18 @@
       "tautan": [
         "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit"
       ],
-      "hash": "3e4ccbf8ad562f0e7391794f8c70ea3a4e32d83d9e7d6adb2aefb03ffb5943f7",
-      "ukuran_kb": 7.3,
-      "ringkasan": "Menjawab: apa saja urutan task implementasi (P1 sampai P7) untuk mewujudkan persetujuan payroll berjenjang dan pembayaran per badan usaha dari ADR 0129, task mana yang sudah selesai (P1) dan mana yang masih tertunda, dependensi antar-task, serta asumsi dan hal yang belum diputuskan.",
+      "hash": "aa0feb48e78c48c67c54993df8f4cdf925fcb0272ca4b512b315276bede5c17a",
+      "ukuran_kb": 7.6,
+      "ringkasan": "Menjawab urutan dan pembagian task teknis di balik ADR 0129 (persetujuan payroll bertingkat) -- dari izin per tahap, jenjang empat tahap approval, pembayaran per badan usaha, notifikasi, email slip untuk karyawan nonaktif, layar frontend run payroll, sampai konfigurasi dan verifikasi akhir -- beserta dependensi antar-task dan asumsi yang dipakai.",
       "kata_kunci": [
-        "ANALISA payroll",
-        "task payroll bertingkat",
+        "ANALISA",
+        "payroll bertingkat",
         "papan kerja",
-        "persetujuan payroll",
+        "task plan",
+        "jenjang tahap",
+        "izin per tahap",
         "ADR 0129",
-        "rencana implementasi",
-        "P1 P2 P3"
+        "persetujuan berjenjang"
       ]
     },
     {

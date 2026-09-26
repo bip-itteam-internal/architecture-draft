@@ -74,6 +74,37 @@ Yang **tetap** sebagai konsekuensi yang diterima:
 - 24 kepergian lama tetap tak bertanggal sampai HRD menambalnya lewat menu Resign; tanggal usulannya diturunkan dari absensi terakhir dan **HRD yang memutuskan**, bukan sistem.
 - ⚠️ **Masih terbuka**: `terapkanStatusAkun` menyaring `employee_id` saja tanpa `company_id`, jadi staf IT satu tenant secara teknis bisa mematikan akun tenant lain. Ini **pre-existing**, bukan lahir dari perluasan ini, dan pantas jadi keputusan tersendiri.
 
+## Perluasan 2026-09-26 — payroll: resign sebelum periode kini dikecualikan
+
+> Keputusan pokok ADR ini **tidak berubah**. Yang diperbarui adalah SATU dari dua gejala
+> di §"Yang belum dikerjakan" di atas — *"karyawan yang resign tanggal 15 ... hilang dari
+> ... basis payroll bulan itu juga"* — dan hanya **sebagian** darinya: jalur payroll,
+> bukan enam kueri `is_active: true` lain yang disebut di bullet yang sama.
+
+`computeRunLines` (payroll-service, branch `fix/payroll-exclude-resign-before-period`)
+kini mengecualikan TOTAL karyawan dengan `employee_resign.status == "applied"` dan
+`effective_date` (dikonversi WIB) jatuh sebelum atau tepat pada hari pertama periode run,
+lewat endpoint baru employee-service `GET /internal/resign/applied`
+([[API - Employee Service]] §Resign / Non-Aktif Karyawan,
+[[Microservices - Payroll Service]] §Pengecualian Karyawan Resign). Ditemukan lewat data
+prod nyata 2026-09-26: run "Gaji September 2026" berisi 4 dari 173 baris milik karyawan
+yang sudah resign sebelum periode (26 Agustus) mulai, potensi salah bayar ±Rp 12,7 juta.
+
+**Yang TETAP belum ditangani** (bukan diselesaikan perluasan ini):
+
+- Enam kueri employee-service lain yang menyaring `is_active: true` diam-diam (laporan
+  absensi, agregat direktori) — hanya jalur payroll yang disentuh perluasan ini.
+- Resign **di tengah** periode: baris tetap dihitung PENUH, hanya komponen kehadiran
+  (`payout_pct`) yang otomatis prorata seperti sebelumnya. Prorata gaji pokok/tunjangan
+  tetap untuk kasus ini belum diputuskan HR/Finance — keputusan produk eksplisit yang
+  diambil bersama perluasan ini, bukan celah yang terlewat.
+- `employee_salary` yatim milik `BIP-2005-08-27` (identitas sudah terhapus total dari
+  `employee_db`/`attendance_db` lewat `.task-plans/hapus-BIP-2005-08-27.ps1` 2026-08-19,
+  tapi `payroll_db` luput) — bukan kasus resign, jadi tak tersaring perluasan ini.
+
+Rencana lengkap, bukti data prod, dan hasil review:
+`.task-plans/2026-09-26-payroll-exclude-karyawan-resign-sebelum-periode.md`.
+
 ## Terkait
 
 - [[Microservices - Employee Service]] (koleksi, rute, cron) · [[API - Employee Service]] (daftar endpoint)
