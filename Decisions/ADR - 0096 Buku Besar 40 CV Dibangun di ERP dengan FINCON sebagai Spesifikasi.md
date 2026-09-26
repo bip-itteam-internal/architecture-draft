@@ -56,6 +56,15 @@ Pembukuan 40 CV grup akan dikerjakan **di dalam ERP**, memakai aplikasi buku bes
 
 Buku besar, bagan akun, jurnal, laporan keuangan, dan konsolidasi **lapisan 40 CV** dimiliki finance-service. Pembukuan PT tetap domain Accurate. [[ADR - 0001 Akuntansi via Accurate]] diusulkan **diamandemen, bukan dicabut**: larangannya tetap berlaku untuk PT dan untuk entitas lain di luar 40 CV. FINCON dipakai sebagai **spesifikasi dan sumber migrasi**; kodenya tidak dipindahkan.
 
+> **Amandemen 2026-09-26.** Modul `akuntansicv` diperluas menerima 21 PT non-Bharata
+> sebagai **identitas**, bukan pembukuan — batasan §1 ini TIDAK berubah: PT tetap
+> 100% dibukukan di Accurate, tanpa buku besar/jurnal/laporan keuangan di ERP. PT
+> yang masuk modul ini HANYA untuk (a) identitas badan usaha yang dirujuk dokumen
+> pengajuan (`KodeCV`, ADR 0096 Jalur A) dan (b) master tanda tangan direktur/sekutu
+> untuk cetak BKK/form request ([[ADR - 0131 Tanda Tangan Direktur-Sekutu pada BKK Otomatis Tanpa Approval]]).
+> Kode badan usaha PT berformat `PT\d{2}` (mis. `PT01`), terpisah dari `CV\d{2}`,
+> supaya keduanya tetap bisa dibedakan tanpa menebak dari prefiks nama.
+
 ### 2. Satu identitas CV
 
 finance-service memegang master entitas CV berkode `CV01` sampai `CV40` (mengikuti FINCON), dengan rujukan ke badan usaha payroll, rekening Accurate 1299xx, dan nama resmi. Konsumen lain merujuk kodenya. Salinan yang sudah ada tidak diketik ulang; kecocokannya dijaga pemindai drift, sesuai syarat salinan sah di [[REF - Kepemilikan Data]]. Toko marketplace dipetakan ke kode CV di master yang sama. Nama yang sama sesudah normalisasi format dan cocok ke tepat satu kandidat dipasangkan otomatis; nama yang tetap berbeda sesudah normalisasi, atau cocok ke lebih dari satu kandidat, ditetapkan manusia.
@@ -63,6 +72,13 @@ finance-service memegang master entitas CV berkode `CV01` sampai `CV40` (mengiku
 > **Amandemen 2026-09-15 (T1).** Kalimat semula berbunyi "Nama yang tidak cocok persis ditetapkan manusia, tidak dicocokkan otomatis." Normalisasinya hanya menyamakan FORMAT, tidak menebak kata: buang karakter format Unicode (satu nama rekening Accurate prod diawali U+2060 sehingga tak pernah cocok persis dengan apa pun), buang nomor rekening dalam kurung terakhir, huruf kecil, buang kode bank bila ia token pertama (mis. BMRI), buang token "cv", lalu satukan tanpa pemisah (`NormalisasiNamaEntitas`, `services/finance/akuntansi_cv_entitas.go`). Singkatan tidak ditebak: "Sinar Kosmetik Indonesia" tetap berbeda dari "Sinar Kosmetik Indo" dan ditetapkan manusia. Laporan kecocokan membandingkan nama dengan kunci yang sama, jadi selisih yang hanya format tidak dilaporkan.
 >
 > **Penerapan T1 (merge 2026-09-16, di prod sejak 2026-09-17).** Pemindai drift berbentuk laporan kecocokan yang dihitung saat dibuka (`GET /api/finance/akuntansi-cv/kecocokan`), tanpa penjadwal dan tanpa koleksi hasil; sumber yang gagal dibaca tidak melahirkan temuan. Pemetaan toko marketplace **ditunda ke T8** (keputusan user 2026-09-15): master T1 belum punya field toko.
+
+> **Amandemen 2026-09-26.** 21 PT non-Bharata (dari `LISTING DIREKTUR PT - CV.xlsx`)
+> ditambahkan ke master entitas yang SAMA dengan kode `PT01`..`PT21`, tanpa rujukan
+> `PayrollCompanyID`/`AkunAccurateNo` (PT tidak digaji lewat modul CV, dan rekeningnya
+> bukan anak COA 1299 seperti CV — divalidasi berbeda, lihat implementasi). Field baru
+> `KodeSignatory` merujuk `EntitasSignatory` (koleksi baru, nama+gambar tanda tangan
+> direktur/sekutu), berlaku untuk CV maupun PT.
 
 ### 3. Cakupan akses per CV ditegakkan server
 
