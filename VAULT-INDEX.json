@@ -7972,7 +7972,7 @@
         "Microservices - Marketing Analytics Service"
       ],
       "hash": "b133eb089e5d15541649d395d18d0604f215402b59175f1147b0d071c857c064",
-      "ukuran_kb": 21.9,
+      "ukuran_kb": 22.2,
       "ringkasan": "Menjawab: apakah laporan terjadwal Asisten Analisa Marketing boleh membawa keputusan tindakan dari AI (hentikan, kurangi, naikkan iklan) dan bagaimana penerima menjalankan atau menolaknya, serta mengapa ini menyimpang dari ADR 0120 dan ADR 0058. Juga menjawab batasannya: sistem tidak mengeksekusi di TikTok/Shopee, tindakan dipilih dari katalog tertutup yang kelayakannya dihitung backend, laba belum matang tak jadi dasar, keputusan anggaran menunggu satu target ROAS, mode bayangan, satu laporan gabungan mingguan, dan kondisi berhentinya.",
       "kata_kunci": [
         "asisten analisa marketing",
@@ -14379,8 +14379,8 @@
       "judul": "RUN - Pengangkatan Magang ke ID Reguler",
       "area": "Runbooks",
       "jenis": "runbook",
-      "status_emoji": "🟡",
-      "status_teks": "Diusulkan (kode dalam tiga PR yang belum merged per 2026-09-27: rute ganti-ID di tiap service bip-erp [#2106](https://github.com/bip-itteam-internal/bip-erp/pull/2106), koordinator di employee-service bip-erp [#2107](https://github.com/bip-itteam-internal/bip-erp/pull/2107), tombol erp-frontend [#1760](https://github.com/bip-itteam-internal/erp-frontend/pull/1760)). Sampai ketiganya live, pengangkatan masih lewat alat IT (§6). Keputusannya [[ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service]].",
+      "status_emoji": "⚠️",
+      "status_teks": "Live PROD 2026-09-27, belum pernah dijalankan untuk karyawan nyata. Kodenya ada di bip-erp [#2106](https://github.com/bip-itteam-internal/bip-erp/pull/2106) (rute ganti-ID di tiap service), bip-erp [#2107](https://github.com/bip-itteam-internal/bip-erp/pull/2107) (koordinator), dan erp-frontend [#1760](https://github.com/bip-itteam-internal/erp-frontend/pull/1760) (tombol). Ketiganya merged. Terverifikasi 06.08 WIB, baca saja: ke-20 biner memuat rute, indeks `kunci_aktif_unik` terbentuk, bundel FE memuat tombol. Keputusannya [[ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service]].",
       "publik": true,
       "tautan": [
         "ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service",
@@ -14388,8 +14388,8 @@
         "RUN - Deploy Microservices bip-erp",
         "HRIS - Personalia"
       ],
-      "hash": "453df308281fac51869c34004479751f9f3fc874bab068274d15c0d751e33bfe",
-      "ukuran_kb": 8.0,
+      "hash": "284e751755f7fb56e27c3688c31cdff8c6558bc9151211241fc8502672f6e5e3",
+      "ukuran_kb": 8.1,
       "ringkasan": "Menjawab: bagaimana HR mengangkat karyawan magang ke PKWT/PKWTT dan menerbitkan ID reguler dari halaman Kontrak tanpa IT, apa yang terjadi sesudahnya (login ulang karyawan, tugas Finance untuk proyek Accurate), dan apa yang dilakukan bila status gagal (Ulangi, bukan pengangkatan baru). Juga menjawab arti tiap pesan galat bagi IT, cara pembalikan lewat pemetaan tersimpan, dan prasyarat serta urutan deploy.",
       "kata_kunci": [
         "pengangkatan magang",
@@ -16032,7 +16032,7 @@
         "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi"
       ],
       "hash": "911176a3332fc4b3135490071f8d0bce7d1fdab4dde3190f871dad950f7d9c9d",
-      "ukuran_kb": 15.0,
+      "ukuran_kb": 15.2,
       "ringkasan": "Menjawab: apa saja daftar pekerjaan (gerbang G1-G4 dan task T1-T14) untuk Asisten Analisa Marketing, mana yang sudah selesai, dependensinya, dan keputusan terbuka yang tersisa seperti penyatuan target ROAS 4,5 vs 3,2, lingkup kiriman, dan daftar harga minimal. Juga menjawab isi tiap irisan: template dan penjadwalan laporan tanpa AI, keputusan AI jalankan/tolak (ADR 0127), tanya-jawab bebas, serta yang sengaja tidak dikerjakan.",
       "kata_kunci": [
         "asisten analisa marketing",
@@ -16742,9 +16742,9 @@
         "ANALISA - ID Karyawan Otomatis dan Pengangkatan Magang",
         "RUN - Pengangkatan Magang ke ID Reguler"
       ],
-      "hash": "1d5b11aa881b9c2d4e34f964957a11f54569a2ffadd339dde20738420b3073a9",
-      "ukuran_kb": 7.5,
-      "ringkasan": "Menjawab: apa saja task pembangunan fitur pengangkatan magang ke ID reguler (fungsi ganti ID bersama, rute per service, koordinator, tombol FE, runbook, deploy), status dan PR tiap task, urutan merge, serta temuan judge yang mengubah rancangan. Juga menjawab kasus nyata yang menunggu (karyawan magang yang siap diangkat).",
+      "hash": "b201ae658df4178c07297e8c6854d5c6213157a150a1dfa0690e853627e13941",
+      "ukuran_kb": 7.8,
+      "ringkasan": "Menjawab: apa saja task pembangunan fitur pengangkatan magang ke ID reguler (fungsi ganti ID bersama, rute per service, koordinator, tombol FE, runbook, deploy), status dan PR tiap task, urutan merge, status live PROD, serta temuan judge yang mengubah rancangan. Juga menjawab kasus nyata yang menunggu (karyawan magang yang siap diangkat).",
       "kata_kunci": [
         "papan kerja pengangkatan",
         "ANALISA pengangkatan magang",
