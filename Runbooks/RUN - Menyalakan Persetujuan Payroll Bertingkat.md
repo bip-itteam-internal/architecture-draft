@@ -147,6 +147,20 @@ Bila alur bertingkat bermasalah, hapus baris itu dari `.env` (atau ubah ke `fals
 
 ---
 
-## Sesudah terbukti
+## Sesudah terbukti: P10, cabut paket lama
+
+Langkah terpisah, **setelah paling sedikit satu run terbit lewat alur bertingkat**. Skripnya `.task-plans/2026-09-27-p10-cabut-paket-lama-prod.ps1` (cek/terapkan/balik, dijalankan manusia). Mode `terapkan` **menolak jalan** sampai tiga syarat terpenuhi: `PAYROLL_JENJANG_AKTIF=true`, paket tahap P7 terpasang (HRD Supervisor memegang `payroll_ttd_hrd`), dan minimal satu run `published` yang riwayatnya memuat tanda tangan tahap Direksi. Sebelum itu paket lama adalah satu-satunya jalan menyetujui gaji.
+
+Susunan akhirnya (ADR 0129 §8):
+
+| Jabatan | Paket sesudah | Izin |
+|---|---|---|
+| Personalia | `payroll_pelaksana`, `payroll_penerbit`, `payroll_pengaturan` (baru) | lihat, master gaji, susun, terbitkan, pengaturan; **tanpa** setujui lama |
+| HRD Supervisor | `payroll_ttd_hrd`, `payroll_ubah_master_gaji` (baru); `payroll_pengaturan` hanya dengan `-SpvHrdPengaturan` | lihat, tanda tangan tahap 2, master gaji |
+
+Paket `payroll_*` yang menempel **langsung di akun** pemegangnya (diukur prod 2026-09-27: Gilang BIP-0187-08-25 dan Seno BIP-0222-11-25) ikut dibersihkan, supaya hak hanya datang dari jabatan.
+
+⚠️ Jalankan `-Mode cek` **tepat sebelum** `terapkan` dan simpan cadangan itu untuk `balik`. Cadangan lama mencerminkan keadaan saat dibuat, bukan saat diterapkan.
+## Kemudian
 
 Langkah terpisah, **bukan** bagian runbook ini: mencabut `payroll.approve` lama dari paket `payroll_penyetuju` setelah alur baru berjalan paling sedikit satu siklus penuh di prod. Dicatat di papan [[ANALISA - Persetujuan Payroll Bertingkat]].
