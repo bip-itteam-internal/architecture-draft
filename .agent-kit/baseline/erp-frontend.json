@@ -1,10 +1,10 @@
 {
     "repo":  "erp-frontend",
     "jenis":  "node",
-    "tanggal":  "2026-09-26T17:07:02.2451923Z",
-    "commit":  "08253d9c2",
+    "tanggal":  "2026-09-27T03:54:16.8327606Z",
+    "commit":  "b4843b236",
     "path_ukur":  "C:/Users/irfan/wt/fe-baseline",
-    "jumlah_test":  16872,
+    "jumlah_test":  17096,
     "jumlah_gagal":  47,
     "gagal":  [
                   "src/app/(main)/form-builder/page.test.tsx \u003e FormBuilderPage — perilaku tab berhenti menyaring tipe yang aturannya dicabut selagi halaman terbuka",
@@ -55,7 +55,7 @@
                   "src/i18n/locales/marketing-keys.test.ts \u003e i18n modul marketing `en` tidak sekadar menyalin `id`",
                   "src/lib/scrollbar.test.ts \u003e pemakai mana memakai varian mana tak ada pemakai baru yang lolos tanpa tercatat"
               ],
-    "durasi_detik":  841.8,
+    "durasi_detik":  970.2,
     "catatan":  [
 
                 ],

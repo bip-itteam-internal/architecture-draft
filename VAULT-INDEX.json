@@ -16743,16 +16743,16 @@
         "ANALISA - ID Karyawan Otomatis dan Pengangkatan Magang",
         "RUN - Pengangkatan Magang ke ID Reguler"
       ],
-      "hash": "b201ae658df4178c07297e8c6854d5c6213157a150a1dfa0690e853627e13941",
-      "ukuran_kb": 7.8,
-      "ringkasan": "Menjawab: apa saja task pembangunan fitur pengangkatan magang ke ID reguler (fungsi ganti ID bersama, rute per service, koordinator, tombol FE, runbook, deploy), status dan PR tiap task, urutan merge, status live PROD, serta temuan judge yang mengubah rancangan. Juga menjawab kasus nyata yang menunggu (karyawan magang yang siap diangkat).",
+      "hash": "e9c3cec9d462086c2456bc52d905dcd0ea5ede79e79c5eef30744ef39bb0a1a9",
+      "ukuran_kb": 9.2,
+      "ringkasan": "Menjawab: apa saja task pembangunan fitur pengangkatan magang ke ID reguler (fungsi ganti ID bersama, rute per service, koordinator, tombol FE, runbook, deploy), status dan PR tiap task, status live PROD, pengingat magang yang menunggu diangkat dan pemberitahuan ke karyawan (T7/T8), serta temuan judge yang mengubah rancangan.",
       "kata_kunci": [
         "papan kerja pengangkatan",
         "ANALISA pengangkatan magang",
         "ganti employee_id",
-        "idreplace",
         "koordinator pengangkatan",
-        "urutan deploy",
+        "banner menunggu diangkat",
+        "pemberitahuan login ulang",
         "ADR 0128",
         "status PR"
       ]
