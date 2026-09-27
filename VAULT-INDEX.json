@@ -16804,20 +16804,20 @@
         "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
         "RUN - Menyalakan Persetujuan Payroll Bertingkat"
       ],
-      "hash": "f440521bf59607c4b59754fa9d15793a829c627c23562ec6f9b7e7774d392b4b",
-      "ukuran_kb": 12.8,
-      "ringkasan": "Menjawab: apa saja tahap kerja (P1 sampai P7) untuk membangun fitur persetujuan payroll bertingkat, status dan nomor PR tiap tahap, dependensi antar-tahap, serta keputusan teknis yang diambil di tiap task -- izin per tahap dan paket akses, jenjang empat tahap di backend payroll, pembayaran per badan usaha dengan publish terkunci, notifikasi inbox, email slip untuk karyawan nonaktif, dan layar FE run payroll. Berguna untuk melacak kemajuan implementasi dan asumsi yang masih bisa berubah.",
+      "hash": "ec3edb6531ff125e7937d6acf7fe7952c7f6e0009a4b18c7ec098d170d20ba66",
+      "ukuran_kb": 13.6,
+      "ringkasan": "Menjawab: bagaimana alur persetujuan payroll bertingkat berjalan (tahap-tahap, siapa berhak menyetujui/mengembalikan tiap tahap, izin apa yang dibutuhkan), bagaimana pembayaran payroll dipecah per badan usaha/CV dan mengapa publish terkunci sampai semua badan usaha lunas, serta bagaimana slip gaji dikirim lewat email ke karyawan nonaktif. Memuat status pengerjaan tiap task (P1-P7: izin & paket, jenjang tahap BE, pembayaran per badan usaha, notifikasi, slip email, layar FE) beserta PR terkait dan urutan dependensinya.",
       "kata_kunci": [
         "payroll",
         "persetujuan bertingkat",
-        "ANALISA payroll",
-        "jenjang persetujuan",
-        "izin payroll",
+        "multi-tier approval",
         "badan usaha",
+        "CV",
+        "publish terkunci",
+        "izin payroll",
+        "slip gaji email",
         "notifikasi payroll",
-        "slip gaji",
-        "papan kerja",
-        "roadmap payroll"
+        "ADR 0129"
       ]
     },
     {
