@@ -1,6 +1,6 @@
 # ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak
 
-> **Status**: 🟡 **Diusulkan** — diputuskan 2026-09-25, kode belum ada. Menggantikan [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] §5 dan §7, serta [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] §5 **khusus untuk laporan Asisten Analisa Marketing**.
+> **Status**: ⚠️ **Implemented (ada catatan)** — diukur 2026-09-27. Kode backend **merged** ke `origin/main` bip-erp lewat enam PR (§ Realisasi di bawah), **BELUM deploy prod**. Layar keputusan di erp-frontend (`/marketing-analytics/keputusan`, penanda di beranda modul, field "Penerima uji keputusan" pada form Jadwal setara `penerima_bayangan` BE) **sedang dinilai review, PR menyusul** (belum merged). Menggantikan [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] §5 dan §7, serta [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] §5 **khusus untuk laporan Asisten Analisa Marketing**.
 
 %% Status ditulis di blockquote atas, bukan bullet di ## Deskripsi, dengan alasan yang sama
 seperti ADR 0120: ## Untuk Manajemen mendorong Deskripsi melewati baris ke-15 sehingga status
@@ -319,6 +319,33 @@ dibangun sampai ada kebutuhan yang terukur.
 
 **Ongkos wajib diukur pekan pertama** dari `NarasiJejak` (`prompt_tokens`, `completion_tokens`,
 `latency_ms`) dikali jumlah kiriman per pekan, lalu dicatat di dok service.
+
+## Realisasi (2026-09-27)
+
+Enam PR bip-erp, seluruhnya merged ke `main` (commit terakhir `d7d9ddc5`), belum di-deploy. Mekanisme lengkap: [[Microservices - Marketing Analytics Service]] § Asisten Analisa.
+
+| Task | PR | Isi |
+|---|---|---|
+| T8 | [#2085](https://github.com/bip-itteam-internal/bip-erp/pull/2085) | Katalog sepuluh tindakan + kelayakannya, tanpa AI |
+| T9 | [#2087](https://github.com/bip-itteam-internal/bip-erp/pull/2087) | Skema, penyusun masukan, validator keputusan AI |
+| T10a | [#2093](https://github.com/bip-itteam-internal/bip-erp/pull/2093) | Keputusan berbasis aturan dihitung & disimpan per kiriman, tanpa AI |
+| T10b | [#2101](https://github.com/bip-itteam-internal/bip-erp/pull/2101) | Panggilan model per kiriman, saklar bawaan mati |
+| T12a | [#2104](https://github.com/bip-itteam-internal/bip-erp/pull/2104) | Mode bayangan §8a: pesan ke penerima bayangan |
+| T11-BE | [#2109](https://github.com/bip-itteam-internal/bip-erp/pull/2109) | `GET`/`POST /keputusan-kiriman` (baca + jawab jalankan/tolak), status kiriman sebelumnya |
+
+**Tempat keputusan bergeser dari ADR ini saat implementasi** — keputusan pemilik brief selama loop, bukan penyimpangan diam-diam:
+
+a. **Katalog sepuluh tindakan diturunkan penuh (`keputusan_katalog.go`), tetapi `pertahankan` belum diterbitkan.** `kelayakanPertahankan` (`keputusan_kelayakan.go:839`) ada dan teruji, tapi orkestrator (`HimpunanKeputusanKiriman`, `keputusan_orkestrator.go`) tidak memanggilnya — menentukan "tanpa sinyal lain" per entitas menuntut vonis per-entitas lintas seluruh ember lain, pekerjaan integrasi yang sengaja di luar batas brief T8 (`keputusan_kelayakan.go:830`). Hari ini tak ada kiriman yang pernah menerbitkan `pertahankan`.
+b. **Jendela matang §3a memakai lag TERUKUR per channel, bukan satu angka ditulis tangan**: diukur dari kurva cair `mart_profit_attribution` produksi 75 hari — Shopee 10 hari, TikTok 35 hari (`LagMatangHari`, `keputusan_jendela_matang.go`), batas mundur pencarian 42 hari (35 + buffer 7 hari bolong sync). Sebabnya: `settlement_belum_matang` **tidak pernah** `true` di level campaign (TikTok 0/6.987, Shopee 0/620) maupun video (0/393.686) — flag itu tak bisa dipakai menilai kematangan di level itu, jadi dipakai UMUR baris (Date + Channel) sebagai gantinya.
+c. **Keputusan disimpan di koleksi BARU `keputusan_kiriman`**, bukan menambah field ke `hasil_analisa` — satu dokumen per kiriman, index `{jadwal_id:1, dibuat_pada:-1}` (`index.go`).
+d. **Identitas sasaran (nama, toko, bukti, keyakinan) dipasang KODE dari himpunan T8/T9**; model (T10b) hanya memilih, mengurutkan, dan menulis kalimat alasan — persis ADR §4, tidak melebar.
+e. **Pelaksana dicari lewat `k.ShopID`** (bukan `EntityID`, yang untuk product/campaign/video bukan id toko) terhadap indeks penanggung jawab, dengan **empat label jujur** (`keputusan_kirim_bayangan.go`): "belum ditetapkan" (toko ada, mapping tak menemukan pemegang), "sasaran bukan satu toko" (portofolio/agregat lintas toko), "data penanggung jawab tidak terbaca" (indeks gagal dimuat), "perlu ditentukan pemilik laporan" (sasaran `periksa` atas seorang Account Specialist — bukan orang itu sendiri yang jadi pelaksana).
+f. **Agregasi status kiriman sebelumnya (§8b butir 1) memakai aturan "TOLAK MENANG"**: begitu ADA satu penerima bayangan yang jawaban terakhirnya "tolak" untuk sebuah keputusan, statusnya "ditolak" — tak peduli berapa banyak atau siapa yang menjawab "jalankan", dan tak peduli urutan waktu (`statusKeputusanTerakhir`, `keputusan_kirim_bayangan.go`). Ini koreksi dari percobaan pertama ("jawaban paling baru menang"), yang bisa membalik status jadi "dijalankan" semata karena urutan mengetik.
+g. **Status kiriman sebelumnya masih SATU BARIS TOTAL per kiriman**, bukan per tim — §8b butir 1 belum memenuhi pemisahan per tim yang diminta susunan §8b secara umum. `statusKirimanSebelumnya` menjumlah seluruh keputusan kiriman itu jadi satu angka dijalankan/ditolak/belum dijawab.
+h. **CS SLA dan komplain belum tersambung ke perakitan keputusan**: pembaca yang ada (`ambilSLAChatCSTerbaru`, `ambilKomplainBulanan`) menerima channel+toko tunggal atau satu bulan tunggal, bukan "lingkup kiriman pada jendela laporan" — menyambungkannya menuntut logika baru yang sengaja belum ditulis (`keputusan_kiriman_rakit.go`). Konsekuensinya `perbaiki_layanan_chat` dan `tangani_komplain` tidak pernah terbit hari ini walau sudah ada di katalog §3, dan ini dibiarkan kosong SENGAJA, bukan galat.
+i. **Penerima bayangan (§8a) disimpan per jadwal** lewat field `penerima_bayangan` (`JadwalLaporan.PenerimaBayangan`, daftar eksplisit — bukan diturunkan dari peran, sesuai §8a). Pesan bayangan memakai kategori inbox yang **sudah ada** (`kategoriInboxLaporanTerjadwal`), bukan kategori baru, sehingga T12a tidak butuh deploy dua container sekaligus (beda dari gotcha kategori inbox baru di team-memory).
+
+**Yang belum bergerak dari ADR**: `kurangi_belanja`/`naikkan_belanja` tetap digerbang mati oleh `GerbangROASDitegaskan = false` (`keputusan_katalog.go:135`) sampai manajemen menegaskan satu ambang ROAS (§10) — belum ditegaskan per 2026-09-27.
 
 ## Terkait
 

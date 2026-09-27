@@ -189,7 +189,9 @@ tertinggal dari `origin/main` (#2067/#2075/#2080). Cocokkan ke umur image lewat 
 `deploy-bip-erp` sebelum T10; keputusan AI di atas build lama tidak punya empat analisa lainnya.
 ## T8 — Katalog tindakan dan kelayakannya, TANPA AI
 
-**Status**: belum · **Dependensi**: tidak ada · **Repo**: bip-erp
+**Status**: ✅ **merged 2026-09-26** (PR [#2085](https://github.com/bip-itteam-internal/bip-erp/pull/2085)), **belum deploy prod** · **Dependensi**: tidak ada · **Repo**: bip-erp
+
+⚠️ Katalog sepuluh tindakan diturunkan penuh, tapi `pertahankan` belum diterbitkan: orkestrator (`HimpunanKeputusanKiriman`) tidak memanggil `kelayakanPertahankan` — menentukan "tanpa sinyal lain" per entitas menuntut vonis per-entitas lintas seluruh ember lain, sengaja di luar batas kerja ini. Detail: [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] § Realisasi butir a.
 
 Sepuluh tindakan dan syarat kelayakannya persis tabel ADR 0127 §3, dihitung dari ember yang sudah
 ada (`klasifikasiVideoBoros`, `pilihPenggerus`/`pilihPeluang`, kelompok Account Specialist, vonis
@@ -206,7 +208,7 @@ yang dibutuhkan sampai porsi settlement cair memadai, lalu pakai angka terukur i
 laporan 2 hari dengan 0% cair tidak pernah menerbitkan keputusan laba.
 ## T9 — Skema keluaran dan validator
 
-**Status**: belum · **Dependensi**: T8 · **Repo**: bip-erp
+**Status**: ✅ **merged 2026-09-26** (PR [#2087](https://github.com/bip-itteam-internal/bip-erp/pull/2087)), **belum deploy prod** · **Dependensi**: T8 · **Repo**: bip-erp
 
 Skema `json_schema strict` (tindakan enum, sasaran id, alasan, rujukan bukti) dan validator lapis
 kedua meniru `screeningDariHasil` recruitment: tolak tindakan di luar katalog, sasaran di luar
@@ -216,54 +218,77 @@ angka mentah (ADR 0120 §4 tetap).
 
 ## T10 — Pasang ke penjalan, dengan jaring gagal
 
-**Status**: belum · **Dependensi**: T9 · **Repo**: bip-erp
+**Status**: ✅ **merged 2026-09-26, belum deploy prod** — dipecah dua PR: **T10a** keputusan berbasis
+aturan dihitung & disimpan per kiriman, tanpa AI (PR [#2093](https://github.com/bip-itteam-internal/bip-erp/pull/2093));
+**T10b** panggilan model sungguhan, saklar bawaan mati (PR [#2101](https://github.com/bip-itteam-internal/bip-erp/pull/2101))
+· **Dependensi**: T9 · **Repo**: bip-erp
 
 Satu panggilan `shared-library/ai` per kiriman, **sebelum** notifikasi dikirim, dengan batas waktu
-per kiriman dan tanpa retry di tik yang sama. Gagal/habis waktu/semua ditolak validator → kiriman
-tetap jalan dengan `Ringkasan`, `narasi_status` = `gagal`, percobaan masuk `NarasiJejak`.
-⚠️ `SimpanHasil` memakai `$set` + upsert tanpa `$unset`: penulis wajib membawa baris utuh.
-Tambah env `AI_*` ke blok marketing-analytics `docker-compose.yml` dan `docker-compose.dev.yml`.
-Uji jalur gagal wajib: klien AI yang melempar galat tetap menghasilkan kiriman terkirim.
+berlapis (`ctxHitung` 60 detik, panggilan model bermargin 10 detik, penyimpanan lepas 5 detik bila
+`ctxHitung` sudah habis) dan tanpa retry di tik yang sama. Gagal/habis waktu/semua ditolak
+validator → kiriman tetap jalan, keputusan model kosong/`status_model: gagal`, percobaan masuk
+`jejak_model`. Disimpan di koleksi **baru** `keputusan_kiriman`, **bukan** `hasil_analisa` — jadi
+catatan `SimpanHasil`/`$unset` di bawah ini sudah tidak relevan untuk jalur ini. Saklar
+`MARKETING_ANALYTICS_AI_KEPUTUSAN_ENABLED` ditambahkan ke `docker-compose.yml` dan
+`docker-compose.dev.yml`, bawaan mati. Mekanisme lengkap: [[Microservices - Marketing Analytics Service]]
+§ Asisten Analisa; titik keputusan yang bergeser dari ADR: [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] § Realisasi.
 
 ## T11 — Catat jawaban jalankan/tolak
 
-**Status**: belum · **Dependensi**: T10 · **Repo**: bip-erp lalu erp-frontend
+**Status**: BE ✅ **merged 2026-09-27** (PR [#2109](https://github.com/bip-itteam-internal/bip-erp/pull/2109)), **belum deploy prod**. FE **sedang dinilai review, PR menyusul (belum merged)**: layar `/marketing-analytics/keputusan` (daftar + tombol jalankan/tolak) di erp-frontend · **Dependensi**: T10 · **Repo**: bip-erp lalu erp-frontend
 
-BE: endpoint menandai satu keputusan dijalankan/ditolak (siapa, kapan, alasan tolak opsional),
-hanya oleh penerima laporan itu. FE: tombolnya di layar riwayat laporan. **BE sebelum FE.**
-⚠️ Dua PR erp-frontend sedang menyentuh `src/features/marketing-analytics/`; koordinasikan dulu.
+BE: `POST /keputusan-kiriman/:id/jawaban` menandai satu keputusan dijalankan/ditolak (siapa dari
+header gateway, kapan, alasan tolak opsional ≤500 karakter), hanya oleh penerima bayangan jadwal
+itu — admin laporan bisa membaca (`GET /keputusan-kiriman`) tapi **tidak** boleh menjawab. Jawaban
+**append-only**: menjawab ulang kunci yang sama diizinkan, tercatat sebagai entri baru. FE: tombolnya
+di layar riwayat laporan, **sedang dinilai review, PR menyusul (belum merged)**. **BE sebelum FE.**
+Kontrak lengkap: [[API - Marketing Analytics Service]] § Keputusan AI per kiriman.
 
 ## T12 — Deploy dan ukur ongkos pekan pertama
 
 **Status**: belum · **Dependensi**: T10 (T11 boleh menyusul) · **Dikerjakan**: manusia untuk PROD
 
-Deploy pertama klien AI di mana pun: `--force-recreate`, lalu picu satu kiriman sungguhan sebagai
-bukti dan baca model yang tercatat di `NarasiJejak`. Sepekan kemudian hitung token × kiriman
-per pekan dan catat di [[Microservices - Marketing Analytics Service]].
+Deploy pertama klien AI di mana pun: `--force-recreate` (saklar `MARKETING_ANALYTICS_AI_KEPUTUSAN_ENABLED`
+dibaca saat container dibuat), lalu picu satu kiriman sungguhan sebagai bukti dan baca model yang
+tercatat di `jejak_model` (`KeputusanKirimanDoc.JejakModel`). Sepekan kemudian hitung token ×
+kiriman per pekan dan catat di [[Microservices - Marketing Analytics Service]]. Paket
+siap-tempel (daftar container, urutan, gerbang verifikasi): `.task-plans/deploy-keputusan-ai-prod.md`
+di workspace `erp` (bukan vault) — lihat juga §3b [[RUN - Deploy Microservices bip-erp]].
 
 ## T11a — Satu laporan gabungan bersusun (ADR 0127 §8b)
 
-**Status**: belum · **Dependensi**: T10 (bagian 1 butuh T11) · **Repo**: bip-erp
+**Status**: ✅ **merged** — bagian 2+3 lewat T12a (PR [#2104](https://github.com/bip-itteam-internal/bip-erp/pull/2104)), bagian 1 lewat PR [#2109](https://github.com/bip-itteam-internal/bip-erp/pull/2109) (2026-09-27), **belum deploy prod** · **Dependensi**: T10 (bagian 1 butuh T11) · **Repo**: bip-erp
 
-Semua penerima menerima laporan yang sama, disusun tiga bagian: (1) status keputusan kiriman
-sebelumnya per tim, yang menuntut query `hasil_analisa` per `jadwal_id` (baru) beserta indeksnya;
-(2) paling banyak lima keputusan berdampak rupiah terbesar lintas tim; (3) keputusan lainnya
-dikelompokkan per tim lalu per penanggung jawab. Penanggung jawab diambil dari mapping yang sudah
-dipakai `sync-profit-attribution`, jangan salinan kedua. Kekerapan bawaan mingguan; tolak atau
-peringatkan `dua_harian` untuk kiriman berkeputusan.
+⚠️ **Bagian 1 (status keputusan kiriman sebelumnya) SATU BARIS TOTAL, belum per tim** seperti
+diminta deskripsi asli di bawah — `statusKirimanSebelumnya` menjumlah SELURUH keputusan kiriman
+sebelumnya jadi satu angka dijalankan/ditolak/belum dijawab, bukan dipecah per tim. Agregasinya
+memakai aturan "TOLAK MENANG" (satu penolakan mengalahkan berapa pun jawaban jalankan, tanpa
+peduli urutan waktu) — detail: [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] § Realisasi butir f, g.
+
+Deskripsi asli: semua penerima menerima laporan yang sama, disusun tiga bagian: (1) status
+keputusan kiriman sebelumnya per tim, yang menuntut query `keputusan_kiriman` per `jadwal_id`
+beserta indeksnya (terpasang, tapi belum per tim — lihat di atas); (2) paling banyak lima
+keputusan berdampak rupiah terbesar lintas tim; (3) keputusan lainnya dikelompokkan per tindakan.
+Penanggung jawab diambil dari mapping yang sudah dipakai `sync-profit-attribution`, jangan salinan
+kedua. Kekerapan bawaan mingguan.
+
 ## T12a — Mode bayangan (ADR 0127 §8a)
 
-**Status**: belum · **Dependensi**: T11, T12
+**Status**: ✅ **merged 2026-09-26** (PR [#2104](https://github.com/bip-itteam-internal/bip-erp/pull/2104)), **belum deploy prod**. FE: penanda di beranda modul + field "Penerima uji keputusan" pada form Jadwal (setara `penerima_bayangan` BE) **sedang dinilai review, PR menyusul (belum merged)** · **Dependensi**: T11, T12
 
-1-2 pekan: bagian keputusan hanya untuk pemilik produk (daftar eksplisit pada kiriman), penerima
-lain tetap `Ringkasan`. Pemilik produk menjawab tiap keputusan jalankan/tolak beserta alasan, lalu
-menyatakan layak dibuka ke semua penerima atau tidak. Bila tidak, perbaiki T8 lalu ulangi.
+Bagian keputusan dikirim hanya ke `penerima_bayangan` yang ditulis eksplisit pada jadwal (field
+`penerima_bayangan[]{employee_id, nama}`, [[API - Marketing Analytics Service]] § Kiriman
+terjadwal), lewat kategori inbox yang **sudah ada** (`kategoriInboxLaporanTerjadwal`) — bukan
+kategori baru, jadi tidak menuntut deploy dua container. Penerima lain tetap `Ringkasan`. Pemilik
+produk menjawab tiap keputusan jalankan/tolak beserta alasan (T11), lalu menyatakan layak dibuka
+ke semua penerima atau tidak. Bila tidak, perbaiki T8 lalu ulangi.
 
 ## T13 — Penilaian 30 hari (ADR 0127 §9)
 
 **Status**: belum · **Dependensi**: T12a selesai dan keputusan dibuka ke semua penerima
 
 Nol keputusan dijawab → matikan keputusan AI. Lebih dari separuh ditolak → tinjau katalog T8.
+Belum bisa dinilai: T12a masih mode bayangan (belum dibuka ke semua penerima) dan belum deploy prod.
 
 ---
 # Irisan 3 — Tanya-jawab bebas
