@@ -708,23 +708,20 @@
         "Microservices - Attendance Service",
         "Microservices - Insentive Service"
       ],
-      "hash": "68563bea93bf0ce41737b935f7e8495f119c77f261b5f86a5c6982f157e2ad89",
-      "ukuran_kb": 26.0,
-      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki Payroll Service, izin RBAC (permission-set) apa yang menggerbang tiap rute — termasuk izin tahap persetujuan bertingkat baru dari ADR 0129 — serta bagaimana alur payroll run, THR, konfigurasi BPJS/pajak, gaji per karyawan, slip self-service, dan pembayaran per badan usaha diakses lewat API.",
+      "hash": "8191472b816ed65b9cd18f4a988cc546959895b0c897840bce6b903aa142e0de",
+      "ukuran_kb": 26.4,
+      "ringkasan": "Menjawab: apa saja endpoint Payroll Service (konfigurasi BPJS/pajak PPh21/potongan kehadiran, master data, gaji per karyawan, payroll run, THR, impor run, slip self-service), dan bagaimana tiap rute digerbang lewat model RBAC permission-set (gate + predikat tier fallback, kill-switch enforcement). Juga menjawab bagaimana alur persetujuan bertingkat empat tahap dan pembayaran per badan usaha (ADR 0129) bekerja, termasuk izin-izin baru yang sudah ada di katalog tapi belum menggerbang rute apa pun, serta rute internal berkunci layanan.",
       "kata_kunci": [
         "payroll",
         "gaji",
-        "slip gaji",
-        "payroll run",
         "THR",
-        "RBAC",
-        "permission-set",
-        "gate",
-        "approval",
-        "persetujuan bertingkat",
+        "payroll run",
+        "RBAC permission-set",
         "BPJS",
         "PPh21",
-        "endpoint"
+        "persetujuan bertingkat",
+        "slip gaji",
+        "badan usaha"
       ]
     },
     {
