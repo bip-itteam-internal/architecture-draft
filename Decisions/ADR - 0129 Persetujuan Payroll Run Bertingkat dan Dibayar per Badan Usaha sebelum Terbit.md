@@ -121,7 +121,7 @@ Usulan terbuka: Internal Audit **lihat saja** (untuk audit); akun HR lain di lua
 1. `routes.InternalRequest` ikut meneruskan `BIP-Permissions`. Hari ini ia hanya meneruskan peran, jadi setiap panggilan antar-service ke gerbang payroll (lampiran gaji PKWT dari employee, cek/tandai insentif dari payroll ke insentive) dinilai lewat tier; menutup tier lebih dulu membuat fitur itu 403.
 2. Fallback tier payroll dihapus di `IzinPayrollEfektifDari` **dan** di salinan web-nya (`erp-frontend` `utils/menu-permission.ts`, baris `payroll.view`/`salary.write`/`work`/`approve`/`manage`/`publish`).
 
-Langkah 1 mengubah penilaian izin internal untuk modul lain yang memakai pola klaim-lalu-tier (hris), jadi dikerjakan sebagai task tersendiri dengan uji lintas service.
+**Pelaksanaan (2026-09-27, bip-erp #2120, erp-frontend #1771):** langkah 1 **dipersempit** agar modul lain tak berubah penilaian izinnya: helper `routes.InternalRequestMembawaIzin` dipakai HANYA oleh lompatan yang mendarat di gerbang payroll (lampiran gaji PKWT employee→payroll, snapshot insentif payroll→insentive), sementara `InternalRequest` tetap untuk ~157 pemanggil lain. Sebelum kode naik, akses sudah ditutup lewat data di prod: paket `payroll_tanpa_akses` (berisi `payroll.tanpa_akses`, klaim "punya payroll" tanpa hak sehingga tier tak berlaku) ke jabatan yang tak berhak, `payroll_lihat` ke Direktur, Corporate Secretary, dan Internal Audit.
 
 ## Consequences
 
