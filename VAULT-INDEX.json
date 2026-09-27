@@ -708,20 +708,23 @@
         "Microservices - Attendance Service",
         "Microservices - Insentive Service"
       ],
-      "hash": "09e7ee39607ad46748d837c33e6ee07d5e1921033acffa08b78252faa9f56725",
-      "ukuran_kb": 24.5,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan payroll-service (konfigurasi, master data, gaji per karyawan, payroll run dan THR, impor run, slip self-service, persetujuan bertingkat dan bayar per badan usaha ADR 0129, rute internal), izin RBAC apa yang menggerbangi tiap rute, serta catatan keadaan produksinya.",
+      "hash": "68563bea93bf0ce41737b935f7e8495f119c77f261b5f86a5c6982f157e2ad89",
+      "ukuran_kb": 26.0,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki Payroll Service, izin RBAC (permission-set) apa yang menggerbang tiap rute — termasuk izin tahap persetujuan bertingkat baru dari ADR 0129 — serta bagaimana alur payroll run, THR, konfigurasi BPJS/pajak, gaji per karyawan, slip self-service, dan pembayaran per badan usaha diakses lewat API.",
       "kata_kunci": [
-        "API payroll",
-        "payroll-service",
+        "payroll",
+        "gaji",
+        "slip gaji",
         "payroll run",
         "THR",
-        "slip gaji",
-        "impor payroll",
+        "RBAC",
+        "permission-set",
+        "gate",
+        "approval",
         "persetujuan bertingkat",
-        "bayar per badan usaha",
-        "RBAC payroll",
-        "endpoint payroll"
+        "BPJS",
+        "PPh21",
+        "endpoint"
       ]
     },
     {
@@ -8041,19 +8044,22 @@
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
         "REF - Alur Persetujuan"
       ],
-      "hash": "b0c7db656f24547562c2158fdba3dd8e5dd55566233b9e26a7fae8d77debf6cc",
-      "ukuran_kb": 20.7,
-      "ringkasan": "Menjawab: kenapa dan bagaimana payroll run disetujui berurutan oleh Cost Control, SPV HRD, SPV Finance, lalu Direktur; bagaimana pembayaran dicatat per badan usaha (PT dan CV) sebelum slip boleh diterbitkan; dan bagaimana mantan karyawan menerima slip lewat email berkata sandi. Juga menjawab siapa terdampak, apa yang tidak dijanjikan (transfer tetap di luar sistem, tanda tangan tak gugur saat koreksi), dan besaran kerjanya.",
+      "hash": "70ceb6c818437f883a73d90723105b14018bb59c697a24498a6ec8cb54dc01fd",
+      "ukuran_kb": 23.3,
+      "ringkasan": "Menjawab: kenapa dan bagaimana persetujuan payroll run diubah dari satu langkah (satu tombol) jadi berurutan empat tahap (Cost Control, SPV HRD, SPV Finance, Direktur), bagaimana pembayaran dicatat per badan usaha (PT dan 39 CV) sebelum slip boleh diterbitkan, dan bagaimana karyawan yang sudah nonaktif tetap menerima slip lewat email pribadi terkunci kata sandi.",
       "kata_kunci": [
         "ADR 0129",
         "persetujuan payroll bertingkat",
-        "payroll approval",
-        "tanda tangan payroll",
-        "Cost Control",
-        "bayar per badan usaha",
+        "approval berjenjang",
+        "cost control",
+        "SPV HRD",
+        "SPV Finance",
+        "Direktur",
+        "badan usaha",
         "CV",
-        "terbitkan slip gaji",
-        "slip email mantan karyawan"
+        "slip email",
+        "payroll run",
+        "izin per tahap"
       ]
     },
     {
@@ -16798,18 +16804,17 @@
         "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
         "RUN - Menyalakan Persetujuan Payroll Bertingkat"
       ],
-      "hash": "1aa84b4870dc0e864375c82b90ca53db2baf6b9fe1b9e8f674ae0e09c0831c97",
-      "ukuran_kb": 9.7,
-      "ringkasan": "Menjawab: apa saja task pembangunan persetujuan payroll bertingkat ADR 0129 (izin per tahap, jenjang empat tahap, pembayaran per badan usaha, notifikasi, slip email karyawan nonaktif, layar FE, konfigurasi), status dan PR tiap task, urutan pengerjaannya, serta asumsi yang dipakai dan hal yang belum diputuskan.",
+      "hash": "f6620cb2cea4c3fc05360d48d32213e98f71cdc8c11da1f1aa67f4c3bdf5cdd4",
+      "ukuran_kb": 11.1,
+      "ringkasan": "Menjawab: sejauh mana pengerjaan tujuh task (P1 sampai P7) fitur persetujuan payroll bertingkat sudah berjalan, PR mana yang sudah merged beserta status deploy-nya di DEV/prod, dan task mana yang masih dikerjakan atau menunggu tahap berikutnya.",
       "kata_kunci": [
-        "papan kerja payroll",
-        "persetujuan payroll bertingkat",
-        "payroll approval",
-        "izin tahap payroll",
-        "bayar per badan usaha",
-        "slip gaji email",
-        "ADR 0129",
-        "status PR payroll"
+        "ANALISA persetujuan payroll bertingkat",
+        "papan kerja",
+        "P1 P2 P3 P4 P5 P6 P7",
+        "payroll jenjang",
+        "status task",
+        "PR bip-erp",
+        "PAYROLL_JENJANG_AKTIF"
       ]
     },
     {

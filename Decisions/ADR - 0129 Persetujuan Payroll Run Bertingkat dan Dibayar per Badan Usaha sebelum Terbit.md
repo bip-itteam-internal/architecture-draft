@@ -98,6 +98,31 @@ Saat run diterbitkan, baris yang karyawannya berakun nonaktif (`system_authentic
 
 Kategori inbox baru untuk payroll: "run menunggu tanda tangan Anda", "run dikembalikan", "run siap dibayar", dan "run terbit". Penerima dihitung dari pemegang izin tahap berikutnya (irisan dengan pemegang CV untuk tahap bayar). Pengiriman best-effort; antrean di layar tetap sumber kebenarannya.
 
+### 8. Matriks hak akhir, dan akses gaji HANYA lewat paket *(diputuskan pemilik produk 2026-09-27)*
+
+Berlaku sesudah `PAYROLL_JENJANG_AKTIF` menyala dan paket lama dicabut. Sampai saat itu **Personalia tetap memegang seluruh hak termasuk setujui alur lama** (keputusan 2026-09-27, supaya gaji berjalan), dan `/approve` lama tertutup sendiri begitu flag hidup.
+
+| Hak | Personalia | Cost Control | SPV HRD | SPV Finance | Direktur / Corp. Secretary | Accounting CV | Senior Accountant | Karyawan lain | IT |
+|---|---|---|---|---|---|---|---|---|---|
+| Melihat gaji semua karyawan | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Mengubah master gaji | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Menyusun, hitung ulang, mengajukan | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Tanda tangan tahap 1 / 2 / 3 / 4 | ❌ | tahap 1 | tahap 2 | tahap 3 | tahap 4 | ❌ | ❌ | ❌ | ❌ |
+| Mengembalikan run | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Daftar bayar & tandai lunas | ❌ | ❌ | ❌ | ❌ | ❌ | CV miliknya | PT tanpa CV | ❌ | ❌ |
+| Menerbitkan slip | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Pengaturan payroll (komponen, tarif, BPJS) | ✅ | ❌ | ✅ *(usulan)* | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Slip sendiri | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+Usulan terbuka: Internal Audit **lihat saja** (untuk audit); akun HR lain di luar Personalia dan SPV HRD tanpa akses.
+
+**Akses gaji hanya lewat paket.** Diukur prod 2026-09-27: `IzinPayrollEfektifDari` menurunkan izin dari tier `system_roles.hris` untuk SIAPA PUN tanpa paket payroll, tanpa memandang departemen, sehingga 8 akun di luar HR (IT, Direktur, Corporate Secretary, Internal Audit, Finance Printing) bisa melihat seluruh gaji, sebagian bahkan mengubah master gaji dan menerbitkan. Mencabut paket saja tidak menutupnya (akun jatuh ke tier). Penutupannya dua langkah yang **harus berurutan**:
+
+1. `routes.InternalRequest` ikut meneruskan `BIP-Permissions`. Hari ini ia hanya meneruskan peran, jadi setiap panggilan antar-service ke gerbang payroll (lampiran gaji PKWT dari employee, cek/tandai insentif dari payroll ke insentive) dinilai lewat tier; menutup tier lebih dulu membuat fitur itu 403.
+2. Fallback tier payroll dihapus di `IzinPayrollEfektifDari` **dan** di salinan web-nya (`erp-frontend` `utils/menu-permission.ts`, baris `payroll.view`/`salary.write`/`work`/`approve`/`manage`/`publish`).
+
+Langkah 1 mengubah penilaian izin internal untuk modul lain yang memakai pola klaim-lalu-tier (hris), jadi dikerjakan sebagai task tersendiri dengan uji lintas service.
+
 ## Consequences
 
 - **Pemutus rilis `PAYROLL_JENJANG_AKTIF`** (env payroll-service, bawaan mati; P2). Selama mati, alur lama berjalan persis seperti sebelum ADR ini dan rute jenjang menolak dengan penjelasan; selama hidup, rute `/approve` lama menolak dan jenjang berlaku. Prod baru dinyalakan setelah layar tanda tangan (P6), paket terpasang ke jabatan (P7), dan notifikasi (P4) siap: layar lama memanggil `/approve`, jadi menyalakannya lebih dulu membuat gaji tak bisa disetujui siapa pun.

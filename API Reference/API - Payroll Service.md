@@ -170,6 +170,18 @@ Notifikasi inbox (best-effort, di goroutine sesudah tulis): kategori `payroll-ta
 
 Service lain yang dibaca payroll untuk fitur ini, semuanya berkunci layanan dan **di luar** `ValidateInternalURL`: employee `GET /payroll/rekening-karyawan` dan `GET /payroll/kontak-slip` (kunci `EMPLOYEE_SERVICE_KEY`; sengaja tanpa prefix `/internal/`), finance `GET /internal/cv/pemegang-badan-usaha` (kunci `FINANCE_SERVICE_KEY`).
 
+## Isi slip dan baris run (2026-09-27)
+
+✅ Merged dan ter-deploy prod 2026-09-27 (bip-erp #2112, #2113, #2115; erp-frontend #1762, #1764, #1766).
+
+| Field | Di mana | Isi |
+|---|---|---|
+| `payslip.rincian_hari[]` | slip (baris run, `GET /payroll-runs/my*`) | Hari yang memicu potongan kehadiran: `tanggal`, `jam_telat`, `jam_izin`, `hari_izin`, `tidak_dibayar`, `mangkir`, `makan_hangus`. Diturunkan dari `days[]` `/payroll-supplement` lewat **satu** keputusan per hari (`nilaiHariKehadiran`) yang juga menghasilkan rekap `attendance_basis`, jadi keduanya tak bisa menyimpang. Hanya slip yang dihitung sesudah deploy; slip terbit tak berubah. Jenis izin (subtipe) belum dikirim supplement walau sudah tersimpan di entri presensi |
+| `rekening_bayar` | baris run + `GET /payroll-runs/my` (daftar & detail, satu penyusun `slipKaryawan`) | Rekening yang dipakai membayar, **dibekukan** saat badan usaha ditandai lunas (dilepas saat batal lunas); publish mengisi baris yang belum terbekukan **sebelum** email slip dikirim. Nomor LENGKAP di web, disamarkan `****1234` di PDF (juga yang dikirim email). Best-effort: gagal jadi `peringatan_rekening`, lunas/publish tak dibatalkan |
+| `master_gaji_tanpa_karyawan[]` | run | `employee_id` master gaji yang TIDAK ikut dihitung karena tak dikenal employee-service (`pilahMasterGaji`). Hanya berlaku bila identitas terambil DAN tidak kosong; employee-service mati = semua tetap dihitung |
+
+Di web, slip dibuka sebagai **Sheet** (bukan dialog) dengan periode kerja dan tanggal bayar, tabel Rincian Kehadiran, dan baris "Dibayar ke".
+
 ## Rute internal (tanpa `gate()`, berkunci layanan)
 
 | Method | Path | Gerbang | Catatan |
