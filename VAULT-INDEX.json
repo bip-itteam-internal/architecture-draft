@@ -16804,17 +16804,20 @@
         "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
         "RUN - Menyalakan Persetujuan Payroll Bertingkat"
       ],
-      "hash": "f6620cb2cea4c3fc05360d48d32213e98f71cdc8c11da1f1aa67f4c3bdf5cdd4",
-      "ukuran_kb": 11.1,
-      "ringkasan": "Menjawab: sejauh mana pengerjaan tujuh task (P1 sampai P7) fitur persetujuan payroll bertingkat sudah berjalan, PR mana yang sudah merged beserta status deploy-nya di DEV/prod, dan task mana yang masih dikerjakan atau menunggu tahap berikutnya.",
+      "hash": "416b57da95a2337948a2200cab550e47935684e87fdd7f2f9f15833f2353c026",
+      "ukuran_kb": 11.7,
+      "ringkasan": "Menjawab: apa saja tahapan kerja (P1 sampai P7) untuk membangun persetujuan payroll run berjenjang empat tahap dan pembayaran per badan usaha (CV) sebelum payroll diterbitkan, izin/paket apa yang dibutuhkan tiap tahap penyetuju, serta bagaimana notifikasi dan pengiriman slip gaji karyawan nonaktif ditangani. Juga menjawab urutan pengerjaan antar-task, dependensi antar-PR, dan apa yang masih diasumsikan atau belum diputuskan; keputusan dan alasannya sendiri dirujuk ke ADR 0129.",
       "kata_kunci": [
-        "ANALISA persetujuan payroll bertingkat",
-        "papan kerja",
-        "P1 P2 P3 P4 P5 P6 P7",
-        "payroll jenjang",
-        "status task",
-        "PR bip-erp",
-        "PAYROLL_JENJANG_AKTIF"
+        "payroll",
+        "persetujuan payroll",
+        "approval bertingkat",
+        "payroll run",
+        "badan usaha",
+        "CV",
+        "izin payroll",
+        "publish payroll",
+        "slip gaji",
+        "notifikasi payroll"
       ]
     },
     {
