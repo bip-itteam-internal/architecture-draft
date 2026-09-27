@@ -149,7 +149,7 @@ Bila alur bertingkat bermasalah, hapus baris itu dari `.env` (atau ubah ke `fals
 
 ## Sesudah terbukti: P10, cabut paket lama
 
-Langkah terpisah, **setelah paling sedikit satu run terbit lewat alur bertingkat**. Skripnya `.task-plans/2026-09-27-p10-cabut-paket-lama-prod.ps1` (cek/terapkan/balik, dijalankan manusia). Mode `terapkan` **menolak jalan** sampai tiga syarat terpenuhi: `PAYROLL_JENJANG_AKTIF=true`, paket tahap P7 terpasang (HRD Supervisor memegang `payroll_ttd_hrd`), dan minimal satu run `published` yang riwayatnya memuat tanda tangan tahap Direksi. Sebelum itu paket lama adalah satu-satunya jalan menyetujui gaji.
+Dijalankan **langsung sesudah flag dinyalakan** (keputusan pemilik produk 2026-09-28: pindah ke alur baru tanpa menunggu satu siklus dan tanpa setujui alur lama). Skripnya `.task-plans/2026-09-27-p10-cabut-paket-lama-prod.ps1` (cek/terapkan/balik, dijalankan manusia). Mode `terapkan` **menolak jalan** sampai dua syarat terpenuhi: `PAYROLL_JENJANG_AKTIF=true` dan paket tahap P7 terpasang (HRD Supervisor memegang `payroll_ttd_hrd`). Tanpa flag, paket lama satu-satunya jalan menyetujui gaji; tanpa P7, tak seorang pun bisa menandatangani. ⚠️ Alur tanda tangan belum pernah diuji utuh di dev (uji berhenti di tahap Cost Control): bila run tertahan, jalan pulangnya matikan flag lalu `-Mode balik` P10.
 
 Susunan akhirnya (ADR 0129 §8):
 

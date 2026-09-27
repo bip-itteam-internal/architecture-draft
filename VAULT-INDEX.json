@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-27",
+  "digenerate": "2026-09-28",
   "jumlah_dokumen": 493,
   "dokumen": [
     {
@@ -14176,20 +14176,20 @@
         "ANALISA - Persetujuan Payroll Bertingkat",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "38eb1526f67341e24616c52e46401094b8ec92768bbd5f941446d9e3a060d69c",
-      "ukuran_kb": 11.6,
-      "ringkasan": "Menjawab: bagaimana urutan dan perintah deploy container untuk fitur persetujuan payroll bertingkat (notification, employee, finance, insentive, payroll, lalu frontend), bagaimana memverifikasi deploy tanpa mengandalkan `docker ps`/`/health` semata, bagaimana memasang paket izin tahap ke jabatan tertentu, dan kapan serta bagaimana menyalakan flag `PAYROLL_JENJANG_AKTIF` di prod dengan aman.",
+      "hash": "23aec001f4300cca12ede441351190d69175fadd159671cf7eac445c56c2aa1f",
+      "ukuran_kb": 11.8,
+      "ringkasan": "Menjawab: bagaimana urutan dan gerbang verifikasi untuk men-deploy lalu menyalakan alur persetujuan payroll bertingkat (jenjang tanda tangan Cost Control -> SPV HRD -> SPV Finance -> Direksi, lalu bayar per badan usaha sebelum terbit) di PROD tanpa mengganggu alur lama. Merinci container mana saja yang harus naik dan urutannya (notification, employee, finance, insentive, payroll, lalu frontend), cara memasang paket izin ke jabatan penanda tangan lewat skrip sekali-jalan, dan cara menyalakan/mematikan flag PAYROLL_JENJANG_AKTIF dengan aman termasuk jalan mundurnya.",
       "kata_kunci": [
-        "payroll bertingkat",
+        "payroll",
+        "persetujuan bertingkat",
+        "payroll approval",
+        "jenjang persetujuan",
         "PAYROLL_JENJANG_AKTIF",
-        "jenjang approval",
         "deploy payroll",
-        "persetujuan payroll",
-        "badan usaha",
         "runbook",
         "tanda tangan payroll",
-        "flag deploy",
-        "multi-tier approval"
+        "bayar per badan usaha",
+        "cost control"
       ]
     },
     {
@@ -16804,20 +16804,20 @@
         "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
         "RUN - Menyalakan Persetujuan Payroll Bertingkat"
       ],
-      "hash": "3ed489e476aa9193948b17e06176c5ec871407708e174cedcfc87936ca068dc0",
-      "ukuran_kb": 12.7,
-      "ringkasan": "Menjawab: task apa saja (P1 sampai P7) yang menyusun fitur persetujuan payroll bertingkat, PR mana yang mengimplementasikan tiap bagian beserta status dan tanggal merge-nya, dan keputusan teknis yang diambil selama pengerjaan (skema izin dan paket per tahap, endpoint pembayaran per badan usaha, notifikasi, email slip, layar FE).",
+      "hash": "f440521bf59607c4b59754fa9d15793a829c627c23562ec6f9b7e7774d392b4b",
+      "ukuran_kb": 12.8,
+      "ringkasan": "Menjawab: apa saja tahap kerja (P1 sampai P7) untuk membangun fitur persetujuan payroll bertingkat, status dan nomor PR tiap tahap, dependensi antar-tahap, serta keputusan teknis yang diambil di tiap task -- izin per tahap dan paket akses, jenjang empat tahap di backend payroll, pembayaran per badan usaha dengan publish terkunci, notifikasi inbox, email slip untuk karyawan nonaktif, dan layar FE run payroll. Berguna untuk melacak kemajuan implementasi dan asumsi yang masih bisa berubah.",
       "kata_kunci": [
-        "payroll bertingkat",
-        "ADR 0129",
-        "analisa kebutuhan",
-        "papan kerja",
-        "izin payroll",
-        "paket permission",
-        "badan usaha",
+        "payroll",
+        "persetujuan bertingkat",
+        "ANALISA payroll",
         "jenjang persetujuan",
-        "tanda tangan payroll",
-        "PR tracking"
+        "izin payroll",
+        "badan usaha",
+        "notifikasi payroll",
+        "slip gaji",
+        "papan kerja",
+        "roadmap payroll"
       ]
     },
     {
