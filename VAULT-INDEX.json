@@ -2785,6 +2785,7 @@
         "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
         "ANALISA - Asisten Analisa Marketing",
         "ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak",
+        "ADR - 0132 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend",
         "RUN - Deploy Microservices bip-erp",
         "IT - Background Jobs & Schedulers",
         "HRIS - Otomasi Skor KPI",
@@ -2801,20 +2802,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "e6a839770e32d90fa2e4ce9979f81ba58c5593558344aa61ff3bf97ab2c5e85c",
-      "ukuran_kb": 177.6,
-      "ringkasan": "Menjawab: apa fungsi dan prinsip arsitektur Marketing Analytics Service (agregasi laba & performa per toko/produk/kampanye/iklan/video/live dari integration_db yang dibaca baca-saja lalu disimpan ke koleksi mart_* miliknya sendiri), endpoint apa saja yang sudah diimplementasikan (beranda, ambang, pagu, kurva alokasi, live shift, price floor, retur, asisten analisa terjadwal), bagaimana logika vonis laba lima keadaan dan aturan larangan hitung ganda antar kolom bekerja, serta status implementasi/deploy tiap fitur (live shift host, karya Live Support, monitoring sesi, keputusan AI).",
+      "hash": "f3a2496622e9ace7d7277d833cbceaa9f54026af3e6b75e721b0154bdb5ea7e4",
+      "ukuran_kb": 177.8,
+      "ringkasan": "Menjawab: bagaimana service marketing-analytics menghitung dan menyajikan laba serta performa marketing per toko, produk, kampanye, video, dan live (endpoint beranda, ambang keputusan, pagu belanja, KPI host live, live shift, live support, analisis Account Specialist), dan bagaimana arsitekturnya menjaga integration_db tetap baca-saja. Juga menjawab aturan anti hitung-ganda (revenue TikTok vs Shopee, iklan sia-sia, pembatalan, GMV live) serta daftar koleksi mart_* dan channel data (TikTok, Shopee, Lazada) yang didukung.",
       "kata_kunci": [
-        "marketing analytics service",
-        "mart",
+        "marketing analytics",
         "laba",
+        "profit",
         "ROAS",
         "live shift",
+        "KPI live",
         "TikTok",
         "Shopee",
-        "price floor",
-        "asisten analisa",
-        "integration_db"
+        "Lazada",
+        "mart_profit_attribution"
       ]
     },
     {
@@ -7972,21 +7973,23 @@
         "CORE - OCR Document Service",
         "ANALISA - Asisten Analisa Marketing",
         "Microservices - Marketing Analytics Service",
+        "ADR - 0132 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend",
         "ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library"
       ],
-      "hash": "094544d65a300d020bbd4e2122d6ff9594eb58be8136b9b03494bf4294a9649f",
-      "ukuran_kb": 37.7,
-      "ringkasan": "Menjawab: kenapa dan bagaimana laporan Asisten Analisa Marketing mulai membawa rekomendasi tindakan konkret (hentikan iklan, kurangi/naikkan belanja, lengkapi harga pokok, dll) yang penerimanya cukup tandai dijalankan atau ditolak, apa batasan yang tetap dijaga (sistem tidak mengeksekusi apa pun, model tidak menerima angka mentah, keputusan soal laba memakai jendela yang sudah matang, keputusan naikkan belanja selalu berdasar terbatas), dan bagaimana ini menjadi penyimpangan sadar dari ADR 0058 §5 dan ADR 0120 §5/§7 sebelumnya.",
+      "hash": "9baeaf1acfd82c8b365d982188dafc1bdbb69ccbacc6a2e1edb525bb52cd7777",
+      "ukuran_kb": 38.1,
+      "ringkasan": "Menjawab: bagaimana laporan Asisten Analisa Marketing berubah dari sekadar angka jadi memuat keputusan tindakan (mis. hentikan iklan, kurangi belanja toko, naikkan belanja produk) yang dipilih, diurutkan, dan dijelaskan AI dari katalog tindakan tertutup, dengan kelayakan tetap dihitung aturan berbasis data bukan model. Juga menjawab siapa yang menjalankan atau menolak tiap keputusan, batasan tegasnya (sistem tidak eksekusi otomatis ke TikTok/Shopee, tidak ada rekomendasi besaran rupiah, laba belum matang tidak jadi dasar keputusan), mode bayangan/masa uji sebelum ke semua penerima, dan prasyarat satu target ROAS yang belum disepakati manajemen.",
       "kata_kunci": [
-        "ADR 0127",
+        "asisten analisa marketing",
         "keputusan AI",
-        "asisten analisa",
-        "marketing analytics",
-        "rekomendasi tindakan",
-        "jalankan atau tolak",
+        "AI decision",
         "ROAS",
-        "laba belum matang",
-        "katalog tindakan tertutup"
+        "katalog tindakan tertutup",
+        "mode bayangan",
+        "penerima uji keputusan",
+        "jalankan atau tolak",
+        "ADR 0120",
+        "ADR 0058"
       ]
     },
     {
