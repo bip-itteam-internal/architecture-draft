@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-28",
+  "digenerate": "2026-09-29",
   "jumlah_dokumen": 499,
   "dokumen": [
     {
@@ -1572,19 +1572,19 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "3239cb4886388d3203534f7d8a96f28ac041af9a8201b9d83ac0d0b1a0fd246b",
-      "ukuran_kb": 574.6,
-      "ringkasan": "Menjawab: apa saja modul dan fitur portal web ERP/HRIS (One Bharata, erp-frontend), bagaimana login, SSO Identity Provider, dan gating menu berdasarkan system_roles/paket izin bekerja, serta bagaimana sidebar dan Pengaturan HRGA dikelompokkan. Juga menjelaskan dukungan multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan) serta konvensi data-fetching TanStack Query dan konvensi bagan Recharts/ChartContainer.",
+      "hash": "f002d2857dfc9ff730c6ad8685e8bc945069cfddc94647a8506198eb2d5dc571",
+      "ukuran_kb": 574.7,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS One Bharata (erp-frontend), stack yang dipakai, bagaimana login, SSO identity provider, dan gating menu berbasis system_roles serta paket izin bekerja. Juga menjelaskan pengelompokan menu sidebar HRIS, Pengaturan HRGA terpusat, dukungan multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), konvensi data-fetching TanStack Query, konvensi bagan Recharts, serta daftar modul yang sudah dan belum dibangun.",
       "kata_kunci": [
-        "web ERP",
+        "Web ERP",
         "erp-frontend",
         "One Bharata",
         "SSO",
         "system_roles",
         "sidebar menu",
-        "multi-tenant",
+        "multi-tenant perusahaan",
         "TanStack Query",
-        "Recharts",
+        "Recharts ChartContainer",
         "Pengaturan HRGA"
       ]
     },
@@ -2121,20 +2121,20 @@
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "3bd96426de8aee596400f287f439321416b4676f1b665878ebdaa26f046f6ca8",
-      "ukuran_kb": 21.7,
-      "ringkasan": "Menjawab: bagaimana asisten AI tanya-jawab (Copilot) di Web ERP dirancang, kenapa ia merutekan pertanyaan ke endpoint yang sudah ada lewat gateway dengan JWT pemakai alih-alih berhitung sendiri, dan penjaga apa yang mencegah angka karangan. Juga menjelaskan klien AI OpenAI-compatible ke code.bharatainternasional.com, siapa yang boleh memakainya, batasan gateway 30 detik/stream, rencana Jadwal Tugas, serta hubungannya dengan ADR 0058, 0120, dan 0132.",
+      "hash": "4c314791ad090be90ba34559d0aa53f3723f6a4eca1967b8a561bcbeba330391",
+      "ukuran_kb": 22.0,
+      "ringkasan": "Menjawab: bagaimana asisten AI tanya-jawab (Copilot) di Web ERP dirancang, mengapa ia merutekan pertanyaan ke endpoint lewat gateway dengan JWT pemakai alih-alih menghitung sendiri, dan mengapa memakai Tool Runner bukan LangGraph. Juga menjelaskan penjaga anti angka karangan, batas timeout/stream gateway, siapa pemakainya (Supervisor, Direktur, IT), hubungannya dengan ADR 0058, 0120, dan 0132, serta hal yang belum diputuskan.",
       "kata_kunci": [
         "assistant service",
-        "Copilot",
         "asisten AI",
-        "AI assistant",
+        "Copilot",
+        "chatbot",
         "tool calling",
-        "JWT",
-        "gateway",
+        "JWT gateway",
+        "ADR 0132",
+        "ADR 0058",
         "LLM",
-        "tanya-jawab",
-        "ADR 0132"
+        "tanya-jawab lintas modul"
       ]
     },
     {

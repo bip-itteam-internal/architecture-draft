@@ -9,10 +9,12 @@
   `ANALISA - Asisten AI Lintas Modul`); **belum ada Fiber/gateway route, RBAC, maupun endpoint
   modul apa pun** (T2 dst). Branch `feat/assistant-klien-ai`, PR belum dibuat/di-merge ke
   `main` — status keseluruhan tetap 🟡 Konsep sampai lebih banyak T-task selesai.
-  **Frontend: menu "Copilot" + halaman placeholder, merged 2026-09-28**
-  ([erp-frontend#1788](https://github.com/bip-itteam-internal/erp-frontend/pull/1788)) — murni
-  pengumuman "Segera Hadir" di `/copilot`, **tidak memanggil backend apa pun**. Nama menu yang
-  diputuskan: **Copilot**. Lihat § Persona untuk gate interimnya yang lebih sempit dari ADR-0132 §3.
+  **Frontend: banner pengumuman "Copilot" + halaman placeholder `/copilot`** — murni pengumuman
+  "Segera Hadir", **tidak memanggil backend apa pun**. Nama fitur yang diputuskan: **Copilot**.
+  Sempat berupa menu di puncak sidebar
+  ([erp-frontend#1788](https://github.com/bip-itteam-internal/erp-frontend/pull/1788)), lalu
+  2026-09-28 diganti banner di atas konten yang sementara hanya terlihat Tech Development
+  (branch `feat/copilot-banner`). Lihat § Persona.
   **Jadwal Tugas** diputuskan sebagai pengingat, bukan eksekusi otomatis — lihat § Jadwal Tugas.
   ⚠️ **SEBAGIAN DIGANTIKAN 2026-09-22** oleh [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]]
   **untuk kasus laporan Marketing terjadwal saja**: asisten analisa marketing diputuskan berdiri
@@ -157,15 +159,18 @@ Empat jalan keluar yang terbuka, belum dipilih:
 | Direktur | Kesekretariatan | Sama seperti di atas; otomatis lolos lewat derivasi `it:supervisor` dari jabatan. Corporate Secretary belum ditegaskan ikut atau tidak | Web ERP |
 | Tim IT | IT | Sama seperti di atas, lewat `common.IsITMember`/`IsITSupervisor` | Web ERP |
 
-⚠️ **Gate menu INTERIM lebih sempit dari tabel di atas** (placeholder "Copilot", erp-frontend
-2026-09-28): menunya hanya terlihat oleh **Direktur dan IT supervisor**, lewat bypass
-`aksesSemuaMenu` (`utils/akses-penuh.ts`); izin `assistant.view` didaftarkan `tolak` di tabel
-`FALLBACK` (`utils/menu-permission.ts`) supaya tak terbuka ke semua orang. Penyempitan ini
-**sadar**, bukan kelalaian: saat itu dianggap tak ada klaim JWT `is_supervisor` generik di FE.
+⚠️ **Pengumuman INTERIM jauh lebih sempit dari tabel di atas** (erp-frontend 2026-09-28): belum
+ada menu Copilot sama sekali. Yang ada banner pengumuman di atas konten seluruh halaman
+(`components/layout/banner-copilot.tsx`, dirender `Container`), hanya untuk
+**departemen Tech Development** — dibandingkan dengan konstanta `DIVISI_IT`, **bukan**
+`system_roles.it` (peran itu juga dipegang orang HR, Kesekretariatan, dan Finance). Selalu tampil
+tanpa tombol tutup, tombol "Pelajari" menuju `/copilot`, dan disembunyikan di `/copilot` sendiri.
+Izin `assistant.view` tetap `tolak` di `FALLBACK` (`utils/menu-permission.ts`) sebagai penjaga,
+walau tak ada menu yang memakainya: izin tak-terdaftar diloloskan untuk semua orang. Halaman
+`/copilot` sendiri tidak menggerbangi apa pun karena tak memuat data (ADR 0031).
 ⚠️ Belum diverifikasi: `KonteksPortal.supervisedDepartments` di `components/layout/portal-menu.ts`
-didokumentasikan sebagai sinyal supervisor yang benar — bila terbukti, gate bisa diperlebar ke
-supervisor lain tanpa menunggu gate backend (T3). Halaman `/copilot` sendiri tidak menggerbangi
-apa pun karena tak memuat data (menu bukan keamanan, ADR 0031).
+didokumentasikan sebagai sinyal supervisor yang benar — relevan saat menu sungguhan dibuka ke
+supervisor (T3).
 
 - **Tujuan**: mendapatkan satu angka tanpa harus tahu lebih dulu layar mana yang memuatnya.
 - **Pain point**: angkanya ada, tetapi tersebar di belasan layar.
@@ -209,13 +214,13 @@ riwayat: kapan terkirim, kapan dibuka
 - **Model dan ongkos.** Probe 2026-09-28 memakai `cc/claude-sonnet-4-6` (bukan opus) — terbukti mendukung tool-calling, 2.332 prompt token untuk satu tool sederhana. Biaya rupiah per pertanyaan lintas modul sungguhan (lebih banyak tool) **masih belum diukur** — lihat T12 di [[ANALISA - Asisten AI Lintas Modul]]. Batas pemakaian per orang per hari juga belum ada.
 - **Prompt caching**: daftar tool dan system prompt yang tetap seharusnya di-cache, penempatan breakpoint-nya belum dirancang.
 - ~~**Penyimpanan kunci API Anthropic** dan siapa yang memegangnya.~~ **Sebagian terjawab 2026-09-28**: `AI_BASE_URL`/`AI_API_KEY` sudah ada sebagai env var di SEMUA container prod (termasuk container MongoDB — kemungkinan dari blok/anchor compose bersama yang terlalu luas, layak ditinjau terpisah, di luar cakupan dok ini) lewat `~/apps/bip-erp/.env` di server. Siapa yang mengelola rotasi/akses kunci ini masih belum jelas.
-- ~~**Seluruh sisi frontend**~~ **Sebagian terjawab 2026-09-28**: letak menu diputuskan — item
-  **"Copilot"** paling atas kategori Portal Saya (`menus.erp`), treatment filled-primary lewat
-  field `MenuItem.highlight` dengan kilau beranimasi (keyframe `copilot-kilau`, mati untuk
-  `prefers-reduced-motion`); halaman placeholder `/copilot` + kunci i18n `copilot.*` dan
-  `sidebar.copilot` di `id`/`en` ([[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]). Yang masih
-  TBD: panel chat sungguhan, render tabel/chart jawaban, dan sub-menu (Tanya Jawab, Jadwal Tugas)
-  yang sengaja ditunda sampai fiturnya nyata.
+- ~~**Seluruh sisi frontend**~~ **Sebagian terjawab 2026-09-28**: pengumuman lewat banner
+  (bukan menu) dengan kilau beranimasi (keyframe `copilot-kilau`, garis putih transparan supaya
+  tak jadi bayangan di tema gelap, mati untuk `prefers-reduced-motion`); halaman placeholder
+  `/copilot` + kunci i18n `copilot.*` dan `copilot.banner.*` di `id`/`en`
+  ([[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]). Yang masih TBD: letak menu Copilot
+  sungguhan saat fiturnya hidup, panel chat, render tabel/chart jawaban, dan sub-menu (Tanya
+  Jawab, Jadwal Tugas).
 - **Irisan dan gerbang verifikasinya.** Belum disusun.
 - ~~**ADR** yang menyelesaikan ketegangan dengan ADR 0058 § 2.~~ **Ditulis 2026-09-28**: [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §2 — asisten lintas modul tetap jadi service terpisah, karena tidak ada satu service pemilik untuk semua modul.
 
