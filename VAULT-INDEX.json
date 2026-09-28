@@ -1462,6 +1462,7 @@
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "HRIS - Recruitment",
+        "Microservices - Assistant Service",
         "HRIS - Organization Structure",
         "ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
@@ -1572,20 +1573,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "99fa552c214c98e705c9377a719108b87a27b89fe08baf505ed396b8e5416935",
-      "ukuran_kb": 574.1,
-      "ringkasan": "Menjawab: menu dan halaman apa saja yang ada di erp-frontend per modul (HRIS, Finance, Marketing, Task Management, dst), status implementasi dan gate izin tiap halaman, dan riwayat perubahan sidebar/menu bertanggal. Bagian Finance memuat peringkasan dashboard FAT 2026-09-26 (Ringkasan Divisi + Kamus, Tim Accounting baru, Pembukuan dan Anggaran & Cost Control menggantikan menu lama, Entitas CV disembunyikan dari sidebar).",
+      "hash": "8f264656fbea43e54da68ffddcc006bc4470b6af356405a4325a16cbd2e235e8",
+      "ukuran_kb": 574.6,
+      "ringkasan": "Menjawab: apa stack dan struktur portal web ERP/HRIS (erp-frontend, \"One Bharata\"), bagaimana login, token refresh, SSO Identity Provider, dan role gating sidebar lewat system_roles bekerja, serta bagaimana menu dikelompokkan (Pengaturan HRGA terpusat, multi-perusahaan, rekrutmen lintas perusahaan). Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts/ChartContainer, dan daftar modul yang sudah maupun belum ada di web.",
       "kata_kunci": [
+        "web ERP",
         "erp-frontend",
+        "hris-dashboard",
+        "SSO",
+        "system_roles",
+        "role gating",
         "sidebar menu",
-        "dashboard FAT",
-        "Pembukuan",
-        "Anggaran & Cost Control",
-        "Tim Accounting",
-        "CV Ditugaskan",
-        "menu terbatas",
-        "Accounts Receivable",
-        "Jurnal"
+        "TanStack Query",
+        "Recharts",
+        "multi-tenant"
       ]
     },
     {
@@ -2122,20 +2123,20 @@
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "19442ec1abbc36e69f50cd6a8b0619162317528219c162e043d5d34ad591f083",
-      "ukuran_kb": 18.2,
-      "ringkasan": "Menjawab: apa itu Assistant Service, bagaimana ia menjawab pertanyaan angka bisnis lintas modul dengan merutekan ke endpoint yang sudah ada (bukan menghitung sendiri), dan bagaimana hak aksesnya dijaga tetap identik dengan hak akses pemakai lewat JWT dan gateway. Juga menjelaskan empat keputusan rancangan (Tool Runner bukan LangGraph, panggilan lewat gateway bukan jalur internal, larangan berhitung sendiri, jawaban sebagai pintu ke layar) beserta penjaga anti angka karangan. Mencatat status implementasi terkini (klien AI dasar T1 sudah ada kodenya, route Fiber/gateway/RBAC modul belum) dan rujukan ke ADR-0132 yang mengubah arah cakupan jadi lintas modul sejak awal.",
+      "hash": "4f13df4492e9a7cefd84b89ac3de12f9902ebe5d512c08891f21b79769832522",
+      "ukuran_kb": 19.8,
+      "ringkasan": "Menjawab: bagaimana asisten AI tanya-jawab (Copilot) di Web ERP dirancang, mengapa ia memanggil endpoint lewat gateway dengan JWT pemakai alih-alih jalur internal, mengapa dilarang berhitung sendiri, dan penjaga apa yang mencegah angka karangan. Juga menjelaskan hubungannya dengan ADR 0058, 0120, dan 0132 (cakupan lintas modul, RBAC Supervisor/Direktur/IT), stack klien AI OpenAI-compatible, batas gateway 30 detik tanpa streaming, serta hal yang belum diputuskan.",
       "kata_kunci": [
         "assistant service",
         "asisten AI",
-        "chatbot ERP",
+        "Copilot",
+        "chatbot",
+        "tool calling",
+        "JWT pemakai",
+        "gateway",
+        "LLM",
         "tanya-jawab lintas modul",
-        "tool runner",
-        "JWT",
-        "API gateway",
-        "RBAC asisten",
-        "ADR-0132",
-        "marketing analytics"
+        "ADR 0132"
       ]
     },
     {
