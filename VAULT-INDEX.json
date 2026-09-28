@@ -2423,20 +2423,22 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "14c60dd2a345841e50110fc10c9992b0d6ccc407fdd69d26cb7ea907dd2db181",
-      "ukuran_kb": 129.3,
-      "ringkasan": "Menjawab: bagaimana Form Builder bekerja sebagai pembuat form dinamis tanpa coding, mulai dari tipe pertanyaan (termasuk `file`), tipe form (survey, evaluation, checklist, kaizen), kepemilikan per departemen, sampai kenapa susunan pertanyaan terkunci sesudah ada jawaban. Juga menjawab cara kerja penilaian karyawan lain lewat `subject`, form berulang bulanan dan mingguan beserta periodenya, gerbang kepatuhan presensi, notifikasi inbox (dan kenapa notification-service wajib ikut deploy), program Kaizen, Program Culture, lampiran berkas, penanda inspeksi Satgas, skor gabungan, serta setoran metrik ke KPI.",
+      "hash": "5fa4b53e595a9e192244bae04649f32c0d35168a4897e64fdc907959f0afb98e",
+      "ukuran_kb": 133.7,
+      "ringkasan": "Menjawab: bagaimana departemen membuat form dinamis tanpa coding (10 tipe pertanyaan, 4 tipe form: survey/evaluation/checklist/kaizen), bagaimana form dipakai untuk menilai karyawan lain, bagaimana form berulang periode bulanan/mingguan bekerja, dan bagaimana form wajib yang belum diisi menahan clock-in presensi mobile lewat gerbang kepatuhan. Juga menjelaskan program kaizen (pengumpulan ide bulanan dengan komite dan papan kepatuhan), modul Kelola Program Culture dengan skor komposit, kepemilikan form per departemen, serta status deploy dan gap verifikasi tiap fitur di dev/prod.",
       "kata_kunci": [
         "form builder",
-        "form dinamis",
-        "survei",
+        "survey",
         "evaluation",
+        "checklist",
+        "kaizen",
         "form berulang",
-        "recurrence",
+        "recurring form",
+        "penilaian karyawan",
+        "employee evaluation",
         "gerbang presensi",
-        "Kaizen",
-        "Program Culture",
-        "inspeksi Satgas"
+        "clock-in",
+        "culture program"
       ]
     },
     {
