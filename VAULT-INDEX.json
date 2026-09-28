@@ -7968,7 +7968,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)** — diukur 2026-09-28 (versi sebelumnya 2026-09-27). Kode backend **merged** ke `origin/main` bip-erp lewat dua belas PR (§ Realisasi di bawah), **BELUM deploy prod**. Layar keputusan di erp-frontend (`/marketing-analytics/keputusan`, penanda di beranda modul, field \"Penerima uji keputusan\" pada form Jadwal setara `penerima_bayangan` BE) **MERGED** (erp-frontend [#1763](https://github.com/bip-itteam-internal/erp-frontend/pull/1763), [#1767](https://github.com/bip-itteam-internal/erp-frontend/pull/1767), [#1774](https://github.com/bip-itteam-internal/erp-frontend/pull/1774) — § Realisasi butir l/m; catatan \"sedang dinilai review, PR menyusul\" di versi sebelumnya sudah tidak berlaku). Tab Hasil analisa jadi satu laporan + unduh PDF (§ Realisasi butir n) **belum ada PR**, dikerjakan di branch lokal. Menggantikan [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] §5 dan §7, serta [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] §5 **khusus untuk laporan Asisten Analisa Marketing**.",
+      "status_teks": "**Implemented (ada catatan)** — diukur 2026-09-28 malam (ukur ulang sebelum dipakai). Backend dan erp-frontend **merged** (§ Realisasi, termasuk tab Hasil analisa + PDF di butir n, erp-frontend [#1776](https://github.com/bip-itteam-internal/erp-frontend/pull/1776)/[#1778](https://github.com/bip-itteam-internal/erp-frontend/pull/1778)), dan **ter-deploy prod** 2026-09-28 (container `marketing-analytics` 16:45 WIB, `frontend-hris-dashboard` 16:50 WIB, penanda biner/bundel terverifikasi). Saklar AI prod menyala, mode bayangan (penerima uji saja). **Catatan**: sampai 2026-09-28 21:45 WIB **nol** kiriman ber-`status_model=siap` di prod; keputusan yang tampil masih dari aturan. Perbaikan anggaran waktu model ada di § Realisasi butir o (bip-erp [#2149](https://github.com/bip-itteam-internal/bip-erp/pull/2149)), menunggu deploy dan kiriman terjadwal pertama sebagai bukti. Menggantikan [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] §5 dan §7, serta [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] §5 **khusus untuk laporan Asisten Analisa Marketing**.",
       "publik": true,
       "tautan": [
         "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
@@ -7979,18 +7979,19 @@
         "ADR - 0134 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend",
         "ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library"
       ],
-      "hash": "a5cbaa22e6dc613be2ab9609c1ff1ecec90ac4c157a84233b86e60212934888c",
-      "ukuran_kb": 38.1,
-      "ringkasan": "Menjawab: kenapa laporan Asisten Analisa Marketing berubah dari sekadar urutan perhatian menjadi membawa keputusan tindakan konkret (mis. hentikan iklan video, kurangi belanja toko), siapa yang menjalankan atau menolak keputusan itu (manusia, sistem tidak mengeksekusi apa pun), dan bagaimana pembagian kerja antara aturan (menentukan kelayakan tindakan dari data) dengan model AI (memilih, mengurutkan, menjelaskan dari katalog tertutup). Juga mencatat status implementasi per PR (backend merged belum deploy prod, FE merged), mode bayangan sebelum tayang ke semua penerima, dan prasyarat yang masih menunggu keputusan manajemen yaitu satu angka target ROAS.",
+      "hash": "7acd33dafb528e7888115ed8387460f2548863d0902d7398f45a3c3f0cc8dcea",
+      "ukuran_kb": 39.8,
+      "ringkasan": "Menjawab: kenapa laporan Asisten Analisa Marketing membawa keputusan tindakan konkret (hentikan iklan video, kurangi atau naikkan belanja toko) yang dijalankan atau ditolak manusia, bagaimana pembagian kerja antara aturan (kelayakan) dan model AI (memilih, mengurutkan, menjelaskan dari katalog tertutup), dan apa yang terjadi saat model gagal. Juga mencatat realisasi per PR (backend, layar keputusan, tab Hasil analisa + PDF, target ROAS 4,5, mode bayangan) serta kenapa keputusan AI belum pernah siap di prod dan perbaikan anggaran waktu model 4 menit dengan batas 25 keputusan.",
       "kata_kunci": [
         "ADR 0127",
         "asisten analisa marketing",
         "keputusan AI",
-        "rekomendasi tindakan iklan",
         "jalankan atau tolak",
         "target ROAS",
-        "katalog tindakan tertutup",
         "mode bayangan",
+        "status_model gagal",
+        "anggaran waktu model",
+        "batas 25 keputusan",
         "AI marketing analytics"
       ]
     },
