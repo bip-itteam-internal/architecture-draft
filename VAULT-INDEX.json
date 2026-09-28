@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-28",
-  "jumlah_dokumen": 493,
+  "jumlah_dokumen": 496,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -634,20 +634,20 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "df0465b907830bf6480924180a07ca88676031932ade28c8363bb22a591e7a7d",
-      "ukuran_kb": 74.4,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service (beranda, ambang, pagu, kurva alokasi, laba, video & live, live-shifts, retur, price floor, Asisten Analisa, setoran karya Live Support, pengumpul KPI), parameter dan gerbang aksesnya, serta konvensi respons seperti unavailable_channels dan kolom_tidak_berlaku. Juga menjelaskan lima keadaan vonis laba (tanpa_data, belum_matang, rugi, waspada, sehat) dan cara mengaudit kelengkapan daftar route terhadap kode.",
+      "hash": "1f0f44279adaf03b0542cb4691abbecc1685c911fa46ad2ef587b772193dfc88",
+      "ukuran_kb": 76.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di Marketing Analytics Service (halaman depan/beranda, ambang keputusan ROAS/CPA, pagu belanja iklan, kurva alokasi, live shift, retur, price floor, asisten analisa terjadwal), bagaimana bentuk request dan response tiap endpoint (paginasi, kode error, amplop respons), dan bagaimana logika vonis laba lima keadaan (tanpa_data, belum_matang, rugi, waspada, sehat) dihitung berurutan.",
       "kata_kunci": [
         "marketing analytics",
         "endpoint",
         "API reference",
-        "beranda",
+        "vonis laba",
         "ambang ROAS",
         "pagu iklan",
-        "live-shifts",
-        "vonis laba",
+        "kurva alokasi",
+        "live shift",
         "price floor",
-        "Asisten Analisa"
+        "asisten analisa"
       ]
     },
     {
@@ -2097,10 +2097,13 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "🟡",
-      "status_teks": "**Konsep**, 2026-08-29, **0 kode**. Belum ada direktori service.",
+      "status_teks": "**Konsep**, 2026-08-29, **0 kode** — dikonfirmasi ulang lewat `git grep` langsung",
       "publik": true,
       "tautan": [
+        "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
+        "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan\n  Data Bisnis per Service Bukan Terpusat",
         "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
+        "ADR - 0132 Asisten AI Tanya-Jawab\n  Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
         "CORE - API Master Gateway",
         "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
         "Microservices - Marketing Analytics Service",
@@ -2115,20 +2118,20 @@
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "11e72059269b7487c65ca2b1a9718f5e7097359a1311a0696021595641d1cbf5",
-      "ukuran_kb": 14.3,
-      "ringkasan": "Menjawab: bagaimana asisten tanya-jawab di Web ERP dirancang supaya ia merutekan pertanyaan ke endpoint yang sudah menghitung angkanya, bukan menghitung sendiri, dan kenapa tool-nya memanggil lewat gateway dengan JWT orang yang bertanya sehingga hak aksesnya identik dengan hak akses orang itu di layar. Juga menjawab kenapa Tool Runner dipilih ketimbang LangGraph, tool apa yang sengaja tidak dibuat (bash, query bebas Mongo, tool tulis), empat penjaga supaya tidak lahir angka karangan, dan kenapa cara mengantar jawaban masih terbuka karena gateway tidak meneruskan stream dan berbatas 30 detik.",
+      "hash": "792dd6f0bf48d9c6ef61eb505404ab4a7033e577f70b80ca1e6a2fe78a969ea9",
+      "ukuran_kb": 16.7,
+      "ringkasan": "Menjawab: bagaimana rancangan awal asisten tanya-jawab AI di Web ERP bekerja (merutekan pertanyaan ke endpoint yang sudah menghitung angkanya, memanggil lewat gateway dengan JWT pemakai sehingga hak aksesnya identik dengan orang itu, dan dilarang berhitung sendiri), apa alasan di balik tiap keputusan rancangan (Tool Runner vs LangGraph, gateway vs jalur internal, jawaban sebagai pintu ke layar asli), dan bagaimana relasinya dengan ADR yang lebih baru (0120 untuk laporan Marketing, 0132 untuk cakupan lintas modul) yang mengubah/menggantikan sebagian rencananya.",
       "kata_kunci": [
         "assistant service",
         "asisten AI",
-        "tanya-jawab",
+        "tanya jawab",
         "chatbot ERP",
         "Tool Runner",
-        "Anthropic Go SDK",
-        "JWT pemakai",
-        "API gateway",
-        "marketing analytics",
-        "hak akses AI"
+        "JWT",
+        "gateway",
+        "RBAC",
+        "ADR 0058",
+        "ADR 0132"
       ]
     },
     {
@@ -2798,20 +2801,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "ae0a52a76d8e0df8e6f2fd2c02f7e415831e34915f7bceda376c25ad1fd32b66",
-      "ukuran_kb": 174.9,
-      "ringkasan": "Menjawab: bagaimana service agregasi laba dan performa marketing bekerja (membaca integration_db baca-saja lalu menyimpan mart_*), job sync dan penjadwal 48 jam, koleksi apa saja yang dimilikinya, serta sumber data per channel TikTok, Shopee, dan Lazada. Juga menjawab aturan pemakaian angka agar tidak hitung ganda (iklan_sia_sia, pembatalan, GMV live), pencatatan sesi live host, ambil alih sesi, KPI Live Support, dan keterbatasan data yang wajib dijaga.",
+      "hash": "e6a839770e32d90fa2e4ce9979f81ba58c5593558344aa61ff3bf97ab2c5e85c",
+      "ukuran_kb": 177.6,
+      "ringkasan": "Menjawab: apa fungsi dan prinsip arsitektur Marketing Analytics Service (agregasi laba & performa per toko/produk/kampanye/iklan/video/live dari integration_db yang dibaca baca-saja lalu disimpan ke koleksi mart_* miliknya sendiri), endpoint apa saja yang sudah diimplementasikan (beranda, ambang, pagu, kurva alokasi, live shift, price floor, retur, asisten analisa terjadwal), bagaimana logika vonis laba lima keadaan dan aturan larangan hitung ganda antar kolom bekerja, serta status implementasi/deploy tiap fitur (live shift host, karya Live Support, monitoring sesi, keputusan AI).",
       "kata_kunci": [
         "marketing analytics service",
         "mart",
-        "integration_db",
-        "laba marketing",
-        "profit attribution",
-        "sesi live",
+        "laba",
+        "ROAS",
         "live shift",
-        "hitung ganda",
-        "TikTok Shopee Lazada",
-        "job sync"
+        "TikTok",
+        "Shopee",
+        "price floor",
+        "asisten analisa",
+        "integration_db"
       ]
     },
     {
@@ -7961,7 +7964,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)** — diukur 2026-09-27. Kode backend **merged** ke `origin/main` bip-erp lewat enam PR (§ Realisasi di bawah), **BELUM deploy prod**. Layar keputusan di erp-frontend (`/marketing-analytics/keputusan`, penanda di beranda modul, field \"Penerima uji keputusan\" pada form Jadwal setara `penerima_bayangan` BE) **sedang dinilai review, PR menyusul** (belum merged). Menggantikan [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] §5 dan §7, serta [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] §5 **khusus untuk laporan Asisten Analisa Marketing**.",
+      "status_teks": "**Implemented (ada catatan)** — diukur 2026-09-28 (versi sebelumnya 2026-09-27). Kode backend **merged** ke `origin/main` bip-erp lewat dua belas PR (§ Realisasi di bawah), **BELUM deploy prod**. Layar keputusan di erp-frontend (`/marketing-analytics/keputusan`, penanda di beranda modul, field \"Penerima uji keputusan\" pada form Jadwal setara `penerima_bayangan` BE) **MERGED** (erp-frontend [#1763](https://github.com/bip-itteam-internal/erp-frontend/pull/1763), [#1767](https://github.com/bip-itteam-internal/erp-frontend/pull/1767), [#1774](https://github.com/bip-itteam-internal/erp-frontend/pull/1774) — § Realisasi butir l/m; catatan \"sedang dinilai review, PR menyusul\" di versi sebelumnya sudah tidak berlaku). Tab Hasil analisa jadi satu laporan + unduh PDF (§ Realisasi butir n) **belum ada PR**, dikerjakan di branch lokal. Menggantikan [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] §5 dan §7, serta [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] §5 **khusus untuk laporan Asisten Analisa Marketing**.",
       "publik": true,
       "tautan": [
         "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
@@ -7971,20 +7974,19 @@
         "Microservices - Marketing Analytics Service",
         "ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library"
       ],
-      "hash": "3c2e4ea7880c7b9f1fdc9bf54bd8733a8caec7591d199b02ffa5f929f645fd16",
-      "ukuran_kb": 27.6,
-      "ringkasan": "Menjawab: mengapa laporan terjadwal Asisten Analisa Marketing kini membawa daftar keputusan tindakan dari AI (hentikan, kurangi, naikkan) yang orang tandai dijalankan atau ditolak, dan batasannya: katalog tindakan tertutup, kelayakan dihitung aturan backend, model tidak menerima angka mentah, laba belum matang tak jadi dasar, dan sistem tidak mengeksekusi. Juga menjawab mode bayangan, satu laporan gabungan untuk semua penerima, kondisi berhenti pengganti ADR 0120 §7, dan prasyarat satu target ROAS.",
+      "hash": "094544d65a300d020bbd4e2122d6ff9594eb58be8136b9b03494bf4294a9649f",
+      "ukuran_kb": 37.7,
+      "ringkasan": "Menjawab: kenapa dan bagaimana laporan Asisten Analisa Marketing mulai membawa rekomendasi tindakan konkret (hentikan iklan, kurangi/naikkan belanja, lengkapi harga pokok, dll) yang penerimanya cukup tandai dijalankan atau ditolak, apa batasan yang tetap dijaga (sistem tidak mengeksekusi apa pun, model tidak menerima angka mentah, keputusan soal laba memakai jendela yang sudah matang, keputusan naikkan belanja selalu berdasar terbatas), dan bagaimana ini menjadi penyimpangan sadar dari ADR 0058 §5 dan ADR 0120 §5/§7 sebelumnya.",
       "kata_kunci": [
         "ADR 0127",
-        "Asisten Analisa",
         "keputusan AI",
-        "AI decision",
+        "asisten analisa",
+        "marketing analytics",
+        "rekomendasi tindakan",
         "jalankan atau tolak",
-        "katalog tindakan",
-        "mode bayangan",
-        "shadow mode",
-        "target ROAS",
-        "laporan terjadwal"
+        "ROAS",
+        "laba belum matang",
+        "katalog tindakan tertutup"
       ]
     },
     {
@@ -8117,6 +8119,79 @@
         "PT",
         "form request",
         "AP"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat.md",
+      "judul": "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-09-28, kode belum ada. Diusulkan tim IT/Tech Development — **belum ada konfirmasi eksplisit ini sudah dibicarakan ke Direktur**. Berdiri di atas grounding vault + kode langsung pada tanggal yang sama (lihat § Context untuk koreksi atas klaim vault yang ternyata tidak cocok dengan kode).",
+      "publik": true,
+      "tautan": [
+        "Microservices - Assistant Service",
+        "Microservices - Assistant\nService",
+        "ADR - 0082\nIntegrasi AI lewat Klien Tipis di Shared-Library",
+        "ADR - 0127 Laporan Asisten Analisa\nMembawa Keputusan AI, Orang Menjalankan atau Menolak",
+        "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan\nTeknologi",
+        "ADR - 0120 Asisten Analisa Marketing Jadi\nMenu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
+        "ADR - 0120",
+        "CORE - Kapabilitas AI dan Machine Learning",
+        "REF - Kepemilikan Data",
+        "ADR - 0058",
+        "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
+        "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
+        "ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak",
+        "ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "CORE - RBAC dan Permission Set",
+        "CORE - API Master Gateway"
+      ],
+      "hash": "2294ec3a1496ac2f4ec89e8dc24c08991a5b47849424867a7961e5968a5a2b22",
+      "ukuran_kb": 16.7,
+      "ringkasan": "Menjawab: bagaimana rancangan asisten AI tanya-jawab lintas modul di Web ERP diputuskan (cakupan Supervisor semua departemen, Direktur, dan IT sejak awal, bukan hanya Marketing seperti rencana lama), kenapa lapisan data bisnis harus hidup di dalam tiap service pemilik data lewat endpoint baca baru bukan lapisan terpusat, apa kendala teknis gateway yang membatasi rancangannya (timeout 30 detik, tidak ada streaming SSE, InternalRequest tidak meneruskan BIP-Permissions), dan bagaimana gate RBAC baru \"Supervisor departemen mana pun ATAU Direktur ATAU IT\" ditegaskan beserta status Corporate Secretary yang belum diputuskan.",
+      "kata_kunci": [
+        "ADR 0132",
+        "asisten AI lintas modul",
+        "RBAC",
+        "Supervisor Direktur IT",
+        "gateway timeout",
+        "lapisan data bisnis",
+        "cross-module assistant",
+        "InternalRequest",
+        "Reroute",
+        "Corporate Secretary"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0132 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend.md",
+      "judul": "ADR - 0132 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": null,
+      "status_teks": "**Accepted** (2026-09-28, keputusan pemilik produk). Melengkapi [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] §5 dan [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] §4; tidak menggantikan keduanya.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak",
+        "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "Microservices - Marketing Analytics Service"
+      ],
+      "hash": "9c59fde257625416ab9cdee3797bdc31ccdc8cf11c3f84848ab75542740f0898",
+      "ukuran_kb": 5.5,
+      "ringkasan": "Menjawab: bagaimana laporan Asisten Analisa Marketing menyajikan hasilnya sebagai daftar blok terstruktur (teks, angka, tabel, bar, line) yang bentuk dan urutannya dipilih AI tetapi seluruh angka/datanya tetap dihitung dan dibekukan oleh backend, apa aturan validasi yang mencegah model menulis angka karangan atau memilih bentuk di luar yang diizinkan dataset, dan bagaimana FE merender tiap jenis blok memakai komponen chart yang sudah ada (ChartContainer + Recharts, warna --fb-seri, bukan --chart-1..5).",
+      "kata_kunci": [
+        "ADR 0132",
+        "sajian laporan",
+        "blok terstruktur",
+        "dataset",
+        "ChartContainer",
+        "Recharts",
+        "asisten analisa",
+        "tabel bar line",
+        "keputusan AI",
+        "satu fakta satu tempat"
       ]
     },
     {
@@ -16015,6 +16090,39 @@
         "pemegang modul",
         "mode riwayat",
         "cabut menu"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Asisten AI Lintas Modul.md",
+      "judul": "ANALISA - Asisten AI Lintas Modul",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
+        "Microservices - Assistant Service",
+        "CORE - API Master Gateway",
+        "ADR - 0132",
+        "ADR - 0120",
+        "REF - Kepemilikan Data",
+        "CORE - RBAC dan Permission Set",
+        "CORE - Kapabilitas AI dan Machine Learning"
+      ],
+      "hash": "b179cec4f0e06b7617fe55ea3c3abdca6d6289bca06fd328974fa6245840bf26",
+      "ukuran_kb": 10.9,
+      "ringkasan": "Menjawab: apa saja task konkret untuk membangun Asisten AI Lintas Modul (klien AI dasar, skeleton service assistant, gate RBAC baru, pemilihan modul percontohan, endpoint baca baru per modul, tool plus uji end-to-end, korelasi lintas modul, presentasi jawaban), bagaimana urutan ketergantungan antar task tersebut, dan keputusan manusia apa yang belum ada (Corporate Secretary ikut akses setara Direktur atau tidak, apakah proposal sudah dibicarakan ke Direktur) yang jadi prasyarat sebelum task tertentu dianggap tuntas.",
+      "kata_kunci": [
+        "ANALISA",
+        "asisten AI lintas modul",
+        "task breakdown",
+        "analisa kebutuhan",
+        "RBAC gate",
+        "modul percontohan",
+        "Tool Runner",
+        "Corporate Secretary",
+        "workspace"
       ]
     },
     {
