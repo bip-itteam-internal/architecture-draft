@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-29",
-  "jumlah_dokumen": 501,
+  "jumlah_dokumen": 502,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -8319,6 +8319,52 @@
         "HPP insentif",
         "bundle produk",
         "Accurate"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0137 Model Persetujuan Tunggal dan Pemisahan Tugas Lintas Modul.md",
+      "judul": "ADR - 0137 Model Persetujuan Tunggal dan Pemisahan Tugas Lintas Modul",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-09-29, BELUM diputuskan dan nol kode. Pengambil keputusan: **TBD** (manajemen bersama pemilik alur uang dan tim IT; lihat §Pertanyaan untuk manajemen, butir 1). Dok ini memetakan masalah, opsi, dan usulan penulis; ia tidak menetapkan apa pun sampai bagian §Decision diisi orang yang berwenang.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
+        "ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor",
+        "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
+        "ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget",
+        "ADR - 0131 Tanda Tangan Direktur-Sekutu pada BKK Otomatis Tanpa Approval",
+        "CORE - RBAC dan Permission Set",
+        "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
+        "REF - Alur Persetujuan",
+        "ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya",
+        "ADR - 0002 Database-per-Service",
+        "REF - PRD ERP",
+        "REF - Rantai Pengajuan Lintas Modul",
+        "REF - Kepemilikan Data",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "Microservices - Procurement Service",
+        "Microservices - Payroll Service",
+        "Microservices - Employee Service",
+        "Microservices - Inventory Service"
+      ],
+      "hash": "52f7b163e5f95a3d3a10d4fa1e5ba4bd9a04b733b9c5c0a340b2057c7b5c0313",
+      "ukuran_kb": 27.7,
+      "ringkasan": "Menjawab: kenapa ada enam pola berbeda untuk menentukan siapa penyetuju di berbagai alur ERP (supervisor departemen, nama jabatan, izin per tahap, penunjukan, tier system_roles, relasi supervisor), dan mengapa RBAC yang ada belum bisa menjamin pemisahan tugas (SoD) seperti pengaju bukan penyetuju atau satu tanda tangan per dokumen. Membandingkan opsi menyatukan model persetujuan (tetap per modul dengan helper SoD bersama, mesin persetujuan sebagai pustaka bersama, atau service persetujuan terpusat) dengan payroll bertingkat sebagai acuan yang sudah menegakkan ketiga aturan SoD sekaligus, serta bagaimana akun super-akses (IT, Direktur) sebaiknya diperlakukan terhadap gerbang bisnis.",
+      "kata_kunci": [
+        "SoD",
+        "segregation of duties",
+        "pemisahan tugas",
+        "persetujuan",
+        "approval",
+        "penyetuju",
+        "RBAC",
+        "payroll bertingkat",
+        "super-akses",
+        "ADR 0137"
       ]
     },
     {
