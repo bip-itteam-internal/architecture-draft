@@ -29,6 +29,9 @@ persetujuan, tapi tidak otomatis dapat hak akses IT) **belum ditegaskan** — li
   lama — ada batas teknis dari infrastruktur gateway yang sudah ada (§6), belum diperbaiki.
 - Asisten mewarisi lubang keamanan endpoint yang diteruskannya apa adanya (§9) — ia tidak menutup
   celah yang sudah ada, dan beberapa celah seperti itu **sudah terbukti ada** hari ini.
+- Model AI-nya dipanggil lewat relay internal yang diteruskan ke penyedia DI LUAR perusahaan.
+  **Belum boleh memproses data asli sampai ada persetujuan tertulis Direksi** (§ Context) — baru
+  boleh dipakai dengan data uji sintetis sampai persetujuan itu ada.
 
 **Perkiraan besaran kerja.** Ini pekerjaan baru sama sekali — tidak ada satu baris kode pun yang
 bisa dipakai ulang (klien AI, service, gate RBAC gabungan: semuanya belum ada, lihat § Context).
@@ -120,6 +123,37 @@ endpoint datanya tetap balas 200 untuk siapa pun bertoken. Prinsip "asisten mewa
 JWT jadi otomatis aman" **hanya sekuat gerbang endpoint aslinya** — dan sudah ada bukti sebagian
 gerbang itu belum ada.
 
+**Klien AI: bukan Anthropic SDK/Tool Runner, tapi klien tipis OpenAI-compatible — divalidasi
+langsung 2026-09-28.** [[ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library]] dan
+[[ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul]]
+sudah memprobe endpoint internal `https://code.bharatainternasional.com/v1` ("9router", menawarkan
+9 model) dan menemukan bentuknya **OpenAI-compatible** (Chat Completions), BUKAN format native
+Anthropic — sehingga rencana awal memakai Anthropic Go SDK/Tool Runner **tidak cocok dipakai
+langsung**. Probe ulang sesi ini (2026-09-28, dari container prod — kredensial `AI_BASE_URL`/
+`AI_API_KEY` ternyata sudah tersedia di SEMUA container prod lewat blok/anchor compose bersama,
+termasuk container MongoDB; ini layak ditinjau terpisah, di luar cakupan ADR ini) **membuktikan
+tool/function-calling DIDUKUNG**: satu panggilan uji dengan skema tool sederhana menghasilkan
+`tool_calls` + `finish_reason:"tool_calls"` yang benar. Overhead terukur **2.332 prompt token**
+untuk satu pesan + satu skema tool (dekat baseline ~2.030 token tanpa tools di ADR-0082). Router
+sempat membalas 401 *"OAuth access token has expired... (reset after 2m)"* pada percobaan pertama
+lalu pulih sendiri di percobaan kedua — **transien**, klien wajib retry sekali untuk kelas galat
+ini, bukan menyerah permanen. ⛔ **Wajib memakai id model eksplisit `cc/claude-*`** (mis.
+`cc/claude-sonnet-4-6`), **jangan pernah** `Claude` polos atau apa pun di bawah `token-router/` —
+router bisa mendarat di penyedia lain (mis. MiniMax) tanpa peringatan bila id-nya generik
+([[ADR - 0075]]).
+
+⚠️ **Keputusan yang SENGAJA ditunda, dicatat eksplisit supaya tidak jadi asumsi diam-diam seperti
+yang sudah terjadi di ADR-0127.** Endpoint ini relay ke Anthropic **di luar perusahaan** — data
+yang dikirim untuk dianalisis (angka HRIS/Marketing/dll) ikut keluar gedung. [[ADR - 0075]]
+mensyaratkan **persetujuan tertulis Direksi** untuk data serupa (rekening koran) dan menahan
+fiturnya sampai ada; [[ADR - 0127]] mengasumsikan boleh tanpa keputusan eksplisit, dengan alasan
+precedent CV pelamar. Dua ADR yang sudah ada mengambil sikap **berlawanan** soal hal yang sama.
+Pemilik proposal ini (2026-09-28) memutuskan: **jalankan dulu pengembangan & probe teknis (data
+uji sintetis, seperti probe di atas, tidak menyentuh isu ini), tapi persetujuan Direksi WAJIB ada
+sebelum modul mana pun mengirim DATA ASLI (bukan data uji) lewat endpoint ini ke produksi.** Ini
+bukan penghalang untuk T1-T9 (pengembangan/uji teknis), tapi penghalang keras untuk deploy prod
+yang memproses pertanyaan sungguhan.
+
 **Kolom yang aman dijumlah beda-beda per modul, dan baru terdokumentasi untuk Marketing.**
 [[CORE - Kapabilitas AI dan Machine Learning]] §Aturan pemakaian kolom cuma memuat jebakan kolom
 marketing-analytics (`iklan_sia_sia`, `spend_vsa` vs `spend_gmv_max`, retur yang sudah terpotong,
@@ -148,6 +182,20 @@ lewat database-nya."
 Panggilan assistant-service ke service lain **wajib** lewat jalur setara `Reroute` gateway (bukan
 `InternalRequest`) supaya `BIP-Permissions` ikut terbawa utuh — lihat § Context soal
 `InternalRequest` yang tidak meneruskannya.
+
+### §2a Klien AI: tipis, hand-roll, OpenAI-compatible — bukan SDK Anthropic
+
+Divalidasi 2026-09-28 (lihat § Context). `services/assistant` memanggil
+`https://code.bharatainternasional.com/v1/chat/completions` langsung lewat `net/http`, TANPA
+menarik SDK vendor apa pun — konsisten dengan filosofi "klien tipis" [[ADR - 0082]]. Ketentuan
+wajib:
+- `stream:false` ditanam mati di payload, tidak pernah jadi parameter (endpoint ini default
+  `true` bila tak dikirim, dan gagalnya tidak terbaca sebagai galat — pola sama dengan ADR-0082).
+- Id model dipatok literal `cc/claude-*`, tidak pernah dibaca dari input bebas.
+- Retry **sekali** khusus untuk 401 ber-pesan "OAuth access token has expired" (transien,
+  terbukti pulih dalam ~2 menit pada probe sesi ini) — retry TIDAK berlaku untuk 401 lain.
+- Loop tool-calling ditulis manual: kirim `tools`, terima `tool_calls` dari respons, eksekusi,
+  kirim hasil balik sebagai pesan `role:"tool"` di giliran berikutnya.
 
 ### §3 RBAC: gate baru "Supervisor departemen mana pun ATAU Direktur ATAU IT"
 

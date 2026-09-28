@@ -24,7 +24,15 @@
   (asisten dilarang berhitung, tool memanggil lewat gateway dengan JWT pemakai, jawaban adalah
   pintu), empat penjaga anti angka karangan, dan § Temuan gateway soal batas 30 detik — semuanya
   jadi dasar ADR-0132.
-- **Stack (rencana)**: Go + [Anthropic Go SDK](https://github.com/anthropics/anthropic-sdk-go) dengan **Tool Runner** (masih beta) + MongoDB untuk riwayat percakapan.
+- **Stack**: Go, `net/http` langsung (klien tipis hand-roll, BUKAN SDK Anthropic — divalidasi
+  2026-09-28, lihat [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per
+  Service Bukan Terpusat]] §Context & §2a) ke `https://code.bharatainternasional.com/v1`
+  (OpenAI-compatible, bukan format native Anthropic), model dipatok literal `cc/claude-*` +
+  MongoDB untuk riwayat percakapan.
+  ✅ **Tool/function-calling terbukti didukung** endpoint ini (probe 2026-09-28: `tool_calls` +
+  `finish_reason:"tool_calls"` kembali benar untuk skema tool sederhana). Overhead terukur ~2.332
+  prompt token per giliran dengan satu tool. Router bisa membalas 401 OAuth-expired transien
+  (pulih ~2 menit) — klien wajib retry sekali untuk kelas galat ini.
 - **Path di repo (rencana)**: `bip-erp/services/assistant/`, mengikuti pola `services/.template`.
 - **Rute (rencana)**: lewat [[CORE - API Master Gateway]] seperti service lain. ⚠️ Cara mengantar jawabannya BELUM diputuskan karena gateway tidak meneruskan stream (lihat § Temuan gateway).
 - **Keputusan yang mengikat**: [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]]
@@ -154,9 +162,9 @@ Empat jalan keluar yang terbuka, belum dipilih:
 - **Daftar tool final** beserta bentuk argumen dan bentuk hasilnya.
 - ~~**Kunci RBAC** yang menentukan siapa boleh membuka asistennya.~~ **Ditegaskan 2026-09-28** oleh [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §3: Supervisor departemen mana pun ATAU Direktur ATAU IT. Yang masih TBD: apakah Corporate Secretary ikut termasuk.
 - **Penyimpanan riwayat percakapan**: koleksi, masa simpan, dan apakah isinya boleh dibaca siapa pun selain penanyanya.
-- **Model dan ongkos.** Bawaan `claude-opus-5` ($5 per 1 juta token masuk, $25 keluar). Turun ke `claude-sonnet-5` atau `claude-haiku-4-5` mungkin dan jauh lebih murah, tetapi belum ada ukuran nyata untuk memutuskannya. Batas pemakaian per orang per hari juga belum ada.
+- **Model dan ongkos.** Probe 2026-09-28 memakai `cc/claude-sonnet-4-6` (bukan opus) — terbukti mendukung tool-calling, 2.332 prompt token untuk satu tool sederhana. Biaya rupiah per pertanyaan lintas modul sungguhan (lebih banyak tool) **masih belum diukur** — lihat T12 di [[ANALISA - Asisten AI Lintas Modul]]. Batas pemakaian per orang per hari juga belum ada.
 - **Prompt caching**: daftar tool dan system prompt yang tetap seharusnya di-cache, penempatan breakpoint-nya belum dirancang.
-- **Penyimpanan kunci API Anthropic** dan siapa yang memegangnya.
+- ~~**Penyimpanan kunci API Anthropic** dan siapa yang memegangnya.~~ **Sebagian terjawab 2026-09-28**: `AI_BASE_URL`/`AI_API_KEY` sudah ada sebagai env var di SEMUA container prod (termasuk container MongoDB — kemungkinan dari blok/anchor compose bersama yang terlalu luas, layak ditinjau terpisah, di luar cakupan dok ini) lewat `~/apps/bip-erp/.env` di server. Siapa yang mengelola rotasi/akses kunci ini masih belum jelas.
 - **Seluruh sisi frontend**: letak panel, komponen, dan kunci i18n `id` serta `en` yang diwajibkan [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]].
 - **Irisan dan gerbang verifikasinya.** Belum disusun.
 - ~~**ADR** yang menyelesaikan ketegangan dengan ADR 0058 § 2.~~ **Ditulis 2026-09-28**: [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §2 — asisten lintas modul tetap jadi service terpisah, karena tidak ada satu service pemilik untuk semua modul.

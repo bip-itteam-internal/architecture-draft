@@ -20,21 +20,38 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
 - **Apakah proposal ini sudah dibicarakan ke Direktur sama sekali.** ADR menulis "belum ada
   konfirmasi". Ini bukan blocker teknis untuk mulai T1-T2 (fondasi netral), tapi jadi blocker
   untuk T4 (memilih modul yang datanya sensitif) dan sebelum di-deploy ke prod.
+- ⛔ **Persetujuan tertulis Direksi untuk data yang keluar perusahaan lewat relay
+  `code.bharatainternasional.com`.** [[ADR - 0132]] §Context mencatat ini eksplisit sebagai
+  keputusan yang SENGAJA ditunda (bukan diabaikan) — [[ADR - 0075]] mensyaratkan persetujuan
+  Direksi tertulis untuk data serupa dan sampai sekarang belum ada. **Boleh dilewati untuk
+  pengembangan/uji teknis pakai data sintetis** (T1-T9), tapi WAJIB ada sebelum modul mana pun
+  memproses pertanyaan dengan data ASLI di produksi.
 
 ## Fondasi
 
-- [ ] **T1 — Klien AI dasar.** Go + Anthropic SDK dengan Tool Runner.
+- [x] **T1 — Klien AI dasar.** ~~Go + Anthropic SDK dengan Tool Runner~~ **Klien tipis hand-roll,
+  OpenAI-compatible, ke `https://code.bharatainternasional.com/v1`** — divalidasi langsung
+  2026-09-28, lihat [[ADR - 0132]] §Context & §2a. Sebagian besar kriteria selesai SUDAH
+  terbukti lewat probe shell; sisanya (dipindah jadi kode Go asli) masih perlu dikerjakan.
   - **Tujuan**: satu-satunya jalan masuk ke model untuk seluruh task di bawah.
   - **Bergantung**: tidak ada.
-  - **Baca dulu**: [[Microservices - Assistant Service]] §"1. Bukan LangGraph, melainkan Tool
-    Runner" (alasan kenapa bukan LangGraph — satu putaran tanya-panggil tool-jawab, bukan alur
-    bercabang panjang). ⚠️ **Jangan asumsikan ada `shared-library/ai`/`GenerateJSON` yang bisa
-    dipakai ulang** — diverifikasi `git grep` 2026-09-28 ke `origin/main`, nol hasil. Ini pemakai
-    AI PERTAMA di bip-erp mana pun; retry/kuota/cache didesain dari nol, JANGAN disalin dari
-    asumsi "sudah ada pola serupa".
-  - **Kriteria selesai**: satu panggilan uji end-to-end (prompt sederhana → tool dummy → jawaban)
-    jalan di dev, token usage (prompt/completion/model) tercatat di log — bukan cuma "jawabannya
-    keluar".
+  - **Baca dulu**: [[ADR - 0132]] §2a untuk ketentuan wajib klien (`stream:false` ditanam mati,
+    id model dipatok `cc/claude-*` literal, retry sekali khusus 401 "OAuth access token has
+    expired", loop tool-calling ditulis manual). ⚠️ **Jangan pakai Anthropic Go SDK/Tool
+    Runner** — endpoint ini OpenAI-compatible (Chat Completions), bukan format native Anthropic.
+    ⚠️ **Jangan asumsikan ada `shared-library/ai`/`GenerateJSON` yang bisa dipakai ulang** —
+    diverifikasi `git grep` 2026-09-28 ke `origin/main`, nol hasil. `AI_BASE_URL`/`AI_API_KEY`
+    SUDAH ada sebagai env var di semua container prod (lihat [[Microservices - Assistant
+    Service]] § Belum Diputuskan) — tinggal dipakai, tidak perlu provisioning baru untuk dev
+    lanjutan, tapi verifikasi juga ketersediaannya di lingkungan dev/staging.
+  - **Sudah terbukti lewat probe shell (2026-09-28)**: satu panggilan uji (prompt sederhana +
+    satu skema tool dummy `get_weather`) menghasilkan `tool_calls` + `finish_reason:"tool_calls"`
+    yang benar; token usage tercatat (`prompt_tokens:2332`, `completion_tokens:56`). Router
+    sempat 401 "OAuth expired" lalu pulih sendiri ~2 menit kemudian — buktikan retry-nya di kode
+    Go, bukan cuma tahu soal gejalanya.
+  - **Kriteria selesai (kode Go, bukan shell)**: fungsi Go yang mereplikasi hasil probe di atas
+    (payload sama, endpoint sama), dengan retry transien dan `stream:false` ditanam di kode
+    (bukan opsional), token usage tercatat di log terstruktur.
 
 - [ ] **T2 — Skeleton `services/assistant/`.**
   - **Tujuan**: rumah orkestrator. Tidak menyimpan data bisnis, tidak baca database service lain.
