@@ -14,8 +14,8 @@
   "Segera Hadir", **tidak memanggil backend apa pun**. Nama fitur yang diputuskan: **Copilot**.
   Sempat berupa menu di puncak sidebar
   ([erp-frontend#1788](https://github.com/bip-itteam-internal/erp-frontend/pull/1788)), lalu
-  2026-09-28 diganti banner di atas konten yang sementara hanya terlihat Tech Development
-  (branch `feat/copilot-banner`). Lihat § Persona.
+  2026-09-28 diganti strip pengumuman di atas header yang sementara hanya terlihat Tech
+  Development (erp-frontend#1790, lalu dipindah dari dalam konten ke atas header). Lihat § Persona.
   **Jadwal Tugas** diputuskan sebagai pengingat, bukan eksekusi otomatis — lihat § Jadwal Tugas.
   ⚠️ **SEBAGIAN DIGANTIKAN 2026-09-22** oleh [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]]
   **untuk kasus laporan Marketing terjadwal saja**: asisten analisa marketing diputuskan berdiri
@@ -161,8 +161,9 @@ Empat jalan keluar yang terbuka, belum dipilih:
 | Tim IT | IT | Sama seperti di atas, lewat `common.IsITMember`/`IsITSupervisor` | Web ERP |
 
 ⚠️ **Pengumuman INTERIM jauh lebih sempit dari tabel di atas** (erp-frontend 2026-09-28): belum
-ada menu Copilot sama sekali. Yang ada banner pengumuman di atas konten seluruh halaman
-(`components/layout/banner-copilot.tsx`, dirender `Container`), hanya untuk
+ada menu Copilot sama sekali. Yang ada strip pengumuman tipis DI ATAS HEADER seluruh halaman,
+selebar kolom konten (`components/layout/banner-copilot.tsx`, dirender `Container` sebelum
+`<Header/>`; tak sticky sehingga tergulir hilang, sidebar tak digeser), hanya untuk
 **departemen Tech Development** — dibandingkan dengan konstanta `DIVISI_IT`, **bukan**
 `system_roles.it` (peran itu juga dipegang orang HR, Kesekretariatan, dan Finance). Selalu tampil
 tanpa tombol tutup, tombol "Pelajari" menuju `/copilot`, dan disembunyikan di `/copilot` sendiri.
