@@ -2099,11 +2099,11 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "🟡",
-      "status_teks": "**Konsep**, 2026-08-29, **0 kode** — dikonfirmasi ulang lewat `git grep` langsung",
+      "status_teks": "**Konsep**, 2026-08-29. ~~0 kode, dikonfirmasi ulang lewat `git grep` langsung ke",
       "publik": true,
       "tautan": [
         "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
-        "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan\n  Data Bisnis per Service Bukan Terpusat",
+        "ANALISA -\n  Asisten AI Lintas Modul",
         "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
         "ADR - 0132 Asisten AI Tanya-Jawab\n  Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
         "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per\n  Service Bukan Terpusat",
@@ -2122,20 +2122,20 @@
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "15d9089306da026f80e24734e219753f831f7520396dc29132f01103793eda42",
-      "ukuran_kb": 17.8,
-      "ringkasan": "Menjawab: apa itu Assistant Service, bagaimana ia merutekan pertanyaan bahasa natural ke endpoint yang sudah menghitung angkanya (bukan menghitung sendiri), dan kenapa dipilih Tool Runner (bukan LangGraph) serta pemanggilan lewat gateway dengan JWT pemakai supaya hak aksesnya identik dengan hak akses orang itu di layar. Juga menjelaskan stack teknis (klien AI hand-roll OpenAI-compatible ke code.bharatainternasional.com, bukan SDK Anthropic), batasan gateway (timeout 30 detik, tanpa streaming), dan bagaimana rancangan awal (irisan marketing-analytics saja) diperluas oleh ADR-0132 jadi lintas modul.",
+      "hash": "19442ec1abbc36e69f50cd6a8b0619162317528219c162e043d5d34ad591f083",
+      "ukuran_kb": 18.2,
+      "ringkasan": "Menjawab: apa itu Assistant Service, bagaimana ia menjawab pertanyaan angka bisnis lintas modul dengan merutekan ke endpoint yang sudah ada (bukan menghitung sendiri), dan bagaimana hak aksesnya dijaga tetap identik dengan hak akses pemakai lewat JWT dan gateway. Juga menjelaskan empat keputusan rancangan (Tool Runner bukan LangGraph, panggilan lewat gateway bukan jalur internal, larangan berhitung sendiri, jawaban sebagai pintu ke layar) beserta penjaga anti angka karangan. Mencatat status implementasi terkini (klien AI dasar T1 sudah ada kodenya, route Fiber/gateway/RBAC modul belum) dan rujukan ke ADR-0132 yang mengubah arah cakupan jadi lintas modul sejak awal.",
       "kata_kunci": [
-        "asisten AI",
         "assistant service",
-        "tanya jawab",
+        "asisten AI",
         "chatbot ERP",
+        "tanya-jawab lintas modul",
         "tool runner",
-        "RBAC",
-        "JWT gateway",
-        "cc/claude",
-        "marketing analytics",
-        "Supervisor Direktur IT"
+        "JWT",
+        "API gateway",
+        "RBAC asisten",
+        "ADR-0132",
+        "marketing analytics"
       ]
     },
     {
@@ -16165,20 +16165,20 @@
         "CORE - RBAC dan Permission Set",
         "CORE - Kapabilitas AI dan Machine Learning"
       ],
-      "hash": "bf59eda2905cbf960418fdc73b5f1286afd88ab9a5a3a021d32c6ac1aed89e75",
-      "ukuran_kb": 12.5,
-      "ringkasan": "Menjawab: task apa saja yang perlu dikerjakan untuk merealisasikan asisten AI lintas modul (dari klien AI dasar, skeleton service, gate RBAC, sampai modul percontohan), urutan ketergantungan antar-task, dan bukti konkret yang menandai tiap task selesai. Juga mencatat prasyarat keputusan manusia yang belum ada (apakah Corporate Secretary ikut akses setara Direktur, konfirmasi proposal ke Direktur, dan persetujuan tertulis Direksi untuk data yang keluar perusahaan lewat relay AI) sebelum task-task tertentu boleh ditutup sebagai selesai.",
+      "hash": "5e3e3eebd818212c57ed598d797914f436596863dbd5f4e5ff30f3535c51ece8",
+      "ukuran_kb": 12.6,
+      "ringkasan": "Menjawab: task apa saja yang perlu dikerjakan untuk membangun asisten AI lintas modul (T1 sampai T13-an), urutan dan ketergantungan antar-task, serta kriteria selesai konkret tiap task mulai dari klien AI, skeleton service, gate RBAC, sampai pemilihan modul percontohan. Juga mencatat keputusan manusia yang masih ditunggu sebelum sebagian task bisa dianggap tuntas, seperti akses Corporate Secretary di gate RBAC dan persetujuan tertulis Direksi untuk data yang keluar lewat relay AI eksternal.",
       "kata_kunci": [
-        "ANALISA asisten AI lintas modul",
-        "analisa kebutuhan",
-        "daftar task",
+        "ANALISA",
+        "asisten AI lintas modul",
+        "task list",
+        "backlog implementasi",
         "T1 T2 T3",
-        "gate RBAC",
+        "RBAC",
+        "ADR-0132",
         "modul percontohan",
-        "persetujuan Direksi",
-        "data sintetis",
-        "Corporate Secretary",
-        "papan kerja"
+        "prasyarat keputusan Direktur",
+        "roadmap assistant service"
       ]
     },
     {

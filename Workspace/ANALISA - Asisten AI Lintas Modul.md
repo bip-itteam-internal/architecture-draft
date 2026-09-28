@@ -29,10 +29,12 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
 
 ## Fondasi
 
-- [x] **T1 — Klien AI dasar.** ~~Go + Anthropic SDK dengan Tool Runner~~ **Klien tipis hand-roll,
-  OpenAI-compatible, ke `https://code.bharatainternasional.com/v1`** — divalidasi langsung
-  2026-09-28, lihat [[ADR - 0132]] §Context & §2a. Sebagian besar kriteria selesai SUDAH
-  terbukti lewat probe shell; sisanya (dipindah jadi kode Go asli) masih perlu dikerjakan.
+- [x] **T1 — Klien AI dasar. SELESAI 2026-09-28**, kode Go nyata (bukan cuma probe shell). ~~Go +
+  Anthropic SDK dengan Tool Runner~~ **Klien tipis hand-roll, OpenAI-compatible, ke
+  `https://code.bharatainternasional.com/v1`** — divalidasi langsung 2026-09-28, lihat
+  [[ADR - 0132]] §Context & §2a. Kode: `bip-erp/services/assistant/internal/aiclient/`
+  (`client.go`+`types.go`, 11 test lolos dua kali jalan) + `cmd/probe/main.go`, branch
+  `feat/assistant-klien-ai` (536 baris, 6 commit), PR belum dibuat.
   - **Tujuan**: satu-satunya jalan masuk ke model untuk seluruh task di bawah.
   - **Bergantung**: tidak ada.
   - **Baca dulu**: [[ADR - 0132]] §2a untuk ketentuan wajib klien (`stream:false` ditanam mati,

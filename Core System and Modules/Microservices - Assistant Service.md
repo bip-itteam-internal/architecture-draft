@@ -2,9 +2,13 @@
 
 *Asisten tanya-jawab di dalam Web ERP yang menjawab pertanyaan tentang angka bisnis dengan cara MERUTEKAN pertanyaan ke endpoint yang sudah menghitungnya, bukan dengan menghitung sendiri. Ia memanggil endpoint memakai JWT orang yang bertanya, sehingga hak aksesnya identik dengan hak akses orang itu di layar. ~~Irisan pertama diarahkan ke data marketing analytics.~~ **Diputuskan berbeda 2026-09-28** ([[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]]): cakupan lintas modul sejak awal, dimulai beberapa modul percontohan sekaligus, dibatasi ke Supervisor/Direktur/IT.*
 
-- **Status**: 🟡 **Konsep**, 2026-08-29, **0 kode** — dikonfirmasi ulang lewat `git grep` langsung
-  ke kode 2026-09-28, masih 0 kode (lihat [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan
-  Data Bisnis per Service Bukan Terpusat]] § Context). Belum ada direktori service.
+- **Status**: 🟡 **Konsep**, 2026-08-29. ~~0 kode, dikonfirmasi ulang lewat `git grep` langsung ke
+  kode 2026-09-28.~~ **T1 sekarang punya kode nyata, 2026-09-28**: `bip-erp/services/assistant/`
+  ada — `internal/aiclient/` (klien tipis OpenAI-compatible, `client.go`+`types.go`+11 test) dan
+  `cmd/probe/main.go` (CLI verifikasi manual), 536 baris. Baru klien AI dasar (T1 di [[ANALISA -
+  Asisten AI Lintas Modul]]); **belum ada Fiber/gateway route, RBAC, maupun endpoint modul apa
+  pun** (T2 dst). Branch `feat/assistant-klien-ai`, PR belum dibuat/di-merge ke `main` — status
+  keseluruhan tetap 🟡 Konsep sampai lebih banyak T-task selesai.
   ⚠️ **SEBAGIAN DIGANTIKAN 2026-09-22** oleh [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]]
   **untuk kasus laporan Marketing terjadwal saja**: asisten analisa marketing diputuskan berdiri
   **di dalam service pemilik data lewat klien tipis `shared-library/ai`**, bukan sebagai service
@@ -33,7 +37,8 @@
   `finish_reason:"tool_calls"` kembali benar untuk skema tool sederhana). Overhead terukur ~2.332
   prompt token per giliran dengan satu tool. Router bisa membalas 401 OAuth-expired transien
   (pulih ~2 menit) — klien wajib retry sekali untuk kelas galat ini.
-- **Path di repo (rencana)**: `bip-erp/services/assistant/`, mengikuti pola `services/.template`.
+- **Path di repo**: `bip-erp/services/assistant/` — `internal/aiclient/` dan `cmd/probe/` sudah
+  ada (T1); route Fiber/gateway (mengikuti pola `services/.template`) **belum ditulis** (T2 dst).
 - **Rute (rencana)**: lewat [[CORE - API Master Gateway]] seperti service lain. ⚠️ Cara mengantar jawabannya BELUM diputuskan karena gateway tidak meneruskan stream (lihat § Temuan gateway).
 - **Keputusan yang mengikat**: [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]]
 
