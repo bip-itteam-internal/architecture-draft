@@ -3,73 +3,167 @@
 Daftar task hasil `/analisa-kebutuhan` (2026-09-28). Keputusan arsitekturnya ada di
 [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]]
 dan [[Microservices - Assistant Service]] (dok domain, diperbarui mengikuti ADR ini). Baca
-keduanya dulu sebelum `/start-task` tiap item — daftar ini papan kerja, bukan rencana per berkas.
+keduanya dulu sebelum `/start-task` tiap item — daftar ini papan kerja, bukan rencana per berkas;
+path/fungsi persis tetap digali `/plan` dari kode saat itu (kode bisa berubah sejak dok ini
+ditulis).
 
-Urutan di bawah wajib dijaga: T1-T3 fondasi (tanpa ini tidak ada yang bisa diuji), T4 gerbang
-sebelum bangun apa pun per modul, T5-T8 satu modul dulu sampai terbukti sebelum modul kedua.
+Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak menebak), **Bergantung**
+(urutan wajib), **Baca dulu** (dokumen/kode/file:line spesifik yang sudah ketemu saat grounding
+2026-09-28 — titik mulai, BUKAN kebenaran final; kode bisa sudah bergeser, verifikasi ulang), dan
+**Kriteria selesai** (bukti konkret, bukan "sudah jalan di localhost").
+
+## Prasyarat — keputusan manusia yang BELUM ada, sebelum task tertentu bisa dianggap tuntas
+
+- **Corporate Secretary ikut akses "Direktur" di gate T3 atau tidak.** Default TIDAK sampai
+  Direktur menegaskan tertulis. T3 dan T13 boleh dikerjakan dengan default ini, TAPI jangan
+  ditutup sebagai "selesai penuh" sampai jawabannya ada — tandai eksplisit di PR/task tracker.
+- **Apakah proposal ini sudah dibicarakan ke Direktur sama sekali.** ADR menulis "belum ada
+  konfirmasi". Ini bukan blocker teknis untuk mulai T1-T2 (fondasi netral), tapi jadi blocker
+  untuk T4 (memilih modul yang datanya sensitif) dan sebelum di-deploy ke prod.
 
 ## Fondasi
 
-- [ ] **T1 — Klien AI dasar.** Go + Anthropic SDK dengan Tool Runner. Tanpa retry/kuota/cache di
-  awal (belum ada bahan ukur untuk merancangnya) — ukur nyata dulu di T12, baru putuskan perlu
-  atau tidak. Ini pemakai PERTAMA klien AI di bip-erp mana pun; tidak ada yang bisa dipakai ulang.
-- [ ] **T2 — Skeleton `services/assistant/`.** Ikuti pola `services/.template`. Orkestrator saja:
-  tidak menyimpan data bisnis, tidak membaca database service lain. Rute lewat
-  [[CORE - API Master Gateway]] seperti service lain.
-- [ ] **T3 — Gate RBAC baru "Supervisor departemen mana pun ATAU Direktur ATAU IT".** Tulis satu
-  fungsi baru (proksi `common.SupervisedDepartmentsStrict(c)) > 0`) dikomposisi lewat pola
-  `validateRole(...)` OR yang sudah ada, bersama `common.IsITMember`/`IsITSupervisor` dan
-  `common.SetaraDirektur`. **Wajib dapat keputusan eksplisit dari Direktur**: apakah Corporate
-  Secretary ikut termasuk (default TIDAK sampai ditegaskan — [[ADR - 0132]] §3). Beri penanda
-  `perm` di sidebar sejak commit pertama.
+- [ ] **T1 — Klien AI dasar.** Go + Anthropic SDK dengan Tool Runner.
+  - **Tujuan**: satu-satunya jalan masuk ke model untuk seluruh task di bawah.
+  - **Bergantung**: tidak ada.
+  - **Baca dulu**: [[Microservices - Assistant Service]] §"1. Bukan LangGraph, melainkan Tool
+    Runner" (alasan kenapa bukan LangGraph — satu putaran tanya-panggil tool-jawab, bukan alur
+    bercabang panjang). ⚠️ **Jangan asumsikan ada `shared-library/ai`/`GenerateJSON` yang bisa
+    dipakai ulang** — diverifikasi `git grep` 2026-09-28 ke `origin/main`, nol hasil. Ini pemakai
+    AI PERTAMA di bip-erp mana pun; retry/kuota/cache didesain dari nol, JANGAN disalin dari
+    asumsi "sudah ada pola serupa".
+  - **Kriteria selesai**: satu panggilan uji end-to-end (prompt sederhana → tool dummy → jawaban)
+    jalan di dev, token usage (prompt/completion/model) tercatat di log — bukan cuma "jawabannya
+    keluar".
+
+- [ ] **T2 — Skeleton `services/assistant/`.**
+  - **Tujuan**: rumah orkestrator. Tidak menyimpan data bisnis, tidak baca database service lain.
+  - **Bergantung**: T1 (butuh klien AI untuk diuji lewat rute ini).
+  - **Baca dulu**: pola boilerplate `services/.template`. [[CORE - API Master Gateway]] soal cara
+    service baru didaftarkan. ⛔ **Rute akar modul didaftarkan di `app.Get("/")`, BUKAN
+    `app.Get("/assistant")`** — gateway memotong prefix `/api/<module>` sebelum meneruskan; salah
+    di sini pernah membuat 404 `Cannot GET /` di calendar-service dan test lokal tetap hijau
+    karena memanggil Fiber langsung, bukan lewat gateway.
+  - **Kriteria selesai**: endpoint kesehatan bisa dipanggil dari FE dev **lewat gateway
+    sungguhan** (bukan `localhost:<port>` langsung ke service).
+
+- [ ] **T3 — Gate RBAC baru "Supervisor departemen mana pun ATAU Direktur ATAU IT".**
+  - **Tujuan**: batasi menu asisten sesuai keputusan [[ADR - 0132]] §3.
+  - **Bergantung**: tidak ada — boleh paralel dengan T1-T2.
+  - **Baca dulu** (file:line dari grounding 2026-09-28, verifikasi ulang sebelum dipakai — kode
+    bisa bergeser): `shared-library/common/roles.go:562-596` (`validateRole` pola OR,
+    `checkRole`), `shared-library/common/department_scope.go:84-107`
+    (`SupervisedDepartmentsStrict` — proksi "supervisor departemen apa pun", TANPA fallback),
+    `shared-library/common/jabatan_direktur.go:24-47` (`SetaraDirektur`, daftar jabatan setara
+    Direktur), `shared-library/common/roles.go:194-205` (`IsITMember`/`IsITSupervisor`),
+    `services/employee/peran_dari_jabatan.go:206-223,308-310` (derivasi otomatis
+    Direktur→`it:supervisor` saat token diterbitkan, dan cara mematikannya lewat env
+    `ROLE_FROM_POSITION=off` — jangan kaget kalau derivasi ini nonaktif di suatu environment).
+  - **Kriteria selesai**: satu fungsi baru "supervisor di departemen manapun" + gate gabungan,
+    dikunci test T13. Menu diberi penanda `perm` sejak commit pertama (menu tanpa penanda selalu
+    tampil ke semua orang — ini gotcha RBAC yang sudah tercatat).
+  - **Jangan tutup sebagai selesai** sampai keputusan Corp Sec (lihat § Prasyarat) ada jawabannya.
 
 ## Modul percontohan pertama
 
-- [ ] **T4 — Pilih modul percontohan final + verifikasi gerbangnya.** Kandidat kuat: attendance,
-  marketing-analytics (jebakan datanya sudah paling banyak terdokumentasi). Untuk tiap kandidat,
-  cek endpoint yang akan diteruskan SUDAH bergerbang peran atau belum (lihat catatan
-  `LOG - 2026-09-17 Audit Checklist Marketing dan Integration` soal Integration & sebagian
-  marketing-analytics yang belum bergerbang). Endpoint yang belum bergerbang **wajib diperbaiki
-  dulu** sebelum modul itu diikutkan ([[ADR - 0132]] §9) — ini prasyarat, bukan bagian pekerjaan
-  fitur ini.
-- [ ] **T5 — Endpoint baca baru ("Lapisan Data Bisnis") di modul percontohan pertama.** Ditulis
-  pakai struct/fungsi bisnis yang SUDAH ADA di service itu — dilarang menulis ulang aturan kolom
-  di tempat baru. Sertakan penanda umur/kesegaran data di responsnya (§4 ADR).
-- [ ] **T6 — Tool + uji end-to-end tool tunggal.** Definisikan tool (skema `strict: true`) untuk
-  endpoint T5. Uji panggilan lewat gateway `Reroute` (BUKAN `InternalRequest` — itu tidak
-  meneruskan `BIP-Permissions`, lihat § Context ADR) pakai JWT akun uji sungguhan, bukan token
-  admin. Buktikan jawaban "tidak tahu" muncul untuk pertanyaan di luar cakupan tool ini.
+- [ ] **T4 — Pilih modul percontohan final + verifikasi gerbangnya.**
+  - **Tujuan**: jangan onboard modul yang endpoint-nya sudah diketahui bocor (ADR §9).
+  - **Bergantung**: § Prasyarat (Direktur sudah tahu proposal ini ada) idealnya sudah terjawab
+    sebelum modul dengan data sensitif dipilih.
+  - **Baca dulu**: `LOG - 2026-09-17 Audit Checklist Marketing dan Integration` bagian yang
+    menyebut endpoint Integration cuma butuh login tanpa gerbang peran (kritis, belum diperbaiki
+    per tanggal log itu — ukur ulang, jangan percaya tanggalnya begitu saja). [[ADR - 0120]]
+    §Realisasi soal endpoint marketing-analytics yang menu-nya sempit tapi data tetap 200 untuk
+    semua token.
+  - **Kandidat kuat** (bukan keputusan final): attendance, marketing-analytics — jebakan datanya
+    sudah paling banyak terdokumentasi di vault, jadi risiko "angka salah yang masuk akal" lebih
+    mudah dijaga sejak awal.
+  - **Kriteria selesai**: untuk TIAP modul kandidat, daftar endpoint yang akan diteruskan + hasil
+    cek gerbangnya (lolos/tidak) DENGAN BUKTI (request nyata, bukan baca kode saja — ingat
+    gerbang lazim berada satu lapis di atas yang tampak jelas, lihat gotcha "GERBANG LAZIM
+    BERADA SATU LAPIS DI ATAS" di rules tim).
+
+- [ ] **T5 — Endpoint baca baru ("Lapisan Data Bisnis") di modul percontohan pertama.**
+  - **Tujuan**: realisasi [[ADR - 0132]] §2 — pintu masuk fleksibel, aturan bisnis TETAP di kode
+    yang sudah ada.
+  - **Bergantung**: T4.
+  - **Kriteria selesai**: endpoint baru ditulis memakai ULANG struct/fungsi bisnis yang SUDAH ADA
+    di service itu (sebutkan nama fungsi yang dipakai ulang di PR description — ini yang
+    membuktikan §2 dipatuhi, bukan aturan ditulis dobel). Responsnya menyertakan penanda umur/
+    kesegaran data (§4 ADR) — untuk marketing-analytics ingat mart-nya sinkron tiap ~48 jam, ini
+    WAJIB muncul di jawaban, bukan disembunyikan.
+
+- [ ] **T6 — Tool + uji end-to-end tool tunggal.**
+  - **Bergantung**: T1, T2, T5.
+  - **Baca dulu**: `shared-library/routes/gateway_request.go:47-115` (`Reroute` — cara header
+    `BIP-*` diisi ulang dari klaim JWT, TERMASUK `BIP-Permissions`) **vs**
+    `shared-library/routes/internal_request.go:34-60` (`InternalRequest` — TIDAK meneruskan
+    `BIP-Permissions`). ⛔ **assistant-service memanggil modul lain WAJIB lewat jalur setara
+    `Reroute` (bulat-balik ke gateway), BUKAN `InternalRequest`** — kalau salah pakai, hak akses
+    bisa diam-diam menciut tanpa galat apa pun.
+  - **Kriteria selesai**: uji dengan akun uji SUNGGUHAN (bukan token admin) untuk tiap tingkat
+    akses (staff biasa, supervisor, Direktur, IT), buktikan hasilnya identik dengan yang orang
+    itu lihat di layar aslinya. Uji juga satu pertanyaan yang SENGAJA di luar cakupan tool ini →
+    jawaban harus "tidak tahu, cek layar X", bukan menaksir.
 
 ## Modul percontohan kedua + korelasi lintas modul
 
 - [ ] **T7 — Ulangi T5-T6 untuk modul percontohan kedua.**
-- [ ] **T8 — Uji korelasi lintas modul.** Satu pertanyaan yang butuh kedua modul (mis. gabungan
-  fakta dari modul 1 dan modul 2 by `employee_id`/`shop_id` yang sama) → dua tool call dalam satu
-  giliran, model menggabungkan angka yang SUDAH benar dari keduanya, bukan menghitung ulang. Ukur
-  total waktu giliran ini vs batas gateway 30 detik ([[ADR - 0132]] §6) — dari angka nyata ini,
-  tetapkan batas maksimal modul/tool-call per pertanyaan.
+  - Sama persis strukturnya, modul berbeda. Jangan disingkat langkahnya hanya karena "sudah
+    pernah dikerjakan di T5-T6" — tiap modul punya jebakan kolomnya sendiri yang belum
+    terdokumentasi (CORE - Kapabilitas AI baru mendokumentasikan jebakan Marketing, modul lain
+    kosong).
+
+- [ ] **T8 — Uji korelasi lintas modul + ukur batas waktu nyata.**
+  - **Bergantung**: T6, T7.
+  - **Tujuan**: buktikan [[ADR - 0132]] §5 (gabung hasil, bukan gabung query) dan isi angka §6
+    yang sengaja dikosongkan di ADR ("ditetapkan dari pengukuran nyata saat /plan").
+  - **Kriteria selesai**: satu pertanyaan yang butuh KEDUA modul (kunci penghubung sama, mis.
+    `employee_id`) → dua tool call dalam satu giliran → jawaban menggabungkan angka yang SUDAH
+    benar dari keduanya. Catat waktu total giliran ini. **Tuliskan angka batas maksimal
+    modul/tool-call per pertanyaan yang aman di bawah timeout gateway 30 detik** sebagai catatan
+    realisasi balik ke ADR-0132 §6 — jangan biarkan angka ini cuma hidup di kode.
 
 ## Presentasi jawaban
 
-- [ ] **T9 — Format keluaran terstruktur (teks/tabel/chart) + panel chat FE.** Chart WAJIB pakai
-  `ChartContainer` + Recharts yang sudah baku di erp-frontend (palet `--fb-seri-*`,
-  `connectNulls={false}`, dst) — dilarang membangun sistem chart baru.
-- [ ] **T10 — Penanda tingkat keyakinan.** Jawaban yang sifatnya judgment/heuristik (bukan
-  agregasi pasti) ditandai eksplisit "perlu diperiksa manusia" sebelum disajikan, bukan seolah
-  fakta pasti.
-- [ ] **T11 — File (Excel/PDF) hanya saat diminta eksplisit.** Jawaban default selalu di dalam
-  chat; jangan generate file otomatis untuk tiap jawaban.
+- [ ] **T9 — Format keluaran terstruktur (teks/tabel/chart) + panel chat FE.**
+  - **Baca dulu**: komponen `ChartContainer` (`components/ui/chart.tsx`) yang sudah baku di
+    erp-frontend, dan skill `dataviz` bila tersedia di sesi yang mengerjakan. Aturan yang SUDAH
+    berlaku di codebase ini (lihat rules tim §Bagan/chart): palet `--fb-seri-1..6` untuk deret
+    jamak (BUKAN `--chart-1..5`, itu goyah kontrasnya), `connectNulls={false}`, `domain=[0,100]`
+    untuk skor, `type="monotone"` saja untuk kurva.
+  - **Kriteria selesai**: minimal satu jawaban berbentuk tabel dan satu berbentuk chart benar-
+    benar dirender di FE dev, lolos di mode terang DAN gelap.
+
+- [ ] **T10 — Penanda tingkat keyakinan.**
+  - **Kriteria selesai**: jawaban yang sifatnya judgment/heuristik menampilkan penanda "perlu
+    diperiksa manusia" yang kelihatan (bukan cuma kalimat terselip). Uji dengan **kontrol
+    negatif**: satu skenario yang SEHARUSNYA ditandai, pastikan benar-benar tertandai — jangan
+    cuma uji skenario yang memang jelas pasti.
+
+- [ ] **T11 — File (Excel/PDF) hanya saat diminta eksplisit.**
+  - **Kriteria selesai**: jawaban default tanpa file. File Excel/PDF cuma muncul kalau prompt
+    penanya eksplisit minta ("buatkan Excel-nya") — dikunci test yang membuktikan permintaan
+    tanpa kata itu TIDAK menghasilkan file.
 
 ## Verifikasi & pengukuran
 
-- [ ] **T12 — Ukur biaya AI per pertanyaan** pada minggu pertama pemakaian nyata (token masuk/keluar,
-  model yang benar-benar menjawab), catat di [[Microservices - Assistant Service]].
-- [ ] **T13 — Uji gate RBAC negatif dan positif.** Staff biasa ditolak; supervisor departemen mana
-  pun (bukan cuma yang diuji manual) lolos; Direktur lolos; IT lolos; Corporate Secretary sesuai
-  keputusan T3 (lolos atau ditolak, keduanya harus punya test yang menguncinya).
+- [ ] **T12 — Ukur biaya AI per pertanyaan.**
+  - **Bergantung**: T1-T9 sudah berjalan di dev, idealnya minimal seminggu pemakaian nyata.
+  - **Kriteria selesai**: angka token + biaya rupiah NYATA (dari `NarasiJejak`-style log atau
+    setara), dicatat di [[Microservices - Assistant Service]] — bukan estimasi dari harga model
+    di kertas.
+
+- [ ] **T13 — Uji gate RBAC positif dan negatif.**
+  - **Bergantung**: T3.
+  - **Kriteria selesai**: test otomatis mengunci LIMA skenario sekaligus: staff biasa DITOLAK,
+    supervisor departemen mana pun (bukan cuma satu departemen yang kebetulan dites) LOLOS,
+    Direktur LOLOS, IT LOLOS, Corporate Secretary sesuai keputusan § Prasyarat (lolos ATAU
+    ditolak — yang penting ada test yang mengunci hasilnya, jangan dibiarkan tak diuji).
 
 ## Terkait
 
 - [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]]
 - [[Microservices - Assistant Service]]
 - [[REF - Kepemilikan Data]]
+- [[CORE - RBAC dan Permission Set]] · [[CORE - API Master Gateway]] · [[CORE - Kapabilitas AI dan Machine Learning]]
