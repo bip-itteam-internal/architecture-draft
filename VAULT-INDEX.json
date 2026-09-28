@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-29",
-  "jumlah_dokumen": 499,
+  "jumlah_dokumen": 500,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -4262,20 +4262,20 @@
         "Microservices - Integration Service",
         "API - Integration Service"
       ],
-      "hash": "3bba31f52d6a60b8cd1e6bf27f5fa907f84aab93e87d63b6d07268ef7bffa26f",
-      "ukuran_kb": 7.6,
-      "ringkasan": "Menjawab: dari mana biaya operasional dalam rumus insentif profit diambil (beban karyawan dari payroll `employer-cost`, beban non-gaji dari saldo proyek Accurate), kenapa filter harus `projectNo` bukan `projectName`, dan akun 6000 mana saja yang dikecualikan agar tidak dihitung dobel. Juga menjelaskan hierarki beban berjenjang Supervisor/Leader/Account Specialist dan bagaimana beban divisi kini sampai ke SPV tanpa hitung ganda.",
+      "hash": "e02b6fc7387e284485b1e92daddbca70247ea1e7498ff3368697200ebb3848d4",
+      "ukuran_kb": 8.7,
+      "ringkasan": "Menjawab: bagaimana biaya operasional dihitung untuk rumus insentif profit-based, dari sumber apa (proyek Accurate per employee_id + payroll employer-cost), akun apa saja yang dikecualikan dan kenapa, serta bagaimana beban itu dibagi berjenjang antara Account Specialist, Leader, dan Supervisor. Juga menjelaskan jebakan parameter projectNo vs projectName di Accurate, status implementasi hierarki beban yang sempat menyimpang dari keputusan, dan bagaimana angka beban gaji ini dipakai ulang (dan membingungkan) di tab Opex Marketing.",
       "kata_kunci": [
         "biaya operasional",
         "opex",
-        "proyek Accurate",
+        "insentif profit",
+        "incentive",
+        "Accurate",
         "projectNo",
-        "beban non-gaji",
-        "employer cost",
-        "akun dikecualikan",
-        "insentif",
-        "hitung ganda",
-        "ADR 0033"
+        "beban gaji",
+        "employer-cost",
+        "BPJS pemberi kerja",
+        "beban berjenjang SPV Leader AS"
       ]
     },
     {
@@ -16380,6 +16380,36 @@
         "Batch Record",
         "master anggaran",
         "backlog KPI"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Gaji Payroll di Opex Marketing.md",
+      "judul": "ANALISA - Gaji Payroll di Opex Marketing",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": "🟡",
+      "status_teks": "Papan kerja 2026-09-29, disusun dari investigasi keluhan user Finance. Aturan beban gaji insentif ada di [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]]; dok ini **bukan** keputusan baru, melainkan temuan + pertanyaan terbuka + dua task yang siap diambil developer lain. **T1 dan T2 ditahan sampai Finance menjawab P1.** Coret item begitu PR-nya merge, pindahkan keadaannya ke dok domain lewat `/sync-docs`.",
+      "publik": false,
+      "tautan": [
+        "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
+        "Finance - Incentive",
+        "Microservices - Insentive Service",
+        "Microservices - Payroll Service"
+      ],
+      "hash": "a148c65c3e43871fa6cbe1267ee92c5e0cc93846aab3924b95c2719ca1f98595",
+      "ukuran_kb": 10.0,
+      "ringkasan": "Menjawab: kenapa angka \"Gaji (Payroll)\" di tab Opex Marketing (halaman Anggaran) terlihat lebih besar dari slip gaji dan tidak cocok dengan akun 6101 di Accurate, dari mana angka biaya_gaji itu dirakit (bruto + BPJS pemberi kerja dari payroll/insentive-service), dan siapa yang mengubah/memakai ulang angka itu serta kapan. Juga mencatat pertanyaan terbuka yang menunggu jawaban Finance dan rencana task T1/T2 untuk memecah angkanya jadi bruto vs BPJS perusahaan terpisah.",
+      "kata_kunci": [
+        "opex marketing",
+        "gaji payroll",
+        "biaya_gaji",
+        "BPJS pemberi kerja",
+        "profit-dashboard",
+        "anggaran finance",
+        "Accurate 6101",
+        "employer-cost",
+        "insentive-service",
+        "breakdown per user"
       ]
     },
     {
