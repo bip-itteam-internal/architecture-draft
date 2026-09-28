@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-29",
-  "jumlah_dokumen": 500,
+  "jumlah_dokumen": 501,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -8276,6 +8276,52 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0136 Pemilik Master Barang dan Master Gudang.md",
+      "judul": "ADR - 0136 Pemilik Master Barang dan Master Gudang",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-09-29, BELUM diputuskan dan nol kode. Pengambil keputusan: **TBD** (tim IT bersama manajemen; lihat §Pertanyaan yang harus dijawab manusia, butir 1). Dok ini memetakan masalah, opsi, dan usulan penulis; ia tidak menetapkan apa pun sampai bagian §Decision diisi orang yang berwenang.",
+      "publik": true,
+      "tautan": [
+        "REF - Kepemilikan Data",
+        "ADR - 0001 Akuntansi via Accurate",
+        "ADR - 0002 Database-per-Service",
+        "ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya",
+        "ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor",
+        "ADR - 0014 Accurate Token DB-backed via OAuth",
+        "ADR - 0088 Auto-Migrasi Padanan Perlengkapan Lewat ID Internal Accurate, Bukan Konfirmasi Manusia",
+        "ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget",
+        "Microservices - Integration Service",
+        "Microservices - Manufacture Service",
+        "Microservices - Procurement Service",
+        "Microservices - Warehouse Service",
+        "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
+        "REF - Rantai Pengajuan Lintas Modul",
+        "ADR - 0008 Profit Engine Join via item_group_id",
+        "ADR - 0077 Koreksi Faktur via Impor Rekap Lengkap Mengalir ke Master-Data, Bukan Override per Baris",
+        "ADR - 0015 Push Pergerakan WMS ke Accurate",
+        "Microservices - Inventory Service",
+        "GA - Inventory Management",
+        "WH - Warehouse Sadewa"
+      ],
+      "hash": "053d57145757bbc05c5fa1bd41ea2be482c34689eebeff270964c5e0ec9cd2de",
+      "ukuran_kb": 22.9,
+      "ringkasan": "Menjawab: siapa yang seharusnya menjadi pemilik data master barang (produk jadi, SKU marketplace, bahan baku, barang GA) dan master gudang di ERP, mengapa data itu sekarang tersebar tanpa penjaga di sembilan tempat barang dan lima tempat gudang, opsi apa yang dibandingkan untuk menyatukannya (Accurate sebagai master, satu service ERP jadi pemilik, atau pemilik per jenis barang), dan akibat nyata yang sudah terjadi akibat duplikasi ini (HPP insentif meledak, gudang faktur tertinggal 241 dokumen). Status ADR ini masih diusulkan, belum diputuskan dan belum ada kode.",
+      "kata_kunci": [
+        "master barang",
+        "master gudang",
+        "item master",
+        "warehouse master",
+        "ADR 0136",
+        "kepemilikan data barang",
+        "duplikasi SKU",
+        "HPP insentif",
+        "bundle produk",
+        "Accurate"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -13569,6 +13615,7 @@
         "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan",
         "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
         "RUN - Deploy Microservices bip-erp",
+        "ADR - 0136 Pemilik Master Barang dan Master Gudang",
         "REF - PRD ERP",
         "DB - Data Dictionary",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin",
@@ -13577,20 +13624,20 @@
         "REF - Rantai Pengajuan Lintas Modul",
         "Microservices - Manufacture Service"
       ],
-      "hash": "f0ff5a5ab5862f9352fb83ba373b9edb15272850a9f3fe84efdb8a1bfa83948b",
-      "ukuran_kb": 77.5,
-      "ringkasan": "Menjawab: siapa pemilik sah tiap fakta bisnis di ERP Bharata (service dan koleksi mana yang menyimpannya), siapa yang boleh menulisnya, lewat jalur apa service lain boleh membacanya, salinan mana yang sah beserta penjaganya, dan duplikasi/master data ganda mana yang belum diputuskan. Berguna sebagai titik cek sebelum membangun penyimpanan atau fitur baru di atas data yang mungkin sudah dimiliki departemen/service lain, supaya tidak melahirkan sumber kebenaran kedua.",
+      "hash": "7687d5b9812bd4188370e20b75a3eb34c7d3eab2dfb48311e70b749b6eb959ba",
+      "ukuran_kb": 78.0,
+      "ringkasan": "Menjawab: siapa pemilik tiap fakta bisnis di ERP Bharata (karyawan, departemen, kontrak, jadwal kerja, hak akses, dan lainnya) beserta service dan koleksi yang memegangnya, siapa yang boleh menulisnya, lewat jalur apa service lain boleh membacanya, salinan data mana yang sah beserta arah dan penjaganya, dan duplikasi mana yang belum diputuskan. Dipakai untuk menjawab \"kalau data ini sudah ada di departemen lain, kenapa dibangun lagi di service baru\" sebelum memulai fitur baru.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "satu fakta satu tempat",
         "single source of truth",
         "duplikasi data",
-        "master data",
         "RACI",
-        "database per service",
-        "SyncCollection",
-        "audit trail"
+        "master data",
+        "salinan data",
+        "ADR 0002",
+        "database-per-service",
+        "satu fakta satu tempat"
       ]
     },
     {
