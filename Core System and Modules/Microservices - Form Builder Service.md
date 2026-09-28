@@ -287,7 +287,7 @@ cron */15 -> form berpenilaian terbit, dikelompokkan per perusahaan
 - ⚠️ Yang menentukan "tak aktif" adalah `is_active` akun di employee-service. Karyawan resign yang akunnya belum dimatikan HR tetap muncul.
 - ⚠️ `PATCH` pada form terbit menulis balik seluruh `subject` dari salinan yang dibacanya; bila cron menulis `excluded` di antaranya, pengecualian itu hilang sampai putaran berikutnya (≤15 menit) menghitungnya kembali.
 
-Status: branch `feat/form-builder-sasaran-resign` (bip-erp), **belum merged**. Loop cron dan jalur `403` belum teruji otomatis (butuh Mongo); verifikasinya lewat DEV.
+Status: merged ke `main` 2026-09-28 (bip-erp [#2145](https://github.com/bip-itteam-internal/bip-erp/pull/2145)). **Belum diverifikasi di DEV maupun PROD**; checklist verifikasinya ada di badan PR. Loop cron dan jalur `403` belum teruji otomatis (butuh Mongo).
 
 ### Aturan relasional sengaja belum ada
 

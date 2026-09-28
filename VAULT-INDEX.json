@@ -2423,22 +2423,20 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "5fa4b53e595a9e192244bae04649f32c0d35168a4897e64fdc907959f0afb98e",
-      "ukuran_kb": 133.7,
-      "ringkasan": "Menjawab: bagaimana departemen membuat form dinamis tanpa coding (10 tipe pertanyaan, 4 tipe form: survey/evaluation/checklist/kaizen), bagaimana form dipakai untuk menilai karyawan lain, bagaimana form berulang periode bulanan/mingguan bekerja, dan bagaimana form wajib yang belum diisi menahan clock-in presensi mobile lewat gerbang kepatuhan. Juga menjelaskan program kaizen (pengumpulan ide bulanan dengan komite dan papan kepatuhan), modul Kelola Program Culture dengan skor komposit, kepemilikan form per departemen, serta status deploy dan gap verifikasi tiap fitur di dev/prod.",
+      "hash": "010ed09c37fb218bb72f4f70b7591b523fec1eb7bb0568b262d0497f1fd05053",
+      "ukuran_kb": 133.8,
+      "ringkasan": "Menjawab: bagaimana membuat dan menerbitkan form dinamis (survei, checklist, evaluasi, kaizen) tanpa rilis kode, siapa yang boleh mengelola form per departemen, dan bagaimana form penilaian karyawan lain serta form berulang (periode bulanan/mingguan) bekerja. Juga menjelaskan bagaimana form wajib bisa menahan clock-in mobile lewat gerbang presensi, kepemilikan bersama antar-departemen, program kaizen dan Culture, serta jebakan deploy (notification-service harus ikut naik bersama form-builder).",
       "kata_kunci": [
         "form builder",
+        "survei",
         "survey",
-        "evaluation",
-        "checklist",
+        "evaluasi karyawan",
         "kaizen",
+        "checklist",
         "form berulang",
         "recurring form",
-        "penilaian karyawan",
-        "employee evaluation",
         "gerbang presensi",
-        "clock-in",
-        "culture program"
+        "clock-in"
       ]
     },
     {
