@@ -10,6 +10,9 @@
   modul apa pun** (T2 dst). Merged 2026-09-29
   ([bip-erp#2150](https://github.com/bip-itteam-internal/bip-erp/pull/2150)) — status
   keseluruhan tetap 🟡 Konsep sampai lebih banyak T-task selesai.
+  **T2 kerangka service ditulis 2026-09-29** (branch `feat/assistant-skeleton`): Fiber +
+  `ValidateGateway`, hanya `GET /` dan `GET /health` (`{"message":"ok"}`), tanpa database dan
+  tanpa rute AI. Belum terbukti lewat gateway dev.
   **Frontend: banner pengumuman "Copilot" + halaman placeholder `/copilot`** — murni pengumuman
   "Segera Hadir", **tidak memanggil backend apa pun**. Nama fitur yang diputuskan: **Copilot**.
   Sempat berupa menu di puncak sidebar
@@ -47,9 +50,17 @@
   `finish_reason:"tool_calls"` kembali benar untuk skema tool sederhana). Overhead terukur ~2.332
   prompt token per giliran dengan satu tool. Router bisa membalas 401 OAuth-expired transien
   (pulih ~2 menit) — klien wajib retry sekali untuk kelas galat ini.
-- **Path di repo**: `bip-erp/services/assistant/` — `internal/aiclient/` dan `cmd/probe/` sudah
-  ada (T1); route Fiber/gateway (mengikuti pola `services/.template`) **belum ditulis** (T2 dst).
-- **Rute (rencana)**: lewat [[CORE - API Master Gateway]] seperti service lain. ⚠️ Cara mengantar jawabannya BELUM diputuskan karena gateway tidak meneruskan stream (lihat § Temuan gateway).
+- **Path di repo**: `bip-erp/services/assistant/` — `internal/aiclient/` dan `cmd/probe/` (T1);
+  `main.go` + `main_test.go` + `Dockerfile` (T2, mengikuti pola `services/.template` tanpa Mongo).
+- **Port & deploy**: `ASSISTANT_SERVICE_PORT=6991`, container `Assistant-Service`
+  (`docker-compose.yml`), healthcheck ber-header `BIP-Gateway-ID`. **Tidak ada di `deploy.yml`**,
+  jadi merge tidak men-deploy apa pun. ⚠️ `.env` server wajib memuat `ASSISTANT_SERVICE_PORT`
+  **sebelum** `api-gateway` di-`--force-recreate`: tanpanya `ASSISTANT_MODULE_URL` menjadi
+  `http://assistant-service:` (tak kosong, jadi gateway tidak panic) dan `/api/assistant/*`
+  membalas 502 tanpa petunjuk.
+- **Rute**: lewat [[CORE - API Master Gateway]] seperti service lain; modul `assistant`, tanpa cache
+  gateway (`noCacheRoutes`) karena jawaban berbeda per pertanyaan. Kini baru `/api/assistant/` dan
+  `/api/assistant/health`. ⚠️ Cara mengantar jawabannya BELUM diputuskan karena gateway tidak meneruskan stream (lihat § Temuan gateway).
 - **Keputusan yang mengikat**: [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]]
 
 ## Latar Belakang

@@ -21,8 +21,8 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
   konfirmasi". Ini bukan blocker teknis untuk mulai T1-T2 (fondasi netral), tapi jadi blocker
   untuk T4 (memilih modul yang datanya sensitif) dan sebelum di-deploy ke prod.
 - ⛔ **Persetujuan tertulis Direksi untuk data yang keluar perusahaan lewat relay
-  `code.bharatainternasional.com`.** [[ADR - 0132]] §Context mencatat ini eksplisit sebagai
-  keputusan yang SENGAJA ditunda (bukan diabaikan) — [[ADR - 0075]] mensyaratkan persetujuan
+  `code.bharatainternasional.com`.** [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §Context mencatat ini eksplisit sebagai
+  keputusan yang SENGAJA ditunda (bukan diabaikan) — [[ADR - 0075 Bukti Sisi Lawan Dilampirkan dan Angkanya Dicatat, Pembacaan Otomatis Menyusul]] mensyaratkan persetujuan
   Direksi tertulis untuk data serupa dan sampai sekarang belum ada. **Boleh dilewati untuk
   pengembangan/uji teknis pakai data sintetis** (T1-T9), tapi WAJIB ada sebelum modul mana pun
   memproses pertanyaan dengan data ASLI di produksi.
@@ -32,19 +32,18 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
 - [x] **T1 — Klien AI dasar. SELESAI 2026-09-28**, kode Go nyata (bukan cuma probe shell). ~~Go +
   Anthropic SDK dengan Tool Runner~~ **Klien tipis hand-roll, OpenAI-compatible, ke
   `https://code.bharatainternasional.com/v1`** — divalidasi langsung 2026-09-28, lihat
-  [[ADR - 0132]] §Context & §2a. Kode: `bip-erp/services/assistant/internal/aiclient/`
+  [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §Context & §2a. Kode: `bip-erp/services/assistant/internal/aiclient/`
   (`client.go`+`types.go`, 11 test lolos dua kali jalan) + `cmd/probe/main.go`, branch
   `feat/assistant-klien-ai`, merged 2026-09-29 (bip-erp#2150).
   - **Tujuan**: satu-satunya jalan masuk ke model untuk seluruh task di bawah.
   - **Bergantung**: tidak ada.
-  - **Baca dulu**: [[ADR - 0132]] §2a untuk ketentuan wajib klien (`stream:false` ditanam mati,
+  - **Baca dulu**: [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §2a untuk ketentuan wajib klien (`stream:false` ditanam mati,
     id model dipatok `cc/claude-*` literal, retry sekali khusus 401 "OAuth access token has
     expired", loop tool-calling ditulis manual). ⚠️ **Jangan pakai Anthropic Go SDK/Tool
     Runner** — endpoint ini OpenAI-compatible (Chat Completions), bukan format native Anthropic.
     ⚠️ **Jangan asumsikan ada `shared-library/ai`/`GenerateJSON` yang bisa dipakai ulang** —
     diverifikasi `git grep` 2026-09-28 ke `origin/main`, nol hasil. `AI_BASE_URL`/`AI_API_KEY`
-    SUDAH ada sebagai env var di semua container prod (lihat [[Microservices - Assistant
-    Service]] § Belum Diputuskan) — tinggal dipakai, tidak perlu provisioning baru untuk dev
+    SUDAH ada sebagai env var di semua container prod (lihat [[Microservices - Assistant Service]] § Belum Diputuskan) — tinggal dipakai, tidak perlu provisioning baru untuk dev
     lanjutan, tapi verifikasi juga ketersediaannya di lingkungan dev/staging.
   - **Sudah terbukti lewat probe shell (2026-09-28)**: satu panggilan uji (prompt sederhana +
     satu skema tool dummy `get_weather`) menghasilkan `tool_calls` + `finish_reason:"tool_calls"`
@@ -65,9 +64,14 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     karena memanggil Fiber langsung, bukan lewat gateway.
   - **Kriteria selesai**: endpoint kesehatan bisa dipanggil dari FE dev **lewat gateway
     sungguhan** (bukan `localhost:<port>` langsung ke service).
+  - **Kemajuan 2026-09-29**: kode ditulis di branch `feat/assistant-skeleton` — `main.go`
+    (Fiber, `ValidateGateway`, `GET /` dan `GET /health`, tanpa Mongo, tanpa rute AI), port
+    `6991`, modul `assistant` di map gateway + `/api/assistant` di noCacheRoutes, blok
+    `assistant-service` di `docker-compose.yml`. **Sengaja TIDAK didaftarkan di `deploy.yml`**
+    (deploy dev manual). Checkbox tetap terbuka sampai kriteria di atas terbukti lewat gateway dev.
 
 - [ ] **T3 — Gate RBAC baru "Supervisor departemen mana pun ATAU Direktur ATAU IT".**
-  - **Tujuan**: batasi menu asisten sesuai keputusan [[ADR - 0132]] §3.
+  - **Tujuan**: batasi menu asisten sesuai keputusan [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §3.
   - **Bergantung**: tidak ada — boleh paralel dengan T1-T2.
   - **Baca dulu** (file:line dari grounding 2026-09-28, verifikasi ulang sebelum dipakai — kode
     bisa bergeser): `shared-library/common/roles.go:562-596` (`validateRole` pola OR,
@@ -91,7 +95,7 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     sebelum modul dengan data sensitif dipilih.
   - **Baca dulu**: `LOG - 2026-09-17 Audit Checklist Marketing dan Integration` bagian yang
     menyebut endpoint Integration cuma butuh login tanpa gerbang peran (kritis, belum diperbaiki
-    per tanggal log itu — ukur ulang, jangan percaya tanggalnya begitu saja). [[ADR - 0120]]
+    per tanggal log itu — ukur ulang, jangan percaya tanggalnya begitu saja). [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]]
     §Realisasi soal endpoint marketing-analytics yang menu-nya sempit tapi data tetap 200 untuk
     semua token.
   - **Kandidat kuat** (bukan keputusan final): attendance, marketing-analytics — jebakan datanya
@@ -103,7 +107,7 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     BERADA SATU LAPIS DI ATAS" di rules tim).
 
 - [ ] **T5 — Endpoint baca baru ("Lapisan Data Bisnis") di modul percontohan pertama.**
-  - **Tujuan**: realisasi [[ADR - 0132]] §2 — pintu masuk fleksibel, aturan bisnis TETAP di kode
+  - **Tujuan**: realisasi [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §2 — pintu masuk fleksibel, aturan bisnis TETAP di kode
     yang sudah ada.
   - **Bergantung**: T4.
   - **Kriteria selesai**: endpoint baru ditulis memakai ULANG struct/fungsi bisnis yang SUDAH ADA
@@ -135,7 +139,7 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
 
 - [ ] **T8 — Uji korelasi lintas modul + ukur batas waktu nyata.**
   - **Bergantung**: T6, T7.
-  - **Tujuan**: buktikan [[ADR - 0132]] §5 (gabung hasil, bukan gabung query) dan isi angka §6
+  - **Tujuan**: buktikan [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §5 (gabung hasil, bukan gabung query) dan isi angka §6
     yang sengaja dikosongkan di ADR ("ditetapkan dari pengukuran nyata saat /plan").
   - **Kriteria selesai**: satu pertanyaan yang butuh KEDUA modul (kunci penghubung sama, mis.
     `employee_id`) → dua tool call dalam satu giliran → jawaban menggabungkan angka yang SUDAH
