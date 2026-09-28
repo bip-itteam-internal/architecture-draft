@@ -1,16 +1,29 @@
 ## Deskripsi
 
-*Asisten tanya-jawab di dalam Web ERP yang menjawab pertanyaan tentang angka bisnis dengan cara MERUTEKAN pertanyaan ke endpoint yang sudah menghitungnya, bukan dengan menghitung sendiri. Ia memanggil endpoint memakai JWT orang yang bertanya, sehingga hak aksesnya identik dengan hak akses orang itu di layar. Irisan pertama diarahkan ke data marketing analytics.*
+*Asisten tanya-jawab di dalam Web ERP yang menjawab pertanyaan tentang angka bisnis dengan cara MERUTEKAN pertanyaan ke endpoint yang sudah menghitungnya, bukan dengan menghitung sendiri. Ia memanggil endpoint memakai JWT orang yang bertanya, sehingga hak aksesnya identik dengan hak akses orang itu di layar. ~~Irisan pertama diarahkan ke data marketing analytics.~~ **Diputuskan berbeda 2026-09-28** ([[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]]): cakupan lintas modul sejak awal, dimulai beberapa modul percontohan sekaligus, dibatasi ke Supervisor/Direktur/IT.*
 
-- **Status**: 🟡 **Konsep**, 2026-08-29, **0 kode**. Belum ada direktori service.
-  ⚠️ **SEBAGIAN DIGANTIKAN 2026-09-22** oleh [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]]:
-  asisten analisa marketing diputuskan berdiri **di dalam service pemilik data lewat klien tipis
-  `shared-library/ai`**, bukan sebagai service tersendiri, dan tanya-jawab bebas ditunda sampai
-  template serta penjadwalan tanpa AI terbukti dipakai. Ketegangan dengan ADR 0058 §2 yang
-  dicatat dokumen ini (§ Dua ketegangan terbuka) **sudah dijawab** di sana. Yang TETAP berlaku
-  dari dokumen ini dan jadi bahan utama irisan ketiga: empat keputusan rancangannya (asisten
-  dilarang berhitung, tool memanggil lewat gateway dengan JWT pemakai, jawaban adalah pintu),
-  empat penjaga anti angka karangan, dan § Temuan gateway soal batas 30 detik.
+- **Status**: 🟡 **Konsep**, 2026-08-29, **0 kode** — dikonfirmasi ulang lewat `git grep` langsung
+  ke kode 2026-09-28, masih 0 kode (lihat [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan
+  Data Bisnis per Service Bukan Terpusat]] § Context). Belum ada direktori service.
+  ⚠️ **SEBAGIAN DIGANTIKAN 2026-09-22** oleh [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]]
+  **untuk kasus laporan Marketing terjadwal saja**: asisten analisa marketing diputuskan berdiri
+  **di dalam service pemilik data lewat klien tipis `shared-library/ai`**, bukan sebagai service
+  tersendiri. ⚠️ **Klien `shared-library/ai` yang disebut di sana TERNYATA BELUM ADA sama sekali
+  di kode** — diverifikasi `git grep` menyeluruh 2026-09-28, nol hasil di luar false-positive.
+  Ketegangan dengan ADR 0058 §2 yang dicatat dokumen ini (§ Dua ketegangan terbuka) **sudah
+  dijawab** di sana, tapi HANYA untuk kasus satu domain (Marketing) — untuk kasus tanya-jawab
+  bebas **lintas modul**, ketegangan itu **dijawab beda** oleh [[ADR - 0132 Asisten AI Tanya-Jawab
+  Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] (2026-09-28): asisten lintas
+  modul secara struktural **tetap jadi service terpisah** (`services/assistant/`, sesuai rencana
+  di dokumen ini), karena tidak ada satu service pemilik untuk semua modul sekaligus.
+  ⚠️ **"Tanya-jawab bebas ditunda sampai template terbukti dipakai" (2026-09-22) DIPUTUSKAN TIDAK
+  BERLAKU LAGI oleh ADR-0132** (2026-09-28) — keputusan sadar untuk mulai cakupan lintas modul
+  sekarang, bukan menunggu. Kunci RBAC yang dicatat TBD di dokumen ini (§ Belum Diputuskan)
+  **sudah ditegaskan** ADR-0132 §3: Supervisor departemen mana pun ATAU Direktur ATAU IT (Corp
+  Sec belum ditegaskan). Yang TETAP berlaku dari dokumen ini: empat keputusan rancangannya
+  (asisten dilarang berhitung, tool memanggil lewat gateway dengan JWT pemakai, jawaban adalah
+  pintu), empat penjaga anti angka karangan, dan § Temuan gateway soal batas 30 detik — semuanya
+  jadi dasar ADR-0132.
 - **Stack (rencana)**: Go + [Anthropic Go SDK](https://github.com/anthropics/anthropic-sdk-go) dengan **Tool Runner** (masih beta) + MongoDB untuk riwayat percakapan.
 - **Path di repo (rencana)**: `bip-erp/services/assistant/`, mengikuti pola `services/.template`.
 - **Rute (rencana)**: lewat [[CORE - API Master Gateway]] seperti service lain. ⚠️ Cara mengantar jawabannya BELUM diputuskan karena gateway tidak meneruskan stream (lihat § Temuan gateway).
@@ -120,8 +133,9 @@ Empat jalan keluar yang terbuka, belum dipilih:
 
 | Persona | Peran & Divisi | Akses / RBAC | Device |
 |---|---|---|---|
-| ICC pemegang toko | Tim ICC, Marketing | Mewarisi gerbang endpoint yang dipanggil; kunci RBAC untuk membuka asistennya sendiri **TBD** | Web ERP |
-| Atasan marketing | Supervisor Marketing | Lingkup divisi, diturunkan dari header `BIP-Supervised-Departments` | Web ERP |
+| Supervisor departemen mana pun | Tim mana pun, ber-`is_supervisor` | Mewarisi gerbang endpoint yang dipanggil; DAN gate baru "Supervisor apa pun ATAU Direktur ATAU IT" ([[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §3) | Web ERP |
+| Direktur | Kesekretariatan | Sama seperti di atas; otomatis lolos lewat derivasi `it:supervisor` dari jabatan. Corporate Secretary belum ditegaskan ikut atau tidak | Web ERP |
+| Tim IT | IT | Sama seperti di atas, lewat `common.IsITMember`/`IsITSupervisor` | Web ERP |
 
 - **Tujuan**: mendapatkan satu angka tanpa harus tahu lebih dulu layar mana yang memuatnya.
 - **Pain point**: angkanya ada, tetapi tersebar di belasan layar.
@@ -132,20 +146,20 @@ Empat jalan keluar yang terbuka, belum dipilih:
 - **Menghitung, menaksir, dan meramal.** Seluruhnya. Yang prediktif tunduk pada gerbang [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] dan bukan pekerjaan service ini.
 - **Aksi menulis.** Irisan pertama baca-saja.
 - **Otomasi komentar di media sosial (buzzer).** Dibahas 2026-08-29 dan **ditolak**, dicatat di sini supaya tidak diusulkan berulang. Komentar otomatis yang dirancang agar terbaca seperti datang dari orang sungguhan menipu pembacanya, dan melanggar aturan platform. Taruhannya bukan kecil: omzet Rp 40,44 miliar dalam 146 hari yang diukur ADR 0058 mengalir lewat toko-toko yang akan kena sanksinya. **Yang sah dan tetap terbuka**: triase komentar masuk, draf balasan yang dikirim setelah ditinjau orang, dan balasan otomatis sebagai akun brand secara terbuka untuk pertanyaan berulang. Pembedanya satu, yaitu apakah identitas yang bicara disamarkan.
-- **Modul selain marketing analytics.** Irisan pertama saja; perluasan diputuskan setelah irisan pertama terbukti hidup.
+- ~~**Modul selain marketing analytics.** Irisan pertama saja; perluasan diputuskan setelah irisan pertama terbukti hidup.~~ **Diputuskan berbeda 2026-09-28** oleh [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]]: cakupan lintas modul sejak awal (beberapa modul percontohan sekaligus, bukan satu-satu bergantian menunggu bukti).
 
 ## Belum Diputuskan (TBD)
 
 - **Cara mengantar jawaban.** Empat pilihan di § Temuan gateway, belum dipilih. Ini penghalang pertama, bukan detail.
 - **Daftar tool final** beserta bentuk argumen dan bentuk hasilnya.
-- **Kunci RBAC** yang menentukan siapa boleh membuka asistennya. Mewarisi gerbang endpoint sudah menutup kebocoran data, tetapi belum menjawab siapa yang boleh memakai fiturnya sama sekali.
+- ~~**Kunci RBAC** yang menentukan siapa boleh membuka asistennya.~~ **Ditegaskan 2026-09-28** oleh [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §3: Supervisor departemen mana pun ATAU Direktur ATAU IT. Yang masih TBD: apakah Corporate Secretary ikut termasuk.
 - **Penyimpanan riwayat percakapan**: koleksi, masa simpan, dan apakah isinya boleh dibaca siapa pun selain penanyanya.
 - **Model dan ongkos.** Bawaan `claude-opus-5` ($5 per 1 juta token masuk, $25 keluar). Turun ke `claude-sonnet-5` atau `claude-haiku-4-5` mungkin dan jauh lebih murah, tetapi belum ada ukuran nyata untuk memutuskannya. Batas pemakaian per orang per hari juga belum ada.
 - **Prompt caching**: daftar tool dan system prompt yang tetap seharusnya di-cache, penempatan breakpoint-nya belum dirancang.
 - **Penyimpanan kunci API Anthropic** dan siapa yang memegangnya.
 - **Seluruh sisi frontend**: letak panel, komponen, dan kunci i18n `id` serta `en` yang diwajibkan [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]].
 - **Irisan dan gerbang verifikasinya.** Belum disusun.
-- **ADR** yang menyelesaikan ketegangan dengan ADR 0058 § 2. Belum ditulis.
+- ~~**ADR** yang menyelesaikan ketegangan dengan ADR 0058 § 2.~~ **Ditulis 2026-09-28**: [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §2 — asisten lintas modul tetap jadi service terpisah, karena tidak ada satu service pemilik untuk semua modul.
 
 ## Dependensi & Integrasi
 
@@ -160,6 +174,7 @@ Empat jalan keluar yang terbuka, belum dipilih:
 
 ## Dokumen Terkait
 
+- [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]], keputusan yang menggantikan cakupan & RBAC dokumen ini
 - [[CORE - Kapabilitas AI dan Machine Learning]], peta seluruh kapabilitas AI dan aturan pemakaian kolomnya
 - [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]], gerbang yang mengikat
 - [[Microservices - Marketing Analytics Service]], pemilik seluruh angka yang dijawab
