@@ -628,28 +628,27 @@
         "APP - MyBharata",
         "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
         "ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak",
+        "ADR - 0134 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend",
         "ADR - 0106 Tema dan Teaser Live Support Disetor dan Diputus Penyetuju Departemen sebagai Dasar KPI",
         "ADR - 0108 Monitoring Sesi Live di Web Hanya Baca untuk Leader dan Live Support",
         "Microservices - Employee Service",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "1f0f44279adaf03b0542cb4691abbecc1685c911fa46ad2ef587b772193dfc88",
-      "ukuran_kb": 76.8,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di Marketing Analytics Service, method dan path-nya, gerbang akses (mis. `RequireMarketingLeader`), dan status deploynya masing-masing — mencakup vonis laba & ambang keputusan di beranda, pagu belanja iklan & simulasi kurva alokasi, pencatatan sesi live host termasuk ambil alih sesi, setoran karya Live Support, dan laporan Asisten Analisa terjadwal.",
+      "hash": "cc11aa46b3363214bb697635ef7ec58bca44f4f6af9db3690850d345f2de282b",
+      "ukuran_kb": 79.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di Marketing Analytics Service (beranda vonis laba, ambang keputusan ROAS/CPA, pagu belanja iklan, kurva alokasi, analisis live, KPI live/live support, retur, price floor, asisten analisa terjadwal), method-path tiap endpoint, siapa yang boleh mengaksesnya (gerbang RBAC seperti RequireMarketingLeader), serta konvensi format respons, paginasi, dan penanganan error. Juga menjelaskan lima kondisi vonis laba (tanpa_data, belum_matang, rugi, waspada, sehat) dan cara mengaudit kelengkapan daftar endpoint ini terhadap kode.",
       "kata_kunci": [
         "marketing analytics",
-        "endpoint",
-        "API",
-        "live shift",
-        "sesi live",
-        "ambang",
-        "pagu iklan",
-        "asisten analisa",
-        "ROAS",
+        "endpoint API",
         "vonis laba",
-        "live support",
-        "kurva alokasi"
+        "ambang ROAS",
+        "pagu belanja iklan",
+        "kurva alokasi",
+        "beranda marketing",
+        "asisten analisa",
+        "live shift",
+        "price floor"
       ]
     },
     {
@@ -2790,7 +2789,7 @@
         "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
         "ANALISA - Asisten Analisa Marketing",
         "ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak",
-        "ADR - 0132 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend",
+        "ADR - 0134 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend",
         "RUN - Deploy Microservices bip-erp",
         "IT - Background Jobs & Schedulers",
         "HRIS - Otomasi Skor KPI",
@@ -2807,22 +2806,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "f3a2496622e9ace7d7277d833cbceaa9f54026af3e6b75e721b0154bdb5ea7e4",
-      "ukuran_kb": 177.8,
-      "ringkasan": "Menjawab: bagaimana Marketing Analytics Service mengagregasi laba dan performa marketing dari `integration_db` (baca-saja, dijaga tiga lapis) ke koleksi `mart_*` miliknya sendiri, bagaimana vonis laba dan ambang ROAS dihitung, bagaimana pencatatan sesi live oleh host serta ambil alih sesi bekerja, dan aturan mana yang mencegah hitung ganda angka per channel TikTok/Shopee/Lazada.",
+      "hash": "2570abf0b11b63881e1872e7bf2d64c7f34b01cea087584dc81d26dc419b60d5",
+      "ukuran_kb": 178.6,
+      "ringkasan": "Menjawab: bagaimana arsitektur Marketing Analytics Service bekerja (Go/Fiber, MongoDB mart_*, membaca integration_db baca-saja lalu pre-agregasi, penjadwal internal 48 jam), fitur apa saja yang sudah live di prod (halaman depan/vonis laba, pencatatan sesi live oleh host, KPI live dan live support, setoran karya, asisten analisa terjadwal) versus yang masih merged-belum-deploy. Juga menjelaskan aturan pencegahan hitung ganda antar level (shop/produk/kampanye) dan kolom yang mudah tertukar (iklan_sia_sia, pembatalan, retur), serta sumber data per channel (TikTok, Shopee, Lazada).",
       "kata_kunci": [
-        "marketing analytics",
-        "arsitektur service",
-        "integration_db",
-        "mart",
-        "live shift",
-        "sesi live",
-        "ROAS",
+        "marketing analytics service",
+        "arsitektur microservice",
+        "mart_*",
+        "integration_db baca-saja",
+        "live shift host",
+        "asisten analisa",
         "vonis laba",
-        "TikTok",
-        "Shopee",
-        "Lazada",
-        "hitung ganda"
+        "ROAS ambang",
+        "hitung ganda",
+        "TikTok Shopee Lazada"
       ]
     },
     {
@@ -7980,23 +7977,22 @@
         "CORE - OCR Document Service",
         "ANALISA - Asisten Analisa Marketing",
         "Microservices - Marketing Analytics Service",
-        "ADR - 0132 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend",
+        "ADR - 0134 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend",
         "ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library"
       ],
-      "hash": "9baeaf1acfd82c8b365d982188dafc1bdbb69ccbacc6a2e1edb525bb52cd7777",
+      "hash": "a5cbaa22e6dc613be2ab9609c1ff1ecec90ac4c157a84233b86e60212934888c",
       "ukuran_kb": 38.1,
-      "ringkasan": "Menjawab: kenapa dan bagaimana laporan Asisten Analisa Marketing berubah dari sekadar urutan perhatian menjadi membawa keputusan tindakan konkret (mis. \"Hentikan iklan video C\") yang tinggal ditandai dijalankan atau ditolak, apa pagar keamanannya (katalog tindakan tertutup, model tidak menerima angka mentah, mode bayangan sebelum ke semua penerima), dan sejauh mana bagian-bagiannya sudah direalisasikan.",
+      "ringkasan": "Menjawab: kenapa laporan Asisten Analisa Marketing berubah dari sekadar urutan perhatian menjadi membawa keputusan tindakan konkret (mis. hentikan iklan video, kurangi belanja toko), siapa yang menjalankan atau menolak keputusan itu (manusia, sistem tidak mengeksekusi apa pun), dan bagaimana pembagian kerja antara aturan (menentukan kelayakan tindakan dari data) dengan model AI (memilih, mengurutkan, menjelaskan dari katalog tertutup). Juga mencatat status implementasi per PR (backend merged belum deploy prod, FE merged), mode bayangan sebelum tayang ke semua penerima, dan prasyarat yang masih menunggu keputusan manajemen yaitu satu angka target ROAS.",
       "kata_kunci": [
         "ADR 0127",
-        "asisten analisa",
+        "asisten analisa marketing",
         "keputusan AI",
-        "marketing analytics",
+        "rekomendasi tindakan iklan",
+        "jalankan atau tolak",
+        "target ROAS",
+        "katalog tindakan tertutup",
         "mode bayangan",
-        "ROAS",
-        "katalog tindakan",
-        "laporan terjadwal",
-        "jalankan tolak",
-        "AI decision"
+        "AI marketing analytics"
       ]
     },
     {
@@ -8179,36 +8175,6 @@
       ]
     },
     {
-      "path": "Decisions/ADR - 0132 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend.md",
-      "judul": "ADR - 0132 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend",
-      "area": "Decisions",
-      "jenis": "adr",
-      "status_emoji": null,
-      "status_teks": "**Accepted** (2026-09-28, keputusan pemilik produk). Melengkapi [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] §5 dan [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] §4; tidak menggantikan keduanya.",
-      "publik": true,
-      "tautan": [
-        "ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak",
-        "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
-        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
-        "Microservices - Marketing Analytics Service"
-      ],
-      "hash": "9c59fde257625416ab9cdee3797bdc31ccdc8cf11c3f84848ab75542740f0898",
-      "ukuran_kb": 5.5,
-      "ringkasan": "Menjawab: bagaimana laporan Asisten Analisa memutuskan bentuk penyajian tiap bagiannya (teks, angka, tabel, bar, atau line), bagaimana AI memilih bentuk dan urutan blok dari katalog dataset yang dihitung backend tanpa pernah menulis angka sendiri, dan bagaimana FE merendernya memakai komponen chart yang sudah ada (ChartContainer/Recharts) lewat kontrak `sajian` pada `GET /keputusan-kiriman`.",
-      "kata_kunci": [
-        "ADR 0132",
-        "sajian laporan",
-        "blok terstruktur",
-        "dataset",
-        "chart",
-        "ChartContainer",
-        "Recharts",
-        "asisten analisa",
-        "keputusan kiriman",
-        "marketing analytics"
-      ]
-    },
-    {
       "path": "Decisions/ADR - 0133 Kompensasi Logistik TikTok Pasca-Retur Dibedakan per Kondisi Barang, Otomasi Ditunda.md",
       "judul": "ADR - 0133 Kompensasi Logistik TikTok Pasca-Retur Dibedakan per Kondisi Barang, Otomasi Ditunda",
       "area": "Decisions",
@@ -8245,6 +8211,35 @@
         "koreksi stok WMS",
         "SOP finance accounting",
         "kondisi barang retur"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0134 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend.md",
+      "judul": "ADR - 0134 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)** — diukur 2026-09-28. §1 (katalog dataset beku per kiriman) dan §2 (model memilih jenis+urutan blok) **merged** ke `origin/main` bip-erp lewat dua PR (§ Realisasi di bawah), **BELUM deploy prod** — saklar dan status deploy sama dengan [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] (satu mekanisme, satu panggilan model, satu saklar `MARKETING_ANALYTICS_AI_KEPUTUSAN_ENABLED`). §3 (perender FE: blok di tab Hasil analisa dan dokumen PDF) **MERGED** erp-frontend [#1784](https://github.com/bip-itteam-internal/erp-frontend/pull/1784). Melengkapi [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] §5 dan [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] §4; tidak menggantikan keduanya.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak",
+        "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "Microservices - Marketing Analytics Service"
+      ],
+      "hash": "8923c9e2524bf2c4d119993d602ce29197ececd70781120d3a09cc80cbc3ae8c",
+      "ukuran_kb": 17.2,
+      "ringkasan": "Menjawab: bagaimana laporan Asisten Analisa Marketing menyajikan datanya sebagai rangkaian blok terstruktur (teks, angka, tabel, bar, line) yang jenis dan urutannya dipilih model AI dari katalog dataset beku yang dihitung backend, sementara model sendiri tidak pernah menerima atau menulis angka mentah. Juga menjelaskan delapan dataset tetap yang tersedia (angka utama, banding periode lalu, laba harian, ROAS per pekan, per toko, keputusan per jenis, status keputusan, tindak lanjut sebelumnya), aturan render di FE (ChartContainer/Recharts, warna seri tim, format angka per satuan), dan status implementasi per PR backend dan frontend.",
+      "kata_kunci": [
+        "ADR 0134",
+        "sajian laporan",
+        "blok terstruktur",
+        "asisten analisa marketing",
+        "dataset backend",
+        "AI pilih bentuk chart",
+        "ChartContainer Recharts",
+        "tabel bar line",
+        "PDF laporan marketing"
       ]
     },
     {
