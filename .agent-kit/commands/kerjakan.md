@@ -282,7 +282,11 @@ Repo kode, di dalam worktree:
 3. `git -C "<wt>" -c core.fsmonitor=false push -u origin <branch>`. Hook `pre-push` akan
    menjalankan tsc/lint/build atau go build. Bila **ditolak**: JANGAN `--no-verify`. Perlakukan
    sebagai kegagalan judge (kembali ke §4 dengan keluaran hook sebagai temuan).
-4. `gh pr create --repo bip-itteam-internal/<repo> --head <branch> --title "<judul commit>" --body-file <berkas>` dengan badan:
+4. `gh pr create --repo bip-itteam-internal/<repo> --head <branch> --title "<judul commit>" --body-file <berkas>`.
+   Bila field `Issue` brief berisi `BHA-<n>`, judul PR diakhiri ` [BHA-<n>]` dan badan memuat baris
+   `Linear: BHA-<n>`. Merge memindahkan issue otomatis ke **Menunggu Adopsi**, BUKAN Done: Done
+   berarti terbukti dipakai di prod, dan itu tak bisa dibuktikan oleh merge (`team-memory.md`
+   § Linear). Jangan memindahkan issue ke Done dari sini. Badan:
    - Tujuan (dari brief)
    - Kriteria lolos + bukti (dari verdict)
    - Ringkasan judge + gerbang yang dijalankan (nama, durasi, lolos)

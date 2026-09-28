@@ -154,6 +154,17 @@ try {
   Check ($bfTriase.Contains('Alur Pengguna') -and $bfTriase.Contains('menyentuh layar')) 'brief.md: mendefinisikan KAPAN Alur Pengguna wajib (brief menyentuh layar)'
   Check ($bfTriase.Contains('langkah orang, bukan aliran data, dengan titik putusnya ditandai') -and $bfTriase.Contains('plan-checklist.md')) 'brief.md: mendefinisikan ISI Alur Pengguna (langkah orang + titik putus) dan merujuk plan-checklist.md, bukan menyalin'
 
+  # kit 1.31.0 (Linear): nomor issue harus sampai ke NAMA BRANCH, karena hanya di sana integrasi
+  # GitHub Linear menyambungkan PR ke issue. Field di template saja tidak cukup (slug-lah yang jadi
+  # branch lewat worktree-baru), jadi yang dipatok: field Issue, aturan slug ber-awalan bha-<n>-,
+  # PR tak memindahkan ke Done, dan pre-push memperingatkan branch tanpa nomor (bukan menolak).
+  Check ($tplBrief.Contains('- Issue: __ISSUE__')) 'templates/brief.md: field Issue'
+  Check ($bfTriase.Contains('slug WAJIB diawali `bha-<n>-`')) 'brief.md: slug diawali bha-<n>- supaya branch tersambung ke Linear'
+  $kjMd = Get-Content (Join-Path $claude 'commands/kerjakan.md') -Raw -Encoding UTF8
+  Check ($kjMd.Contains('[BHA-<n>]') -and $kjMd.Contains('Menunggu Adopsi')) 'kerjakan.md: judul PR ber-[BHA-<n>] dan merge ke Menunggu Adopsi, bukan Done'
+  $ppLinear = Get-Content (Join-Path $kitRoot 'hooks/githooks/pre-push') -Raw -Encoding UTF8
+  Check ($ppLinear.Contains("grep -qi 'bha-[0-9]'") -and $ppLinear.Contains('PERINGATAN: branch')) 'pre-push: peringatan branch tanpa bha-<n> (tak menolak)'
+
   # --- Sambungan antar-berkas, temuan review akhir 1.28.0 ---
   # Kelas yang sama untuk kelimanya: tiap berkas benar sendiri-sendiri, yang salah sambungannya.
 

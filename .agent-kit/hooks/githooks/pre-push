@@ -38,8 +38,10 @@ touched=""
 # .agent-kit/ dilaporkan "gerbang test kit DILEWATI". Kelas yang sama dengan nol-gerbang-lolos
 # yang sedang ditutup rilis ini, cuma satu lapis lebih awal.
 tak_tentu=0
+dipush=""
 while read -r lref lsha rref rsha; do
   [ "$lsha" = "$zero" ] && continue                      # hapus branch remote: tak ada yang diperiksa
+  dipush="$dipush ${lref#refs/heads/}"
   if [ "$rsha" = "$zero" ]; then
     base="$(git merge-base "$lsha" origin/main 2>/dev/null || git merge-base "$lsha" origin/master 2>/dev/null || echo "")"
   else
@@ -60,6 +62,19 @@ fi
 
 gagal=0
 echo "[agent-kit pre-push] repo: $top"
+
+# ---- nomor issue Linear di nama branch (kit 1.31.0, PERINGATAN saja, tak pernah menolak) ----
+# Integrasi GitHub di Linear hanya menyambungkan PR ke issue lewat `bha-<n>` di nama branch/judul;
+# tanpanya status issue diubah tangan lalu basi (team-memory § Linear). Vault (.agent-kit/ di
+# akar) push langsung ke main, jadi dilewati; begitu pula main/master dan branch rilis/dependabot.
+if [ ! -d "$top/.agent-kit" ]; then
+  for b in $dipush; do
+    case "$b" in main|master|dev|release/*|chore/rilis*|dependabot/*) continue ;; esac
+    if ! printf '%s' "$b" | grep -qi 'bha-[0-9]'; then
+      echo "[agent-kit pre-push] PERINGATAN: branch '$b' tak memuat nomor issue Linear (bha-<n>). PR-nya tak akan tersambung ke issue. Bila ada issue-nya, beri nomor di judul PR: [BHA-<n>]"
+    fi
+  done
+fi
 
 # ---- antrean kerja berat (kit 1.30.0) ----
 # pnpm tsc/lint/build dan go build di bawah mengantre di antre.ps1 bersama gerbang dan run penuh

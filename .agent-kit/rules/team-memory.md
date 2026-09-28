@@ -292,5 +292,34 @@ Yang membuatnya bergejala: `DepartmentFilterOptions` sengaja MENGGANTI anggota g
 - **Sumber diresolusi, bukan diingat.** Menyebut ADR dari ingatan tanpa membuka berkasnya = `ragu`
   (brief ditampilkan, tunggu persetujuan). Prosedur lengkap: `/start-task` langkah 0.
 
+## Linear: status issue mengikuti keadaan ERP (2026-09-29)
+
+Backlog tim ada di Linear `bharata-erp`, tim `BHA`. Akses dari agent lewat GraphQL
+(`https://api.linear.app/graphql`, header `Authorization: <LINEAR_API_KEY>`); tidak ada MCP Linear.
+
+| Status | Artinya | Yang memindahkan |
+|---|---|---|
+| Backlog / Todo | belum ada branch | manusia |
+| In Progress | branch `<domain>/bha-<n>-<slug>` sudah ada | otomatis (integrasi GitHub) |
+| In Review | PR terbuka | otomatis |
+| **Menunggu Adopsi** | kode merged; sisa deploy prod (manusia) dan fitur benar-benar dipakai | otomatis saat merge |
+| Done | terpasang di prod **dan terbukti dipakai** (data > 0 / proses bisnis jalan) | manusia, dengan bukti |
+
+- ⛔ **Nomor `bha-<n>` WAJIB ada di nama branch** (dan judul PR `[BHA-<n>]`). Hanya itu yang membuat
+  integrasi GitHub menyambungkan PR ke issue; tanpanya status diubah tangan lalu basi. Diukur
+  2026-09-29: 22 dari 100 PR bip-erp dan 14 dari 100 PR erp-frontend yang menyebutnya. `/brief`
+  mengisi field `Issue` dan menaruh nomornya di slug; PR tangan wajib meniru polanya.
+- ⛔ **Merge BUKAN Done.** Otomasi "PR merged" diarahkan ke Menunggu Adopsi, bukan Done (sebelumnya
+  Done). Pada audit 2026-09-29 status meleset ke dua arah: BHA-249 Done tanpa satu baris kode,
+  BHA-250 tertulis "Belum Mulai" padahal 127 sesi live sudah memakainya, dan BHA-22 (insentif)
+  kodenya lengkap di prod dengan 0 snapshot. "Kode selesai" dan "dipakai" pemiliknya berbeda (dev vs
+  pengguna/pemilik proses); satu status untuk keduanya menyembunyikan siapa yang ditunggu.
+- **PIC ditulis di deskripsi (`**PIC:** ...`), bukan kolom assignee**: sebagian besar dev belum jadi
+  anggota workspace Linear.
+- ⚠️ **Deskripsi hasil audit bisa basi dan audit bisa salah baca.** "Rute tak ditemukan" di banyak
+  issue lahir dari lupa bahwa gateway membuang prefix `/api/<module>`; MyBharata dibaca dari `main`
+  padahal rilis store dari `dev`. Sebelum memindahkan status, ukur ke `origin/main` (MyBharata:
+  `origin/dev`) dan data prod, lalu tulis bagian `### Verifikasi <tanggal>` di deskripsi.
+
 ## Bahasa
 - Balasan AI ke user & dokumentasi: **Bahasa Indonesia**; istilah teknis lazim English biarkan English.

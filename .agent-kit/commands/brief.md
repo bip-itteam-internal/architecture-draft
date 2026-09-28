@@ -59,6 +59,15 @@ grounding pada satu dua pencarian yang mengisi bagian Konteks.
    `/kerjakan`. Jalur `yakin` melewati manusia sepenuhnya, jadi ia satu-satunya tempat sumber
    karangan tidak akan tertangkap siapa pun.
 
+4c. **`Issue`**: nomor issue Linear (`BHA-<n>`) yang dikerjakan brief ini. Ambil dari teks user;
+   bila tak disebut dan `LINEAR_API_KEY` tersedia, cari satu kali lewat GraphQL (judul mirip,
+   state belum selesai) lalu **tampilkan** kandidatnya, jangan memilih diam-diam. Tak ada → tulis
+   `tidak ada`. Bila ada, **slug WAJIB diawali `bha-<n>-`** (mis. `bha-249-dashboard-integrasi`):
+   slug menjadi nama branch (`<domain>/<slug>`), dan integrasi GitHub di Linear hanya menyambungkan
+   PR ke issue lewat nomor itu. Tanpanya issue tak pernah berpindah status sendiri, lalu diubah
+   tangan atau lewat audit dan basi; diukur 2026-09-29, cuma 22 dari 100 PR bip-erp dan 14 dari
+   100 PR erp-frontend yang menyebut `BHA-`. Arti tiap status ada di `team-memory.md` § Linear.
+
 5. **Kriteria lolos**: minimal satu yang bisa dibuktikan **mesin** (test bernama, perintah yang
    harus hijau, `file:line` yang harus berubah) dan minimal satu dari sudut **orang yang
    memakainya** ("di layar X, setelah Y, terlihat Z"). Kriteria "kodenya bagus" ditolak.
