@@ -7,8 +7,9 @@
   ada — `internal/aiclient/` (klien tipis OpenAI-compatible, `client.go`+`types.go`+11 test) dan
   `cmd/probe/main.go` (CLI verifikasi manual), 536 baris. Baru klien AI dasar (T1 di papan kerja
   `ANALISA - Asisten AI Lintas Modul`); **belum ada Fiber/gateway route, RBAC, maupun endpoint
-  modul apa pun** (T2 dst). Branch `feat/assistant-klien-ai`, PR belum dibuat/di-merge ke
-  `main` — status keseluruhan tetap 🟡 Konsep sampai lebih banyak T-task selesai.
+  modul apa pun** (T2 dst). Merged 2026-09-29
+  ([bip-erp#2150](https://github.com/bip-itteam-internal/bip-erp/pull/2150)) — status
+  keseluruhan tetap 🟡 Konsep sampai lebih banyak T-task selesai.
   **Frontend: banner pengumuman "Copilot" + halaman placeholder `/copilot`** — murni pengumuman
   "Segera Hadir", **tidak memanggil backend apa pun**. Nama fitur yang diputuskan: **Copilot**.
   Sempat berupa menu di puncak sidebar

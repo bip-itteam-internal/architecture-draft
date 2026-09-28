@@ -34,7 +34,7 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
   `https://code.bharatainternasional.com/v1`** — divalidasi langsung 2026-09-28, lihat
   [[ADR - 0132]] §Context & §2a. Kode: `bip-erp/services/assistant/internal/aiclient/`
   (`client.go`+`types.go`, 11 test lolos dua kali jalan) + `cmd/probe/main.go`, branch
-  `feat/assistant-klien-ai` (536 baris, 6 commit), PR belum dibuat.
+  `feat/assistant-klien-ai`, merged 2026-09-29 (bip-erp#2150).
   - **Tujuan**: satu-satunya jalan masuk ke model untuk seluruh task di bawah.
   - **Bergantung**: tidak ada.
   - **Baca dulu**: [[ADR - 0132]] §2a untuk ketentuan wajib klien (`stream:false` ditanam mati,
