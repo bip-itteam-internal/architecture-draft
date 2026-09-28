@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-28",
-  "jumlah_dokumen": 498,
+  "jumlah_dokumen": 499,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1572,20 +1572,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "8f264656fbea43e54da68ffddcc006bc4470b6af356405a4325a16cbd2e235e8",
+      "hash": "3239cb4886388d3203534f7d8a96f28ac041af9a8201b9d83ac0d0b1a0fd246b",
       "ukuran_kb": 574.6,
-      "ringkasan": "Menjawab: apa stack dan struktur portal web ERP/HRIS (erp-frontend, \"One Bharata\"), bagaimana login, token refresh, SSO Identity Provider, dan role gating sidebar lewat system_roles bekerja, serta bagaimana menu dikelompokkan (Pengaturan HRGA terpusat, multi-perusahaan, rekrutmen lintas perusahaan). Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts/ChartContainer, dan daftar modul yang sudah maupun belum ada di web.",
+      "ringkasan": "Menjawab: apa saja modul dan fitur portal web ERP/HRIS (One Bharata, erp-frontend), bagaimana login, SSO Identity Provider, dan gating menu berdasarkan system_roles/paket izin bekerja, serta bagaimana sidebar dan Pengaturan HRGA dikelompokkan. Juga menjelaskan dukungan multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan) serta konvensi data-fetching TanStack Query dan konvensi bagan Recharts/ChartContainer.",
       "kata_kunci": [
         "web ERP",
         "erp-frontend",
-        "hris-dashboard",
+        "One Bharata",
         "SSO",
         "system_roles",
-        "role gating",
         "sidebar menu",
+        "multi-tenant",
         "TanStack Query",
         "Recharts",
-        "multi-tenant"
+        "Pengaturan HRGA"
       ]
     },
     {
@@ -2103,10 +2103,7 @@
       "publik": true,
       "tautan": [
         "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
-        "ANALISA -\n  Asisten AI Lintas Modul",
         "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
-        "ADR - 0132 Asisten AI Tanya-Jawab\n  Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
-        "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per\n  Service Bukan Terpusat",
         "CORE - API Master Gateway",
         "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
         "Microservices - Marketing Analytics Service",
@@ -2116,25 +2113,27 @@
         "Microservices - Vault MCP Service",
         "Sales - Veo (Gemini) Automation Layer",
         "Microservices - Calendar Service",
+        "ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai",
+        "Microservices - Notification Service",
         "ANALISA - Asisten AI Lintas Modul",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "CORE - SSO Flow",
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "4f13df4492e9a7cefd84b89ac3de12f9902ebe5d512c08891f21b79769832522",
-      "ukuran_kb": 19.8,
-      "ringkasan": "Menjawab: bagaimana asisten AI tanya-jawab (Copilot) di Web ERP dirancang, mengapa ia memanggil endpoint lewat gateway dengan JWT pemakai alih-alih jalur internal, mengapa dilarang berhitung sendiri, dan penjaga apa yang mencegah angka karangan. Juga menjelaskan hubungannya dengan ADR 0058, 0120, dan 0132 (cakupan lintas modul, RBAC Supervisor/Direktur/IT), stack klien AI OpenAI-compatible, batas gateway 30 detik tanpa streaming, serta hal yang belum diputuskan.",
+      "hash": "3bd96426de8aee596400f287f439321416b4676f1b665878ebdaa26f046f6ca8",
+      "ukuran_kb": 21.7,
+      "ringkasan": "Menjawab: bagaimana asisten AI tanya-jawab (Copilot) di Web ERP dirancang, kenapa ia merutekan pertanyaan ke endpoint yang sudah ada lewat gateway dengan JWT pemakai alih-alih berhitung sendiri, dan penjaga apa yang mencegah angka karangan. Juga menjelaskan klien AI OpenAI-compatible ke code.bharatainternasional.com, siapa yang boleh memakainya, batasan gateway 30 detik/stream, rencana Jadwal Tugas, serta hubungannya dengan ADR 0058, 0120, dan 0132.",
       "kata_kunci": [
         "assistant service",
-        "asisten AI",
         "Copilot",
-        "chatbot",
+        "asisten AI",
+        "AI assistant",
         "tool calling",
-        "JWT pemakai",
+        "JWT",
         "gateway",
         "LLM",
-        "tanya-jawab lintas modul",
+        "tanya-jawab",
         "ADR 0132"
       ]
     },
@@ -8240,6 +8239,39 @@
         "ChartContainer Recharts",
         "tabel bar line",
         "PDF laporan marketing"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai.md",
+      "judul": "ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-09-28, kode belum ada. Disetujui pemilik proposal lewat `/analisa-kebutuhan`. Dikerjakan **sesudah** fondasi [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] (klien AI, service, gate akses, minimal satu modul percontohan) terbukti jalan — keputusan eksplisit, bukan ditunda diam-diam.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
+        "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
+        "Microservices - Calendar Service",
+        "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "Microservices - Form Builder Service",
+        "Microservices - Notification Service",
+        "Microservices - Assistant Service"
+      ],
+      "hash": "f832c313c5c257b6d3e11de787c50fcbf7175cb5f755c14454d49571dd4e569f",
+      "ukuran_kb": 11.1,
+      "ringkasan": "Menjawab: bagaimana fitur Jadwal Tugas (scheduled tasks) Copilot bekerja, kenapa saat jatuh tempo hanya mengirim notifikasi pengingat bertautan alih-alih menjalankan pertanyaan otomatis, dan masalah identitas/JWT kedaluwarsa apa yang membuat eksekusi otomatis ditunda. Juga menjelaskan siapa boleh membuat jadwal, isi tugas dan frekuensinya, pola penjadwal cron idempoten, kategori inbox baru, serta fitur PRD asli yang sengaja dibuang.",
+      "kata_kunci": [
+        "jadwal tugas",
+        "scheduled tasks",
+        "Copilot",
+        "pengingat",
+        "reminder",
+        "notifikasi",
+        "cron",
+        "JWT",
+        "identitas service-to-service",
+        "ADR 0135"
       ]
     },
     {
@@ -16157,24 +16189,26 @@
         "Microservices - Assistant\n    Service",
         "CORE - API Master Gateway",
         "ADR - 0120",
+        "ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai",
+        "Microservices - Notification Service",
         "REF - Kepemilikan Data",
         "CORE - RBAC dan Permission Set",
         "CORE - Kapabilitas AI dan Machine Learning"
       ],
-      "hash": "5e3e3eebd818212c57ed598d797914f436596863dbd5f4e5ff30f3535c51ece8",
-      "ukuran_kb": 12.6,
-      "ringkasan": "Menjawab: task apa saja yang perlu dikerjakan untuk membangun asisten AI lintas modul (T1 sampai T13-an), urutan dan ketergantungan antar-task, serta kriteria selesai konkret tiap task mulai dari klien AI, skeleton service, gate RBAC, sampai pemilihan modul percontohan. Juga mencatat keputusan manusia yang masih ditunggu sebelum sebagian task bisa dianggap tuntas, seperti akses Corporate Secretary di gate RBAC dan persetujuan tertulis Direksi untuk data yang keluar lewat relay AI eksternal.",
+      "hash": "2796e3c7558a7d64a9a2f7c68f7cd06557d4e7551b5a567bbcd9198b16222a58",
+      "ukuran_kb": 15.2,
+      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk membangun asisten AI lintas modul (Copilot), dalam urutan apa, dengan dependensi, bacaan awal, dan kriteria selesai masing-masing. Juga menjawab keputusan manusia apa yang masih menjadi prasyarat (akses Corporate Secretary, persetujuan Direksi untuk data keluar lewat relay AI), dan modul percontohan mana yang dipertimbangkan beserta cara memverifikasi gerbang endpoint-nya.",
       "kata_kunci": [
-        "ANALISA",
-        "asisten AI lintas modul",
+        "analisa kebutuhan",
+        "papan kerja",
         "task list",
-        "backlog implementasi",
-        "T1 T2 T3",
-        "RBAC",
-        "ADR-0132",
+        "asisten AI",
+        "Copilot",
+        "lintas modul",
+        "gate RBAC",
         "modul percontohan",
-        "prasyarat keputusan Direktur",
-        "roadmap assistant service"
+        "Lapisan Data Bisnis",
+        "ADR 0132"
       ]
     },
     {
