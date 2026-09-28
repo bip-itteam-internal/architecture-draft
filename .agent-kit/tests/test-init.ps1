@@ -165,6 +165,18 @@ try {
   $ppLinear = Get-Content (Join-Path $kitRoot 'hooks/githooks/pre-push') -Raw -Encoding UTF8
   Check ($ppLinear.Contains("grep -qi 'bha-[0-9]'") -and $ppLinear.Contains('PERINGATAN: branch')) 'pre-push: peringatan branch tanpa bha-<n> (tak menolak)'
 
+  # kit 1.32.0: /linear-cek. Yang dipatok: skrip tersalin init dan TERPARSE (PS 5.1 pernah
+  # gagal diam-diam karena [string]$Tim dan $tim adalah variabel yang sama), --terapkan hanya
+  # menyentuh R1/R2 (tak pernah Done), dan command melarang memindah ke Done.
+  $lvPath = Join-Path $claude 'hooks/linear-verifikasi.ps1'
+  Check (Test-Path $lvPath) 'hooks/linear-verifikasi.ps1 tersalin init'
+  $lvErr = $null; [void][System.Management.Automation.Language.Parser]::ParseFile($lvPath, [ref]$null, [ref]$lvErr)
+  Check ($lvErr.Count -eq 0) 'linear-verifikasi.ps1 terparse tanpa galat'
+  $lvSrc = Get-Content $lvPath -Raw -Encoding UTF8
+  Check ($lvSrc.Contains("`$_.Aturan -in @('R1', 'R2')") -and -not $lvSrc.Contains("`$state['Done']")) 'linear-verifikasi: -Terapkan hanya R1/R2, tak menyentuh Done'
+  $lcMd = Get-Content (Join-Path $claude 'commands/linear-cek.md') -Raw -Encoding UTF8
+  Check ($lcMd.Contains('Jangan memindahkan issue ke **Done**')) 'linear-cek.md melarang memindah ke Done'
+
   # --- Sambungan antar-berkas, temuan review akhir 1.28.0 ---
   # Kelas yang sama untuk kelimanya: tiap berkas benar sendiri-sendiri, yang salah sambungannya.
 

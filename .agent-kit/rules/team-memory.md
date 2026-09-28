@@ -314,6 +314,10 @@ Backlog tim ada di Linear `bharata-erp`, tim `BHA`. Akses dari agent lewat Graph
   BHA-250 tertulis "Belum Mulai" padahal 127 sesi live sudah memakainya, dan BHA-22 (insentif)
   kodenya lengkap di prod dengan 0 snapshot. "Kode selesai" dan "dipakai" pemiliknya berbeda (dev vs
   pengguna/pemilik proses); satu status untuk keduanya menyembunyikan siapa yang ditunggu.
+- **`/linear-cek`** (kit ≥ 1.32.0) mencocokkan status dengan PR tertaut dan menulis laporan ke
+  `.task-plans/linear/`; `--terapkan` hanya memindahkan yang buktinya pasti (PR terbuka → In Review,
+  semua PR merged → Menunggu Adopsi), tak pernah ke Done. Run pertama 2026-09-29: **82 dari 105**
+  issue Done tak punya satu pun PR tertaut, jadi Done di backlog lama umumnya tak terverifikasi.
 - **PIC ditulis di deskripsi (`**PIC:** ...`), bukan kolom assignee**: sebagian besar dev belum jadi
   anggota workspace Linear.
 - ⚠️ **Deskripsi hasil audit bisa basi dan audit bisa salah baca.** "Rute tak ditemukan" di banyak
