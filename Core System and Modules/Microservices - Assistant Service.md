@@ -5,14 +5,15 @@
 - **Status**: 🟡 **Konsep**, 2026-08-29. ~~0 kode, dikonfirmasi ulang lewat `git grep` langsung ke
   kode 2026-09-28.~~ **T1 sekarang punya kode nyata, 2026-09-28**: `bip-erp/services/assistant/`
   ada — `internal/aiclient/` (klien tipis OpenAI-compatible, `client.go`+`types.go`+11 test) dan
-  `cmd/probe/main.go` (CLI verifikasi manual), 536 baris. Baru klien AI dasar (T1 di [[ANALISA -
-  Asisten AI Lintas Modul]]); **belum ada Fiber/gateway route, RBAC, maupun endpoint modul apa
-  pun** (T2 dst). Branch `feat/assistant-klien-ai`, PR belum dibuat/di-merge ke `main` — status
-  keseluruhan tetap 🟡 Konsep sampai lebih banyak T-task selesai.
-  **Frontend: menu "Copilot" + halaman placeholder, 2026-09-28** (erp-frontend branch
-  `feat/copilot-placeholder`, belum merge) — murni pengumuman "Segera Hadir" di `/copilot`,
-  **tidak memanggil backend apa pun**. Nama menu yang diputuskan: **Copilot**. Lihat § Persona
-  untuk gate interimnya yang lebih sempit dari ADR-0132 §3.
+  `cmd/probe/main.go` (CLI verifikasi manual), 536 baris. Baru klien AI dasar (T1 di papan kerja
+  `ANALISA - Asisten AI Lintas Modul`); **belum ada Fiber/gateway route, RBAC, maupun endpoint
+  modul apa pun** (T2 dst). Branch `feat/assistant-klien-ai`, PR belum dibuat/di-merge ke
+  `main` — status keseluruhan tetap 🟡 Konsep sampai lebih banyak T-task selesai.
+  **Frontend: menu "Copilot" + halaman placeholder, merged 2026-09-28**
+  ([erp-frontend#1788](https://github.com/bip-itteam-internal/erp-frontend/pull/1788)) — murni
+  pengumuman "Segera Hadir" di `/copilot`, **tidak memanggil backend apa pun**. Nama menu yang
+  diputuskan: **Copilot**. Lihat § Persona untuk gate interimnya yang lebih sempit dari ADR-0132 §3.
+  **Jadwal Tugas** diputuskan sebagai pengingat, bukan eksekusi otomatis — lihat § Jadwal Tugas.
   ⚠️ **SEBAGIAN DIGANTIKAN 2026-09-22** oleh [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]]
   **untuk kasus laporan Marketing terjadwal saja**: asisten analisa marketing diputuskan berdiri
   **di dalam service pemilik data lewat klien tipis `shared-library/ai`**, bukan sebagai service
@@ -20,8 +21,9 @@
   di kode** — diverifikasi `git grep` menyeluruh 2026-09-28, nol hasil di luar false-positive.
   Ketegangan dengan ADR 0058 §2 yang dicatat dokumen ini (§ Dua ketegangan terbuka) **sudah
   dijawab** di sana, tapi HANYA untuk kasus satu domain (Marketing) — untuk kasus tanya-jawab
-  bebas **lintas modul**, ketegangan itu **dijawab beda** oleh [[ADR - 0132 Asisten AI Tanya-Jawab
-  Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] (2026-09-28): asisten lintas
+  bebas **lintas modul**, ketegangan itu **dijawab beda** oleh
+  [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]]
+  (2026-09-28): asisten lintas
   modul secara struktural **tetap jadi service terpisah** (`services/assistant/`, sesuai rencana
   di dokumen ini), karena tidak ada satu service pemilik untuk semua modul sekaligus.
   ⚠️ **"Tanya-jawab bebas ditunda sampai template terbukti dipakai" (2026-09-22) DIPUTUSKAN TIDAK
@@ -33,8 +35,9 @@
   pintu), empat penjaga anti angka karangan, dan § Temuan gateway soal batas 30 detik — semuanya
   jadi dasar ADR-0132.
 - **Stack**: Go, `net/http` langsung (klien tipis hand-roll, BUKAN SDK Anthropic — divalidasi
-  2026-09-28, lihat [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per
-  Service Bukan Terpusat]] §Context & §2a) ke `https://code.bharatainternasional.com/v1`
+  2026-09-28, lihat
+  [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]]
+  §Context & §2a) ke `https://code.bharatainternasional.com/v1`
   (OpenAI-compatible, bukan format native Anthropic), model dipatok literal `cc/claude-*` +
   MongoDB untuk riwayat percakapan.
   ✅ **Tool/function-calling terbukti didukung** endpoint ini (probe 2026-09-28: `tool_calls` +
@@ -167,6 +170,28 @@ apa pun karena tak memuat data (menu bukan keamanan, ADR 0031).
 - **Tujuan**: mendapatkan satu angka tanpa harus tahu lebih dulu layar mana yang memuatnya.
 - **Pain point**: angkanya ada, tetapi tersebar di belasan layar.
 - **Aksi utama**: bertanya, membaca jawabannya, lalu mengklik tautannya untuk memeriksa sendiri di layar aslinya.
+
+## Jadwal Tugas (🟡 diusulkan)
+
+Keputusan dan alasannya di [[ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai]]. Bagian ini menjelaskan cara kerjanya. Kode belum ada, dan **tidak bisa dikerjakan sebelum Tanya Jawab bisa menjawab**, karena tautan pengingat menunjuk ke sana.
+
+```
+buat jadwal (nama + instruksi/template + frekuensi + jam)      @ Copilot > Jadwal Tugas
+        │
+cron assistant-service (Asia/Jakarta) ── slot jatuh tempo? ── klaim atomik (tugas, slot) unik
+        │
+kirim pengingat: inbox + push, kategori baru, tautan pre-fill  ── TANPA panggilan AI / data
+        │
+pemakai klik ── Tanya Jawab terbuka berisi instruksi ── jalan dengan JWT HIDUP miliknya
+        │                                                     (gate ADR-0132 §3 dinilai ulang)
+riwayat: kapan terkirim, kapan dibuka
+```
+
+- **Tidak ada eksekusi tanpa kehadiran pemakai.** Itu satu-satunya alasan fitur ini tak butuh mekanisme identitas baru: cron di kode hari ini memanggil lewat `InternalRequest(nil, …)` tanpa header RBAC apa pun, dan perhitungan izin efektif cuma hidup privat di titik penerbitan JWT employee-service (rincian di ADR-0135 § Context).
+- **Isi tugas**: nama, instruksi atau template Copilot, frekuensi (harian, hari kerja, mingguan+hari, bulanan+tanggal) + jam. Tanpa mode izin, pilihan model, atau project.
+- **Biaya AI nol sampai pemakai membuka tautan**; jadwal yang diabaikan tak memakan token.
+- ⚠️ **Deploy**: kategori inbox baru → `notification-service` naik LEBIH DULU, baru `assistant-service` (lihat [[Microservices - Notification Service]]).
+- **TBD**: nama kategori inbox, batas jumlah tugas per orang dan interval minimum (angka PRD claude.ai tak dipakai), serta apakah pengingat berikutnya ditahan bila yang sebelumnya belum dibuka.
 
 ## Di luar lingkup
 

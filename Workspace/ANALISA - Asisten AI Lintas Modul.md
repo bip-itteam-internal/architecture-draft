@@ -180,6 +180,43 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     Direktur LOLOS, IT LOLOS, Corporate Secretary sesuai keputusan § Prasyarat (lolos ATAU
     ditolak — yang penting ada test yang mengunci hasilnya, jangan dibiarkan tak diuji).
 
+## Jadwal Tugas ([[ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai]])
+
+⛔ **Semua task di bawah bergantung Tanya Jawab sudah bisa menjawab** (minimal T2, T3, T5, T6).
+Tautan pengingat menunjuk ke Tanya Jawab; membangunnya lebih dulu menghasilkan notifikasi ke
+halaman yang tak bisa apa-apa. Keputusan user 2026-09-28: tunda sampai fondasi terbukti.
+
+- [ ] **T14 — Koleksi jadwal + CRUD di `services/assistant`.**
+  - **Bergantung**: T2, T3.
+  - **Baca dulu**: ADR-0135 §2-§3; `services/form-builder/form_handlers.go:35-42` — bug
+    `recurrence` yang tak pernah terikat ke struct request (3 hari "live" tak bisa dipakai).
+  - **Kriteria selesai**: buat/ubah/jeda/hapus jadwal lewat gateway `/api/assistant/...` dengan
+    akun ber-gate; field jadwal TERBUKTI terikat dari body JSON (test `app.Test` handler, bukan cuma
+    unit domain); akun tanpa gate ditolak.
+- [ ] **T15 — Penjadwal pengingat idempoten.**
+  - **Bergantung**: T14.
+  - **Baca dulu**: `services/form-builder/cron.go` (pola buka periode per jam, idempoten);
+    `services/calendar/obligation_cron.go` (`cron.Recover`); `services/integration/internal/worker/lock.go`
+    (kunci terdistribusi — hanya bila lebih dari satu replika).
+  - **Kriteria selesai**: satu slot = paling banyak satu pengingat (indeks unik tugas+slot, ada test
+    yang menjalankan slot sama dua kali); zona Asia/Jakarta; TIDAK ada panggilan AI maupun endpoint
+    data di jalur ini (dikunci test).
+- [ ] **T16 — Kategori inbox + tautan pre-fill.**
+  - **Bergantung**: T15, dan layar Tanya Jawab (T8/T9).
+  - **Baca dulu**: `shared-library/models/notification/models.go` (`InboxCategories`, komentar
+    urutan deploy); [[Microservices - Notification Service]].
+  - **Kriteria selesai**: satu notifikasi sungguhan tiba di inbox + push di dev; tautannya membuka
+    Tanya Jawab dengan instruksi terisi; urutan deploy (notification-service dulu) tercatat di
+    rencana.
+- [ ] **T17 — Layar Jadwal Tugas di erp-frontend.**
+  - **Bergantung**: T14, T16.
+  - **Baca dulu**: `rules/ui-checklist.md` §2a (Sheet berangka tiga — form Task Baru);
+    `features/form-builder/components/recurrence-fields.tsx` sebagai acuan BENTUK saja (ia tak punya
+    harian maupun jam, jangan dipakai ulang apa adanya); mockup Contoh 8 sesi 2026-09-28.
+  - **Kriteria selesai**: daftar jadwal + form Sheet (nama, instruksi/template, frekuensi, jam,
+    notifikasi) + riwayat terkirim/dibuka; sub-menu Copilot "Tanya Jawab"/"Jadwal Tugas" (ingat
+    `ambangSarang: 2`); i18n id+en; satu perjalanan utuh sebagai orang di dev.
+
 ## Terkait
 
 - [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]]
