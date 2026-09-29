@@ -149,7 +149,12 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     gerbang lazim berada satu lapis di atas yang tampak jelas, lihat gotcha "GERBANG LAZIM
     BERADA SATU LAPIS DI ATAS" di rules tim).
 
-- [ ] **T5 — Endpoint baca baru ("Lapisan Data Bisnis") di modul percontohan pertama.**
+- [x] **T5 — Endpoint baca baru ("Lapisan Data Bisnis") di modul percontohan pertama. SELESAI
+  2026-09-29** (bip-erp #2160; naik di dev dan prod). Terbukti lewat gateway DEV dengan akun
+  sungguhan pada periode berdata (2026-04 dan 2026-02; data telat dev hanya padat sampai April):
+  Diki → hanya Manufaktur, Seno → hanya HR+GA, Wirawan → hanya Kesekretariatan, Fathur → 403;
+  `late_count` tiap orang cocok **100%** dengan `/internal/late-recap` (9/9, 9/9, 1/1; 23/23,
+  3/3, 1/1). PROD: biner memuat rute, healthy; panggilan ber-JWT di prod belum dicoba.
   - **Kemajuan 2026-09-29**: `GET /api/attendance/rekap-telat/tim` di branch
     `feat/attendance-rekap-telat-tim` ([[API - Attendance Service]]). Fungsi yang dipakai ULANG:
     `rentangPeriodeTelat`, `kriteriaTelatDihitung`, `pipelineRekapTelat` (diberi parameter
