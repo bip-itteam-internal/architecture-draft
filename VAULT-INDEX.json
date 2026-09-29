@@ -2118,20 +2118,20 @@
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "28a685bb6bae46497ae2f695b4389ca76986fabee738ea64ddaf7909af9f72f7",
-      "ukuran_kb": 24.8,
-      "ringkasan": "Menjawab: bagaimana asisten AI Copilot di Web ERP menjawab pertanyaan angka bisnis dengan merutekan ke endpoint yang sudah menghitungnya, memanggil lewat gateway dengan JWT pemakai, siapa yang boleh memakainya (gate RequireCopilot: supervisor departemen mana pun, Direktur, Corporate Secretary, IT), bagaimana halaman /copilot bertanya ke GET /api/assistant/akses dan membalas 404 untuk yang tak berhak, serta kenapa banner tetap khusus Tech Development. Juga menjawab kerangka service port 6991, batas gateway 30 detik tanpa stream, penjaga anti angka karangan, Jadwal Tugas, syarat .env sebelum deploy, dan keputusan yang masih TBD.",
+      "hash": "cede1c1e98d557538bc020095f908211423ca031fe769a1c46868c3de8ce1af2",
+      "ukuran_kb": 26.9,
+      "ringkasan": "Menjawab: bagaimana asisten AI Copilot menjawab pertanyaan angka bisnis lewat POST /api/assistant/tanya dengan tool yang memanggil endpoint lewat gateway memakai JWT penanya (tool pertama rekap_telat_tim), bagaimana identitas karyawan disamarkan menjadi token Karyawan-N sebelum dikirim ke relay AI beserta penjaga dan batasnya, siapa yang boleh memakai (gate RequireCopilot, halaman /copilot via /akses), serta pengantaran jawaban sekaligus tanpa stream dengan tenggat 25 detik. Juga menjawab kerangka service, penjaga anti angka karangan, Jadwal Tugas, dan keputusan yang masih TBD.",
       "kata_kunci": [
         "asisten AI",
         "Copilot",
         "assistant-service",
+        "/api/assistant/tanya",
+        "rekap_telat_tim",
+        "samaran identitas",
+        "tool calling",
         "RequireCopilot",
-        "/api/assistant/akses",
-        "halaman /copilot",
-        "useAksesCopilot",
-        "Corporate Secretary",
-        "AI assistant",
-        "Jadwal Tugas"
+        "relay AI",
+        "tanpa stream"
       ]
     },
     {
@@ -16500,16 +16500,16 @@
         "CORE - RBAC dan Permission Set",
         "CORE - Kapabilitas AI dan Machine Learning"
       ],
-      "hash": "10915254a42181241749aca5041ae1ce37b308f8cd751e6004b89043e60a6a7d",
-      "ukuran_kb": 21.3,
-      "ringkasan": "Menjawab: apa urutan pekerjaan untuk membangun asisten AI tanya-jawab lintas modul (T1 klien AI, T2 kerangka service, T3 gate Copilot, T4 attendance sebagai modul percontohan dengan hasil ukur gerbang endpoint, T5 endpoint rekap telat tim untuk supervisor yang sudah naik dan cocok dengan rekap HR; berikutnya T6 tool dan uji end-to-end sampai T13, serta T14-T17 Jadwal Tugas), kenapa marketing-analytics gugur sementara (issue #2008), dependensi dan kriteria selesai tiap task, serta prasyarat persetujuan Direksi untuk data yang keluar lewat relay AI.",
+      "hash": "ec53f3556afe5871b5d2b830be3a54cbcc643d853c46ae4cc1a2bedd4aa82b35",
+      "ukuran_kb": 21.8,
+      "ringkasan": "Menjawab: apa urutan pekerjaan untuk membangun asisten AI tanya-jawab lintas modul (T1 sampai T5 selesai, T6 POST /tanya dengan tool rekap_telat_tim dan samaran identitas sedang dikerjakan, T7-T8 dilewati dulu karena modul kedua belum diputuskan, lanjut T9 panel chat; T14-T17 Jadwal Tugas), dependensi dan kriteria selesai tiap task, kenapa marketing-analytics gugur sementara (issue #2008), serta prasyarat persetujuan Direksi untuk data yang keluar lewat relay AI.",
       "kata_kunci": [
         "papan kerja asisten AI",
         "daftar task Copilot",
+        "T6 tanya",
+        "samaran identitas",
+        "panel chat T9",
         "modul percontohan attendance",
-        "rekap telat tim",
-        "T5 selesai",
-        "gate RBAC asisten",
         "persetujuan Direksi relay",
         "Jadwal Tugas",
         "task list AI assistant"
