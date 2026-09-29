@@ -54,7 +54,10 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     (payload sama, endpoint sama), dengan retry transien dan `stream:false` ditanam di kode
     (bukan opsional), token usage tercatat di log terstruktur.
 
-- [ ] **T2 — Skeleton `services/assistant/`.**
+- [x] **T2 — Skeleton `services/assistant/`. SELESAI di DEV 2026-09-29** (bip-erp #2151):
+  lewat gateway dev dengan JWT sungguhan `GET /api/assistant/health` dan `/api/assistant/` → 200
+  `{"message":"ok"}`, kontrol `/api/assistant/tidakada` → 404. **PROD naik 2026-09-29** (manusia):
+  healthy, env gateway `http://assistant-service:6991`; panggilan ber-JWT lewat gateway prod belum dicoba.
   - **Tujuan**: rumah orkestrator. Tidak menyimpan data bisnis, tidak baca database service lain.
   - **Bergantung**: T1 (butuh klien AI untuk diuji lewat rute ini).
   - **Baca dulu**: pola boilerplate `services/.template`. [[CORE - API Master Gateway]] soal cara
@@ -68,7 +71,11 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     (Fiber, `ValidateGateway`, `GET /` dan `GET /health`, tanpa Mongo, tanpa rute AI), port
     `6991`, modul `assistant` di map gateway + `/api/assistant` di noCacheRoutes, blok
     `assistant-service` di `docker-compose.yml`. **Sengaja TIDAK didaftarkan di `deploy.yml`**
-    (deploy dev manual). Checkbox tetap terbuka sampai kriteria di atas terbukti lewat gateway dev.
+    ⚠️ Ternyata dev TETAP ter-deploy otomatis oleh Harness `bip_erp_deploy_dev` begitu merge
+    (bukan deploy.yml), dan karena `.env` dev belum memuat `ASSISTANT_SERVICE_PORT` container
+    sempat naik dengan `PORT=` kosong dan gateway menunjuk `http://assistant-service:`. Port
+    ditambahkan ke `.env` dev lalu kedua container dibuat ulang (`--no-build --force-recreate`).
+    Service baru berikutnya: isi `.env` dev SEBELUM merge.
 
 - [ ] **T3 — Gate RBAC baru "Supervisor departemen mana pun ATAU Direktur ATAU IT".**
   - **Tujuan**: batasi menu asisten sesuai keputusan [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §3.

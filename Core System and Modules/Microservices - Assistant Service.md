@@ -12,7 +12,9 @@
   keseluruhan tetap 🟡 Konsep sampai lebih banyak T-task selesai.
   **T2 kerangka service ditulis 2026-09-29** (branch `feat/assistant-skeleton`): Fiber +
   `ValidateGateway`, hanya `GET /` dan `GET /health` (`{"message":"ok"}`), tanpa database dan
-  tanpa rute AI. Belum terbukti lewat gateway dev.
+  tanpa rute AI. Merged (bip-erp #2151) dan **terbukti di DEV 2026-09-29** lewat gateway dengan
+  JWT sungguhan (`/api/assistant/health` → 200). PROD dinaikkan manusia 2026-09-29 (healthy,
+  env gateway benar; panggilan ber-JWT lewat gateway prod belum dicoba).
   **Frontend: banner pengumuman "Copilot" + halaman placeholder `/copilot`** — murni pengumuman
   "Segera Hadir", **tidak memanggil backend apa pun**. Nama fitur yang diputuskan: **Copilot**.
   Sempat berupa menu di puncak sidebar
@@ -53,8 +55,9 @@
 - **Path di repo**: `bip-erp/services/assistant/` — `internal/aiclient/` dan `cmd/probe/` (T1);
   `main.go` + `main_test.go` + `Dockerfile` (T2, mengikuti pola `services/.template` tanpa Mongo).
 - **Port & deploy**: `ASSISTANT_SERVICE_PORT=6991`, container `Assistant-Service`
-  (`docker-compose.yml`), healthcheck ber-header `BIP-Gateway-ID`. **Tidak ada di `deploy.yml`**,
-  jadi merge tidak men-deploy apa pun. ⚠️ `.env` server wajib memuat `ASSISTANT_SERVICE_PORT`
+  (`docker-compose.yml`), healthcheck ber-header `BIP-Gateway-ID`. Tidak ada di `deploy.yml`,
+  tetapi **DEV tetap ter-deploy otomatis oleh Harness `bip_erp_deploy_dev`** saat merge (terjadi
+  2026-09-29); PROD manual. ⚠️ `.env` server wajib memuat `ASSISTANT_SERVICE_PORT`
   **sebelum** `api-gateway` di-`--force-recreate`: tanpanya `ASSISTANT_MODULE_URL` menjadi
   `http://assistant-service:` (tak kosong, jadi gateway tidak panic) dan `/api/assistant/*`
   membalas 502 tanpa petunjuk.
