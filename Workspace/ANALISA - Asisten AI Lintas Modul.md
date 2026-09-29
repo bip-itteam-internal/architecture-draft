@@ -150,6 +150,12 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     BERADA SATU LAPIS DI ATAS" di rules tim).
 
 - [ ] **T5 — Endpoint baca baru ("Lapisan Data Bisnis") di modul percontohan pertama.**
+  - **Kemajuan 2026-09-29**: `GET /api/attendance/rekap-telat/tim` di branch
+    `feat/attendance-rekap-telat-tim` ([[API - Attendance Service]]). Fungsi yang dipakai ULANG:
+    `rentangPeriodeTelat`, `kriteriaTelatDihitung`, `pipelineRekapTelat` (diberi parameter
+    `employeeIDs`). Penanda kesegaran `dihitung_pada`. Keputusan user: jumlah telat saja (tanpa
+    penanda SP1 Pasal 19), cakupan hanya departemen yang disupervisi; HR/Direktur tetap
+    `/internal/late-recap`. Belum terbukti lewat gateway dev.
   - **Tujuan**: realisasi [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §2 — pintu masuk fleksibel, aturan bisnis TETAP di kode
     yang sudah ada.
   - **Bergantung**: T4.
