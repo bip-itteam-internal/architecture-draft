@@ -92,7 +92,8 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
   - **Kriteria selesai**: satu fungsi baru "supervisor di departemen manapun" + gate gabungan,
     dikunci test T13. Menu diberi penanda `perm` sejak commit pertama (menu tanpa penanda selalu
     tampil ke semua orang — ini gotcha RBAC yang sudah tercatat).
-  - **Jangan tutup sebagai selesai** sampai keputusan Corp Sec (lihat § Prasyarat) ada jawabannya.
+  - ~~**Jangan tutup sebagai selesai** sampai keputusan Corp Sec (lihat § Prasyarat) ada jawabannya.~~
+    ✅ **Dijawab 2026-09-29: Corporate Secretary IKUT** (ADR-0132 §3 diperbarui).
 
 ## Modul percontohan pertama
 

@@ -207,9 +207,13 @@ Dibangun mengikuti pola `validateRole(...)` OR yang sudah mapan (bukan arsitektu
 - **Supervisor departemen mana pun**: predikat BARU (belum ada di kode), dasarnya
   `len(common.SupervisedDepartmentsStrict(c)) > 0`.
 
-⛔ **Corporate Secretary TIDAK termasuk** sampai ditegaskan eksplisit oleh Direktur, sekalipun ia
+~~⛔ **Corporate Secretary TIDAK termasuk** sampai ditegaskan eksplisit oleh Direktur, sekalipun ia
 `SetaraDirektur` untuk alur persetujuan lain. Default fail-closed: tidak diikutkan sampai ada
-keputusan tertulis.
+keputusan tertulis.~~ ✅ **Ditegaskan 2026-09-29: Corporate Secretary IKUT termasuk**, disampaikan
+tim Tech Development (panpan) saat memulai T3 dengan alasan Corporate Secretary adalah orang
+kepercayaan Direktur. Belum ada dokumen tertulis dari Direktur sendiri. Gate-nya menjadi
+"Supervisor departemen mana pun ATAU Direktur ATAU Corporate Secretary ATAU IT". ⚠️ Bagian
+§ Untuk Manajemen di atas masih berbunyi "belum ditegaskan" dan perlu diselaraskan pemiliknya.
 
 Menu WAJIB diberi penanda `perm` sejak commit pertama — RBAC modul ini mencatat menu tanpa
 penanda selalu tampil ke semua orang.
