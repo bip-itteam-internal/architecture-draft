@@ -16548,18 +16548,19 @@
         "CORE - RBAC dan Permission Set",
         "CORE - Kapabilitas AI dan Machine Learning"
       ],
-      "hash": "09b80332ef09453ab6d1ed0220cda9b01a72585cdcb80938518df1360ff207d4",
-      "ukuran_kb": 24.7,
-      "ringkasan": "Menjawab: task apa saja (T1 sampai T13) untuk membangun Copilot lintas modul, urutan dan dependensinya, kriteria selesai tiap task, serta kemajuan terkini seperti panel tanya, riwayat percakapan, dan tabel/grafik (T9b). Juga menyebut prasyarat persetujuan Direksi untuk data asli.",
+      "hash": "9be14b1fb5a056a252ff84265124de774b32b63e98b8b2f64d53887022770522",
+      "ukuran_kb": 25.2,
+      "ringkasan": "Menjawab: task apa saja (T1 sampai T13) untuk membangun Copilot lintas modul, urutan dan dependensinya, kriteria selesai tiap task, serta kemajuan terkini seperti panel tanya, riwayat percakapan, tabel/grafik (T9b), dan uji gerbang RBAC (T13). Juga menyebut prasyarat persetujuan Direksi untuk data asli.",
       "kata_kunci": [
         "ANALISA Copilot",
         "asisten AI lintas modul",
         "daftar task",
         "T9b",
+        "T13",
         "tabel grafik",
         "riwayat",
-        "persetujuan Direksi",
-        "roadmap"
+        "gerbang RBAC",
+        "persetujuan Direksi"
       ]
     },
     {
