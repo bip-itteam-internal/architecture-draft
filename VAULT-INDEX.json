@@ -7979,9 +7979,9 @@
         "ADR - 0134 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend",
         "ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library"
       ],
-      "hash": "7acd33dafb528e7888115ed8387460f2548863d0902d7398f45a3c3f0cc8dcea",
-      "ukuran_kb": 39.8,
-      "ringkasan": "Menjawab: kenapa laporan Asisten Analisa Marketing membawa keputusan tindakan konkret (hentikan iklan video, kurangi atau naikkan belanja toko) yang dijalankan atau ditolak manusia, bagaimana pembagian kerja antara aturan (kelayakan) dan model AI (memilih, mengurutkan, menjelaskan dari katalog tertutup), dan apa yang terjadi saat model gagal. Juga mencatat realisasi per PR (backend, layar keputusan, tab Hasil analisa + PDF, target ROAS 4,5, mode bayangan) serta kenapa keputusan AI belum pernah siap di prod dan perbaikan anggaran waktu model 4 menit dengan batas 25 keputusan.",
+      "hash": "78e85dedbdbb7e5854b183159bc20fa817511998da67ff462a0a81686a3bac9f",
+      "ukuran_kb": 40.6,
+      "ringkasan": "Menjawab: kenapa laporan Asisten Analisa Marketing membawa keputusan tindakan konkret (hentikan iklan video, kurangi atau naikkan belanja toko) yang dijalankan atau ditolak manusia, bagaimana pembagian kerja antara aturan (kelayakan) dan model AI (memilih, mengurutkan, menjelaskan dari katalog tertutup), dan apa yang terjadi saat model gagal. Juga mencatat realisasi per PR (backend, layar keputusan, tab Hasil analisa berupa kartu ringkas dengan halaman detail + PDF, target ROAS 4,5, mode bayangan) serta kenapa keputusan AI belum pernah siap di prod dan perbaikan anggaran waktu model 4 menit dengan batas 25 keputusan.",
       "kata_kunci": [
         "ADR 0127",
         "asisten analisa marketing",
@@ -7989,10 +7989,10 @@
         "jalankan atau tolak",
         "target ROAS",
         "mode bayangan",
-        "status_model gagal",
+        "hasil analisa kartu ringkas",
+        "halaman detail laporan",
         "anggaran waktu model",
-        "batas 25 keputusan",
-        "AI marketing analytics"
+        "batas 25 keputusan"
       ]
     },
     {
