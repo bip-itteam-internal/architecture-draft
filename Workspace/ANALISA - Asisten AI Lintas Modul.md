@@ -229,6 +229,14 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
 - [ ] **T9 — Format keluaran terstruktur (teks/tabel/chart) + panel chat FE.**
   - **Dipecah user 2026-09-29**: **T9a** panel tanya teks + sumber (sekarang), **T9b** tabel/chart
     (menyusul; butuh `/tanya` mengembalikan data baris apa adanya ke penanya, tidak lewat AI).
+  - **Kemajuan T9b (2026-09-29)**: keputusan user = **AI memilih bentuk, angka dari tool**; grafik
+    rekap telat = batang mendatar per karyawan. BE merged (bip-erp #2359) dan terbukti di DEV lewat
+    gateway (tabel 56 baris, grafik 15 dari 56). FE `feat/copilot-tampilan` (erp-frontend) menyusul;
+    **kriteria selesai (render di layar, terang DAN gelap) belum dibuktikan**. Rincian:
+    [[Microservices - Assistant Service]] § Blok tampilan.
+  - **Riwayat percakapan (2026-09-29, di luar daftar T awal, diminta user)**: simpan selamanya,
+    hanya pemilik, drawer daftar + hapus + lanjutkan. BE bip-erp #2332 dan FE erp-frontend #1899
+    merged; BE terbukti di DEV. Rincian: [[Microservices - Assistant Service]] § Riwayat percakapan.
   - **Kemajuan T9a**: branch erp-frontend `feat/copilot-panel-tanya` — `features/copilot/components/
     panel-tanya.tsx` + `hooks/use-tanya-copilot.ts`; halaman `/copilot` menampilkan panel (badge "Uji
     Coba"), jawaban teks polos + sumber, galat per status lewat i18n dengan Coba lagi, riwayat
