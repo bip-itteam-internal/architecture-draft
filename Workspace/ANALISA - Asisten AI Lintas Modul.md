@@ -209,6 +209,12 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
 ## Presentasi jawaban
 
 - [ ] **T9 — Format keluaran terstruktur (teks/tabel/chart) + panel chat FE.**
+  - **Dipecah user 2026-09-29**: **T9a** panel tanya teks + sumber (sekarang), **T9b** tabel/chart
+    (menyusul; butuh `/tanya` mengembalikan data baris apa adanya ke penanya, tidak lewat AI).
+  - **Kemajuan T9a**: branch erp-frontend `feat/copilot-panel-tanya` — `features/copilot/components/
+    panel-tanya.tsx` + `hooks/use-tanya-copilot.ts`; halaman `/copilot` menampilkan panel (badge "Uji
+    Coba"), jawaban teks polos + sumber, galat per status lewat i18n dengan Coba lagi, riwayat
+    hanya selama halaman terbuka. Batas panjang pertanyaan sengaja tak disalin ke FE (milik BE).
   - **Baca dulu**: komponen `ChartContainer` (`components/ui/chart.tsx`) yang sudah baku di
     erp-frontend, dan skill `dataviz` bila tersedia di sesi yang mengerjakan. Aturan yang SUDAH
     berlaku di codebase ini (lihat rules tim §Bagan/chart): palet `--fb-seri-1..6` untuk deret
