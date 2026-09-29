@@ -106,7 +106,33 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
 
 ## Modul percontohan pertama
 
-- [ ] **T4 — Pilih modul percontohan final + verifikasi gerbangnya.**
+- [x] **T4 — Pilih modul percontohan final + verifikasi gerbangnya. SELESAI 2026-09-29: ATTENDANCE.**
+  - **Keputusan user 2026-09-29**: modul percontohan pertama **attendance**. marketing-analytics
+    **gugur sementara** menurut ADR §9: `/beranda`, `/summary`, `/returns/detail` membaca laba
+    seluruh perusahaan tanpa gerbang peran, dan keputusannya (terima terbuka / gerbang jalur baca)
+    masih menunggu issue bip-erp #2008 (OPEN, 0 komentar per 2026-09-29).
+  - **Hasil ukur lewat gateway DEV 2026-09-29** (JWT sungguhan, parameter unik per panggilan
+    melawan cache; tiap 403 punya kontrol positif). Akun: Fathur (staf, peran `{}`), Diki
+    (supervisor Manufaktur, non-HR), Seno (HRD Supervisor), Wirawan (Direktur, `hris:supervisor`).
+
+    | Endpoint | Gerbang (tempatnya) | Fathur | Diki | Seno | Wirawan | Hasil |
+    |---|---|---|---|---|---|---|
+    | `GET /today?view=team` | departemen pemanggil dari JWT (handler) | 200, 32 org Manufaktur | 200, 32 org Manufaktur | 200, 20 org GA+HR | 200, 6 org Kesekretariatan | ✅ lolos, tercakup departemen sendiri |
+    | `GET /history?month=YYYY-MM` | diri sendiri dari JWT (handler) | 200, 1 org | 200, 1 org | 200, 1 org | 200, 0 baris | ✅ lolos, hanya diri sendiri |
+    | `GET /report?date=YYYY-MM` | `gateHris(PermHrisView, RequireHRISStaff)` (rute) | 403 | 403 | 200, 169 org | 200, 169 org | ✅ lolos, HR saja |
+    | `GET /entries?period_start&period_end` | `gateHris(PermHrisView, RequireHRISStaff)` (rute) | 403 | 403 | 200 | 200 | ✅ lolos, HR saja |
+    | `GET /internal/summary` | `RequireHRISStaff` (rute) | 403 | 403 | 200 | 200 | ✅ lolos, HR saja |
+    | `GET /internal/late-recap?period=YYYY-MM` | `RequireHRISStaff` (rute) | 403 | 403 | 200 | 200 | ✅ lolos, HR saja |
+    | `GET /kpi/attendance` | `GerbangKunciAbsensi` (rute) | 401 | 401 | 401 | 401 | ⛔ **tidak diteruskan**: jalur mesin-ke-mesin, bukan untuk JWT pemakai |
+
+  - **Kesimpulan**: tak satu pun endpoint attendance yang diukur bocor; §9 terpenuhi untuk enam
+    endpoint di atas. ⚠️ **Konsekuensi manfaat**: rekap disiplin (`/report`, `/entries`,
+    `/late-recap`, `/internal/summary`) hanya untuk HR (dan Direktur lewat `hris:supervisor`,
+    BUKAN lewat jabatan). Supervisor non-HR hanya mendapat presensi tim hari ini + riwayat
+    dirinya; pertanyaan "siapa di tim saya yang paling sering telat bulan ini" belum punya
+    endpoint bercakupan departemen, dan itu **wajib jadi endpoint baru di T5** (dicakup
+    `SupervisedDepartmentsStrict`), bukan dengan melonggarkan gerbang HR. Corporate Secretary
+    tanpa peran `hris` akan mendapat 403 di endpoint HR, sebagai warisan gerbang yang benar.
   - **Tujuan**: jangan onboard modul yang endpoint-nya sudah diketahui bocor (ADR §9).
   - **Bergantung**: § Prasyarat (Direktur sudah tahu proposal ini ada) idealnya sudah terjawab
     sebelum modul dengan data sensitif dipilih.
