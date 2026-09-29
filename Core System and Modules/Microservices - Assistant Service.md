@@ -138,6 +138,18 @@ maksimal 3 putaran model-tool, tenggat **25 detik** (di bawah batas proxy 30 det
 **504** berpesan), balasan `{jawaban, sumber[]{alat, endpoint, dihitung_pada}}`. Env
 `AI_BASE_URL`/`AI_API_KEY`/`AI_MODEL`/`GATEWAY_URL` kosong = `/tanya` **503**, service tetap hidup.
 
+**Tool kedua (2026-09-29, bip-erp #2362)**: `antrean_persetujuan(jenis?, tampilan?)` →
+`GET /api/attendance/hr/requests?as=reviewer` **apa adanya** (tanpa endpoint baru). Filternya
+relasional, sama dengan jalur setuju/tolak (`build*ReviewFilter`): hanya pengajuan yang menunggu
+keputusan penanya, milik sendiri dikecualikan; penanya yang bukan penyetuju mendapat 0 baris, bukan
+403. ⚠️ Endpoint mengurutkan **terbaru dulu** dan berpaginasi (`limit` maks 100), jadi tool
+**menarik semua halaman** sampai `total` (berbatas 5 halaman, lalu melapor "terbaca N dari
+total"), lalu mengurutkan ulang dari yang **paling lama menunggu**; lama menunggu (hari) dihitung
+server. ⚠️ `from`/`to` di endpoint itu menyaring **tanggal dibuat**, bukan tanggal cuti, jadi tool
+sengaja tak memakainya. Terbukti di DEV 2026-09-29 dengan pengajuan uji (dibatalkan sesudahnya):
+supervisor Manufaktur melihatnya dalam tabel; pemilik (staf) 403 di gerbang Copilot; HRD tak
+melihatnya karena belum sampai tahap HR.
+
 ### Samaran identitas sebelum ke relay AI (keputusan user 2026-09-29)
 
 Persetujuan tertulis Direksi untuk data asli yang keluar lewat `code.bharatainternasional.com`
