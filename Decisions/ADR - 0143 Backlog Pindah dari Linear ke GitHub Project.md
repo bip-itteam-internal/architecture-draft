@@ -30,7 +30,7 @@
 
 ## Decision
 
-1. **Wadah**: GitHub Project #15 "ERP Bharata - Backlog" (privat), field Status (Backlog, Todo, In Progress, In Review, Menunggu Adopsi, Done, Canceled), Area (7 area sesuai project Linear), Prioritas, Jenis, Linear ID, Target, Bukti Adopsi. Repo kode ERP aktif ditautkan; repo vault `architecture-draft` **tidak**, karena publik.
+1. **Wadah**: GitHub Project #15 (privat; judul awal "ERP Bharata - Backlog", diganti jadi "Semangatt guyss !!! 👏" pada hari yang sama, jadi rujuk lewat nomor, bukan judul), field Status (Backlog, Todo, In Progress, In Review, Menunggu Adopsi, Done, Canceled), Area (7 area sesuai project Linear), Prioritas, Jenis, Linear ID, Target, Bukti Adopsi. Repo kode ERP aktif ditautkan; repo vault `architecture-draft` **tidak**, karena publik.
 2. **Status tetap bermakna keadaan ERP**; field Status, bukan issue open/closed, yang menentukan selesai. Merge menutup issue dan workflow *Item closed* memindahkannya ke Menunggu Adopsi. Done hanya diisi manusia dengan Bukti Adopsi.
 3. **Penyambung**: `Closes bip-itteam-internal/<repo>#<n>` di badan PR. Nama branch `<domain>/<n>-<slug>` hanya untuk keterbacaan.
 4. **Satu issue satu repo**; pekerjaan lintas repo memakai issue induk + sub-issue per repo.

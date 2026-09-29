@@ -292,9 +292,10 @@ Yang membuatnya bergejala: `DepartmentFilterOptions` sengaja MENGGANTI anggota g
 - **Sumber diresolusi, bukan diingat.** Menyebut ADR dari ingatan tanpa membuka berkasnya = `ragu`
   (brief ditampilkan, tunggu persetujuan). Prosedur lengkap: `/start-task` langkah 0.
 
-## Backlog: GitHub Project "ERP Bharata - Backlog" (2026-09-29, menggantikan Linear)
+## Backlog: GitHub Project #15 "Semangatt guyss !!! 👏" (2026-09-29, menggantikan Linear)
 
-Backlog tim pindah dari Linear ke **GitHub Project #15** org `bip-itteam-internal`
+Backlog tim pindah dari Linear ke **GitHub Project #15** org `bip-itteam-internal` (judulnya bisa
+diganti; rujuk project lewat **nomor 15**, jangan lewat judul)
 (https://github.com/orgs/bip-itteam-internal/projects/15, privat). Alasannya terukur: paket Free
 Linear berhenti di **250 issue** (terisi 245), dan hanya 3 dari 10 anggota org yang ada di Linear
 sehingga PIC terpaksa ditulis sebagai teks. Keputusannya [[ADR - 0143 Backlog Pindah dari Linear ke GitHub Project]].
