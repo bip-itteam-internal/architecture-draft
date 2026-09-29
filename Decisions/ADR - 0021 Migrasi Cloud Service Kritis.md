@@ -1,6 +1,7 @@
 ## ADR 0021 — Migrasi cloud bertahap untuk service kritis (ketahanan mati listrik / kegagalan server kantor)
 
-- **Status**: 🟡 Proposed (rekomendasi system analyst; menunggu persetujuan manajemen/IT)
+- **Status**: ⚠️ **Terjadi dalam bentuk lain** (diverifikasi ke kode + prod 2026-09-29): prod dipindah **sekaligus** ke satu VPS (lift-and-shift), bukan bertahap seperti rancangan di bawah; dua prasyarat HA (`ssoStore` in-memory di `api-gateway/sso.go`, cron tanpa kunci terdistribusi) **belum** dikerjakan, jadi belum ada ketahanan terhadap kegagalan host. Awalnya: Proposed (rekomendasi system analyst).
+- **Issue GitHub**: [bip-erp#2335](https://github.com/bip-itteam-internal/bip-erp/issues/2335) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 - **Tanggal**: 2026-06-29
 - **Konteks dok**: [[IT - Server, VMs and Databases]] · [[IT - Backup & DR]] · [[CORE - API Master Gateway]] · [[DB - Overview and Notes]]
 

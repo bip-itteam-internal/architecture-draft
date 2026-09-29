@@ -1816,6 +1816,7 @@
         "Sales - TikTok Sentiment Pipeline",
         "CORE - OCR Document Service",
         "Microservices - Assistant Service",
+        "ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak",
         "APP - Web ERP",
         "Microservices - Vault MCP Service",
         "API - Marketing Analytics Service",
@@ -1824,8 +1825,8 @@
         "Sales - Marketing Analytics (Audit Ketersediaan Data)",
         "ADR - 0008 Profit Engine Join via item_group_id"
       ],
-      "hash": "11ab509d5190251dd30c0fb249f387fe2260346363f07381c2979bd3bd9ed260",
-      "ukuran_kb": 23.8,
+      "hash": "e255362f240eed378bc637026c42984988ad696fc4bf6c9c86f2a9a1f5213a7f",
+      "ukuran_kb": 24.2,
       "ringkasan": "Menjawab: kapabilitas AI apa saja yang dimiliki ERP Bharata (generatif vs prediktif, engine, dan dokumen pemiliknya), serta gerbang kelayakan data ADR 0058 yang menentukan kapan pekerjaan AI baru boleh dimulai. Juga menjawab bagaimana alur data marketing-analytics menopang rancangan peringatan dini belanja iklan video (batas kesegaran, aturan pemakaian kolom, sumber belanja per video) dan mengapa prediksi paket COD gagal antar ditinjau ulang beserta jebakan kebocoran datanya.",
       "kata_kunci": [
         "AI",
@@ -3372,8 +3373,8 @@
         "Finance - Big Pictures",
         "External - Accurate"
       ],
-      "hash": "9900d4c7f3c60c3a30423e8c0d55173fb8fd420a1fbe374960af83d5e08a2d6a",
-      "ukuran_kb": 5.0,
+      "hash": "1b4aadda1090d96604101c3af6d9b6e81f7c9cff747ff7929829fdd2b5d1b795",
+      "ukuran_kb": 5.2,
       "ringkasan": "Menjawab apakah dan bagaimana perjalanan dinas bisa ke depan terhubung ke reimbursement/uang muka/Finance/payroll, memetakan opsi (lewat payroll vs Finance-Accurate vs hybrid) dan kenapa keputusan final masih menunggu Finance System siap.",
       "kata_kunci": [
         "reimbursement",
@@ -3804,8 +3805,8 @@
       "judul": "ADR - 0021 Migrasi Cloud Service Kritis",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "Proposed (rekomendasi system analyst; menunggu persetujuan manajemen/IT)",
+      "status_emoji": "⚠️",
+      "status_teks": "**Terjadi dalam bentuk lain** (diverifikasi ke kode + prod 2026-09-29): prod dipindah **sekaligus** ke satu VPS (lift-and-shift), bukan bertahap seperti rancangan di bawah; dua prasyarat HA (`ssoStore` in-memory di `api-gateway/sso.go`, cron tanpa kunci terdistribusi) **belum** dikerjakan, jadi belum ada ketahanan terhadap kegagalan host. Awalnya: Proposed (rekomendasi system analyst).",
       "publik": true,
       "tautan": [
         "IT - Server, VMs and Databases",
@@ -3831,8 +3832,8 @@
         "ADR - 0003 SSO-only Gateway",
         "IT - Monitoring System"
       ],
-      "hash": "d626f97248b291e1eb56ddbdd6b2bdf6b0c75ac33dfa8438a4847363454d22e4",
-      "ukuran_kb": 7.7,
+      "hash": "7d145293da0d5892939637459d1afb0b70e677b5059218881367a8c873ee7356",
+      "ukuran_kb": 8.1,
       "ringkasan": "Menjawab service mana yang paling perlu duluan dipindah ke cloud agar tetap hidup saat listrik/server kantor mati (gateway, integration, employee, attendance), mana yang bisa menyusul atau tetap on-premise, dan blocker teknis (ssoStore in-memory, cron tanpa distributed lock) yang harus dibereskan sebelum migrasi.",
       "kata_kunci": [
         "migrasi cloud",
@@ -5150,8 +5151,8 @@
         "API - Marketing Analytics Service",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "3e272db428e7c2073f8bf450d62d8245ada31c2975909a0f2bd736efde3a1b07",
-      "ukuran_kb": 17.2,
+      "hash": "9cdc1141f22eeadd7f34ec0782b1477ebf4f65598fe8a53c3e67653eac27f467",
+      "ukuran_kb": 17.3,
       "ringkasan": "Menjawab: kapan fitur AI atau machine learning layak dibangun di bip-erp, syarat data apa yang harus terpenuhi, dan kenapa model menumpang service pemilik data alih-alih service AI terpisah. Juga menjawab kandidat prediksi mana yang ditolak atau ditunda beserta angkanya (retur, pembatalan/COD gagal antar, resign, penilaian pelamar), dan kenapa kapabilitas prediktif pertama adalah peringatan dini belanja iklan video.",
       "kata_kunci": [
         "AI",
@@ -5288,8 +5289,8 @@
         "HRIS - Personalia",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id"
       ],
-      "hash": "7b9bee3a9c09c297951ed6e7c83b5c3928f5b3a24700e1eaf9bbcf789aabf74e",
-      "ukuran_kb": 18.6,
+      "hash": "2aa3c38946b0689dd22fca62b8ed26ea7fb2aa260a0e9f60b9b60003b96a75d7",
+      "ukuran_kb": 18.8,
       "ringkasan": "Menjawab: kenapa jatah cuti tahunan diputuskan terbit otomatis di ulang tahun kontrak tiap karyawan (bukan diketik HR per orang dan bukan serentak 1 Januari), apa patokan tanggalnya (start_date kontrak paling awal yang sudah lepas masa evaluasi), dan bagaimana saldo dicatat sebagai ledger kejadian vacation_ledger dengan work_data.vacation turun jadi salinan ringkas. Menjelaskan asal-usul angka kuota 5 hari (12 hari Pasal 15 dikurangi 7 hari kerja Cuti Bersama) yang selama ini hanya hidup di kepala HR, plus temuan pengukuran data produksi 2026-08-29: 15 orang sudah lebih dari setahun tetapi berkuota 0 sehingga tidak bisa mengajukan cuti sama sekali, dan 23 orang sudah berkuota padahal belum genap setahun. Juga mencatat jebakan join_date bertipe BSON campur (date dan string) yang membuat filter Mongo melewatkan separuh karyawan tanpa galat, serta apa saja yang sengaja tidak dijanjikan (tidak mencabut jatah terlanjur, tidak backfill mundur, Cuti Bersama tetap tidak dipotong sistem).",
       "kata_kunci": [
         "cuti tahunan",
@@ -5342,17 +5343,18 @@
       "judul": "ADR - 0062 Jenjang Jabatan Menggerbangi Pengajuan Requisition Lintas-Departemen",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "Konsep / Direncanakan — kode sudah ditulis dan diuji di branch `feat/recruitment-requisition-jenjang-direktur` (bip-erp) + `feat/requisition-jenjang-direktur` (erp-frontend), **belum merged, belum deployed**.",
+      "status_emoji": "⛔",
+      "status_teks": "**Superseded** oleh [[ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen]] (2026-09-07). Kode jenjang ini **sudah merged** (commit `0d3c5966`) dan hidup sebagai **jalur transisi** di belakang izin `recruitment.requisition_cross_dept` (`services/recruitment/requisition_handlers.go:72-87`, diverifikasi 2026-09-29); dibuang setelah paket izin ADR 0080 terpasang ke posisi Direktur di prod.",
       "publik": true,
       "tautan": [
+        "ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen",
         "Microservices - Recruitment Service",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "HRIS - Recruitment",
         "Microservices - Employee Service"
       ],
-      "hash": "2dad8806bf5fc42fc5a720b1a6e561d859ad6a52860167e8a553e7e9907c52f6",
-      "ukuran_kb": 7.8,
+      "hash": "2b43a7ca32d25cf46bc3706d4f31867efe6a65654937f5e2b046c2f683a73e66",
+      "ukuran_kb": 8.0,
       "ringkasan": "Menjawab: kenapa kewenangan mengajukan Job Requisition untuk departemen mana pun digerbang jenjang jabatan (level_key berjenjang direktur pada master_department.position_items) alih-alih daftar nama jabatan seperti SetaraDirektur, dan kenapa Corporate Secretary sengaja dikeluarkan dari kewenangan itu. Juga menjawab batas pemakaian jenjang yang diizinkan (hanya mengajukan, tidak pernah menyetujui, tidak boleh jadi gerbang rute atau sumbu izin modul), kenapa pembandingnya kesamaan dan bukan urutan rank, kenapa level_key ditanyakan lintas-service ke employee-service alih-alih dititipkan di JWT, dan kenapa gagal memastikan jenjang dibalas 503 bukan diturunkan jadi tidak berhak. Memuat angka kesiapan data level_key di prod dan dev beserta konsekuensi yang diterima.",
       "kata_kunci": [
         "ADR 0062",
@@ -5721,8 +5723,8 @@
         "HRIS - Leave Request",
         "ADR - 0061 Jatah Cuti Tahunan Terbit Otomatis di Ulang Tahun Kontrak"
       ],
-      "hash": "e0657bb9a05478f421628896d8a5ced25326e7eb8248752acc6deaeaec89f953",
-      "ukuran_kb": 10.8,
+      "hash": "52606ee61d535efe222f87131105c6219761852719672a448ce08614ea223718",
+      "ukuran_kb": 10.9,
       "ringkasan": "Menjawab: kenapa kepatuhan sistem terhadap Peraturan Perusahaan 2026-2028 dicatat di SATU peta selisih alih-alih tersebar di banyak dokumen teknis, dan kenapa peta itu bukan sumber kebenaran aturan (sumbernya tetap BUSINESS_LOGIC_IMPLEMENTATION.md di repo mybharata-app). Menjelaskan lima keputusan turunannya: satu dokumen peta, larangan menjadikannya sumber kebenaran kedua, kewajiban mencatat nilai config produksi beserta tanggal ukurnya, kewajiban menerbitkan ADR tersendiri untuk tiap penyimpangan yang diputuskan sadar, dan penandaan eksplisit untuk aturan yang belum diimplementasikan. Berguna saat perlu tahu kenapa usulan awal membangun MCP baca backend digeser jadi audit kepatuhan.",
       "kata_kunci": [
         "kepatuhan",
@@ -6146,8 +6148,8 @@
         "HRIS - Payroll Persona",
         "IT - CI-CD"
       ],
-      "hash": "8794187e34a05fe833ef2f62ac9f0dbea20d4ecc3efc6ccc0358d3500e72b4fd",
-      "ukuran_kb": 17.0,
+      "hash": "97e4063e60716f28ca109a599f8f12a719b36c9bfeb3998e472d5a26a7c9a28a",
+      "ukuran_kb": 17.2,
       "ringkasan": "Menjawab: kenapa dan bagaimana layar Insentif Saya dipindah dari web ERP ke MyBharata sebagai kartu di halaman Slip Gaji ber-PIN, siapa yang berhak melihat kartu Insentif, dan endpoint apa yang dipakai (keanggotaan tanpa angka dan /profit-dashboard/saya). Juga menjelaskan urutan rilis, kapan menu web dicabut, dan apa yang sengaja tidak dijanjikan (notifikasi, penjumlahan ke gaji).",
       "kata_kunci": [
         "insentif saya",
@@ -7117,8 +7119,8 @@
         "APP - Web ERP",
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput"
       ],
-      "hash": "6e73647037ba6f93daaa54e209c4bdf4ac339db6338e07c89ed188a54429e0c3",
-      "ukuran_kb": 18.6,
+      "hash": "329f7848c19efb7bb96605d81ae25ecb9b05251be6e8b8a7d7c7b19c8c642b8d",
+      "ukuran_kb": 18.7,
       "ringkasan": "Menjawab: kenapa selisih retur antara pembukuan Accurate dan scan gudang disajikan sebagai satu tab Selisih Retur di halaman Auto Sync Retur, dihitung terjadwal per periode dan disimpan per temuan, bukan dihitung saat halaman dibuka. Merinci tujuh jenis selisih dalam tiga kelompok dan dua tahap, status temuan (terbuka, beres otomatis, ditandai beres berikut alasannya), aturan kejujuran soal kelengkapan data, serta akses lewat izin `returselisih.*` yang dipasang per jabatan dari layar Hak Akses. Dipakai untuk menjawab: bagaimana finance merekonsiliasi retur saat tutup buku, apa yang tidak dijanjikan laman ini, dan kenapa nilai antar jenis selisih tidak boleh dijumlahkan.",
       "kata_kunci": [
         "ADR 0104",
@@ -7299,8 +7301,8 @@
         "ADR - 0001 Akuntansi via Accurate",
         "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan"
       ],
-      "hash": "250f92dd352a2b7bf0317ad6b8414bb523e2411fdd8cec158d4624e671642506",
-      "ukuran_kb": 32.1,
+      "hash": "6384544ce513398d52a9ee8375a12bd4b924facaea82ef75273fd978d55646da",
+      "ukuran_kb": 32.3,
       "ringkasan": "Menjawab: bagaimana penyelenggara pelatihan dicatat (Internal berupa departemen atau Eksternal berupa vendor), kenapa master vendor pelatihan dibuat sendiri di learning-service alih-alih memakai master Pemasok Procurement yang terikat Accurate, dan kenapa vendor pada trainer hanya berarti afiliasi bukan penentu penyelenggara. Menjawab juga: bagaimana saklar e-sertifikat per kelas disimpan terbalik supaya form lama tidak mematikannya diam-diam, bagaimana tab Sertifikasi Pelatihan menjadi bank data dua sumber (sertifikat internal yang terbit otomatis plus sertifikat pihak luar yang diunggah HR beserta nomor, tanggal, dan masa berlaku), dan bagaimana spesimen tanda tangan, stempel, serta logo dihidupkan membalik keputusan teks-saja 2026-09-15. Berisi batas yang sengaja tidak dijanjikan: upload materi PPT dipisah jadi keputusan sendiri karena batas unggah file-service 4 MB, ikatan dinas dan ganti rugi biaya pelatihan tetap dihitung manual HR, dan masa berlaku sertifikat dicatat tanpa pengingat otomatis.",
       "kata_kunci": [
         "ADR 0109",
@@ -7446,8 +7448,8 @@
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "ANALISA - Actual vs Planning MPP"
       ],
-      "hash": "91c74f8d98fb2dea90cdf163c1383b46bb0963fc9ef6c38f86708ec7881faff2",
-      "ukuran_kb": 14.7,
+      "hash": "1c79e603c2180072ab57a8a49449fcf47cadfb261fd31f7c90624498cadda64a",
+      "ukuran_kb": 14.9,
       "ringkasan": "Menjawab: kenapa kolom Actual pada lembar MPP diputuskan dihitung sistem alih-alih diketik HRD tiap bulan, bagaimana jumlah karyawan akhir bulan didefinisikan dan direkonstruksi per orang lewat employee_movement, dan kenapa bulan lampau menolak menjawab selama masih ada akun non-aktif tanpa tanggal keluar. Juga menjawab kenapa Divisi lahir sebagai master data tersendiri, apa akibatnya bagi rencana MPP bersumbu bulan, dan bagaimana pekerjaannya dipecah berurutan dari T1 sampai T6.",
       "kata_kunci": [
         "MPP",
@@ -7518,8 +7520,8 @@
         "ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI",
         "ADR - 0109 Penyelenggara Pelatihan Internal atau Eksternal dengan Master Vendor Milik HR dan Bank Sertifikat Dua Sumber"
       ],
-      "hash": "93ccda544d643a5737e58a297b23139136a43351cce84d5975b9d4f810720602",
-      "ukuran_kb": 9.3,
+      "hash": "f26ca519a25abc00b8a5e8028076077f6cbd35d50a422614a3855c7fa329a622",
+      "ukuran_kb": 9.5,
       "ringkasan": "Menjawab: kenapa permintaan memindahkan 25 sheet Dashboard People & Development ke ERP ditunda, dan empat modul mana yang sengaja tidak dibangun (program perbaikan kinerja/KPK, talent assessment 9-box beserta talent pool, analisis kebutuhan pelatihan/TNA, dan program pengembangan). Menjawab juga kenapa KPI bulanan wajib punya satu sumber padahal fakta yang sama dipelihara di ERP dan spreadsheet sekaligus, kenapa jalur KPI rendah menuju surat peringatan tidak diotomatiskan (Peraturan Perusahaan memicu SP dari kehadiran, bukan KPI), dan siapa yang boleh melihat kategori 9-box. Memuat syarat kapan penundaan ini dibuka kembali supaya tidak jadi penolakan permanen.",
       "kata_kunci": [
         "people and development",
@@ -7552,8 +7554,8 @@
         "Finance - Pemetaan Komponen Marketplace ke Akun Accurate",
         "Finance - Proses Penjualan Marketplace dan Uang Masuk"
       ],
-      "hash": "27dd4d2eb753184128139f2df31833476dfa541795f284657e2cef2e589aef3b",
-      "ukuran_kb": 15.9,
+      "hash": "3ceb1511deac338d6eba5e0fc040b1b0e31728ccb9ca92828ef4e5f0850ec689",
+      "ukuran_kb": 16.1,
       "ringkasan": "Menjawab: kenapa biaya marketplace (ongkir, proteksi pengiriman, PPh 22) sering mendarat di Biaya Admin, dan kenapa penyebabnya bukan salah pemetaan melainkan keranjang sisa TotalAdjustment yang berbagi akun 6112 dengan laci service-fee. Menjelaskan siapa yang boleh mengubah pemetaan akun di tab Setelan Akun Config Accurate (staf mengusulkan, SPV FAT menyetujui), kenapa keenam rute kv-config hari ini tanpa gerbang peran dan tanpa updated_by atau koleksi riwayat, serta apa bedanya akun 611701 (nilai barang sampel) dan 611704 (ongkir sampel). Memuat sembilan keputusan: gerbang peran, alur usul lalu setujui berjejak, validasi nilai akun, larangan keranjang sisa berbagi akun dengan kategori bernama, daftar komponen biaya yang belum punya akun, pratinjau transaksi terdampak, plus batasan bahwa koreksi di Accurate dan dimensi per marketplace tidak termasuk.",
       "kata_kunci": [
         "setelan akun marketplace",
@@ -7625,8 +7627,8 @@
         "CORE - RBAC dan Permission Set",
         "Sales - ICC Account Manager Mapping"
       ],
-      "hash": "bc8c3d836e3f2c19bfeeb8bf97ccb861a77073dc37227bbfe66d943349604995",
-      "ukuran_kb": 19.7,
+      "hash": "0b6c16f2de4250e3aa84cd140a9e4afec8c25e8d9a9da79c35ca96ac9c3af93a",
+      "ukuran_kb": 19.9,
       "ringkasan": "Menjawab: kenapa riwayat komplain produk digabung jadi satu tabel baca untuk pemegang akun toko, leader, dan SPV sementara register gudang dan register QC tetap terpisah, dan kenapa agregatornya ditaruh di employee-service. Juga menjawab kenapa kedua register masih nol dokumen — paket izin `marketing_akuntoko_pemegang` belum dipasang ke satu pun dari 36 Account Specialist sehingga menunya tak terlihat — serta bagaimana dua kosakata status dipetakan di agregator dan bukan di layar.",
       "kata_kunci": [
         "komplain produk",
@@ -7834,8 +7836,8 @@
         "Microservices - Task Management Service",
         "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan"
       ],
-      "hash": "4bf55c01062f37df5413c13ea93652d5c49957b02bcbbd6e49a90835e7bfea4d",
-      "ukuran_kb": 17.8,
+      "hash": "8d997ac380e4464d5fa355b7f48077a48702f9996923d81929c83b958b15cb0f",
+      "ukuran_kb": 18.0,
       "ringkasan": "Menjawab: di mana perawatan berkala (preventive maintenance) gedung dan alat disimpan dan kenapa di inventory-service alih-alih form-builder, employee-service, atau ceklis KPI. Menjelaskan bagaimana nilai KPI-nya dihitung dari dua koleksi baru (`pm_jadwal` sebagai penyebut jatuh tempo, `pm_realisasi` sebagai pembilang berbukti foto), kenapa atasan hanya menolak bukti dan tidak memberi angka, dan kenapa skornya berbasis penyelesaian sehingga tanpa bukti bernilai nol bukan seratus. Juga menjawab apa yang sengaja tidak diputuskan: bobot, target, arah metrik, catatan perbaikan kerusakan, dan patroli Security.",
       "kata_kunci": [
         "preventive maintenance",
@@ -7868,8 +7870,8 @@
         "Manufacture - Stock & Material Management",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
       ],
-      "hash": "7f4aa0644723fdf1dd00f0db04e76d460e3d86be8dbd8971c8c7085b0e69215f",
-      "ukuran_kb": 13.9,
+      "hash": "18586a0b57ff5647cac66601e1645488125eaaec24417745d43703fb95f0749a",
+      "ukuran_kb": 14.1,
       "ringkasan": "Menjawab: kenapa pencatatan kondisi retur gudang adalah beban ketikan manusia terbesar yang terukur di ERP tetapi tetap tidak boleh langsung dibangun perbaikannya, dan kenapa jawabannya bukan AI. Menetapkan pengukuran komposisi siklus sebagai gerbang yang boleh membatalkan seluruh pekerjaan, lalu membatasi perbaikannya pada konfirmasi massal khusus paket yang seluruh barisnya sudah cocok dengan klaim marketplace. Menjelaskan juga kenapa formulirnya sudah berbasis pengecualian sehingga menambah nilai bawaan bukan lagi pekerjaan yang tersisa.",
       "kata_kunci": [
         "retur gudang",
@@ -8131,8 +8133,8 @@
       "judul": "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-09-28, kode belum ada. Diusulkan tim IT/Tech Development — **belum ada konfirmasi eksplisit ini sudah dibicarakan ke Direktur**. Berdiri di atas grounding vault + kode langsung pada tanggal yang sama (lihat § Context untuk koreksi atas klaim vault yang ternyata tidak cocok dengan kode).",
+      "status_emoji": "⚠️",
+      "status_teks": "**Sebagian diterapkan** (diverifikasi 2026-09-29): fondasi merged dan `Assistant-Service` jalan di prod sejak 2026-09-29, baru satu modul (rekap telat, attendance); sisa di § Yang kurang pada issue. Awalnya Diusulkan 2026-09-28. Diusulkan tim IT/Tech Development — **belum ada konfirmasi eksplisit ini sudah dibicarakan ke Direktur**. Berdiri di atas grounding vault + kode langsung pada tanggal yang sama (lihat § Context untuk koreksi atas klaim vault yang ternyata tidak cocok dengan kode).",
       "publik": true,
       "tautan": [
         "Microservices - Assistant Service",
@@ -8157,8 +8159,8 @@
         "CORE - RBAC dan Permission Set",
         "CORE - API Master Gateway"
       ],
-      "hash": "8f8efc907f1a8e511083304e9c667383eb6a81b2e6edb43b31c97b11914d3d9a",
-      "ukuran_kb": 20.9,
+      "hash": "fd5b85efdbfd6e4c6c74cd11e758d43faf1d5852c89dbb460e04d9b43ce8af8b",
+      "ukuran_kb": 21.3,
       "ringkasan": "Menjawab: kenapa asisten AI tanya-jawab (Copilot) dibangun lintas modul sejak awal dengan beberapa modul percontohan, kenapa lapisan data bisnis hidup di dalam service pemilik data dan bukan terpusat, dan siapa yang boleh memakainya (Supervisor departemen mana pun, Direktur, Corporate Secretary, IT). Juga menjawab kenapa klien AI tipis hand-roll OpenAI-compatible, larangan menghitung dari data mentah, batas modul per pertanyaan akibat timeout gateway, bentuk keluaran teks/tabel/chart, dan file hanya saat diminta.",
       "kata_kunci": [
         "ADR 0132",
@@ -8258,8 +8260,8 @@
         "Microservices - Notification Service",
         "Microservices - Assistant Service"
       ],
-      "hash": "f832c313c5c257b6d3e11de787c50fcbf7175cb5f755c14454d49571dd4e569f",
-      "ukuran_kb": 11.1,
+      "hash": "93919d0169362603a64b0beca9cb0de3d5e4521ccebcc784ec4922e6e686e2a7",
+      "ukuran_kb": 11.3,
       "ringkasan": "Menjawab: bagaimana fitur Jadwal Tugas (scheduled tasks) Copilot bekerja, kenapa saat jatuh tempo hanya mengirim notifikasi pengingat bertautan alih-alih menjalankan pertanyaan otomatis, dan masalah identitas/JWT kedaluwarsa apa yang membuat eksekusi otomatis ditunda. Juga menjelaskan siapa boleh membuat jadwal, isi tugas dan frekuensinya, pola penjadwal cron idempoten, kategori inbox baru, serta fitur PRD asli yang sengaja dibuang.",
       "kata_kunci": [
         "jadwal tugas",
@@ -8304,8 +8306,8 @@
         "GA - Inventory Management",
         "WH - Warehouse Sadewa"
       ],
-      "hash": "053d57145757bbc05c5fa1bd41ea2be482c34689eebeff270964c5e0ec9cd2de",
-      "ukuran_kb": 22.9,
+      "hash": "14afa794f173eeea3d8bfe54beebef42217f5f1a964a3985cbe58d2818e2a62f",
+      "ukuran_kb": 23.1,
       "ringkasan": "Menjawab: siapa yang seharusnya menjadi pemilik data master barang (produk jadi, SKU marketplace, bahan baku, barang GA) dan master gudang di ERP, mengapa data itu sekarang tersebar tanpa penjaga di sembilan tempat barang dan lima tempat gudang, opsi apa yang dibandingkan untuk menyatukannya (Accurate sebagai master, satu service ERP jadi pemilik, atau pemilik per jenis barang), dan akibat nyata yang sudah terjadi akibat duplikasi ini (HPP insentif meledak, gudang faktur tertinggal 241 dokumen). Status ADR ini masih diusulkan, belum diputuskan dan belum ada kode.",
       "kata_kunci": [
         "master barang",

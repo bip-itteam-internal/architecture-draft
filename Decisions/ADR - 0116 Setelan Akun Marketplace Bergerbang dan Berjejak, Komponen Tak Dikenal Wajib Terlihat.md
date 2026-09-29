@@ -11,6 +11,7 @@ Finance berulang kali melaporkan biaya marketplace tercatat di akun yang salah, 
 *Setelan akun marketplace tetap tinggal di tempatnya sekarang, tetapi dikuatkan dengan gerbang peran, jejak perubahan, dan alur usul lalu setujui. Bersamaan dengan itu, komponen biaya yang belum punya akun diangkat jadi daftar yang terlihat, dan keranjang sisa dilarang berbagi akun dengan kategori bernama, karena di situlah kesalahan yang dikeluhkan Finance sebenarnya lahir.*
 
 - **Status**: 🟡 **Diusulkan**, kode belum ada. Pemutus: SPV FAT (akun untuk keranjang sisa) dan IT (gerbang peran).
+- **Issue GitHub**: [bip-erp#2348](https://github.com/bip-itteam-internal/bip-erp/issues/2348) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 - **Path di repo**: `bip-erp/services/integration/main.go` (gerbang peran pada rute kv-config) · `bip-erp/services/integration/internal/domain/entity/accurate.go` (jejak pada `AccurateKVConfig`) · `bip-erp/services/integration/internal/infrastructure/repository/accurate_kv_riwayat.go` (baru) · `bip-erp/services/integration/internal/usecase/komponen_belum_berakun.go` (baru) · `bip-erp/services/integration/internal/interface/http/accurate_handler.go` · `erp-frontend/src/features/integration/config-accurate/` · `erp-frontend/src/i18n/locales/id.ts` dan `en.ts`
 - **Tanggal**: 2026-09-22
 

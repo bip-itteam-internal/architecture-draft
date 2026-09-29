@@ -10,6 +10,7 @@
 *Kepatuhan sistem terhadap Peraturan Perusahaan 2026-2028 dipetakan di SATU dokumen vault yang menyandingkan tiap pasal dengan aturan yang benar-benar dijalankan, tempat nilainya tinggal, dan nilai terukur di produksi. Peta itu bukan sumber kebenaran aturan, melainkan catatan selisih; dan tiap penyimpangan yang diputuskan sadar wajib punya ADR sendiri, tidak boleh berhenti sebagai peringatan di dalam dokumen.*
 
 - **Status**: 🟡 **Diusulkan**, 2026-09-01. Belum ada dokumen maupun ADR turunannya.
+- **Issue GitHub**: [bip-erp#2339](https://github.com/bip-itteam-internal/bip-erp/issues/2339) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 - **Path di repo**: tidak menyentuh repo kode sama sekali. Artefaknya `architecture-draft/Human Resource Information System/HRIS - Kepatuhan Peraturan Perusahaan.md` (baru) dan `architecture-draft/Workspace/ANALISA - Kepatuhan Peraturan Perusahaan.md` (baru).
 - **Tanggal**: 2026-09-01
 
