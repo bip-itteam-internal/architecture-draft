@@ -65,21 +65,10 @@
         "HRIS - Attendance Correction",
         "HRIS - Payroll"
       ],
-      "hash": "692060984d224a61ae35929a8f7b2abf4bdae9df17755e684e78be42afc626c7",
-      "ukuran_kb": 29.8,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan attendance-service beserta gerbangnya, misalnya clock-in/out (/tap), daftar entri dan laporan presensi untuk HR, riwayat dan jumlah telat milik sendiri, status kehadiran tim hari ini, rekap telat per karyawan untuk usulan SP1 (/internal/late-recap) dan rekap telat tim untuk supervisor (/rekap-telat/tim), suplemen payroll, perlakuan status, serta panggilan mesin untuk sesi live host. Juga menjelaskan periode payroll 26 sampai 25 dan definisi telat yang dihitung.",
-      "kata_kunci": [
-        "attendance API",
-        "presensi",
-        "absensi",
-        "clock-in",
-        "rekap telat",
-        "late-recap",
-        "rekap-telat tim",
-        "keterlambatan",
-        "SP1",
-        "payroll-supplement"
-      ]
+      "hash": "4df761136f077fa24e8f57afe96b216eb20c94d4284517faf03612bee85770bc",
+      "ukuran_kb": 30.1,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "API Reference/API - Employee Service.md",
@@ -8412,8 +8401,8 @@
       "judul": "ADR - 0139 Penjelasan Tiap Tabel dan Diagram Laporan Ditulis AI, Angkanya Rujukan ke Fakta Backend",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": null,
-      "status_teks": "📝 **Accepted, belum diimplementasikan** — diputuskan 2026-09-29. Mengubah sebagian [[ADR - 0134 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend]] § Realisasi butir g (model tidak menulis teks apa pun untuk blok non-teks): larangan itu diganti mekanisme di bawah **khusus untuk penjelasan per blok**. Judul blok dan blok Ringkasan tetap dari aturan seperti sebelumnya.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)** — diputuskan dan di-merge 2026-09-29 (bip-erp [#2329](https://github.com/bip-itteam-internal/bip-erp/pull/2329), erp-frontend [#1838](https://github.com/bip-itteam-internal/erp-frontend/pull/1838)); status deploy prod diukur ulang sebelum dipakai (lihat § Realisasi). Mengubah sebagian [[ADR - 0134 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend]] § Realisasi butir g (model tidak menulis teks apa pun untuk blok non-teks): larangan itu diganti mekanisme di bawah **khusus untuk penjelasan per blok**. Judul blok dan blok Ringkasan tetap dari aturan seperti sebelumnya.",
       "publik": true,
       "tautan": [
         "ADR - 0134 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend",
@@ -8422,9 +8411,9 @@
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "Microservices - Marketing Analytics Service"
       ],
-      "hash": "826eb6590f46b67d524c1e642bdad1ee5c5b9e7095ccde9b7b9a7c54c40c1f73",
-      "ukuran_kb": 5.8,
-      "ringkasan": "Menjawab: bagaimana setiap tabel, diagram, dan chart di laporan Asisten Analisa Marketing mendapat penjelasan ringkas yang ditulis AI tanpa risiko angka karangan: backend menghitung fakta per dataset, model hanya merujuknya lewat {fN}, validator menolak digit apa pun di luar rujukan, dan tiap blok punya kalimat baku cara membaca sebagai cadangan saat AI gagal. Juga menjelaskan kenapa status_keputusan dan keputusan_per_jenis selalu memakai kalimat baku dan bagaimana FE menandai penjelasan dari AI.",
+      "hash": "6f3b71c7cbf2a232cd19d8d4aa6033354aafa5eaf7f8eca94ca18c6cf74f79b5",
+      "ukuran_kb": 8.1,
+      "ringkasan": "Menjawab: bagaimana setiap tabel, diagram, dan chart di laporan Asisten Analisa Marketing mendapat penjelasan ringkas yang ditulis AI tanpa risiko angka karangan: backend menghitung fakta per dataset, model hanya merujuknya lewat {fN}, validator menolak digit di luar rujukan, dan tiap blok punya kalimat baku netral bentuk sebagai cadangan saat AI gagal. Juga mencatat realisasi (PR backend dan frontend), kenapa fakta per toko menyebut penyebutnya, format rupiah ringkas, perlakuan kiriman lama, dan bagian yang belum ditegakkan validator.",
       "kata_kunci": [
         "ADR 0139",
         "penjelasan diagram",
@@ -8433,6 +8422,7 @@
         "penjelasan AI",
         "fakta backend",
         "rujukan fakta",
+        "kalimat baku",
         "asisten analisa marketing",
         "sajian laporan"
       ]
@@ -18418,5 +18408,7 @@
       ]
     }
   ],
-  "gagal": []
+  "gagal": [
+    "API Reference/API - Attendance Service.md"
+  ]
 }
