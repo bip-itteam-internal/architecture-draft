@@ -1,6 +1,8 @@
 # ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai
 
 > **Status**: 🟡 **Diusulkan**, 2026-09-28, kode belum ada. Disetujui pemilik proposal lewat `/analisa-kebutuhan`. Dikerjakan **sesudah** fondasi [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] (klien AI, service, gate akses, minimal satu modul percontohan) terbukti jalan — keputusan eksplisit, bukan ditunda diam-diam.
+>
+> **Issue GitHub**: [bip-erp#2355](https://github.com/bip-itteam-internal/bip-erp/issues/2355) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 
 %% Status ditulis di blockquote atas, alasan sama dengan ADR 0120/0127/0132:
 ## Untuk Manajemen mendorong Deskripsi melewati baris ke-15 sehingga status tak terbaca VAULT-INDEX.json. %%

@@ -1,4 +1,6 @@
 > **Status**: 🟡 **Diusulkan**, kodenya belum ada. Pekerjaan pertamanya (memasang paket izin `marketing_akuntoko_pemegang` ke pemegang toko) adalah master data dan **tidak menunggu ADR ini**. Diukur prod 2026-09-22: kedua register komplain nol dokumen dan paket izin itu dipasang ke nol orang, sehingga 36 pemegang toko belum melihat satu pun menu komplain. Daftar task: [[ANALISA - Riwayat Komplain Produk Terpusat]].
+>
+> **Issue GitHub**: [bip-erp#2350](https://github.com/bip-itteam-internal/bip-erp/issues/2350) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 
 ## Untuk Manajemen
 

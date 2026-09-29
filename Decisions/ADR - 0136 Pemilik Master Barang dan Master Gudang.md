@@ -1,6 +1,8 @@
 # ADR - 0136 Pemilik Master Barang dan Master Gudang
 
 > **Status**: 🟡 **Diusulkan**, 2026-09-29, BELUM diputuskan dan nol kode. Pengambil keputusan: **TBD** (tim IT bersama manajemen; lihat §Pertanyaan yang harus dijawab manusia, butir 1). Dok ini memetakan masalah, opsi, dan usulan penulis; ia tidak menetapkan apa pun sampai bagian §Decision diisi orang yang berwenang.
+>
+> **Issue GitHub**: [bip-erp#2357](https://github.com/bip-itteam-internal/bip-erp/issues/2357) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 
 %% Status di blockquote atas supaya terbaca VAULT-INDEX.json (15 baris pertama), pola sama dengan ADR 0132/0135. %%
 

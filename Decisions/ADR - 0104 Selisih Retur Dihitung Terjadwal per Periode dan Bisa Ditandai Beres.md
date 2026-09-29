@@ -1,5 +1,7 @@
 > **Status**: 🟡 **Diusulkan sebagian terlaksana** (2026-09-17; diperiksa ulang 2026-09-24) — tab Selisih Retur terjadwal per periode, dua tahap, akses lewat izin `returselisih.*`. ✅ **T1 (izin + gerbang) SUDAH di `origin/main`**: `shared-library/common/catalog_retur_selisih.go`, `services/integration/internal/interface/http/retur_selisih_gate.go`, dan entri katalog di `services/employee/permission_catalogs.go` — penanda lama "belum merge" **USANG**, diverifikasi `git grep origin/main` 2026-09-24. Sisanya **belum ada kode**: perhitungan terjadwal, koleksi `retur_selisih`, handler daftar, endpoint scan per periode di manufacture, dan seluruh sisi frontend.
 >
+> **Issue GitHub**: [bip-erp#2341](https://github.com/bip-itteam-internal/bip-erp/issues/2341) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
+>
 > ⚠️ **Koreksi satuan (2026-09-24).** Decision §7 menetapkan kartu "belum terbukukan" menghitung **order**, tetapi angka yang dicatat §Data nyata (601 PENDING) adalah **dokumen**. Selisihnya besar dan bukan pembulatan: diukur prod 2026-09-22 populasi yang sama berjumlah **698 dokumen = 2.294 order** (3,3×). Sebelum tab ini dibangun, satuan tiap kartu wajib ditetapkan eksplisit, kalau tidak ia lahir dengan ambiguitas yang persis sedang dikeluhkan pemakainya di metrik KPI retur.
 
 ## Untuk Manajemen

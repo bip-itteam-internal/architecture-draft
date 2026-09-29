@@ -1,6 +1,7 @@
 ## ADR 0007 — Reimbursement / Settlement Perjalanan Dinas
 
 - **Status**: 🟡 Proposed (belum diputuskan — placeholder arah; menunggu Finance System & konfirmasi HRD/Finance)
+- **Issue GitHub**: [bip-erp#2334](https://github.com/bip-itteam-internal/bip-erp/issues/2334), [my-bharata#170](https://github.com/bip-itteam-internal/my-bharata/issues/170) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 - **Tanggal**: 2026-06-29 (diusulkan)
 - **Konteks dok**: [[HRIS - Perjalanan Dinas]] · [[ADR - 0001 Akuntansi via Accurate]] · [[GA - Procurement System]] · [[HRIS - Payroll]]
 

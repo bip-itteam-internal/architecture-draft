@@ -1,6 +1,8 @@
 # ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok
 
 > **Status**: 🟡 **Diusulkan**, 2026-09-24, kode belum ada. Berdiri di atas pengukuran langsung produksi 2026-09-24 dan pembacaan `origin/main`.
+>
+> **Issue GitHub**: [erp-frontend#1896](https://github.com/bip-itteam-internal/erp-frontend/issues/1896) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 
 %% Status ditulis DI SINI sebagai blockquote, bukan sebagai bullet di ## Deskripsi seperti
 kebanyakan ADR, dan itu bukan gaya bebas: `## Untuk Manajemen` mendorong bagian Deskripsi

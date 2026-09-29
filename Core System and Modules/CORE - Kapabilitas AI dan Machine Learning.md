@@ -22,8 +22,8 @@ Dua sifat yang sangat berbeda hidup berdampingan di sini, dan membedakannya pent
 | Otomasi tren ke video siap kirim | Generatif | LangGraph, human-in-the-loop | ⚠️ WIP | [[Sales - Veo (Gemini) Automation Layer]] |
 | Analisis sentimen komentar TikTok | Generatif | Claude | ✅ jalan tiap awal pekan | [[APP - Tiktok Insight Analyzer]] · [[Sales - TikTok Sentiment Pipeline]] |
 | OCR dan document intelligence | Generatif | rencana OCR + RAG lokal | 🟡 konsep, **0 kode** | [[CORE - OCR Document Service]] |
-| Asisten tanya-jawab angka bisnis | Generatif | rencana Claude + Tool Runner | 🟡 konsep, **0 kode** | [[Microservices - Assistant Service]] |
-| Peringatan dini belanja iklan | **Prediktif** | belum ditentukan | 🟡 konsep, **0 kode**. Blok "Perlu tindakan" untuk video GMV Max yang rugi di halaman Video (aturan laba kotor < 0 di FE, 2026-09-15) **bukan** lapisan ini: tanpa model dan tanpa pemberitahuan | dokumen ini · [[APP - Web ERP]] |
+| Asisten tanya-jawab angka bisnis | Generatif | Claude lewat klien tipis `services/assistant` | ⚠️ **sebagian, live prod 2026-09-29**: satu modul (rekap telat) | [[Microservices - Assistant Service]] |
+| Peringatan dini belanja iklan | **Prediktif** | belum ditentukan | ⚠️ **sebagian, berbasis aturan** (diverifikasi 2026-09-29): keputusan "hentikan iklan video" untuk video TERBUKTI rugi (revenue > 0, laba < 0) lewat laporan Asisten Analisa ([[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]]); kasus inti **penjualan nol** belum tertangani, tanpa model. Blok "Perlu tindakan" untuk video GMV Max yang rugi di halaman Video (aturan laba kotor < 0 di FE, 2026-09-15) **bukan** lapisan ini: tanpa model dan tanpa pemberitahuan | dokumen ini · [[APP - Web ERP]] |
 | Prediksi paket COD gagal antar | **Prediktif** | belum ditentukan | 🟡 ditinjau ulang 2026-09-14, **0 kode** | [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] §7 |
 
 Akses Claude ke vault lewat [[Microservices - Vault MCP Service]] sengaja **tidak** dimasukkan sebagai kapabilitas AI produk. Ia jalur baca dokumentasi untuk manusia, bukan fitur yang dipakai pengguna ERP.

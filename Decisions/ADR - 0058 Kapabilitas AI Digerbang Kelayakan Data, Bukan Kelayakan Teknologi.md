@@ -10,6 +10,7 @@
 *Kelayakan pekerjaan AI di bip-erp ditentukan oleh kelayakan DATA-nya, bukan oleh ketersediaan teknologinya. Tiga syarat dijadikan gerbang, model menumpang service yang sudah memegang datanya alih-alih berdiri sebagai service AI terpisah, dan kapabilitas prediktif pertama diarahkan ke belanja iklan karena di situ syaratnya terpenuhi sekaligus uangnya terbesar.*
 
 - **Status**: 🟡 **Diusulkan**, 2026-08-28, kode belum ada. Berdiri di atas pengukuran langsung database produksi pada 2026-08-28, dikoreksi 2026-09-14 (lihat bagian Koreksi).
+- **Issue GitHub**: [bip-erp#2336](https://github.com/bip-itteam-internal/bip-erp/issues/2336) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 - **Path di repo**: `bip-erp/services/marketing-analytics/` (baru, lapisan peringatan dini). Tidak ada service baru dan tidak ada perubahan gateway.
 - **Tanggal**: 2026-08-28
 
