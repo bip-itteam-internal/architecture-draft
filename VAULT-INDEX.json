@@ -12973,19 +12973,20 @@
         "RUN - Agent Backlog Otonom",
         "ADR - 0143 Backlog Pindah dari Linear ke GitHub Project"
       ],
-      "hash": "98d3f57639346164ee16a088839c722a0fff3bd6ab52d412af8421d81ff152c1",
-      "ukuran_kb": 1.2,
-      "ringkasan": "Menjawab: issue backlog mana saja yang dikerjakan agent otonom pada September 2026, PR apa yang dihasilkan, apakah selesai sesuai Estimasi Selesai, dan apa sebab keterlambatannya. Juga memuat pelajaran estimasi yang dipakai agent untuk memperkirakan issue berikutnya.",
+      "hash": "ef04fe6d584535a02d35a288cb9ffd2b0220cb1483db40c0768b228bd19e5949",
+      "ukuran_kb": 4.2,
+      "ringkasan": "Log operasional agent backlog otonom September 2026: mencatat status penyelesaian issue per domain, durasi aktual, dan pelajaran dari setiap pekerjaan. Menjawab: berapa lama estimasi akurat per jenis issue (FE kecil ~30-40 menit, FE kompleks ~3 jam, baseline refresh ~20 menit), apa pola penyebab gagal atau terlambat (toolchain macet, keputusan belum), dan permasalahan yang dihadapi saat gerbang lokal.",
       "kata_kunci": [
-        "agent otonom",
-        "autonomous agent",
-        "log agent",
-        "backlog",
-        "estimasi selesai",
-        "keterlambatan",
-        "pelajaran estimasi",
-        "PR agent",
-        "GitHub Project"
+        "agent backlog otonom",
+        "backlog automation",
+        "issue tracking",
+        "estimasi durasi",
+        "time estimation",
+        "frontend",
+        "backend",
+        "pull request",
+        "verification gate",
+        "toolchain"
       ]
     },
     {
