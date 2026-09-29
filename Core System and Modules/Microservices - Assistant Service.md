@@ -127,6 +127,33 @@ Satu tool per endpoint baca, sekitar delapan sampai dua belas untuk irisan perta
 
 Semua tool `strict: true` supaya argumennya dijamin valid.
 
+**Tool pertama yang ada di kode (T6, 2026-09-29, branch `feat/assistant-tanya-rekap-telat`)**:
+`rekap_telat_tim(periode?, minimal?)` → `GET /api/attendance/rekap-telat/tim` lewat
+`GATEWAY_URL` dengan header `Authorization` **milik penanya** (hak akses = penanya; assistant tak
+pernah membuat token). Status gagal (`tidak_berhak`, `sumber_tak_terjangkau`, `tanpa_identitas`,
+`argumen_tidak_sah`) dikirim ke model sebagai teks, bukan galat, supaya model tak menaksir.
+`periode` kosong diteruskan kosong: attendance yang menurunkan periode payroll berjalan.
+Pintunya `POST /api/assistant/tanya` `{pertanyaan}` di belakang `RequireCopilot`: satu giliran,
+maksimal 3 putaran model-tool, tenggat **25 detik** (di bawah batas proxy 30 detik; lewat =
+**504** berpesan), balasan `{jawaban, sumber[]{alat, endpoint, dihitung_pada}}`. Env
+`AI_BASE_URL`/`AI_API_KEY`/`AI_MODEL`/`GATEWAY_URL` kosong = `/tanya` **503**, service tetap hidup.
+
+### Samaran identitas sebelum ke relay AI (keputusan user 2026-09-29)
+
+Persetujuan tertulis Direksi untuk data asli yang keluar lewat `code.bharatainternasional.com`
+belum ada, jadi `internal/samaran` memastikan yang keluar hanya **token `Karyawan-N`, angka, dan
+nama departemen**:
+
+- Nama dan `employee_id` dari hasil tool diganti token; **jabatan tidak dikirim sama sekali**
+  (jabatan tunggal, mis. satu-satunya supervisor, mengidentifikasi orangnya sama baiknya dengan nama).
+- Sebelum TIAP kiriman, seluruh percakapan disamarkan dengan peta yang sudah ada (termasuk nama
+  yang diketik penanya), lalu **penjaga** memindainya sekali lagi: sisa identitas = kiriman
+  **dibatalkan** (500 "Jawaban ditahan"), bukan sekadar dicatat.
+- Jawaban dipulihkan ke nama asli hanya di balasan untuk penanya.
+- ⚠️ **Batas yang diketahui**: nama yang diketik penanya di pertanyaan **pertama** terkirim apa
+  adanya, karena sebelum tool pertama berjalan peta masih kosong. Nama panggilan/sebagian nama
+  ("Danu" untuk "Danu Prayuda") tak dikenali penyamaran.
+
 Yang sengaja **TIDAK** ada, dan alasannya bukan kehati-hatian umum:
 
 | Tidak dibuat | Alasan |
@@ -239,7 +266,7 @@ riwayat: kapan terkirim, kapan dibuka
 
 ## Belum Diputuskan (TBD)
 
-- **Cara mengantar jawaban.** Empat pilihan di § Temuan gateway, belum dipilih. Ini penghalang pertama, bukan detail.
+- ~~**Cara mengantar jawaban.** Empat pilihan di § Temuan gateway, belum dipilih.~~ **Diputuskan user 2026-09-29: sekaligus, tanpa stream**, lewat gateway biasa dengan tenggat 25 detik (cukup untuk satu-dua tool). Stream ditunda sampai pertanyaan lintas modul (T8) membuktikan 25 detik tak cukup.
 - **Daftar tool final** beserta bentuk argumen dan bentuk hasilnya.
 - ~~**Kunci RBAC** yang menentukan siapa boleh membuka asistennya.~~ **Ditegaskan 2026-09-28** oleh [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §3: Supervisor departemen mana pun ATAU Direktur ATAU IT. ~~Yang masih TBD: apakah Corporate Secretary ikut termasuk.~~ Corporate Secretary **ikut** (ditegaskan 2026-09-29).
 - **Penyimpanan riwayat percakapan**: koleksi, masa simpan, dan apakah isinya boleh dibaca siapa pun selain penanyanya.

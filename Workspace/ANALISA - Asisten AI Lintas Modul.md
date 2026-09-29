@@ -171,6 +171,11 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     WAJIB muncul di jawaban, bukan disembunyikan.
 
 - [ ] **T6 — Tool + uji end-to-end tool tunggal.**
+  - **Kemajuan 2026-09-29**: kode di branch `feat/assistant-tanya-rekap-telat` — `POST /tanya` +
+    tool `rekap_telat_tim` + samaran identitas ([[Microservices - Assistant Service]] § Permukaan
+    tool). Keputusan user: pengujian memakai data dev ASLI dengan identitas disamarkan (bukan data
+    sintetis), jawaban sekaligus tanpa stream, **T7-T8 dilewati dulu, lanjut T9** sesudah T6
+    (marketing masih terhalang #2008). `.env` dev diisi `AI_*` dari prod sebelum merge.
   - **Bergantung**: T1, T2, T5.
   - **Baca dulu**: `shared-library/routes/gateway_request.go:47-115` (`Reroute` — cara header
     `BIP-*` diisi ulang dari klaim JWT, TERMASUK `BIP-Permissions`) **vs**
