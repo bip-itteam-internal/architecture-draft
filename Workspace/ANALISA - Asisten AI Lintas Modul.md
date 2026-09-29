@@ -176,6 +176,16 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     tool). Keputusan user: pengujian memakai data dev ASLI dengan identitas disamarkan (bukan data
     sintetis), jawaban sekaligus tanpa stream, **T7-T8 dilewati dulu, lanjut T9** sesudah T6
     (marketing masih terhalang #2008). `.env` dev diisi `AI_*` dari prod sebelum merge.
+  - **Terbukti di DEV 2026-09-29** (bip-erp #2161, lewat gateway, akun sungguhan): Diki → 3 teratas
+    = rekap T5 (6,4 dtk); Seno → 9 orang HR+GA = rekap T5 (5 dtk); Fathur → 403 tanpa memanggil
+    AI; pertanyaan laba toko → menolak tanpa angka. Dua cacat ditemukan: jawaban bermarkdown
+    (tampil mentah di panel T9a) dan saran modul karangan ("Point of Sale"); diperbaiki di PR
+    `fix/assistant-prompt-teks-biasa`.
+  - ⚠️ **Keputusan prod, disampaikan user (panpan) 2026-09-29**: Copilot T6+T9a boleh naik ke
+    PROD **tanpa menunggu persetujuan tertulis Direksi**, dengan dasar identitas disamarkan. Yang
+    tetap keluar ke relay: nama departemen, jumlah telat per token, dan isi pertanyaan (termasuk
+    nama yang diketik penanya di pertanyaan pertama). Prasyarat § Persetujuan Direksi di atas
+    tidak dicabut oleh keputusan ini; ia tetap terbuka untuk modul berikutnya.
   - **Bergantung**: T1, T2, T5.
   - **Baca dulu**: `shared-library/routes/gateway_request.go:47-115` (`Reroute` — cara header
     `BIP-*` diisi ulang dari klaim JWT, TERMASUK `BIP-Permissions`) **vs**
