@@ -393,20 +393,20 @@
         "Finance - Incentive",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "44b29dc22c57318694db3d087c27cade880e9d6fa3d4f5e51d903ee31fa23101",
-      "ukuran_kb": 14.4,
-      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki insentive-service untuk skema insentif profit (dashboard per level, insentif milik sendiri, keanggotaan level, struktur tim, target, opex), siapa yang boleh menulis target dan apa arti status 400/403/409/503-nya. Juga menjelaskan rute snapshot bekukan dan setujui Finance, rute internal untuk payroll, serta rute warisan skema KPI-multiplier yang kini menolak.",
+      "hash": "72da1a47cfd155ff0345b570e743ffa495769f5a26634ac21bfc93177fdc3b12",
+      "ukuran_kb": 14.7,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di insentive-service untuk skema insentif profit-based (dashboard profit per level ICC/Leader/Supervisor, insentif milik sendiri, keanggotaan level), bagaimana target profit, opex, dan struktur tim ditulis beserta gerbang aksesnya, serta cara membekukan dan menyetujui snapshot insentif untuk dibayar lewat payroll. Juga menjelaskan field respons seperti tarif_tiers, gugur, peringatan, hpp_sampel, dan status galat 401/502/503/409.",
       "kata_kunci": [
         "insentif",
         "incentive",
         "profit-dashboard",
-        "insentif saya",
         "target profit",
         "opex",
         "snapshot insentif",
-        "bekukan setujui",
-        "freeze approve",
-        "ICC Leader Supervisor"
+        "ICC",
+        "leader supervisor",
+        "insentif saya",
+        "endpoint insentive"
       ]
     },
     {
@@ -449,20 +449,20 @@
         "Sales - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "c3d9b01a62b82c1d4f2c783f8bd898ce428fcc78e0a68d3d4e7341727714ad63",
-      "ukuran_kb": 104.2,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service (marketplace TikTok/Shopee/Lazada ⇄ Accurate), cara memfilter dan mengekspor order, aging piutang, feed retur untuk WMS, packet tracking, atribusi afiliasi Shopee, dashboard akuntansi FAT, ICC account mapping, kas toko/wallet, ulasan marketplace, status sinkron toko, dan worker/jobs. Juga menjelaskan webhook publik mana yang tidak butuh gateway key dan parameter penting tiap endpoint.",
+      "hash": "9a02b4900689bd16469e4db0d9b4bd6b2d31f21ccb611f1b442f1a33a7b8f365",
+      "ukuran_kb": 105.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service untuk marketplace (TikTok Shop/Business, Shopee, Lazada), webhook, order terpadu, retur, packet tracking, aging piutang, Accurate, dashboard akuntansi FAT, ICC account mapping, kas toko, ulasan, dan status sinkron toko. Juga menjelaskan parameter filter (mis. shopee_attribution, order_ids, updated_since), bentuk respons, dan konsumen tiap endpoint.",
       "kata_kunci": [
-        "integration-service",
+        "integration service",
         "marketplace",
-        "TikTok Shop",
-        "Shopee",
-        "Accurate",
         "order",
+        "webhook",
+        "Shopee",
+        "TikTok Shop",
+        "Accurate",
         "piutang",
-        "retur",
         "packet tracking",
-        "webhook"
+        "ICC mapping"
       ]
     },
     {
@@ -2488,6 +2488,7 @@
         "ADR - 0081 Insentif Saya Pindah ke MyBharata di Dalam Slip Gaji",
         "Microservices - Inventory Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
+        "RUN - Deploy Microservices bip-erp",
         "APP - Web ERP",
         "IT - Background Jobs & Schedulers",
         "Microservices - Marketing Analytics Service",
@@ -2499,20 +2500,20 @@
         "Sales - Incentive",
         "HRIS - Key Performance Index"
       ],
-      "hash": "9d5498ec1ef7bf6761d499fd893da384e533f8925c768aced66ed198e459e628",
-      "ukuran_kb": 24.6,
-      "ringkasan": "Menjawab: bagaimana insentif marketing dihitung dengan skema profit-based (rumus profit, tangga tarif, gerbang retur 7%, target turun Supervisor ke Leader ke ICC), dari mana service mengambil komponen profit, beban gaji, dan opex, serta bagaimana cache dashboard dan pembuangannya bekerja. Juga menjelaskan dua jendela periode (insentif menghanguskan, KPI menggeser), hierarki Leader/Supervisor dari HRIS, dan apa yang masih menahan angkanya dipakai membayar.",
+      "hash": "952af5641d350d07094c0aea3b83f82e9d62eb2aa94326735d9a7225a67c93d4",
+      "ukuran_kb": 28.9,
+      "ringkasan": "Menjawab: bagaimana insentif tim marketing dihitung dengan skema profit-based (rumus profit, tangga tarif, gerbang retur 7%, target dan pembagiannya), dari mana komponen profit, beban gaji, dan beban non-gaji diambil, serta bagaimana Leader/Supervisor diturunkan dari hierarki HRIS. Juga menjelaskan cache dashboard, jendela periode insentif vs KPI, beban sampling, dan catatan yang membuat angka belum layak dibayar.",
       "kata_kunci": [
         "insentif",
         "incentive",
-        "insentive-service",
         "profit-based",
         "tarif insentif",
         "gerbang retur",
         "target profit",
-        "cache dashboard",
-        "hierarki HRIS",
-        "SK insentif"
+        "biaya operasional",
+        "hierarki leader supervisor",
+        "ICC",
+        "insentive-service"
       ]
     },
     {
@@ -2554,6 +2555,7 @@
         "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
         "ADR - 0017 Tanggal Retur TikTok via order_update_date",
         "ADR - 0023 Retur Tanggal Accepted-Seragam + Cutover Terpisah",
+        "Microservices - Insentive Service",
         "ADR - 0077 Koreksi Faktur via Impor Rekap Lengkap Mengalir ke Master-Data, Bukan Override per Baris",
         "RUN - Import Koreksi Faktur dari Rekap Lengkap",
         "ADR - 0100 Penerimaan Beda dengan Accurate Diputus di Halaman Penerimaan",
@@ -2573,7 +2575,6 @@
         "ADR - 0097 Kompensasi Shopee Susulan Ditahan dan Dicatat AR lewat Koreksi Manual ERP",
         "API - Index",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
-        "Microservices - Insentive Service",
         "ADR - 0008 Profit Engine Join via item_group_id",
         "LOG - 2026-09-17 Audit Checklist Marketing dan Integration",
         "LOG - Shopee API Rate Limit Request",
@@ -2588,20 +2589,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "f60411e7d97b5b220f7c1598c7ffce0b275530009bbe31ba8c256e426932d555",
-      "ukuran_kb": 428.2,
-      "ringkasan": "Menjawab: bagaimana integration-service menghubungkan ERP ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) lewat webhook dan cron, menormalkan order jadi transaksi terpadu, lalu mem-bridge ke Accurate (sales invoice, sales return). Juga menjawab cara kerja fitur seperti GMV Max monitoring, ICC account mapping, shop ACL, kepemilikan toko per departemen, profit per produk, ulasan marketplace, status sinkron per toko, observability Shopee, serta rencana Meta Ads dan catatan legacy Desty.",
+      "hash": "4b21fcf6d914e6659e1046e947ca17d7441e0ec790b8c2a8a10e3b1b16025de2",
+      "ukuran_kb": 429.1,
+      "ringkasan": "Menjawab: apa peran integration-service sebagai penghubung marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) ke ERP dan bridge akuntansi ke Accurate, bagaimana order masuk lewat webhook dan dinormalkan jadi transaksi terpadu, serta fitur seperti GMV Max monitoring, ICC account mapping, shop ACL, kepemilikan toko per departemen, profit per produk, dan cron worker. Juga memuat catatan ketahanan Shopee, index MongoDB, status sinkron toko, dan rencana Meta Ads.",
       "kata_kunci": [
         "integration service",
         "marketplace",
-        "TikTok Shop",
-        "Shopee",
         "Accurate",
         "webhook",
+        "TikTok Business",
         "GMV Max",
-        "ICC",
-        "sinkron toko",
-        "Desty"
+        "Shopee",
+        "ICC mapping",
+        "cron worker",
+        "sales invoice"
       ]
     },
     {
@@ -4262,20 +4263,19 @@
         "Microservices - Integration Service",
         "API - Integration Service"
       ],
-      "hash": "e02b6fc7387e284485b1e92daddbca70247ea1e7498ff3368697200ebb3848d4",
-      "ukuran_kb": 8.7,
-      "ringkasan": "Menjawab: bagaimana biaya operasional dihitung untuk rumus insentif profit-based, dari sumber apa (proyek Accurate per employee_id + payroll employer-cost), akun apa saja yang dikecualikan dan kenapa, serta bagaimana beban itu dibagi berjenjang antara Account Specialist, Leader, dan Supervisor. Juga menjelaskan jebakan parameter projectNo vs projectName di Accurate, status implementasi hierarki beban yang sempat menyimpang dari keputusan, dan bagaimana angka beban gaji ini dipakai ulang (dan membingungkan) di tab Opex Marketing.",
+      "hash": "5930078e47ae823e7cdb212ab7cfed7aa2665a866c79db1a0e416e99c842201b",
+      "ukuran_kb": 9.7,
+      "ringkasan": "Menjawab: dari mana biaya operasional dalam rumus insentif profit diambil (beban karyawan dari payroll, beban non-gaji dari saldo proyek Accurate), kenapa filter wajib projectNo dan akun induk 6000 harus dikurangi akun-akun yang dikecualikan, serta bagaimana beban Leader dan Supervisor dibebankan tanpa hitung ganda. Juga mencatat akun yang menunggu konfirmasi finance dan kebingungan label gaji di halaman Anggaran.",
       "kata_kunci": [
-        "biaya operasional",
+        "beban operasional",
         "opex",
-        "insentif profit",
-        "incentive",
-        "Accurate",
+        "proyek Accurate",
         "projectNo",
-        "beban gaji",
-        "employer-cost",
-        "BPJS pemberi kerja",
-        "beban berjenjang SPV Leader AS"
+        "insentif",
+        "akun dikecualikan",
+        "employer cost",
+        "hitung ganda",
+        "ADR 0033"
       ]
     },
     {
@@ -14547,19 +14547,19 @@
         "RUN - Deploy Task Management Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "8d70b71e687b366546329bba79d48425f105b7e175509f69fb9e22d757b93f72",
-      "ukuran_kb": 41.7,
-      "ringkasan": "Menjawab: bagaimana men-deploy ulang satu microservice bip-erp ke produksi dengan aman (git reset ke origin/main, --build, --no-deps), kenapa build sukses atau /health bukan bukti dan cara memeriksa umur image, serta urutan deploy antar-service dan kapan notification-service wajib ikut naik saat shared-library berubah. Juga mencakup tag dan gerbang versi rilis produksi, feature flag, TTL index, dan troubleshooting gejala pasca-deploy.",
+      "hash": "ef4a24e02e8e1cb20975008af0b81ae64f0558bc64a111c1b303efc325fda5b9",
+      "ukuran_kb": 42.6,
+      "ringkasan": "Menjawab: bagaimana men-deploy satu microservice bip-erp ke produksi dengan aman (tarik kode dulu, docker compose up --build --no-deps, cek umur image), urutan deploy antar-service yang saling bergantung, dan kapan perubahan shared-library atau kategori inbox menuntut container lain ikut naik. Juga menjelaskan tagging versi rilis, feature flag, TTL index, kunci layanan baru, verifikasi pasca-deploy, dan troubleshooting gejala seperti fitur tak bereaksi atau notifikasi tak tiba.",
       "kata_kunci": [
-        "deploy microservice",
-        "bip-erp",
-        "docker compose --no-deps",
-        "deploy backend",
-        "umur image",
+        "deploy",
+        "deployment",
+        "docker compose",
+        "no-deps",
+        "rilis produksi",
         "shared-library",
-        "kategori inbox",
-        "runbook",
-        "rollback",
+        "umur image",
+        "rebuild service",
+        "versioning",
         "troubleshooting deploy"
       ]
     },

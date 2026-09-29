@@ -131,6 +131,13 @@ Urutannya tak kritis di sini — yang kritis keduanya naik. Selama hanya satu ya
 
 Penjaganya di sisi kode ada di `services/form-builder/notify_category_test.go` — menambah kategori tanpa mendaftarkannya di `shared-library` menggagalkan test. Penjaga itu tidak bisa tahu container mana yang sudah naik, jadi langkah deploy ini tetap manual.
 
+**Kasus kedua: prefiks peringatan insentif (`shared-library/models/insentive/peringatan.go`).** insentive-service menulis `peringatan[]` di baris dashboard profit, dan employee-service menyaringnya lewat prefiks yang sama untuk memutuskan metrik KPI mana yang boleh tetap dinilai; peringatan yang tak dikenal **menggagalkan** metrik (fail-closed, sengaja). Menambah prefiks baru berarti **employee-service naik BERSAMA atau SEBELUM insentive-service**. Bila insentive naik lebih dulu, metrik KPI Profit baris yang memuat peringatan baru itu mati sampai employee menyusul — kelas insiden prod 2026-08-27 (PR #1480). Kasus terbaru: `PeringatanSampelTanpaHPP` dan `PeringatanFootageTanpaHPP` (bip-erp [#2333](https://github.com/bip-itteam-internal/bip-erp/pull/2333), 2026-09-29):
+
+```bash
+docker compose up -d --build integration-service employee-service --no-deps
+docker compose up -d --build insentive-service --no-deps
+```
+
 **Kasus yang sama, gejala yang jauh lebih besar (dev, ditemukan 2026-08-09):** dua container memegang biner yang mendahului perubahan `shared-library`, dan keduanya menyesatkan pelacakan berjam-jam.
 
 | Container | Umur image | Akibat |
