@@ -99,8 +99,8 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     per cabang) dan `GET /api/assistant/akses`. Merged (bip-erp #2154) dan **terbukti di DEV
     2026-09-29** lewat gateway, tiap cabang oleh akun yang hanya punya cabang itu: panpan (IT
     saja) 200, Diki (supervisor saja) 200, Wirawan (Direktur) 200, Fathur & Abdul (staf) 403.
-    Cabang Corporate Secretary hanya dikunci unit test (tak ada akun Corp Sec di dev). PROD:
-    rebuild `assistant-service` oleh manusia. **FE ditunda
+    Cabang Corporate Secretary hanya dikunci unit test (tak ada akun Corp Sec di dev). **PROD naik
+    2026-09-29** (manusia): biner memuat `/akses`, healthy; panggilan ber-JWT di prod belum dicoba. **FE ditunda
     sebagai task terpisah** (keputusan user): halaman/menu `/copilot` bertanya ke `/akses`,
     BUKAN `aksesSemuaMenu` (tak mencakup Corp Sec). Banner tetap khusus Tech Development.
 
