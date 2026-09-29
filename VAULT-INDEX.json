@@ -2119,20 +2119,20 @@
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "6221d0011b66abef72610ec5439a831ae4f6a3252660b55c6f3e05b88557ae2b",
-      "ukuran_kb": 30.1,
-      "ringkasan": "Menjawab: bagaimana Copilot (assistant-service) menjawab pertanyaan data lewat tool yang memanggil endpoint lewat gateway dengan JWT penanya, bagaimana identitas karyawan disamarkan sebelum ke relay AI, dan bagaimana riwayat percakapan (simpan selamanya, hanya pemilik) serta blok tabel/grafik (AI memilih bentuk, angka dari tool) bekerja. Juga memuat rute /tanya, /akses, /percakapan, env yang dibutuhkan, dan batas gateway 30 detik.",
+      "hash": "2fabf5bc9164927ead3394b2fcd18eed19e044356deee6e8e796e692a5308627",
+      "ukuran_kb": 31.0,
+      "ringkasan": "Menjawab: bagaimana Copilot (assistant-service) menjawab pertanyaan data lewat tool yang memanggil endpoint lewat gateway dengan JWT penanya (rekap telat tim dan antrean persetujuan), bagaimana identitas karyawan disamarkan sebelum ke relay AI, dan bagaimana riwayat percakapan serta blok tabel/grafik bekerja. Juga memuat rute /tanya, /akses, /percakapan, env yang dibutuhkan, dan batas gateway 30 detik.",
       "kata_kunci": [
         "Copilot",
         "assistant-service",
         "asisten AI",
-        "tanya jawab",
         "tool calling",
+        "antrean persetujuan",
+        "approval queue",
         "samaran identitas",
         "riwayat percakapan",
-        "conversation history",
         "tabel grafik",
-        "chart"
+        "rekap telat"
       ]
     },
     {
@@ -16548,18 +16548,18 @@
         "CORE - RBAC dan Permission Set",
         "CORE - Kapabilitas AI dan Machine Learning"
       ],
-      "hash": "9be14b1fb5a056a252ff84265124de774b32b63e98b8b2f64d53887022770522",
-      "ukuran_kb": 25.2,
-      "ringkasan": "Menjawab: task apa saja (T1 sampai T13) untuk membangun Copilot lintas modul, urutan dan dependensinya, kriteria selesai tiap task, serta kemajuan terkini seperti panel tanya, riwayat percakapan, tabel/grafik (T9b), dan uji gerbang RBAC (T13). Juga menyebut prasyarat persetujuan Direksi untuk data asli.",
+      "hash": "5c24896a689fa702145a48170bdd3804258fbd81380880945ea4b04ae6f27c59",
+      "ukuran_kb": 25.8,
+      "ringkasan": "Menjawab: task apa saja (T1 sampai T13) untuk membangun Copilot lintas modul, urutan dan dependensinya, kriteria selesai tiap task, serta kemajuan terkini seperti riwayat percakapan, tabel/grafik (T9b), uji gerbang RBAC (T13), dan tool kedua antrean persetujuan beserta pemetaan kandidat tool berikutnya. Juga menyebut prasyarat persetujuan Direksi untuk data asli.",
       "kata_kunci": [
         "ANALISA Copilot",
         "asisten AI lintas modul",
         "daftar task",
         "T9b",
         "T13",
-        "tabel grafik",
-        "riwayat",
-        "gerbang RBAC",
+        "antrean persetujuan",
+        "tool kedua",
+        "cuti tim",
         "persetujuan Direksi"
       ]
     },
