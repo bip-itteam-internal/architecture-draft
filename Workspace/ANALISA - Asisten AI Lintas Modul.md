@@ -94,6 +94,11 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     tampil ke semua orang — ini gotcha RBAC yang sudah tercatat).
   - ~~**Jangan tutup sebagai selesai** sampai keputusan Corp Sec (lihat § Prasyarat) ada jawabannya.~~
     ✅ **Dijawab 2026-09-29: Corporate Secretary IKUT** (ADR-0132 §3 diperbarui).
+  - **Kemajuan 2026-09-29 (BE)**: branch `feat/assistant-gate-copilot` — `common.BolehPakaiCopilot`
+    + `RequireCopilot` (`shared-library/common/akses_copilot.go`, 20 kasus test + kontrol negatif
+    per cabang) dan `GET /api/assistant/akses`. Belum terbukti lewat gateway dev. **FE ditunda
+    sebagai task terpisah** (keputusan user): halaman/menu `/copilot` bertanya ke `/akses`,
+    BUKAN `aksesSemuaMenu` (tak mencakup Corp Sec). Banner tetap khusus Tech Development.
 
 ## Modul percontohan pertama
 
