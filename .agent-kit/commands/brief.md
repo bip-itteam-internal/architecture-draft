@@ -59,14 +59,17 @@ grounding pada satu dua pencarian yang mengisi bagian Konteks.
    `/kerjakan`. Jalur `yakin` melewati manusia sepenuhnya, jadi ia satu-satunya tempat sumber
    karangan tidak akan tertangkap siapa pun.
 
-4c. **`Issue`**: nomor issue Linear (`BHA-<n>`) yang dikerjakan brief ini. Ambil dari teks user;
-   bila tak disebut dan `LINEAR_API_KEY` tersedia, cari satu kali lewat GraphQL (judul mirip,
-   state belum selesai) lalu **tampilkan** kandidatnya, jangan memilih diam-diam. Tak ada → tulis
-   `tidak ada`. Bila ada, **slug WAJIB diawali `bha-<n>-`** (mis. `bha-249-dashboard-integrasi`):
-   slug menjadi nama branch (`<domain>/<slug>`), dan integrasi GitHub di Linear hanya menyambungkan
-   PR ke issue lewat nomor itu. Tanpanya issue tak pernah berpindah status sendiri, lalu diubah
-   tangan atau lewat audit dan basi; diukur 2026-09-29, cuma 22 dari 100 PR bip-erp dan 14 dari
-   100 PR erp-frontend yang menyebut `BHA-`. Arti tiap status ada di `team-memory.md` § Linear.
+4c. **`Issue`**: issue GitHub yang dikerjakan brief ini, bentuk lengkap `<repo>#<n>` (mis.
+   `bip-erp#2162`), di Project #15 (`team-memory.md` § Backlog: GitHub Project). Ambil dari teks
+   user; rujukan lama `BHA-<n>` diterjemahkan lewat `gh search issues "BHA-<n>" --owner
+   bip-itteam-internal` (judul hasil migrasi berakhiran `[BHA-<n>]`). Bila tak disebut, cari satu
+   kali (`gh issue list -R bip-itteam-internal/<repo> --search "<kata kunci>"`) lalu **tampilkan**
+   kandidatnya, jangan memilih diam-diam. Tak ada → tulis `tidak ada` dan usulkan ke user untuk
+   dibuat; jangan membuat issue diam-diam. Bila ada, **slug diawali `<n>-`** (mis.
+   `2162-anonim-be`) supaya branch `<domain>/<n>-<slug>` terbaca; yang benar-benar menyambungkan
+   PR ke issue adalah `Closes` di badan PR (`/kerjakan` §5), bukan nama branch. Brief yang menjadi
+   salah satu pecahan per repo menunjuk **sub-issue** repo itu, bukan issue induknya. Jangan
+   menaruh issue di `architecture-draft`: repo itu publik.
 
 5. **Kriteria lolos**: minimal satu yang bisa dibuktikan **mesin** (test bernama, perintah yang
    harus hijau, `file:line` yang harus berubah) dan minimal satu dari sudut **orang yang

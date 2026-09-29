@@ -63,15 +63,17 @@ fi
 gagal=0
 echo "[agent-kit pre-push] repo: $top"
 
-# ---- nomor issue Linear di nama branch (kit 1.31.0, PERINGATAN saja, tak pernah menolak) ----
-# Integrasi GitHub di Linear hanya menyambungkan PR ke issue lewat `bha-<n>` di nama branch/judul;
-# tanpanya status issue diubah tangan lalu basi (team-memory § Linear). Vault (.agent-kit/ di
-# akar) push langsung ke main, jadi dilewati; begitu pula main/master dan branch rilis/dependabot.
+# ---- nomor issue di nama branch (kit 1.31.0, GitHub sejak 1.33.0; PERINGATAN saja, tak menolak) ----
+# Backlog di GitHub Project #15 (team-memory § Backlog: GitHub Project). Yang menyambungkan PR ke
+# issue adalah `Closes bip-itteam-internal/<repo>#<n>` di badan PR, bukan nama branch; peringatan
+# ini pengingat supaya baris itu tak lupa. Pola branch `<domain>/<n>-<slug>`; `bha-<n>-` lama
+# tetap diterima. Vault (.agent-kit/ di akar) push langsung ke main, jadi dilewati; begitu pula
+# main/master dan branch rilis/dependabot.
 if [ ! -d "$top/.agent-kit" ]; then
   for b in $dipush; do
     case "$b" in main|master|dev|release/*|chore/rilis*|dependabot/*) continue ;; esac
-    if ! printf '%s' "$b" | grep -qi 'bha-[0-9]'; then
-      echo "[agent-kit pre-push] PERINGATAN: branch '$b' tak memuat nomor issue Linear (bha-<n>). PR-nya tak akan tersambung ke issue. Bila ada issue-nya, beri nomor di judul PR: [BHA-<n>]"
+    if ! printf '%s' "$b" | grep -qiE '/[0-9]+-|bha-[0-9]'; then
+      echo "[agent-kit pre-push] PERINGATAN: branch '$b' tak memuat nomor issue (<domain>/<n>-<slug>). Pastikan badan PR memuat 'Closes bip-itteam-internal/<repo>#<n>', kalau tidak issue di Project #15 tak bergerak."
     fi
   done
 fi

@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-29",
-  "jumlah_dokumen": 508,
+  "jumlah_dokumen": 509,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -8531,6 +8531,31 @@
         "IT",
         "form builder",
         "kerahasiaan"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0143 Backlog Pindah dari Linear ke GitHub Project.md",
+      "judul": "ADR - 0143 Backlog Pindah dari Linear ke GitHub Project",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-09-29, **sedang diterapkan**: Project dan agent-kit 1.33.0 selesai; migrasi 245 issue berjalan sejak 2026-09-29 (status migrasi diukur di Project, bukan dicatat di sini). Diputuskan user (Tech Development). Linear `BHA` dibekukan jadi arsip baca. Nomor 0143 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.",
+      "publik": true,
+      "tautan": [],
+      "hash": "1656bea4960e26a849668bc7922cf7475a96f7562a76caedde81cb1a39b6fcee",
+      "ukuran_kb": 4.2,
+      "ringkasan": "Menjawab: di mana backlog tim ERP sekarang (GitHub Project #15, bukan Linear), kenapa pindah (batas 250 issue paket Free Linear, hanya 3 dari 10 anggota punya akun), dan bagaimana status bekerja (Menunggu Adopsi, merge bukan Done, PR menyambung lewat Closes). Juga menjelaskan cara menerjemahkan rujukan lama BHA-n ke issue GitHub dan bahwa Linear dibekukan sebagai arsip.",
+      "kata_kunci": [
+        "backlog",
+        "Linear",
+        "GitHub Project",
+        "issue",
+        "BHA",
+        "Menunggu Adopsi",
+        "Closes",
+        "migrasi",
+        "status issue",
+        "sub-issue"
       ]
     },
     {

@@ -292,38 +292,67 @@ Yang membuatnya bergejala: `DepartmentFilterOptions` sengaja MENGGANTI anggota g
 - **Sumber diresolusi, bukan diingat.** Menyebut ADR dari ingatan tanpa membuka berkasnya = `ragu`
   (brief ditampilkan, tunggu persetujuan). Prosedur lengkap: `/start-task` langkah 0.
 
-## Linear: status issue mengikuti keadaan ERP (2026-09-29)
+## Backlog: GitHub Project "ERP Bharata - Backlog" (2026-09-29, menggantikan Linear)
 
-Backlog tim ada di Linear `bharata-erp`, tim `BHA`. Akses dari agent lewat GraphQL
-(`https://api.linear.app/graphql`, header `Authorization: <LINEAR_API_KEY>`); tidak ada MCP Linear.
+Backlog tim pindah dari Linear ke **GitHub Project #15** org `bip-itteam-internal`
+(https://github.com/orgs/bip-itteam-internal/projects/15, privat). Alasannya terukur: paket Free
+Linear berhenti di **250 issue** (terisi 245), dan hanya 3 dari 10 anggota org yang ada di Linear
+sehingga PIC terpaksa ditulis sebagai teks. Keputusannya [[ADR - 0143 Backlog Pindah dari Linear ke GitHub Project]].
+**Linear `BHA` dibekukan jadi arsip baca**: jangan membuat atau memperbarui issue di sana. Tiap issue
+lama punya padanan di GitHub: judulnya berakhiran `[BHA-<n>]` dan field **Linear ID** berisi `BHA-<n>`,
+jadi rujukan `BHA-<n>` di vault, ADR, dan brief tetap bisa dilacak (`gh search issues "BHA-<n>" --owner bip-itteam-internal`).
 
 | Status | Artinya | Yang memindahkan |
 |---|---|---|
 | Backlog / Todo | belum ada branch | manusia |
-| In Progress | branch `<domain>/bha-<n>-<slug>` sudah ada | otomatis (integrasi GitHub) |
-| In Review | PR terbuka | otomatis |
-| **Menunggu Adopsi** | kode merged; sisa deploy prod (manusia) dan fitur benar-benar dipakai | otomatis saat merge |
-| Done | terpasang di prod **dan terbukti dipakai** (data > 0 / proses bisnis jalan) | manusia, dengan bukti |
+| In Progress | branch sudah ada | pembuat branch (manusia atau agent) |
+| In Review | PR terbuka | pembuat PR (manusia atau agent) |
+| **Menunggu Adopsi** | kode merged; sisa deploy prod (manusia) dan fitur benar-benar dipakai | otomatis: PR merged menutup issue, workflow *Item closed* memindahkannya |
+| Done | terpasang di prod **dan terbukti dipakai** (field **Bukti Adopsi** terisi) | manusia, dengan bukti |
+| Canceled | tidak dikerjakan / duplikat | manusia |
 
-- ⛔ **Nomor `bha-<n>` WAJIB ada di nama branch** (dan judul PR `[BHA-<n>]`). Hanya itu yang membuat
-  integrasi GitHub menyambungkan PR ke issue; tanpanya status diubah tangan lalu basi. Diukur
-  2026-09-29: 22 dari 100 PR bip-erp dan 14 dari 100 PR erp-frontend yang menyebutnya. `/brief`
-  mengisi field `Issue` dan menaruh nomornya di slug; PR tangan wajib meniru polanya.
-- ⛔ **Merge BUKAN Done.** Otomasi "PR merged" diarahkan ke Menunggu Adopsi, bukan Done (sebelumnya
-  Done). Pada audit 2026-09-29 status meleset ke dua arah: BHA-249 Done tanpa satu baris kode,
-  BHA-250 tertulis "Belum Mulai" padahal 127 sesi live sudah memakainya, dan BHA-22 (insentif)
-  kodenya lengkap di prod dengan 0 snapshot. "Kode selesai" dan "dipakai" pemiliknya berbeda (dev vs
-  pengguna/pemilik proses); satu status untuk keduanya menyembunyikan siapa yang ditunggu.
-- **`/linear-cek`** (kit ≥ 1.32.0) mencocokkan status dengan PR tertaut dan menulis laporan ke
-  `.task-plans/linear/`; `--terapkan` hanya memindahkan yang buktinya pasti (PR terbuka → In Review,
-  semua PR merged → Menunggu Adopsi), tak pernah ke Done. Run pertama 2026-09-29: **82 dari 105**
-  issue Done tak punya satu pun PR tertaut, jadi Done di backlog lama umumnya tak terverifikasi.
-- **PIC ditulis di deskripsi (`**PIC:** ...`), bukan kolom assignee**: sebagian besar dev belum jadi
-  anggota workspace Linear.
+Aturan (berlaku untuk developer DAN agent):
+
+- ⛔ **Yang menentukan selesai adalah field Status, BUKAN issue open/closed.** Issue tertutup berarti
+  kodenya merged, belum berarti dipakai. View dan laporan menyaring Status, jangan `is:open`.
+- ⛔ **PR wajib memuat `Closes bip-itteam-internal/<repo>#<n>` di badannya.** Hanya tautan resmi
+  (kata kunci penutup, atau branch dari `gh issue develop`) yang menggerakkan otomasi; `Refs #<n>`
+  tidak menyambungkan apa pun, dan issue-nya diam di In Review selamanya. Bentuk lengkap
+  `<org>/<repo>#<n>` wajib saat PR dan issue beda repo (PR erp-frontend untuk issue bip-erp).
+- ⛔ **Merge BUKAN Done.** Pelajaran audit Linear 2026-09-29 tetap berlaku: status meleset ke dua arah
+  (BHA-249 Done tanpa satu baris kode, BHA-250 "Belum Mulai" padahal 127 sesi live sudah memakainya,
+  BHA-22 kodenya lengkap di prod dengan 0 snapshot), dan 82 dari 105 issue Done tak punya PR tertaut.
+  "Kode selesai" dan "dipakai" pemiliknya berbeda; satu status untuk keduanya menyembunyikan siapa
+  yang ditunggu. **Agent tidak pernah memindahkan issue ke Done.**
+- ⛔ **Jangan membuat issue di repo vault `architecture-draft`: repo itu PUBLIK.** Issue bertanda
+  keamanan hanya di repo kode (privat), dan rincian celah yang belum ditambal tidak ditulis ke vault.
+- **Satu issue tinggal di satu repo.** Taruh di repo kode yang paling banyak disentuh. Pekerjaan lintas
+  repo = satu issue induk + **sub-issue** per repo (sub-issue boleh beda repo), pola yang sama dengan
+  memecah brief BE/FE/mobile.
+- **PIC = assignee** (login GitHub). Pengawas ditulis di badan issue sebagai `**Pengawas:** <login>`.
+- **Nama branch `<domain>/<n>-<slug>`**, `<n>` = nomor issue GitHub. Bukan syarat otomasi (yang
+  menyambungkan adalah `Closes` di PR), tetapi membuat branch terbaca dan dipakai pre-push untuk
+  mengingatkan. Branch lama `bha-<n>-` tetap diterima.
+- **Membatalkan**: tutup issue sebagai *not planned* lalu set Status **Canceled** sendiri; workflow
+  *Item closed* tidak membedakan alasan penutupan dan akan menaruhnya di Menunggu Adopsi.
 - ⚠️ **Deskripsi hasil audit bisa basi dan audit bisa salah baca.** "Rute tak ditemukan" di banyak
-  issue lahir dari lupa bahwa gateway membuang prefix `/api/<module>`; MyBharata dibaca dari `main`
-  padahal rilis store dari `dev`. Sebelum memindahkan status, ukur ke `origin/main` (MyBharata:
-  `origin/dev`) dan data prod, lalu tulis bagian `### Verifikasi <tanggal>` di deskripsi.
+  issue lama lahir dari lupa bahwa gateway membuang prefix `/api/<module>`; MyBharata dibaca dari
+  `main` padahal rilis store dari `dev`. Sebelum memindahkan status, ukur ke `origin/main`
+  (MyBharata: `origin/dev`) dan data prod, lalu tulis komentar `Verifikasi <tanggal>` di issue.
 
+Cara agent mengaksesnya:
+
+- Lewat `gh`, butuh scope **`project`** di mesin itu (`gh auth refresh -h github.com -s project`,
+  sekali per mesin; tanpa itu perintah project gagal dengan pesan scope, bukan diam).
+- Tambah issue ke project: `gh project item-add 15 --owner bip-itteam-internal --url <url issue>`.
+  Ubah field: `gh project item-edit` (butuh id item, id field, id opsi; `gh project field-list 15
+  --owner bip-itteam-internal --format json`). Pada PowerShell 5.1, kirim payload GraphQL lewat
+  berkas `--input`, bukan argumen: kutip ganda di argumen `-f query=` dirusak.
+- ⚠️ **PowerShell: `$L` dan `$l`, `$F` dan `$f`, `$ORG` dan `$org` adalah variabel yang SAMA.**
+  Skrip migrasi menggigit tiga kali dalam satu jam: `foreach ($l in $L)` menimpa daftar label
+  sehingga hanya label terakhir yang terkirim, tanpa galat. Juga: `@($x.nodes.name)` atas daftar
+  kosong menghasilkan `@($null)` (satu elemen null), bukan array kosong.
+- `/linear-cek` dan `linear-verifikasi.ps1` **usang** sejak Linear dibekukan; penggantinya (laporan
+  mingguan dari Project #15) **belum ada** (TBD).
 ## Bahasa
 - Balasan AI ke user & dokumentasi: **Bahasa Indonesia**; istilah teknis lazim English biarkan English.

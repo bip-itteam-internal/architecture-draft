@@ -1,10 +1,14 @@
 ---
-description: Cocokkan status issue Linear (tim BHA) dengan PR GitHub yang tertaut; laporan dulu, pindah status hanya dengan --terapkan
+description: (USANG sejak kit 1.33.0) Cocokkan status issue Linear (tim BHA) dengan PR GitHub yang tertaut
 argument-hint: [--terapkan] [--hari-macet N]
 ---
 
+> ⛔ **USANG sejak kit 1.33.0.** Backlog pindah ke GitHub Project #15 dan Linear `BHA` dibekukan jadi
+> arsip baca (`team-memory.md` § Backlog: GitHub Project). **Jangan jalankan `--terapkan`**: ia
+> menulis ke backlog yang tak lagi dibaca siapa pun. Pengganti (laporan mingguan Project #15) belum ada.
+
 Jalankan verifikasi status backlog Linear terhadap bukti PR, sesuai definisi status di
-`team-memory.md` § Linear. Argumen: $ARGUMENTS
+`team-memory.md` (bagian Linear lama, kini diganti § Backlog: GitHub Project). Argumen: $ARGUMENTS
 
 Butuh `LINEAR_API_KEY` (env proses atau env **User**; key pribadi dari Linear → Settings →
 Security & access). Tanpa itu skrip keluar dengan pesan, jangan meminta user menempel key ke chat.
