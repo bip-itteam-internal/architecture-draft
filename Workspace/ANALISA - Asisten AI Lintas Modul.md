@@ -186,6 +186,14 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     tetap keluar ke relay: nama departemen, jumlah telat per token, dan isi pertanyaan (termasuk
     nama yang diketik penanya di pertanyaan pertama). Prasyarat § Persetujuan Direksi di atas
     tidak dicabut oleh keputusan ini; ia tetap terbuka untuk modul berikutnya.
+  - **Naik di PROD 2026-09-29** (manusia; bip-erp #2161, #2167, #2240; erp-frontend #1798, #1885):
+    biner attendance + assistant memuat kode baru, env `AI_*`/`GATEWAY_URL` terisi, 0 panic,
+    tanpa JWT = 401, bundel FE memuat panel. Panggilan ber-JWT di prod belum dicoba agent (tanpa
+    akun uji prod). Cakupan rekap diperluas (keputusan user): IT supervisor/admin, Direktur, Corp
+    Sec = seluruh perusahaan (dev: 56/56 cocok rekap HR); staf IT tetap 403. Prompt: tanpa
+    Markdown, tanpa nama layar/modul (dev: model sempat mengarang "Point of Sale"). Tampilan dari
+    review Grok (dipilih user): tampilan awal satu input + chip saran pengisi + input pil Enter.
+    Sisa kecil: keterangan uji coba masih berbunyi "tim yang Anda supervisi".
   - **Bergantung**: T1, T2, T5.
   - **Baca dulu**: `shared-library/routes/gateway_request.go:47-115` (`Reroute` — cara header
     `BIP-*` diisi ulang dari klaim JWT, TERMASUK `BIP-Permissions`) **vs**
