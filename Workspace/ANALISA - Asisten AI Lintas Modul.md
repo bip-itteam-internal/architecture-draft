@@ -96,7 +96,11 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     ✅ **Dijawab 2026-09-29: Corporate Secretary IKUT** (ADR-0132 §3 diperbarui).
   - **Kemajuan 2026-09-29 (BE)**: branch `feat/assistant-gate-copilot` — `common.BolehPakaiCopilot`
     + `RequireCopilot` (`shared-library/common/akses_copilot.go`, 20 kasus test + kontrol negatif
-    per cabang) dan `GET /api/assistant/akses`. Belum terbukti lewat gateway dev. **FE ditunda
+    per cabang) dan `GET /api/assistant/akses`. Merged (bip-erp #2154) dan **terbukti di DEV
+    2026-09-29** lewat gateway, tiap cabang oleh akun yang hanya punya cabang itu: panpan (IT
+    saja) 200, Diki (supervisor saja) 200, Wirawan (Direktur) 200, Fathur & Abdul (staf) 403.
+    Cabang Corporate Secretary hanya dikunci unit test (tak ada akun Corp Sec di dev). PROD:
+    rebuild `assistant-service` oleh manusia. **FE ditunda
     sebagai task terpisah** (keputusan user): halaman/menu `/copilot` bertanya ke `/akses`,
     BUKAN `aksesSemuaMenu` (tak mencakup Corp Sec). Banner tetap khusus Tech Development.
 
