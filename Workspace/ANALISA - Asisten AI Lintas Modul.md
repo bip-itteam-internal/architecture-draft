@@ -237,6 +237,13 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
   - **Riwayat percakapan (2026-09-29, di luar daftar T awal, diminta user)**: simpan selamanya,
     hanya pemilik, drawer daftar + hapus + lanjutkan. BE bip-erp #2332 dan FE erp-frontend #1899
     merged; BE terbukti di DEV. Rincian: [[Microservices - Assistant Service]] § Riwayat percakapan.
+  - **Tool kedua `antrean_persetujuan` (2026-09-29, keputusan user: antrean dulu, lalu cuti/izin
+    tim)**: endpoint attendance `/hr/requests?as=reviewer` dipakai apa adanya (gerbang relasional
+    sudah benar). BE bip-erp #2362 merged, terbukti di DEV ujung ke ujung dengan pengajuan uji.
+    Pemetaan kandidat lain: cuti/izin tim, lembur tim, dan sisa kuota **tak punya** endpoint
+    bercakupan supervisor (hanya HR, diri sendiri, atau yang pernah ditinjau), jadi cuti/izin tim
+    butuh endpoint baru seperti T5. Temuan sampingan keamanan dicatat di issue privat bip-erp, tidak
+    di vault (repo publik).
   - **Kemajuan T9a**: branch erp-frontend `feat/copilot-panel-tanya` — `features/copilot/components/
     panel-tanya.tsx` + `hooks/use-tanya-copilot.ts`; halaman `/copilot` menampilkan panel (badge "Uji
     Coba"), jawaban teks polos + sumber, galat per status lewat i18n dengan Coba lagi, riwayat
