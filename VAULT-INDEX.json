@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-29",
-  "jumlah_dokumen": 506,
+  "jumlah_dokumen": 507,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -2402,6 +2402,7 @@
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
         "IT - Form Builder",
+        "ADR - 0141 Potret Sasaran Penilaian Form Berulang Diambil Ulang tiap Periode, Beku di Dalam Periode",
         "Microservices - Notification Service",
         "IT - Background Jobs & Schedulers",
         "HRIS - Kaizen (Ide Perbaikan)",
@@ -2418,20 +2419,20 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "010ed09c37fb218bb72f4f70b7591b523fec1eb7bb0568b262d0497f1fd05053",
-      "ukuran_kb": 133.8,
-      "ringkasan": "Menjawab: bagaimana membuat dan menerbitkan form dinamis (survei, checklist, evaluasi, kaizen) tanpa rilis kode, siapa yang boleh mengelola form per departemen, dan bagaimana form penilaian karyawan lain serta form berulang (periode bulanan/mingguan) bekerja. Juga menjelaskan bagaimana form wajib bisa menahan clock-in mobile lewat gerbang presensi, kepemilikan bersama antar-departemen, program kaizen dan Culture, serta jebakan deploy (notification-service harus ikut naik bersama form-builder).",
+      "hash": "c3944ca7cd2aff47988fec871c550ef057d708715e03695650e45e9d339580bf",
+      "ukuran_kb": 134.1,
+      "ringkasan": "Menjawab: bagaimana cara membuat form dinamis (survey, evaluation, checklist, kaizen) tanpa coding, siapa yang boleh mengelola form per departemen, dan bagaimana alur terbit-isi-analisa bekerja termasuk export ke CSV. Juga menjelaskan penilaian karyawan lain (potret sasaran subject/audience), form berulang periode bulanan/mingguan, gerbang presensi yang menahan clock-in mobile bila form wajib belum diisi, dan risiko notifikasi inbox hilang bila notification-service tak ikut di-deploy bersama.",
       "kata_kunci": [
         "form builder",
-        "survei",
         "survey",
-        "evaluasi karyawan",
-        "kaizen",
+        "evaluation",
         "checklist",
+        "kaizen",
         "form berulang",
-        "recurring form",
+        "penilaian karyawan",
         "gerbang presensi",
-        "clock-in"
+        "compliance",
+        "notifikasi inbox"
       ]
     },
     {
@@ -8464,6 +8465,42 @@
         "/health version",
         "catatan rilis",
         "GitHub Release"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0141 Potret Sasaran Penilaian Form Berulang Diambil Ulang tiap Periode, Beku di Dalam Periode.md",
+      "judul": "ADR - 0141 Potret Sasaran Penilaian Form Berulang Diambil Ulang tiap Periode, Beku di Dalam Periode",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-09-29, BELUM diputuskan dan nol kode. Linear: BHA-359. Pengambil keputusan: **TBD** (pemilik form penilaian di HR bersama tim IT; lihat §Pertanyaan terbuka). Bila diputuskan sesuai usulan, ADR ini **menggantikan** butir keputusan 2026-09-28 \"karyawan baru tidak ditambahkan ke potret yang sudah terbit\" di [[Microservices - Form Builder Service]] §Sasaran yang resign dikecualikan. Sampai §Decision diisi, butir 2026-09-28 itu yang berlaku. Nomor 0141 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.",
+      "publik": true,
+      "tautan": [
+        "Microservices - Form Builder Service",
+        "ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI",
+        "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
+        "ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval",
+        "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
+        "API - Form Builder Service",
+        "IT - Form Builder",
+        "APP - MyBharata"
+      ],
+      "hash": "9f4863572290c51ee8fe489c75875ad942bb6dc94250efcbd1939db1192e21cd",
+      "ukuran_kb": 23.1,
+      "ringkasan": "Menjawab: kenapa karyawan baru yang masuk sesudah form penilaian berulang terbit (mis. form kepuasan Office Boy) tidak pernah ikut dinilai, dan kenapa karyawan yang pindah jabatan namun masih aktif tetap ditagih penilaian atas jabatan lamanya sementara hanya yang resign yang otomatis dikeluarkan. Menjelaskan mekanisme potret sasaran (`subject.resolved`) saat ini yang diambil sekali seumur form lalu dibekukan, cron pengecualian sasaran keluar (`segarkanSasaranKeluar`), serta preseden pola potret per-periode yang sudah dipakai kaizen (`FormPeriod.Participants`). Membandingkan empat opsi perbaikan (tetap seperti sekarang, potret ulang tiap periode dibuka, sinkron otomatis, tombol tambah sasaran manual) sebagai ADR yang masih diusulkan dan belum diputuskan.",
+      "kata_kunci": [
+        "potret sasaran",
+        "subject snapshot",
+        "form berulang",
+        "recurring form",
+        "FormPeriod",
+        "subject.resolved",
+        "karyawan baru tidak dinilai",
+        "kaizen",
+        "form builder",
+        "mutasi jabatan",
+        "ADR 0141",
+        "BHA-359"
       ]
     },
     {
