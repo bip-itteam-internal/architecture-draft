@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-29",
-  "jumlah_dokumen": 507,
+  "jumlah_dokumen": 508,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -2402,6 +2402,7 @@
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
         "IT - Form Builder",
+        "ADR - 0142 Pengisi Penilaian dan Survei Selalu Anonim, IT Membuka Identitas lewat Jalur Audit Bercatatan",
         "ADR - 0141 Potret Sasaran Penilaian Form Berulang Diambil Ulang tiap Periode, Beku di Dalam Periode",
         "Microservices - Notification Service",
         "IT - Background Jobs & Schedulers",
@@ -2419,17 +2420,17 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "c3944ca7cd2aff47988fec871c550ef057d708715e03695650e45e9d339580bf",
-      "ukuran_kb": 134.1,
-      "ringkasan": "Menjawab: bagaimana cara membuat form dinamis (survey, evaluation, checklist, kaizen) tanpa coding, siapa yang boleh mengelola form per departemen, dan bagaimana alur terbit-isi-analisa bekerja termasuk export ke CSV. Juga menjelaskan penilaian karyawan lain (potret sasaran subject/audience), form berulang periode bulanan/mingguan, gerbang presensi yang menahan clock-in mobile bila form wajib belum diisi, dan risiko notifikasi inbox hilang bila notification-service tak ikut di-deploy bersama.",
+      "hash": "1718d73886ba7646e9705fa02682967d0466cb6e3a55496c39a5f0f178c9de13",
+      "ukuran_kb": 134.4,
+      "ringkasan": "Menjawab: bagaimana cara membuat form dinamis (survey, evaluation, checklist, kaizen) tanpa coding, siapa yang boleh mengelola form per departemen, dan bagaimana alur terbit-isi-analisa bekerja termasuk export ke CSV. Juga menjelaskan penilaian karyawan lain (potret sasaran subject/audience), anonimitas pengisi (subject.anonymous, settings.anonymous, anonimAktif) dan keputusan anonim wajib untuk penilaian dan survei, form berulang periode bulanan/mingguan, serta gerbang presensi yang menahan clock-in mobile bila form wajib belum diisi.",
       "kata_kunci": [
         "form builder",
         "survey",
         "evaluation",
-        "checklist",
-        "kaizen",
-        "form berulang",
         "penilaian karyawan",
+        "anonim",
+        "anonymous",
+        "form berulang",
         "gerbang presensi",
         "compliance",
         "notifikasi inbox"
@@ -8501,6 +8502,35 @@
         "mutasi jabatan",
         "ADR 0141",
         "BHA-359"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0142 Pengisi Penilaian dan Survei Selalu Anonim, IT Membuka Identitas lewat Jalur Audit Bercatatan.md",
+      "judul": "ADR - 0142 Pengisi Penilaian dan Survei Selalu Anonim, IT Membuka Identitas lewat Jalur Audit Bercatatan",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-09-29, nol kode. Linear: BHA-360. Arah diputuskan user (Tech Development): pengisi form bertipe penilaian karyawan dan survei disembunyikan, kecuali IT. Rincian pelaksanaan (§Decision butir 2 sampai 4) adalah usulan penulis yang disetujui bersamaan (\"buat sekalian\"); butir yang masih boleh diubah tanpa ADR baru ditandai di §Pertanyaan terbuka. Nomor 0142 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.",
+      "publik": true,
+      "tautan": [
+        "Microservices - Form Builder Service",
+        "ADR - 0141 Potret Sasaran Penilaian Form Berulang Diambil Ulang tiap Periode, Beku di Dalam Periode",
+        "ADR - 0121 Jadwal Ruang Publik Menyertakan Nama dan Divisi Pemohon"
+      ],
+      "hash": "d61b577a268281fd905d0a8a37b83153a3753c620b66dbaedea57022c5dfa457",
+      "ukuran_kb": 8.2,
+      "ringkasan": "Menjawab: apakah pengelola form bisa melihat siapa yang mengisi penilaian karyawan atau survei, siapa yang boleh membuka identitas pengisi, dan bagaimana caranya. Memutuskan anonimitas jadi sifat tipe form evaluation dan survey (selalu nyala, berlaku mundur), IT supervisor/admin membuka identitas satu jawaban lewat jalur audit beralasan dan tercatat, serta teks pemberitahuan jujur ke pengisi di MyBharata.",
+      "kata_kunci": [
+        "anonim",
+        "anonymous",
+        "penilaian karyawan",
+        "survei",
+        "survey",
+        "identitas pengisi",
+        "audit",
+        "IT",
+        "form builder",
+        "kerahasiaan"
       ]
     },
     {
