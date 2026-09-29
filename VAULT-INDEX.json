@@ -2121,19 +2121,19 @@
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "04e2adea20a0209bf4d46b159da5bfe9c3238f42fa315562c916cc812b3b6c9b",
-      "ukuran_kb": 24.3,
-      "ringkasan": "Menjawab: bagaimana asisten AI Copilot di Web ERP menjawab pertanyaan angka bisnis dengan merutekan ke endpoint yang sudah menghitungnya, memanggil lewat gateway dengan JWT pemakai, siapa yang boleh memakainya (gate RequireCopilot: supervisor departemen mana pun, Direktur, Corporate Secretary, IT) dan kenapa frontend wajib bertanya ke GET /api/assistant/akses alih-alih aksesSemuaMenu. Juga menjawab kerangka service port 6991, batas gateway 30 detik tanpa stream, penjaga anti angka karangan, Jadwal Tugas sebagai pengingat, syarat .env sebelum deploy, dan keputusan yang masih TBD.",
+      "hash": "28a685bb6bae46497ae2f695b4389ca76986fabee738ea64ddaf7909af9f72f7",
+      "ukuran_kb": 24.8,
+      "ringkasan": "Menjawab: bagaimana asisten AI Copilot di Web ERP menjawab pertanyaan angka bisnis dengan merutekan ke endpoint yang sudah menghitungnya, memanggil lewat gateway dengan JWT pemakai, siapa yang boleh memakainya (gate RequireCopilot: supervisor departemen mana pun, Direktur, Corporate Secretary, IT), bagaimana halaman /copilot bertanya ke GET /api/assistant/akses dan membalas 404 untuk yang tak berhak, serta kenapa banner tetap khusus Tech Development. Juga menjawab kerangka service port 6991, batas gateway 30 detik tanpa stream, penjaga anti angka karangan, Jadwal Tugas, syarat .env sebelum deploy, dan keputusan yang masih TBD.",
       "kata_kunci": [
         "asisten AI",
         "Copilot",
         "assistant-service",
         "RequireCopilot",
-        "gate Copilot",
         "/api/assistant/akses",
+        "halaman /copilot",
+        "useAksesCopilot",
         "Corporate Secretary",
         "AI assistant",
-        "tool calling",
         "Jadwal Tugas"
       ]
     },
