@@ -152,7 +152,45 @@ nama departemen**:
 - Jawaban dipulihkan ke nama asli hanya di balasan untuk penanya.
 - ⚠️ **Batas yang diketahui**: nama yang diketik penanya di pertanyaan **pertama** terkirim apa
   adanya, karena sebelum tool pertama berjalan peta masih kosong. Nama panggilan/sebagian nama
-  ("Danu" untuk "Danu Prayuda") tak dikenali penyamaran.
+  ("Danu" untuk "Danu Prayuda") tak dikenali penyamaran. Pada percakapan yang **dilanjutkan**
+  (§ Riwayat) peta lama dipulihkan, jadi nama yang sudah dikenal ikut tersamar sejak putaran pertama.
+
+### Riwayat percakapan (keputusan user 2026-09-29, bip-erp #2332, erp-frontend #1899)
+
+- **Disimpan selamanya, hanya pemiliknya yang bisa membaca.** Database sendiri
+  `assistant-mongo-db` (container `Assistant-MongoDB`, env `MONGO_ASSISTANT_DB`), koleksi
+  `percakapan`. Pemilik ditegakkan di **filter penyimpanan** (`riwayat.FilterMilik` =
+  `_id` + `employee_id`), bukan di handler: milik orang lain dibalas **404**, sama dengan tidak ada.
+- Rute di belakang `RequireCopilot`: `GET /percakapan` (100 terbaru), `GET /percakapan/:id`,
+  `DELETE /percakapan/:id` (hapus **permanen**, 204). `POST /tanya` menerima `percakapan_id` untuk
+  melanjutkan; balasannya membawa `percakapan_id` dan `tersimpan`.
+- Tiap giliran menyimpan dua versi: nama asli (untuk layar) dan versi tersamar (yang dikirim ulang ke
+  model, maksimal 6 giliran terakhir), plus **peta samaran**. Peta dan `employee_id` tak pernah ikut
+  di balasan JSON.
+- Gagal menyimpan **tidak** membatalkan jawaban: `tersimpan:false`, layar memberi keterangan.
+  `MONGO_URI` kosong/Mongo mati = rute riwayat 503, `/tanya` tetap menjawab.
+- Terbukti di DEV 2026-09-29 lewat gateway dengan dua akun: simpan, isolasi (baca/hapus/lanjutkan
+  milik orang lain = 404), lanjutkan, hapus 204 lalu 404.
+- Deploy pertama menuntut `up -d` **tanpa** `--no-deps` supaya `assistant-mongo-db` ikut tercipta.
+
+### Blok tampilan: tabel dan grafik (T9b, keputusan user 2026-09-29, bip-erp #2359)
+
+- **Model memilih bentuk, angka dari tool.** Tool berdata baris punya argumen `tampilan`
+  (`teks`/`tabel`/`grafik`) yang diisi model saat memanggilnya (nol putaran tambahan). Isi blok
+  dibangun **server** dari balasan endpoint (`internal/alat/tampilan.go`), dengan nama asli, dan
+  diantar hanya ke penanya di field `tampilan` (array, `[]` bila tak ada). Model tak pernah
+  mengetik isi tabel, dan kiriman ke relay tetap tersamar.
+- Bentuk blok: `jenis`, `alat`, `periode`, `kolom` (**kunci**, bukan label: labelnya milik layar,
+  [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]), `baris`, `kategori`/`nilai` (sumbu grafik),
+  `total`. Rekap telat: terurut dari yang paling sering telat; grafik dipotong **15** dengan `total`.
+- Tanpa blok bila model memilih teks, data kosong, atau status gagal/tidak berhak.
+- Blok ikut tersimpan di riwayat dan **tidak pernah** dikirim ulang ke model.
+- Frontend: `features/copilot/components/blok-tampilan.tsx` (tabel `components/ui/table`, grafik
+  batang mendatar lewat `ChartContainer` + `WARNA_BAGAN.violet`); jenis asing diabaikan.
+- Terukur di DEV 2026-09-29 (akun Direktur, seluruh perusahaan): "rekap April 2026" → tabel 56 baris
+  (12 dtk); "grafik ... April 2026" → grafik 15 dari 56 (7 dtk). ⚠️ Pertanyaan "satu orang paling
+  sering telat" juga mendapat tabel 56 baris, karena model memilih sebelum melihat data; perketat
+  deskripsi argumen bila terasa berlebihan.
 
 Yang sengaja **TIDAK** ada, dan alasannya bukan kehati-hatian umum:
 
@@ -269,7 +307,7 @@ riwayat: kapan terkirim, kapan dibuka
 - ~~**Cara mengantar jawaban.** Empat pilihan di § Temuan gateway, belum dipilih.~~ **Diputuskan user 2026-09-29: sekaligus, tanpa stream**, lewat gateway biasa dengan tenggat 25 detik (cukup untuk satu-dua tool). Stream ditunda sampai pertanyaan lintas modul (T8) membuktikan 25 detik tak cukup.
 - **Daftar tool final** beserta bentuk argumen dan bentuk hasilnya.
 - ~~**Kunci RBAC** yang menentukan siapa boleh membuka asistennya.~~ **Ditegaskan 2026-09-28** oleh [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §3: Supervisor departemen mana pun ATAU Direktur ATAU IT. ~~Yang masih TBD: apakah Corporate Secretary ikut termasuk.~~ Corporate Secretary **ikut** (ditegaskan 2026-09-29).
-- **Penyimpanan riwayat percakapan**: koleksi, masa simpan, dan apakah isinya boleh dibaca siapa pun selain penanyanya.
+- ~~**Penyimpanan riwayat percakapan**: koleksi, masa simpan, dan apakah isinya boleh dibaca siapa pun selain penanyanya.~~ **Diputuskan user 2026-09-29**: koleksi `percakapan` di `assistant-mongo-db`, disimpan selamanya, hanya pemiliknya. Lihat § Riwayat percakapan.
 - **Model dan ongkos.** Probe 2026-09-28 memakai `cc/claude-sonnet-4-6` (bukan opus) — terbukti mendukung tool-calling, 2.332 prompt token untuk satu tool sederhana. Biaya rupiah per pertanyaan lintas modul sungguhan (lebih banyak tool) **masih belum diukur** — lihat T12 di [[ANALISA - Asisten AI Lintas Modul]]. Batas pemakaian per orang per hari juga belum ada.
 - **Prompt caching**: daftar tool dan system prompt yang tetap seharusnya di-cache, penempatan breakpoint-nya belum dirancang.
 - ~~**Penyimpanan kunci API Anthropic** dan siapa yang memegangnya.~~ **Sebagian terjawab 2026-09-28**: `AI_BASE_URL`/`AI_API_KEY` sudah ada sebagai env var di SEMUA container prod (termasuk container MongoDB — kemungkinan dari blok/anchor compose bersama yang terlalu luas, layak ditinjau terpisah, di luar cakupan dok ini) lewat `~/apps/bip-erp/.env` di server. Siapa yang mengelola rotasi/akses kunci ini masih belum jelas.
@@ -279,7 +317,8 @@ riwayat: kapan terkirim, kapan dibuka
   `/copilot` + kunci i18n `copilot.*` dan `copilot.banner.*` di `id`/`en`
   ([[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]). Yang masih TBD: letak menu Copilot
   sungguhan saat fiturnya hidup, panel chat, render tabel/chart jawaban, dan sub-menu (Tanya
-  Jawab, Jadwal Tugas).
+  Jawab, Jadwal Tugas). **Panel chat, riwayat, dan render tabel/grafik sudah dibangun 2026-09-29**
+  (§ Riwayat percakapan, § Blok tampilan).
 - **Irisan dan gerbang verifikasinya.** Belum disusun.
 - ~~**ADR** yang menyelesaikan ketegangan dengan ADR 0058 § 2.~~ **Ditulis 2026-09-28**: [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §2 — asisten lintas modul tetap jadi service terpisah, karena tidak ada satu service pemilik untuk semua modul.
 
