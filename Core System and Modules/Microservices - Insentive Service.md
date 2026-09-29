@@ -50,7 +50,7 @@ Rumus profit memakai **Biaya Operasional** sebagai pengurang terakhir. Isinya:
 | Penyusutan aset | [[Microservices - Inventory Service]] | Rp 551.847 (2 aset) |
 | **Total** | | **Rp 9.948.636** |
 
-**Beban marketing menggantikan cara lama.** Sebelumnya sistem mengambil SELURUH akun beban `6000` di Accurate lalu membuang 14 akun yang sudah dihitung di tempat lain. Cara itu berbahaya: akun baru yang muncul di Accurate otomatis ikut terhitung tanpa ada yang tahu. Sekarang sistem **memilih 5 akun** yang memang beban per-orang — Software, Pelatihan, Perjalanan Dinas, Sewa, dan Server.
+**Beban marketing menggantikan cara lama.** Sebelumnya sistem mengambil SELURUH akun beban `6000` di Accurate lalu membuang 14 akun yang sudah dihitung di tempat lain. Cara itu berbahaya: akun baru yang muncul di Accurate otomatis ikut terhitung tanpa ada yang tahu. Sekarang sistem **memilih akun** yang memang beban per-orang. Semula 5 akun (Software, Pelatihan, Perjalanan Dinas, Sewa, Server); daftarnya sudah berubah beberapa kali (BHA-279, BHA-278), jadi daftar yang berlaku **dibaca dari kode**, `AkunBebanMarketing` di `services/integration/internal/usecase/beban_marketing.go`, bukan dari dok ini. Endpoint `/profit/incentive/beban-marketing` juga mengirimnya sebagai `akun_dibebankan`.
 
 Cara baru juga sudah **membagi beban proyek divisi** ke tiap orang. Proyek `BIP - BH` dan `BIP - KY + GB` dulu tak pernah terbaca karena kodenya bukan employee id; kini isinya dibagi rata ke anggota divisinya.
 
@@ -63,6 +63,29 @@ Cara baru juga sudah **membagi beban proyek divisi** ke tiap orang. Proyek `BIP 
 Aturannya: **selama aset masih dipakai, penyusutannya tetap dibebankan** — walau umur bukunya sudah habis. Ini keputusan sadar dan berbeda dari akuntansi: di Accurate, aset yang habis umurnya bernilai nol dan tak disusutkan lagi. Yang diukur di sini biaya pemakaian, bukan nilai buku. Kalau suatu saat dibandingkan dengan Accurate, selisihnya akan muncul dan sebabnya ini.
 
 Aset yang belum diisi harga atau masa manfaatnya **tidak dilewati diam-diam** — jumlahnya dilaporkan sebagai peringatan baris, supaya beban yang belum terhitung tetap terlihat. Prod 2026-08-26: 70 dari 71 aset marketing sudah lengkap.
+
+### Beban sampling (6117) dan footage (611703): qty × HPP ERP
+
+> **Status**: ✅ merged 2026-09-29 (bip-erp [#2333](https://github.com/bip-itteam-internal/bip-erp/pull/2333), erp-frontend [#1887](https://github.com/bip-itteam-internal/erp-frontend/pull/1887); perbaikan review di branch `fix/bha-279-footage-review`). Belum diverifikasi di dev/prod.
+
+Catatan Finance 2026-09-29: kedua beban marketing ini dihitung dari **qty × HPP ERP** (`product_costs`), bukan dari nominal jurnal Accurate. Keduanya diperlakukan berbeda karena posisinya di rumus profit berbeda.
+
+**6117 Beban Sampling = pecahan HPP, BUKAN pengurang tambahan.** Order sampel TikTok (`is_sample`) sudah lama ikut HPP profit: agregasi penjualan tidak menyaring sampel, order sampel ikut cair karena ongkirnya dipotong payout, dan HPP dihitung dari qty walau nilai jualnya 0. Karena itu integration hanya **memisahkan porsinya**:
+
+- `/profit/incentive/summary` mengirim `hpp_sampel` per toko. ⛔ **`hpp_sampel` adalah HIMPUNAN BAGIAN dari `hpp`, jangan dijumlahkan ke `hpp` dan jangan dikurangkan dari realisasi di samping HPP.** `hpp` sengaja tetap total supaya konsumen yang belum membaca field baru tetap benar; "HPP penjualan" = `hpp − hpp_sampel`. Realisasi dan insentif **tidak bergeser sepeser pun** oleh perubahan ini.
+- Jendela periodenya sama dengan profit (kirim di bulan itu, cair ≤ tanggal 25 bulan berikutnya), sehingga order sampel batal otomatis tak ikut. Angkanya bisa sedikit berbeda dari workbook Finance, yang memakai tanggal order; perbedaan ini disengaja supaya tak lahir aturan periode kedua.
+- **Shopee tak punya penanda sampel.** Bila sampel Shopee tercatat sebagai order, HPP-nya sudah ada di HPP penjualan (tidak hilang, cuma tak terpisah). Baris yang memegang toko Shopee membawa `toko_shopee_sampel_tak_terpisah` sebagai **catatan yang tidak menahan bayar**; tak ada qty yang dikarang.
+
+**611703 Footage = qty dokumen IA × HPP ERP, masuk beban non-gaji.** Dicabut dari `AkunBebanMarketing` (nominal jurnalnya memakai harga pokok Accurate) dan dihitung terpisah di `beban_marketing_footage.go`:
+
+1. Riwayat akun 611703 memberi nomor IA, proyek, dan keterangan per baris jurnal; detail tiap IA (`item-adjustment/detail.do?number=`) memberi item, qty, `unitCost`, arah (`ADJUSTMENT_IN`/`OUT`), dan proyek per baris.
+2. **Penjaga:** Σ qty × `unitCost` dokumen per (IA, proyek) harus sama dengan nominal jurnal 611703. Selisih (dokumen memuat baris akun lain, proyek tak sepakat, atau field salah terbaca) menjadi **galat** yang menggagalkan penarikan beban marketing periode itu, bukan angka. Baris `ADJUSTMENT_IN` (barang footage kembali ke stok) mengurangi beban, sama seperti jurnalnya yang kredit.
+3. Nilai ulang dengan HPP ERP yang berlaku di akhir periode (HPP yang sama dengan profit), lalu dialokasikan dengan **aturan umum** penerima manfaat (nama di keterangan → orangnya; tak bernama > Rp500 rb → leader + ICC; sisanya → SPV).
+4. Proyek `BIP - BH Host Live` → Beauty Hacks dan `BIP - KY+GB Host Live` → Kyura dibaca sebagai proyek divisi **khusus footage**. Akun lain di proyek Host Live tetap diabaikan seperti sebelumnya.
+
+**Produk tanpa HPP ERP tidak dihitung nol.** Sampel maupun footage yang produknya belum punya HPP ERP dilaporkan sebagai **qty per SKU** (`sampel_tanpa_hpp`, `footage_tanpa_hpp`) dan menjadi **peringatan baris yang menahan `layak_dibayar`** (keputusan user 2026-09-29), sekelas HPP penjualan yang belum ada. Untuk KPI keduanya **diloloskan** (sekelas "HPP baru mencakup"), jadi skor tak ikut mati. Prefiksnya kontrak antar-service di `shared-library/models/insentive/peringatan.go`; ⚠️ **employee-service wajib naik bersama/sebelum insentive-service**, lihat [[RUN - Deploy Microservices bip-erp]] §3a. Agustus 2026: PJG-010 Serum GB PDRN (footage Kyura, 8 pcs) belum punya HPP ERP.
+
+⚠️ **Belum terbukti di data asli:** nama field respons detail IA Accurate masih diuji dengan fixture rakitan. Rekam respons sungguhan lewat `cmd/iadetailprobe` (baca saja) dan jadikan test kontrak sebelum angka footage dipakai membayar.
 
 ### Warisan skema lama (masih terdaftar)
 - `GET /health` · `GET /stats` · `GET/PUT /configs/ppn`
