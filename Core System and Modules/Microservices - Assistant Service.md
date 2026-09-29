@@ -193,8 +193,13 @@ selebar kolom konten (`components/layout/banner-copilot.tsx`, dirender `Containe
 `system_roles.it` (peran itu juga dipegang orang HR, Kesekretariatan, dan Finance). Selalu tampil
 tanpa tombol tutup, tombol "Pelajari" menuju `/copilot`, dan disembunyikan di `/copilot` sendiri.
 Izin `assistant.view` tetap `tolak` di `FALLBACK` (`utils/menu-permission.ts`) sebagai penjaga,
-walau tak ada menu yang memakainya: izin tak-terdaftar diloloskan untuk semua orang. Halaman
-`/copilot` sendiri tidak menggerbangi apa pun karena tak memuat data (ADR 0031).
+walau tak ada menu yang memakainya: izin tak-terdaftar diloloskan untuk semua orang. ~~Halaman
+`/copilot` sendiri tidak menggerbangi apa pun karena tak memuat data (ADR 0031).~~ **Sejak
+2026-09-29 (branch erp-frontend `feat/copilot-akses`) halaman `/copilot` bertanya ke
+`GET /api/assistant/akses`** lewat `features/copilot/hooks/use-akses-copilot.ts`: yang tak berhak
+mendapat **404** (`notFound`), selama memuat `Skeleton`, gagal-tertutup (403/502/badan lain =
+tidak boleh), `retry: false`. Banner **tetap khusus Tech Development** (keputusan user
+2026-09-29), jadi yang berhak di luar Tech Development baru bisa masuk lewat URL.
 ⚠️ Belum diverifikasi: `KonteksPortal.supervisedDepartments` di `components/layout/portal-menu.ts`
 didokumentasikan sebagai sinyal supervisor yang benar — relevan saat menu sungguhan dibuka ke
 supervisor (T3).
