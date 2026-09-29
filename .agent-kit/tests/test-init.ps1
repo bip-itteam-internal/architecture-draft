@@ -168,6 +168,18 @@ try {
   $tmSrc = Get-Content (Join-Path $kitRoot 'rules/team-memory.md') -Raw -Encoding UTF8
   Check ($tmSrc.Contains('## Backlog: GitHub Project') -and -not $tmSrc.Contains('## Linear: status issue')) 'team-memory: bagian Backlog GitHub Project menggantikan bagian Linear'
 
+  # kit 1.34.0: sub-issue per repo. Yang dipatok: skrip tersalin init dan TERPARSE, pencocokan
+  # idempotennya meratakan array (tanpa itu PS 5.1 mencocokkan SEMUA anak sekaligus: terjadi saat
+  # uji pertama), /brief 2c memanggilnya, dan team-memory memuat aturannya.
+  $sbPath = Join-Path $claude 'hooks/buat-sub-issue.ps1'
+  Check (Test-Path $sbPath) 'hooks/buat-sub-issue.ps1 tersalin init'
+  $sbErr = $null; [void][System.Management.Automation.Language.Parser]::ParseFile($sbPath, [ref]$null, [ref]$sbErr)
+  Check ($sbErr.Count -eq 0) 'buat-sub-issue.ps1 terparse tanpa galat'
+  $sbSrc = Get-Content $sbPath -Raw -Encoding UTF8
+  Check ($sbSrc.Contains('sub_issues?per_page=100") $null | ForEach-Object { $_ })') -and $sbSrc.Contains("ValidateSet('bip-erp', 'erp-frontend', 'my-bharata')")) 'buat-sub-issue: anak diratakan sebelum dicocokkan, repo dibatasi tiga repo kode'
+  Check ($bfTriase.Contains('2c. **Sub-issue per repo**') -and $bfTriase.Contains('buat-sub-issue.ps1')) 'brief.md 2c: brief lintas repo memakai sub-issue lewat buat-sub-issue.ps1'
+  Check ($tmSrc.Contains('SATU sub-issue per repo') -and $tmSrc.Contains('Satu tingkat saja') -and $tmSrc.Contains('dipasang saat pekerjaan MULAI')) 'team-memory: aturan sub-issue per repo dan assignee saat mulai'
+
   # kit 1.32.0: /linear-cek. Yang dipatok: skrip tersalin init dan TERPARSE (PS 5.1 pernah
   # gagal diam-diam karena [string]$Tim dan $tim adalah variabel yang sama), --terapkan hanya
   # menyentuh R1/R2 (tak pernah Done), dan command melarang memindah ke Done.

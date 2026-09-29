@@ -327,10 +327,27 @@ Aturan (berlaku untuk developer DAN agent):
   yang ditunggu. **Agent tidak pernah memindahkan issue ke Done.**
 - ⛔ **Jangan membuat issue di repo vault `architecture-draft`: repo itu PUBLIK.** Issue bertanda
   keamanan hanya di repo kode (privat), dan rincian celah yang belum ditambal tidak ditulis ke vault.
-- **Satu issue tinggal di satu repo.** Taruh di repo kode yang paling banyak disentuh. Pekerjaan lintas
-  repo = satu issue induk + **sub-issue** per repo (sub-issue boleh beda repo), pola yang sama dengan
-  memecah brief BE/FE/mobile.
-- **PIC = assignee** (login GitHub). Pengawas ditulis di badan issue sebagai `**Pengawas:** <login>`.
+- **Satu issue tinggal di satu repo.** Taruh di repo kode yang paling banyak disentuh.
+- ⭐ **Perubahan yang menyentuh lebih dari satu repo (BE `bip-erp`, FE `erp-frontend`, Mobile
+  `my-bharata`) WAJIB dipecah jadi issue induk + SATU sub-issue per repo.** Induk = fiturnya (tinggal
+  di repo tempat kontraknya lahir, biasanya `bip-erp`), tanpa PR sendiri; tiap sub-issue berjudul
+  `[BE]` / `[FE]` / `[Mobile]`, tinggal di repo-nya, punya brief dan PR-nya sendiri, dan PR itulah
+  yang menutupnya (`Closes <org>/<repo>#<sub>`). Hasilnya progress bar "2/3" di kartu induk, jadi
+  semua orang melihat bagian mana yang tertinggal tanpa membuka issue. Buat lewat
+  `& '.claude/hooks/buat-sub-issue.ps1' -Induk <repo>#<n> -Repo <bip-erp|erp-frontend|my-bharata> -Judul '<judul>'`
+  (idempoten, memasukkan ke Project #15, menyalin Area + Prioritas induk); jangan merakit `gh api`
+  sendiri, karena PS 5.1 merusak array dan kutip tanpa galat. Aturan turunannya:
+  - **Satu tingkat saja.** Sub-issue tidak dipecah lagi; butir rinci masuk checklist rencana, bukan sub-issue.
+  - **Satu repo cukup satu issue**, tanpa sub-issue. Memecah pekerjaan satu repo jadi sub-issue per berkas
+    membuat board tak terbaca.
+  - **Status induk mengikuti anak-anaknya**: In Progress begitu satu anak mulai; **Menunggu Adopsi**
+    hanya bila SEMUA anak sudah merged (induk ditutup manual saat itu); Done tetap manusia dengan bukti.
+  - **Urutan deploy BE sebelum FE/Mobile** ditulis di badan sub-issue FE/Mobile ("deploy sesudah
+    `bip-erp#<sub BE>`"); merged duluan boleh, deploy duluan tidak.
+- **Assignee = orang yang SEDANG mengerjakan, dipasang saat pekerjaan MULAI (In Progress)**, bukan saat
+  dijatahkan (keputusan user 2026-09-29). Issue Backlog/Todo tanpa assignee; PIC rencana cukup ditulis di
+  badan (`**PIC:** <login>`). Agent yang mulai mengerjakan issue meng-assign akun yang menjalankannya.
+  Pengawas ditulis di badan issue sebagai `**Pengawas:** <login>`.
 - **Nama branch `<domain>/<n>-<slug>`**, `<n>` = nomor issue GitHub. Bukan syarat otomasi (yang
   menyambungkan adalah `Closes` di PR), tetapi membuat branch terbaca dan dipakai pre-push untuk
   mengingatkan. Branch lama `bha-<n>-` tetap diterima.
