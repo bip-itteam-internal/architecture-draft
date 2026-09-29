@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-29",
-  "jumlah_dokumen": 502,
+  "jumlah_dokumen": 503,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -8364,6 +8364,47 @@
         "payroll bertingkat",
         "super-akses",
         "ADR 0137"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0138 Penugasan Toko Marketplace Bertanggal Berlaku untuk KPI dan Insentif.md",
+      "judul": "ADR - 0138 Penugasan Toko Marketplace Bertanggal Berlaku untuk KPI dan Insentif",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-09-29, BELUM diputuskan dan nol kode. Pengambil keputusan: **TBD** (manajemen marketing bersama Finance dan tim IT; lihat §Pertanyaan terbuka, butir 1). Dok ini memetakan masalah, opsi, dan usulan penulis; ia tidak menetapkan apa pun sampai bagian §Decision diisi orang yang berwenang. Nomor 0138 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0052 Status Sinkron per Toko",
+        "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
+        "ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya",
+        "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
+        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
+        "ADR - 0086 Metrik Live Lintas Channel Digabung Satu Angka, Rincian Tetap per Channel",
+        "REF - Kepemilikan Data",
+        "Sales - ICC Account Manager Mapping",
+        "Microservices - Integration Service",
+        "Microservices - Marketing Analytics Service",
+        "HRIS - Otomasi Skor KPI",
+        "REF - Penamaan Metrik & Sumber KPI",
+        "Microservices - Insentive Service",
+        "Finance - Incentive",
+        "HRIS - Alur KPI Otomatis"
+      ],
+      "hash": "8a552af302f88b2ea4a047c9fd2d0d75b7e9a8f898f5bd43f658b81f3a5969b7",
+      "ukuran_kb": 28.4,
+      "ringkasan": "Menjawab: kenapa skor KPI dan realisasi insentif profit bisa salah menilai pemegang toko marketplace (TikTok/Shopee/Lazada) yang di-banned atau berpindah tangan di tengah bulan, padahal data penjualannya sendiri tidak hilang. Menjelaskan akar masalahnya yaitu pemetaan toko-ke-orang (icc_account_mappings, department_shops, cs_shop_mappings) yang tidak punya tanggal berlaku dan ditimpa di tempat, sehingga dibaca dalam keadaan sekarang alih-alih keadaan saat penjualan terjadi. Membandingkan opsi perbaikan (penugasan toko bertanggal berlaku, aturan operasional sementara, kunci Simpan saat periode beku, KPI membaca snapshot insentif, SLA CS berperiode, snapshot mapping per periode) beserta pertanyaan terbuka untuk manajemen dan marketing.",
+      "kata_kunci": [
+        "penugasan toko",
+        "mapping toko",
+        "icc_account_mappings",
+        "toko banned",
+        "toko dinonaktifkan",
+        "kinerja toko",
+        "insentif profit",
+        "atribusi toko marketplace",
+        "bertanggal berlaku",
+        "TikTok Shopee Lazada"
       ]
     },
     {
