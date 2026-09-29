@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-29",
-  "jumlah_dokumen": 504,
+  "jumlah_dokumen": 506,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -8439,6 +8439,37 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0140 Versioning Rilis SemVer per Repo dari Tag Git.md",
+      "judul": "ADR - 0140 Versioning Rilis SemVer per Repo dari Tag Git",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diterima, belum diimplementasikan**, 2026-09-29. Diputuskan di sesi Tech Development 2026-09-29; **perlu dikabarkan ke wirkancil**, yang membuat tag dan GitHub Release `v0.1.2` kedua repo dan kebiasaannya diubah di sini. Nol kode: versi belum dibakar ke image mana pun, `/health` belum membawa versi. Implementasinya dua brief (BE dulu, lalu FE), lihat §Implementasi.",
+      "publik": true,
+      "tautan": [
+        "IT - Catatan Rilis ERP",
+        "RUN - Deploy Microservices bip-erp",
+        "RUN - Deploy Frontend ERP ke Produksi",
+        "IT - CI-CD",
+        "APP - MyBharata"
+      ],
+      "hash": "7b8d105dcf02d71df8f048f46c5cd6be9f09443b063cb408436878400934150b",
+      "ukuran_kb": 12.1,
+      "ringkasan": "Menjawab: bagaimana nomor versi bip-erp, erp-frontend, dan MyBharata ditentukan dan kapan naik (MINOR vs PATCH selama fase 0.x), siapa yang membuat tag git dan kapan (tepat sebelum deploy produksi). Juga menjelaskan bagaimana versi dibakar ke image lewat build-arg APP_VERSION dari git describe, dilaporkan di /health, digerbang saat deploy, dan dirangkum dalam catatan rilis payung bernama tanggal.",
+      "kata_kunci": [
+        "versioning",
+        "versi rilis",
+        "SemVer",
+        "tag git",
+        "git describe",
+        "APP_VERSION",
+        "release",
+        "/health version",
+        "catatan rilis",
+        "GitHub Release"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -12151,6 +12182,34 @@
       ]
     },
     {
+      "path": "IT/IT - Catatan Rilis ERP.md",
+      "judul": "IT - Catatan Rilis ERP",
+      "area": "IT",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Konsep** — templat siap, **belum ada entri**. Entri pertama ditulis pada deploy produksi pertama sesudah [[ADR - 0140 Versioning Rilis SemVer per Repo dari Tag Git]] diterapkan.",
+      "publik": false,
+      "tautan": [
+        "ADR - 0140 Versioning Rilis SemVer per Repo dari Tag Git",
+        "RUN - Deploy Microservices bip-erp",
+        "RUN - Deploy Frontend ERP ke Produksi",
+        "IT - CI-CD"
+      ],
+      "hash": "3b643b51c17613b30cb1ed62f3155505ac9d416bdf495f79ebaad9080fa239f2",
+      "ukuran_kb": 1.9,
+      "ringkasan": "Menjawab: ERP versi berapa yang sedang berjalan di produksi, dan versi bip-erp, erp-frontend, serta MyBharata mana yang dirilis bersama di tiap deploy produksi. Juga menjelaskan cara mengisi entri catatan rilis (format Rilis YYYY.MM.DD, service yang dinaikkan, kebutuhan kecocokan antar-repo) dan siapa yang menulisnya.",
+      "kata_kunci": [
+        "catatan rilis",
+        "release notes",
+        "changelog",
+        "riwayat rilis",
+        "versi ERP",
+        "Rilis YYYY.MM.DD",
+        "deploy produksi",
+        "release history"
+      ]
+    },
+    {
       "path": "IT/IT - CI-CD.md",
       "judul": "IT - CI-CD",
       "area": "IT",
@@ -12170,23 +12229,25 @@
         "APP - Dynamic Task Tracker",
         "Sales - TikTok Sentiment Pipeline",
         "Sales - Veo (Gemini) Implementation",
+        "ADR - 0140 Versioning Rilis SemVer per Repo dari Tag Git",
+        "IT - Catatan Rilis ERP",
         "IT - Big Pictures",
         "IT - Monitoring System"
       ],
-      "hash": "23b9481695a0cdca23bb3824fc49c26937cd377514c0b337b04feda661ad68bf",
-      "ukuran_kb": 10.2,
-      "ringkasan": "Menjawab: bagaimana pipeline CI/CD tiap aplikasi ERP Bharata bekerja (GitHub Actions untuk bip-erp, deploy manual untuk erp-frontend sejak workflow dimatikan, Codemagic untuk mobile), workflow mana yang aktif atau `disabled_manually`, dan fakta krusial bahwa merge ke `main` pernah mendarat langsung di produksi lewat jalur di luar GitHub Actions yang belum terverifikasi mekanismenya.",
+      "hash": "5b36a44eb4bc86c3fb2af56cc2060d3a0639621fbf3063712b94edf0c5b2202d",
+      "ukuran_kb": 10.4,
+      "ringkasan": "Menjawab: bagaimana pipeline CI/CD tiap aplikasi ERP bekerja (GitHub Actions untuk bip-erp, deploy manual untuk erp-frontend, Codemagic untuk MyBharata), apakah merge ke main otomatis sampai ke produksi, dan gerbang otomatis apa yang sebenarnya masih hidup. Juga mencatat keberadaan self-hosted runner dan Harness di VPS, workflow yang dimatikan, serta cara memverifikasi service benar-benar ter-deploy lewat umur image.",
       "kata_kunci": [
         "CI/CD",
-        "GitHub Actions",
-        "deploy",
         "pipeline",
-        "self-hosted runner",
+        "GitHub Actions",
         "Codemagic",
-        "deploy produksi",
+        "Harness",
+        "self-hosted runner",
+        "deploy otomatis",
         "workflow disabled",
-        "branch protection",
-        "VPS Biznet"
+        "VPS Biznet",
+        "auto deploy"
       ]
     },
     {
@@ -14314,22 +14375,24 @@
       "publik": true,
       "tautan": [
         "RUN - Deploy Microservices bip-erp",
-        "APP - Web ERP"
+        "APP - Web ERP",
+        "ADR - 0140 Versioning Rilis SemVer per Repo dari Tag Git",
+        "IT - Catatan Rilis ERP"
       ],
-      "hash": "442dff81f3fa27020309fe26a33e9ef6a73192505d4dd15e6164300e2f121cfb",
-      "ukuran_kb": 3.4,
-      "ringkasan": "Menjawab: bagaimana cara men-deploy erp-frontend ke produksi sekarang setelah seluruh workflow GitHub Actions-nya dimatikan, memakai host, user SSH, dan app dir mana. Memuat perintah manualnya, gerbang verifikasi yang menolak docker ps sebagai bukti (mengharuskan kontrol negatif berupa string lama yang harus nol), langkah rollback, dan jebakan deploy-prod.yml yang masih menarget VM pensiun tanpa runner.",
+      "hash": "dcbadcc890dd5e26a17a6dab6102b126b4e0967a1e28af75a80cd6dda12f897b",
+      "ukuran_kb": 4.2,
+      "ringkasan": "Menjawab: bagaimana langkah men-deploy erp-frontend ke produksi secara manual lewat SSH ke VPS Biznet, termasuk membuat tag versi rilis sebelum build. Juga menjelaskan cara membuktikan bundle baru benar-benar jalan (grep string baru plus kontrol negatif), cara rollback, dan jebakan workflow deploy-prod.yml yang menarget VM pensiun.",
       "kata_kunci": [
-        "deploy",
-        "produksi",
+        "deploy frontend",
         "erp-frontend",
-        "frontend",
-        "Biznet",
-        "SSH",
-        "Docker",
+        "deploy produksi",
+        "production deploy",
+        "runbook",
         "rollback",
-        "verifikasi",
-        "runbook"
+        "frontend-hris-dashboard",
+        "docker compose",
+        "VPS Biznet",
+        "web ERP"
       ]
     },
     {
@@ -14341,6 +14404,8 @@
       "status_teks": "Implemented (prosedur diturunkan dari praktik deploy prod sesi 2026-07; nilai host/creds diisi saat eksekusi). Grounded ke `bip-erp/docker-compose.yml`.",
       "publik": true,
       "tautan": [
+        "ADR - 0140 Versioning Rilis SemVer per Repo dari Tag Git",
+        "IT - Catatan Rilis ERP",
         "IT - Background Jobs & Schedulers",
         "CORE - IT Orchestrator",
         "APP - Web ERP",
@@ -14370,20 +14435,20 @@
         "RUN - Deploy Task Management Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "7ed1f4c6150fd674200ea4f2cd2dd345fb3c7e5b860274383d92d02128969867",
-      "ukuran_kb": 39.9,
-      "ringkasan": "Menjawab: bagaimana men-deploy ulang satu microservice bip-erp ke produksi dengan aman (tarik kode dulu, docker compose up --build --no-deps, periksa umur image), mengapa --no-deps wajib di jam rawan, dan urutan deploy antar-service yang saling bergantung. Juga menjawab kapan perubahan shared-library atau kategori inbox menuntut beberapa container naik bersama, feature flag, TTL index, kunci layanan baru, verifikasi pasca-deploy, dan troubleshooting gejala seperti notifikasi tak tiba atau fitur tak berubah.",
+      "hash": "8d70b71e687b366546329bba79d48425f105b7e175509f69fb9e22d757b93f72",
+      "ukuran_kb": 41.7,
+      "ringkasan": "Menjawab: bagaimana men-deploy ulang satu microservice bip-erp ke produksi dengan aman (git reset ke origin/main, --build, --no-deps), kenapa build sukses atau /health bukan bukti dan cara memeriksa umur image, serta urutan deploy antar-service dan kapan notification-service wajib ikut naik saat shared-library berubah. Juga mencakup tag dan gerbang versi rilis produksi, feature flag, TTL index, dan troubleshooting gejala pasca-deploy.",
       "kata_kunci": [
-        "deploy",
-        "runbook",
-        "docker compose",
-        "--no-deps",
+        "deploy microservice",
+        "bip-erp",
+        "docker compose --no-deps",
+        "deploy backend",
         "umur image",
         "shared-library",
         "kategori inbox",
-        "produksi",
-        "prod deploy",
-        "troubleshooting"
+        "runbook",
+        "rollback",
+        "troubleshooting deploy"
       ]
     },
     {

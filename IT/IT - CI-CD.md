@@ -65,6 +65,7 @@
 
 ## Dokumen Terkait
 
+- [[ADR - 0140 Versioning Rilis SemVer per Repo dari Tag Git]] · [[IT - Catatan Rilis ERP]] — tag, versi di image, dan catatan rilis per deploy produksi
 - [[IT - Server, VMs and Databases]]
 - [[IT - Big Pictures]]
 - [[IT - Monitoring System]]

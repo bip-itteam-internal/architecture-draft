@@ -56,6 +56,38 @@ Harus **lebih baru dari waktu merge commit yang kamu harapkan hidup**. `docker p
 membuktikan biner mana yang sedang melayani permintaan**. Bukti terakhirnya tetap satu panggilan
 lewat gateway yang menunjukkan perilaku barunya.
 
+### 1c. Deploy PRODUKSI: tag dulu, versi dibakar, lalu dicatat
+
+Aturannya di [[ADR - 0140 Versioning Rilis SemVer per Repo dari Tag Git]]. ⚠️ **Belum berlaku
+penuh**: selama brief implementasi bip-erp belum mendarat, Dockerfile belum menerima
+`APP_VERSION` dan `/health` belum membawa `version`, jadi langkah 3 dan 4 di bawah belum bisa
+dijalankan. Langkah 1 dan 5 sudah bisa.
+
+1. **Buat tag + GitHub Release sebelum build**, pada commit `origin/main` yang akan
+   di-checkout. MINOR bila ada fitur atau kontrak berubah, PATCH bila hanya perbaikan
+   (ADR 0140 §4):
+
+   ```bash
+   gh release create v0.X.Y -R bip-itteam-internal/bip-erp --target main --generate-notes
+   ```
+
+2. **Tarik kode BERSAMA tag-nya.** `--tags` wajib ditulis: tanpa itu tag yang baru dibuat
+   bisa tak ikut, dan `describe` melaporkan tag lama tanpa galat.
+
+   ```bash
+   git fetch origin main --tags && git reset --hard origin/main
+   export APP_VERSION=$(git describe --tags --always --dirty)
+   echo "$APP_VERSION"   # harus persis v0.X.Y, tanpa akhiran
+   ```
+
+3. **Build seperti §1**, di shell yang sama supaya `APP_VERSION` terbawa ke compose.
+4. **Gerbang versi**, untuk tiap service yang dinaikkan, dari dalam jaringan docker:
+   `version` di `/health` harus **sama persis** dengan tag. `unknown` berarti `APP_VERSION`
+   tak ter-export; tag lama berarti tag tak ter-fetch; `-N-g<sha>` berarti tag dibuat di commit
+   lain. Gerbang ini **menambah**, tidak menggantikan, gerbang umur image §1b.
+5. **Catat satu baris** di [[IT - Catatan Rilis ERP]]: tag, service yang dinaikkan, versi FE
+   dan MyBharata yang berjalan.
+
 ## 2. Kenapa `--no-deps` WAJIB di jam rawan
 
 `docker compose up <service>` secara default **ikut menyalakan/recreate semua yang ada di `depends_on`** service tersebut. Di `docker-compose.yml`, `warehouse-service` **`depends_on: warehouse-mongo-db`** (`condition: service_healthy`). Tanpa `--no-deps`, deploy warehouse bisa **menyentuh MongoDB warehouse** → seluruh operasi gudang putus beberapa saat, bukan cuma service target.
@@ -267,6 +299,7 @@ docker logs <Container-Name> --tail 40
 
 ## Dokumen Terkait
 
+- [[ADR - 0140 Versioning Rilis SemVer per Repo dari Tag Git]] · [[IT - Catatan Rilis ERP]] — tag, versi di `/health`, dan catatan rilis tiap deploy produksi (§1c)
 - [[Microservices - Warehouse Service]] · [[Microservices - Integration Service]] — implementasi service
 - [[Microservices - Form Builder Service]] · [[Microservices - Notification Service]] — pasangan yang wajib naik bersama saat kategori inbox bertambah (§3a)
 - [[HRIS - Kaizen (Ide Perbaikan)]] — fitur yang kegagalan senyapnya jadi contoh di §3a
