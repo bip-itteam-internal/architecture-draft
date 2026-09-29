@@ -180,6 +180,15 @@ try {
   Check ($bfTriase.Contains('2c. **Sub-issue per repo**') -and $bfTriase.Contains('buat-sub-issue.ps1')) 'brief.md 2c: brief lintas repo memakai sub-issue lewat buat-sub-issue.ps1'
   Check ($tmSrc.Contains('SATU sub-issue per repo') -and $tmSrc.Contains('Satu tingkat saja') -and $tmSrc.Contains('dipasang saat pekerjaan MULAI')) 'team-memory: aturan sub-issue per repo dan assignee saat mulai'
 
+  # kit 1.35.0: gerbang nomor ADR ganda. Yang dipatok: skrip tersalin init, pre-push memanggilnya
+  # atas POHON COMMIT (--rev HEAD, bukan working tree bersama), dan gerbang-kit menjalankan
+  # test-nya (gerbang-kit memakai daftar test EKSPLISIT: test yang tak didaftarkan tak pernah jalan).
+  Check (Test-Path (Join-Path $claude 'hooks/githooks/gerbang-adr.py')) 'githooks/gerbang-adr.py tersalin init'
+  $ppAdr = Get-Content (Join-Path $kitRoot 'hooks/githooks/pre-push') -Raw -Encoding UTF8
+  Check ($ppAdr.Contains('gerbang-adr.py" --vault "$top" --rev HEAD') -and $ppAdr.Contains("grep -q '^Decisions/ADR - '")) 'pre-push: gerbang nomor ADR ganda atas pohon commit, menyala bila ADR tersentuh'
+  $gkSrc = Get-Content (Join-Path $kitRoot 'hooks/gerbang-kit.py') -Raw -Encoding UTF8
+  Check ($gkSrc.Contains('test_gerbang_adr.py')) 'gerbang-kit menjalankan test_gerbang_adr.py'
+
   # kit 1.32.0: /linear-cek. Yang dipatok: skrip tersalin init dan TERPARSE (PS 5.1 pernah
   # gagal diam-diam karena [string]$Tim dan $tim adalah variabel yang sama), --terapkan hanya
   # menyentuh R1/R2 (tak pernah Done), dan command melarang memindah ke Done.

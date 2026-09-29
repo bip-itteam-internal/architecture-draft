@@ -9,6 +9,7 @@ SPV dan Leader Beauty Hacks serta Kyura kini langsung melihat Ringkasan Marketin
 *Anggaran iklan yang ditampilkan Ringkasan Marketing Analytics dibaca dari Master Anggaran OPEX Finance (integration-service, koleksi `anggaran_opex`, akun "Beban Iklan" per departemen Accurate) lewat HTTP, per brand dan per bulan berjalan WIB. `mart_pagu` milik marketing-analytics (pagu per channel+toko+bulan) tak lagi dibaca beranda tetapi belum dihapus; duplikasi fakta "anggaran belanja iklan" dicatat di [[REF - Kepemilikan Data]] sebagai belum diputuskan.*
 
 - **Status**: ⚠️ **Diterima, terimplementasi di branch, belum merge** (dicatat 2026-09-15, ukur ulang sebelum dipakai): erp-frontend `feat/marketing-iklan-dashboard`. Tanpa perubahan backend, env, maupun kontrak.
+- ⚠️ **Nomor ganda**: nomor 0097 juga dipakai [[ADR - 0097 Kompensasi Shopee Susulan Ditahan dan Dicatat AR lewat Koreksi Manual ERP]]. Rujuk ADR ini dengan **judul**, bukan nomor saja. Diputuskan 2026-09-29 tidak dinomori ulang karena kutipan nomornya sudah tersebar di kode, PR, dan issue; nomor ganda baru ditolak pre-push (`gerbang-adr.py`).
 - **Path di repo**:
   - `erp-frontend/src/features/marketing-analytics/components/anggaran-iklan.ts` (`susunAnggaranIklan`, `KeadaanBlokAnggaran`, `labelBulanBahasa`)
   - `erp-frontend/src/features/marketing-analytics/hooks/use-anggaran-iklan.ts`

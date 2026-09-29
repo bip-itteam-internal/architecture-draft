@@ -3,6 +3,7 @@
 *Tiket Engagement Tim disimpan di koleksi Mongo sendiri (`engagement_tickets`) dengan state machine lima status yang ditulis di kode, BUKAN sebagai `tasks` ber-stage space seperti tiket IT — meski keduanya hidup di service yang sama. Menyimpang dari model satu-koleksi-satu-service yang berlaku di [[Microservices - Task Management Service]], dengan alasan yang dicatat di bawah.*
 
 - **Status**: ⚠️ **Berlaku, kodenya sudah di `main`** (bip-erp PR [#1504](https://github.com/bip-itteam-internal/bip-erp/pull/1504) `feat/engagement-assign`; commit awalnya `3436ad95` "model, nomor tiket, dan repository"). ADR ini ditulis **setelah** kodenya ada — keputusannya selama ini hanya hidup sebagai komentar di `engagement_models.go:9-18` dan `engagement_state.go:3-13`. **Belum diverifikasi lewat gateway** dev maupun prod.
+- ⚠️ **Nomor ganda**: nomor 0058 juga dipakai [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]]. Rujuk ADR ini dengan **judul**, bukan nomor saja. Diputuskan 2026-09-29 tidak dinomori ulang karena kutipan nomornya sudah tersebar di kode, PR, dan issue; nomor ganda baru ditolak pre-push (`gerbang-adr.py`).
 - **Path di repo**: `bip-erp/services/task-management/engagement_models.go` · `engagement_state.go` · `engagement_repo.go` · `engagement_nomor.go`
 - **Tanggal**: keputusan diambil saat modul dibuat; didokumentasikan 2026-08-29
 

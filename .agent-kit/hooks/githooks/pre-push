@@ -196,6 +196,25 @@ if [ -n "$compose_sasaran" ]; then
   fi
 fi
 
+# ---- vault: nomor ADR ganda (kit 1.35.0) ----
+# Nomor ADR diklaim saat push, jadi dua sesi bisa mengambil nomor yang sama tanpa satu pun galat
+# (10 pasangan terukur 2026-09-29). Menyala hanya di vault dan hanya bila push menyentuh
+# Decisions/ADR (atau daftar berkas tak tentu). Memeriksa POHON COMMIT yang di-push, bukan working
+# tree, karena pohon vault dipakai bersama sesi lain. Pasangan lama berizin di gerbang-adr.py.
+if [ -d .agent-kit ] && { [ "$tak_tentu" -eq 1 ] || printf '%s\n' "$touched" | grep -q '^Decisions/ADR - '; }; then
+  pyadr=""
+  for c in "Tools/.venv/Scripts/python.exe" "Tools/.venv/bin/python" py python3 python; do
+    if [ -x "$c" ] || command -v "$c" >/dev/null 2>&1; then pyadr="$c"; break; fi
+  done
+  if [ -z "$pyadr" ]; then
+    echo "[agent-kit pre-push] TIDAK ADA python untuk memeriksa nomor ADR ganda. Gerbang GAGAL, bukan dilewati."
+    gagal=1
+  elif ! "$pyadr" "$hookdir/gerbang-adr.py" --vault "$top" --rev HEAD; then
+    echo "[agent-kit pre-push] GAGAL: nomor ADR ganda"
+    gagal=1
+  fi
+fi
+
 # ---- vault agent-kit (architecture-draft): test milik kit sendiri ----
 # Nama berkas dok vault berisi SPASI, jadi daftarnya dioper lewat berkas, bukan argumen: kata
 # yang terpecah di sini membuat saringan path meleset dan gerbangnya menyala untuk push dok.

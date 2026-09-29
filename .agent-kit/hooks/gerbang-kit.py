@@ -152,7 +152,7 @@ def main(argv):
 
     ok = True
     target = [os.path.join(utama, "Tools", "tests"), os.path.join(kit, "tests", "test_kantor_agent.py"),
-              os.path.join(kit, "tests", "test_gerbang.py")]
+              os.path.join(kit, "tests", "test_gerbang.py"), os.path.join(kit, "tests", "test_gerbang_adr.py")]
     ok = jalankan("pytest", [py, "-m", "pytest", "-p", "no:cacheprovider", "-q"] + [t for t in target if os.path.exists(t)],
                   utama, BATAS_PYTEST) and ok
 
