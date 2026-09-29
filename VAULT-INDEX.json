@@ -8158,20 +8158,19 @@
         "CORE - RBAC dan Permission Set",
         "CORE - API Master Gateway"
       ],
-      "hash": "b861253117a57c49103b02a7d7d02508b368d8b85ada9e5144c23f24917613dd",
-      "ukuran_kb": 20.5,
-      "ringkasan": "Menjawab: kenapa asisten AI tanya-jawab dirancang lintas modul sejak awal (bukan dimulai dari satu domain saja), bagaimana lapisan data bisnis tetap hidup di tiap service pemilik data masing-masing alih-alih dipusatkan, dan siapa yang boleh mengaksesnya (gate RBAC baru: Supervisor departemen mana pun ATAU Direktur ATAU IT). Juga menjelaskan kendala teknis yang mengikat rancangan (timeout gateway 30 detik, tidak ada streaming SSE, InternalRequest tidak meneruskan permission-set baru), keputusan klien AI OpenAI-compatible hand-roll, serta prasyarat persetujuan tertulis Direksi sebelum memproses data asli lewat relay AI eksternal.",
+      "hash": "8f8efc907f1a8e511083304e9c667383eb6a81b2e6edb43b31c97b11914d3d9a",
+      "ukuran_kb": 20.9,
+      "ringkasan": "Menjawab: kenapa asisten AI tanya-jawab (Copilot) dibangun lintas modul sejak awal dengan beberapa modul percontohan, kenapa lapisan data bisnis hidup di dalam service pemilik data dan bukan terpusat, dan siapa yang boleh memakainya (Supervisor departemen mana pun, Direktur, Corporate Secretary, IT). Juga menjawab kenapa klien AI tipis hand-roll OpenAI-compatible, larangan menghitung dari data mentah, batas modul per pertanyaan akibat timeout gateway, bentuk keluaran teks/tabel/chart, dan file hanya saat diminta.",
       "kata_kunci": [
         "ADR 0132",
         "asisten AI lintas modul",
-        "RBAC gate",
-        "Supervisor Direktur IT",
-        "gateway timeout 30 detik",
-        "streaming SSE",
+        "Copilot",
+        "gate RBAC Copilot",
+        "Corporate Secretary",
         "lapisan data bisnis",
-        "tool calling",
-        "persetujuan Direksi",
-        "keamanan endpoint"
+        "AI assistant",
+        "modul percontohan",
+        "tanya jawab AI"
       ]
     },
     {
@@ -16299,9 +16298,9 @@
         "CORE - RBAC dan Permission Set",
         "CORE - Kapabilitas AI dan Machine Learning"
       ],
-      "hash": "6784ae1212c156870e9fc1e6863540cfdb165cdd49119a1c39a4e33a13ca6587",
-      "ukuran_kb": 16.9,
-      "ringkasan": "Menjawab: apa urutan pekerjaan untuk membangun asisten AI tanya-jawab lintas modul (T1 klien AI dan T2 kerangka service sudah selesai, T3 gate RBAC sampai T13 uji gate, T14-T17 Jadwal Tugas), apa dependensi dan kriteria selesai tiap task, serta prasyarat non-teknis seperti persetujuan tertulis Direksi untuk data yang keluar lewat relay AI. Dipakai sebagai papan kerja sebelum menjalankan /start-task per item.",
+      "hash": "83f3bc70e6b00085d83275268ee182d6c4649dd571c9b22c5febe082aee88a9e",
+      "ukuran_kb": 17.0,
+      "ringkasan": "Menjawab: apa urutan pekerjaan untuk membangun asisten AI tanya-jawab lintas modul (T1 klien AI dan T2 kerangka service sudah selesai, T3 gate RBAC termasuk Corporate Secretary, sampai T13 uji gate dan T14-T17 Jadwal Tugas), apa dependensi dan kriteria selesai tiap task, serta prasyarat non-teknis seperti persetujuan tertulis Direksi untuk data yang keluar lewat relay AI. Dipakai sebagai papan kerja sebelum menjalankan /start-task per item.",
       "kata_kunci": [
         "papan kerja asisten AI",
         "daftar task Copilot",
