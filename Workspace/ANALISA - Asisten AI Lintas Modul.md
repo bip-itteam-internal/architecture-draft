@@ -268,7 +268,12 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     setara), dicatat di [[Microservices - Assistant Service]] — bukan estimasi dari harga model
     di kertas.
 
-- [ ] **T13 — Uji gate RBAC positif dan negatif.**
+- [x] **T13 — Uji gate RBAC positif dan negatif. SELESAI bersama T3 (diperiksa 2026-09-29)**:
+  `bip-erp/shared-library/common/akses_copilot_test.go` `TestRequireCopilot` di `origin/main` mengunci
+  kelima skenario (staf ditolak; supervisor satu departemen DAN grup HRGA lolos; Direktur, IT
+  staf/supervisor/admin, Corporate Secretary lolos) plus 10 kasus tolak (admin HR, supervisor modul
+  tanpa `is_supervisor`, cakupan kosong/rusak, "Direktur Utama", fallback `BIP-Department`). Tiap
+  cabang diuji sendirian supaya kontrol negatif per cabang bermakna. Tak ada kode tambahan.
   - **Bergantung**: T3.
   - **Kriteria selesai**: test otomatis mengunci LIMA skenario sekaligus: staff biasa DITOLAK,
     supervisor departemen mana pun (bukan cuma satu departemen yang kebetulan dites) LOLOS,
