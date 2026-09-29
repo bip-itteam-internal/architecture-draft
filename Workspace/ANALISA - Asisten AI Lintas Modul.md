@@ -160,7 +160,7 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     `rentangPeriodeTelat`, `kriteriaTelatDihitung`, `pipelineRekapTelat` (diberi parameter
     `employeeIDs`). Penanda kesegaran `dihitung_pada`. Keputusan user: jumlah telat saja (tanpa
     penanda SP1 Pasal 19), cakupan hanya departemen yang disupervisi; HR/Direktur tetap
-    `/internal/late-recap`. Belum terbukti lewat gateway dev.
+    `/internal/late-recap`.
   - **Tujuan**: realisasi [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §2 — pintu masuk fleksibel, aturan bisnis TETAP di kode
     yang sudah ada.
   - **Bergantung**: T4.
