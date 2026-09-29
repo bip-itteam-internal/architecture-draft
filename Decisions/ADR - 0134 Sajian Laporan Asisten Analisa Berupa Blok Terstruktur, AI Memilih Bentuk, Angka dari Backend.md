@@ -95,6 +95,7 @@ o. **Penomoran "Tabel N."/"Gambar N." dihitung saat render**, mengikuti bagian l
 
 ## Terkait
 
+- [[ADR - 0139 Penjelasan Tiap Tabel dan Diagram Laporan Ditulis AI, Angkanya Rujukan ke Fakta Backend]] (2026-09-29): mengganti larangan butir g **khusus untuk penjelasan per blok** lewat rujukan fakta backend; judul blok dan Ringkasan tetap dari aturan.
 - [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]]
 - [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]]
 - [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]

@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-09-29",
-  "jumlah_dokumen": 503,
+  "jumlah_dokumen": 504,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -8223,12 +8223,13 @@
       "tautan": [
         "ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak",
         "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
+        "ADR - 0139 Penjelasan Tiap Tabel dan Diagram Laporan Ditulis AI, Angkanya Rujukan ke Fakta Backend",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "Microservices - Marketing Analytics Service"
       ],
-      "hash": "8923c9e2524bf2c4d119993d602ce29197ececd70781120d3a09cc80cbc3ae8c",
-      "ukuran_kb": 17.2,
-      "ringkasan": "Menjawab: bagaimana laporan Asisten Analisa Marketing menyajikan datanya sebagai rangkaian blok terstruktur (teks, angka, tabel, bar, line) yang jenis dan urutannya dipilih model AI dari katalog dataset beku yang dihitung backend, sementara model sendiri tidak pernah menerima atau menulis angka mentah. Juga menjelaskan delapan dataset tetap yang tersedia (angka utama, banding periode lalu, laba harian, ROAS per pekan, per toko, keputusan per jenis, status keputusan, tindak lanjut sebelumnya), aturan render di FE (ChartContainer/Recharts, warna seri tim, format angka per satuan), dan status implementasi per PR backend dan frontend.",
+      "hash": "e3e9ea536ee3e20da16dd6904e2c022aa4a01dc16368ada7e5192d7a7eb7bf84",
+      "ukuran_kb": 17.4,
+      "ringkasan": "Menjawab: bagaimana laporan Asisten Analisa Marketing menyajikan datanya sebagai rangkaian blok terstruktur (teks, angka, tabel, bar, line) yang jenis dan urutannya dipilih model AI dari katalog dataset beku yang dihitung backend, sementara model sendiri tidak pernah menerima atau menulis angka mentah. Juga menjelaskan delapan dataset tetap yang tersedia (angka utama, banding periode lalu, laba harian, ROAS per pekan, per toko, keputusan per jenis, status keputusan, tindak lanjut sebelumnya), aturan render di FE (ChartContainer/Recharts, warna seri tim, format angka per satuan), status implementasi per PR, dan bahwa larangan teks model untuk penjelasan per blok diganti ADR 0139.",
       "kata_kunci": [
         "ADR 0134",
         "sajian laporan",
@@ -8405,6 +8406,36 @@
         "atribusi toko marketplace",
         "bertanggal berlaku",
         "TikTok Shopee Lazada"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0139 Penjelasan Tiap Tabel dan Diagram Laporan Ditulis AI, Angkanya Rujukan ke Fakta Backend.md",
+      "judul": "ADR - 0139 Penjelasan Tiap Tabel dan Diagram Laporan Ditulis AI, Angkanya Rujukan ke Fakta Backend",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": null,
+      "status_teks": "📝 **Accepted, belum diimplementasikan** — diputuskan 2026-09-29. Mengubah sebagian [[ADR - 0134 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend]] § Realisasi butir g (model tidak menulis teks apa pun untuk blok non-teks): larangan itu diganti mekanisme di bawah **khusus untuk penjelasan per blok**. Judul blok dan blok Ringkasan tetap dari aturan seperti sebelumnya.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0134 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend",
+        "ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak",
+        "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "Microservices - Marketing Analytics Service"
+      ],
+      "hash": "826eb6590f46b67d524c1e642bdad1ee5c5b9e7095ccde9b7b9a7c54c40c1f73",
+      "ukuran_kb": 5.8,
+      "ringkasan": "Menjawab: bagaimana setiap tabel, diagram, dan chart di laporan Asisten Analisa Marketing mendapat penjelasan ringkas yang ditulis AI tanpa risiko angka karangan: backend menghitung fakta per dataset, model hanya merujuknya lewat {fN}, validator menolak digit apa pun di luar rujukan, dan tiap blok punya kalimat baku cara membaca sebagai cadangan saat AI gagal. Juga menjelaskan kenapa status_keputusan dan keputusan_per_jenis selalu memakai kalimat baku dan bagaimana FE menandai penjelasan dari AI.",
+      "kata_kunci": [
+        "ADR 0139",
+        "penjelasan diagram",
+        "keterangan tabel",
+        "caption chart",
+        "penjelasan AI",
+        "fakta backend",
+        "rujukan fakta",
+        "asisten analisa marketing",
+        "sajian laporan"
       ]
     },
     {
