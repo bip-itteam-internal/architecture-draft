@@ -637,24 +637,24 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "68a991759679e539a8998db164e7063922b85a5d99d340631b7dee826ed18251",
-      "ukuran_kb": 81.1,
-      "ringkasan": "Menjawab: rute apa saja yang dimiliki marketing-analytics (beranda, ambang, pagu, profit, video, live, live-shifts, retur, asisten analisa, live-support, pengumpul KPI), parameter dan konvensi respons, serta rute mana yang digerbang RequireAnalitikMarketing. Juga memuat hitungan jumlah route per tanggal audit dan cara mengaudit kelengkapan daftar.",
+      "hash": "647451e2ef7062bdac16656e86441674c655de763570d087c10fecc56655cc56",
+      "ukuran_kb": 81.4,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki Marketing Analytics Service (laba, video, live, retur, pagu, ambang, live-shifts, setoran karya Live Support, pengumpul KPI), parameter dan konvensi respons-nya, serta rute mana yang digerbang RequireAnalitikMarketing. Berguna untuk memastikan sebuah route sudah terdokumentasi, kapan merged/deployed, dan cara mengaudit kelengkapan daftar rute.",
       "kata_kunci": [
         "marketing analytics",
+        "API",
         "endpoint",
+        "route",
+        "gerbang baca",
+        "RequireAnalitikMarketing",
         "beranda",
         "ambang",
         "pagu",
-        "profit",
         "live-shifts",
-        "kurva alokasi",
-        "gerbang baca",
-        "RequireAnalitikMarketing",
         "live support",
-        "KPI live",
+        "KPI",
         "mart",
-        "API"
+        "profit"
       ]
     },
     {
@@ -2129,9 +2129,9 @@
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "e42930113095fa9d1ff2b281d3738c2a2ec6e75be85594ccacce976491efb7db",
-      "ukuran_kb": 34.6,
-      "ringkasan": "Menjawab: apa itu asisten AI (Copilot) lintas modul di ERP, bagaimana ia dirancang (tool runner, memanggil endpoint lewat gateway dengan JWT pemakai, dilarang berhitung), status implementasi T1-T3, dan siapa yang boleh memakainya. Juga memuat stack, port, rute, penjaga anti angka karangan, riwayat percakapan, dan temuan gateway.",
+      "hash": "eb11e88475ff0afaf7e16a16551b1b3becec881eb70c952f049de5d338e6bcc6",
+      "ukuran_kb": 37.2,
+      "ringkasan": "Menjawab: bagaimana Assistant Service (Copilot) dirancang untuk menjawab pertanyaan angka bisnis dengan merutekan ke endpoint via gateway memakai JWT pemakai, siapa yang boleh memakainya, dan sejauh mana implementasinya (klien AI, skeleton, gate RBAC). Juga memuat penjaga anti angka karangan, permukaan tool, riwayat percakapan, jadwal tugas, dan temuan gateway (batas 30 detik, tanpa stream).",
       "kata_kunci": [
         "assistant",
         "Copilot",
@@ -2142,10 +2142,10 @@
         "RBAC",
         "gateway",
         "JWT",
-        "riwayat percakapan",
-        "jadwal tugas",
         "ADR 0132",
-        "aiclient"
+        "ADR 0058",
+        "riwayat percakapan",
+        "jadwal tugas"
       ]
     },
     {
@@ -2826,25 +2826,24 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "65798ad1ab2ee062922b7bb0d30b8f45c2388ee2990607d2b656ad63490702c1",
-      "ukuran_kb": 181.6,
-      "ringkasan": "Menjawab: bagaimana service agregasi laba dan performa marketing bekerja (mart_* dari integration_db baca-saja), rute apa yang ada dan gerbangnya, sumber data per channel TikTok/Shopee/Lazada, pencatatan sesi live host, serta aturan pemakaian angka agar tidak hitung ganda. Juga memuat penjadwal, koleksi, asisten analisa, dan catatan kejujuran data.",
+      "hash": "88ee45107131bf4ba4ba580a1dff09fd41f2021154263c6e0b2178756e81a154",
+      "ukuran_kb": 183.8,
+      "ringkasan": "Menjawab: bagaimana service agregasi laba dan performa marketing bekerja (mart_* pre-agregasi dari integration_db baca-saja), prinsip arsitekturnya, koleksi, channel (TikTok/Shopee/Lazada), dan aturan pemakaian angka agar tidak terjadi hitung ganda. Juga mencakup pencatatan sesi live host, KPI live, asisten analisa terjadwal, penjadwal 48 jam, gerbang baca, serta status implementasi dan kejujuran data.",
       "kata_kunci": [
         "marketing analytics",
         "mart",
         "laba",
-        "profit",
-        "iklan",
-        "ROAS",
+        "profit attribution",
         "live shift",
         "sesi live",
+        "integration_db",
+        "penjadwal",
+        "asisten analisa",
+        "hitung ganda",
         "TikTok",
         "Shopee",
         "Lazada",
-        "hitung ganda",
-        "penjadwal",
-        "integration_db",
-        "asisten analisa"
+        "RBAC"
       ]
     },
     {
@@ -16637,22 +16636,22 @@
         "CORE - RBAC dan Permission Set",
         "CORE - Kapabilitas AI dan Machine Learning"
       ],
-      "hash": "207952383d46587312d04e5b5afb78d6698b8b8c06679899b1f46650eb8c5375",
-      "ukuran_kb": 27.7,
-      "ringkasan": "Menjawab: apa saja task (T1 dan seterusnya) untuk membangun Asisten AI/Copilot tanya-jawab lintas modul, urutan ketergantungannya, dan mana yang sudah selesai (klien AI, skeleton assistant-service) versus belum (gate RBAC, modul percontohan, presentasi jawaban, jadwal tugas). Juga menjawab: prasyarat keputusan manusia apa yang masih menggantung (persetujuan Direksi untuk data keluar lewat relay, konfirmasi ke Direktur, Corporate Secretary) dan file/kode mana yang dibaca dulu per task. Papan kerja hasil /analisa-kebutuhan yang mengacu ke ADR 0132 dan dok Assistant Service.",
+      "hash": "3833958c3f0822756c91303d4ffb4ea160ce5cf13e0b3fe545b5420873475dd0",
+      "ukuran_kb": 28.8,
+      "ringkasan": "Menjawab: apa saja daftar task (T1 dan seterusnya) untuk membangun asisten AI lintas modul, urutan ketergantungannya, prasyarat keputusan manusia (Corp Sec, persetujuan Direksi untuk data keluar lewat relay), dan kriteria selesai tiap task. Papan kerja hasil analisa-kebutuhan mencakup fondasi klien AI, skeleton service, gate RBAC, modul percontohan, presentasi jawaban, verifikasi, dan jadwal tugas.",
       "kata_kunci": [
         "asisten AI",
-        "AI assistant",
-        "copilot",
-        "assistant-service",
-        "lintas modul",
-        "tanya-jawab",
-        "klien AI",
-        "tool-calling",
-        "gate RBAC",
-        "ADR 0132",
+        "Copilot",
         "analisa kebutuhan",
-        "jadwal tugas"
+        "task",
+        "T1",
+        "T3",
+        "gate RBAC",
+        "Corporate Secretary",
+        "ADR 0132",
+        "modul percontohan",
+        "klien AI",
+        "papan kerja"
       ]
     },
     {
