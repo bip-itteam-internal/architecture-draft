@@ -225,9 +225,9 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     - Juga dari sisi HRIS: tool ketiga `cuti_tim` + endpoint baru `GET /cuti/tim` (bip-erp #2363,
       erp-frontend #1905).
     - **PROD 2026-09-30** (dideploy manusia): backend di HEAD #2369, `assistant-service`
-      `MONGO_DB=assistant_db`. ⚠️ Per pengecekan agent pukul 08:21 WIB container frontend masih
-      build 2026-09-29 17:28 (checkout sudah memuat #1905/#1906), jadi label/saran tool baru belum
-      tampil sampai `frontend-hris` dibangun ulang.
+      `MONGO_DB=assistant_db`; `frontend-hris` dibangun ulang 08:23 WIB (memuat #1905/#1906).
+      Terbukti dipakai di layar prod: "toko mana yang labanya paling rendah bulan ini" dijawab
+      dengan tabel laba 54 toko (tangkapan layar user).
     - ⛔ **Belum**: uji end-to-end DEV dengan akun leader marketing (angka = layar) dan akun
       non-marketing (`tidak_berhak`), uji `cuti_tim` dengan pengajuan uji, dan ukur waktu
       `/profit/items` rentang 3 bulan terhadap batas 30 detik. Agent tak bisa membuat token uji
