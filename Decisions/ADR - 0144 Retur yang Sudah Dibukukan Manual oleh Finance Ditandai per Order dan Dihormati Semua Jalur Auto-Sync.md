@@ -1,3 +1,5 @@
+> **Status**: 🟡 **Diusulkan** (2026-09-30), disetujui pemilik proses (opsi A dari analisis kebutuhan), **kode belum ada**. Dua asumsi belum dikonfirmasi pemilik proses dan ditandai di Decision §5 dan §6: siapa yang boleh menandai, dan apakah nomor Retur Penjualan wajib.
+
 ## Untuk Manajemen
 
 **Apa yang berubah di layar.** Di layar Auto-Sync Retur, finance mendapat satu aksi baru: **"Tandai sudah dibukukan manual"** pada sebuah order. Finance wajib mengisi alasan dan nomor Retur Penjualan yang sudah ia buat sendiri di Accurate. Sesudah itu sistem berhenti menyentuh retur order tersebut, lewat jalur apa pun (sinkronisasi otomatis tiap beberapa jam, kirim ulang, sweep, konfirmasi scan gudang), dan barisnya tampil "DILEWATI" beserta nomor dokumen dan siapa yang menandai. Tanda bisa dicabut, juga dengan alasan wajib dan tercatat.
@@ -17,7 +19,7 @@
 
 *Retur sebuah order yang sudah dibukukan finance secara manual di Accurate ditandai sebagai penanda per ORDER yang dibaca oleh fungsi keputusan yang sama dengan order fake/dikecualikan, sehingga seluruh jalur Auto-Sync Retur menghormatinya tanpa penjaga baru di tiap jalur. Menutup celah bahwa baris `SKIPPED` bukan penanda dan bisa dihidupkan lagi oleh sinkronisasi terjadwal.*
 
-- **Status**: 🟡 **Diusulkan**, disetujui pemilik proses 2026-09-30 (opsi A dari analisis kebutuhan), kode belum ada
+- **Status**: lihat blockquote di baris pertama dokumen ini
 - **Path di repo**: `bip-erp/services/integration/internal/domain/entity/transaction.go` (field penanda, baru) · `bip-erp/services/integration/internal/usecase/accurate_rts_usecase.go` (`returTakDibukukan`, diperluas) · `bip-erp/services/integration/internal/handler/` (endpoint tandai dan cabut, baru) · `erp-frontend/src/features/integration/accurate/auto-sync-return/components/` (dialog tandai, baru)
 - **Tanggal**: 2026-09-30
 
