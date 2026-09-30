@@ -16637,21 +16637,22 @@
         "CORE - RBAC dan Permission Set",
         "CORE - Kapabilitas AI dan Machine Learning"
       ],
-      "hash": "e432e369a68725cf0a8eeb58a127d696eba905febfe6cd3495e8c70900349fe4",
+      "hash": "207952383d46587312d04e5b5afb78d6698b8b8c06679899b1f46650eb8c5375",
       "ukuran_kb": 27.7,
-      "ringkasan": "Menjawab: apa daftar task (T1 dst) untuk membangun asisten AI lintas modul, urutan ketergantungannya, status tiap task, dan prasyarat keputusan manusia yang belum ada (Corp Sec, konfirmasi Direktur, persetujuan Direksi untuk relay data). Berfungsi sebagai papan kerja dengan bahan baca dan kriteria selesai per task.",
+      "ringkasan": "Menjawab: apa saja task (T1 dan seterusnya) untuk membangun Asisten AI/Copilot tanya-jawab lintas modul, urutan ketergantungannya, dan mana yang sudah selesai (klien AI, skeleton assistant-service) versus belum (gate RBAC, modul percontohan, presentasi jawaban, jadwal tugas). Juga menjawab: prasyarat keputusan manusia apa yang masih menggantung (persetujuan Direksi untuk data keluar lewat relay, konfirmasi ke Direktur, Corporate Secretary) dan file/kode mana yang dibaca dulu per task. Papan kerja hasil /analisa-kebutuhan yang mengacu ke ADR 0132 dan dok Assistant Service.",
       "kata_kunci": [
-        "ANALISA",
         "asisten AI",
-        "Copilot",
+        "AI assistant",
+        "copilot",
+        "assistant-service",
         "lintas modul",
-        "task",
-        "T1 klien AI",
-        "T2 skeleton",
-        "T3 gate RBAC",
+        "tanya-jawab",
+        "klien AI",
+        "tool-calling",
+        "gate RBAC",
         "ADR 0132",
-        "papan kerja",
-        "prasyarat"
+        "analisa kebutuhan",
+        "jadwal tugas"
       ]
     },
     {
