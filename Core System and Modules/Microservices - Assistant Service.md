@@ -5,10 +5,23 @@
 - **Status**: 🟡 **Konsep**, 2026-08-29. ~~0 kode, dikonfirmasi ulang lewat `git grep` langsung ke
   kode 2026-09-28.~~ **T1 sekarang punya kode nyata, 2026-09-28**: `bip-erp/services/assistant/`
   ada — `internal/aiclient/` (klien tipis OpenAI-compatible, `client.go`+`types.go`+11 test) dan
-  `cmd/probe/main.go` (CLI verifikasi manual), 536 baris. Baru klien AI dasar (T1 di [[ANALISA -
-  Asisten AI Lintas Modul]]); **belum ada Fiber/gateway route, RBAC, maupun endpoint modul apa
-  pun** (T2 dst). Branch `feat/assistant-klien-ai`, PR belum dibuat/di-merge ke `main` — status
+  `cmd/probe/main.go` (CLI verifikasi manual), 536 baris. Baru klien AI dasar (T1 di papan kerja
+  `ANALISA - Asisten AI Lintas Modul`); **belum ada Fiber/gateway route, RBAC, maupun endpoint
+  modul apa pun** (T2 dst). Merged 2026-09-29
+  ([bip-erp#2150](https://github.com/bip-itteam-internal/bip-erp/pull/2150)) — status
   keseluruhan tetap 🟡 Konsep sampai lebih banyak T-task selesai.
+  **T2 kerangka service ditulis 2026-09-29** (branch `feat/assistant-skeleton`): Fiber +
+  `ValidateGateway`, hanya `GET /` dan `GET /health` (`{"message":"ok"}`), tanpa database dan
+  tanpa rute AI. Merged (bip-erp #2151) dan **terbukti di DEV 2026-09-29** lewat gateway dengan
+  JWT sungguhan (`/api/assistant/health` → 200). PROD dinaikkan manusia 2026-09-29 (healthy,
+  env gateway benar; panggilan ber-JWT lewat gateway prod belum dicoba).
+  **Frontend: banner pengumuman "Copilot" + halaman placeholder `/copilot`** — murni pengumuman
+  "Segera Hadir", **tidak memanggil backend apa pun**. Nama fitur yang diputuskan: **Copilot**.
+  Sempat berupa menu di puncak sidebar
+  ([erp-frontend#1788](https://github.com/bip-itteam-internal/erp-frontend/pull/1788)), lalu
+  2026-09-28 diganti strip pengumuman di atas header yang sementara hanya terlihat Tech
+  Development (erp-frontend#1790, lalu dipindah dari dalam konten ke atas header). Lihat § Persona.
+  **Jadwal Tugas** diputuskan sebagai pengingat, bukan eksekusi otomatis — lihat § Jadwal Tugas.
   ⚠️ **SEBAGIAN DIGANTIKAN 2026-09-22** oleh [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]]
   **untuk kasus laporan Marketing terjadwal saja**: asisten analisa marketing diputuskan berdiri
   **di dalam service pemilik data lewat klien tipis `shared-library/ai`**, bukan sebagai service
@@ -16,8 +29,9 @@
   di kode** — diverifikasi `git grep` menyeluruh 2026-09-28, nol hasil di luar false-positive.
   Ketegangan dengan ADR 0058 §2 yang dicatat dokumen ini (§ Dua ketegangan terbuka) **sudah
   dijawab** di sana, tapi HANYA untuk kasus satu domain (Marketing) — untuk kasus tanya-jawab
-  bebas **lintas modul**, ketegangan itu **dijawab beda** oleh [[ADR - 0132 Asisten AI Tanya-Jawab
-  Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] (2026-09-28): asisten lintas
+  bebas **lintas modul**, ketegangan itu **dijawab beda** oleh
+  [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]]
+  (2026-09-28): asisten lintas
   modul secara struktural **tetap jadi service terpisah** (`services/assistant/`, sesuai rencana
   di dokumen ini), karena tidak ada satu service pemilik untuk semua modul sekaligus.
   ⚠️ **"Tanya-jawab bebas ditunda sampai template terbukti dipakai" (2026-09-22) DIPUTUSKAN TIDAK
@@ -29,17 +43,29 @@
   pintu), empat penjaga anti angka karangan, dan § Temuan gateway soal batas 30 detik — semuanya
   jadi dasar ADR-0132.
 - **Stack**: Go, `net/http` langsung (klien tipis hand-roll, BUKAN SDK Anthropic — divalidasi
-  2026-09-28, lihat [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per
-  Service Bukan Terpusat]] §Context & §2a) ke `https://code.bharatainternasional.com/v1`
+  2026-09-28, lihat
+  [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]]
+  §Context & §2a) ke `https://code.bharatainternasional.com/v1`
   (OpenAI-compatible, bukan format native Anthropic), model dipatok literal `cc/claude-*` +
   MongoDB untuk riwayat percakapan.
   ✅ **Tool/function-calling terbukti didukung** endpoint ini (probe 2026-09-28: `tool_calls` +
   `finish_reason:"tool_calls"` kembali benar untuk skema tool sederhana). Overhead terukur ~2.332
   prompt token per giliran dengan satu tool. Router bisa membalas 401 OAuth-expired transien
   (pulih ~2 menit) — klien wajib retry sekali untuk kelas galat ini.
-- **Path di repo**: `bip-erp/services/assistant/` — `internal/aiclient/` dan `cmd/probe/` sudah
-  ada (T1); route Fiber/gateway (mengikuti pola `services/.template`) **belum ditulis** (T2 dst).
-- **Rute (rencana)**: lewat [[CORE - API Master Gateway]] seperti service lain. ⚠️ Cara mengantar jawabannya BELUM diputuskan karena gateway tidak meneruskan stream (lihat § Temuan gateway).
+- **Path di repo**: `bip-erp/services/assistant/` — `internal/aiclient/` dan `cmd/probe/` (T1);
+  `main.go` + `main_test.go` + `Dockerfile` (T2, mengikuti pola `services/.template` tanpa Mongo).
+- **Port & deploy**: `ASSISTANT_SERVICE_PORT=6991`, container `Assistant-Service`
+  (`docker-compose.yml`), healthcheck ber-header `BIP-Gateway-ID`. Tidak ada di `deploy.yml`,
+  tetapi **DEV tetap ter-deploy otomatis oleh Harness `bip_erp_deploy_dev`** saat merge (terjadi
+  2026-09-29); PROD manual. ⚠️ `.env` server wajib memuat `ASSISTANT_SERVICE_PORT`
+  **sebelum** `api-gateway` di-`--force-recreate`: tanpanya `ASSISTANT_MODULE_URL` menjadi
+  `http://assistant-service:` (tak kosong, jadi gateway tidak panic) dan `/api/assistant/*`
+  membalas 502 tanpa petunjuk.
+- **Rute**: lewat [[CORE - API Master Gateway]] seperti service lain; modul `assistant`, tanpa cache
+  gateway (`noCacheRoutes`) karena jawaban berbeda per pertanyaan. Kini `/api/assistant/` dan
+  `/api/assistant/health` (tanpa gate, dipakai healthcheck), plus **`GET /api/assistant/akses`**
+  (T3, branch `feat/assistant-gate-copilot`) di belakang `common.RequireCopilot`: 200
+  `{"boleh":true}` atau 403 — pintu tanya "boleh pakai Copilot?" untuk frontend. ⚠️ Cara mengantar jawabannya BELUM diputuskan karena gateway tidak meneruskan stream (lihat § Temuan gateway).
 - **Keputusan yang mengikat**: [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]]
 
 ## Latar Belakang
@@ -97,9 +123,169 @@ flowchart LR
 
 ## Permukaan tool
 
-Satu tool per endpoint baca, sekitar delapan sampai dua belas untuk irisan pertama. Kandidatnya dari rute yang sudah ada di `services/marketing-analytics/handler_mart.go` dan tetangganya: `/beranda`, `/summary`, `/profit/shops`, `/profit/products`, `/profit/skus`, `/profit/campaigns`, `/profit/ads`, `/videos`, `/lives`, `/returns/breakdown`. Daftar finalnya **TBD**.
+Satu tool per endpoint baca, sekitar delapan sampai dua belas untuk irisan pertama. Kandidatnya dari rute yang sudah ada di `services/marketing-analytics/handler_mart.go` dan tetangganya: `/beranda`, `/summary`, `/profit/shops`, `/profit/products`, `/profit/skus`, `/profit/campaigns`, `/profit/ads`, `/videos`, `/lives`, `/returns/breakdown`. ~~Daftar finalnya **TBD**.~~
+Per 2026-09-30 ada **lima belas** tool di kode: tiga HRIS (`rekap_telat_tim`, `antrean_persetujuan`,
+`cuti_tim`) dan dua belas marketing (§ Tool marketing). Satu daftar (`daftarAlat()` di `tanya.go`)
+dipakai untuk menawarkan tool ke model sekaligus untuk dispatch. ⚠️ Semua definisi tool ikut di
+tiap giliran, jadi prompt makin panjang per tool; waktu jawab dengan 15 tool **belum diukur**
+terhadap tenggat 25 detik.
 
 Semua tool `strict: true` supaya argumennya dijamin valid.
+
+**Tool pertama yang ada di kode (T6, 2026-09-29, branch `feat/assistant-tanya-rekap-telat`)**:
+`rekap_telat_tim(periode?, minimal?)` → `GET /api/attendance/rekap-telat/tim` lewat
+`GATEWAY_URL` dengan header `Authorization` **milik penanya** (hak akses = penanya; assistant tak
+pernah membuat token). Status gagal (`tidak_berhak`, `sumber_tak_terjangkau`, `tanpa_identitas`,
+`argumen_tidak_sah`) dikirim ke model sebagai teks, bukan galat, supaya model tak menaksir.
+`periode` kosong diteruskan kosong: attendance yang menurunkan periode payroll berjalan.
+Pintunya `POST /api/assistant/tanya` `{pertanyaan}` di belakang `RequireCopilot`: satu giliran,
+maksimal 3 putaran model-tool, tenggat **25 detik** (di bawah batas proxy 30 detik; lewat =
+**504** berpesan), balasan `{jawaban, sumber[]{alat, endpoint, dihitung_pada}}`. Env
+`AI_BASE_URL`/`AI_API_KEY`/`AI_MODEL`/`GATEWAY_URL` kosong = `/tanya` **503**, service tetap hidup.
+
+**Tool kedua (2026-09-29, bip-erp #2362)**: `antrean_persetujuan(jenis?, tampilan?)` →
+`GET /api/attendance/hr/requests?as=reviewer` **apa adanya** (tanpa endpoint baru). Filternya
+relasional, sama dengan jalur setuju/tolak (`build*ReviewFilter`): hanya pengajuan yang menunggu
+keputusan penanya, milik sendiri dikecualikan; penanya yang bukan penyetuju mendapat 0 baris, bukan
+403. ⚠️ Endpoint mengurutkan **terbaru dulu** dan berpaginasi (`limit` maks 100), jadi tool
+**menarik semua halaman** sampai `total` (berbatas 5 halaman, lalu melapor "terbaca N dari
+total"), lalu mengurutkan ulang dari yang **paling lama menunggu**; lama menunggu (hari) dihitung
+server. ⚠️ `from`/`to` di endpoint itu menyaring **tanggal dibuat**, bukan tanggal cuti, jadi tool
+sengaja tak memakainya. Terbukti di DEV 2026-09-29 dengan pengajuan uji (dibatalkan sesudahnya):
+supervisor Manufaktur melihatnya dalam tabel; pemilik (staf) 403 di gerbang Copilot; HRD tak
+melihatnya karena belum sampai tahap HR.
+
+**Tool ketiga (2026-09-30, bip-erp #2363)**: `cuti_tim(dari?, sampai?, tampilan?)` →
+`GET /api/attendance/cuti/tim`, endpoint **baru** di attendance (lihat
+[[API - Attendance Service]]). Endpoint cuti yang sudah ada tak bisa menjawab "siapa di tim saya
+yang cuti minggu ini": `/request/view` hanya memuat pengajuan yang pernah ditinjau pemanggil.
+Cakupan "tim" sama persis dengan `rekap_telat_tim`, rentang maks 62 hari, hanya status menunggu dan
+disetujui, dan alasan/lampiran pengajuan tidak pernah dikirim. ⚠️ **Belum diuji end-to-end di DEV**
+(per 2026-09-30).
+
+### Tool marketing (2026-09-30, bip-erp #2367 + #2374, erp-frontend #1906 + #1910)
+
+Dua belas tool di atas `marketing-analytics`, semuanya memakai endpoint yang sudah ada, satu klien
+bersama (`internal/alat/marketing.go`, `KlienMarketing`) dengan saringan seragam
+`dari`/`sampai`/`bulan`/`divisi`/`channel`. Lima yang terakhir (#2374) dikerjakan paralel oleh tiga
+agen di worktree terpisah lalu disatukan:
+
+| Tool | Endpoint | Yang dijawab |
+|---|---|---|
+| `ringkasan_marketing` | `/beranda` | vonis laba, penggerus, peluang periode |
+| `laba_toko` | `/profit/shops` | laba/omzet per toko (bulan-bulan digabung per toko di tool) |
+| `laba_produk` | `/profit/products` | laba per produk master (lintas toko / per toko / lintas channel) |
+| `iklan` | `/profit/campaigns` atau `/profit/ads`, plus `/ambang` | belanja, ROAS terhadap target |
+| `live` | `/lives/analisis` atau `/lives` | performa sesi live |
+| `retur` | `/returns/breakdown` | retur per status dan pemicu |
+| `affiliate_video` | `/affiliate` atau `/videos/periode` | performa affiliate dan video |
+| `laba_sku_listing` | `/profit/skus` atau `/profit/items` (argumen `level`) | laba per SKU master / per listing marketplace |
+| `matriks_produk_toko` | `/matrix/sku-shop` | produk × toko satu metrik aditif |
+| `account_specialist` | `/penanggung-jawab/analisis` | laba per pemegang toko |
+| `performa_host` | `/live-shifts/performa` | performa live per host |
+| `retur_detail` | `/returns/detail` | rincian order retur/batal |
+
+Aturan khusus lima tool terakhir, juga ditegakkan di tool:
+
+- `laba_sku_listing`: `lingkup` tak dikirim (kedua endpoint menolaknya dengan 400; penggabungan
+  dikerjakan tool). ⛔ **Biaya iklan level SKU/listing ditagihkan ke SATU entitas** yang terbaca lebih
+  dulu (marketing-analytics `agregasi_profit.go` ~1344-1388: belanja listing Shopee ke satu varian
+  SKU, belanja TikTok per SKU ke satu listing). Totalnya benar, pembagiannya tidak bermakna, jadi
+  model diberi tahu untuk **tidak memeringkat ROAS/laba antar SKU atau listing** dan memakai `iklan`
+  atau `laba_toko` untuk ROAS. Dikunci `TestLabaSKUListing_CatatanBiayaIklanTertumpuk`.
+- `matriks_produk_toko`: **sel absen ≠ nol**. Pasangan tanpa baris dikirim sebagai
+  `toko_tanpa_penjualan`, nol nyata sebagai 0. Tabel berbentuk panjang (satu baris per produk×toko,
+  maks 200) karena matriks lebar tak terbaca di panel chat. Rasio ditolak.
+- `account_specialist`: `per_orang` tak pernah dijumlahkan (totalnya `ringkasan`), `retur` bukan
+  pengurang laba, `belum_matang` bukan kabar buruk; `bulan` diterjemahkan dan rentang > 92 hari
+  ditolak sebelum memanggil sumber. Kolom `status` berisi kode vonis yang diterjemahkan layar.
+- `performa_host`: rasio tanpa penyebut (tak ada klik/tontonan) jadi `null`, bukan 0 seperti yang
+  dikirim sumber.
+- `retur_detail`: paginasi berbatas **1.000 order** (2 × 500) dan dilaporkan "terbaca N dari total";
+  `total:-1` bukan 0; data pembeli dan nomor resi tak pernah dikirim ke model.
+- Nama orang (Account Specialist, host, penanggung jawab) selalu lewat samaran.
+
+Aturan kolom **ditegakkan di tool, bukan diserahkan ke model** (sumbernya [[Microservices - Marketing Analytics Service]] § Aturan Pemakaian Angka):
+
+- `null` = tidak diketahui, **bukan 0**. Rasio (ROAS, margin, porsi) **dihitung ulang dari total**,
+  tak pernah dijumlah atau dirata-rata.
+- `pembatalan` dan `iklan_sia_sia` bukan komponen kerugian; `produk_terjual` tak aditif (pakai
+  `unit_terjual`); `orders_berresi` himpunan bagian `orders`; `gmv_live_tanpa_performa` tidak
+  ditambahkan ke GMV toko; belanja USD tidak dikonversi; revenue VSA `null` bukan kerugian.
+- Target ROAS **dibaca dari `/ambang`**, tidak ditulis di tool.
+- `bulan` diterjemahkan ke `dari`/`sampai` untuk endpoint yang mengabaikannya.
+
+Siapa yang bisa memakai: gerbang Copilot (`RequireCopilot`) **dan** gerbang baca marketing
+(`common.RequireAnalitikMarketing`, bip-erp #2365) berlaku berlapis. Supervisor departemen
+non-marketing lolos gerbang Copilot, tetapi tool marketing-nya membalas `tidak_berhak`, bukan angka
+nol. `account_specialist` dan `performa_host` memakai gerbang yang lebih sempit,
+`common.RequireAnalisisPerOrangMarketing` (bip-erp #2375): marketing leader + Direktur/Corporate
+Secretary, **tanpa** staf integration. ⚠️ **Belum diuji end-to-end di DEV** dengan akun leader
+marketing dan akun non-marketing (per 2026-09-30); `laba_toko` baru terbukti sekali di layar PROD.
+
+`laba_produk` sempat selalu mengirim peringatan "data harian terpotong 5000 baris" karena cacat
+sumbernya (bip-erp #2366). Sejak #2369 sumbernya menjumlah seluruh baris, jadi peringatan tinggal
+berbunyi saat **daftar produk** mentok di limit endpoint (5000 produk).
+
+### Samaran identitas sebelum ke relay AI (keputusan user 2026-09-29)
+
+Persetujuan tertulis Direksi untuk data asli yang keluar lewat `code.bharatainternasional.com`
+belum ada, jadi `internal/samaran` memastikan yang keluar hanya **token `Karyawan-N`, angka, dan
+nama departemen**:
+
+- Nama dan `employee_id` dari hasil tool diganti token; **jabatan tidak dikirim sama sekali**
+  (jabatan tunggal, mis. satu-satunya supervisor, mengidentifikasi orangnya sama baiknya dengan nama).
+- Sebelum TIAP kiriman, seluruh percakapan disamarkan dengan peta yang sudah ada (termasuk nama
+  yang diketik penanya), lalu **penjaga** memindainya sekali lagi: sisa identitas = kiriman
+  **dibatalkan** (500 "Jawaban ditahan"), bukan sekadar dicatat.
+- Jawaban dipulihkan ke nama asli hanya di balasan untuk penanya.
+- ⚠️ **Batas yang diketahui**: nama yang diketik penanya di pertanyaan **pertama** terkirim apa
+  adanya, karena sebelum tool pertama berjalan peta masih kosong. Nama panggilan/sebagian nama
+  ("Danu" untuk "Danu Prayuda") tak dikenali penyamaran. Pada percakapan yang **dilanjutkan**
+  (§ Riwayat) peta lama dipulihkan, jadi nama yang sudah dikenal ikut tersamar sejak putaran pertama.
+
+### Riwayat percakapan (keputusan user 2026-09-29, bip-erp #2332, erp-frontend #1899)
+
+- **Disimpan selamanya, hanya pemiliknya yang bisa membaca.** Database sendiri
+  `assistant-mongo-db` (container `Assistant-MongoDB`, env `MONGO_ASSISTANT_DB`), koleksi
+  `percakapan`. Pemilik ditegakkan di **filter penyimpanan** (`riwayat.FilterMilik` =
+  `_id` + `employee_id`), bukan di handler: milik orang lain dibalas **404**, sama dengan tidak ada.
+- Rute di belakang `RequireCopilot`: `GET /percakapan` (100 terbaru), `GET /percakapan/:id`,
+  `DELETE /percakapan/:id` (hapus **permanen**, 204). `POST /tanya` menerima `percakapan_id` untuk
+  melanjutkan; balasannya membawa `percakapan_id` dan `tersimpan`.
+- Tiap giliran menyimpan dua versi: nama asli (untuk layar) dan versi tersamar (yang dikirim ulang ke
+  model, maksimal 6 giliran terakhir), plus **peta samaran**. Peta dan `employee_id` tak pernah ikut
+  di balasan JSON.
+- Gagal menyimpan **tidak** membatalkan jawaban: `tersimpan:false`, layar memberi keterangan.
+  `MONGO_URI` kosong/Mongo mati = rute riwayat 503, `/tanya` tetap menjawab.
+- ⚠️ **`MONGO_DB` kosong juga wajib ditolak di awal** (bip-erp #2368, `alasanRiwayatNonaktif`):
+  `Connect` tetap berhasil lalu tiap baca/tulis gagal `database name cannot be empty` sementara
+  container tampak sehat. Terjadi di PROD 2026-09-29 karena `MONGO_ASSISTANT_DB` tak ada di `.env`
+  server; riwayat mati belasan jam tanpa tanda di `/health`. Kini log berbunyi `[Copilot] riwayat
+  nonaktif: MONGO_DB kosong (isi MONGO_ASSISTANT_DB di .env)` dan rute riwayat 503. PROD dibetulkan
+  manusia 2026-09-30 (`printenv MONGO_DB` = `assistant_db`).
+- Terbukti di DEV 2026-09-29 lewat gateway dengan dua akun: simpan, isolasi (baca/hapus/lanjutkan
+  milik orang lain = 404), lanjutkan, hapus 204 lalu 404.
+- Deploy pertama menuntut `up -d` **tanpa** `--no-deps` supaya `assistant-mongo-db` ikut tercipta.
+
+### Blok tampilan: tabel dan grafik (T9b, keputusan user 2026-09-29, bip-erp #2359)
+
+- **Model memilih bentuk, angka dari tool.** Tool berdata baris punya argumen `tampilan`
+  (`teks`/`tabel`/`grafik`) yang diisi model saat memanggilnya (nol putaran tambahan). Isi blok
+  dibangun **server** dari balasan endpoint (`internal/alat/tampilan.go`), dengan nama asli, dan
+  diantar hanya ke penanya di field `tampilan` (array, `[]` bila tak ada). Model tak pernah
+  mengetik isi tabel, dan kiriman ke relay tetap tersamar.
+- Bentuk blok: `jenis`, `alat`, `periode`, `kolom` (**kunci**, bukan label: labelnya milik layar,
+  [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]), `baris`, `kategori`/`nilai` (sumbu grafik),
+  `total`. Rekap telat: terurut dari yang paling sering telat; grafik dipotong **15** dengan `total`.
+- Tanpa blok bila model memilih teks, data kosong, atau status gagal/tidak berhak.
+- Blok ikut tersimpan di riwayat dan **tidak pernah** dikirim ulang ke model.
+- Frontend: `features/copilot/components/blok-tampilan.tsx` (tabel `components/ui/table`, grafik
+  batang mendatar lewat `ChartContainer` + `WARNA_BAGAN.violet`); jenis asing diabaikan.
+- Terukur di DEV 2026-09-29 (akun Direktur, seluruh perusahaan): "rekap April 2026" → tabel 56 baris
+  (12 dtk); "grafik ... April 2026" → grafik 15 dari 56 (7 dtk). ⚠️ Pertanyaan "satu orang paling
+  sering telat" juga mendapat tabel 56 baris, karena model memilih sebelum melihat data; perketat
+  deskripsi argumen bila terasa berlebihan.
 
 Yang sengaja **TIDAK** ada, dan alasannya bukan kehati-hatian umum:
 
@@ -146,13 +332,63 @@ Empat jalan keluar yang terbuka, belum dipilih:
 
 | Persona | Peran & Divisi | Akses / RBAC | Device |
 |---|---|---|---|
-| Supervisor departemen mana pun | Tim mana pun, ber-`is_supervisor` | Mewarisi gerbang endpoint yang dipanggil; DAN gate baru "Supervisor apa pun ATAU Direktur ATAU IT" ([[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §3) | Web ERP |
-| Direktur | Kesekretariatan | Sama seperti di atas; otomatis lolos lewat derivasi `it:supervisor` dari jabatan. Corporate Secretary belum ditegaskan ikut atau tidak | Web ERP |
-| Tim IT | IT | Sama seperti di atas, lewat `common.IsITMember`/`IsITSupervisor` | Web ERP |
+| Supervisor departemen mana pun | Tim mana pun, ber-`is_supervisor` | Mewarisi gerbang endpoint yang dipanggil; DAN gate Copilot ([[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §3) lewat `SupervisedDepartmentsStrict` non-kosong | Web ERP |
+| Direktur & Corporate Secretary | Kesekretariatan | Sama seperti di atas, lewat `common.SetaraDirektur` atas `BIP-Position` (Corp Sec ditegaskan ikut 2026-09-29); Direktur juga lolos lewat derivasi `it:supervisor` | Web ERP |
+| Tim IT | IT | Sama seperti di atas, lewat `common.IsITMember` (staf ke atas) | Web ERP |
+
+**Gate Copilot di kode** (T3): satu-satunya tempat aturannya `shared-library/common/akses_copilot.go`
+(`BolehPakaiCopilot`, dibungkus `RequireCopilot`). Gagal-tertutup: token lama tanpa klaim
+`supervised_departments` ditolak sampai login ulang, dan versi berfallback `SupervisedDepartments`
+sengaja TIDAK dipakai (membuat setiap staf tampak supervisor departemennya sendiri). Jabatan
+dicocokkan PERSIS: "Direktur Utama" tidak lolos lewat cabang jabatan. ⛔ **Frontend wajib bertanya
+ke `GET /api/assistant/akses`, jangan memakai `aksesSemuaMenu`**: helper FE itu sengaja TIDAK
+mencakup Corporate Secretary, jadi halaman Copilot yang digerbang dengannya menolak Corp Sec
+tanpa pesan apa pun.
+
+⚠️ **Pengumuman INTERIM jauh lebih sempit dari tabel di atas** (erp-frontend 2026-09-28): belum
+ada menu Copilot sama sekali. Yang ada strip pengumuman tipis DI ATAS HEADER seluruh halaman,
+selebar kolom konten (`components/layout/banner-copilot.tsx`, dirender `Container` sebelum
+`<Header/>`; tak sticky sehingga tergulir hilang, sidebar tak digeser), hanya untuk
+**departemen Tech Development** — dibandingkan dengan konstanta `DIVISI_IT`, **bukan**
+`system_roles.it` (peran itu juga dipegang orang HR, Kesekretariatan, dan Finance). Selalu tampil
+tanpa tombol tutup, tombol "Pelajari" menuju `/copilot`, dan disembunyikan di `/copilot` sendiri.
+Izin `assistant.view` tetap `tolak` di `FALLBACK` (`utils/menu-permission.ts`) sebagai penjaga,
+walau tak ada menu yang memakainya: izin tak-terdaftar diloloskan untuk semua orang. ~~Halaman
+`/copilot` sendiri tidak menggerbangi apa pun karena tak memuat data (ADR 0031).~~ **Sejak
+2026-09-29 (branch erp-frontend `feat/copilot-akses`) halaman `/copilot` bertanya ke
+`GET /api/assistant/akses`** lewat `features/copilot/hooks/use-akses-copilot.ts`: yang tak berhak
+mendapat **404** (`notFound`), selama memuat `Skeleton`, gagal-tertutup (403/502/badan lain =
+tidak boleh), `retry: false`. Banner **tetap khusus Tech Development** (keputusan user
+2026-09-29), jadi yang berhak di luar Tech Development baru bisa masuk lewat URL.
+⚠️ Belum diverifikasi: `KonteksPortal.supervisedDepartments` di `components/layout/portal-menu.ts`
+didokumentasikan sebagai sinyal supervisor yang benar — relevan saat menu sungguhan dibuka ke
+supervisor (T3).
 
 - **Tujuan**: mendapatkan satu angka tanpa harus tahu lebih dulu layar mana yang memuatnya.
 - **Pain point**: angkanya ada, tetapi tersebar di belasan layar.
 - **Aksi utama**: bertanya, membaca jawabannya, lalu mengklik tautannya untuk memeriksa sendiri di layar aslinya.
+
+## Jadwal Tugas (🟡 diusulkan)
+
+Keputusan dan alasannya di [[ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai]]. Bagian ini menjelaskan cara kerjanya. Kode belum ada, dan **tidak bisa dikerjakan sebelum Tanya Jawab bisa menjawab**, karena tautan pengingat menunjuk ke sana.
+
+```
+buat jadwal (nama + instruksi/template + frekuensi + jam)      @ Copilot > Jadwal Tugas
+        │
+cron assistant-service (Asia/Jakarta) ── slot jatuh tempo? ── klaim atomik (tugas, slot) unik
+        │
+kirim pengingat: inbox + push, kategori baru, tautan pre-fill  ── TANPA panggilan AI / data
+        │
+pemakai klik ── Tanya Jawab terbuka berisi instruksi ── jalan dengan JWT HIDUP miliknya
+        │                                                     (gate ADR-0132 §3 dinilai ulang)
+riwayat: kapan terkirim, kapan dibuka
+```
+
+- **Tidak ada eksekusi tanpa kehadiran pemakai.** Itu satu-satunya alasan fitur ini tak butuh mekanisme identitas baru: cron di kode hari ini memanggil lewat `InternalRequest(nil, …)` tanpa header RBAC apa pun, dan perhitungan izin efektif cuma hidup privat di titik penerbitan JWT employee-service (rincian di ADR-0135 § Context).
+- **Isi tugas**: nama, instruksi atau template Copilot, frekuensi (harian, hari kerja, mingguan+hari, bulanan+tanggal) + jam. Tanpa mode izin, pilihan model, atau project.
+- **Biaya AI nol sampai pemakai membuka tautan**; jadwal yang diabaikan tak memakan token.
+- ⚠️ **Deploy**: kategori inbox baru → `notification-service` naik LEBIH DULU, baru `assistant-service` (lihat [[Microservices - Notification Service]]).
+- **TBD**: nama kategori inbox, batas jumlah tugas per orang dan interval minimum (angka PRD claude.ai tak dipakai), serta apakah pengingat berikutnya ditahan bila yang sebelumnya belum dibuka.
 
 ## Di luar lingkup
 
@@ -163,14 +399,21 @@ Empat jalan keluar yang terbuka, belum dipilih:
 
 ## Belum Diputuskan (TBD)
 
-- **Cara mengantar jawaban.** Empat pilihan di § Temuan gateway, belum dipilih. Ini penghalang pertama, bukan detail.
+- ~~**Cara mengantar jawaban.** Empat pilihan di § Temuan gateway, belum dipilih.~~ **Diputuskan user 2026-09-29: sekaligus, tanpa stream**, lewat gateway biasa dengan tenggat 25 detik (cukup untuk satu-dua tool). Stream ditunda sampai pertanyaan lintas modul (T8) membuktikan 25 detik tak cukup.
 - **Daftar tool final** beserta bentuk argumen dan bentuk hasilnya.
-- ~~**Kunci RBAC** yang menentukan siapa boleh membuka asistennya.~~ **Ditegaskan 2026-09-28** oleh [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §3: Supervisor departemen mana pun ATAU Direktur ATAU IT. Yang masih TBD: apakah Corporate Secretary ikut termasuk.
-- **Penyimpanan riwayat percakapan**: koleksi, masa simpan, dan apakah isinya boleh dibaca siapa pun selain penanyanya.
+- ~~**Kunci RBAC** yang menentukan siapa boleh membuka asistennya.~~ **Ditegaskan 2026-09-28** oleh [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §3: Supervisor departemen mana pun ATAU Direktur ATAU IT. ~~Yang masih TBD: apakah Corporate Secretary ikut termasuk.~~ Corporate Secretary **ikut** (ditegaskan 2026-09-29).
+- ~~**Penyimpanan riwayat percakapan**: koleksi, masa simpan, dan apakah isinya boleh dibaca siapa pun selain penanyanya.~~ **Diputuskan user 2026-09-29**: koleksi `percakapan` di `assistant-mongo-db`, disimpan selamanya, hanya pemiliknya. Lihat § Riwayat percakapan.
 - **Model dan ongkos.** Probe 2026-09-28 memakai `cc/claude-sonnet-4-6` (bukan opus) — terbukti mendukung tool-calling, 2.332 prompt token untuk satu tool sederhana. Biaya rupiah per pertanyaan lintas modul sungguhan (lebih banyak tool) **masih belum diukur** — lihat T12 di [[ANALISA - Asisten AI Lintas Modul]]. Batas pemakaian per orang per hari juga belum ada.
 - **Prompt caching**: daftar tool dan system prompt yang tetap seharusnya di-cache, penempatan breakpoint-nya belum dirancang.
 - ~~**Penyimpanan kunci API Anthropic** dan siapa yang memegangnya.~~ **Sebagian terjawab 2026-09-28**: `AI_BASE_URL`/`AI_API_KEY` sudah ada sebagai env var di SEMUA container prod (termasuk container MongoDB — kemungkinan dari blok/anchor compose bersama yang terlalu luas, layak ditinjau terpisah, di luar cakupan dok ini) lewat `~/apps/bip-erp/.env` di server. Siapa yang mengelola rotasi/akses kunci ini masih belum jelas.
-- **Seluruh sisi frontend**: letak panel, komponen, dan kunci i18n `id` serta `en` yang diwajibkan [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]].
+- ~~**Seluruh sisi frontend**~~ **Sebagian terjawab 2026-09-28**: pengumuman lewat banner
+  (bukan menu) dengan kilau beranimasi (keyframe `copilot-kilau`, garis putih transparan supaya
+  tak jadi bayangan di tema gelap, mati untuk `prefers-reduced-motion`); halaman placeholder
+  `/copilot` + kunci i18n `copilot.*` dan `copilot.banner.*` di `id`/`en`
+  ([[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]). Yang masih TBD: letak menu Copilot
+  sungguhan saat fiturnya hidup, panel chat, render tabel/chart jawaban, dan sub-menu (Tanya
+  Jawab, Jadwal Tugas). **Panel chat, riwayat, dan render tabel/grafik sudah dibangun 2026-09-29**
+  (§ Riwayat percakapan, § Blok tampilan).
 - **Irisan dan gerbang verifikasinya.** Belum disusun.
 - ~~**ADR** yang menyelesaikan ketegangan dengan ADR 0058 § 2.~~ **Ditulis 2026-09-28**: [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §2 — asisten lintas modul tetap jadi service terpisah, karena tidak ada satu service pemilik untuk semua modul.
 

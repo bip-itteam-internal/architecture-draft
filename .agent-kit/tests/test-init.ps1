@@ -154,6 +154,53 @@ try {
   Check ($bfTriase.Contains('Alur Pengguna') -and $bfTriase.Contains('menyentuh layar')) 'brief.md: mendefinisikan KAPAN Alur Pengguna wajib (brief menyentuh layar)'
   Check ($bfTriase.Contains('langkah orang, bukan aliran data, dengan titik putusnya ditandai') -and $bfTriase.Contains('plan-checklist.md')) 'brief.md: mendefinisikan ISI Alur Pengguna (langkah orang + titik putus) dan merujuk plan-checklist.md, bukan menyalin'
 
+  # kit 1.31.0, diganti 1.33.0 (backlog pindah dari Linear ke GitHub Project #15). Yang
+  # menyambungkan PR ke issue kini `Closes <org>/<repo>#<n>` di badan PR (Refs TIDAK
+  # menyambungkan), jadi yang dipatok: field Issue ber-<repo>#<n>, /kerjakan menulis Closes dan
+  # tak memindahkan ke Done, pre-push tetap hanya memperingatkan (bukan menolak) dan masih
+  # menerima branch bha-<n> lama.
+  Check ($tplBrief.Contains('- Issue: __ISSUE__') -and $tplBrief.Contains('<repo>#<n>')) 'templates/brief.md: field Issue berbentuk <repo>#<n>'
+  Check ($bfTriase.Contains('slug diawali `<n>-`') -and $bfTriase.Contains('gh search issues "BHA-<n>"')) 'brief.md: slug diawali <n>- dan BHA-<n> lama diterjemahkan lewat gh search'
+  $kjMd = Get-Content (Join-Path $claude 'commands/kerjakan.md') -Raw -Encoding UTF8
+  Check ($kjMd.Contains('Closes bip-itteam-internal/<repo>#<n>') -and $kjMd.Contains('Menunggu Adopsi') -and $kjMd.Contains('Jangan memindahkan') -and -not $kjMd.Contains('[BHA-<n>]')) 'kerjakan.md: PR ber-Closes <org>/<repo>#<n>, merge ke Menunggu Adopsi, bukan Done'
+  $ppLinear = Get-Content (Join-Path $kitRoot 'hooks/githooks/pre-push') -Raw -Encoding UTF8
+  Check ($ppLinear.Contains("grep -qiE '/[0-9]+-|bha-[0-9]'") -and $ppLinear.Contains('PERINGATAN: branch')) 'pre-push: peringatan branch tanpa nomor issue (tak menolak), bha-<n> lama diterima'
+  $tmSrc = Get-Content (Join-Path $kitRoot 'rules/team-memory.md') -Raw -Encoding UTF8
+  Check ($tmSrc.Contains('## Backlog: GitHub Project') -and -not $tmSrc.Contains('## Linear: status issue')) 'team-memory: bagian Backlog GitHub Project menggantikan bagian Linear'
+
+  # kit 1.34.0: sub-issue per repo. Yang dipatok: skrip tersalin init dan TERPARSE, pencocokan
+  # idempotennya meratakan array (tanpa itu PS 5.1 mencocokkan SEMUA anak sekaligus: terjadi saat
+  # uji pertama), /brief 2c memanggilnya, dan team-memory memuat aturannya.
+  $sbPath = Join-Path $claude 'hooks/buat-sub-issue.ps1'
+  Check (Test-Path $sbPath) 'hooks/buat-sub-issue.ps1 tersalin init'
+  $sbErr = $null; [void][System.Management.Automation.Language.Parser]::ParseFile($sbPath, [ref]$null, [ref]$sbErr)
+  Check ($sbErr.Count -eq 0) 'buat-sub-issue.ps1 terparse tanpa galat'
+  $sbSrc = Get-Content $sbPath -Raw -Encoding UTF8
+  Check ($sbSrc.Contains('sub_issues?per_page=100") $null | ForEach-Object { $_ })') -and $sbSrc.Contains("ValidateSet('bip-erp', 'erp-frontend', 'my-bharata')")) 'buat-sub-issue: anak diratakan sebelum dicocokkan, repo dibatasi tiga repo kode'
+  Check ($bfTriase.Contains('2c. **Sub-issue per repo**') -and $bfTriase.Contains('buat-sub-issue.ps1')) 'brief.md 2c: brief lintas repo memakai sub-issue lewat buat-sub-issue.ps1'
+  Check ($tmSrc.Contains('SATU sub-issue per repo') -and $tmSrc.Contains('Satu tingkat saja') -and $tmSrc.Contains('dipasang saat pekerjaan MULAI')) 'team-memory: aturan sub-issue per repo dan assignee saat mulai'
+
+  # kit 1.35.0: gerbang nomor ADR ganda. Yang dipatok: skrip tersalin init, pre-push memanggilnya
+  # atas POHON COMMIT (--rev HEAD, bukan working tree bersama), dan gerbang-kit menjalankan
+  # test-nya (gerbang-kit memakai daftar test EKSPLISIT: test yang tak didaftarkan tak pernah jalan).
+  Check (Test-Path (Join-Path $claude 'hooks/githooks/gerbang-adr.py')) 'githooks/gerbang-adr.py tersalin init'
+  $ppAdr = Get-Content (Join-Path $kitRoot 'hooks/githooks/pre-push') -Raw -Encoding UTF8
+  Check ($ppAdr.Contains('gerbang-adr.py" --vault "$top" --rev HEAD') -and $ppAdr.Contains("grep -q '^Decisions/ADR - '")) 'pre-push: gerbang nomor ADR ganda atas pohon commit, menyala bila ADR tersentuh'
+  $gkSrc = Get-Content (Join-Path $kitRoot 'hooks/gerbang-kit.py') -Raw -Encoding UTF8
+  Check ($gkSrc.Contains('test_gerbang_adr.py')) 'gerbang-kit menjalankan test_gerbang_adr.py'
+
+  # kit 1.32.0: /linear-cek. Yang dipatok: skrip tersalin init dan TERPARSE (PS 5.1 pernah
+  # gagal diam-diam karena [string]$Tim dan $tim adalah variabel yang sama), --terapkan hanya
+  # menyentuh R1/R2 (tak pernah Done), dan command melarang memindah ke Done.
+  $lvPath = Join-Path $claude 'hooks/linear-verifikasi.ps1'
+  Check (Test-Path $lvPath) 'hooks/linear-verifikasi.ps1 tersalin init'
+  $lvErr = $null; [void][System.Management.Automation.Language.Parser]::ParseFile($lvPath, [ref]$null, [ref]$lvErr)
+  Check ($lvErr.Count -eq 0) 'linear-verifikasi.ps1 terparse tanpa galat'
+  $lvSrc = Get-Content $lvPath -Raw -Encoding UTF8
+  Check ($lvSrc.Contains("`$_.Aturan -in @('R1', 'R2')") -and -not $lvSrc.Contains("`$state['Done']")) 'linear-verifikasi: -Terapkan hanya R1/R2, tak menyentuh Done'
+  $lcMd = Get-Content (Join-Path $claude 'commands/linear-cek.md') -Raw -Encoding UTF8
+  Check ($lcMd.Contains('Jangan memindahkan issue ke **Done**')) 'linear-cek.md melarang memindah ke Done'
+
   # --- Sambungan antar-berkas, temuan review akhir 1.28.0 ---
   # Kelas yang sama untuk kelimanya: tiap berkas benar sendiri-sendiri, yang salah sambungannya.
 

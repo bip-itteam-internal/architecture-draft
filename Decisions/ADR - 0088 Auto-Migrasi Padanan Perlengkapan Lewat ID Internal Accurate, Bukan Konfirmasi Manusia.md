@@ -1,4 +1,5 @@
 **Status**: ⚠️ **Implemented (ada catatan)** — kode selesai & ber-tes, bip-erp branch `feat/accurate-item-rename-auto-migrasi` (commit `71786d88`+`3674ba98`+`28cc5cfb`), **PR belum dibuka**. Asumsi kunci (id internal Accurate stabil lintas rename) belum diverifikasi empiris — lihat "Belum selesai".
+- ⚠️ **Nomor ganda**: nomor 0088 juga dipakai [[ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift]]. Rujuk ADR ini dengan **judul**, bukan nomor saja. Diputuskan 2026-09-29 tidak dinomori ulang karena kutipan nomornya sudah tersebar di kode, PR, dan issue; nomor ganda baru ditolak pre-push (`gerbang-adr.py`).
 
 # ADR - 0088 Auto-Migrasi Padanan Perlengkapan Lewat ID Internal Accurate, Bukan Konfirmasi Manusia
 

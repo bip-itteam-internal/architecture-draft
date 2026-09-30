@@ -2,7 +2,7 @@
 
 *Kewenangan mengajukan Job Requisition untuk posisi di **departemen mana pun** digerbang **jenjang jabatan** (`position_items[].level_key` terhadap `master_job_level`), bukan daftar nama jabatan. Ini pemakaian PERTAMA jenjang sebagai sumbu keputusan, yang sampai sekarang dilarang eksplisit di kode, dan sekaligus mencabut Corporate Secretary dari kewenangan itu.*
 
-- **Status**: 🟡 Konsep / Direncanakan — kode sudah ditulis dan diuji di branch `feat/recruitment-requisition-jenjang-direktur` (bip-erp) + `feat/requisition-jenjang-direktur` (erp-frontend), **belum merged, belum deployed**.
+- **Status**: ⛔ **Superseded** oleh [[ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen]] (2026-09-07). Kode jenjang ini **sudah merged** (commit `0d3c5966`) dan hidup sebagai **jalur transisi** di belakang izin `recruitment.requisition_cross_dept` (`services/recruitment/requisition_handlers.go:72-87`, diverifikasi 2026-09-29); dibuang setelah paket izin ADR 0080 terpasang ke posisi Direktur di prod.
 - **Path di repo**: `bip-erp/services/recruitment/jenjang.go` · `models_requisition.go` · `requisition_handlers.go` · `erp-frontend/src/hooks/use-jenjang-jabatan.ts` · `src/features/hris/recruitment/requisitions/components/requisition-form.tsx` · `src/app/(main)/portal/requisitions/create/page.tsx`
 - **Tanggal**: 2026-08-29
 

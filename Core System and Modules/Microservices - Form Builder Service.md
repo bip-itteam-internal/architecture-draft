@@ -67,7 +67,7 @@ Prefix gateway `/api/form-builder/*`. Kontrak lengkap: [[API - Form Builder Serv
 
 **Pengisian** (cukup karyawan terautentikasi)
 - `GET /me/forms` — form terbit yang ditujukan ke pemanggil, lengkap dengan penanda `submitted` dan `blocks_attendance`. Untuk form penilaian ikut membawa `subject_enabled`, `subject_total`, `subject_done`, `subject_anonymous`; `submitted` baru bernilai `true` setelah **seluruh** sasaran dinilai, bukan setelah orang pertama.
-- `GET /me/forms/:id/subjects` — daftar orang yang harus dinilai pemanggil, beserta mana yang sudah selesai. Dibaca dari potret di dokumen form, jadi jalur ini **tak menyentuh employee-service sama sekali**.
+- `GET /me/forms/:id/subjects` — daftar orang yang harus dinilai pemanggil, beserta mana yang sudah selesai. Dibaca dari potret di dokumen form **dikurangi sasaran yang sudah tak aktif** (`subject.excluded`), jadi jalur ini **tak menyentuh employee-service sama sekali**.
 - `POST /me/forms/:id/responses` — kirim jawaban. Form non-`published` ditolak, dan bukan-sasaran ditolak `403`.
 - `GET /me/responses` — riwayat jawaban sendiri.
 - **Idempoten**: pengiriman identik dalam 2 menit dianggap retry dan dibalas sukses tanpa insert baru. Sidiknya di-hash dari jawaban yang **kuncinya diurutkan lebih dulu**, jadi klien yang menyusun ulang payload saat retry tetap terdeteksi. Pola sejenis dipakai leave request di [[Microservices - Attendance Service]].
@@ -228,7 +228,7 @@ Skor gabungan di atas menjawab "siapa yang perlu ditindaklanjuti". Bagian ini me
 
 **Rutenya di grup `/me`, bukan `/forms`.** Alasannya sama persis dengan rute komite Kaizen: yang membacanya staf divisi di ringkasannya sendiri, yang belum tentu mengelola form apa pun. Gerbangnya pindah ke dalam handler dan bersumbu departemen (`common.SupervisedDepartments`, yang selalu memuat departemen pemanggil sendiri). Rute BACA, jadi terkunci `EffectiveCompanyID` — memakai `CompanyID` membuat admin pusat melihat angka perusahaannya sendiri di bawah label perusahaan yang sedang dibuka.
 
-**Kerahasiaan meluas ke form tanpa sasaran.** `settings.anonymous` melengkapi `subject.anonymous` yang lebih dulu ada, dan keduanya sengaja **tidak** dijumlahkan sebagai OR — form bersasaran hanya membaca miliknya sendiri. Penentu tunggalnya `anonimAktif` di `anonim.go`, menggantikan syarat yang sebelumnya ditulis ulang di daftar jawaban dan export. Mencabutnya setelah ada jawaban dibalas `409`, dan pada `PATCH` field yang absen berarti jangan diubah.
+**Kerahasiaan meluas ke form tanpa sasaran.** `settings.anonymous` melengkapi `subject.anonymous` yang lebih dulu ada, dan keduanya sengaja **tidak** dijumlahkan sebagai OR — form bersasaran hanya membaca miliknya sendiri. Penentu tunggalnya `anonimAktif` di `anonim.go`, menggantikan syarat yang sebelumnya ditulis ulang di daftar jawaban dan export. Mencabutnya setelah ada jawaban dibalas `409`, dan pada `PATCH` field yang absen berarti jangan diubah. ⚠️ **Diputuskan 2026-09-29, belum dikodekan**: untuk tipe `evaluation` dan `survey` anonimitas jadi sifat TIPE (selalu nyala, tak bisa dimatikan, berlaku mundur), dan IT membuka identitas hanya lewat jalur audit bercatatan, lihat [[ADR - 0142 Pengisi Penilaian dan Survei Selalu Anonim, IT Membuka Identitas lewat Jalur Audit Bercatatan]].
 
 **Pertanyaan berbobot nol dikembalikan terpisah** sebagai `unweighted`, bukan disembunyikan: ia jadi pembanding di luar indeks, sehingga indeks yang naik sementara pertanyaan keseluruhan turun menunjukkan bobot antar aspeknya yang salah, bukan layanannya yang membaik.
 
@@ -257,9 +257,37 @@ Skenario OB jadi `audience: all` + `subject.rules: [positions]` dengan `position
 
 `subject.resolved` membekukan daftar orang **tepat saat form diterbitkan**, dan itu bukan cache demi kecepatan semata. Orang pindah jabatan dan karyawan baru masuk kapan saja; daftar yang bergeser di tengah periode membuat sebagian penilai mendapat orang yang tak pernah dilihat penilai lain, lalu angkanya dibandingkan seolah setara.
 
-Efek sampingnya seluruh jalur pengisian **tak menyentuh employee-service sama sekali** — service itu hanya dipanggil pada saat menerbitkan.
+Efek sampingnya seluruh jalur pengisian **tak menyentuh employee-service sama sekali** — service itu hanya dipanggil pada saat menerbitkan, dan oleh cron pengecualian di bawah.
 
 Gagal memotret **menggagalkan penerbitan** (`422`), berbeda dari notifikasi yang cuma di-log: form berpenilaian tanpa daftar sasaran tampak normal bagi pengelolanya sementara tak seorang pun pengisi melihat siapa yang harus dinilai. Batasnya **300 orang**, ditolak di muka dan tidak dipotong diam-diam.
+
+### Sasaran yang resign dikecualikan (`subject.excluded`)
+
+Potret yang beku berarti orang yang resign sesudah form terbit **ditagih selamanya**. Pada form bergerbang "wajib sebelum absen" itu berarti seluruh pengisi tak bisa absen sebelum menilai orang yang sudah tak ada (dilaporkan user 2026-09-28 pada form "Pelayanan Tim Office Boy"). Potretnya **tetap beku**; yang ditambahkan hanya daftar pengecualian (`sasaran_keluar.go`, cron `*/15 * * * *` Asia/Jakarta):
+
+```
+cron */15 -> form berpenilaian terbit, dikelompokkan per perusahaan
+          -> GET /list?type=employee (employee-service, sekali per perusahaan; bawaannya hanya is_active)
+          -> daftarAktifMasukAkal (tolak = lewati perusahaan itu, di-log)
+          -> hitungSasaranKeluar per form -> $set subject.excluded bila himpunannya berubah
+```
+
+- **Isi**: `[{employee_id, excluded_at}]`. Dihitung **ulang utuh** tiap putaran, jadi orang yang salah dinonaktifkan lalu diaktifkan kembali pulang ke daftar sendiri. `excluded_at` lama dipertahankan; putaran tanpa perubahan tak menulis apa pun.
+- **Dua pembaca, dua aturan** (`subject.go`), dan tak ada jalur yang membaca `resolved` mentah selain notifikasi terbit:
+
+| Fungsi | Dipakai oleh | Aturan |
+|---|---|---|
+| `sasaranAktif` | daftar `/me/forms` + `/subjects`, validasi simpan jawaban (`403` untuk sasaran yang dikecualikan), `sasaranWajibBagi` (gerbang presensi + "tuntas" di analitik) | `resolved` − `excluded` |
+| `rosterLaporan` | analitik per orang, indeks tim, detail tim | `resolved` − (`excluded` yang **tak punya** jawaban). Nilai yang sudah masuk untuk orang yang resign tetap tampil |
+
+- **Kelengkapan dihitung atas sasaran aktif saja** (`sasaranTerpenuhiBagi`). Penilaian yang masuk sebelum seseorang resign tetap tercatat; tanpa saringan ini 2 orang aktif + 1 orang resign terbaca "3 dari 3" padahal orang aktif keempat belum dinilai, dan gerbangnya lepas terlalu cepat.
+- **Gagal-aman**: daftar aktif kosong (employee-service bermasalah) → tak ada perubahan. Daftar yang tak memuat satu pun anggota potret dari **seluruh** form penilaian perusahaan itu (ciri tenant yang salah) → perusahaan itu dilewati. Ditimbang per **perusahaan**, bukan per form, supaya satu tim yang resign seluruhnya tetap dikecualikan. ⚠️ Sisa celahnya: bila **semua** orang di **semua** form penilaian satu perusahaan keluar bersamaan, keadaan itu tak bisa dibedakan dari tenant salah; pengecualiannya tertahan dan log menyebutnya. Jalan keluarnya terbitkan ulang form.
+- **Terbit ulang** mengosongkan `excluded`, karena potret barunya hanya berisi karyawan aktif. `excluded` kiriman klien dibuang (`normalizeSubject`), sama seperti `resolved`.
+- **Karyawan baru TIDAK ditambahkan** ke potret yang sudah terbit (keputusan user 2026-09-28): prinsip daftar beku di atas tetap berlaku ke arah itu. 🟡 **Diusulkan diganti** [[ADR - 0141 Potret Sasaran Penilaian Form Berulang Diambil Ulang tiap Periode, Beku di Dalam Periode]] (2026-09-29, belum diputuskan): untuk form berulang, potret diambil ulang tiap periode dan beku di dalam periode. Sampai ADR itu diputuskan, butir ini yang berlaku.
+- ⚠️ Yang menentukan "tak aktif" adalah `is_active` akun di employee-service. Karyawan resign yang akunnya belum dimatikan HR tetap muncul.
+- ⚠️ `PATCH` pada form terbit menulis balik seluruh `subject` dari salinan yang dibacanya; bila cron menulis `excluded` di antaranya, pengecualian itu hilang sampai putaran berikutnya (≤15 menit) menghitungnya kembali.
+
+Status: merged ke `main` 2026-09-28 (bip-erp [#2145](https://github.com/bip-itteam-internal/bip-erp/pull/2145)). **Belum diverifikasi di DEV maupun PROD**; checklist verifikasinya ada di badan PR. Loop cron dan jalur `403` belum teruji otomatis (butuh Mongo).
 
 ### Aturan relasional sengaja belum ada
 
@@ -274,9 +302,13 @@ Dari (form, pengisi) jadi **(form, pengisi, yang dinilai)**. Tanpa itu `single_r
 > [!warning] Jebakan yang ikut ditutup: field yang hilang ≠ string kosong
 > Jawaban yang tersimpan **sebelum** fitur ini tak punya `subject_employee_id` sama sekali (`omitempty`), dan di Mongo `{field: ""}` **tidak cocok** dengan dokumen yang field-nya hilang. Tanpa `subjectQuery` (yang memakai `$in: ["", null]`), `single_response` dan guard idempotensi diam-diam berhenti bekerja pada **seluruh form lama**: form sekali-isi bisa diisi ulang, dan retry jaringan mulai melahirkan jawaban ganda.
 
-### Gerbang presensi DILARANG pada form penilaian
+### Gerbang presensi pada form penilaian: diizinkan, lepas setelah SELURUH sasaran aktif dinilai
 
-Keputusan sadar. Gerbang menahan orang masuk kerja; form penilaian menuntut **seluruh** sasaran dinilai lebih dulu. Pada kasus OB itu berarti menahan 185 orang di depan pintu sampai masing-masing menyelesaikan 4 penilaian. Larangan ini sekaligus menjaga jalur clock-in tetap murah: tanpanya tiap clock-in harus menghitung kelengkapan penilaian per orang.
+⚠️ Bagian ini semula berjudul "Gerbang presensi DILARANG pada form penilaian". Larangan itu **sudah dicabut di kode** (komentar `validate.go`: yang memasang gerbang adalah pengelola form, dan dialah yang tahu pantas tidaknya menagih pengisian di jalur presensi), dan dok ini tak ikut diperbarui sampai 2026-09-28, ketika form "Pelayanan Tim Office Boy" terlihat berlabel "Wajib sebelum absen" di MyBharata.
+
+Perilaku kini (`penilaianSelesai` di `compliance.go`, sejak commit `765a3d92` 2026-08-12): gerbang lepas setelah **seluruh sasaran aktif** milik orang itu dinilai pada periode berjalan, bukan setelah satu jawaban. Jumlahnya dari `sasaranWajibBagi`, definisi yang sama dengan analitik "tuntas". **Gagal-terbuka** bila tak ada seorang pun untuk dinilai (daftar kosong, isinya cuma diri sendiri, atau semuanya sudah dikecualikan karena resign).
+
+Konsekuensi yang dulu jadi alasan larangan tetap berlaku dan kini ditanggung pengelola: pada form OB, tiap orang harus menyelesaikan 4 penilaian sebelum bisa absen, dan jalur clock-in menghitung kelengkapan per orang. Peredamnya mode Ingatkan saja atau jendela tanggal yang lebih lebar.
 
 ### Kerahasiaan penilai: saklar per form
 
@@ -839,7 +871,7 @@ Ter-scope `company_id` **sejak awal**, bukan ditambal belakangan: stempel `commo
 - [[CORE - API Master Gateway]] — satu-satunya pintu masuk; modul `form-builder` di map `InternalURL`.
 - [[Microservices - Attendance Service]] — **konsumen** `GET /internal/compliance` pada jalur clock-in mobile.
 - Auth mengikuti [[CORE - SSO Flow]]; identitas datang sebagai header `BIP-*`.
-- [[Microservices - Employee Service]] — **dependensi OPSIONAL**, dipanggil HANYA saat menerbitkan form penilaian (`GET /list?type=employee`) untuk memotret sasaran dan menyusun penerima notifikasi. Daftar diambil **sekali** untuk keduanya.
+- [[Microservices - Employee Service]] — **dependensi OPSIONAL**, dipanggil saat menerbitkan form penilaian (`GET /list?type=employee`) untuk memotret sasaran dan menyusun penerima notifikasi (daftar diambil **sekali** untuk keduanya), dan oleh cron 15 menit yang mengecualikan sasaran yang sudah tak aktif (sekali per perusahaan). Jalur pengisian dan clock-in tetap tak memanggilnya.
 - [[Microservices - Notification Service]] — **dependensi OPSIONAL**, `POST /inbox/send` saat form terbit dan saat pengisian selesai. Best-effort: gagal hanya di-log.
 
 > [!warning] Kedua dependensi itu SENGAJA di luar map `InternalURL`

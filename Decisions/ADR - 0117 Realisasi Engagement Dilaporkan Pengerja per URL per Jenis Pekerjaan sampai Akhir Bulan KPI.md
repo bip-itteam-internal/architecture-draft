@@ -5,6 +5,7 @@
 *Jenis pekerjaan dan target dipindah dari tingkat tiket ke tiap target URL, dan pengerja melaporkan angka tercapai (realisasi) per URL per jenis, tetap bisa diperbarui sampai akhir bulan KPI walau Account Specialist sudah menutup tiket. Keputusan ini mewujudkan janji [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] §1 ("`volume_realisasi` diperbarui per baris saat pengerja melapor") yang rute pelapornya tak pernah dibangun, sehingga metrik KPI Engagement Quantity selalu bernilai 0 tanpa satu pun galat.*
 
 - **Status**: ⚠️ **Kode selesai di branch `feat/engagement-realisasi-per-jenis` (bip-erp dan erp-frontend), belum merge, belum deploy, belum diverifikasi lewat gateway.** Test backend hijau (paket `task-management` seluruhnya, paket `employee` hanya gagal di satu test yang sama-sama gagal di `origin/main`).
+- ⚠️ **Nomor ganda**: nomor 0117 juga dipakai [[ADR - 0117 Riwayat Komplain Produk Terpusat di Satu Tabel, Register Tetap Dua]]. Rujuk ADR ini dengan **judul**, bukan nomor saja. Diputuskan 2026-09-29 tidak dinomori ulang karena kutipan nomornya sudah tersebar di kode, PR, dan issue; nomor ganda baru ditolak pre-push (`gerbang-adr.py`).
 - **Tanggal**: 2026-09-21
 - **Terkait**: [[Sales - Engagement Team (Modul)]] · [[Microservices - Task Management Service]] · [[API - Task Management Service]] · [[Microservices - Employee Service]] · [[HRIS - Otomasi Skor KPI]] · [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] · [[APP - Web ERP]]
 

@@ -33,6 +33,18 @@ grounding pada satu dua pencarian yang mengisi bagian Konteks.
    `Paralel: tidak (BE dulu, perubahan kontrak)`. Urutan deploy BE sebelum FE tetap berlaku
    apa pun isi field ini: yang diparalelkan waktu mengetik, bukan waktu deploy.
 
+2c. **Sub-issue per repo** (kit ≥ 1.34.0), WAJIB bila langkah 2 menghasilkan brief di **lebih dari
+   satu repo kode** (`bip-erp`, `erp-frontend`, `mybharata-app` = GitHub `my-bharata`). Issue yang
+   disebut user (atau hasil 4c) menjadi **induk**; untuk tiap repo panggil
+   ```
+   & '.claude/hooks/buat-sub-issue.ps1' -Induk <repo>#<n> -Repo <bip-erp|erp-frontend|my-bharata> -Judul '<judul singkat>'
+   ```
+   lalu isi field `Issue` tiap brief dengan **sub-issue repo itu** (`<repo>#<sub> (sub-issue dari
+   <repo>#<n>)`), bukan induknya. Skripnya idempoten, jadi menjalankannya ulang aman. Tanpa induk
+   (field `Issue` = `tidak ada`) → JANGAN membuat induk diam-diam; tampilkan usulannya ke user.
+   Brief satu repo tidak memakai sub-issue. Aturan status induk dan urutan deploy di `team-memory.md`
+   § Backlog: GitHub Project.
+
 3. **Domain**, urutan menang bila lebih dari satu cocok: **fix** (bug, salah, gagal, error,
    tidak muncul, 502, hilang) > **test** (uji, test, coverage, kontrol negatif) > **refactor**
    (rapikan, pisahkan, duplikat, pindahkan) > **docs** (dok, dokumentasi, ADR, README,
@@ -58,6 +70,18 @@ grounding pada satu dua pencarian yang mengisi bagian Konteks.
    brief tetap ditulis, tetapi **ditampilkan ke user dan menunggu persetujuan** sebelum
    `/kerjakan`. Jalur `yakin` melewati manusia sepenuhnya, jadi ia satu-satunya tempat sumber
    karangan tidak akan tertangkap siapa pun.
+
+4c. **`Issue`**: issue GitHub yang dikerjakan brief ini, bentuk lengkap `<repo>#<n>` (mis.
+   `bip-erp#2162`), di Project #15 (`team-memory.md` § Backlog: GitHub Project). Ambil dari teks
+   user; rujukan lama `BHA-<n>` diterjemahkan lewat `gh search issues "BHA-<n>" --owner
+   bip-itteam-internal` (judul hasil migrasi berakhiran `[BHA-<n>]`). Bila tak disebut, cari satu
+   kali (`gh issue list -R bip-itteam-internal/<repo> --search "<kata kunci>"`) lalu **tampilkan**
+   kandidatnya, jangan memilih diam-diam. Tak ada → tulis `tidak ada` dan usulkan ke user untuk
+   dibuat; jangan membuat issue diam-diam. Bila ada, **slug diawali `<n>-`** (mis.
+   `2162-anonim-be`) supaya branch `<domain>/<n>-<slug>` terbaca; yang benar-benar menyambungkan
+   PR ke issue adalah `Closes` di badan PR (`/kerjakan` §5), bukan nama branch. Brief yang menjadi
+   salah satu pecahan per repo menunjuk **sub-issue** repo itu, bukan issue induknya. Jangan
+   menaruh issue di `architecture-draft`: repo itu publik.
 
 5. **Kriteria lolos**: minimal satu yang bisa dibuktikan **mesin** (test bernama, perintah yang
    harus hijau, `file:line` yang harus berubah) dan minimal satu dari sudut **orang yang

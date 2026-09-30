@@ -3,6 +3,7 @@
 *Menetapkan bagaimana katalog izin modul `manufacture` (WMS) hidup berdampingan dengan `MATRIKS_TAB_WMS` selama fase satu: keduanya **dijumlahkan** (union), bukan "klaim menang lalu tier diabaikan" seperti modul berkatalog lainnya. Keputusan ini lahir karena tier WMS bukan `staff/supervisor/admin` yang kasar melainkan matriks enam peran yang dipakai belasan orang setiap hari — sehingga pola baku akan membuat pemberian paket sempit MENCABUT hak tulis seorang admin gudang, senyap, dan persis kebalikan dari maksud pemberiannya.*
 
 - **Status**: 🟡 **Diputuskan, menunggu merge** — bip-erp PR [#1723](https://github.com/bip-itteam-internal/bip-erp/pull/1723) + erp-frontend PR [#1463](https://github.com/bip-itteam-internal/erp-frontend/pull/1463), keduanya **belum merge**. Fase dua (`MANUFACTURE_TIER_FALLBACK=off`) belum dijadwalkan dan menuntut sensus lebih dulu.
+- ⚠️ **Nomor ganda**: nomor 0078 juga dipakai [[ADR - 0078 Klasifikasi Fee Lazada Mengikuti Pemetaan COA Finance]]. Rujuk ADR ini dengan **judul**, bukan nomor saja. Diputuskan 2026-09-29 tidak dinomori ulang karena kutipan nomornya sudah tersebar di kode, PR, dan issue; nomor ganda baru ditolak pre-push (`gerbang-adr.py`).
 - **Path di repo**: `bip-erp/shared-library/common/catalog_manufacture.go` · `bip-erp/services/manufacture/rbac.go` · `bip-erp/services/employee/permission_catalogs.go` · `bip-erp/shared-library/models/employee/permission_set.go` · `erp-frontend/src/features/manufacture/akses.ts` · `erp-frontend/src/utils/access.ts`
 - **Tanggal**: 2026-09-05
 

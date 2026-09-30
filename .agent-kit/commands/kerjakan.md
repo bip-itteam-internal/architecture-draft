@@ -282,7 +282,15 @@ Repo kode, di dalam worktree:
 3. `git -C "<wt>" -c core.fsmonitor=false push -u origin <branch>`. Hook `pre-push` akan
    menjalankan tsc/lint/build atau go build. Bila **ditolak**: JANGAN `--no-verify`. Perlakukan
    sebagai kegagalan judge (kembali ke §4 dengan keluaran hook sebagai temuan).
-4. `gh pr create --repo bip-itteam-internal/<repo> --head <branch> --title "<judul commit>" --body-file <berkas>` dengan badan:
+4. `gh pr create --repo bip-itteam-internal/<repo> --head <branch> --title "<judul commit>" --body-file <berkas>`.
+   Bila field `Issue` brief berisi `<repo>#<n>`, badan PR memuat baris
+   `Closes bip-itteam-internal/<repo>#<n>` (bentuk lengkap, karena PR dan issue bisa beda repo;
+   `Refs` tidak menyambungkan apa pun) dan judul diakhiri ` (<repo>#<n>)`. Sesudah PR dibuat, set
+   Status item issue itu di Project #15 ke **In Review**. Merge menutup issue lalu workflow project
+   memindahkannya ke **Menunggu Adopsi**, BUKAN Done: Done berarti terbukti dipakai di prod, dan itu
+   tak bisa dibuktikan oleh merge (`team-memory.md` § Backlog: GitHub Project). Jangan memindahkan
+   issue ke Done dari sini. Brief lama yang masih berisi `BHA-<n>`: terjemahkan dulu lewat
+   `gh search issues "BHA-<n>" --owner bip-itteam-internal`. Badan:
    - Tujuan (dari brief)
    - Kriteria lolos + bukti (dari verdict)
    - Ringkasan judge + gerbang yang dijalankan (nama, durasi, lolos)

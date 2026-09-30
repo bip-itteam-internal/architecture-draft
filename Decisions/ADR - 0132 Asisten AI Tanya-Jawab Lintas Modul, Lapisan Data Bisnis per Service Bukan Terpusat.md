@@ -1,6 +1,8 @@
 # ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat
 
-> **Status**: 🟡 **Diusulkan**, 2026-09-28, kode belum ada. Diusulkan tim IT/Tech Development — **belum ada konfirmasi eksplisit ini sudah dibicarakan ke Direktur**. Berdiri di atas grounding vault + kode langsung pada tanggal yang sama (lihat § Context untuk koreksi atas klaim vault yang ternyata tidak cocok dengan kode).
+> **Status**: ⚠️ **Sebagian diterapkan** (diverifikasi 2026-09-29): fondasi merged dan `Assistant-Service` jalan di prod sejak 2026-09-29, baru satu modul (rekap telat, attendance); sisa di § Yang kurang pada issue. Awalnya Diusulkan 2026-09-28. Diusulkan tim IT/Tech Development — **belum ada konfirmasi eksplisit ini sudah dibicarakan ke Direktur**. Berdiri di atas grounding vault + kode langsung pada tanggal yang sama (lihat § Context untuk koreksi atas klaim vault yang ternyata tidak cocok dengan kode).
+>
+> **Issue GitHub**: [bip-erp#2353](https://github.com/bip-itteam-internal/bip-erp/issues/2353) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 
 %% Status ditulis di blockquote atas, bukan bullet di ## Deskripsi, alasan sama dengan ADR 0120/0127:
 ## Untuk Manajemen mendorong Deskripsi melewati baris ke-15 sehingga status tak terbaca VAULT-INDEX.json. %%
@@ -207,9 +209,13 @@ Dibangun mengikuti pola `validateRole(...)` OR yang sudah mapan (bukan arsitektu
 - **Supervisor departemen mana pun**: predikat BARU (belum ada di kode), dasarnya
   `len(common.SupervisedDepartmentsStrict(c)) > 0`.
 
-⛔ **Corporate Secretary TIDAK termasuk** sampai ditegaskan eksplisit oleh Direktur, sekalipun ia
+~~⛔ **Corporate Secretary TIDAK termasuk** sampai ditegaskan eksplisit oleh Direktur, sekalipun ia
 `SetaraDirektur` untuk alur persetujuan lain. Default fail-closed: tidak diikutkan sampai ada
-keputusan tertulis.
+keputusan tertulis.~~ ✅ **Ditegaskan 2026-09-29: Corporate Secretary IKUT termasuk**, disampaikan
+tim Tech Development (panpan) saat memulai T3 dengan alasan Corporate Secretary adalah orang
+kepercayaan Direktur. Belum ada dokumen tertulis dari Direktur sendiri. Gate-nya menjadi
+"Supervisor departemen mana pun ATAU Direktur ATAU Corporate Secretary ATAU IT". ⚠️ Bagian
+§ Untuk Manajemen di atas masih berbunyi "belum ditegaskan" dan perlu diselaraskan pemiliknya.
 
 Menu WAJIB diberi penanda `perm` sejak commit pertama — RBAC modul ini mencatat menu tanpa
 penanda selalu tampil ke semua orang.

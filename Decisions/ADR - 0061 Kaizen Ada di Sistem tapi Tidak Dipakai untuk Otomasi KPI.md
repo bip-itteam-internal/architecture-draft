@@ -3,6 +3,7 @@
 *Modul Kaizen dan kedua sumber KPI-nya **ada dan terdaftar di kode**, tetapi **tidak dipakai** dalam perencanaan otomasi skor KPI. Metrik ber-redaksi "ide inovasi / Kaizen" di seluruh template `kpi_template` **tetap dinilai manual**. Keputusan ini murni soal PEMAKAIAN, bukan soal ketersediaan: tak ada kode yang dihapus, tak ada rencana pembangunan yang dibatalkan.*
 
 - **Status**: ✅ **Berlaku** sejak 2026-08-31. Keputusan pemilik proses (SPV), bukan temuan teknis. Tidak menyentuh kode: modul Kaizen tetap hidup di produksi seperti sebelumnya.
+- ⚠️ **Nomor ganda**: nomor 0061 juga dipakai [[ADR - 0061 Jatah Cuti Tahunan Terbit Otomatis di Ulang Tahun Kontrak]]. Rujuk ADR ini dengan **judul**, bukan nomor saja. Diputuskan 2026-09-29 tidak dinomori ulang karena kutipan nomornya sudah tersebar di kode, PR, dan issue; nomor ganda baru ditolak pre-push (`gerbang-adr.py`).
 - **Path di repo (yang TIDAK diubah)**: `bip-erp/services/employee/kpi_sumber_kaizen.go` · `bip-erp/services/form-builder/kaizen_metrics.go`
 - **Tanggal**: 2026-08-31
 

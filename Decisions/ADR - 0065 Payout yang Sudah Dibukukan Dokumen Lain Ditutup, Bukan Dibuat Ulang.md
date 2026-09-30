@@ -10,6 +10,7 @@
 *Bila payout sebuah statement sudah dibukukan oleh dokumen Accurate yang BUKAN milik auto-sync, receipt-nya ditutup di sisi ERP dan dicatat siapa pembukunya — tidak dibuat ulang, tidak pula ditautkan ke dokumen itu.*
 
 - **Status**: ✅ **Accepted**, 2026-08-30. Diterapkan ke 233 receipt Juli 2026 pada hari yang sama.
+- ⚠️ **Nomor ganda**: nomor 0065 juga dipakai [[ADR - 0065 Template Form Generik untuk Realisasi Program (Culture)]]. Rujuk ADR ini dengan **judul**, bukan nomor saja. Diputuskan 2026-09-29 tidak dinomori ulang karena kutipan nomornya sudah tersebar di kode, PR, dan issue; nomor ganda baru ditolak pre-push (`gerbang-adr.py`).
 - **Path di repo**: `bip-erp/services/integration/internal/usecase/receipt_dibukukan_eksternal.go` · `internal/domain/entity/accurate_daily_invoice.go` (`HoldReasonBookedExternally`) · `cmd/receiptbooked`
 - **Tanggal**: 2026-08-30
 

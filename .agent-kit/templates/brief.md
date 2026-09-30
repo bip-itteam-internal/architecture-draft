@@ -6,6 +6,7 @@
 - Ukuran: __UKURAN__ (S = satu putaran eksekutor · M = mungkin 2 sampai 3 putaran · L = pecah dulu jadi beberapa brief)
 - Paralel: __PARALEL__ (aman = boleh jalan bersamaan dengan brief di repo LAIN · tidak = berurutan; ragu berarti tidak)
 - Sumber: __SUMBER__
+- Issue: __ISSUE__ (issue GitHub `<repo>#<n>` di Project #15, atau `tidak ada`; bila ada, slug diawali `<n>-` dan PR memuat `Closes bip-itteam-internal/<repo>#<n>`)
 
 ## Tujuan
 

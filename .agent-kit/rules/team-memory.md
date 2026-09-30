@@ -25,6 +25,7 @@
 - **`.claude/` BUKAN git repo** (root `erp/` bukan repo). Isinya di-generate `init` dari agent-kit. Ubah standar/hook/command/**rules** → edit **`architecture-draft/.agent-kit/`** lalu re-run `init`; JANGAN edit file di `.claude/` (akan ketimpa saat init).
 - **Semua repo KODE wajib PR** — termasuk `bip-erp`. Jangan commit langsung ke `main`. Alur: buat branch `feat/<nama>` dari `origin/main` → commit → push branch → buat PR. Info lama "bip-erp auto-push" adalah **SALAH** dan sudah dihapus.
 - ⛔ **"Semua repo kode" ITU BENAR-BENAR SEMUA, dan repo BARU yang paling mudah lolos.** `audit-bharata` menerima **18 commit langsung ke branch utamanya, nol PR**, sebelum ada yang menyadarinya (2026-09-04). Dua hal membuatnya lolos, dan keduanya akan terulang di repo berikutnya: branch utamanya bernama **`master`**, bukan `main`, sehingga aturan yang berbunyi "jangan commit langsung ke `main`" terbaca tidak berlaku; dan repo yang baru dibuat belum punya branch protection, jadi tak ada apa pun yang menolak push-nya. Gagalnya **senyap** — push berhasil, CI tak ada, dan tak ada yang berbunyi sampai seseorang bertanya "sudah di-PR belum?". **Aturannya berlaku atas nama branch APA PUN.** Untuk repo yang baru lahir, pasang branch protection di hari pertama; disiplin tanpa penjaga sudah terbukti gagal 18 kali berturut-turut di sini.
+- ⚠️ **Nomor ADR BUKAN kunci unik: 10 nomor dipakai dua ADR** (0058, 0061, 0065, 0066, 0077, 0078, 0088, 0090, 0097, 0117; diukur 2026-09-29). Sebabnya nomor diklaim saat push, jadi dua sesi bisa mengambil nomor berikutnya yang sama. Pasangan lama sengaja tidak dinomori ulang (kutipannya sudah tersebar di kode, PR, issue, dan berkas ini, mis. "ADR 0077 §1") dan ditandai **Nomor ganda** di dok-nya. **Rujuk ADR dengan judul, bukan nomor saja.** Nomor ganda baru ditolak pre-push vault (`githooks/gerbang-adr.py`, kit ≥ 1.35.0), yang menyebut nomor bebas berikutnya.
 - **KECUALI vault `architecture-draft`: push LANGSUNG ke `main`, JANGAN pakai PR.** Dokumentasi tidak menunggu review, dan PR vault justru mengundang konflik yang tak perlu: `VAULT-INDEX.json` tersentuh hampir tiap commit oleh banyak orang paralel, jadi branch yang menganggur beberapa jam hampir pasti bentrok di berkas itu. Alurnya: commit di `main` (stage **per-nama-berkas**, jangan `git add -A`) → merge `origin/main` → regenerasi index → push `main`. **Bila `VAULT-INDEX.json` konflik, JANGAN menggabungkannya baris per baris** — ambil salah satu sisi, selesaikan konflik dokumennya dulu, lalu regenerasi index **sekali di akhir** (`--daftar-tugas` → subagent → `--serap`). Adanya satu-dua `Merge pull request` di riwayat vault bukan bukti konvensinya PR; itu kejadian sekali, dan menyimpulkan konvensi dari artefak git sudah pernah menyesatkan.
 
 ## Konvensi git & rilis
@@ -292,5 +293,85 @@ Yang membuatnya bergejala: `DepartmentFilterOptions` sengaja MENGGANTI anggota g
 - **Sumber diresolusi, bukan diingat.** Menyebut ADR dari ingatan tanpa membuka berkasnya = `ragu`
   (brief ditampilkan, tunggu persetujuan). Prosedur lengkap: `/start-task` langkah 0.
 
+## Backlog: GitHub Project #15 "Semangatt guyss !!! 👏" (2026-09-29, menggantikan Linear)
+
+Backlog tim pindah dari Linear ke **GitHub Project #15** org `bip-itteam-internal` (judulnya bisa
+diganti; rujuk project lewat **nomor 15**, jangan lewat judul)
+(https://github.com/orgs/bip-itteam-internal/projects/15, privat). Alasannya terukur: paket Free
+Linear berhenti di **250 issue** (terisi 245), dan hanya 3 dari 10 anggota org yang ada di Linear
+sehingga PIC terpaksa ditulis sebagai teks. Keputusannya [[ADR - 0143 Backlog Pindah dari Linear ke GitHub Project]].
+**Linear `BHA` dibekukan jadi arsip baca**: jangan membuat atau memperbarui issue di sana. Tiap issue
+lama punya padanan di GitHub: judulnya berakhiran `[BHA-<n>]` dan field **Linear ID** berisi `BHA-<n>`,
+jadi rujukan `BHA-<n>` di vault, ADR, dan brief tetap bisa dilacak (`gh search issues "BHA-<n>" --owner bip-itteam-internal`).
+
+| Status | Artinya | Yang memindahkan |
+|---|---|---|
+| Backlog / Todo | belum ada branch | manusia |
+| In Progress | branch sudah ada | pembuat branch (manusia atau agent) |
+| In Review | PR terbuka | pembuat PR (manusia atau agent) |
+| **Menunggu Adopsi** | kode merged; sisa deploy prod (manusia) dan fitur benar-benar dipakai | otomatis: PR merged menutup issue, workflow *Item closed* memindahkannya |
+| Done | terpasang di prod **dan terbukti dipakai** (field **Bukti Adopsi** terisi) | manusia, dengan bukti |
+| Canceled | tidak dikerjakan / duplikat | manusia |
+
+Aturan (berlaku untuk developer DAN agent):
+
+- ⛔ **Yang menentukan selesai adalah field Status, BUKAN issue open/closed.** Issue tertutup berarti
+  kodenya merged, belum berarti dipakai. View dan laporan menyaring Status, jangan `is:open`.
+- ⛔ **PR wajib memuat `Closes bip-itteam-internal/<repo>#<n>` di badannya.** Hanya tautan resmi
+  (kata kunci penutup, atau branch dari `gh issue develop`) yang menggerakkan otomasi; `Refs #<n>`
+  tidak menyambungkan apa pun, dan issue-nya diam di In Review selamanya. Bentuk lengkap
+  `<org>/<repo>#<n>` wajib saat PR dan issue beda repo (PR erp-frontend untuk issue bip-erp).
+- ⛔ **Merge BUKAN Done.** Pelajaran audit Linear 2026-09-29 tetap berlaku: status meleset ke dua arah
+  (BHA-249 Done tanpa satu baris kode, BHA-250 "Belum Mulai" padahal 127 sesi live sudah memakainya,
+  BHA-22 kodenya lengkap di prod dengan 0 snapshot), dan 82 dari 105 issue Done tak punya PR tertaut.
+  "Kode selesai" dan "dipakai" pemiliknya berbeda; satu status untuk keduanya menyembunyikan siapa
+  yang ditunggu. **Agent tidak pernah memindahkan issue ke Done.**
+- ⛔ **Jangan membuat issue di repo vault `architecture-draft`: repo itu PUBLIK.** Issue bertanda
+  keamanan hanya di repo kode (privat), dan rincian celah yang belum ditambal tidak ditulis ke vault.
+- **Satu issue tinggal di satu repo.** Taruh di repo kode yang paling banyak disentuh.
+- ⭐ **Perubahan yang menyentuh lebih dari satu repo (BE `bip-erp`, FE `erp-frontend`, Mobile
+  `my-bharata`) WAJIB dipecah jadi issue induk + SATU sub-issue per repo.** Induk = fiturnya (tinggal
+  di repo tempat kontraknya lahir, biasanya `bip-erp`), tanpa PR sendiri; tiap sub-issue berjudul
+  `[BE]` / `[FE]` / `[Mobile]`, tinggal di repo-nya, punya brief dan PR-nya sendiri, dan PR itulah
+  yang menutupnya (`Closes <org>/<repo>#<sub>`). Hasilnya progress bar "2/3" di kartu induk, jadi
+  semua orang melihat bagian mana yang tertinggal tanpa membuka issue. Buat lewat
+  `& '.claude/hooks/buat-sub-issue.ps1' -Induk <repo>#<n> -Repo <bip-erp|erp-frontend|my-bharata> -Judul '<judul>'`
+  (idempoten, memasukkan ke Project #15, menyalin Area + Prioritas induk); jangan merakit `gh api`
+  sendiri, karena PS 5.1 merusak array dan kutip tanpa galat. Aturan turunannya:
+  - **Satu tingkat saja.** Sub-issue tidak dipecah lagi; butir rinci masuk checklist rencana, bukan sub-issue.
+  - **Satu repo cukup satu issue**, tanpa sub-issue. Memecah pekerjaan satu repo jadi sub-issue per berkas
+    membuat board tak terbaca.
+  - **Status induk mengikuti anak-anaknya**: In Progress begitu satu anak mulai; **Menunggu Adopsi**
+    hanya bila SEMUA anak sudah merged (induk ditutup manual saat itu); Done tetap manusia dengan bukti.
+  - **Urutan deploy BE sebelum FE/Mobile** ditulis di badan sub-issue FE/Mobile ("deploy sesudah
+    `bip-erp#<sub BE>`"); merged duluan boleh, deploy duluan tidak.
+- **Assignee = orang yang SEDANG mengerjakan, dipasang saat pekerjaan MULAI (In Progress)**, bukan saat
+  dijatahkan (keputusan user 2026-09-29). Issue Backlog/Todo tanpa assignee; PIC rencana cukup ditulis di
+  badan (`**PIC:** <login>`). Agent yang mulai mengerjakan issue meng-assign akun yang menjalankannya.
+  Pengawas ditulis di badan issue sebagai `**Pengawas:** <login>`.
+- **Nama branch `<domain>/<n>-<slug>`**, `<n>` = nomor issue GitHub. Bukan syarat otomasi (yang
+  menyambungkan adalah `Closes` di PR), tetapi membuat branch terbaca dan dipakai pre-push untuk
+  mengingatkan. Branch lama `bha-<n>-` tetap diterima.
+- **Membatalkan**: tutup issue sebagai *not planned* lalu set Status **Canceled** sendiri; workflow
+  *Item closed* tidak membedakan alasan penutupan dan akan menaruhnya di Menunggu Adopsi.
+- ⚠️ **Deskripsi hasil audit bisa basi dan audit bisa salah baca.** "Rute tak ditemukan" di banyak
+  issue lama lahir dari lupa bahwa gateway membuang prefix `/api/<module>`; MyBharata dibaca dari
+  `main` padahal rilis store dari `dev`. Sebelum memindahkan status, ukur ke `origin/main`
+  (MyBharata: `origin/dev`) dan data prod, lalu tulis komentar `Verifikasi <tanggal>` di issue.
+
+Cara agent mengaksesnya:
+
+- Lewat `gh`, butuh scope **`project`** di mesin itu (`gh auth refresh -h github.com -s project`,
+  sekali per mesin; tanpa itu perintah project gagal dengan pesan scope, bukan diam).
+- Tambah issue ke project: `gh project item-add 15 --owner bip-itteam-internal --url <url issue>`.
+  Ubah field: `gh project item-edit` (butuh id item, id field, id opsi; `gh project field-list 15
+  --owner bip-itteam-internal --format json`). Pada PowerShell 5.1, kirim payload GraphQL lewat
+  berkas `--input`, bukan argumen: kutip ganda di argumen `-f query=` dirusak.
+- ⚠️ **PowerShell: `$L` dan `$l`, `$F` dan `$f`, `$ORG` dan `$org` adalah variabel yang SAMA.**
+  Skrip migrasi menggigit tiga kali dalam satu jam: `foreach ($l in $L)` menimpa daftar label
+  sehingga hanya label terakhir yang terkirim, tanpa galat. Juga: `@($x.nodes.name)` atas daftar
+  kosong menghasilkan `@($null)` (satu elemen null), bukan array kosong.
+- `/linear-cek` dan `linear-verifikasi.ps1` **usang** sejak Linear dibekukan; penggantinya (laporan
+  mingguan dari Project #15) **belum ada** (TBD).
 ## Bahasa
 - Balasan AI ke user & dokumentasi: **Bahasa Indonesia**; istilah teknis lazim English biarkan English.

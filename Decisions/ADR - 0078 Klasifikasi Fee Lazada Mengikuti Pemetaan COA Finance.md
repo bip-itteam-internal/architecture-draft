@@ -12,6 +12,7 @@
 *Aturan pengelompokan biaya Lazada sebelumnya hidup sebagai tiga salinan kode yang sudah menyimpang satu sama lain, dan tak satu pun bersandar pada pemetaan akun yang dipakai finance. Keputusan ini menyatukannya jadi satu fungsi dan menjadikan sheet pemetaan COA dari finance sebagai sumber aturannya.*
 
 - **Status**: ⚠️ **Implemented (ada catatan)** — bip-erp PR #1755, erp-frontend PR #1470, keduanya **belum deploy**. Catatan: data lama belum di-backfill; dua nama fee di sheet belum pernah muncul di prod.
+- ⚠️ **Nomor ganda**: nomor 0078 juga dipakai [[ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya]]. Rujuk ADR ini dengan **judul**, bukan nomor saja. Diputuskan 2026-09-29 tidak dinomori ulang karena kutipan nomornya sudah tersebar di kode, PR, dan issue; nomor ganda baru ditolak pre-push (`gerbang-adr.py`).
 - **Path di repo**: `bip-erp/services/integration/internal/domain/entity/lazada_fee_kategori.go` (sumber aturan) · `lazada_income.go` · `internal/interface/http/lazada_settlement.go` · `erp-frontend/src/features/integration/gross-profit/lib/breakdown-config.ts`
 - **Tanggal**: 2026-09-07
 

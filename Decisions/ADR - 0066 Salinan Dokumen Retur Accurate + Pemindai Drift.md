@@ -1,4 +1,5 @@
 **Status**: ⚠️ **Implemented (ada catatan)** — kode selesai & ber-tes (PR #1552, **merged 2026-08-31**; penanda "belum merge" lama basi, diverifikasi `gh pr view` 2026-09-16). Ekspor belum dialihkan ke salinan; penjadwalan pemindai belum dipasang. ⚠️ Diverifikasi `git grep` 2026-09-17: pemindai `returndriftscan` (`BEDA_TOTAL`/`DOKUMEN_HILANG`) **tidak ada** di `main` — yang ada hanya salinan + endpoint refresh, terisi 269 dari 7.261 dokumen SENT. Pemindai dan penjadwalannya diambil alih [[ADR - 0104 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres]] Tahap 2. Lihat "Belum selesai".
+- ⚠️ **Nomor ganda**: nomor 0066 juga dipakai [[ADR - 0066 Modul Kelola Program Culture]]. Rujuk ADR ini dengan **judul**, bukan nomor saja. Diputuskan 2026-09-29 tidak dinomori ulang karena kutipan nomornya sudah tersebar di kode, PR, dan issue; nomor ganda baru ditolak pre-push (`gerbang-adr.py`).
 
 # ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift
 

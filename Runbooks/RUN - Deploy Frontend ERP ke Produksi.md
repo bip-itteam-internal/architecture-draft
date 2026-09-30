@@ -34,6 +34,25 @@ docker compose build --no-cache && docker compose up -d
 guestbook-system, dan seterusnya), jadi jangan menjalankan perintah `docker compose` tanpa
 `cd` ke direktori aplikasinya lebih dulu.
 
+### Versi rilis
+
+Aturannya di [[ADR - 0140 Versioning Rilis SemVer per Repo dari Tag Git]]. ⚠️ **Belum berlaku
+penuh**: selama brief implementasi erp-frontend belum mendarat, Dockerfile belum menerima
+`APP_VERSION`, jadi versinya belum tertanam di bundle. Tag dan catatan rilis sudah bisa.
+
+Sebelum build, buat tag pada commit yang akan di-checkout, lalu tarik bersama tag-nya:
+
+```bash
+gh release create v0.X.Y -R bip-itteam-internal/erp-frontend --target main --generate-notes
+# di VPS:
+git fetch origin main --tags && git reset --hard origin/main
+export APP_VERSION=$(git describe --tags --always --dirty)
+echo "$APP_VERSION"   # harus persis v0.X.Y, tanpa akhiran
+docker compose build --no-cache && docker compose up -d
+```
+
+Sesudah gerbang verifikasi di bawah lolos, catat satu baris di [[IT - Catatan Rilis ERP]].
+
 ---
 
 ## Gerbang verifikasi

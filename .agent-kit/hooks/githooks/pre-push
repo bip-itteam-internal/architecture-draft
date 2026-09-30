@@ -38,8 +38,10 @@ touched=""
 # .agent-kit/ dilaporkan "gerbang test kit DILEWATI". Kelas yang sama dengan nol-gerbang-lolos
 # yang sedang ditutup rilis ini, cuma satu lapis lebih awal.
 tak_tentu=0
+dipush=""
 while read -r lref lsha rref rsha; do
   [ "$lsha" = "$zero" ] && continue                      # hapus branch remote: tak ada yang diperiksa
+  dipush="$dipush ${lref#refs/heads/}"
   if [ "$rsha" = "$zero" ]; then
     base="$(git merge-base "$lsha" origin/main 2>/dev/null || git merge-base "$lsha" origin/master 2>/dev/null || echo "")"
   else
@@ -60,6 +62,21 @@ fi
 
 gagal=0
 echo "[agent-kit pre-push] repo: $top"
+
+# ---- nomor issue di nama branch (kit 1.31.0, GitHub sejak 1.33.0; PERINGATAN saja, tak menolak) ----
+# Backlog di GitHub Project #15 (team-memory § Backlog: GitHub Project). Yang menyambungkan PR ke
+# issue adalah `Closes bip-itteam-internal/<repo>#<n>` di badan PR, bukan nama branch; peringatan
+# ini pengingat supaya baris itu tak lupa. Pola branch `<domain>/<n>-<slug>`; `bha-<n>-` lama
+# tetap diterima. Vault (.agent-kit/ di akar) push langsung ke main, jadi dilewati; begitu pula
+# main/master dan branch rilis/dependabot.
+if [ ! -d "$top/.agent-kit" ]; then
+  for b in $dipush; do
+    case "$b" in main|master|dev|release/*|chore/rilis*|dependabot/*) continue ;; esac
+    if ! printf '%s' "$b" | grep -qiE '/[0-9]+-|bha-[0-9]'; then
+      echo "[agent-kit pre-push] PERINGATAN: branch '$b' tak memuat nomor issue (<domain>/<n>-<slug>). Pastikan badan PR memuat 'Closes bip-itteam-internal/<repo>#<n>', kalau tidak issue di Project #15 tak bergerak."
+    fi
+  done
+fi
 
 # ---- antrean kerja berat (kit 1.30.0) ----
 # pnpm tsc/lint/build dan go build di bawah mengantre di antre.ps1 bersama gerbang dan run penuh
@@ -176,6 +193,25 @@ if [ -n "$compose_sasaran" ]; then
       gagal=1
     fi
     rm -f "$daftar_compose"
+  fi
+fi
+
+# ---- vault: nomor ADR ganda (kit 1.35.0) ----
+# Nomor ADR diklaim saat push, jadi dua sesi bisa mengambil nomor yang sama tanpa satu pun galat
+# (10 pasangan terukur 2026-09-29). Menyala hanya di vault dan hanya bila push menyentuh
+# Decisions/ADR (atau daftar berkas tak tentu). Memeriksa POHON COMMIT yang di-push, bukan working
+# tree, karena pohon vault dipakai bersama sesi lain. Pasangan lama berizin di gerbang-adr.py.
+if [ -d .agent-kit ] && { [ "$tak_tentu" -eq 1 ] || printf '%s\n' "$touched" | grep -q '^Decisions/ADR - '; }; then
+  pyadr=""
+  for c in "Tools/.venv/Scripts/python.exe" "Tools/.venv/bin/python" py python3 python; do
+    if [ -x "$c" ] || command -v "$c" >/dev/null 2>&1; then pyadr="$c"; break; fi
+  done
+  if [ -z "$pyadr" ]; then
+    echo "[agent-kit pre-push] TIDAK ADA python untuk memeriksa nomor ADR ganda. Gerbang GAGAL, bukan dilewati."
+    gagal=1
+  elif ! "$pyadr" "$hookdir/gerbang-adr.py" --vault "$top" --rev HEAD; then
+    echo "[agent-kit pre-push] GAGAL: nomor ADR ganda"
+    gagal=1
   fi
 fi
 
