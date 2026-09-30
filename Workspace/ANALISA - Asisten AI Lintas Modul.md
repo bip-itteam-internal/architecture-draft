@@ -228,6 +228,14 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
       `MONGO_DB=assistant_db`; `frontend-hris` dibangun ulang 08:23 WIB (memuat #1905/#1906).
       Terbukti dipakai di layar prod: "toko mana yang labanya paling rendah bulan ini" dijawab
       dengan tabel laba 54 toko (tangkapan layar user).
+    - **Lanjutan 2026-09-30** (dikerjakan paralel tiga agen, merged; deploy prod oleh manusia):
+      lima tool lagi, total dua belas marketing — `laba_sku_listing`, `matriks_produk_toko`,
+      `account_specialist`, `performa_host`, `retur_detail` (bip-erp #2374, erp-frontend #1910).
+      Keputusan user: Direktur/Corp Sec boleh membaca perbandingan per orang
+      (`RequireAnalisisPerOrangMarketing`, bip-erp #2375). Layar: tata letak tetap, banner untuk
+      semua yang berhak, sumber data berbahasa awam, unduh PDF per jawaban bertabel (erp-frontend
+      #1909). Masih di luar Copilot: pagu/simulasi alokasi, audiens, cohort (koleksinya kosong),
+      dan data marketing milik service lain (target insentif, SLA chat CS, piutang marketplace).
     - ⛔ **Belum**: uji end-to-end DEV dengan akun leader marketing (angka = layar) dan akun
       non-marketing (`tidak_berhak`), uji `cuti_tim` dengan pengajuan uji, dan ukur waktu
       `/profit/items` rentang 3 bulan terhadap batas 30 detik. Agent tak bisa membuat token uji
@@ -289,6 +297,10 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
   - **Kriteria selesai**: jawaban default tanpa file. File Excel/PDF cuma muncul kalau prompt
     penanya eksplisit minta ("buatkan Excel-nya") — dikunci test yang membuktikan permintaan
     tanpa kata itu TIDAK menghasilkan file.
+  - **Sebagian lewat jalur lain 2026-09-30** (permintaan user, erp-frontend #1909): bukan model
+    yang membuat file, melainkan **tombol unduh PDF** di tiap jawaban bertabel/bergrafik (dibuat di
+    browser dari blok yang sama dengan layar, berheader + berfooter). Jawaban teks saja tak punya
+    tombol. Excel dan "file saat diminta di prompt" belum.
 
 ## Verifikasi & pengukuran
 

@@ -124,9 +124,11 @@ flowchart LR
 ## Permukaan tool
 
 Satu tool per endpoint baca, sekitar delapan sampai dua belas untuk irisan pertama. Kandidatnya dari rute yang sudah ada di `services/marketing-analytics/handler_mart.go` dan tetangganya: `/beranda`, `/summary`, `/profit/shops`, `/profit/products`, `/profit/skus`, `/profit/campaigns`, `/profit/ads`, `/videos`, `/lives`, `/returns/breakdown`. ~~Daftar finalnya **TBD**.~~
-Per 2026-09-30 ada **sepuluh** tool di kode: tiga HRIS (`rekap_telat_tim`, `antrean_persetujuan`,
-`cuti_tim`) dan tujuh marketing (§ Tool marketing). Satu daftar (`daftarAlat()` di `tanya.go`)
-dipakai untuk menawarkan tool ke model sekaligus untuk dispatch.
+Per 2026-09-30 ada **lima belas** tool di kode: tiga HRIS (`rekap_telat_tim`, `antrean_persetujuan`,
+`cuti_tim`) dan dua belas marketing (§ Tool marketing). Satu daftar (`daftarAlat()` di `tanya.go`)
+dipakai untuk menawarkan tool ke model sekaligus untuk dispatch. ⚠️ Semua definisi tool ikut di
+tiap giliran, jadi prompt makin panjang per tool; waktu jawab dengan 15 tool **belum diukur**
+terhadap tenggat 25 detik.
 
 Semua tool `strict: true` supaya argumennya dijamin valid.
 
@@ -161,10 +163,12 @@ Cakupan "tim" sama persis dengan `rekap_telat_tim`, rentang maks 62 hari, hanya 
 disetujui, dan alasan/lampiran pengajuan tidak pernah dikirim. ⚠️ **Belum diuji end-to-end di DEV**
 (per 2026-09-30).
 
-### Tool marketing (2026-09-30, bip-erp #2367, erp-frontend #1906)
+### Tool marketing (2026-09-30, bip-erp #2367 + #2374, erp-frontend #1906 + #1910)
 
-Tujuh tool di atas `marketing-analytics`, satu klien bersama (`internal/alat/marketing.go`,
-`KlienMarketing`) dengan saringan seragam `dari`/`sampai`/`bulan`/`divisi`/`channel`:
+Dua belas tool di atas `marketing-analytics`, semuanya memakai endpoint yang sudah ada, satu klien
+bersama (`internal/alat/marketing.go`, `KlienMarketing`) dengan saringan seragam
+`dari`/`sampai`/`bulan`/`divisi`/`channel`. Lima yang terakhir (#2374) dikerjakan paralel oleh tiga
+agen di worktree terpisah lalu disatukan:
 
 | Tool | Endpoint | Yang dijawab |
 |---|---|---|
@@ -175,6 +179,31 @@ Tujuh tool di atas `marketing-analytics`, satu klien bersama (`internal/alat/mar
 | `live` | `/lives/analisis` atau `/lives` | performa sesi live |
 | `retur` | `/returns/breakdown` | retur per status dan pemicu |
 | `affiliate_video` | `/affiliate` atau `/videos/periode` | performa affiliate dan video |
+| `laba_sku_listing` | `/profit/skus` atau `/profit/items` (argumen `level`) | laba per SKU master / per listing marketplace |
+| `matriks_produk_toko` | `/matrix/sku-shop` | produk × toko satu metrik aditif |
+| `account_specialist` | `/penanggung-jawab/analisis` | laba per pemegang toko |
+| `performa_host` | `/live-shifts/performa` | performa live per host |
+| `retur_detail` | `/returns/detail` | rincian order retur/batal |
+
+Aturan khusus lima tool terakhir, juga ditegakkan di tool:
+
+- `laba_sku_listing`: `lingkup` tak dikirim (kedua endpoint menolaknya dengan 400; penggabungan
+  dikerjakan tool). ⛔ **Biaya iklan level SKU/listing ditagihkan ke SATU entitas** yang terbaca lebih
+  dulu (marketing-analytics `agregasi_profit.go` ~1344-1388: belanja listing Shopee ke satu varian
+  SKU, belanja TikTok per SKU ke satu listing). Totalnya benar, pembagiannya tidak bermakna, jadi
+  model diberi tahu untuk **tidak memeringkat ROAS/laba antar SKU atau listing** dan memakai `iklan`
+  atau `laba_toko` untuk ROAS. Dikunci `TestLabaSKUListing_CatatanBiayaIklanTertumpuk`.
+- `matriks_produk_toko`: **sel absen ≠ nol**. Pasangan tanpa baris dikirim sebagai
+  `toko_tanpa_penjualan`, nol nyata sebagai 0. Tabel berbentuk panjang (satu baris per produk×toko,
+  maks 200) karena matriks lebar tak terbaca di panel chat. Rasio ditolak.
+- `account_specialist`: `per_orang` tak pernah dijumlahkan (totalnya `ringkasan`), `retur` bukan
+  pengurang laba, `belum_matang` bukan kabar buruk; `bulan` diterjemahkan dan rentang > 92 hari
+  ditolak sebelum memanggil sumber. Kolom `status` berisi kode vonis yang diterjemahkan layar.
+- `performa_host`: rasio tanpa penyebut (tak ada klik/tontonan) jadi `null`, bukan 0 seperti yang
+  dikirim sumber.
+- `retur_detail`: paginasi berbatas **1.000 order** (2 × 500) dan dilaporkan "terbaca N dari total";
+  `total:-1` bukan 0; data pembeli dan nomor resi tak pernah dikirim ke model.
+- Nama orang (Account Specialist, host, penanggung jawab) selalu lewat samaran.
 
 Aturan kolom **ditegakkan di tool, bukan diserahkan ke model** (sumbernya [[Microservices - Marketing Analytics Service]] § Aturan Pemakaian Angka):
 
@@ -189,8 +218,10 @@ Aturan kolom **ditegakkan di tool, bukan diserahkan ke model** (sumbernya [[Micr
 Siapa yang bisa memakai: gerbang Copilot (`RequireCopilot`) **dan** gerbang baca marketing
 (`common.RequireAnalitikMarketing`, bip-erp #2365) berlaku berlapis. Supervisor departemen
 non-marketing lolos gerbang Copilot, tetapi tool marketing-nya membalas `tidak_berhak`, bukan angka
-nol. ⚠️ **Belum diuji end-to-end di DEV** dengan akun leader marketing dan akun non-marketing (per
-2026-09-30).
+nol. `account_specialist` dan `performa_host` memakai gerbang yang lebih sempit,
+`common.RequireAnalisisPerOrangMarketing` (bip-erp #2375): marketing leader + Direktur/Corporate
+Secretary, **tanpa** staf integration. ⚠️ **Belum diuji end-to-end di DEV** dengan akun leader
+marketing dan akun non-marketing (per 2026-09-30); `laba_toko` baru terbukti sekali di layar PROD.
 
 `laba_produk` sempat selalu mengirim peringatan "data harian terpotong 5000 baris" karena cacat
 sumbernya (bip-erp #2366). Sejak #2369 sumbernya menjumlah seluruh baris, jadi peringatan tinggal
