@@ -265,7 +265,12 @@ Empat syarat berlaku untuk seluruh isi:
 Konsekuensi yang diterima sadar: tiap SPV melihat angka dan keputusan tim lain. Ini sejalan
 dengan keadaan hari ini, karena endpoint angka laba memang terbuka untuk siapa pun yang login
 (ADR 0120 §Realisasi, issue bip-erp #2008); bila kelak #2008 memutuskan menutupnya, bentuk
-gabungan ini wajib ditinjau ulang.
+gabungan ini wajib ditinjau ulang. ⚠️ **#2008 memutuskan menutupnya 2026-09-30** (bip-erp
+#2365, `RequireAnalitikMarketing`), jadi tinjauan ulang ini **kini jatuh tempo dan belum
+dikerjakan** (TBD). Catatan untuk peninjau: gerbang baru mengizinkan seluruh marketing leader
+membaca angka seluruh divisi, jadi "tiap SPV melihat angka tim lain" masih sejalan dengan gerbang
+rute; yang perlu diputuskan adalah apakah penerima kiriman di luar audiens itu tetap boleh
+menerima angka gabungan.
 
 ### §8a Mode bayangan sebelum sampai ke semua penerima
 

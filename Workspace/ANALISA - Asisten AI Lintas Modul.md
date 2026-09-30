@@ -110,7 +110,8 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
   - **Keputusan user 2026-09-29**: modul percontohan pertama **attendance**. marketing-analytics
     **gugur sementara** menurut ADR §9: `/beranda`, `/summary`, `/returns/detail` membaca laba
     seluruh perusahaan tanpa gerbang peran, dan keputusannya (terima terbuka / gerbang jalur baca)
-    masih menunggu issue bip-erp #2008 (OPEN, 0 komentar per 2026-09-29).
+    masih menunggu issue bip-erp #2008 (OPEN, 0 komentar per 2026-09-29). **Diputuskan dan
+    ditutup 2026-09-30**: gerbang jalur baca (bip-erp #2365), lihat T7.
   - **Hasil ukur lewat gateway DEV 2026-09-29** (JWT sungguhan, parameter unik per panggilan
     melawan cache; tiap 403 punya kontrol positif). Akun: Fathur (staf, peran `{}`), Diki
     (supervisor Manufaktur, non-HR), Seno (HRD Supervisor), Wirawan (Direktur, `hris:supervisor`).
@@ -209,6 +210,28 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
 ## Modul percontohan kedua + korelasi lintas modul
 
 - [ ] **T7 — Ulangi T5-T6 untuk modul percontohan kedua.**
+  - **Kemajuan 2026-09-30 — modul kedua: MARKETING** (keputusan user "marketing dulu semuanya",
+    urutan "gerbang dulu, baru Copilot"):
+    - **Penghalang §9 dibereskan**: bip-erp #2365 (menutup #2008) menggerbang 21 rute baca angka
+      bisnis marketing-analytics dengan `RequireAnalitikMarketing` = audiens layar (`bolehAnalitik`)
+      + Direktur/Corp Sec (keputusan user). Rute baru dijaga `TestRuteGetTerklasifikasi`
+      ([[Microservices - Marketing Analytics Service]] § Prinsip Arsitektur 3).
+    - **Tujuh tool** (bip-erp #2367, erp-frontend #1906): `ringkasan_marketing`, `laba_toko`,
+      `laba_produk`, `iklan`, `live`, `retur`, `affiliate_video` — memakai endpoint yang ADA, tanpa
+      endpoint baru; aturan kolom ditegakkan di tool ([[Microservices - Assistant Service]] § Tool
+      marketing).
+    - **Cacat sumber ditemukan saat membangun**: laba per produk/SKU/item bulanan terpotong 5.000
+      baris harian (issue #2366, diukur PROD); diperbaiki bip-erp #2369.
+    - Juga dari sisi HRIS: tool ketiga `cuti_tim` + endpoint baru `GET /cuti/tim` (bip-erp #2363,
+      erp-frontend #1905).
+    - **PROD 2026-09-30** (dideploy manusia): backend di HEAD #2369, `assistant-service`
+      `MONGO_DB=assistant_db`. ⚠️ Per pengecekan agent pukul 08:21 WIB container frontend masih
+      build 2026-09-29 17:28 (checkout sudah memuat #1905/#1906), jadi label/saran tool baru belum
+      tampil sampai `frontend-hris` dibangun ulang.
+    - ⛔ **Belum**: uji end-to-end DEV dengan akun leader marketing (angka = layar) dan akun
+      non-marketing (`tidak_berhak`), uji `cuti_tim` dengan pengajuan uji, dan ukur waktu
+      `/profit/items` rentang 3 bulan terhadap batas 30 detik. Agent tak bisa membuat token uji
+      sendiri (membaca secret JWT dev ditolak classifier 2026-09-30); butuh akun dari manusia.
   - Sama persis strukturnya, modul berbeda. Jangan disingkat langkahnya hanya karena "sudah
     pernah dikerjakan di T5-T6" — tiap modul punya jebakan kolomnya sendiri yang belum
     terdokumentasi (CORE - Kapabilitas AI baru mendokumentasikan jebakan Marketing, modul lain

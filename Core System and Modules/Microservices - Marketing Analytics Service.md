@@ -10,7 +10,7 @@
 
 ## Prinsip Arsitektur
 
-Dua hal yang membedakan service ini dari service lain dan wajib dijaga saat mengubahnya.
+Tiga hal yang membedakan service ini dari service lain dan wajib dijaga saat mengubahnya.
 
 **1. Database service lain baca-saja, dijaga tiga lapis** (`integration_db.go:18-34`). `integration_db` milik [[Microservices - Integration Service]]; tulisan dari sini merusak data service lain tanpa jejak di repo ini. Lapisnya:
 
@@ -21,6 +21,8 @@ Dua hal yang membedakan service ini dari service lain dan wajib dijaga saat meng
 Penjaga yang sama sudah dibuktikan menutup `insentive_db` (sumber ICC) — arahnya whitelist: yang tak terbukti aman **ditolak**, bukan yang terdaftar dilarang. Ini penegakan konkret dari [[ADR - 0002 Database-per-Service]] untuk kasus lintas-database yang tidak lewat HTTP.
 
 **2. `/health` turun jadi `degraded` (503) bila index unik gagal dibuat** (`main.go`, `index.go`). Index unik adalah fondasi idempotensi sync: tanpa itu job yang diulang menggandakan baris. Service sengaja **tidak** panic saat boot karena pembacaan dashboard masih valid; status degraded menahan penjadwal menganggapnya siap menerima sync sambil tetap bisa ditelusuri lewat endpoint yang sama.
+
+**3. Rute baca angka bisnis DIGERBANG, dan rute baru wajib memilih gerbangnya** (bip-erp #2365, menutup #2008, merged 2026-09-30). Sebelumnya seluruh rute baca terbuka bagi karyawan mana pun yang login, sementara layar frontend menyaringnya (`bolehAnalitik`). Kini **21 rute** membaca angka memakai `common.RequireAnalitikMarketing` (`shared-library/common/analitik_marketing.go`) = `IsMarketingLeader` **atau** `IsIntegrationStaff` **atau** `SetaraDirektur` (Direktur dan Corporate Secretary): `/summary`, `/beranda`, `/profit/{shops,products,items,skus,campaigns,ads,orders}`, `/videos`, `/videos/periode`, `/videos/orders`, `/lives`, `/lives/analisis`, `/affiliate`, `/returns/breakdown`, `/returns/detail`, `/matrix/sku-shop`, `/cohort`, `/audience`, `/kurva-alokasi`. `IsMarketingLeader` = supervisor/admin `kyura`/`beauty_hacks`/`integration`, `insentive` adv_leader, dan IT tier mana pun (`roles.go`). Penjaganya `TestRuteGetTerklasifikasi` (`gerbang_baca_test.go`): tiap rute GET yang terdaftar wajib bergerbang analitik **atau** tercantum di `ruteGetTanpaGerbangAnalitik` beserta alasannya (master dropdown `/toko` `/divisi`, konfigurasi `/ambang` `/pagu`, rute berpenjaga lebih spesifik seperti `/live-shifts*` dan `/penanggung-jawab/analisis`, dan rute mesin `/kpi/*` berkunci layanan), sehingga rute data baru tak bisa lahir terbuka tanpa disadari. ⚠️ Izin frontend `marketing.analitik.view` **tak punya padanan** di backend; akun yang memegangnya tanpa salah satu peran di atas melihat menunya lalu mendapat 403.
 
 ## Endpoint (Sudah Diimplementasikan)
 
@@ -104,14 +106,14 @@ Yang salah adalah pertanyaan yang berbeda: **"hari ini tanggal berapa?"**. Antar
 
 Penjaganya `TestRentangBawaanPakaiHariWIBBukanUTCPolos` — pemindai AST berdaftar **dinamis** (`filepath.Glob`), jadi berkas baru ikut terjaga. Batasnya jujur tertulis di komentarnya: ia mencocokkan ekspresi harfiah, jadi variabel antara (`n := time.Now().UTC()`) dan helper pembungkus lolos.
 
-**Pembacaan agregat WAJIB menaikkan `Limit` sendiri.** `filterMart.Limit` bernilai nol berarti `limitReturBawaan` (500), yang merupakan ukuran halaman untuk tabel, bukan batas untuk penjumlahan. Karena urutannya `gross_profit` menurun, pemancungan membuang barisnya yang **merugi** lebih dulu: vonis jadi terlalu optimis dan daftar penggerus permanen kosong. Ketika pembacaan menyentuh `limitReturMaks`, amplopnya melaporkan diri lewat `unavailable_channels` (pola `ReasonMatrixSumberTerpancung`).
+**Pembacaan agregat WAJIB menaikkan `Limit` sendiri.** `filterMart.Limit` bernilai nol berarti `limitReturBawaan` (500), yang merupakan ukuran halaman untuk tabel, bukan batas untuk penjumlahan. Karena urutannya `gross_profit` menurun, pemancungan membuang barisnya yang **merugi** lebih dulu: vonis jadi terlalu optimis dan daftar penggerus permanen kosong. ~~Ketika pembacaan menyentuh `limitReturMaks`, amplopnya melaporkan diri lewat `unavailable_channels` (pola `ReasonMatrixSumberTerpancung`).~~ **Sejak bip-erp #2369 (2026-09-30) pembacaan yang MENJUMLAH memakai `bacaProfitPenuh`**: diputar per `limitReturMaks` (5.000) sampai habis, berbatas 200 putaran, dan batas yang tersentuh adalah **galat**, bukan hasil separuh. `ReasonMatrixSumberTerpancung` dicabut karena keadaannya tak lagi terjadi. Pemakainya: beranda, `/profit/*` granularitas bulanan, `/matrix/sku-shop` (dan `bacaLivePenuh` untuk live).
 
 ### Laba (baca `mart_profit_attribution`)
 
 | Endpoint | Isi |
 |---|---|
 | `/summary` | Ringkasan lintas sumber |
-| `/profit/shops` · `/profit/products` · `/profit/campaigns` · `/profit/ads` | Laba per level. **Bawaan BULANAN** (`granularitas=harian` untuk rincian); products juga **lintas-toko** secara bawaan (`lingkup=per_toko` untuk per toko, baris gabungan membawa `jumlah_toko`). `sort_by`/`sort_dir` per level; nilai tak dikenal → **400** + daftar sah |
+| `/profit/shops` · `/profit/products` · `/profit/campaigns` · `/profit/ads` | Laba per level. **Bawaan BULANAN** (`granularitas=harian` untuk rincian); products juga **lintas-toko** secara bawaan (`lingkup=per_toko` untuk per toko, baris gabungan membawa `jumlah_toko`). `sort_by`/`sort_dir` per level; nilai tak dikenal → **400** + daftar sah. `/profit/skus` dan `/profit/items` berperilaku sama. ⚠️ **Sampai bip-erp #2369 (2026-09-30) versi bulanan terpotong diam-diam**: baris HARIAN dibaca paling banyak 5.000 sebelum digabung, sementara PROD September 2026 berisi 6.790 baris harian level product, 7.278 SKU, dan 15.011 item (diukur 2026-09-30, issue #2366), jadi laba per produk/SKU/item tampil lebih kecil. Kini dibaca penuh (`bacaProfitPenuh`); `granularitas=harian` tetap satu bacaan berlimit pengguna. Waktu respons rentang panjang (item Jul-Sep = 40.684 baris, 9 putaran) **belum diukur** terhadap batas gateway 30 detik |
 | `/profit/orders` | **Drill level product → daftar order penyusunnya** (baca `transaction_orders` langsung). `entity_id` wajib; `bulan` XOR `dari`/`sampai` (batas WIB); order CANCELLED **dikecualikan bawaan** — konsisten dengan agregasi laba — dan dibuka lewat `termasuk_batal=true`; respons membawa `sku_tercakup` |
 
 ### Video & live
@@ -504,7 +506,7 @@ Penyatuannya **tidak** dilakukan sekarang dan itu disengaja: pipeline `toko.go` 
 | `/returns/breakdown` | Agregat retur per channel + initiator (`BUYER`/`SYSTEM`/`SELLER`) + **alasan mentah** (tidak dinormalisasi) + kurir; `refund_value` dan `order_value` terpisah (order batal-sebelum-bayar tak punya refund) |
 | `/returns/detail` | Drill baris agregat → daftar order: order_id, toko, **nama ICC**, item+SKU+jumlah, nilai, alasan mentah, tanggal. `reason=` kosong **bermakna** ("tanpa alasan tercatat"); `total: -1` = cacah gagal (bukan 0) |
 | `/affiliate` · `/cohort` · `/audience` | Analitik affiliate (kolom `collaboration_type` internal/eksternal), kohort, audiens; `sort_by`/`sort_dir` dua arah + pemecah-seri deterministik |
-| `/matrix/sku-shop` | ✅ **Terimplementasi** (`matrix_sku_shop.go`, 576 baris + 631 baris test). Matriks **produk × toko**: baris = produk (`entity_id` = master SKU), kolom = toko, sel = satu metrik terpilih. **Sel yang ABSEN bermakna bisnis**: tak ada satu pun baris mart untuk pasangan itu = *peluang listing*, jadi nol nyata tetap hadir sebagai sel bernilai 0 sementara yang tak berbaris tak punya kunci sama sekali — FE wajib membedakan keduanya lewat keanggotaan peta, bukan nilai. Metrik terbatas pada **tujuh kolom aditif** (`gross_profit` bawaan, `revenue`, `net_settlement`, `hpp`, `ads_cost`, `fee_marketplace`, `retur`); kolom rasio **tak boleh** ditambahkan lewat jalur ini karena rasio wajib dihitung ulang dari pembilang/penyebut gabungan. `orders` **sengaja tak ada** — mart tak menyimpan cacah order. `bulan` XOR `dari`/`sampai` (keduanya → 400); `limit` bawaan 100 maks 500 berlaku **setelah** penjumlahan dan pemeringkatan, dan pemotongan **selalu** dilaporkan lewat `terpotong` + `total_produk`. Lapisan **baca murni**: tak ada koleksi baru, tak ada pipeline tulis |
+| `/matrix/sku-shop` | ✅ **Terimplementasi** (`matrix_sku_shop.go`, 576 baris + 631 baris test). Matriks **produk × toko**: baris = produk (`entity_id` = master SKU), kolom = toko, sel = satu metrik terpilih. **Sel yang ABSEN bermakna bisnis**: tak ada satu pun baris mart untuk pasangan itu = *peluang listing*, jadi nol nyata tetap hadir sebagai sel bernilai 0 sementara yang tak berbaris tak punya kunci sama sekali — FE wajib membedakan keduanya lewat keanggotaan peta, bukan nilai. Metrik terbatas pada **tujuh kolom aditif** (`gross_profit` bawaan, `revenue`, `net_settlement`, `hpp`, `ads_cost`, `fee_marketplace`, `retur`); kolom rasio **tak boleh** ditambahkan lewat jalur ini karena rasio wajib dihitung ulang dari pembilang/penyebut gabungan. `orders` **sengaja tak ada** — mart tak menyimpan cacah order. `bulan` XOR `dari`/`sampai` (keduanya → 400); `limit` bawaan 100 maks 500 berlaku **setelah** penjumlahan dan pemeringkatan, dan pemotongan **selalu** dilaporkan lewat `terpotong` + `total_produk`. Baris **harian** sumbernya dibaca penuh (`bacaProfitPenuh`) sejak bip-erp #2369 (2026-09-30); sebelumnya paling banyak 5.000 lalu hanya ditandai `ReasonMatrixSumberTerpancung` (kini dicabut). Lapisan **baca murni**: tak ada koleksi baru, tak ada pipeline tulis |
 
 ### Price floor, job & health
 
@@ -883,8 +885,9 @@ Dicatat di sini justru karena rumusnya terlihat benar: tanpa catatan ini, orang 
 
 | Persona | Peran & Divisi | Akses/RBAC | Device |
 |---|---|---|---|
-| Supervisor & Leader Marketing | Pembaca dashboard laba per toko, kampanye, video | Lewat gateway dan menu dashboard di [[APP - Web ERP]] | Web |
-| Advertiser / ICC / Host Live | Melihat performa kreatif dan iklan miliknya; namanya tampil sebagai penanggung jawab toko | idem | Web |
+| Supervisor & Leader Marketing | Pembaca dashboard laba per toko, kampanye, video | `RequireAnalitikMarketing` (§ Prinsip Arsitektur 3), lewat menu dashboard di [[APP - Web ERP]] | Web |
+| Direktur & Corporate Secretary | Membaca angka marketing, juga lewat Copilot ([[Microservices - Assistant Service]] § Tool marketing) | `RequireAnalitikMarketing` lewat `SetaraDirektur` | Web |
+| Advertiser / ICC / Host Live | Melihat performa kreatif dan iklan miliknya; namanya tampil sebagai penanggung jawab toko | Rute angka bisnis hanya bila memegang salah satu peran `RequireAnalitikMarketing`; host memakai `/live-shifts*` (`RequireLiveShiftUser`) | Web, MyBharata |
 | Tim IT / operator | Memicu job, membaca `sync_state` dan `GET /jobs/status` saat data janggal | `POST /jobs/:name/trigger` | Web, terminal |
 
 - **Tujuan**: melihat laba yang sudah dikurangi HPP dan biaya iklan, bukan sekadar omzet kotor.

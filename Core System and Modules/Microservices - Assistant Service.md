@@ -123,7 +123,10 @@ flowchart LR
 
 ## Permukaan tool
 
-Satu tool per endpoint baca, sekitar delapan sampai dua belas untuk irisan pertama. Kandidatnya dari rute yang sudah ada di `services/marketing-analytics/handler_mart.go` dan tetangganya: `/beranda`, `/summary`, `/profit/shops`, `/profit/products`, `/profit/skus`, `/profit/campaigns`, `/profit/ads`, `/videos`, `/lives`, `/returns/breakdown`. Daftar finalnya **TBD**.
+Satu tool per endpoint baca, sekitar delapan sampai dua belas untuk irisan pertama. Kandidatnya dari rute yang sudah ada di `services/marketing-analytics/handler_mart.go` dan tetangganya: `/beranda`, `/summary`, `/profit/shops`, `/profit/products`, `/profit/skus`, `/profit/campaigns`, `/profit/ads`, `/videos`, `/lives`, `/returns/breakdown`. ~~Daftar finalnya **TBD**.~~
+Per 2026-09-30 ada **sepuluh** tool di kode: tiga HRIS (`rekap_telat_tim`, `antrean_persetujuan`,
+`cuti_tim`) dan tujuh marketing (§ Tool marketing). Satu daftar (`daftarAlat()` di `tanya.go`)
+dipakai untuk menawarkan tool ke model sekaligus untuk dispatch.
 
 Semua tool `strict: true` supaya argumennya dijamin valid.
 
@@ -149,6 +152,49 @@ server. ⚠️ `from`/`to` di endpoint itu menyaring **tanggal dibuat**, bukan t
 sengaja tak memakainya. Terbukti di DEV 2026-09-29 dengan pengajuan uji (dibatalkan sesudahnya):
 supervisor Manufaktur melihatnya dalam tabel; pemilik (staf) 403 di gerbang Copilot; HRD tak
 melihatnya karena belum sampai tahap HR.
+
+**Tool ketiga (2026-09-30, bip-erp #2363)**: `cuti_tim(dari?, sampai?, tampilan?)` →
+`GET /api/attendance/cuti/tim`, endpoint **baru** di attendance (lihat
+[[API - Attendance Service]]). Endpoint cuti yang sudah ada tak bisa menjawab "siapa di tim saya
+yang cuti minggu ini": `/request/view` hanya memuat pengajuan yang pernah ditinjau pemanggil.
+Cakupan "tim" sama persis dengan `rekap_telat_tim`, rentang maks 62 hari, hanya status menunggu dan
+disetujui, dan alasan/lampiran pengajuan tidak pernah dikirim. ⚠️ **Belum diuji end-to-end di DEV**
+(per 2026-09-30).
+
+### Tool marketing (2026-09-30, bip-erp #2367, erp-frontend #1906)
+
+Tujuh tool di atas `marketing-analytics`, satu klien bersama (`internal/alat/marketing.go`,
+`KlienMarketing`) dengan saringan seragam `dari`/`sampai`/`bulan`/`divisi`/`channel`:
+
+| Tool | Endpoint | Yang dijawab |
+|---|---|---|
+| `ringkasan_marketing` | `/beranda` | vonis laba, penggerus, peluang periode |
+| `laba_toko` | `/profit/shops` | laba/omzet per toko (bulan-bulan digabung per toko di tool) |
+| `laba_produk` | `/profit/products` | laba per produk master (lintas toko / per toko / lintas channel) |
+| `iklan` | `/profit/campaigns` atau `/profit/ads`, plus `/ambang` | belanja, ROAS terhadap target |
+| `live` | `/lives/analisis` atau `/lives` | performa sesi live |
+| `retur` | `/returns/breakdown` | retur per status dan pemicu |
+| `affiliate_video` | `/affiliate` atau `/videos/periode` | performa affiliate dan video |
+
+Aturan kolom **ditegakkan di tool, bukan diserahkan ke model** (sumbernya [[Microservices - Marketing Analytics Service]] § Aturan Pemakaian Angka):
+
+- `null` = tidak diketahui, **bukan 0**. Rasio (ROAS, margin, porsi) **dihitung ulang dari total**,
+  tak pernah dijumlah atau dirata-rata.
+- `pembatalan` dan `iklan_sia_sia` bukan komponen kerugian; `produk_terjual` tak aditif (pakai
+  `unit_terjual`); `orders_berresi` himpunan bagian `orders`; `gmv_live_tanpa_performa` tidak
+  ditambahkan ke GMV toko; belanja USD tidak dikonversi; revenue VSA `null` bukan kerugian.
+- Target ROAS **dibaca dari `/ambang`**, tidak ditulis di tool.
+- `bulan` diterjemahkan ke `dari`/`sampai` untuk endpoint yang mengabaikannya.
+
+Siapa yang bisa memakai: gerbang Copilot (`RequireCopilot`) **dan** gerbang baca marketing
+(`common.RequireAnalitikMarketing`, bip-erp #2365) berlaku berlapis. Supervisor departemen
+non-marketing lolos gerbang Copilot, tetapi tool marketing-nya membalas `tidak_berhak`, bukan angka
+nol. ⚠️ **Belum diuji end-to-end di DEV** dengan akun leader marketing dan akun non-marketing (per
+2026-09-30).
+
+`laba_produk` sempat selalu mengirim peringatan "data harian terpotong 5000 baris" karena cacat
+sumbernya (bip-erp #2366). Sejak #2369 sumbernya menjumlah seluruh baris, jadi peringatan tinggal
+berbunyi saat **daftar produk** mentok di limit endpoint (5000 produk).
 
 ### Samaran identitas sebelum ke relay AI (keputusan user 2026-09-29)
 
@@ -181,6 +227,12 @@ nama departemen**:
   di balasan JSON.
 - Gagal menyimpan **tidak** membatalkan jawaban: `tersimpan:false`, layar memberi keterangan.
   `MONGO_URI` kosong/Mongo mati = rute riwayat 503, `/tanya` tetap menjawab.
+- ⚠️ **`MONGO_DB` kosong juga wajib ditolak di awal** (bip-erp #2368, `alasanRiwayatNonaktif`):
+  `Connect` tetap berhasil lalu tiap baca/tulis gagal `database name cannot be empty` sementara
+  container tampak sehat. Terjadi di PROD 2026-09-29 karena `MONGO_ASSISTANT_DB` tak ada di `.env`
+  server; riwayat mati belasan jam tanpa tanda di `/health`. Kini log berbunyi `[Copilot] riwayat
+  nonaktif: MONGO_DB kosong (isi MONGO_ASSISTANT_DB di .env)` dan rute riwayat 503. PROD dibetulkan
+  manusia 2026-09-30 (`printenv MONGO_DB` = `assistant_db`).
 - Terbukti di DEV 2026-09-29 lewat gateway dengan dua akun: simpan, isolasi (baca/hapus/lanjutkan
   milik orang lain = 404), lanjutkan, hapus 204 lalu 404.
 - Deploy pertama menuntut `up -d` **tanpa** `--no-deps` supaya `assistant-mongo-db` ikut tercipta.

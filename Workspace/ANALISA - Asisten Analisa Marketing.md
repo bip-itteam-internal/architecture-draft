@@ -51,6 +51,10 @@ belum terjawab. Jalankan G1 **sebelum** T5, selagi layar masih murah diubah.
    modul apa pun. Menunggu di issue bip-erp
    [#2008](https://github.com/bip-itteam-internal/bip-erp/issues/2008). Sampai dijawab, jangan
    menaruh apa pun di kiriman yang memang tidak boleh dibaca semua karyawan.
+   **Dijawab 2026-09-30**: ketiganya (dan 18 rute baca lain) digerbang `RequireAnalitikMarketing`
+   (bip-erp #2365), lihat [[Microservices - Marketing Analytics Service]] § Prinsip Arsitektur 3.
+   Kiriman terjadwal tetap dirakit penjalan di dalam service, jadi gerbang rute tak mengubah isi
+   kiriman; yang berubah hanya pembacaan langsung lewat gateway.
 
 ---
 

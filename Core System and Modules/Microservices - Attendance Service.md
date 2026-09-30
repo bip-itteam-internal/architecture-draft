@@ -28,6 +28,10 @@
 - `GET /internal/status-tap`: instan clock-out beserta `ada_entri` per karyawan pada satu tanggal entri (hari mulai shift), dipakai tutup otomatis sesi live.
 - Keduanya digerbang `GerbangKunciAbsensi` (`?key=` = `ATTENDANCE_SERVICE_KEY`, maksimum 100 id per permintaan) **di belakang** `ValidateGateway` global, jadi pemanggil wajib mengirim header `BIP-Gateway-ID` juga. Kontrak lengkap di [[API - Attendance Service]].
 
+**Untuk Copilot** ([[Microservices - Assistant Service]], [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]]) — dipanggil dengan JWT penanya, bukan panggilan mesin
+- `GET /rekap-telat/tim` — ✅ merged (bip-erp #2161, #2240). Rekap telat tim pemanggil; pipeline sama dengan `/internal/late-recap`. Rincian: [[API - Attendance Service]].
+- `GET /cuti/tim` — ✅ merged (bip-erp #2363, 2026-09-30). Cuti/izin/sakit tim pemanggil yang beririsan dengan rentang `dari`/`sampai` (WIB, maks 62 hari), status menunggu dan disetujui. Cakupan "tim" **dipakai bersama** dengan `/rekap-telat/tim` (`cakupanRekapTelat` + `ambilAnggotaTim`), jadi keduanya tak bisa menyimpang. Alasan dan lampiran pengajuan sengaja tidak dikirim.
+
 **Integrasi HRIS**
 - `GET /internal/summary` — hitung jumlah clock-in/out dalam 24 jam.
 - `GET /internal/late-recap` — ✅ merged & **hidup di prod** (diverifikasi 2026-08-14 lewat banner usulan yang angkanya cocok dengan `attendance_entries` prod). Jumlah telat **per karyawan** satu periode, dipakai [[Microservices - Employee Service]] menyusun usulan SP1 ([[HRIS - Disciplinary (Surat Peringatan)]]). Digerbang `RequireHRISStaff`: prefiks `/internal/` tidak membuat rute privat, gateway tetap meneruskannya dari internet, dan rekap ini memaparkan siapa saja yang sering terlambat di seluruh perusahaan.
