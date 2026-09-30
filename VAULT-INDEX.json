@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-09-30",
+  "digenerate": "2026-10-01",
   "jumlah_dokumen": 513,
   "dokumen": [
     {
@@ -2610,24 +2610,28 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "2b9137747c59a1572612f3ab6aee9f81fd58491e005bea43d528c28abbb51418",
-      "ukuran_kb": 432.1,
-      "ringkasan": "Menjawab: apa saja yang dilakukan integration-service (marketplace TikTok Shop/Ads, Shopee, Lazada, bridge ke Accurate Online), endpoint webhook/credential/holiday/GMV Max/ICC yang ada, dan bagaimana order dinormalkan ke model transaction terpadu lalu di-push sebagai Sales Invoice dan Sales Return. Juga menjawab cara kerja worker/cron sync, Shop ACL, kepemilikan toko per departemen, observability Shopee, serta bagian yang masih konsep (Meta Ads) atau legacy (Desty soft-disabled).",
+      "hash": "e4ef78ae18027ff1a56eb7f8f1d1ea0cb9d5c782feb97d156f13ed5adc90263d",
+      "ukuran_kb": 438.3,
+      "ringkasan": "Menjawab: apa saja yang dilakukan integration-service (webhook, sync order, laporan iklan, bridging ke Accurate), endpoint apa yang tersedia per marketplace (TikTok Shop/Ads, Shopee, Lazada, Meta Ads rencana), dan bagaimana normalisasi ke model transaction terpadu berjalan. Juga menjawab: bagaimana webhook Shopee/TikTok diautentikasi dan diproses, bagaimana GMV Max monitoring/overview dan ICC video metrics dihitung, serta siapa boleh melihat toko apa (Shop ACL, department_shops, status sinkron per toko). Mencakup worker/cron, observability Shopee, index MongoDB, alarm toko tanpa config Accurate, beban operasional insentif per proyek, gross profit per product, dan ulasan marketplace.",
       "kata_kunci": [
         "integration service",
         "marketplace",
+        "webhook",
         "TikTok Shop",
-        "TikTok Business",
-        "GMV Max",
+        "TikTok Business Ads",
         "Shopee",
         "Lazada",
-        "Accurate",
-        "webhook",
-        "transaction",
-        "auto-sync",
-        "Desty",
+        "Accurate Online",
+        "sales invoice",
+        "sales return",
+        "GMV Max",
         "ICC",
-        "Shop ACL"
+        "Shop ACL",
+        "transaction terpadu",
+        "auto-ship",
+        "Desty",
+        "Meta Ads",
+        "gross profit"
       ]
     },
     {
