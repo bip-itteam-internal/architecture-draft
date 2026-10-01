@@ -8811,20 +8811,20 @@
         "ADR - 0002 Database-per-Service",
         "HRIS - Kepatuhan Peraturan Perusahaan"
       ],
-      "hash": "07bdf31aa24fc7bebf839825cd630d1658b00bd0fdf78f1ccf0dc6ce026c3f45",
-      "ukuran_kb": 19.4,
-      "ringkasan": "Menjawab: kenapa struktur gaji karyawan disimpan sebagai riwayat versi bertanggal mulai berlaku yang menunjuk dokumen hulunya (offer, kontrak, promosi/mutasi, kenaikan massal, impor sheet), dan bagaimana gaji diprorata per hari saat ada perubahan, karyawan masuk, atau resign di tengah periode. Juga memuat masalah yang mendasarinya (employee_salary ditimpa tanpa riwayat, effective_date tak pernah dibaca, angka diketik ulang), gerbang saat menyimpan versi, rencana migrasi, dan revisi atas ADR 0035 soal resign dibayar penuh.",
+      "hash": "329b6a78e6a60f5b1fb51cf7f2ba022130514b8d36eb9c7ae7b8f11404f4ed29",
+      "ukuran_kb": 19.8,
+      "ringkasan": "Menjawab: bagaimana menyimpan riwayat perubahan struktur gaji setiap karyawan, mengapa gaji perlu diprorata saat terjadi perubahan di tengah periode, dan bagaimana menghubungkan setiap perubahan gaji ke dokumen asalnya (offer, kontrak, promosi, resign). Keputusan ini menyelesaikan masalah hilangnya angka gaji lama dan pengetikan ulang gaji di berbagai tempat.",
       "kata_kunci": [
         "struktur gaji",
-        "salary version",
-        "riwayat gaji",
-        "salary history",
+        "salary versioning",
         "prorata",
-        "proration",
-        "kenaikan gaji",
-        "offer",
-        "promosi mutasi",
-        "employee_salary"
+        "event personalia",
+        "compensation",
+        "riwayat gaji",
+        "surat penawaran",
+        "kontrak",
+        "resign",
+        "promosi"
       ]
     },
     {
@@ -18284,20 +18284,21 @@
         "HRIS - Compensation & Benefits",
         "HRIS - Disciplinary (Surat Peringatan)"
       ],
-      "hash": "ddef9c57f940c9e0253e93e943f7cf6372fcb93d5fedb83defeaa609f661d08f",
-      "ukuran_kb": 8.2,
-      "ringkasan": "Menjawab: task apa saja yang perlu dikerjakan untuk mewujudkan struktur gaji berversi (ADR 0148), dalam urutan dan tahap apa (riwayat dan jejak, prorata per hari, hulu mengalir dari offer/mutasi/kontrak/kenaikan massal), apa dependensi dan uji tiap task, serta asumsi yang masih menunggu konfirmasi HRD seperti pembagi prorata.",
+      "hash": "9cfb21220e1006a3971d61a10e0eb4011a9b0af8d8400ebca14bd8b1ce7e5030",
+      "ukuran_kb": 8.3,
+      "ringkasan": "Memecah rencana implementasi ADR 0148 menjadi 13 task terstruktur dalam tiga tahap, menentukan service mana saja yang terdampak (payroll, recruitment, employee, contract), urutan kerja, dan dependensi antar-task. Dokumen ini adalah papan kerja yang mengarahkan setiap tim (BE, FE, Mobile) dalam mengerjakan versioning dan prorata gaji.",
       "kata_kunci": [
-        "analisa",
-        "daftar task",
-        "struktur gaji berversi",
-        "salary version",
-        "prorata",
-        "migrasi employee_salary",
-        "impor sheet HRD",
-        "offer",
-        "konfirmasi HRD",
-        "roadmap payroll"
+        "implementasi",
+        "tahap kerja",
+        "task",
+        "payroll",
+        "recruitment",
+        "employee service",
+        "kontrak",
+        "mutasi",
+        "BE",
+        "FE",
+        "Mobile"
       ]
     },
     {
