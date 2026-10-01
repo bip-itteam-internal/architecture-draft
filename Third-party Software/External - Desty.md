@@ -28,7 +28,7 @@
 ## Catatan
 
 - **2026-07-12**: seluruh jalur Desty **soft-disabled** (lihat blok status di atas). `POST /webhooks/services/desty` kini 404.
-- Cron 01:00 `refreshDestyToken` + `ProcessPendingAutoShip` di `internal/cmd/cron.go` (`CronManager`) ternyata **dead code** — tidak pernah dipanggil dari `main.go`; refresh kredensial yang sempat aktif adalah `DestyCredentialTask` (worker, 00:00), kini juga dicabut.
+- Cron 01:00 `refreshDestyToken` + `ProcessPendingAutoShip` di `internal/cmd/cron.go` (`CronManager`) ternyata **dead code** — tidak pernah dipanggil dari `main.go`; refresh kredensial yang sempat aktif adalah `DestyCredentialTask` (worker, 00:00), kini juga dicabut. Sejak 2026-10-02 `internal/cmd/` beserta `usecase/desty_usecase.go` dan `interface/http/desty_handler.go` (jalur webhook Desty lama) **dihapus permanen**; `NewDestyRepository` dan `clients.NewDestyClient` tetap karena masih dipakai jalur webhook baru (menunggu merge PR https://github.com/bip-itteam-internal/bip-erp/pull/2483).
 - Historis: route webhook Desty langsung (`/webhook/desty`, `/webhooks/desty`) **di-comment** — digantikan `/webhooks/services/desty` (lihat [[Microservices - Integration Service]]).
 
 ## Dokumen Terkait
