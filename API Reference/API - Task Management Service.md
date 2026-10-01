@@ -118,7 +118,7 @@ melakukannya.
 | Method | Path | Fungsi |
 |---|---|---|
 | POST | `/tasks/:id/attachments` · `/tasks/:id/links` | Upload file (field `file`, resp `{attachment}`) / tambah link (resp `{link}`) |
-| GET | `/tasks/:id/attachments/:fileId/preview` | Presigned URL preview (`{url}`) |
+| GET | `/tasks/:id/attachments/:fileId/preview` | Presigned URL preview (`{url}`). Sejak 2026-09-30 URL dibuat dengan `filename` lampiran sehingga file-service menambahkan `response-content-disposition: inline` (PDF tampil, tak diunduh); link dikembalikan apa adanya |
 | DELETE | `/tasks/:id/attachments/:attachmentId` | Hapus lampiran |
 
 ## Reports & Users
@@ -226,7 +226,7 @@ Aturan muatannya, semuanya supaya sumber tidak diam-diam menilai:
 ## Comments · Checklist · Notifications
 | Method | Path | Fungsi |
 |---|---|---|
-| POST/PUT/DELETE | `/tasks/:id/comments` · `/tasks/:taskId/comments/:commentId` | Komentar |
+| POST/PUT/DELETE | `/tasks/:id/comments` · `/tasks/:taskId/comments/:commentId` | Komentar. **POST**: admin/supervisor, pembuat/pemohon, atau assignee (`canEditTask`), selain itu 403. **PUT/DELETE**: penulis komentar atau admin/supervisor, selain itu 403 |
 | POST/PUT/DELETE | `/tasks/:id/checklist` · `/tasks/:taskId/checklist/:itemId[/toggle]` | Checklist |
 | GET/PUT/DELETE | `/notifications` · `/notifications/unread-count` · `/read-all` · `/:id/read` · `/:id` | Notifikasi |
 
