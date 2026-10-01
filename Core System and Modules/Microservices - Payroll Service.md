@@ -126,7 +126,9 @@ ikut mengubah bentuk respons endpoint itu untuk konsumen lain.
   §Potongan Kehadiran di bawah) yang otomatis prorata seperti sudah berjalan. Ini keputusan
   produk eksplisit, bukan celah yang tersisa: prorata gaji pokok/tunjangan tetap untuk
   resign tengah periode belum diputuskan HR/Finance dan sengaja di luar lingkup perbaikan
-  ini.
+  ini. 🟡 Kini diusulkan berubah: [[ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari]]
+  memprorata gaji per hari untuk perubahan struktur, masuk, dan resign di tengah periode
+  (kode belum ada).
 - **Fail-closed selalu**: gagal mengambil data resign, atau `PayPeriodStart` tak valid,
   membatalkan run (`fmt.Errorf`, bukan menghitungnya tanpa pengecualian) — sejalan dengan
   penanganan kegagalan identitas untuk Lingkup Run di atas.
@@ -319,6 +321,8 @@ tidak ada slip.
 	Bukti bahwa penimpaan itu nyata, bukan teoretis (diukur 2026-08-28): log akses `Payroll-Service` mencatat `PUT /employee-salary/BIP-0105-10-24` **dua kali dalam 46 detik** (10:27:22 dan 10:28:08 WIB) sementara Mongo hanya menyimpan satu jejak. Pada hari yang sama 164 record disunting oleh **tiga** orang, 143 di antaranya dalam satu hari, jadi tabrakan semacam itu bukan kejadian langka.
 
 	⚠️ **Rekonstruksi lewat oplog TIDAK bisa**: `Payroll-MongoDB` jalan **standalone**, bukan replica set (`rs.status()` membalas `not running with --replSet`, diperiksa di prod 2026-08-28), sehingga `local` hanya berisi `startup_log`. Log fiber di dalam container merekam waktu tiap `PUT` beserta `employee_id` sasaran, tapi **tanpa identitas pengedit** (IP-nya gateway untuk semua) dan **hilang tiap container restart**. Siapa pun yang butuh riwayat sungguhan harus membangun koleksi audit terpisah; jangan menjanjikannya dari data yang ada sekarang. Konsumen pertama jejak ini: sheet Ubah Gaji di [[APP - Web ERP]].
+
+	🟡 **Riwayat sungguhan diputuskan 2026-10-01** (kode belum ada): [[ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari]] menjadikan struktur gaji rangkaian versi bertanggal berlaku dengan rujukan hulu, dan `employee_salary` menjadi proyeksi "versi berlaku hari ini". Diukur ulang 2026-10-01: 160 dari 183 record ditimpa `SCRIPT-SHEET-SEP-20261001` dalam satu jam; `effective_date` 134 kosong dan 45 bernilai `2027-08-25`, dan field itu tak dibaca engine.
 
 ### Kondisi Pemakaian di Produksi (diukur 2026-08-26)
 

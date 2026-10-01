@@ -98,6 +98,9 @@ yang sudah resign sebelum periode (26 Agustus) mulai, potensi salah bayar ±Rp 1
   (`payout_pct`) yang otomatis prorata seperti sebelumnya. Prorata gaji pokok/tunjangan
   tetap untuk kasus ini belum diputuskan HR/Finance — keputusan produk eksplisit yang
   diambil bersama perluasan ini, bukan celah yang terlewat.
+  🟡 **Direvisi (diusulkan) 2026-10-01** oleh [[ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari]]
+  §7: resign di tengah periode diprorata per hari. Sampai kodenya mendarat, perilaku di atas
+  yang berlaku.
 - `employee_salary` yatim milik `BIP-2005-08-27` (identitas sudah terhapus total dari
   `employee_db`/`attendance_db` lewat `.task-plans/hapus-BIP-2005-08-27.ps1` 2026-08-19,
   tapi `payroll_db` luput) — bukan kasus resign, jadi tak tersaring perluasan ini.

@@ -95,7 +95,7 @@ Menu **Talent Pool** di `/hris/learning/talent` (baru, Fase 2): usulan kandidat 
 - Alur **approval** perpindahan — **ditunda sadar** 2026-08-10, bukan terlupa. Lingkupnya sudah ditetapkan (hanya antar-perusahaan); yang belum adalah siapa penyetujunya. Tetap yang paling mendesak, sebab modulnya sudah jalan tanpa persetujuan siapa pun
 - ~~**Masa kerja, kuota cuti, dan BPJS saat pindah badan usaha**~~ — **diputuskan 2026-08-10**: ketiganya ikut pindah apa adanya, **sementara**. Perlu ditinjau ulang bila pesangon lintas-entitas jadi persoalan, sebab masa kerja yang berjalan terus berarti perhitungannya memakai tanggal masuk di perusahaan lama
 - Aturan & syarat promosi (kapan seseorang layak naik) — masih terbuka, dan bergantung pada matriks kompetensi yang juga belum ada. Dua syarat yang sudah dinyatakan (belajar lewat post-test kurikulum jabatan tujuan, dan psikotes) ada di dua butir prasyarat di atas
-- Dampak ke payroll/komponen gaji — **rentang gaji per jenjang** adalah salah satu alasan utama jenjang dibuat, tapi belum ada apa pun yang menghubungkan keduanya
+- Dampak ke payroll/komponen gaji — **rentang gaji per jenjang** adalah salah satu alasan utama jenjang dibuat, tapi belum ada apa pun yang menghubungkan keduanya. 🟡 Sebagian diputuskan 2026-10-01: promosi/mutasi menerbitkan versi struktur gaji bertaut `employee_movement` ([[ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari]]); rentang per jenjang **tetap** di luar keputusan itu
 - Pencatatan riwayat (efektif tanggal, alasan) — sengaja **di luar lingkup** pekerjaan jenjang 2026-08-03 supaya task-nya tak membengkak
 
 ## Dependensi / Dokumen Terkait
