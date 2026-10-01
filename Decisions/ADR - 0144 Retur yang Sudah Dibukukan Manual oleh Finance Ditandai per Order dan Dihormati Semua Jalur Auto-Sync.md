@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan** (2026-09-30), disetujui pemilik proses (opsi A dari analisis kebutuhan), **kode belum ada**. Dua asumsi belum dikonfirmasi pemilik proses dan ditandai di Decision §5 dan §6: siapa yang boleh menandai, dan apakah nomor Retur Penjualan wajib.
+> **Status**: 🟡 **Diusulkan, sebagian terlaksana** (2026-09-30; diperbarui 2026-10-01), disetujui pemilik proses (opsi A dari analisis kebutuhan). ✅ **T1 (§1-§3: penanda per order dan penjagaannya di `returTakDibukukan`) merged**: bip-erp PR #2420, di `origin/main` `3ed75df5`. **Belum ada kode**: endpoint tandai/cabut (§4-§7), layar, perkakas penandaan ulang. Dua pertanyaan pemilik proses di §5 dan §6 sudah dijawab 2026-10-01.
 
 ## Untuk Manajemen
 
@@ -61,15 +61,15 @@ Order bertanda tetap **berjejak** ([[ADR - 0024 Retur Gerbang Payout + Tanggal p
 
 Bila order itu sudah menjadi anggota baris `SENT`, endpoint menolak dan menyebut nomor dokumen sistem. Menandai di atas dokumen sistem tidak menghapus dokumen ganda dan hanya menyembunyikannya. Gagal-tertutup: yang kelihatan finance adalah penolakan, bukan tanda yang menipu.
 
-### 5. Siapa yang boleh menandai dan mencabut: finance saja (ASUMSI)
+### 5. Siapa yang boleh menandai dan mencabut: finance saja (dikonfirmasi 2026-10-01)
 
-Gerbang izin `returselisih.tandai` yang sudah ada ([[ADR - 0104 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres]] T1), diterapkan di rute endpoint baru. **Asumsi**: pemilik proses belum menjawab pertanyaan "siapa"; dipakai rekomendasi finance saja tanpa membuat izin baru. Bila kelak perlu memisahkan penanda retur dari penanda selisih, izin dipecah pada saat itu, bukan sekarang.
+Gerbang izin `returselisih.tandai` yang sudah ada ([[ADR - 0104 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres]] T1), diterapkan di rute endpoint baru, tanpa izin baru. Pemilik proses menjawab 2026-10-01: finance saja. Bila kelak perlu memisahkan penanda retur dari penanda selisih, izin dipecah pada saat itu, bukan sekarang.
 
 Identitas penanda **dicap server** dari header gateway, tidak dari body: jejak yang bisa dipalsukan bukan jejak audit ([[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]] #6). Endpoint hidup di `/accurate/orders/...` berdampingan dengan koreksi order yang sudah ada dan memakai pola audit yang sama.
 
-### 6. Alasan dan nomor Retur Penjualan WAJIB (ASUMSI)
+### 6. Alasan dan nomor Retur Penjualan WAJIB (dikonfirmasi 2026-10-01)
 
-Tanpa alasan atau nomor dokumen, permintaan ditolak. **Asumsi**: pertanyaan "wajib nomor dokumen?" belum dijawab pemilik proses; dipakai rekomendasi wajib, karena kesalahan arah sebaliknya (retur tak pernah dibukukan sistem padahal finance keliru menandai) tak terlihat dan hanya ketahuan berminggu-minggu kemudian. Pada tahap pertama nomor hanya dicatat; verifikasi bahwa dokumen itu ada di Accurate dan mengacu ke faktur order yang sama adalah tahap kedua, bukan syarat.
+Tanpa alasan atau nomor dokumen, permintaan ditolak. Pemilik proses menjawab 2026-10-01: wajib dan hanya dicatat. Alasannya: kesalahan arah sebaliknya (retur tak pernah dibukukan sistem padahal finance keliru menandai) tak terlihat dan hanya ketahuan berminggu-minggu kemudian. Pada tahap pertama nomor hanya dicatat; verifikasi bahwa dokumen itu ada di Accurate dan mengacu ke faktur order yang sama adalah tahap kedua, bukan syarat.
 
 ### 7. Pencabutan
 
