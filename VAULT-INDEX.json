@@ -13267,19 +13267,21 @@
         "ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual",
         "REF - PRD ERP"
       ],
-      "hash": "1b8567b9594852fc6cbdd4cc32bfff35838b0a107ba693a6b3399e9bc37c4ca6",
-      "ukuran_kb": 15.4,
-      "ringkasan": "Menjawab: issue backlog mana saja yang disentuh agent backlog otonom pada Oktober 2026, apa hasilnya (Butuh Info, dilewati, PR terbuka), dan mengapa sebuah issue tertahan menunggu keputusan manusia. Juga memuat estimasi vs realisasi penyelesaian serta pelajaran yang dipetik per issue.",
+      "hash": "cb19fee797414f2c7dbaa4e2e7b0d02516f193c666264af8ab3c018f7179c282",
+      "ukuran_kb": 16.0,
+      "ringkasan": "Mencatat hasil kerja agent backlog otonom di Oktober 2026: setiap issue GitHub yang disentuh agent, statusnya (Butuh Info/Selesai/Dilewati), alasan tertahan, dan pelajaran yang dipetik. Menjawab: apa yang dikerjakan agent dalam mengelola backlog GitHub Project #15, kenapa mayoritas issue masih tertahan menunggu keputusan manusia (ADR/persetujuan lintas-modul), dan pola keputusan yang sering jadi bottleneck.",
       "kata_kunci": [
         "agent backlog otonom",
-        "log agent",
-        "Butuh Info",
         "GitHub Project",
-        "backlog",
-        "issue",
-        "estimasi",
+        "issue triage",
+        "Butuh Info",
+        "keputusan manusia",
+        "ADR",
+        "agent loop",
+        "status tracking",
+        "brief",
         "pelajaran",
-        "Oktober 2026"
+        "backlog management"
       ]
     },
     {
