@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-01",
-  "jumlah_dokumen": 519,
+  "jumlah_dokumen": 520,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -8749,6 +8749,36 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0147 Rata-rata KPI Departemen Dibagi yang Sudah Dinilai, Cakupan Ditampilkan Terpisah.md",
+      "judul": "ADR - 0147 Rata-rata KPI Departemen Dibagi yang Sudah Dinilai, Cakupan Ditampilkan Terpisah",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "Diusulkan (2026-10-01). Belum ada kode.",
+      "publik": true,
+      "tautan": [
+        "HRIS - Key Performance Index",
+        "HRIS - Otomasi Skor KPI",
+        "API - Employee Service",
+        "APP - Web ERP"
+      ],
+      "hash": "e3abcfb57e279811fdde183a4eb478ab2f57b5c294039f04e317045f7bb0c5aa",
+      "ukuran_kb": 5.8,
+      "ringkasan": "Menjawab: kenapa rata-rata KPI departemen di /portal/kpi kini dibagi jumlah orang yang sudah dinilai (bukan seluruh karyawan aktif), apa yang berubah di kartu, tren, dan grafik, serta bagaimana cakupan penilaian tetap tampil terpisah. Juga menjelaskan file backend/frontend yang terdampak dan alasan membalik keputusan product owner 2026-08-28 (contoh Procurement 31,4 vs sekitar 96).",
+      "kata_kunci": [
+        "KPI",
+        "rata-rata departemen",
+        "pembagi",
+        "cakupan penilaian",
+        "belum dinilai",
+        "kartu departemen",
+        "portal KPI",
+        "kpi_score",
+        "average score",
+        "ADR 0147"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -13175,18 +13205,20 @@
         "ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual",
         "REF - PRD ERP"
       ],
-      "hash": "b44cc1515960bca31d1319c5672e6ebba9b61bd2f7e84605020709f861faad94",
-      "ukuran_kb": 11.1,
-      "ringkasan": "Menjawab: issue backlog mana saja yang disentuh agent backlog otonom pada Oktober 2026, apa hasilnya (Butuh Info, dilewati, PR), dan kenapa sebagian besar dikembalikan ke manusia (keputusan belum diambil, butuh ADR, prasyarat sedang dikerjakan orang lain). Juga memuat pelajaran per issue, misalnya fitur yang ternyata sudah ada di kode atau audit yang salah tunjuk.",
+      "hash": "eac1b55571bac455d321778600c48e41bf21dbdbdb617db09ee4ab4c6c1d5588",
+      "ukuran_kb": 11.7,
+      "ringkasan": "Menjawab: issue backlog mana saja yang disentuh agent otonom pada Oktober 2026, apa hasilnya (umumnya Butuh Info atau dilewati), dan apa alasan serta pelajarannya per issue. Berguna untuk melacak kenapa sebuah issue GitHub Project #15 belum dikerjakan agent dan keputusan apa yang masih menunggu manusia.",
       "kata_kunci": [
         "agent backlog otonom",
-        "log agent",
+        "log",
+        "Oktober 2026",
         "Butuh Info",
         "GitHub Project",
-        "issue backlog",
-        "Oktober 2026",
-        "autonomous agent",
-        "pelajaran"
+        "issue",
+        "backlog",
+        "ketepatan estimasi",
+        "pelajaran",
+        "autonomous agent"
       ]
     },
     {
