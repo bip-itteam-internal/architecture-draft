@@ -31,7 +31,7 @@ Urutan: S1 → (S2, S3, S4 paralel) → S5 → S6 → S7 → (S8+S9, S10+S11, S1
 ## Asumsi yang dipakai (koreksi di sini bila berubah)
 
 1. Pembagi prorata = hari kalender periode (menunggu S5).
-2. Seluruh komponen struktur tetap ikut diprorata, termasuk TM dan TH.
+2. Seluruh komponen struktur tetap ikut diprorata, termasuk TH. **TM bergantung pada bip-erp#2431**: bila TM menjadi tarif harian × hari terjadwal, ia keluar dari struktur tetap (struktur tetap diturunkan dari master komponen, jadi tanpa ubah kode S1).
 3. Penyetuju versi = Manajer HRD lewat paket SPV HRD, sampai ADR 0137 diputuskan.
 4. Visibilitas mengikuti ADR 0129 dan 0089 (atasan tidak melihat).
 5. Versi #1 hasil migrasi berlaku sejak awal periode pertama yang dihitung engine sesudah migrasi.

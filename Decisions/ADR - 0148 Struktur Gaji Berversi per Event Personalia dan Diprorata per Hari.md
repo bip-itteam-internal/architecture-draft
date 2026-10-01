@@ -117,6 +117,7 @@ Dalam satu periode, setiap komponen struktur tetap dibayar sebesar `nilai × har
 Butir ketiga **merevisi** keputusan produk di [[ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign]] ("resign di tengah periode dihitung penuh").
 
 - **Pembagi = hari kalender periode** (mis. 26 Agustus s.d. 25 September = 31 hari). Ini **asumsi yang menunggu konfirmasi HRD**, bukan aturan Peraturan Perusahaan; ia sengaja tidak memakai pembagi 26 milik potongan kehadiran.
+- ⚠️ **Tunjangan Makan bergantung pada issue bip-erp#2431** (terbuka, 2026-10-01), yang mengusulkan TM dihitung engine sebagai tarif harian × hari kerja terjadwal (sheet HRD September berbeda TM dari sistem untuk 160 dari 167 orang). Bila diterima, TM keluar dari struktur tetap dan sudah proporsional dengan sendirinya, sehingga tidak ikut prorata hari kalender di sini. Karena itu struktur tetap **diturunkan dari master komponen** (`input_type`), bukan dari daftar nama di kode.
 - Tarif potongan kehadiran per hari memakai **nilai dasar Tunjangan Kehadiran dari versi yang berlaku pada hari pelanggaran**.
 - Slip pada bulan prorata menampilkan **satu baris per komponen** beserta keterangan hari, bukan baris per versi, supaya pembaca slip tidak membaca dua Gaji Pokok sebagai dua pembayaran.
 
