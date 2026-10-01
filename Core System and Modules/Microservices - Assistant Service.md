@@ -724,9 +724,16 @@ supervisor (T3).
 - **Pain point**: angkanya ada, tetapi tersebar di belasan layar.
 - **Aksi utama**: bertanya, membaca jawabannya, lalu mengklik tautannya untuk memeriksa sendiri di layar aslinya.
 
-## Jadwal Tugas (🟡 diusulkan)
+## Jadwal Tugas (🟡 backend menunggu merge PR https://github.com/bip-itteam-internal/bip-erp/pull/2382)
 
-Keputusan dan alasannya di [[ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai]]. Bagian ini menjelaskan cara kerjanya. Kode belum ada, dan **tidak bisa dikerjakan sebelum Tanya Jawab bisa menjawab**, karena tautan pengingat menunjuk ke sana.
+Keputusan dan alasannya di [[ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai]]. Bagian ini menjelaskan cara kerjanya.
+
+**Backend (menunggu merge PR https://github.com/bip-itteam-internal/bip-erp/pull/2382, issue bip-erp#2356):**
+- Rute (akar modul, gateway memotong `/api/assistant`), semuanya di belakang `common.RequireCopilot`: `GET/POST /jadwal`, `GET/PATCH/DELETE /jadwal/:id`, `GET /jadwal/:id/riwayat`, `POST /jadwal/:id/dibuka {slot}`. Jadwal milik orang lain dibalas **404**, bukan 403; `PATCH` sebagian (field absen = tak berubah).
+- Kode: `services/assistant/jadwal_rute.go`, `pengingat.go`, `internal/jadwal/` (slot berikutnya sebagai fungsi murni zona Asia/Jakarta, gudang Mongo + memori, pemindai). Koleksi `jadwal_tugas` dan `jadwal_pengingat`; indeks unik (`jadwal_id`, `slot`) menjamin paling banyak satu pengingat per slot. Pengiriman **at-most-once**: slot diklaim dulu, lalu dikirim.
+- Kategori inbox **`copilot-jadwal`**. Tautan notifikasi `/copilot?jadwal=<id>&slot=<RFC3339>`; judul = nama jadwal, badan satu kalimat tetap, instruksi tidak ikut terkirim.
+- Env `NOTIFICATION_MODULE_URL` dan `NOTIFICATION_SERVICE_KEY` di blok compose `assistant-service`; bila kosong, pemindai nonaktif dengan log dan rute lain tetap hidup.
+- Layar pengelola dan penerima tautan di erp-frontend: issue erp-frontend#1898.
 
 ```
 buat jadwal (nama + instruksi/template + frekuensi + jam)      @ Copilot > Jadwal Tugas
@@ -744,7 +751,7 @@ riwayat: kapan terkirim, kapan dibuka
 - **Isi tugas**: nama, instruksi atau template Copilot, frekuensi (harian, hari kerja, mingguan+hari, bulanan+tanggal) + jam. Tanpa mode izin, pilihan model, atau project.
 - **Biaya AI nol sampai pemakai membuka tautan**; jadwal yang diabaikan tak memakan token.
 - ⚠️ **Deploy**: kategori inbox baru → `notification-service` naik LEBIH DULU, baru `assistant-service` (lihat [[Microservices - Notification Service]]).
-- **TBD**: nama kategori inbox, batas jumlah tugas per orang dan interval minimum (angka PRD claude.ai tak dipakai), serta apakah pengingat berikutnya ditahan bila yang sebelumnya belum dibuka.
+- **TBD**: batas jumlah tugas per orang dan interval minimum (angka PRD claude.ai tak dipakai), serta apakah pengingat berikutnya ditahan bila yang sebelumnya belum dibuka.
 
 ## Di luar lingkup
 
