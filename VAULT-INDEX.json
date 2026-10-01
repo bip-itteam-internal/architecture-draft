@@ -13134,20 +13134,24 @@
       "tautan": [
         "RUN - Agent Backlog Otonom",
         "ADR - 0143 Backlog Pindah dari Linear ke GitHub Project",
-        "LOG - Agent Backlog Otonom 2026-09"
+        "LOG - Agent Backlog Otonom 2026-09",
+        "ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual",
+        "REF - PRD ERP"
       ],
-      "hash": "8f71c7dce4a35624055437280c5c2e7d52239100b9d2818f99c1312576aa6802",
-      "ukuran_kb": 3.1,
-      "ringkasan": "Menjawab: issue apa saja yang disentuh agent backlog otonom pada Oktober 2026 dan kenapa putaran itu tidak menghasilkan PR (semua kandidat butuh keputusan, punya PIC manusia, atau terblokir). Juga mencatat bagaimana kolam kandidat Low/Medium tanpa assignee sudah habis dan perlakuan terhadap issue Butuh Info dan issue terlambat.",
+      "hash": "63c569de137add2b0ac23c106a7f57dd7b70bf3375d763b7ea79742de5ac8e39",
+      "ukuran_kb": 7.2,
+      "ringkasan": "Menjawab: issue backlog mana yang disentuh agent backlog otonom pada Oktober 2026, kenapa tiap issue diberi label Butuh Info alih-alih dikerjakan, dan keputusan apa yang ditunggu dari manusia. Juga mencatat pelajaran putaran agent, mis. mengapa kolam kandidat Low/Medium habis tanpa PR, deskripsi audit yang menunjuk mesin yang salah (Tax Control vs obligation_templates), dan perlakuan issue yang melewati Estimasi Selesai.",
       "kata_kunci": [
         "agent backlog otonom",
         "autonomous agent",
-        "log Oktober 2026",
         "Butuh Info",
-        "kandidat issue",
-        "PIC",
-        "keterlambatan",
-        "GitHub Project 15"
+        "GitHub Project #15",
+        "backlog",
+        "issue",
+        "estimasi selesai",
+        "log operasional",
+        "keputusan tertunda",
+        "Oktober 2026"
       ]
     },
     {
