@@ -360,6 +360,27 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     Direktur LOLOS, IT LOLOS, Corporate Secretary sesuai keputusan § Prasyarat (lolos ATAU
     ditolak — yang penting ada test yang mengunci hasilnya, jangan dibiarkan tak diuji).
 
+## Catatan 2026-10-01: backlog celah ada di issue privat bip-erp#2422
+
+Celah yang tersisa sesudah pemakaian PROD 2026-09-30..10-01 (keandalan jawaban, celah data, biaya,
+adopsi) dikumpulkan di issue privat repo kode **bip-erp#2422**; rujuk lewat nomor, rinciannya jangan
+disalin ke vault (repo publik). Kemajuan **bagian A** (keandalan) per 2026-10-01, diperiksa ke
+`origin/main` dan branch:
+
+- [x] **Penjaga skala rupiah**: merged (bip-erp #2425), dan label layarnya `angka_tak_cocok` sudah di
+  `main` erp-frontend.
+- [ ] **Penjaga token disingkat + akses tak terbukti** (satu jalur koreksi bersama): **PR terbuka**,
+  branch `feat/copilot-penjaga-jawaban` (bip-erp #2437) (belum di `main`); label layarnya branch lokal
+  `feat/copilot-label-penjaga` di erp-frontend (belum merged).
+- [ ] **Rekap umpan untuk tinjauan IT** (`GET /umpan/rekap`): **PR terbuka**, branch
+  `feat/copilot-rekap-umpan` (bip-erp #2438) (belum di `main`).
+- [ ] **Uji pertanyaan tetap** (`cmd/ujitetap`): **PR terbuka**, bip-erp #2435.
+- Di luar #2422 yang ikut merged hari itu: tool `daftar_karyawan` (#2421), rincian telat per kejadian
+  (#2423), percakapan di URL (erp-frontend #1941).
+- **T8 tetap belum terkonfirmasi**: uji ulang "kontrak segera berakhir × KPI" sesudah #2406 di-deploy
+  belum dilakukan; alat uji pertanyaan tetap di atas dibuat untuk menutup celah itu, tetapi dijalankan
+  manusia sesudah deploy. Detail mekanisme: [[Microservices - Assistant Service]].
+
 ## Jadwal Tugas ([[ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai]])
 
 ⛔ **Semua task di bawah bergantung Tanya Jawab sudah bisa menjawab** (minimal T2, T3, T5, T6).
