@@ -1,5 +1,16 @@
 # ADR - 0146 Live Support Ditugaskan ke Departemen Tambahan, Setoran Diputus Penyetuju Departemen Pemilik Toko
 
+## Deskripsi
+
+*Seorang Live Support boleh ditugaskan resmi ke **departemen tambahan** lewat daftar penugasan milik marketing-analytics, tanpa menyentuh `work_data.department`. Pilihan toko setoran karya = toko TikTok departemen aslinya ditambah departemen penugasannya, dan setiap setoran menyimpan **departemen pemilik toko** yang menentukan penyetujunya. KPI tetap menghitung setoran per orang, tidak berubah. Mengubah [[ADR - 0106 Tema dan Teaser Live Support Disetor dan Diputus Penyetuju Departemen sebagai Dasar KPI]] §8.*
+
+- **Status**: 🟡 Diusulkan (2026-10-01). Belum ada kode.
+- **Path di repo**:
+  - bip-erp `services/marketing-analytics/live_support_penugasan.go` (baru), `live_support_penugasan_store.go` (baru), `karya_live_support.go`, `karya_live_support_handler.go`, `karya_live_support_store.go`, `index.go`, `routes.go`
+  - erp-frontend `src/features/marketing/live-support-karya/` (pemilih toko berkelompok, kolom departemen toko), `src/features/marketing/live-support-penugasan/` (baru, layar penugasan), `src/i18n/locales/id.ts` + `en.ts`
+- **Tanggal**: 2026-10-01
+- **Terkait**: [[ADR - 0106 Tema dan Teaser Live Support Disetor dan Diputus Penyetuju Departemen sebagai Dasar KPI]] · [[ADR - 0110 Kesiapan Live Dinilai Lintas Departemen dan Pendukung Diisi Backend saat Tunggal]] · [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] · [[ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun]] · [[Microservices - Marketing Analytics Service]] · [[REF - Kepemilikan Data]] · [[ANALISA - Live Support Memegang Departemen Tambahan]]
+
 ## Untuk Manajemen
 
 **Apa yang berubah di layar.** HR mencatat bahwa seorang Live Support juga memegang departemen lain (contoh pertama: Live Support Kyura yang juga memegang live Beauty Hacks). Sesudah itu, saat menyetor Tema atau Teaser, pilihan tokonya memuat toko TikTok Kyura **dan** Beauty Hacks, dikelompokkan per departemen dan bisa dicari. Setoran untuk toko Beauty Hacks muncul di antrean Tinjau Setoran **atasan Beauty Hacks**, dan hanya dia yang bisa menyetujui atau menolaknya. Setoran untuk toko Kyura tetap diputus atasan Kyura.
@@ -13,17 +24,6 @@
 - Berlaku untuk posisi Live Support saja, bukan aturan umum rangkap departemen.
 
 **Perkiraan besaran kerja.** Kecil sampai sedang: satu service backend (marketing-analytics) dan satu layar web, tanpa perubahan aplikasi MyBharata. Kira-kira 2 sampai 3 hari kerja termasuk verifikasi.
-
-## Deskripsi
-
-*Seorang Live Support boleh ditugaskan resmi ke **departemen tambahan** lewat daftar penugasan milik marketing-analytics, tanpa menyentuh `work_data.department`. Pilihan toko setoran karya = toko TikTok departemen aslinya ditambah departemen penugasannya, dan setiap setoran menyimpan **departemen pemilik toko** yang menentukan penyetujunya. KPI tetap menghitung setoran per orang, tidak berubah. Mengubah [[ADR - 0106 Tema dan Teaser Live Support Disetor dan Diputus Penyetuju Departemen sebagai Dasar KPI]] §8.*
-
-- **Status**: 🟡 Diusulkan (2026-10-01). Belum ada kode.
-- **Path di repo**:
-  - bip-erp `services/marketing-analytics/live_support_penugasan.go` (baru), `live_support_penugasan_store.go` (baru), `karya_live_support.go`, `karya_live_support_handler.go`, `karya_live_support_store.go`, `index.go`, `routes.go`
-  - erp-frontend `src/features/marketing/live-support-karya/` (pemilih toko berkelompok, kolom departemen toko), `src/features/marketing/live-support-penugasan/` (baru, layar penugasan), `src/i18n/locales/id.ts` + `en.ts`
-- **Tanggal**: 2026-10-01
-- **Terkait**: [[ADR - 0106 Tema dan Teaser Live Support Disetor dan Diputus Penyetuju Departemen sebagai Dasar KPI]] · [[ADR - 0110 Kesiapan Live Dinilai Lintas Departemen dan Pendukung Diisi Backend saat Tunggal]] · [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] · [[ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun]] · [[Microservices - Marketing Analytics Service]] · [[REF - Kepemilikan Data]] · [[ANALISA - Live Support Memegang Departemen Tambahan]]
 
 ## Context
 
