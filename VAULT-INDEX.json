@@ -13138,9 +13138,9 @@
         "ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual",
         "REF - PRD ERP"
       ],
-      "hash": "63c569de137add2b0ac23c106a7f57dd7b70bf3375d763b7ea79742de5ac8e39",
-      "ukuran_kb": 7.2,
-      "ringkasan": "Menjawab: issue backlog mana yang disentuh agent backlog otonom pada Oktober 2026, kenapa tiap issue diberi label Butuh Info alih-alih dikerjakan, dan keputusan apa yang ditunggu dari manusia. Juga mencatat pelajaran putaran agent, mis. mengapa kolam kandidat Low/Medium habis tanpa PR, deskripsi audit yang menunjuk mesin yang salah (Tax Control vs obligation_templates), dan perlakuan issue yang melewati Estimasi Selesai.",
+      "hash": "2daaa63703568b51c2aa2c9935e81728c5457f332c0a81824720bf76a5bc7432",
+      "ukuran_kb": 8.1,
+      "ringkasan": "Menjawab: issue backlog mana saja yang disentuh agent backlog otonom pada Oktober 2026, kenapa banyak di antaranya diberi label Butuh Info alih-alih dikerjakan, dan keputusan apa yang ditunggu dari manusia per issue. Juga mencatat pelajaran putaran agent, mis. kenapa kolam kandidat Low/Medium habis, deskripsi audit yang menunjuk mesin yang salah, dan issue induk yang basi dalam sehari.",
       "kata_kunci": [
         "agent backlog otonom",
         "autonomous agent",
@@ -13148,10 +13148,10 @@
         "GitHub Project #15",
         "backlog",
         "issue",
+        "log Oktober 2026",
+        "pelajaran",
         "estimasi selesai",
-        "log operasional",
-        "keputusan tertunda",
-        "Oktober 2026"
+        "keterlambatan"
       ]
     },
     {
