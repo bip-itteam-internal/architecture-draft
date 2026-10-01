@@ -42,18 +42,24 @@
   (asisten dilarang berhitung, tool memanggil lewat gateway dengan JWT pemakai, jawaban adalah
   pintu), empat penjaga anti angka karangan, dan § Temuan gateway soal batas 30 detik — semuanya
   jadi dasar ADR-0132.
-  **Sinkron 2026-10-01 (PR merged 2026-09-30..10-01)**: 42 tool ditawarkan (tiga HRIS, dua belas
+  **Sinkron 2026-10-01 (PR merged 2026-09-30..10-01)**: ~~42 tool~~ (angka saat itu; kini 51, lihat Sinkron berikutnya) ditawarkan (tiga HRIS, dua belas
   marketing, **27 HRGA** dalam dua tahap), penggabungan per orang lintas tool, umpan balik jempol,
   sapaan dari server, pencocokan divisi marketing, jawaban di latar (202). Detail di § Tool HRGA
   sampai § Realisasi pengukuran T8. ⚠️ Belum diuji ulang di prod sesudah perbaikan penggabungan
   (#2406).
   **Sinkron 2026-10-01 (lanjutan, diperiksa ke `origin/main`)**: **43 tool** ditawarkan (+ `daftar_karyawan`,
   bip-erp #2421), `rekap_telat_tim` bisa merinci per kejadian (#2423), dan **penjaga skala rupiah**
-  merged (#2425). Yang **PR terbuka, belum di `main`** (dibaca dari branch, bukan dari `main`):
-  penjaga jawaban umum `feat/copilot-penjaga-jawaban` (bip-erp #2437), rekap umpan `feat/copilot-rekap-umpan` (bip-erp #2438),
-  uji pertanyaan tetap `feat/copilot-uji-tetap` (bip-erp #2435). Lihat § Penjaga jawaban,
+  merged (#2425). ~~Yang PR terbuka, belum di `main`: #2437, #2438, #2435.~~ **Ketiganya sudah merged
+  ke `main` 2026-10-01** (merge commit `310132bb`, `74ef4bf5`, `76bc54ca`; berkas `penjaga.go`,
+  `umpan_rekap_rute.go`, `cmd/ujitetap/` ada di `origin/main`). Lihat § Penjaga jawaban,
   § Rekap umpan untuk tinjauan IT, § Uji pertanyaan tetap. Daftar celah yang tersisa
   (keandalan, data, biaya, adopsi) dicatat di issue privat repo kode bip-erp#2422.
+  **Sinkron 2026-10-01 (sesudah #2447, #2448, #2464, diukur ke `origin/main`)**: **51 tool** ditawarkan
+  (tiga HRIS, dua belas marketing, **36 HRGA**; 36 = 6 + 5 + 2 + 6 + 5 + 3 + 3 + 6 dari `alatHrga()` di
+  `main.go`, dikunci `TestDaftarAlat_NamaUnikDanHrgaLengkap`). Baru: saringan gabung lintas alat
+  (§ Penggabungan data per orang), rincian per kejadian (§ Rincian per kejadian), delapan tool baru
+  (§ Tool HRGA gelombang 2026-10-01), dan daftar sumber yang **sengaja dilewati**
+  (§ Sumber yang sengaja dilewati). ⚠️ Belum ada pengukuran PROD atas gelombang ini.
 - **Stack**: Go, `net/http` langsung (klien tipis hand-roll, BUKAN SDK Anthropic — divalidasi
   2026-09-28, lihat
   [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]]
@@ -136,11 +142,12 @@ flowchart LR
 ## Permukaan tool
 
 Satu tool per endpoint baca, sekitar delapan sampai dua belas untuk irisan pertama. Kandidatnya dari rute yang sudah ada di `services/marketing-analytics/handler_mart.go` dan tetangganya: `/beranda`, `/summary`, `/profit/shops`, `/profit/products`, `/profit/skus`, `/profit/campaigns`, `/profit/ads`, `/videos`, `/lives`, `/returns/breakdown`. ~~Daftar finalnya **TBD**.~~
-~~Per 2026-09-30 ada **lima belas** tool di kode.~~ ~~Per 2026-10-01 ada **42 tool**.~~ Per 2026-10-01
-(sesudah #2421) ada **43 tool yang ditawarkan ke model**: tiga HRIS (`rekap_telat_tim`,
-`antrean_persetujuan`, `cuti_tim`), dua belas marketing (§ Tool marketing), dan 28 HRGA (§ Tool
-HRGA; tahap 1 = 14 sejak `daftar_karyawan`, tahap 2 = 14; kepegawaian kini empat tool,
-`alat_hrga_kepegawaian.go`). Satu tool lagi,
+~~Per 2026-09-30 ada **lima belas** tool di kode.~~ ~~Per 2026-10-01 ada **42 tool**.~~ ~~Per 2026-10-01 (sesudah #2421) ada 43 tool.~~ Per 2026-10-01
+(sesudah #2464) ada **51 tool yang ditawarkan ke model**: tiga HRIS (`rekap_telat_tim`,
+`antrean_persetujuan`, `cuti_tim`), dua belas marketing (§ Tool marketing), dan **36 HRGA** (§ Tool
+HRGA, termasuk delapan tool gelombang 2026-10-01; dihitung dari daftar per area `alat_hrga_*.go`:
+kepegawaian 6, presensi 5, payroll 2, rekrutmen & GA 6, KPI 5, jadwal 3, pelatihan & dokumen 3,
+hubungan industrial 6). Satu tool lagi,
 `insentif_snapshot`, **sudah ditulis tetapi sengaja tidak ditawarkan** (alasannya di § Tool HRGA).
 Satu daftar (`daftarAlat()` di `tanya.go`) dipakai untuk menawarkan tool ke model sekaligus untuk
 dispatch, dan `TestDaftarAlat_NamaUnikDanHrgaLengkap` (`hrga_test.go`) mengunci nama yang tak boleh
@@ -320,7 +327,7 @@ nama departemen**:
   sering telat" juga mendapat tabel 56 baris, karena model memilih sebelum melihat data; perketat
   deskripsi argumen bila terasa berlebihan.
 
-### Tool HRGA: 28 tool atas endpoint yang sudah ada (bip-erp #2387 tahap 1, #2392 tahap 2, 2026-09-30; #2421 `daftar_karyawan`, 2026-10-01)
+### Tool HRGA: 36 tool atas endpoint yang sudah ada (bip-erp #2387 tahap 1, #2392 tahap 2, 2026-09-30; #2421 `daftar_karyawan`, #2464 delapan tool, 2026-10-01)
 
 Keputusan user 2026-09-30: pemakai HRGA = **supervisor HRGA + Direksi**, cakupan **kelima area tahap 1
 dan area tahap 2 sekaligus**. Semua tool membaca endpoint GET yang **sudah ada** di service pemiliknya
@@ -398,6 +405,62 @@ bukan identitas sehingga ikut ke model; nama tetap token. ⚠️ **Urutan deploy
 assistant-service.** Attendance lama tak membaca `rincian` (simpulan dari kode; belum diuji pada
 biner lama), sehingga tool mengira rincian terkirim padahal `kejadian` kosong, tanpa galat.
 
+### Tool HRGA gelombang 2026-10-01 (bip-erp #2464, merged; berisi #2453/#2456/#2459/#2461)
+
+Delapan tool baru, semuanya membaca endpoint yang sudah ada lewat `KlienHrga` dengan JWT penanya
+(gerbang tetap milik service sumber, tool tak punya gerbang sendiri), dekode berdaftar-putih seperti
+tool lain. Tabel di atas belum memuat baris-barisnya; daftar lengkapnya dikunci
+`TestDaftarAlat_NamaUnikDanHrgaLengkap` (`hrga_test.go`).
+
+| Tool | Endpoint yang dibaca | Yang dijawab, dan batasnya |
+|---|---|---|
+| `rekap_telat_perusahaan` | `attendance /internal/late-recap` + daftar karyawan `employee /v2/internal/aggregate/employees` (`rekap_telat_perusahaan.go:19`, `:171`) | Jumlah telat per karyawan **seluruh perusahaan** untuk satu periode payroll. Sumber hanya membalas `{employee_id, late_count}` (tanpa nama/departemen), nama + departemen digabung dari daftar karyawan; gerbang sumber `common.RequireHRISStaff`. `periode` **wajib** (sumber 400 bila kosong). Tanpa rincian tanggal (beda dengan `rekap_telat_tim`, yang mengikuti hak supervisor). Aturan telat tetap milik attendance (periode 26-25, `late_hour > 0`): tool tak menghitung ulang |
+| `pengangkatan_karyawan` | `employee /pengangkatan/menunggu` (`pengangkatan_karyawan.go:13`) | Magang yang menunggu diangkat jadi tetap: siap diangkat, proses berjalan, atau proses gagal dan perlu diulang. Kode status sumber di luar tiga yang dikenal diteruskan apa adanya, tak dibuang |
+| `akun_nonaktif_tanpa_catatan` | `employee /resign/non-aktif-tanpa-catatan` (`akun_nonaktif_tanpa_catatan.go:15`) | Backlog kebersihan data HR: akun non-aktif yang belum punya catatan resign. Jabatan tak dideklarasikan di struct dekode |
+| `kpi_otomasi_karyawan` | `employee /kpi/auto-scores` (`kpi_otomasi_karyawan.go:17`) | Skor KPI yang **dihitung sistem** per orang untuk satu periode (usulan otomatis, belum tentu final). Departemen diteruskan **apa adanya**: label grup (HRGA) diterjemahkan sumber lewat `cakupanDepartemenKPI` |
+| `kpi_rincian_karyawan` | `employee /kpi/score` (`kpi_rincian_karyawan.go:16`) | Rincian skor KPI **tersimpan** satu orang per periode (per metrik: bobot, nilai, jenis sumber, target dan realisasi beku, rincian). Sumber melayani satu orang per permintaan; tool menurunkan `employee_id` dari token percakapan. Tiga jenis baris rincian (komponen, hasil berawalan `=`, pengecualian berfrasa "tak ikut dihitung") dipisah **dari teks label sumber** (`jenisRincianKPI`), jadi penandanya heuristik, bukan kontrak: label Go yang diubah mengembalikan barisnya jadi komponen tanpa galat |
+| `kpi_penetapan_template` | `employee /kpi/template-assignment` (`kpi_penetapan_template.go:17`) | Siapa yang templatenya sudah **ditetapkan manusia**, hanya ditebak dari riwayat penilaian, atau belum bisa ditentukan; hanya orang di posisi yang punya lebih dari satu template. Nama template dan kandidat tak dibaca (hanya jumlah kandidat) |
+| `mpp_cakupan` | `recruitment /manpower-plans/coverage`, `/manpower-plans`, `/mpp/vacancies` (`mpp_cakupan.go:41-43`) | Rencana kebutuhan orang (MPP), tiga `bagian` per panggilan: `cakupan` (rencana per posisi vs kandidat berstatus **Buffer**), `rencana` (diagregasi per departemen), `posisi_kosong` (posisi yang ditinggalkan karyawan resign, tanpa nama). `posisi_kosong` digerbang lebih sempit (`PermRecruitmentWork`) daripada dua bagian lain |
+| `onboarding_karyawan` | `recruitment /onboarding-instances` + `/onboarding-reviews` (`onboarding_karyawan.go:35`) | Karyawan baru yang sedang onboarding atau masa evaluasi, per orang (token samaran, bukan kandidat luar). Digabung per `employee_id`: yang masih berjalan menang, selain itu yang terbaru. Penilai hanya dihitung; jawaban/rating/esai penilai tak dibaca |
+
+⛔ **`mpp_cakupan`: MPP tidak menyimpan "terisi".** Sumber hanya memuat `jumlah_rencana`; pembanding di layar
+adalah buffer kandidat. Tool tidak menghitung dan tidak boleh menyebut "terisi", dan `kekurangan_buffer` =
+rencana dikurangi buffer, **bukan** kekurangan karyawan; MPP kosong berarti belum disusun, bukan 0% (komentar
+`mpp_cakupan.go` kepala berkas dan deskripsi tool). Baris MPP hasil resign membawa identitas karyawan yang
+pergi: struct dekode tidak membacanya, hanya dihitung berapa yang berstatus pengganti. Pembanding yang
+sah untuk "sudah terisi" adalah **kandidat Buffer**, bukan jumlah karyawan: keputusan apakah pembanding
+karyawan perlu dibangun masih **TBD**.
+
+`kpi_skor_karyawan` kini juga membawa **kelengkapan bukti**: `bukti_metrik_ada` dari `bukti_metrik_total` per
+orang (hanya jumlah metrik berlampiran, isi berkas tak dibaca) dan `cakupan_bukti_persen` per departemen
+(`kpi_skor_karyawan.go:142`, `:294-295`, `:329`). Kunci absen = tidak diketahui (belum dinilai atau gagal
+dihitung), **bukan nol bukti**. Samaran: `samaran.Peta.NamaDariID`
+(`samaran.go:109`) mengembalikan nama yang sudah dikenal peta untuk sebuah `employee_id`, dipakai tool yang
+sumbernya tanpa nama (rekap telat perusahaan, KPI otomasi) agar nama kosong dilengkapi dan
+`Samarkan` (`samaran.go:63`) tetap menjadi satu-satunya pintu keluar ke model.
+
+### Sumber yang sengaja dilewati (jangan dicoba ulang tanpa membaca alasannya)
+
+Diperiksa saat menyusun gelombang 2026-10-01. Alasan di kolom kanan berasal dari pembacaan kode oleh
+pengerjanya; yang bertanda **dugaan** belum diukur ke data.
+
+| Sumber | Alasan dilewati |
+|---|---|
+| Koreksi absen dan dinas luar | Rutenya antrean peninjau; sudah dicakup `pengajuan_karyawan` dan `antrean_persetujuan` |
+| `payroll-supplement` | Gerbang sumbernya terlalu longgar untuk data gaji; rincian celah ada di issue privat bip-erp#2389, **bukan di vault** (repo publik) |
+| `resign/summary` | Sama dengan yang sudah dibaca `turnover_karyawan` lewat `/resign/summary/riwayat` |
+| `aggregate employees/summary` | Galat hitung jadi 0 diam-diam; `in_probation` **diduga** selalu 0 (dugaan dari kode, belum diukur) |
+| `supervisor-assignment` | Gerbang IT + HR dan datanya per orang |
+| `kpi/auto-overview` | Label grup HRGA tak diterjemahkan di sumber ini (beda dengan `kpi/auto-scores`) |
+| `kpi/dashboard` | Ambang tertanam di sumber; menyalinnya melanggar satu fakta satu tempat |
+| `kpi/evidence` | Teks bebas, berisiko memuat identitas |
+| psikotes status | Per kandidat/orang, tak ada alasan memasukkannya ke model |
+
+**Butir terbuka dari gelombang ini**: (1) **daftar karyawan MASUK per bulan belum bisa dijawab**, karena
+tak ada sumber bergerbang HR yang memuat `join_date` (hasil pencarian pengerjanya; belum diulang
+`git grep` oleh dokumen ini); butuh endpoint daftar karyawan masuk bergerbang HR. (2) **Apakah baris
+rincian KPI dikirim ke model atau hanya jumlahnya** belum diputuskan.
+
 **Aturan privasi yang ditegakkan di tool, bukan diserahkan ke model** (melanjutkan § Samaran identitas):
 
 - **Jabatan tak pernah dikirim ke model**, termasuk dari tool yang sumbernya memuatnya
@@ -460,14 +523,46 @@ Mekanismenya, dua sisi:
    yang orangnya tak muncul di sumber dilaporkan eksplisit di `karyawan_tidak_ada_di_sumber`. Token
    yang bukan milik percakapan ditolak (`argumen_tidak_sah`): model tak boleh mengarang orang.
 
+**Diperluas ke semua alat daftar-per-orang (bip-erp #2447, merged 2026-10-01).** Semula empat tool
+(di atas; `kpi_skor_karyawan` dan `rekap_kehadiran` sudah lengkap sebelumnya). Commit `0f2255e5` menyentuh
+sebelas tool, yang kini semuanya menerima `karyawan` dan, bila daftarnya dipotong, mengirim
+`karyawan_semua`: `cuti_tim`, `daftar_karyawan`, `mutasi_karyawan`, `jadwal_roster`, `jadwal_shift_harian`,
+`kontrak_karyawan`, `rincian_payroll`, `pengajuan_karyawan`, `sisa_cuti`, `surat_peringatan`,
+`turnover_karyawan` (daftar dari berkas yang diubah commit `0f2255e5`; `gabung_semua_alat_test.go` menguji
+tiap alat dengan empat pertanyaan yang sama). Tool gelombang 2026-10-01 yang berdaftar orang
+(`kpi_otomasi_karyawan`, `kpi_rincian_karyawan`, `kpi_penetapan_template`, `onboarding_karyawan`,
+`pengangkatan_karyawan`, `akun_nonaktif_tanpa_catatan`) memakai mekanisme yang sama (`bacaSaringanKaryawan`).
+Sumber yang **terbaca tidak lengkap** (dipotong halaman, gagal sebagian) tidak boleh menghasilkan
+`karyawan_tidak_ada_di_sumber`: token yang tak ditemukan dilaporkan sebagai **`karyawan_tak_terbaca`**
+(`gabung_karyawan.go:123-140`), dengan catatan bahwa itu belum tentu tak punya data. Alat yang sumbernya
+selalu terbaca lengkap (roster, payroll, cuti tim) tak punya jalur ini
+(komentar `gabung_semua_alat_test.go`).
+
 Prompt aturan 12 (`tanya.go`) mewajibkan urutannya (panggil tool pertama, lalu tool kedua dengan
 `karyawan` berisi token) dan melarang menyimpulkan "tidak ada", "belum dinilai", atau nol dari
 ketiadaan di daftar yang dipotong; "tidak ada" hanya boleh bila tool menyebutnya di
-`karyawan_tidak_ada_di_sumber`. Aturan prompt 3 melarang menyingkat token ("Karyawan-27, 28" muncul di
+`karyawan_tidak_ada_di_sumber`, dan token di `karyawan_tak_terbaca` bukan bukti tidak ada: model harus
+berkata datanya belum terbaca seluruhnya (`tanya.go:153`). Aturan prompt 3 melarang menyingkat token ("Karyawan-27, 28" muncul di
 layar sebagai "28, 29" tanpa nama di PROD 2026-09-30). **Pelajaran: join tak boleh dikerjakan di atas
 daftar yang terpotong; "tidak ada" hanya datang dari sumber.**
 
-### Penjaga jawaban sisi server (bip-erp #2425 merged; generalisasinya PR terbuka)
+### Rincian per kejadian di tiga tool (bip-erp #2448, merged 2026-10-01)
+
+Selain `rekap_telat_tim` (§ di atas), tiga tool menerima `rincian` dan mengirim baris per kejadian. Batasnya
+ditegakkan di tool: orang yang boleh membawa rincian ke model dibatasi, di atasnya
+`rekap_kehadiran` dan `catatan_kepatuhan` membalas `rincian_tidak_dikirim` berisi petunjuk menyempitkan
+`karyawan`, bukan memotong diam-diam (`pemakaian_ruang` memotong ke 100 booking dan menghitung sisanya).
+
+| Tool | Isi rincian | Batas |
+|---|---|---|
+| `rekap_kehadiran` | harian per orang (tanggal, jam; bukan identitas) | **20 orang** ke model (`batasOrangRincianKehadiran`, `rekap_kehadiran.go:83`); baris tabel layar dibatasi `batasBarisRincianKehadiran`, sisanya di `total` |
+| `catatan_kepatuhan` | rincian catatan per orang, **tanpa narasi** (`reason`), balasan, dan berkas (`hi_kepatuhan_rincian.go:87`) | 20 orang (`batasOrangRincianKepatuhan`), 100 catatan, 100 baris tabel |
+| `pemakaian_ruang` | booking per ruang; **pemohon hanya ke tabel penanya**, tidak ke model | 100 booking ke model (`batasBookingRincianRuang`, `pemakaian_ruang.go:83`), jendela 31 hari |
+
+⚠️ **Daftar karyawan MASUK per bulan belum bisa dijawab**: pengerjanya tak menemukan sumber bergerbang HR yang
+memuat `join_date` (§ Sumber yang sengaja dilewati, butir terbuka).
+
+### Penjaga jawaban sisi server (bip-erp #2425 dan #2437, keduanya merged)
 
 Aturan prompt saja tidak cukup menahan model, dan tiga kegagalan PROD 2026-09-30..10-01 membuktikannya.
 Penjaga memeriksa **jawaban yang sudah ditulis** terhadap apa yang benar-benar terjadi pada giliran itu
@@ -479,7 +574,8 @@ Penjaga memeriksa **jawaban yang sudah ditulis** terhadap apa yang benar-benar t
 | "Karyawan-27, 28" muncul di layar sebagai "28, 29" tanpa nama | **Token disingkat**: `Karyawan-N` yang disambung angka tanpa awalan | `token_disingkat` |
 | "Kontrak segera berakhir" dijawab "tidak berhak" tanpa memanggil tool (§ Deskripsi tool dilarang memuat aturan hak akses) | **Akses tak terbukti**: jawaban menyatakan penanya tak punya akses padahal tak ada tool yang membalas `tidak_berhak` | `akses_tak_terbukti` |
 
-**Di `main` (bip-erp #2425)** hanya baris pertama: `penjaga_rupiah.go` + `jawab.go`. Pencocokan rupiah
+~~**Di `main` (bip-erp #2425)** hanya baris pertama.~~ Baris pertama masuk lewat #2425 (`penjaga_rupiah.go` +
+`jawab.go`), dua lainnya lewat #2437. Pencocokan rupiah
 (`rupiahTakCocok`): satuan `ribu/rb/juta/jt/miliar/milyar/triliun`, format Indonesia (koma desimal, titik
 ribuan); cocok bila selisih dalam **toleransi pembulatan** yang ditulis (setengah digit terakhir kali
 satuan) atau dalam **1%** angka sumber; angka di bawah 1.000 dilewati; **tanpa angka sumber (jawaban
@@ -495,26 +591,27 @@ daftar potongan yang melanggar; **kalimat penjelasnya milik label layar**
 (`copilot.penanda.<kode>`, [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]), bukan teks backend.
 Satu fakta satu tempat: label `angka_tak_cocok` hidup di `i18n/locales`, bukan di sini.
 
-**PR terbuka, belum di `main`** (branch `feat/copilot-penjaga-jawaban` (bip-erp #2437) di bip-erp, satu commit di atas
-main; diperiksa 2026-10-01): `penjaga.go` mengangkat penjaga jadi **daftar** (`daftarPenjaga`) dengan
+**Generalisasinya merged (bip-erp #2437, merge commit `310132bb`, 2026-10-01; ~~PR terbuka~~)**:
+`penjaga.go` mengangkat penjaga jadi **daftar** (`daftarPenjaga`, `penjaga.go:39`) dengan
 satu jalur dan **satu jatah koreksi bersama**: semua penjaga yang gagal digabung jadi **satu** pesan
 koreksi, model menulis ulang sekali, sisanya jadi penanda. Penjaga akses satu-satunya yang
 mengizinkan model memanggil tool lagi dalam koreksinya (`bolehAlat`); dua lainnya menyuruh memakai hasil
 tool yang ada. Pola akses: "tidak berhak", "tidak memiliki akses", "tidak punya akses", "tidak
 diizinkan". Daftar status tool dikumpulkan per giliran dari kunci `status` tingkat atas hasil tool.
-Pelabelan layar kedua penanda baru ada di erp-frontend branch lokal `feat/copilot-label-penjaga`
-(belum di-push, **belum merged**). Penjaga baru cukup ditambahkan ke `daftarPenjaga`.
+Label layar kedua penanda baru sudah ada di `main` erp-frontend (`copilot.penanda.token_disingkat` dan
+`akses_tak_terbukti`, `src/i18n/locales/id.ts:15228-15229`, diperiksa 2026-10-01; ~~branch lokal belum
+merged~~). Penjaga baru cukup ditambahkan ke `daftarPenjaga`.
 
 ⛔ **Batas yang diketahui**: penjaga **mengurangi** kegagalan ini, tidak menghapusnya. Ia tidak
 memeriksa angka non-rupiah (persen, jumlah), tidak memeriksa kebenaran nama, dan bergantung pada pola
 teks (kalimat penolakan yang diparafrasa di luar pola lolos). **TBD**: apakah pola akses perlu diperluas
 belum diukur terhadap jawaban PROD.
 
-### Rekap umpan untuk tinjauan IT (PR terbuka `feat/copilot-rekap-umpan` (bip-erp #2438), belum di `main`)
+### Rekap umpan untuk tinjauan IT (bip-erp #2438, merged 2026-10-01, merge commit `74ef4bf5`)
 
 Tujuan (issue privat bip-erp#2422): umpan jempol turun yang terkonfirmasi jadi perbaikan + test, jadi
-tim IT perlu membacanya. Pembaca umpan yang tadinya **TBD** (§ Umpan balik jempol) ditulis di branch ini
-(`umpan_rekap_rute.go`, `internal/riwayat`, `internal/umpan`; diperiksa 2026-10-01):
+tim IT perlu membacanya. Pembaca umpan yang tadinya **TBD** (§ Umpan balik jempol) kini ada di `main`
+(`umpan_rekap_rute.go:93`, `internal/riwayat`, `internal/umpan`; diperiksa ke `origin/main` 2026-10-01):
 
 - `GET /umpan/rekap?dari&sampai&nilai` di belakang **`common.RequireITSupervisor`** (IT
   supervisor/admin, `shared-library/common/roles.go:62`), dipasang di **pendaftaran rute**, **bukan**
@@ -535,7 +632,7 @@ tim IT perlu membacanya. Pembaca umpan yang tadinya **TBD** (§ Umpan balik jemp
 - Baris umpan yang percakapan atau gilirannya tak ditemukan (mis. percakapan dihapus) tetap dikirim
   dengan `percakapan_hilang:true`.
 
-### Uji pertanyaan tetap (PR terbuka bip-erp #2435, belum di `main`)
+### Uji pertanyaan tetap (bip-erp #2435, merged 2026-10-01, merge commit `76bc54ca`)
 
 `cmd/ujitetap` + `uji/pertanyaan-tetap.json` (19 kasus; 2 percakapan lanjutan) menjalankan pertanyaan
 tetap terhadap Copilot yang **sudah ter-deploy** dan mencetak tabel PASS/FAIL, supaya regresi pasca-deploy
@@ -587,8 +684,8 @@ JWT penanya berikutnya (ditemukan di bip-erp #2382).
 - Setiap giliran tersimpan kini punya `id` (dipakai menempelkan umpan), dan balasan jalur langsung
   maupun 202 membawa `giliran_id`. Log umpan **tidak memuat teks catatan** (bisa memuat nama).
 - Frontend: `features/copilot/components/tombol-umpan.tsx`, `hooks/use-umpan-copilot.ts`.
-- Di `main` belum ada pembaca: tak ada rute atau laporan yang mengagregasi umpan. Pembacanya (rekap
-  untuk tinjauan IT) ada di PR terbuka, lihat § Rekap umpan untuk tinjauan IT.
+- ~~Di `main` belum ada pembaca.~~ Pembacanya (`GET /umpan/rekap`, rekap untuk tinjauan IT) sudah di
+  `main` sejak #2438, lihat § Rekap umpan untuk tinjauan IT.
 
 ### Sapaan dan bentuk laporan (bip-erp #2385)
 
@@ -621,9 +718,12 @@ JWT penanya berikutnya (ditemukan di bip-erp #2382).
   tak kembali ke URL yang pasti 404. `page.tsx` membungkus panel dengan `Suspense` karena
   `useSearchParams` tanpa itu gagal di `pnpm build`, bukan di test. Key `percakapan` milik panel ini
   saja di rute `/copilot`.
-- Label layar dua penanda penjaga baru (`token_disingkat`, `akses_tak_terbukti`) ada di branch lokal
-  `feat/copilot-label-penjaga` (id + en), **belum merged** per 2026-10-01; label `angka_tak_cocok`
-  sudah di `main`.
+- Label layar tiga penanda penjaga (`angka_tak_cocok`, `token_disingkat`, `akses_tak_terbukti`) sudah di
+  `main` erp-frontend (`src/i18n/locales/id.ts:15228-15229`, diperiksa 2026-10-01; ~~dua yang terakhir di
+  branch lokal belum merged~~).
+- Label layar delapan tool gelombang 2026-10-01 dan tabel rincian kejadian: erp-frontend #1966
+  (`feat/copilot-label-rincian-kejadian`) dan #1976 (`integrasi/copilot-label-area-hrga`), merged
+  2026-10-01 (merge commit `33021df31`, `0047fce03`). ⚠️ Isi persisnya tak dibaca dokumen ini (**TBD**).
 
 ### Realisasi pengukuran T8 (PROD 2026-09-30, dari log `[Copilot] giliran`)
 
@@ -763,9 +863,9 @@ riwayat: kapan terkirim, kapan dibuka
 ## Belum Diputuskan (TBD)
 
 - ~~**Cara mengantar jawaban.** Empat pilihan di § Temuan gateway, belum dipilih.~~ **Diputuskan user 2026-09-29: sekaligus, tanpa stream**, lewat gateway biasa dengan tenggat 25 detik (cukup untuk satu-dua tool). Stream ditunda sampai pertanyaan lintas modul (T8) membuktikan 25 detik tak cukup.
-- **Daftar tool final** beserta bentuk argumen dan bentuk hasilnya. Daftar per 2026-10-01 ada di
-  § Permukaan tool; `insentif_snapshot` menunggu menu insentif dikunci di prod.
-- **Batas pemakaian per orang per hari** belum ada; **agregasi umpan jempol** belum ada pembacanya di `main` (rekap tinjauan IT ada di PR terbuka, § Rekap umpan untuk tinjauan IT).
+- **Daftar tool final** beserta bentuk argumen dan bentuk hasilnya. Daftar per 2026-10-01 (51 tool) ada di
+  § Permukaan tool; sumber yang sengaja dilewati di § Sumber yang sengaja dilewati; `insentif_snapshot` menunggu menu insentif dikunci di prod.
+- **Batas pemakaian per orang per hari** belum ada; ~~**agregasi umpan jempol** belum ada pembacanya di `main`~~ (pembacanya sudah merged lewat #2438, § Rekap umpan untuk tinjauan IT).
 - ~~**Kunci RBAC** yang menentukan siapa boleh membuka asistennya.~~ **Ditegaskan 2026-09-28** oleh [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §3: Supervisor departemen mana pun ATAU Direktur ATAU IT. ~~Yang masih TBD: apakah Corporate Secretary ikut termasuk.~~ Corporate Secretary **ikut** (ditegaskan 2026-09-29).
 - ~~**Penyimpanan riwayat percakapan**: koleksi, masa simpan, dan apakah isinya boleh dibaca siapa pun selain penanyanya.~~ **Diputuskan user 2026-09-29**: koleksi `percakapan` di `assistant-mongo-db`, disimpan selamanya, hanya pemiliknya. Lihat § Riwayat percakapan.
 - **Model dan ongkos.** Probe 2026-09-28 memakai `cc/claude-sonnet-4-6` (bukan opus) — terbukti mendukung tool-calling, 2.332 prompt token untuk satu tool sederhana. Token per giliran kini tercatat di log (PROD 2026-09-30: 8.977 masuk untuk dua tool, sekitar 110 ribu masuk untuk laporan enam tool; § Realisasi pengukuran T8), tetapi **biaya rupiah per pertanyaan masih belum dihitung** (task T12 di papan kerja `ANALISA - Asisten AI Lintas Modul`, dokumen `Workspace/` yang tak boleh ditaut dari dok terbit). Batas pemakaian per orang per hari juga belum ada.

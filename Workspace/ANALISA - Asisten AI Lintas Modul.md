@@ -369,12 +369,16 @@ disalin ke vault (repo publik). Kemajuan **bagian A** (keandalan) per 2026-10-01
 
 - [x] **Penjaga skala rupiah**: merged (bip-erp #2425), dan label layarnya `angka_tak_cocok` sudah di
   `main` erp-frontend.
-- [ ] **Penjaga token disingkat + akses tak terbukti** (satu jalur koreksi bersama): **PR terbuka**,
-  branch `feat/copilot-penjaga-jawaban` (bip-erp #2437) (belum di `main`); label layarnya branch lokal
-  `feat/copilot-label-penjaga` di erp-frontend (belum merged).
-- [ ] **Rekap umpan untuk tinjauan IT** (`GET /umpan/rekap`): **PR terbuka**, branch
-  `feat/copilot-rekap-umpan` (bip-erp #2438) (belum di `main`).
-- [ ] **Uji pertanyaan tetap** (`cmd/ujitetap`): **PR terbuka**, bip-erp #2435.
+- [x] **Penjaga token disingkat + akses tak terbukti** (satu jalur koreksi bersama): **merged**, bip-erp
+  #2437 (merge commit `310132bb`, 2026-10-01); label layarnya sudah di `main` erp-frontend
+  (`src/i18n/locales/id.ts:15228-15229`, diperiksa 2026-10-01).
+- [x] **Rekap umpan untuk tinjauan IT** (`GET /umpan/rekap`): **merged**, bip-erp #2438 (`74ef4bf5`).
+- [x] **Uji pertanyaan tetap** (`cmd/ujitetap`): **merged**, bip-erp #2435 (`76bc54ca`); dijalankan manusia.
+- [x] **Saringan gabung lintas alat** (#2447), **rincian per kejadian** (#2448), dan **delapan tool HRGA baru**
+  (#2464): merged 2026-10-01, total 51 tool; label layar erp-frontend #1966 dan #1976. Mekanisme dan sumber
+  yang sengaja dilewati: [[Microservices - Assistant Service]].
+- [ ] **Butir terbuka**: endpoint daftar karyawan masuk (butuh `join_date`) bergerbang HR; keputusan apakah baris
+  rincian KPI dikirim ke model atau hanya jumlahnya.
 - Di luar #2422 yang ikut merged hari itu: tool `daftar_karyawan` (#2421), rincian telat per kejadian
   (#2423), percakapan di URL (erp-frontend #1941).
 - **T8 tetap belum terkonfirmasi**: uji ulang "kontrak segera berakhir × KPI" sesudah #2406 di-deploy

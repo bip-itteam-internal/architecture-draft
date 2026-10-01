@@ -265,6 +265,10 @@ satu angka kini terukur:
   orang), tool penerima menyaring data lengkap lewat argumen `karyawan` dan melaporkan
   `karyawan_tidak_ada_di_sumber` (bip-erp #2406). ⚠️ Uji ulang pertanyaan yang sama sesudah deploy
   #2406 **belum dikonfirmasi** per 2026-10-01.
+- **Perluasan 2026-10-01 (bip-erp #2447, #2464)**: saringan `karyawan` + `karyawan_semua` kini berlaku di
+  sebelas tool tambahan, dan sumber yang terbaca tak lengkap dilaporkan `karyawan_tak_terbaca`, bukan
+  "tidak ada". Cakupan modul percontohan melebar jadi 51 tool (HRIS, marketing, HRGA); daftar, alasan sumber
+  yang sengaja dilewati, dan batasnya di [[Microservices - Assistant Service]].
 
 ### §7 Keluaran terstruktur: teks, tabel, atau chart — pakai komponen yang sudah ada
 
