@@ -283,6 +283,16 @@ Terukur 2026-09-17 untuk Kyura periode 2026-09: `toko_diminta` **17**, `sesi_dep
 
 **Notifikasi keputusan** dikirim best-effort di goroutine ke penyetor, kategori `live-support-karya-decided`, judul menyebut jenis dan keputusan, isi memuat alasan penolakan. Tujuannya dikirim sebagai **`AppRoute` `/marketing/live-support/karya`, bukan `ExternalURL`**: notification-service menurunkan `action.web_route` (tombol lonceng web dan tautan web push) dari `AppRoute` lewat `aturanRuteWeb`, sedangkan `ExternalURL` dibuka MyBharata sebagai tautan eksternal. Pengirimnya `kirimInbox(employeeID, judul, isi, kategori, rute)` di `live_shift_pengingat.go`; `kirimInboxHost` pengingat sesi live tetap berkategori `reminder` tanpa rute (dikunci `TestKirimInboxHostTetapReminder`).
 
+#### Departemen tambahan Live Support (🟡 Diusulkan 2026-10-01, belum ada kode)
+
+Keputusannya [[ADR - 0146 Live Support Ditugaskan ke Departemen Tambahan, Setoran Diputus Penyetuju Departemen Pemilik Toko]]; urutan kerjanya [[ANALISA - Live Support Memegang Departemen Tambahan]]. Baris tabel di atas yang menyebut "departemen penyetor" untuk toko dan peninjau berlaku sampai keputusan ini terimplementasi.
+
+- Koleksi baru **`live_support_penugasan`**, satu dokumen per `{company_id, employee_id}` berisi `departemen_tambahan[]` + jejak pengubah. Departemen asli tetap dari header `BIP-Department`, tidak disalin. Diubah staf HRIS ke atas dan supervisor IT.
+- **Toko sah** = toko TikTok `department_shops` untuk departemen asli ∪ `departemen_tambahan`. Respons toko membawa `department` pemilik tiap toko.
+- Setoran menyimpan **`department_toko`** (departemen pemilik toko saat setor, dicap server). ⛔ **`department` ≠ `department_toko`**: `department` = departemen penyetor (riwayat), `department_toko` = penentu penyetuju. Mengelompokkan antrean per `department` menaruh setoran Beauty Hacks di bawah Kyura.
+- **Penyetuju = penyetuju `department_toko`**, jatuh ke `department` untuk setoran lama tanpa field itu. Guard setoran sendiri, gagal-tertutup 502, dan supervisor IT lihat-saja tidak berubah.
+- KPI tidak berubah, tetap per orang (paragraf di bawah).
+
 **KPI** (`GET /kpi/karya-live-support?periode=YYYY-MM&employee_id=…&key=…`, `GerbangKunciKinerjaToko`, tepat **401** tanpa `key`) membalas `{data: {tema: {disetujui, menunggu, ditolak}, teaser: {...}}}` dari `ringkasKarya`, penghitung yang SAMA dengan kartu ringkasan layar Setor. ⛔ **Tanpa `department`**, berbeda dari `/kpi/kesiapan-live`: yang dinilai setoran milik orang itu pada periode setornya di departemen mana pun ia menyetor, dan parameter yang diterima tapi tak menyaring apa pun menyesatkan pemanggilnya. Nol setoran dikirim sebagai ringkasan berisi nol, bukan `null`.
 
 ### Monitoring sesi live hanya baca (`/live-support/sesi*`)
