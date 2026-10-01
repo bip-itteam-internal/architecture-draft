@@ -240,12 +240,39 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
       non-marketing (`tidak_berhak`), uji `cuti_tim` dengan pengajuan uji, dan ukur waktu
       `/profit/items` rentang 3 bulan terhadap batas 30 detik. Agent tak bisa membuat token uji
       sendiri (membaca secret JWT dev ditolak classifier 2026-09-30); butuh akun dari manusia.
+    - **Modul ketiga: HRGA (keputusan user 2026-09-30)**: pemakai = **supervisor HRGA + Direksi**,
+      cakupan **kelima area tahap 1 dan area tahap 2 sekaligus**. Tahap 1 (bip-erp #2387, 13 tool):
+      kepegawaian, presensi, payroll, rekrutmen, GA. Tahap 2 (#2392, 14 tool): KPI, jadwal,
+      pelatihan, dokumen HRD, hubungan industrial dan lainnya. Total 42 tool ditawarkan bersama
+      marketing dan tiga tool HRIS awal. Semua lewat endpoint yang ada, JWT penanya, gerbang di
+      service sumber; `insentif_snapshot` ditulis tetapi **ditahan** sampai menu insentif dikunci di
+      prod (ADR-0132 §9). Aturan privasi (tanpa jabatan, daftar-putih, tanpa data pribadi) dan
+      batas yang diketahui: [[Microservices - Assistant Service]] § Tool HRGA. Perbaikan berkaitan:
+      #2391 (deskripsi tool dilarang memuat aturan hak akses, karena model menolak tanpa memanggil
+      alat), #2386 (divisi marketing dicocokkan dari nama ke id). Frontend: erp-frontend #1914,
+      #1916 (label layar).
+    - ⛔ **Belum**: uji end-to-end DEV/PROD 27 tool HRGA dengan akun supervisor HRGA, Direktur, dan
+      akun non-HRGA (`tidak_berhak`). Temuan keamanan dari pemeriksaan gerbang dicatat di issue
+      privat repo kode, bukan di sini.
   - Sama persis strukturnya, modul berbeda. Jangan disingkat langkahnya hanya karena "sudah
     pernah dikerjakan di T5-T6" — tiap modul punya jebakan kolomnya sendiri yang belum
     terdokumentasi (CORE - Kapabilitas AI baru mendokumentasikan jebakan Marketing, modul lain
     kosong).
 
-- [ ] **T8 — Uji korelasi lintas modul + ukur batas waktu nyata.**
+- [x] **T8 — Uji korelasi lintas modul + ukur batas waktu nyata. SELESAI 2026-09-30 dengan perbaikan**
+  (bip-erp #2406); uji ulang sesudah deploy perbaikan **belum dikonfirmasi** (per 2026-10-01).
+  - **Hasil ukur PROD 2026-09-30** (log `[Copilot] giliran`): "kontrak segera berakhir × KPI" = 2 tool
+    paralel, 2 putaran, **14,5 dtk**, token masuk 8.977 / keluar 645. Laporan marketing penuh = 6 tool
+    paralel dalam satu putaran, **21 dtk**, sekitar 110 ribu token masuk. Jalur latar (tenggat 3
+    menit, maks 5 putaran, tool 20 dtk) tak terikat batas gateway 30 dtk, jadi yang membatasi jumlah
+    tool per pertanyaan adalah tenggat latar dan ongkos token. Dicatat balik di ADR-0132 §6.
+  - ⛔ **Temuan: jawaban pertama SALAH.** Dua daftar yang masing-masing dipotong 25 baris (51
+    kontrak, 119 skor) digabung model, lalu ia menyimpulkan sisanya "belum dinilai" padahal minimal 8
+    orang berskor. Perbaikan #2406: tool yang terpotong mengirim `karyawan_semua`, tool penerima
+    (`kpi_skor_karyawan`, `rekap_kehadiran`) menerima `karyawan` (token) dan melapor
+    `karyawan_tidak_ada_di_sumber`; aturan prompt 12. **Pelajaran: join tak boleh dikerjakan di atas
+    daftar terpotong; "tidak ada" hanya datang dari sumber.** Mekanisme:
+    [[Microservices - Assistant Service]] § Penggabungan data per orang.
   - **Bergantung**: T6, T7.
   - **Tujuan**: buktikan [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §5 (gabung hasil, bukan gabung query) dan isi angka §6
     yang sengaja dikosongkan di ADR ("ditetapkan dari pengukuran nyata saat /plan").
@@ -275,6 +302,10 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     bercakupan supervisor (hanya HR, diri sendiri, atau yang pernah ditinjau), jadi cuti/izin tim
     butuh endpoint baru seperti T5. Temuan sampingan keamanan dicatat di issue privat bip-erp, tidak
     di vault (repo publik).
+  - **Lapisan umpan balik (2026-09-30, di luar daftar T awal)**: jempol naik/turun per jawaban,
+    disimpan di koleksi terpisah `umpan_balik` (dokumen percakapan ditimpa utuh saat giliran latar
+    selesai, jadi umpan di dalamnya bisa hilang). BE bip-erp #2416, FE erp-frontend #1930. Belum ada
+    pembaca agregat umpan. Rincian: [[Microservices - Assistant Service]] § Umpan balik jempol.
   - **Kemajuan T9a**: branch erp-frontend `feat/copilot-panel-tanya` — `features/copilot/components/
     panel-tanya.tsx` + `hooks/use-tanya-copilot.ts`; halaman `/copilot` menampilkan panel (badge "Uji
     Coba"), jawaban teks polos + sumber, galat per status lewat i18n dengan Coba lagi, riwayat
@@ -288,6 +319,10 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     benar dirender di FE dev, lolos di mode terang DAN gelap.
 
 - [ ] **T10 — Penanda tingkat keyakinan.**
+  - **Kemajuan (diperiksa 2026-10-01)**: penanda **sudah ada di kode**: aturan prompt 10 (baris
+    `PERLU_DIPERIKSA:` dicabut server, `services/assistant/penanda.go`) dan badge di layar
+    (`features/copilot/lib/penanda.ts`). Yang belum dibuktikan oleh sinkron ini: kontrol negatif
+    di bawah.
   - **Kriteria selesai**: jawaban yang sifatnya judgment/heuristik menampilkan penanda "perlu
     diperiksa manusia" yang kelihatan (bukan cuma kalimat terselip). Uji dengan **kontrol
     negatif**: satu skenario yang SEHARUSNYA ditandai, pastikan benar-benar tertandai — jangan
@@ -305,6 +340,9 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
 ## Verifikasi & pengukuran
 
 - [ ] **T12 — Ukur biaya AI per pertanyaan.**
+  - **Kemajuan (2026-09-30)**: **token sudah tercatat** per giliran di log dan di riwayat
+    (`durasi_ms`, `putaran`, `alat`, `token_masuk`, `token_keluar`; `jawab.go`). Dua titik ukur PROD
+    ada di T8. **Biaya rupiah masih TBD**: konversi token ke rupiah belum dilakukan.
   - **Bergantung**: T1-T9 sudah berjalan di dev, idealnya minimal seminggu pemakaian nyata.
   - **Kriteria selesai**: angka token + biaya rupiah NYATA (dari `NarasiJejak`-style log atau
     setara), dicatat di [[Microservices - Assistant Service]] — bukan estimasi dari harga model

@@ -245,6 +245,27 @@ Context). Batas maksimal modul/tool-call per pertanyaan ditetapkan dari pengukur
 timeout per-rute) **ditunda** — berkas itu dipakai SELURUH service lain, jadi bukan keputusan
 untuk satu fitur ini sendirian.
 
+**Catatan realisasi (2026-10-01; keputusan di atas tidak diubah).** Dua hal berubah di kode dan
+satu angka kini terukur:
+
+- **Jawaban dikerjakan di latar**: `/tanya` membalas 202 dan jawabannya ditarik dari riwayat, jadi
+  jalur utama tak lagi terikat 30 detik gateway. Tenggat latar 3 menit, maksimal 5 putaran, tiap tool
+  ber-timeout HTTP 20 detik, tool dalam satu putaran paralel. Jalur langsung 25 detik tinggal cadangan.
+  Rinciannya di [[Microservices - Assistant Service]] § Giliran di latar.
+- **Angka yang dikosongkan §6, dari pengukuran nyata PROD 2026-09-30** (log `[Copilot] giliran`):
+  pertanyaan lintas modul (kontrak segera berakhir × KPI) = 2 tool paralel, 2 putaran, **14,5 detik**,
+  8.977 token masuk / 645 keluar; laporan marketing penuh = 6 tool paralel dalam satu putaran,
+  **21 detik**, sekitar 110 ribu token masuk. Jadi untuk jalur latar **batas jumlah tool per
+  pertanyaan tidak lagi ditentukan oleh 30 detik gateway**; batas praktisnya tenggat latar dan ongkos
+  token. Batas "aman di bawah 30 detik" hanya berlaku untuk jalur langsung (3 putaran, 25 detik).
+- **§5 terbukti sekaligus terkoreksi**: jawaban lintas modul pertama **salah**, karena model
+  menggabungkan dua daftar yang masing-masing dipotong 25 baris lalu menyimpulkan orang yang tak
+  muncul "belum dinilai". Gabung hasil tetap benar; yang ditambahkan adalah aturan bahwa join
+  **tak boleh dilakukan di atas daftar terpotong**: tool mengirim `karyawan_semua` (token seluruh
+  orang), tool penerima menyaring data lengkap lewat argumen `karyawan` dan melaporkan
+  `karyawan_tidak_ada_di_sumber` (bip-erp #2406). ⚠️ Uji ulang pertanyaan yang sama sesudah deploy
+  #2406 **belum dikonfirmasi** per 2026-10-01.
+
 ### §7 Keluaran terstruktur: teks, tabel, atau chart — pakai komponen yang sudah ada
 
 Jawaban model berbentuk data terstruktur (bukan cuma prosa), diklasifikasi jenis penyajiannya
@@ -276,9 +297,12 @@ diikutkan ke asisten — bukan diikutkan dengan lubang itu dibiarkan.
 
 - Cakupan sempit di awal (beberapa modul saja), tumbuh bertahap, bukan universal sejak hari
   pertama — ini pengorbanan sadar demi keamanan, bukan kelalaian.
-- Biaya panggilan AI per pertanyaan **belum pernah diukur** karena klien AI belum ada sama sekali.
-- Batas 30 detik gateway membatasi kompleksitas pertanyaan lintas-modul yang bisa dijawab dalam
-  satu giliran.
+- ~~Biaya panggilan AI per pertanyaan **belum pernah diukur** karena klien AI belum ada sama sekali.~~
+  Token per giliran kini tercatat di log (2026-09-30, lihat catatan realisasi §6); **biaya rupiah
+  belum dihitung** (TBD, T12).
+- ~~Batas 30 detik gateway membatasi kompleksitas pertanyaan lintas-modul yang bisa dijawab dalam
+  satu giliran.~~ Tidak lagi untuk jalur latar (catatan realisasi §6); tetap berlaku untuk jalur
+  langsung cadangan.
 - Endpoint yang diketahui belum bergerbang peran (Integration, sebagian marketing-analytics)
   menahan modul terkait sampai diperbaiki lebih dulu (§9) — menambah pekerjaan di luar fitur ini
   sendiri sebagai prasyarat.

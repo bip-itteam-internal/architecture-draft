@@ -831,20 +831,22 @@
         "ADR - 0117 Realisasi Engagement Dilaporkan Pengerja per URL per Jenis Pekerjaan sampai Akhir Bulan KPI",
         "APP - Dynamic Task Tracker"
       ],
-      "hash": "2af6185810222fc2aeef1a269097066300146f8fc2081a723f11f5263049558d",
-      "ukuran_kb": 30.6,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan task-management-service lewat gateway `/api/task-management/*`, siapa yang boleh memanggil tiap rute (supervisor divisi, admin, atau admin space), dan bentuk request/response-nya. Berisi kontrak rute Spaces (termasuk `admins`, `visibility`, dan `types[].fields` untuk pertanyaan per tipe permintaan), Tasks (buat/filter/assign/approve/reject/status/arsip/CSAT/history), attachment, report, KPI panggilan mesin, Engagement Tim, WebSocket, comment, checklist, dan notifikasi. Juga menjelaskan aturan halus yang mudah salah, seperti `fields` absen berarti jangan diubah sementara array kosong berarti hapus semua, serta pengisian `requestor_name`/`phone` oleh server saat klien mengirimnya kosong.",
+      "hash": "3042340638b03395dc008bdccd721d0a92afd0376324b209f7192d8b7a364658",
+      "ukuran_kb": 30.9,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di task-management-service lewat gateway `/api/task-management/*` (spaces, tasks, CSAT, attachments, reports, KPI, Engagement Tim, WebSocket), serta bagaimana kontrak admin space, pertanyaan per tipe permintaan (`types[].fields`), dan pengisian identitas pemohon di `POST /tasks`. Juga menjawab aturan validasi, hak akses (supervisor, admin space, space restricted), dan status kematangan tiap fitur.",
       "kata_kunci": [
         "task management",
         "ticketing",
         "helpdesk",
-        "API endpoint",
-        "space",
-        "tiket",
+        "endpoint",
+        "spaces",
         "admin space",
-        "approval",
+        "types fields",
         "CSAT",
-        "engagement"
+        "POST /tasks",
+        "requestor_name",
+        "Engagement Tim",
+        "WebSocket"
       ]
     },
     {
@@ -2124,28 +2126,33 @@
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai",
         "Microservices - Notification Service",
-        "ANALISA - Asisten AI Lintas Modul",
         "CORE - SSO Flow",
+        "Microservices - Employee Service",
+        "Microservices - Attendance Service",
+        "Microservices - Payroll Service",
+        "Microservices - Recruitment Service",
+        "Microservices - Inventory Service",
+        "Microservices - Learning Service",
+        "Microservices - HRD Document Service",
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "eb11e88475ff0afaf7e16a16551b1b3becec881eb70c952f049de5d338e6bcc6",
-      "ukuran_kb": 37.2,
-      "ringkasan": "Menjawab: bagaimana Assistant Service (Copilot) dirancang untuk menjawab pertanyaan angka bisnis dengan merutekan ke endpoint via gateway memakai JWT pemakai, siapa yang boleh memakainya, dan sejauh mana implementasinya (klien AI, skeleton, gate RBAC). Juga memuat penjaga anti angka karangan, permukaan tool, riwayat percakapan, jadwal tugas, dan temuan gateway (batas 30 detik, tanpa stream).",
+      "hash": "e22cd2ebf40c25037dc543178a4bc59e820d7d4e4651bc8754a565754597cc26",
+      "ukuran_kb": 53.8,
+      "ringkasan": "Menjawab: bagaimana Assistant Service (Copilot) di Web ERP bekerja, yaitu merutekan pertanyaan ke endpoint yang sudah menghitung dengan JWT pemakai, tanpa menghitung sendiri. Mencakup status implementasi per tahap (klien AI, skeleton, gate akses, tool HRIS/marketing/HRGA, riwayat percakapan, umpan balik), keputusan rancangan, penjaga anti angka karangan, temuan batas gateway 30 detik, serta hal yang belum diputuskan.",
       "kata_kunci": [
         "assistant",
         "Copilot",
         "asisten AI",
-        "tanya-jawab",
         "tool calling",
-        "LLM",
-        "RBAC",
+        "tanya-jawab",
         "gateway",
         "JWT",
+        "RBAC",
         "ADR 0132",
         "ADR 0058",
         "riwayat percakapan",
-        "jadwal tugas"
+        "tool HRGA"
       ]
     },
     {
@@ -3131,20 +3138,22 @@
         "APP - Dynamic Task Tracker",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "9deed7b4c497c032c212a23d768c8c9154f4fbcf8bd2816ca6b746f709edbc50",
-      "ukuran_kb": 44.0,
-      "ringkasan": "Menjawab: bagaimana service IT Helpdesk/ticketing internal ERP bekerja dari sisi implementasi — stack (Go + Fiber + MongoDB + WebSocket + file-service), struktur Space per divisi ala Kanban, alur status `Request → Todo → On Going → Testing → Done` beserta jalur ditolak, dan siapa yang berwenang di tiap langkah. Menjelaskan cakupan divisi supervisor dari header `BIP-Supervised-Departments`, kontrol akses space (public/restricted), admin space sebagai hak per-objek, tipe permintaan beserta pertanyaannya, approval, hold/reopen, CSAT, automation auto-assign dan auto-close, engine SLA dua dimensi dengan scheduler eskalasi, serta modul Engagement Tim yang datanya terpisah total. Juga memuat daftar yang belum diimplementasikan, dependensi, dan integrasi ke notification-service serta MinIO.",
+      "hash": "5c744d3a62ca937a9f00b2182c29f89ff909731a6c11af848c1b417f2e5b6819",
+      "ukuran_kb": 45.6,
+      "ringkasan": "Menjawab: bagaimana backend IT Helpdesk/ticketing task-management-service bekerja, termasuk space Kanban per divisi, admin space, tipe permintaan dan pertanyaannya, kontrol akses, approval, hold/reopen, CSAT, automation, SLA engine, KPI, dan modul Engagement Tim. Juga menjawab cakupan divisi supervisor, status implementasi, dependensi, dan hal yang belum diimplementasikan.",
       "kata_kunci": [
-        "task management service",
-        "IT helpdesk",
+        "task management",
+        "helpdesk",
         "ticketing",
         "Kanban",
+        "space",
         "SLA",
-        "auto-assign",
-        "WebSocket",
-        "space admin",
-        "engagement tim",
-        "Go Fiber MongoDB"
+        "CSAT",
+        "admin space",
+        "approval",
+        "supervisor",
+        "Engagement Tim",
+        "KPI"
       ]
     },
     {
@@ -8216,19 +8225,22 @@
         "CORE - RBAC dan Permission Set",
         "CORE - API Master Gateway"
       ],
-      "hash": "fd5b85efdbfd6e4c6c74cd11e758d43faf1d5852c89dbb460e04d9b43ce8af8b",
-      "ukuran_kb": 21.3,
-      "ringkasan": "Menjawab: kenapa asisten AI tanya-jawab (Copilot) dibangun lintas modul sejak awal dengan beberapa modul percontohan, kenapa lapisan data bisnis hidup di dalam service pemilik data dan bukan terpusat, dan siapa yang boleh memakainya (Supervisor departemen mana pun, Direktur, Corporate Secretary, IT). Juga menjawab kenapa klien AI tipis hand-roll OpenAI-compatible, larangan menghitung dari data mentah, batas modul per pertanyaan akibat timeout gateway, bentuk keluaran teks/tabel/chart, dan file hanya saat diminta.",
+      "hash": "69937000a27d85fc806afe86976c3242407d9414099bcefe72ac7a62c92fab14",
+      "ukuran_kb": 23.2,
+      "ringkasan": "Menjawab: mengapa asisten AI lintas modul dibangun sebagai service orkestrator dengan endpoint baca di tiap service pemilik data (bukan lapisan data terpusat), siapa yang boleh memakainya (Supervisor, Direktur, IT), dan apa batasannya. Mencakup klien AI hand-roll OpenAI-compatible, larangan menghitung dari data mentah, batas gateway 30 detik, keluaran tabel/chart, pewarisan gerbang endpoint, dan syarat persetujuan Direksi untuk data asli.",
       "kata_kunci": [
         "ADR 0132",
-        "asisten AI lintas modul",
+        "asisten AI",
         "Copilot",
-        "gate RBAC Copilot",
-        "Corporate Secretary",
-        "lapisan data bisnis",
-        "AI assistant",
-        "modul percontohan",
-        "tanya jawab AI"
+        "lintas modul",
+        "RBAC",
+        "gateway",
+        "tool calling",
+        "relay AI",
+        "klien tipis",
+        "ADR 0058",
+        "ADR 0120",
+        "keputusan arsitektur"
       ]
     },
     {
@@ -16805,22 +16817,22 @@
         "CORE - RBAC dan Permission Set",
         "CORE - Kapabilitas AI dan Machine Learning"
       ],
-      "hash": "3833958c3f0822756c91303d4ffb4ea160ce5cf13e0b3fe545b5420873475dd0",
-      "ukuran_kb": 28.8,
-      "ringkasan": "Menjawab: apa saja daftar task (T1 dan seterusnya) untuk membangun asisten AI lintas modul, urutan ketergantungannya, prasyarat keputusan manusia (Corp Sec, persetujuan Direksi untuk data keluar lewat relay), dan kriteria selesai tiap task. Papan kerja hasil analisa-kebutuhan mencakup fondasi klien AI, skeleton service, gate RBAC, modul percontohan, presentasi jawaban, verifikasi, dan jadwal tugas.",
+      "hash": "d09024c24eb732a7db6b6b4109a4efa8761fc8fb98e7520242ebba55a13c47a5",
+      "ukuran_kb": 32.2,
+      "ringkasan": "Menjawab: daftar task (T1 dan seterusnya) untuk membangun Copilot lintas modul, urutan ketergantungannya, dokumen dan kode yang dibaca dulu, serta kriteria selesai tiap task. Juga menjawab prasyarat keputusan manusia yang belum ada (Corp Sec, konfirmasi Direktur, persetujuan Direksi untuk data keluar) dan kemajuan fondasi (klien AI, skeleton service, gate RBAC).",
       "kata_kunci": [
+        "analisa kebutuhan",
         "asisten AI",
         "Copilot",
-        "analisa kebutuhan",
-        "task",
-        "T1",
-        "T3",
+        "task T1 T2 T3",
+        "papan kerja",
         "gate RBAC",
-        "Corporate Secretary",
-        "ADR 0132",
-        "modul percontohan",
         "klien AI",
-        "papan kerja"
+        "skeleton service",
+        "modul percontohan",
+        "ADR 0132",
+        "prasyarat",
+        "Corporate Secretary"
       ]
     },
     {
