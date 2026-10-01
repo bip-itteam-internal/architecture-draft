@@ -42,24 +42,31 @@
   (asisten dilarang berhitung, tool memanggil lewat gateway dengan JWT pemakai, jawaban adalah
   pintu), empat penjaga anti angka karangan, dan § Temuan gateway soal batas 30 detik — semuanya
   jadi dasar ADR-0132.
-  **Sinkron 2026-10-01 (PR merged 2026-09-30..10-01)**: ~~42 tool~~ (angka saat itu; kini 51, lihat Sinkron berikutnya) ditawarkan (tiga HRIS, dua belas
+  **Sinkron 2026-10-01 (PR merged 2026-09-30..10-01)**: ~~42 tool~~ (angka saat itu; hitungan terkini di § Permukaan tool) ditawarkan (tiga HRIS, dua belas
   marketing, **27 HRGA** dalam dua tahap), penggabungan per orang lintas tool, umpan balik jempol,
   sapaan dari server, pencocokan divisi marketing, jawaban di latar (202). Detail di § Tool HRGA
   sampai § Realisasi pengukuran T8. ⚠️ Belum diuji ulang di prod sesudah perbaikan penggabungan
   (#2406).
-  **Sinkron 2026-10-01 (lanjutan, diperiksa ke `origin/main`)**: **43 tool** ditawarkan (+ `daftar_karyawan`,
+  **Sinkron 2026-10-01 (lanjutan, diperiksa ke `origin/main`)**: ~~43 tool~~ (angka saat itu) ditawarkan (+ `daftar_karyawan`,
   bip-erp #2421), `rekap_telat_tim` bisa merinci per kejadian (#2423), dan **penjaga skala rupiah**
   merged (#2425). ~~Yang PR terbuka, belum di `main`: #2437, #2438, #2435.~~ **Ketiganya sudah merged
   ke `main` 2026-10-01** (merge commit `310132bb`, `74ef4bf5`, `76bc54ca`; berkas `penjaga.go`,
   `umpan_rekap_rute.go`, `cmd/ujitetap/` ada di `origin/main`). Lihat § Penjaga jawaban,
   § Rekap umpan untuk tinjauan IT, § Uji pertanyaan tetap. Daftar celah yang tersisa
   (keandalan, data, biaya, adopsi) dicatat di issue privat repo kode bip-erp#2422.
-  **Sinkron 2026-10-01 (sesudah #2447, #2448, #2464, diukur ke `origin/main`)**: **51 tool** ditawarkan
-  (tiga HRIS, dua belas marketing, **36 HRGA**; 36 = 6 + 5 + 2 + 6 + 5 + 3 + 3 + 6 dari `alatHrga()` di
-  `main.go`, dikunci `TestDaftarAlat_NamaUnikDanHrgaLengkap`). Baru: saringan gabung lintas alat
+  **Sinkron 2026-10-01 (sesudah #2447, #2448, #2464, diukur ke `origin/main`)**: ~~51 tool~~ (angka saat
+  itu; hitungan terkini hanya di § Permukaan tool) ditawarkan. Baru: saringan gabung lintas alat
   (§ Penggabungan data per orang), rincian per kejadian (§ Rincian per kejadian), delapan tool baru
   (§ Tool HRGA gelombang 2026-10-01), dan daftar sumber yang **sengaja dilewati**
   (§ Sumber yang sengaja dilewati). ⚠️ Belum ada pengukuran PROD atas gelombang ini.
+  **Sinkron 2026-10-02 (diukur ke `origin/main`, bip-erp #2474, #2475, #2484; erp-frontend #1982, #1986)**:
+  sebelas tool baru di tiga area, **GA** (`booking_ruang`, `permintaan_barang_ga`, `opname_perlengkapan`),
+  **hubungan industrial** (`usulan_sp`, `inspeksi_area`, `temuan_satgas`, `culture_antrean_klub`), dan
+  **pelatihan** (`evaluasi_pelatihan`, `kursus_elearning`, `permintaan_pelatihan`, `sertifikat_pelatihan`);
+  rinciannya di § Tool HRGA gelombang 2026-10-02, dan daftar sumber yang sengaja dilewati bertambah. Label
+  layar sebelas tool itu sudah ada di `id.ts` dan `en.ts` erp-frontend `origin/main` (kunci tiap nama tool
+  ditemukan lewat `git grep`; isi kalimatnya tak dibaca dokumen ini). ⚠️ Belum ada pengukuran PROD maupun uji
+  di DEV atas gelombang ini (yang terbukti baru kode dan test di repo).
 - **Stack**: Go, `net/http` langsung (klien tipis hand-roll, BUKAN SDK Anthropic — divalidasi
   2026-09-28, lihat
   [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]]
@@ -142,12 +149,15 @@ flowchart LR
 ## Permukaan tool
 
 Satu tool per endpoint baca, sekitar delapan sampai dua belas untuk irisan pertama. Kandidatnya dari rute yang sudah ada di `services/marketing-analytics/handler_mart.go` dan tetangganya: `/beranda`, `/summary`, `/profit/shops`, `/profit/products`, `/profit/skus`, `/profit/campaigns`, `/profit/ads`, `/videos`, `/lives`, `/returns/breakdown`. ~~Daftar finalnya **TBD**.~~
-~~Per 2026-09-30 ada **lima belas** tool di kode.~~ ~~Per 2026-10-01 ada **42 tool**.~~ ~~Per 2026-10-01 (sesudah #2421) ada 43 tool.~~ Per 2026-10-01
-(sesudah #2464) ada **51 tool yang ditawarkan ke model**: tiga HRIS (`rekap_telat_tim`,
-`antrean_persetujuan`, `cuti_tim`), dua belas marketing (§ Tool marketing), dan **36 HRGA** (§ Tool
-HRGA, termasuk delapan tool gelombang 2026-10-01; dihitung dari daftar per area `alat_hrga_*.go`:
-kepegawaian 6, presensi 5, payroll 2, rekrutmen & GA 6, KPI 5, jadwal 3, pelatihan & dokumen 3,
-hubungan industrial 6). Satu tool lagi,
+~~Per 2026-09-30 ada **lima belas** tool di kode.~~ ~~Per 2026-10-01 ada **42 tool**.~~ ~~Per 2026-10-01 (sesudah #2421) ada 43 tool.~~ ~~Per 2026-10-01
+(sesudah #2464) ada 51 tool.~~ Per 2026-10-02 (sesudah #2474, #2475,
+#2484) ada **62 tool yang ditawarkan ke model**: tiga HRIS (`rekap_telat_tim`,
+`antrean_persetujuan`, `cuti_tim`; `Rekap`, `Antrean`, `Cuti` di `daftarAlat()`, `tanya.go`), dua belas
+marketing (§ Tool marketing; `alatMarketing()` di `main.go`), dan **47 HRGA** (§ Tool HRGA; dihitung
+dari elemen `[]Alat` tiap fungsi `Daftar*` di `alat_hrga_*.go` pada `origin/main` 2026-10-02, dirakit
+`alatHrga()` di `main.go`: kepegawaian 6, presensi 5, payroll 2, rekrutmen & GA 9, KPI 5, jadwal 3,
+pelatihan & dokumen 7, hubungan industrial 10; 6+5+2+9+5+3+7+10 = 47, dan 3+12+47 = 62). Ini **satu-satunya
+tempat** jumlah tool ditulis; dok lain (termasuk ADR dan ANALISA) cukup menaut ke sini. Satu tool lagi,
 `insentif_snapshot`, **sudah ditulis tetapi sengaja tidak ditawarkan** (alasannya di § Tool HRGA).
 Satu daftar (`daftarAlat()` di `tanya.go`) dipakai untuk menawarkan tool ke model sekaligus untuk
 dispatch, dan `TestDaftarAlat_NamaUnikDanHrgaLengkap` (`hrga_test.go`) mengunci nama yang tak boleh
@@ -327,7 +337,7 @@ nama departemen**:
   sering telat" juga mendapat tabel 56 baris, karena model memilih sebelum melihat data; perketat
   deskripsi argumen bila terasa berlebihan.
 
-### Tool HRGA: 36 tool atas endpoint yang sudah ada (bip-erp #2387 tahap 1, #2392 tahap 2, 2026-09-30; #2421 `daftar_karyawan`, #2464 delapan tool, 2026-10-01)
+### Tool HRGA: atas endpoint yang sudah ada (bip-erp #2387 tahap 1, #2392 tahap 2, 2026-09-30; #2421 `daftar_karyawan`, #2464 delapan tool, 2026-10-01; #2474, #2475, #2484 sebelas tool, 2026-10-02)
 
 Keputusan user 2026-09-30: pemakai HRGA = **supervisor HRGA + Direksi**, cakupan **kelima area tahap 1
 dan area tahap 2 sekaligus**. Semua tool membaca endpoint GET yang **sudah ada** di service pemiliknya
@@ -439,6 +449,40 @@ dihitung), **bukan nol bukti**. Samaran: `samaran.Peta.NamaDariID`
 sumbernya tanpa nama (rekap telat perusahaan, KPI otomasi) agar nama kosong dilengkapi dan
 `Samarkan` (`samaran.go:63`) tetap menjadi satu-satunya pintu keluar ke model.
 
+### Tool HRGA gelombang 2026-10-02 (bip-erp #2474 GA, #2475 hubungan industrial, #2484 pelatihan; merged)
+
+Sebelas tool, semuanya membaca endpoint GET yang sudah ada lewat `KlienHrga` dengan JWT penanya; gerbang
+tetap milik service sumber, dekode berdaftar-putih, nama hanya token `Karyawan-N`. Tabel di § Tool HRGA
+belum memuat baris-barisnya; nama unik dikunci `TestDaftarAlat_NamaUnikDanHrgaLengkap` (`hrga_test.go`).
+Sumber: komentar kepala berkas tiap tool di `internal/alat/` pada `origin/main` 2026-10-02.
+
+| Tool | Endpoint yang dibaca | Yang dijawab, dan batasnya |
+|---|---|---|
+| `booking_ruang` | `inventory /peminjaman` + `/peminjaman/perlu-aksi` (`booking_ruang.go:33`, `:179`) | Pengajuan booking **ruang** GA per status (menunggu, disetujui, ditolak, dibatalkan). Daftar dipotong 200 di sumber (`terpotong`); `perlu-aksi` = antrean persetujuan **milik penanya** (hanya penyetuju yang ditunjuk HR, selain itu 403) dan tak punya penanda pemotongan, jadi tepat 200 baris ditandai sebagian. Pemohon token; keperluan, no. WA, dan riwayat tak dibaca. **Sistem hanya mengenal peminjaman RUANG**, bukan aset, jadi tak ada tenggat kembali (`booking_ruang.go:24`) |
+| `permintaan_barang_ga` | `inventory /permintaan` + `/permintaan/sinyal-stok` + `/permintaan/cadangan-mengendap` (`permintaan_barang_ga.go:39`) | Permintaan barang staf ke gudang GA, sinyal stok habis, cadangan mengendap. Daftar dipotong 200 terbaru tanpa penanda. **Peminta hanya dirinci (token + saringan `karyawan`) bila penanya lolos gerbang serah GA**, diukur dari jawaban `sinyal-stok`, bukan aturan sendiri; yang tak lolos mendapat daftar tanpa peminta (`permintaan_barang_ga.go:28-31`, `:247`). Teks bebas (keperluan, keterangan baris, alasan tutup paksa) tak dibaca; hanya ada-tidaknya tutup paksa yang jadi `ditutup_paksa` |
+| `opname_perlengkapan` | `inventory /perlengkapan-opname?periode=YYYY-MM` (`opname_perlengkapan.go:32`) | Hasil stock opname perlengkapan GA satu bulan; `data` kosong = belum ada opname, bukan galat. `selisih` = qty fisik dikurangi snapshot Accurate **yang dilihat penghitung saat opname**, bukan qty Accurate hari ini, jadi tak bergeser oleh sinkronisasi. Persen akurasi dihitung layar sumber, **tool tak mengarangnya** (hanya cacah cocok/kurang/lebih). Bukan alat per orang: employee_id penghitung tak didekode |
+| `usulan_sp` | `employee /warnings/suggestions` (`hi_usulan_sp.go:17`) | Usulan SP yang **disusun sistem** dari akumulasi telat satu periode payroll; sistem hanya mengusulkan, HR yang menerbitkan. Jabatan dan teks dasar usulan tak didekode; `late_count` hilang = balasan rusak, bukan nol telat. Digerbang `RequireHRISStaff` di pendaftaran rute (`warning.go:305`) |
+| `inspeksi_area` | `employee /area-inspections/rekap` (`hi_inspeksi_area.go:18`) | Rekap inspeksi 5R per departemen satu bulan; objeknya departemen, bukan orang. Catatan bebas, foto, dan petugas tak dibaca. ⚠️ **Ketiadaan sebuah departemen BUKAN bukti bersih atau belum diinspeksi**: hanya departemen yang sudah diinspeksi dan boleh dilihat penanya yang ada (`hi_inspeksi_area.go:170`) |
+| `temuan_satgas` | `employee /satgas-findings` (`hi_satgas.go:18`; terdaftar `satgas_finding.go:154` dengan `gatePembacaSatgas`) | **Agregat saja** temuan Satgas 5R dan K3 (jumlah per status, departemen, bulan). Sumbernya per orang berfoto, jadi orang, jabatan, catatan, dan foto tak didekode. Ini membalik catatan lama di § Batas yang diketahui bahwa Satgas tidak ditawarkan |
+| `culture_antrean_klub` | `form-builder /culture/terlaksana/pending` + `/culture/clubs` (`hi_culture_antrean_klub.go:16`) | Dua bagian per panggilan (`bagian`): `antrean_terlaksana` (tanda "terlaksana" program non-event yang menunggu persetujuan) dan `klub_culture` (klub beserta jumlah anggota). Hanya agregat; pengaju, catatan, tautan grup, dan daftar anggota tak didekode. `jumlah` klub hilang = rusak, bukan klub kosong |
+| `evaluasi_pelatihan` | `learning /training` + `/training/trainers` + `/training/:id/evaluation` + `/training/trainers/:id/evaluation` (`pelatihan_evaluasi.go:15`) | Penilaian peserta atas pelatihan selesai, per kelas atau per trainer, agregat (penilai dan komentar tak ada di sumber). **Skor hanya keluar bila responden ≥ 3** (`pelatihanMinResponden`, cermin `MinRespondenEvaluasi` di `services/learning/models_evaluation.go:29`; di bawahnya status `responden_kurang`, jangan disebut nol). Trainer jadi token (eksternal: kunci sintetis). Dibaca terbaru dulu, **maks 8 trainer** per panggilan (`pelatihanMaksTrainerEvaluasi`), kelas dibatasi `pelatihanMaksKelasPerId`; hasil sebagian diberi `peringatan` |
+| `kursus_elearning` | `learning /courses` + `/courses/:id/attempts` (`pelatihan_kursus.go:15`) | Kursus e-learning dan hasil ujian per orang (pre-test, post-test). Satu baris = satu orang pada satu kursus, persen = skor/skor maksimum dari percobaan terbaik. **Maks 12 kursus** dibaca per panggilan (`pelatihanMaksKursus`); jawaban, soal, alasan pembatalan tak dibaca |
+| `permintaan_pelatihan` | `learning /training/requests` (`as=reviewer` dan `as=reviewed`) + `/training/types` (`pelatihan_permintaan.go:16`) | Pengajuan pelatihan (rantai SPV lalu HR) per status dan departemen. Alasan, topik (teks bebas), dan catatan peninjau tak dibaca |
+| `sertifikat_pelatihan` | `learning /training` + `/training/:id/certificates` (`pelatihan_sertifikat.go:16`) | Status sertifikat peserta pada kelas selesai (terbit, tertunda, tidak memenuhi syarat, dicabut). Nomor dan berkas tak dibaca. ⛔ **Kode sumber `tidak_berhak` diterjemahkan jadi `tidak_memenuhi_syarat`** (`pelatihan_sertifikat.go:23`, `:29`): `tidak_berhak` adalah status alat untuk penanya yang ditolak sumber (penjaga `akses_tak_terbukti`, prompt aturan 4), dan model yang membacanya di data peserta bisa menyimpulkan penolakan akses. Kolom layarnya **`alasan_sertifikat`**, bukan `alasan`, karena `alasan` di layar dipakai `retur_detail` untuk teks bebas (`pelatihan_sertifikat.go:248`) |
+
+Aturan pemakaian kolom yang wajib ikut (tegak di tool, sumbernya komentar Go): `tertunda` ≠ `tidak_memenuhi_syarat`
+(yang pertama syarat terpenuhi tetapi belum terbit, mis. penanda tangan belum diatur); selisih opname memakai
+snapshot, bukan qty Accurate kini; skor evaluasi di bawah tiga responden **bukan nol**. Frontend: label layar
+sebelas tool di erp-frontend #1982 dan #1986 (merged 2026-10-02).
+
+**Butir terbuka gelombang ini**: (1) `GET /culture/clubs` **menyemai klub bawaan bila koleksi kosong**
+(`services/form-builder/culture_clubs.go:109`, `ensureClubs`), jadi sebuah pembacaan bisa menulis; bagian
+`klub_culture` memicunya di sumber. Apakah bagian itu **dipertahankan atau dicabut** belum diputuskan.
+(2) Gerbang baca daftar `/permintaan` di inventory **longgar** (praktis terbuka untuk seluruh staf, handler tak
+menyaring per peminta); Copilot hanya merinci peminta bagi pemegang gerbang serah GA. Pengetatan di sumber
+perlu keputusan terpisah dan tidak diuraikan di sini (repo publik). (3) Keputusan lama tetap terbuka: baris
+rincian KPI dikirim ke model atau hanya jumlahnya.
+
 ### Sumber yang sengaja dilewati (jangan dicoba ulang tanpa membaca alasannya)
 
 Diperiksa saat menyusun gelombang 2026-10-01. Alasan di kolom kanan berasal dari pembacaan kode oleh
@@ -455,6 +499,13 @@ pengerjanya; yang bertanda **dugaan** belum diukur ke data.
 | `kpi/dashboard` | Ambang tertanam di sumber; menyalinnya melanggar satu fakta satu tempat |
 | `kpi/evidence` | Teks bebas, berisiko memuat identitas |
 | psikotes status | Per kandidat/orang, tak ada alasan memasukkannya ke model |
+| `inventory /items` (2026-10-02) | Gerbangnya terbuka, tanpa halaman, dan memuat pemegang aset |
+| `inventory /penyusutan` (2026-10-02) | Gerbang terbuka dan butuh `employee_ids` dari pemanggil |
+| `inventory /item/repair/:id/all` (2026-10-02) | Per aset, bukan daftar |
+| Peminjaman **aset** / tenggat kembali (2026-10-02) | Sistem tak punya: yang ada hanya peminjaman RUANG (`booking_ruang.go:24`) |
+| Kaizen (2026-10-02) | Programnya direncanakan dihapus (komentar `alat_hrga_hi.go`) |
+| `/legal/disputes` (2026-10-02) | Domain Corporate Secretary, bukan HRGA |
+| `learning /training/history/:employeeId` (2026-10-02) | Satu orang per panggilan; riwayat pelatihan siapa pun terbaca lewat rute ini (komentar `services/learning/request.go:221`) |
 
 **Butir terbuka dari gelombang ini**: (1) **daftar karyawan MASUK per bulan belum bisa dijawab**, karena
 tak ada sumber bergerbang HR yang memuat `join_date` (hasil pencarian pengerjanya; belum diulang
@@ -497,10 +548,11 @@ tool terhadap pola kalimat aturan-akses dan menuntut kalimat larangan itu ada di
   berkas pribadi (KTP, ijazah, dst.) per departemen (`dokumen_hrd.go`). Penyelesaian pelatihan wajib
   juga tak punya tool: sumber yang dipakai (`pelatihan_*`) tak memuatnya (**TBD**, belum diukur
   terhadap sumber lain).
-- **Satgas tidak ditawarkan** dengan alasan di kode: bacaannya per orang (temuan inspeksi berfoto)
-  (`alat_hrga_hi.go`). Komentar yang sama menyebut rute FE lamanya tak lagi ada di form-builder;
-  ⚠️ **TBD, belum terverifikasi**: `employee/satgas_finding.go` mendaftarkan `/satgas-findings`,
-  jadi pernyataan "FE memanggil rute yang tak ada" perlu diukur per rute sebelum dijadikan temuan.
+- ~~**Satgas tidak ditawarkan** dengan alasan di kode: bacaannya per orang (temuan inspeksi berfoto).~~
+  **Sejak 2026-10-02 hanya agregatnya yang ditawarkan** (`temuan_satgas`, `inspeksi_area`; § Tool HRGA
+  gelombang 2026-10-02); data per orang, jabatan, catatan, dan foto tetap tak pernah sampai ke model.
+  `employee/satgas_finding.go:154` memang mendaftarkan `GET /satgas-findings` (dengan `gatePembacaSatgas`),
+  jadi pernyataan lama "rute FE lamanya tak ada di form-builder" tak relevan untuk tool ini.
 - Temuan keamanan yang muncul saat memeriksa gerbang endpoint dicatat di **issue privat repo kode**,
   bukan di vault (repo publik).
 
@@ -863,7 +915,7 @@ riwayat: kapan terkirim, kapan dibuka
 ## Belum Diputuskan (TBD)
 
 - ~~**Cara mengantar jawaban.** Empat pilihan di § Temuan gateway, belum dipilih.~~ **Diputuskan user 2026-09-29: sekaligus, tanpa stream**, lewat gateway biasa dengan tenggat 25 detik (cukup untuk satu-dua tool). Stream ditunda sampai pertanyaan lintas modul (T8) membuktikan 25 detik tak cukup.
-- **Daftar tool final** beserta bentuk argumen dan bentuk hasilnya. Daftar per 2026-10-01 (51 tool) ada di
+- **Daftar tool final** beserta bentuk argumen dan bentuk hasilnya. Daftar dan jumlah terkini ada di
   § Permukaan tool; sumber yang sengaja dilewati di § Sumber yang sengaja dilewati; `insentif_snapshot` menunggu menu insentif dikunci di prod.
 - **Batas pemakaian per orang per hari** belum ada; ~~**agregasi umpan jempol** belum ada pembacanya di `main`~~ (pembacanya sudah merged lewat #2438, § Rekap umpan untuk tinjauan IT).
 - ~~**Kunci RBAC** yang menentukan siapa boleh membuka asistennya.~~ **Ditegaskan 2026-09-28** oleh [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] §3: Supervisor departemen mana pun ATAU Direktur ATAU IT. ~~Yang masih TBD: apakah Corporate Secretary ikut termasuk.~~ Corporate Secretary **ikut** (ditegaskan 2026-09-29).
@@ -890,7 +942,7 @@ riwayat: kapan terkirim, kapan dibuka
 | [[Microservices - Marketing Analytics Service]] | Seluruh angka yang dijawab | Asisten wajib menjawab tidak tahu, bukan menaksir |
 | Claude API (Anthropic) | Model bahasa | Fitur padam; kegagalannya wajib berbunyi, bukan diam |
 | [[CORE - SSO Flow]] | JWT yang diwarisi tool | Tak ada identitas, tak ada jawaban |
-| [[Microservices - Employee Service]], [[Microservices - Attendance Service]], [[Microservices - Payroll Service]], [[Microservices - Recruitment Service]], [[Microservices - Inventory Service]], [[Microservices - Learning Service]], [[Microservices - HRD Document Service]] | Tool HRGA membaca endpoint GET-nya lewat gateway dengan JWT penanya | Tool terkait membalas `sumber_tak_terjangkau`, bukan angka; tool lain tetap jalan |
+| [[Microservices - Employee Service]], [[Microservices - Attendance Service]], [[Microservices - Payroll Service]], [[Microservices - Recruitment Service]], [[Microservices - Inventory Service]], [[Microservices - Learning Service]], [[Microservices - HRD Document Service]], [[Microservices - Form Builder Service]] (`culture_antrean_klub`) | Tool HRGA membaca endpoint GET-nya lewat gateway dengan JWT penanya | Tool terkait membalas `sumber_tak_terjangkau`, bukan angka; tool lain tetap jalan |
 
 **Tidak** bergantung pada: notification-service, calendar-service, dan database mana pun milik service lain.
 

@@ -243,7 +243,7 @@ Tiap task di bawah punya **Tujuan** (kenapa, biar agen yang eksekusi tidak meneb
     - **Modul ketiga: HRGA (keputusan user 2026-09-30)**: pemakai = **supervisor HRGA + Direksi**,
       cakupan **kelima area tahap 1 dan area tahap 2 sekaligus**. Tahap 1 (bip-erp #2387, 13 tool):
       kepegawaian, presensi, payroll, rekrutmen, GA. Tahap 2 (#2392, 14 tool): KPI, jadwal,
-      pelatihan, dokumen HRD, hubungan industrial dan lainnya. Total 42 tool ditawarkan bersama
+      pelatihan, dokumen HRD, hubungan industrial dan lainnya. Jumlah tool terkini di [[Microservices - Assistant Service]] (angka saat itu tak disalin); ditawarkan bersama
       marketing dan tiga tool HRIS awal. Semua lewat endpoint yang ada, JWT penanya, gerbang di
       service sumber; `insentif_snapshot` ditulis tetapi **ditahan** sampai menu insentif dikunci di
       prod (ADR-0132 §9). Aturan privasi (tanpa jabatan, daftar-putih, tanpa data pribadi) dan
@@ -375,10 +375,12 @@ disalin ke vault (repo publik). Kemajuan **bagian A** (keandalan) per 2026-10-01
 - [x] **Rekap umpan untuk tinjauan IT** (`GET /umpan/rekap`): **merged**, bip-erp #2438 (`74ef4bf5`).
 - [x] **Uji pertanyaan tetap** (`cmd/ujitetap`): **merged**, bip-erp #2435 (`76bc54ca`); dijalankan manusia.
 - [x] **Saringan gabung lintas alat** (#2447), **rincian per kejadian** (#2448), dan **delapan tool HRGA baru**
-  (#2464): merged 2026-10-01, total 51 tool; label layar erp-frontend #1966 dan #1976. Mekanisme dan sumber
-  yang sengaja dilewati: [[Microservices - Assistant Service]].
+  (#2464): merged 2026-10-01; label layar erp-frontend #1966 dan #1976. Sebelas tool lagi (GA, hubungan
+  industrial, pelatihan; bip-erp #2474, #2475, #2484, label erp-frontend #1982, #1986) merged 2026-10-02.
+  Jumlah terkini, mekanisme, dan sumber yang sengaja dilewati: [[Microservices - Assistant Service]].
 - [ ] **Butir terbuka**: endpoint daftar karyawan masuk (butuh `join_date`) bergerbang HR; keputusan apakah baris
-  rincian KPI dikirim ke model atau hanya jumlahnya.
+  rincian KPI dikirim ke model atau hanya jumlahnya; keputusan apakah bagian `klub_culture` dipertahankan
+  (pembacaan `/culture/clubs` menyemai klub bawaan bila koleksi kosong, yaitu pembacaan yang bisa menulis).
 - Di luar #2422 yang ikut merged hari itu: tool `daftar_karyawan` (#2421), rincian telat per kejadian
   (#2423), percakapan di URL (erp-frontend #1941).
 - **T8 tetap belum terkonfirmasi**: uji ulang "kontrak segera berakhir × KPI" sesudah #2406 di-deploy

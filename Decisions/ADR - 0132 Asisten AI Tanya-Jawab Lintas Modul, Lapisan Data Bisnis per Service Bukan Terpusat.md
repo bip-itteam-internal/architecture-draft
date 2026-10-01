@@ -267,8 +267,9 @@ satu angka kini terukur:
   #2406 **belum dikonfirmasi** per 2026-10-01.
 - **Perluasan 2026-10-01 (bip-erp #2447, #2464)**: saringan `karyawan` + `karyawan_semua` kini berlaku di
   sebelas tool tambahan, dan sumber yang terbaca tak lengkap dilaporkan `karyawan_tak_terbaca`, bukan
-  "tidak ada". Cakupan modul percontohan melebar jadi 51 tool (HRIS, marketing, HRGA); daftar, alasan sumber
-  yang sengaja dilewati, dan batasnya di [[Microservices - Assistant Service]].
+  "tidak ada". Cakupan modul percontohan terus melebar (HRIS, marketing, HRGA; tiga area HRGA baru 2026-10-02:
+  GA, hubungan industrial, pelatihan, bip-erp #2474, #2475, #2484); jumlah terkini, daftar, alasan sumber
+  yang sengaja dilewati, dan batasnya di [[Microservices - Assistant Service]] § Permukaan tool.
 
 ### §7 Keluaran terstruktur: teks, tabel, atau chart — pakai komponen yang sudah ada
 
