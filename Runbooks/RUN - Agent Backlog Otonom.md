@@ -15,6 +15,7 @@ Menjalankan agent Claude Code tanpa ditunggui untuk mengerjakan backlog **Priori
 1. **Pemicu**: Windows Task Scheduler, task `ERP Bharata - Agent Backlog`, tiap jam. Sebuah `run.lock` membuat pemicu yang jatuh saat run masih berjalan langsung keluar, jadi tak pernah ada dua run bersamaan.
 2. **Mode terus**: satu run terdiri dari beberapa putaran; tiap putaran menjalankan `claude -p` headless untuk maksimal 3 issue. Selesai satu putaran dan masih ada kandidat, putaran berikutnya langsung mulai. Run berhenti bila kandidat habis, atau bila 2 putaran berturut-turut tak menghasilkan PR (jeda; pemicu jam berikutnya mencoba lagi dan grup IT dikabari).
 3. **Kandidat**: item Project #15 berstatus Backlog/Todo, Prioritas Low atau Medium, bukan Jenis Keputusan, tanpa label `Butuh Info`.
+   - **Perubahan yang sudah diusulkan, belum diterapkan di skrip**: [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]] mensyaratkan label `Siap Agent` sebagai gerbang masuk, antrean ulang lewat pelepasan label `Butuh Info` (bukan komentar apa pun), dan pertanyaan yang menyebut `@<Pemutus>`. Kriteria di atas adalah perilaku skrip saat ini sampai skrip di PC IT diperbarui.
 4. **Per issue** agent: mengisi field **Mulai** dan **Estimasi Selesai** plus komentar dasar estimasinya, Status In Progress, lalu `/brief` dan `/kerjakan` (worktree, eksekutor `loop-fe`/`loop-be`, gerbang deterministik, `loop-judge`, perbaikan maks 2 kali), PR dengan `Closes bip-itteam-internal/<repo>#<n>`, Status **In Review**, komentar link PR.
    - Spesifikasi tak cukup atau brief `ragu`: komentar berisi pertanyaan, label `Butuh Info`, kembali ke Backlog. Begitu manusia menjawab di issue, agent mengambilnya lagi.
    - Gagal: kembali ke Backlog dengan komentar alasan.
@@ -61,6 +62,7 @@ Menjalankan agent Claude Code tanpa ditunggui untuk mengerjakan backlog **Priori
 ## Dokumen Terkait
 
 - [[ADR - 0143 Backlog Pindah dari Linear ke GitHub Project]]
+- [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]
 - [[ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak]]
 - [[LOG - Agent Backlog Otonom 2026-09]]
 - [[Microservices - Notification Service]]
