@@ -18286,23 +18286,20 @@
         "HRIS - Compensation & Benefits",
         "HRIS - Disciplinary (Surat Peringatan)"
       ],
-      "hash": "c4a825d3ce5f2a430af900860168f1cff438f2335263752d1eb8b8fa7ddb202c",
-      "ukuran_kb": 8.8,
-      "ringkasan": "Rencana implementasi (papan kerja) untuk ADR 0148 yang dipecah 3 tahap: tahap 1 membangun koleksi versi gaji dan migrasi data lama; tahap 2 membuat engine payroll membaca versi per hari dan menghitung prorata saat perubahan/masuk/resign; tahap 3 menyambung hulu (offer/movement/kontrak) agar gaji mengalir otomatis. Total 13 subtask lintas backend Go, frontend React, dan mobile Flutter dengan urutan dan dependensi jelas.",
+      "hash": "054a64a1fa6a18687a5df24494e359a1a9529509d430b5fee0481c8f7b92fbe6",
+      "ukuran_kb": 9.1,
+      "ringkasan": "Daftar kerja tiga tahap untuk mengimplementasikan versi struktur gaji yang berubah per event personalia. Menjawab: bagaimana gaji dihitung saat karyawan dipromosi/dimutasi/berganti kontrak, bagaimana prorata per hari dijalankan, dan urutan pengembangan mulai dari migrasi data hingga integrasi dengan modul recruitment dan mutasi.",
       "kata_kunci": [
-        "rencana implementasi",
-        "tahap",
-        "prorata",
-        "koleksi versi",
-        "migrasi",
-        "engine payroll",
-        "offer",
+        "payroll",
+        "struktur gaji",
+        "versi",
+        "event personalia",
         "promosi",
+        "mutasi",
         "kontrak",
-        "task",
-        "dependensi",
-        "frontend",
-        "backend"
+        "prorata",
+        "task-plan",
+        "migrasi gaji"
       ]
     },
     {
