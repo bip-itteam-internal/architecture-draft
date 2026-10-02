@@ -378,6 +378,13 @@ disalin ke vault (repo publik). Kemajuan **bagian A** (keandalan) per 2026-10-01
   (#2464): merged 2026-10-01; label layar erp-frontend #1966 dan #1976. Sebelas tool lagi (GA, hubungan
   industrial, pelatihan; bip-erp #2474, #2475, #2484, label erp-frontend #1982, #1986) merged 2026-10-02.
   Jumlah terkini, mekanisme, dan sumber yang sengaja dilewati: [[Microservices - Assistant Service]].
+- [x] **Paket di luar HRGA dan marketing** (finance, akuntansi, tiket, procurement, gudang, manufaktur, lintas
+  modul; bip-erp #2509 gerbang baca uang, #2510, #2535; label layar erp-frontend #2036, penjaga layar #2006):
+  merged 2026-10-02. Jumlah, gerbang per sumber, dan sumber yang dilewati: [[Microservices - Assistant Service]].
+- [ ] **Uji end-to-end lewat gateway per alat paket itu** (akun berizin dan tak berizin) belum dilakukan, dan
+  `uji/pertanyaan-tetap.json` belum memuat kasus untuk paket itu.
+- [ ] **Keputusan rute tulis akuntansi integration** (belum bergerbang; rinci di issue privat bip-erp#2389) dan
+  tool `aset_tetap` / `ppn_masukan` yang belum dibuat.
 - [ ] **Butir terbuka**: endpoint daftar karyawan masuk (butuh `join_date`) bergerbang HR.
 - [x] Diputuskan 2026-10-02 (pemilik produk): baris rincian KPI **tetap dikirim** ke model; bagian
   `klub_culture` **dipertahankan** walau pembacaan `/culture/clubs` menyemai klub bawaan bila koleksi kosong.

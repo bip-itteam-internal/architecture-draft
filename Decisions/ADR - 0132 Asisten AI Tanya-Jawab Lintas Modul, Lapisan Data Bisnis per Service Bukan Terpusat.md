@@ -290,6 +290,15 @@ diteruskannya. TAPI: modul percontohan yang endpoint-nya diketahui belum bergerb
 § Context) **wajib diperbaiki gerbangnya lebih dulu** sebagai prasyarat sebelum modul itu
 diikutkan ke asisten — bukan diikutkan dengan lubang itu dibiarkan.
 
+**Catatan realisasi (2026-10-02; keputusan di atas tidak diubah).** §9 dijalankan untuk modul
+keuangan: rute baca uang di integration-service digerbang lebih dulu (`RequireFinanceBaca`), baru
+alat akuntansi diikutkan ke asisten; rute baca yang sengaja dibiarkan terbuka tidak dipetakan ke alat.
+Cakupan sejak itu melebar dari modul percontohan ke paket finance, tiket, procurement, gudang,
+manufaktur, dan lintas modul. Jumlah alat, gerbang tiap sumber, dan sumber yang dilewati berikut
+alasannya hanya di [[Microservices - Assistant Service]]; gerbangnya di [[API - Integration Service]]
+§ Gerbang baca uang. Rute tulis akuntansi belum bergerbang dan keputusannya masih terbuka (issue privat
+bip-erp#2389). Belum ada uji end-to-end lewat gateway per alat.
+
 ## Consequences
 
 ### Yang membaik
