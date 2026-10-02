@@ -2140,22 +2140,24 @@
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "f250f40b7ff2432cb817f5fa991851775c62cfbd6490c8b1c8673350763d5e08",
-      "ukuran_kb": 86.9,
-      "ringkasan": "Menjawab: apa itu Copilot/Assistant Service di Web ERP, bagaimana ia merutekan pertanyaan ke endpoint yang sudah menghitung (bukan berhitung sendiri) memakai JWT penanya, dan tool apa saja yang ditawarkan (marketing, HRGA, GA, hubungan industrial, pelatihan). Juga menjawab status kode terkini (aiclient, skeleton, deploy DEV/PROD), penjaga anti angka karangan, riwayat percakapan, umpan balik, Jadwal Tugas sebagai pengingat, serta keputusan yang sebagian menggantikan ADR 0120 dan diteruskan ADR 0132.",
+      "hash": "c6cb9b65732d5aad3b5f79bded8fbf6bab08a725e32f0eadff44b2dc752f0566",
+      "ukuran_kb": 87.2,
+      "ringkasan": "Menjawab: apa itu asisten tanya-jawab Copilot di Web ERP, bagaimana ia merutekan pertanyaan ke endpoint lewat gateway dengan JWT pemakai (tanpa berhitung sendiri), dan tool apa saja yang ditawarkan (marketing, HRGA, GA, hubungan industrial, pelatihan). Juga menjawab bagaimana penjaga anti angka karangan, samaran identitas ke relay AI, riwayat percakapan, umpan balik, jadwal tugas, dan status implementasi/deploy per tahap (T1, T2, dev vs prod) bekerja, serta apa yang sengaja dilewati atau belum diputuskan.",
       "kata_kunci": [
         "assistant service",
-        "copilot",
+        "Copilot",
         "asisten AI",
-        "tool runner",
-        "function calling",
         "tanya-jawab",
-        "JWT gateway",
-        "tool HRGA",
+        "tool calling",
+        "function calling",
+        "gateway JWT",
+        "RBAC",
+        "ADR 0132",
         "marketing analytics",
-        "jadwal tugas",
+        "HRGA",
         "penjaga jawaban",
-        "ADR 0132"
+        "jadwal tugas",
+        "LLM relay"
       ]
     },
     {
@@ -16974,22 +16976,23 @@
         "CORE - RBAC dan Permission Set",
         "CORE - Kapabilitas AI dan Machine Learning"
       ],
-      "hash": "b436042d01bb94b8555ae5fce44a5351a0557abfff48425f4d9978fcb2242e5b",
+      "hash": "1c5a1bb4279df7769af184bb5b84b9ed060016695847570b4d6ab61f874aa8ab",
       "ukuran_kb": 34.4,
-      "ringkasan": "Menjawab: apa saja daftar task (T1 dst) untuk membangun Asisten AI lintas modul, urutan dan ketergantungannya, apa yang harus dibaca dulu, dan kriteria selesai tiap task. Mencakup prasyarat keputusan manusia (Corp Sec, persetujuan Direksi untuk data asli), fondasi klien AI dan skeleton service, gate RBAC Copilot, modul percontohan, presentasi jawaban, pengukuran, serta Jadwal Tugas.",
+      "ringkasan": "Menjawab: apa saja daftar task (T1 dst) untuk membangun asisten AI lintas modul, urutan ketergantungannya, dan kriteria selesai tiap task. Juga menjawab prasyarat keputusan manusia yang belum ada (Corp Sec, persetujuan Direksi untuk data keluar lewat relay, konfirmasi Direktur), progres klien AI, skeleton service, gate RBAC Copilot, modul percontohan, presentasi jawaban, verifikasi, dan jadwal tugas.",
       "kata_kunci": [
-        "analisa kebutuhan",
         "asisten AI",
-        "copilot",
-        "papan kerja task",
-        "T1 klien AI",
-        "T2 skeleton",
-        "T3 gate RBAC",
-        "modul percontohan",
+        "Copilot",
+        "analisa kebutuhan",
+        "task list",
+        "papan kerja",
+        "lintas modul",
         "ADR 0132",
-        "ADR 0135",
-        "jadwal tugas",
-        "verifikasi"
+        "RBAC gate",
+        "klien AI",
+        "skeleton service",
+        "persetujuan Direksi",
+        "modul percontohan",
+        "jadwal tugas"
       ]
     },
     {
