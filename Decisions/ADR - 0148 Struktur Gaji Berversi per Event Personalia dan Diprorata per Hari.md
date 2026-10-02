@@ -131,7 +131,9 @@ Butir ketiga **merevisi** keputusan produk di [[ADR - 0035 HR Menonaktifkan Akun
 ### 9. Migrasi dan pensiun sheet
 
 - Setiap `employee_salary` yang ada menjadi **versi #1** bersumber `migrasi`, berlaku sejak **awal periode payroll pertama yang dihitung engine sesudah migrasi**. `effective_date` lama (kosong atau 2027) tidak dipakai. Riwayat sebelumnya tetap di run impor ADR 0070.
+	- 🔁 **Amandemen 2026-10-02 (S1 + S2):** versi #1 dibuat **identik dengan versi dasar otomatis S1**: sumber `baseline_proyeksi`, berlaku **`1970-01-01`** sebagai penanda "sebelum riwayat tercatat" (proyeksi dan layar tak memamerkan tanggal itu), bukan sumber `migrasi` bertanggal awal periode. Alasannya: dengan prorata (§7), periode lama yang dihitung ulang tetap menemukan versi berlaku; versi bertanggal awal periode akan membuat hari sebelumnya tanpa versi, alias gaji nol. Satu bentuk juga berarti migrasi dan pembuatan lazy S1 tak bisa menggandakan versi #1. Versi hasil migrasi diberi penanda `migrasi: "s2-20261002"` untuk pemulihan.
 - Komponen variabel yang tersimpan di struktur (Kasbon) dibuang dari versi #1 dan dicatat di laporan migrasi.
+	- Diukur prod 2026-10-02: satu karyawan (Kasbon Rp 1.000.000 di struktur). Diputuskan user 2026-10-02: kasbon punya **alur pengajuan sendiri** (masih manual, tanda tangan basah), bukan bagian struktur gaji; sesudah migrasi potongannya tidak lagi otomatis tiap run, dan HRD memasukkannya sebagai Kasbon per run sesuai pengajuan. Alur pengajuan kasbon di sistem = di luar ADR ini (calon rantai pengajuan → payroll, lihat [[REF - Rantai Pengajuan Lintas Modul]]).
 - Skrip impor sheet HRD tak lagi menulis `employee_salary` langsung; ia membuat versi bersumber `impor_sheet`, melewati gerbang §8 yang sama.
 - Migrasi adalah **tulis prod**: agent menyiapkan skrip dry-run dan apply beserta backup; manusia yang menjalankan.
 
