@@ -210,22 +210,20 @@
         "ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "d45eecc29887768e4d6b89f5ccde81a80159212978c3dc90b957042b26d34962",
+      "hash": "41afa60cbfa3b5191aaa7bdb504d71ea297c18881d02b8b7819764df8d6691e4",
       "ukuran_kb": 27.0,
-      "ringkasan": "Menjawab: endpoint finance-service apa saja (Cost Control rekomendasi efisiensi, Pajak kewajiban per masa, Biaya Variabel Produksi, Audit Internal, Buku Besar CV), izin yang dibutuhkan tiap rute, dan bagaimana rute /internal/ dijaga. Juga menjelaskan kontrak prefix gateway /api/finance, rute mesin penugasan pemegang CV, dan mana yang sudah di kode tetapi datanya masih kosong di prod.",
+      "ringkasan": "Dokumentasi lengkap endpoint gateway `/api/finance/*` yang mencakup modul Cost Control (rekomendasi efisiensi), Pajak (kewajiban per masa), Biaya Variabel Produksi, Audit Internal, dan Buku Besar CV. Menjawab: bagaimana struktur request-response, izin akses per modul (RBAC), rute internal untuk sumber KPI, alur implementasi per fitur, dan status kesiapan di production.",
       "kata_kunci": [
-        "finance service",
-        "API finance",
-        "cost control",
-        "rekomendasi efisiensi",
+        "finance-service",
+        "cost-control",
         "pajak",
         "tax",
         "kewajiban pajak",
         "biaya variabel produksi",
         "audit internal",
         "buku besar CV",
-        "penugasan CV",
-        "internal route"
+        "endpoint API",
+        "RBAC"
       ]
     },
     {
