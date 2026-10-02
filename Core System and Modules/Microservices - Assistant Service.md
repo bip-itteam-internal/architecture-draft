@@ -67,6 +67,15 @@
   layar sebelas tool itu sudah ada di `id.ts` dan `en.ts` erp-frontend `origin/main` (kunci tiap nama tool
   ditemukan lewat `git grep`; isi kalimatnya tak dibaca dokumen ini). ⚠️ Belum ada pengukuran PROD maupun uji
   di DEV atas gelombang ini (yang terbukti baru kode dan test di repo).
+  **Sinkron 2026-10-02 (lanjutan, diukur ke `origin/main`, bip-erp #2509, #2510, #2535; erp-frontend #2006, #2036)**:
+  Copilot keluar dari HRGA dan marketing. **Tujuh paket baru** (finance, akuntansi, tiket, procurement, gudang,
+  manufaktur, lintas modul) menambah 35 tool; hitungan terkini hanya di § Permukaan tool dan rinciannya di
+  § Paket tool di luar HRGA dan marketing. Gerbang baca uang di integration-service (#2509) menjadi
+  prasyarat paket akuntansi, lihat [[API - Integration Service]] § Accounting. Label layar paket baru ada di erp-frontend
+  #2036 (kunci delapan tool contoh ditemukan lewat `git grep` di `id.ts` dan `en.ts`; isi kalimatnya dan jumlah
+  persisnya tak dibaca dokumen ini) dan #2006 (branch `fix/penjaga-layar-rekonsiliasi`; isinya tak dibaca,
+  **TBD**). ⚠️ Belum ada uji
+  end-to-end lewat gateway per tool maupun pengukuran PROD atas gelombang ini; yang terbukti baru kode dan test di repo.
 - **Stack**: Go, `net/http` langsung (klien tipis hand-roll, BUKAN SDK Anthropic — divalidasi
   2026-09-28, lihat
   [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]]
@@ -150,13 +159,19 @@ flowchart LR
 
 Satu tool per endpoint baca, sekitar delapan sampai dua belas untuk irisan pertama. Kandidatnya dari rute yang sudah ada di `services/marketing-analytics/handler_mart.go` dan tetangganya: `/beranda`, `/summary`, `/profit/shops`, `/profit/products`, `/profit/skus`, `/profit/campaigns`, `/profit/ads`, `/videos`, `/lives`, `/returns/breakdown`. ~~Daftar finalnya **TBD**.~~
 ~~Per 2026-09-30 ada **lima belas** tool di kode.~~ ~~Per 2026-10-01 ada **42 tool**.~~ ~~Per 2026-10-01 (sesudah #2421) ada 43 tool.~~ ~~Per 2026-10-01
-(sesudah #2464) ada 51 tool.~~ Per 2026-10-02 (sesudah #2474, #2475,
-#2484) ada **62 tool yang ditawarkan ke model**: tiga HRIS (`rekap_telat_tim`,
+(sesudah #2464) ada 51 tool.~~ ~~Per 2026-10-02 (sesudah #2474, #2475,
+#2484) ada 62 tool.~~ Per 2026-10-02 (sesudah #2510 dan #2535, diukur ke `origin/main` `9f0a2649`) ada
+**97 tool yang ditawarkan ke model**: tiga HRIS (`rekap_telat_tim`,
 `antrean_persetujuan`, `cuti_tim`; `Rekap`, `Antrean`, `Cuti` di `daftarAlat()`, `tanya.go`), dua belas
-marketing (§ Tool marketing; `alatMarketing()` di `main.go`), dan **47 HRGA** (§ Tool HRGA; dihitung
-dari elemen `[]Alat` tiap fungsi `Daftar*` di `alat_hrga_*.go` pada `origin/main` 2026-10-02, dirakit
-`alatHrga()` di `main.go`: kepegawaian 6, presensi 5, payroll 2, rekrutmen & GA 9, KPI 5, jadwal 3,
-pelatihan & dokumen 7, hubungan industrial 10; 6+5+2+9+5+3+7+10 = 47, dan 3+12+47 = 62). Ini **satu-satunya
+marketing (§ Tool marketing; `alatMarketing()` di `main.go`), **47 HRGA** (§ Tool HRGA; dihitung
+dari elemen `[]Alat` tiap fungsi `Daftar*` di `alat_hrga_*.go`: kepegawaian 6, presensi 5, payroll 2,
+rekrutmen & GA 9, KPI 5, jadwal 3, pelatihan & dokumen 7, hubungan industrial 10; 6+5+2+9+5+3+7+10 = 47),
+dan **35 di luar HRGA dan marketing** (§ Paket tool di luar HRGA dan marketing, dari fungsi `Daftar*` di
+`alat_finance.go` 4, `alat_akuntansi.go` 5, `alat_tiket.go` 4, `alat_procurement.go` 5, `alat_gudang.go` 4,
+`alat_manufaktur.go` 7, `alat_lintas.go` 6; 4+5+4+5+4+7+6 = 35). Semua `Daftar*` itu dirakit satu fungsi,
+`alatHrga()` di `main.go` (15 daftar; namanya warisan dari paket pertama), jadi 47+35 = 82 lewat fungsi itu, dan
+3+12+82 = **97**. Hitungan dari membaca elemen daftar di kode, bukan dari uraian PR; jumlah di badan PR (mis. "31 alat")
+tidak dicocokkan. Ini **satu-satunya
 tempat** jumlah tool ditulis; dok lain (termasuk ADR dan ANALISA) cukup menaut ke sini. Satu tool lagi,
 `insentif_snapshot`, **sudah ditulis tetapi sengaja tidak ditawarkan** (alasannya di § Tool HRGA).
 Satu daftar (`daftarAlat()` di `tanya.go`) dipakai untuk menawarkan tool ke model sekaligus untuk
@@ -485,6 +500,113 @@ serah GA. Pengetatan di sumber dicatat di issue privat bip-erp#2389 (2026-10-02)
 (repo publik). (3) **Diputuskan 2026-10-02 (pemilik produk): baris rincian KPI tetap dikirim ke model**
 (label + nilai, dibedakan komponen / hasil / pengecualian), bukan hanya jumlahnya.
 
+### Paket tool di luar HRGA dan marketing (bip-erp #2510 dan #2535, merged 2026-10-02)
+
+Tujuh paket, **35 tool** (jumlah per paket dan cara menghitungnya di § Permukaan tool). Semuanya membaca
+endpoint GET yang **sudah ada** di service pemiliknya lewat `KlienHrga` (gateway + JWT penanya), dengan dekode
+berdaftar-putih, tanpa gerbang buatan tool: 403/401 dari sumber menjadi `tidak_berhak`, bukan angka. Satu-satunya
+pengecualian klien: `kohort_audiens` memakai `KlienMarketing` (pesan `tidak_berhak` khas marketing,
+`alat_lintas.go`). Tak satu pun tool di paket ini mengirim nama karyawan ke model, kecuali yang dinyatakan di
+tabelnya (token `Karyawan-N`). Sumber: komentar kepala berkas `internal/alat/{fin_,tiket_,procurement_,gudang_,mfg_,lintas_,akt_}*.go`
+pada `origin/main` 2026-10-02; nomor baris yang disebut ada di komentar itu dan **mengikuti kode sumber pada
+saat komentar ditulis**, jadi ukur ulang sebelum dijadikan rujukan.
+
+**Finance** (`finance-service`, modul gateway `finance`; `alat_finance.go`, `fin_*.go`)
+
+| Tool | Endpoint yang dibaca | Gerbang di sumber | Batas dan field yang sengaja tak dibaca |
+|---|---|---|---|
+| `pajak_kewajiban` | `GET /pajak/ringkasan` | `PermFinancePajakView` | Periode = bulan **tenggat**, bukan masa pajak. Status diturunkan di sumber (terlambat dll.), tool tak menghitung keterlambatan atau skor KPI. Nilai `null` = belum diisi. `riwayat` (memuat employee_id dan alasan), bukti, nomor BPE, nomor pengajuan, tanggal lapor tak didekode. Cacah jatuh tempo 0 bisa berarti penerbitan kewajiban otomatis belum jalan (periksa `masa_terakhir_terbit`), bukan pencapaian |
+| `temuan_audit` | `GET /audit/temuan` (+ `/audit/uji` untuk nama uji) | `PermAuditView` | Sumber mengirim **seluruh** temuan tanpa paginasi; daftar ke model dipotong, cacah tetap utuh. Kondisi, sampel, akar penyebab, dampak, rekomendasi, kriteria, dan penerbit tak didekode. Registry uji gagal dibaca = kode uji saja |
+| `kertas_kerja_audit` | `GET /audit/periode/:periode` | `PermAuditView` | Keadaan **efektif** tiap item uji (vonis manusia menang atas keadaan mesin). Maks 40 baris (`batasBarisKertasKerjaFin`). Angka hasil uji, ringkasan, rincian, catatan, sampel, dan nama peninjau tak didekode |
+| `kecocokan_cv` | `GET /akuntansi-cv/kecocokan` | `akuntansicv.view` | Sumber yang gagal dibaca dibalas 200 berstatus per sumber dan pemeriksaan yang bergantung padanya **tidak dijalankan**: tool meneruskan status itu, jadi "tak ada selisih" jenis itu **bukan** bukti cocok. Rujukan jenis `PEMEGANG_TANPA_IZIN` (employee_id) tak dikirim; `/penugasan` tak dipanggil |
+
+**Akuntansi** (`integration-service`, `alat_akuntansi.go`, `akt_*.go`; gerbangnya [[API - Integration Service]] § Accounting)
+
+| Tool | Endpoint yang dibaca | Gerbang di sumber (nama kelompok di `finance_baca_gate.go`) | Batas dan aturan kolom |
+|---|---|---|---|
+| `laba_rugi` | `GET /accounting/profit-loss` | `GerbangFinanceLaporan` | Laporan datang **sudah tersusun** dari Accurate; tool tak menghitung ulang |
+| `saldo_akun` | `GET /accounting/account-balance` | `GerbangFinanceLaporan` | Akun neraca bersaldo **per tanggal**, akun laba rugi **sepanjang rentang**. `/balance-sheet` tak dipakai (gerbangnya lain) |
+| `anggaran_mingguan` | `GET /accounting/anggaran/mingguan` | `GerbangFinanceAkuntansi` | Akurasi `null` bila `akurasi_terdefinisi` false: nol di sumber berarti **belum diukur**, bukan 0% |
+| `piutang` | `GET /transactions/orders/piutang/summary` + `GET /accounting/receivables` | `GerbangFinancePiutang` | Dua bagian terpisah, `marketplace` (order sudah dikirim, uang belum cair) dan `b2b` (faktur Accurate belum lunas): **dua basis berbeda, tidak pernah dijumlahkan jadi satu total**. Kelompok umur marketplace bertanda `subset=true` adalah **bagian dari** kelompok lain, jangan dijumlahkan. Daftar faktur dan nama pelanggan B2B tak dikirim |
+| `kas_dan_dompet` | `GET /accounting/kas/rekonsiliasi/ringkasan` + `/kesegaran` + `GET /wallet/saldo` | rekonsiliasi dan kesegaran `GerbangFinanceRekonsiliasiKas`; dompet `GerbangFinanceDompet` | Tiga bagian terpisah, **gerbangnya berbeda** sehingga satu bagian bisa `tidak_berhak` sementara yang lain terbaca. Rentang rekonsiliasi maks **31 hari** (`batasRentangRekonAkun`): sumbernya memindai buku besar Accurate per toko untuk seluruh rentang, dan rentang panjang berujung timeout gateway 30 detik yang terbaca seperti "audit lambat". `saldo_tersedia_ada=false` (TikTok) = sumber tak menyediakan saldo, **bukan nol, jangan dijumlahkan** |
+
+Aturan paket akuntansi: laporan dicache 10 menit di integration, jadi tool menyebut umur cache itu di keluarannya
+(`catatanCacheAkun`). **Kelima tool masuk `alatJawabanTertutup`** (`umpan_rekap_rute.go`) bersama alat payroll:
+teks jawaban giliran yang memakainya disembunyikan dari peninjau rekap umpan IT, karena gerbang izin finance
+bukan gerbang IT; test `TestAlatAkuntansiAkt_SemuaJawabanTertutup` mengunci bahwa alat baru di `DaftarAkuntansi`
+tak boleh lupa didaftarkan, dan menjaga `pajak_kewajiban` **tidak** ikut tertutup tanpa keputusan.
+
+**Tiket** (`task-management`, modul gateway `task-management`; `alat_tiket.go`, `tiket_*.go`)
+
+Gerbang semua tool tiket: rute laporan tim di belakang `reportGate` (`gateOrSpaceAdmin(PermTicketReportTeam,
+supervisor, admin)`, `routes.go:86-92`) dan `/tasks/stats` (`staffOrSup`, `routes.go:30`). **Cakupan baris
+ditentukan sumber** (`scopeSpaceLaporan` + `terapkanScopeLaporan`), tool tak menyaring hak akses.
+
+| Tool | Endpoint yang dibaca | Aturan kolom dan batas |
+|---|---|---|
+| `ringkasan_tiket` | `GET /report/summary-by-department`, `GET /tasks/stats`, `GET /report/timeline` (hanya bila `rincian_harian`) | Rentang = tanggal **dibuat**, bawaan 30 hari, maks 92 hari, selalu dikirim eksplisit supaya angkanya berrentang tertulis. `division` = divisi **pemohon**, bukan pemilik ruang kerja. `reopened`/`reopen_rate` di `/tasks/stats` **selalu nol** di rute ini jadi tak diambil. Sumber tak punya hitungan per prioritas |
+| `sla_tiket` | `GET /report/sla`, `GET /report/sla-breaches` | `on_time_rate` persen 0-100 tetapi **bernilai 0 saat `total` 0**: **nol tiket terukur = `null`, bukan 0%**. Hanya tiket yang punya tenggat **dan** sudah selesai yang terukur. Pelanggaran dihitung pada saat panggilan (tiket terbuka yang lewat tenggat ikut, `overdue_hours` terus bertambah); tiket yang ditahan tak pernah tercatat melanggar. Judul tiket (`keluhan`) dan `assignee_name` hanya ke tabel penanya, tak ke model |
+| `csat_tiket` | `GET /report/csat` | Rentang memakai **tanggal rating** (`csat.rated_at`), **bukan** tanggal tiket dibuat (beda dari tool tiket lain), hanya tiket berstatus Done. **`top2box_pct` sumbernya PECAHAN 0..1** walau bernama `_pct` (`csat.go:95`, tak dikali 100); tool mengubahnya ke persen. `count` 0 membuat `average` dan `top2box_pct` bernilai 0 di sumber: tanpa rating, bukan rating nol. Komentar rating tak diminta |
+| `kinerja_personel_tiket` | `GET /report/manpower-performance` | Tiket yang ditugaskan ke beberapa orang dihitung **sekali per orang**, jadi jumlah `total` antar-orang bisa melebihi jumlah tiket. `avg_response_hours`/`avg_resolution_hours` bernilai 0 baik saat tak ada data maupun saat rata-ratanya di bawah 3 menit (sumber tak membedakan). `avg_csat` berpenyebut `csat_count`: 0 = tanpa rating. `name` jatuh ke employee_id bila data pribadi tak ditemukan di sumber; orang disamarkan token, employee_id mentah tak dikirim |
+
+**Procurement** (`procurement-service`; `alat_procurement.go`, `procurement_*.go`)
+
+| Tool | Endpoint yang dibaca | Gerbang di sumber | Aturan kolom dan batas |
+|---|---|---|---|
+| `ringkasan_procurement` | `GET /ringkasan` | `gate(PermProcurementView)` berfallback tier | `pembelian_terbaca`/`penjualan_terbaca` false = angka kelompok itu **dibuang** dari keluaran, bukan dikirim sebagai nol. **`po_berjalan`, `po_diterima_30_hari`, `rata_lead_time` menghitung PO buatan ERP** (koleksi `purchase_order`, 0 dokumen di produksi menurut komentar `ringkasan.go`); angka pembelian nyata ada di `nilai_pembelian` (cermin Accurate). `nilai_pembelian` dan `pesanan_menunggu_persetujuan` dijumlah atas **seluruh** pesanan yang tercermin, bukan atas periode `dari`/`sampai`. Return rate hanya dikirim bila `retur_tersedia` dan `punya_retur` (retur baru tercatat sejak Juni 2026). `pembelian_error`/`penjualan_error` (galat Mongo) tak didekode |
+| `utang_pemasok` | `GET /tagihan/aging`, `GET /tagihan/per-pemasok`, `GET /pemasok/ringkas` | `gate(PermProcurementView)` | Nominal = `prime_owing` (**sisa** utang), bukan total faktur. `tanpa_jatuh_tempo` dipisah dari keempat ember supaya jumlah ember sama dengan total. Per-pemasok tak berpaginasi dan tanpa nama (nama dari `/pemasok/ringkas`; gagal = baris tetap tampil berkode). Nama pemasok = badan usaha, boleh tampil |
+| `pembelian_pemasok` | `GET /pesanan`, `GET /penerimaan`, `GET /po/lead-time` | `gate(PermProcurementView)` | Selalu `limit=100` + baca `total`: tanpa limit eksplisit sumber memotong diam-diam. Penerimaan **tak menyimpan `vendor_no`**: pemasoknya terbaca lewat nomor pesanan tertaut, dan lapis detail itu hanya ada 6 bulan terakhir. Lead time berasal dari PO buatan ERP sehingga hampir selalu kosong. `catatan_erp`, metadata, `keterangan_tidak_sesuai`, dan pencatat tak didekode |
+| `pengajuan_barang` | `GET /pengajuan-barang`, `GET /pengajuan-barang/antrean` | **tanpa gerbang di pendaftaran rute**; gerbang di badan handler per cakupan penanya (departemen sendiri atau dinaungi, yang ia tindak; Finance semua departemen) | Daftar yang pendek untuk non-Finance adalah cakupan sumber, bukan kerusakan. `perlu_perhatian` hanya string `"true"` persis (`1` diabaikan diam-diam dan mengembalikan daftar penuh). `cakupan_cv_gagal` true = antrean mungkin lebih pendek dari seharusnya. Alasan/riwayat, lampiran, tujuan dana, spesifikasi barang, rekening, dan id dokumen tak didekode; pengaju token |
+| `pengajuan_budget` | `GET /budget/pengajuan`, `GET /budget/persetujuan` | `gateBacaBudget` (supervisor mana pun atau pemegang izin budget) **lalu** lapis kedua di handler | Tanpa `approve.finance`/`approve.direksi`, daftar disaring ke `dibuat_oleh = penanya` (cakupan sumber, bukan kerusakan). Penanya tanpa tahap yang bisa ia setujui menerima daftar kosong 200 di `/budget/persetujuan`, bukan 403. Keperluan, tautan, lampiran, riwayat alasan, dan alokasi akuntansi tak didekode. Sumber hanya mengirim employee_id pengaju (tanpa nama): tool memberinya token |
+
+**Gudang** (`warehouse-service` dan stok `manufacture-service`; `alat_gudang.go`, `gudang_*.go`). Semuanya cacah atau agregat: pelapor, packer, pencatat, nomor pesanan, resi, pembeli, alamat, catatan, ulasan, dan foto tak didekode, jadi tak satu pun memakai penggabungan per orang.
+
+| Tool | Endpoint yang dibaca | Gerbang di sumber | Aturan kolom dan batas |
+|---|---|---|---|
+| `status_antrean_gudang` | `GET /fulfillment/dashboard` + `GET /fulfillment/queue/counts` | `warehouseGuard("admin_gudang","leader","spv","admin_qc"[,sadewa])` (`warehouse main.go:158,175`) | ⛔ **`total_today` di sumber BUKAN "hari ini"**: ia total semua status yang cocok filter tanggal, dan tanpa rentang berarti seluruh riwayat. **Kolom per status adalah himpunan bagian dari total, jangan dijumlahkan ke total**; `handed_over_rincian` (dikirim, selesai) adalah pecahan `handed_over`, bukan status tambahan. Hitungan hilang = balasan rusak, bukan nol |
+| `komplain_gudang` | `GET /wms/komplain` | `gerbangBacaKomplain` (`warehouse main.go:224`) | Komplain marketing atas pekerjaan packing, per status, kategori, toko, channel, bulan |
+| `waste_packing` | `GET /wms/waste` | `warehouseGuard` (`warehouse main.go:231`) | Barang jadi rusak/kedaluwarsa satu bulan, per sebab dan SKU. `/wms/sla-dispatch` sengaja tak dipanggil: isinya konfigurasi cutoff, bukan data waste |
+| `stok_gudang` | `GET /stok/sektor`; rincian barang `GET /stok` + master bahan/produk bila ada saringan | `requireTabRead("stock")` (`manufacture main.go:146-148`) | ⛔ **Field `stock` di `/stok/sektor` sengaja tak didekode**: ia menjumlahkan qty **lintas satuan** (gram + liter + pcs), angka yang tak bermakna. `/stok` mengirim seluruh koleksi tanpa filter, disaring di tool; saringan dengan NAMA saat master tak terbaca akan diam-diam kurang, jadi kegagalan master dikembalikan sebagai status |
+
+**Manufaktur** (`manufacture-service`; `alat_manufaktur.go`, `mfg_*.go`). Gerbang milik sumber per tab WMS (`requireTabRead`), `requireGudangRead`, `requireK3Read`. Daftar manufacture **tidak berpaginasi dan tak menerima limit**: rentang dan pemotongan dikerjakan di tool, dan balasan mencapai 16 MB (batas baca `KlienHrga.ambil`) dilaporkan `sumber_tak_terjangkau`, **bukan dihitung sebagian**. Nama orang (pelapor, penerima, PIC, penginput) dan teks bebas tak didekode; label master diketik orang dipotong dan yang memuat urutan angka panjang dibuang (`teksAmanMfg`).
+
+| Tool | Endpoint yang dibaca | Gerbang di sumber | Aturan kolom dan batas |
+|---|---|---|---|
+| `produksi` | `GET /production-log` | `requireTabRead("production")` | Log produksi **tidak punya status**, hanya catatan hasil. `per_tanggal` memuat 31 hari terbaru. Angka dibaca seperti sumber (nilai non-angka = nol tanpa menggagalkan baris) |
+| `po_marketing` | `GET /marketing-po` + `/marketing-po/menunggu-count` | `requireTabRead("orders_po")` | Pesanan barang jadi (MO) marketing ke produksi: status, tenggat kirim, yang menunggu PPIC. Pelanggan, PIC, harga, keterangan tak didekode |
+| `material_order` | `GET /material-order` + `GET /procurement-po` | `requireTabRead("orders_po")` | Permintaan bahan produksi dan PO pembelian bahan. Harga satuan PO multi-bahan **tak dikirim**: bahan tambahan ada di `detail`, jadi harga tak bisa dikalikan dengan aman |
+| `selisih_rm` | `GET /selisih-rm` | `requireTabRead("selisih_rm")` | Selisih bahan baku **dikirim gudang RM vs diterima produksi**. Filter `date` sumber hanya satu hari persis, jadi rentang disaring di tool dan `date` dikirim hanya bila `dari == sampai` |
+| `gudang_bahan` | `GET /lot-bahan?sisa=true` + `GET /cycle-count` | `requireGudangRead` | Lot bahan yang masih bersisa (FIFO/FEFO) dan cycle count mingguan. `no_lot` pemasok, penyetuju, dan alasan tolak tak didekode |
+| `piutang_konsinyasi` | `GET /piutang-konsinyasi?toko=` (+ `GET /lokasi-gudang?aktif=true` bila `toko` kosong) | `requireTabRead("piutang_konsinyasi")`; daftar lokasi `requireTabRead("master_lokasi")` | ⛔ **Piutang BARANG, bukan rupiah**: semua angka kuantitas, satuan tak dikirim sumber, jadi **jangan dijumlahkan antar-barang dan jangan diberi satuan atau nilai rupiah**. Sumber tak punya umur piutang, harga, nominal, dan menolak (400) toko yang bukan lokasi konsinyasi aktif |
+| `insiden_k3` | `GET /accident-report?periode=` + `GET /gmp-ceklis?periode=` | `requireK3Read` | **Agregat saja**; sumber menerima satu periode per panggilan, jadi tool memanggil sekali per bulan (maks 6 bulan) dan tak pernah memakai hasil sebagian bulan. Korban, pelapor, kronologi, tindakan (hanya ada-tidaknya), dan nama poin ceklis tak dibaca. Persetujuan `nil` = belum diputuskan. `area_wajib` hilang = cakupan tak dihitung, bukan galat |
+
+Sengaja **tidak** ada di paket manufaktur: `/transaksi` (disaring diam-diam untuk Finance di sumber sehingga angkanya berbeda menurut penanya) dan `/kpi/*` (kunci layanan, bukan JWT penanya).
+
+**Lintas modul** (`alat_lintas.go`, `lintas_*.go`). Hak akses diputuskan service sumber; tak ada penggabungan per orang karena tak satu pun mengirim nama.
+
+| Tool | Endpoint yang dibaca | Gerbang di sumber | Aturan kolom dan batas |
+|---|---|---|---|
+| `agenda` | `GET /api/calendar/` | tanpa gerbang modul di rute; visibilitas diputuskan **service sumber tiap feed** ([[Microservices - Calendar Service]]) | Ke model hanya tanggal, jam WIB, seharian, jenis, sumber, status, lingkup. **Judul agenda hanya ke tabel penanya** (bisa memuat nama atau teks bebas). Agenda seharian hanya mengirim tanggal mulai karena semantik `end_at` beragam antar feed |
+| `insentif_saya` | `GET /api/insentive/profit-dashboard/saya` | tanpa gerbang peran di rute; filter dokumen `barisMilik(rows, employeeID)` dari header gateway, bukan parameter | Insentif **milik penanya sendiri**. Dua potret satu rupiah: `rows[].insentif` = hitungan **live**, `snapshot[].insentif` = yang **dibekukan** (angka yang dibayar): **bukan komponen yang dijumlahkan**, dan realisasi/target satu level tak dijumlahkan dengan level lain (realisasi leader/supervisor sudah memuat tim). Rute `/profit-dashboard` dan `/results*` sengaja tak dipakai |
+| `ulasan_produk` | `GET /reviews/summary` + `GET /reviews/products` (integration) | `MiddlewareCakupanUlasan`: leader/SPV marketing dan staf Integration semua toko, selain itu hanya toko di mapping ICC aktif; gagal membaca mapping = 500 (gagal tertutup) | Sebaran bintang adalah **hitungan**, dijumlahkan hanya **dalam satu channel**: sumber memakai snapshot kumulatif TikTok (ambil yang terbaru) tetapi menjumlah Shopee sepanjang rentang, jadi **total lintas channel tidak dibuat**. Tak ada paginasi, pemotongan di tool dan ditandai. `/reviews/comments` tak dipakai (teks pembeli). Nama produk dipotong 80 karakter |
+| `indeks_layanan_divisi` | `GET /me/service-index` (form-builder) | gerbang departemen **di handler**: `SupervisedDepartments` harus memuat departemen yang ditanyakan, kalau tidak 403 | Respons tanpa amplop `data`. Departemen tanpa form (`has_form:false`) adalah keadaan **normal**. `index` null = belum ada jawaban berskala. `unweighted` (pertanyaan berbobot nol) bukan komponen indeks dan tak dijumlahkan ke dalamnya. Label aspek (teks pertanyaan) dipotong 80 karakter |
+| `kesehatan_sistem` | `GET /summary` + `GET /incidents?limit=` (monitoring) | `lihat := gate(PermMonitoringView, isITStaff)` | Daftar insiden dipotong di `limit` kejadian terbaru oleh sumber yang **tak melaporkan total**, jadi daftar berisi tepat `limit` baris ditandai sebagian. **Satu gangguan = dua baris** (down lalu up): jumlah baris bukan jumlah gangguan. `message` insiden mentah tak dibaca |
+| `kohort_audiens` | `GET /cohort` + `GET /audience` (marketing-analytics) | `common.RequireAnalitikMarketing` di pendaftaran rute | `/cohort` **hanya Shopee** (buyer.id TikTok/Lazada kosong). **`buyers` per SKU tak dijumlahkan antar SKU** (pembeli dua SKU terhitung di keduanya); `returns` himpunan bagian `orders`; `return_value` bukan pengurang `revenue`. Kegagalan membaca `integration_db` **bukan 5xx** melainkan 200 berisi nol baris dengan `unavailable_channels` beralasan "Data gagal dibaca": tool mengubahnya jadi `sumber_tak_terjangkau`, bukan "nol pembeli". Order pada tanggal `sampai` sendiri sebagian besar **tidak ikut** (sumber membaca `sampai` sebagai awal hari UTC) |
+
+**Butir terbuka paket ini** (diputuskan atau dikerjakan terpisah, bukan oleh dokumen ini):
+
+1. **Rute TULIS di grup `/accounting` integration-service belum bergerbang finance.** Gerbang #2509 hanya
+   menutup rute BACA; apakah rute tulis perlu gerbang adalah keputusan yang belum diambil. Rinciannya di issue
+   privat repo kode bip-erp#2389 dan **tidak diuraikan di vault** (repo publik). Copilot sendiri tidak menulis apa pun.
+2. **`aset_tetap` dan `ppn_masukan` belum dibuat** sebagai tool (rutenya `/accounting/fixed-assets/summary` dan
+   `/accounting/ppn-masukan` sudah bergerbang di sumber); `/accounting/journals` juga belum. Keputusan terpisah.
+3. **Belum ada uji end-to-end lewat gateway per tool** dengan akun berizin dan akun tak berizin. Yang terbukti
+   baru kode dan test di repo; `kas_dan_dompet`, `piutang`, dan kawan-kawannya belum dibandingkan dengan layar
+   Finance. `uji/pertanyaan-tetap.json` (§ Uji pertanyaan tetap) **belum memuat satu pun nama tool paket ini**
+   (delapan nama contoh dicari dengan `Select-String` di berkas itu pada `origin/main` 2026-10-02, semuanya nol),
+   jadi uji pasca-deploy belum menjaga paket ini.
+4. Daftar karyawan masuk per bulan (butir terbuka § Sumber yang sengaja dilewati) tetap tak terjawab.
+
 ### Sumber yang sengaja dilewati (jangan dicoba ulang tanpa membaca alasannya)
 
 Diperiksa saat menyusun gelombang 2026-10-01. Alasan di kolom kanan berasal dari pembacaan kode oleh
@@ -508,6 +630,16 @@ pengerjanya; yang bertanda **dugaan** belum diukur ke data.
 | Kaizen (2026-10-02) | Programnya direncanakan dihapus (komentar `alat_hrga_hi.go`) |
 | `/legal/disputes` (2026-10-02) | Domain Corporate Secretary, bukan HRGA |
 | `learning /training/history/:employeeId` (2026-10-02) | Satu orang per panggilan; riwayat pelatihan siapa pun terbaca lewat rute ini (komentar `services/learning/request.go:221`) |
+| finance `/biaya-variabel` (2026-10-02) | Tanpa gerbang izin di sumber (komentar `alat_finance.go`); menunggu gerbang |
+| finance `/cost-control/rekomendasi` (2026-10-02) | "Keputusan terpisah, bukan kelalaian" (komentar `alat_finance.go`); alasan lebih rinci tak tertulis, **TBD** |
+| insentive `/results*` dan `/profit-dashboard` (2026-10-02) | `/profit-dashboard` digerbang `RequireMenu` yang gagal-terbuka dan memuat seluruh orang serta `biaya_gaji`; `/results*` tanpa gerbang (komentar `lintas_insentif_saya.go`). Yang dipakai hanya `/profit-dashboard/saya` (baris milik penanya) |
+| integration `/accounting/anggaran/varians` (2026-10-02) | **Sengaja terbuka di sumber** (terdaftar di `ruteBacaSengajaTerbuka`, `finance_baca_gate_test.go:195`, alasan "dipanggil layanan lain langsung"); pemakai yang terverifikasi di kode: sumber KPI employee (`kpi_sumber_varians_anggaran.go:362`). Pemakai lain (kartu efisiensi GA, menurut keterangan pemilik produk) **belum diverifikasi** dokumen ini. Memaparkannya lewat Copilot memberi anggaran vs realisasi OPEX ke penanya mana pun yang login, jadi menunggu gerbang di sumber (`akt_anggaran_mingguan.go`) |
+| integration `/accounting/riwayat-akun` (2026-10-02) | Kunci layanan, rute mesin-ke-mesin; bukan JWT penanya (`alat_akuntansi.go`) |
+| integration `/accounting/journals`, `/fixed-assets/summary`, `/ppn-masukan` (2026-10-02) | Rutenya sudah bergerbang tetapi tool-nya belum dikerjakan; keputusan terpisah (`alat_akuntansi.go`) |
+| manufacture `/transaksi` dan `/kpi/*` (2026-10-02) | `/transaksi` disaring diam-diam untuk Finance di sumber sehingga angkanya berbeda menurut penanya; `/kpi/*` berkunci layanan, bukan JWT penanya (`alat_manufaktur.go`) |
+| warehouse `/wms/sla-dispatch` (2026-10-02) | Isinya konfigurasi cutoff dan hari kerja KPI dispatch, bukan data waste; menempelkannya jadi derau (`gudang_waste.go`) |
+| task-management `/engagement/*`, `/users`, `/notifications`, `/audits` (2026-10-02) | Teks bebas (judul, komentar, isi notifikasi) dan data orang tanpa kebutuhan jawaban agregat (`alat_tiket.go`) |
+| procurement: saldo kas Accurate langsung, `/harga/banding`; marketing/integration `/icc/sla-chat`, `/live-shifts` (selain `/live-shifts/performa`) (2026-10-02) | Dilewati dalam gelombang ini; **alasannya tidak tertulis di komentar kode asisten pada `origin/main`** dan belum ditelusuri dokumen ini (**TBD**). Jangan menambahkannya tanpa membaca gerbang sumbernya lebih dulu |
 
 **Butir terbuka dari gelombang ini**: (1) **daftar karyawan MASUK per bulan belum bisa dijawab**, karena
 tak ada sumber bergerbang HR yang memuat `join_date` (hasil pencarian pengerjanya; belum diulang
@@ -946,6 +1078,7 @@ riwayat: kapan terkirim, kapan dibuka
 | Claude API (Anthropic) | Model bahasa | Fitur padam; kegagalannya wajib berbunyi, bukan diam |
 | [[CORE - SSO Flow]] | JWT yang diwarisi tool | Tak ada identitas, tak ada jawaban |
 | [[Microservices - Employee Service]], [[Microservices - Attendance Service]], [[Microservices - Payroll Service]], [[Microservices - Recruitment Service]], [[Microservices - Inventory Service]], [[Microservices - Learning Service]], [[Microservices - HRD Document Service]], [[Microservices - Form Builder Service]] (`culture_antrean_klub`) | Tool HRGA membaca endpoint GET-nya lewat gateway dengan JWT penanya | Tool terkait membalas `sumber_tak_terjangkau`, bukan angka; tool lain tetap jalan |
+| [[API - Finance Service]], [[Microservices - Integration Service]] (akuntansi, ulasan), [[Microservices - Task Management Service]], [[Microservices - Procurement Service]], [[Microservices - Warehouse Service]], [[Microservices - Manufacture Service]], [[Microservices - Insentive Service]], [[Microservices - Monitoring Service]], [[Microservices - Calendar Service]] | Paket tool di luar HRGA dan marketing (§ Paket tool di luar HRGA dan marketing) membaca endpoint GET-nya lewat gateway dengan JWT penanya | Tool terkait membalas `sumber_tak_terjangkau` atau `tidak_berhak`, bukan angka; tool lain tetap jalan |
 
 **Tidak** bergantung pada: notification-service, calendar-service, dan database mana pun milik service lain.
 
@@ -958,4 +1091,5 @@ riwayat: kapan terkirim, kapan dibuka
 - [[API - Marketing Analytics Service]], endpoint yang jadi tool
 - [[Microservices - Vault MCP Service]], preseden akses Claude ke data internal, dan preseden tidak lewat gateway
 - [[Sales - Veo (Gemini) Automation Layer]], kapabilitas yang memakai LangGraph dan kenapa di sini tidak
+- [[API - Integration Service]], gerbang baca uang (`RequireFinanceBaca`) yang menjadi prasyarat paket akuntansi
 - [[APP - Web ERP]], tempat panel chat berdiri
