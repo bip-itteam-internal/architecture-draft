@@ -210,20 +210,20 @@
         "ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "41afa60cbfa3b5191aaa7bdb504d71ea297c18881d02b8b7819764df8d6691e4",
-      "ukuran_kb": 27.0,
-      "ringkasan": "Dokumentasi lengkap endpoint gateway `/api/finance/*` yang mencakup modul Cost Control (rekomendasi efisiensi), Pajak (kewajiban per masa), Biaya Variabel Produksi, Audit Internal, dan Buku Besar CV. Menjawab: bagaimana struktur request-response, izin akses per modul (RBAC), rute internal untuk sumber KPI, alur implementasi per fitur, dan status kesiapan di production.",
+      "hash": "f6872844468419482fe465f43ad9d2cf4099246ec573b2970b2c356f87a2c733",
+      "ukuran_kb": 26.7,
+      "ringkasan": "Dokumentasi lengkap endpoint finance-service yang menyediakan API untuk master data divisi FAT mencakup Cost Control, Tax, Biaya Variabel Produksi, Audit Internal, dan Buku Besar CV dengan RBAC per rute. Menjawab: bagaimana mengajukan rekomendasi efisiensi, melapor kewajiban pajak, mencatat biaya produksi variabel, dan mengelola penugasan pemegang CV melalui endpoint terpisah dengan identifikasi pemanggil yang benar.",
       "kata_kunci": [
         "finance-service",
-        "cost-control",
-        "pajak",
-        "tax",
-        "kewajiban pajak",
+        "endpoint API",
+        "Cost Control rekomendasi",
+        "pajak tax kewajiban",
         "biaya variabel produksi",
         "audit internal",
-        "buku besar CV",
-        "endpoint API",
-        "RBAC"
+        "buku besar CV penugasan",
+        "RBAC permission izin",
+        "health check",
+        "gateway prefix"
       ]
     },
     {
@@ -10079,20 +10079,20 @@
         "External - Accurate",
         "RUN - Deploy Microservices bip-erp"
       ],
-      "hash": "77509dc1a169d9d414debc201de383b92319dad59c04bfa3485008cce40e11dc",
-      "ukuran_kb": 96.5,
-      "ringkasan": "Menjawab: apa isi dan tujuan finance-service (modul Tax, Cost Control, Biaya Variabel Produksi) dan bagaimana ia memasok angka supaya KPI divisi FAT terisi otomatis, termasuk rute, izin, alur status kewajiban pajak dan penghematan, serta cara master data terisi. Juga menjelaskan gap rencana dengan kode: fitur forecast kas mingguan, Admin & Non-Ops YoY, dan grid Opex Marketing justru dibangun di integration-service, jembatan KPI terpadu `/internal/kpi/metrics` tak pernah ada, serta rute biaya variabel yang tidak bergerbang izin maupun company_id.",
+      "hash": "6b7f88fe12c47c243e5a1aac06739c06997a6565e269bca9238fd53bf7ad04f5",
+      "ukuran_kb": 96.3,
+      "ringkasan": "Rancangan arsitektur service baru yang mengumpulkan master data tax, cost control, biaya variabel produksi, dan forecast kas untuk mengaktifkan otomasi metrik KPI divisi FAT (saat ini 0 dari 66 terisi). Menjelaskan fase implementasi (Fase 0 live, Fase 1a/1b implemented), gap antara rancangan versus kode aktual, dan ketergantungan pada Accurate serta integration-service untuk jalur entri OPEX.",
       "kata_kunci": [
-        "finance-service",
-        "modul pajak",
-        "tax",
-        "Cost Control",
-        "forecast kas",
-        "cashflow forecast",
-        "anggaran OPEX",
-        "KPI Finance FAT",
-        "biaya variabel produksi",
-        "SPT"
+        "finance service rancangan design",
+        "pajak tax kewajiban SPT",
+        "cost control rekomendasi efisiensi",
+        "forecast kas cashflow",
+        "KPI metric automasi",
+        "OPEX anggaran",
+        "biaya variabel produksi manufacturing",
+        "audit internal kepatuhan",
+        "Accurate integration",
+        "fase implementasi"
       ]
     },
     {
