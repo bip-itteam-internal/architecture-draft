@@ -378,9 +378,10 @@ disalin ke vault (repo publik). Kemajuan **bagian A** (keandalan) per 2026-10-01
   (#2464): merged 2026-10-01; label layar erp-frontend #1966 dan #1976. Sebelas tool lagi (GA, hubungan
   industrial, pelatihan; bip-erp #2474, #2475, #2484, label erp-frontend #1982, #1986) merged 2026-10-02.
   Jumlah terkini, mekanisme, dan sumber yang sengaja dilewati: [[Microservices - Assistant Service]].
-- [ ] **Butir terbuka**: endpoint daftar karyawan masuk (butuh `join_date`) bergerbang HR; keputusan apakah baris
-  rincian KPI dikirim ke model atau hanya jumlahnya; keputusan apakah bagian `klub_culture` dipertahankan
-  (pembacaan `/culture/clubs` menyemai klub bawaan bila koleksi kosong, yaitu pembacaan yang bisa menulis).
+- [ ] **Butir terbuka**: endpoint daftar karyawan masuk (butuh `join_date`) bergerbang HR.
+- [x] Diputuskan 2026-10-02 (pemilik produk): baris rincian KPI **tetap dikirim** ke model; bagian
+  `klub_culture` **dipertahankan** walau pembacaan `/culture/clubs` menyemai klub bawaan bila koleksi kosong.
+  Rincian di [[Microservices - Assistant Service]].
 - Di luar #2422 yang ikut merged hari itu: tool `daftar_karyawan` (#2421), rincian telat per kejadian
   (#2423), percakapan di URL (erp-frontend #1941).
 - **T8 tetap belum terkonfirmasi**: uji ulang "kontrak segera berakhir × KPI" sesudah #2406 di-deploy

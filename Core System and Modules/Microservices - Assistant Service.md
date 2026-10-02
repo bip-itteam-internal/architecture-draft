@@ -475,13 +475,15 @@ Aturan pemakaian kolom yang wajib ikut (tegak di tool, sumbernya komentar Go): `
 snapshot, bukan qty Accurate kini; skor evaluasi di bawah tiga responden **bukan nol**. Frontend: label layar
 sebelas tool di erp-frontend #1982 dan #1986 (merged 2026-10-02).
 
-**Butir terbuka gelombang ini**: (1) `GET /culture/clubs` **menyemai klub bawaan bila koleksi kosong**
-(`services/form-builder/culture_clubs.go:109`, `ensureClubs`), jadi sebuah pembacaan bisa menulis; bagian
-`klub_culture` memicunya di sumber. Apakah bagian itu **dipertahankan atau dicabut** belum diputuskan.
-(2) Gerbang baca daftar `/permintaan` di inventory **longgar** (praktis terbuka untuk seluruh staf, handler tak
-menyaring per peminta); Copilot hanya merinci peminta bagi pemegang gerbang serah GA. Pengetatan di sumber
-perlu keputusan terpisah dan tidak diuraikan di sini (repo publik). (3) Keputusan lama tetap terbuka: baris
-rincian KPI dikirim ke model atau hanya jumlahnya.
+**Keputusan dan butir terbuka gelombang ini**: (1) `GET /culture/clubs` **menyemai klub bawaan bila koleksi
+kosong** (`services/form-builder/culture_clubs.go:109`, `ensureClubs`), jadi sebuah pembacaan bisa menulis;
+bagian `klub_culture` memicunya di sumber. **Diputuskan 2026-10-02 (pemilik produk): bagian itu
+dipertahankan.** Copilot tetap tak menulis apa pun sendiri; penyemaian adalah perilaku sumber dan hanya
+terjadi pada koleksi kosong. (2) Gerbang baca daftar `/permintaan` di inventory **longgar** (praktis terbuka
+untuk seluruh staf, handler tak menyaring per peminta); Copilot hanya merinci peminta bagi pemegang gerbang
+serah GA. Pengetatan di sumber dicatat di issue privat bip-erp#2389 (2026-10-02) dan tidak diuraikan di sini
+(repo publik). (3) **Diputuskan 2026-10-02 (pemilik produk): baris rincian KPI tetap dikirim ke model**
+(label + nilai, dibedakan komponen / hasil / pengecualian), bukan hanya jumlahnya.
 
 ### Sumber yang sengaja dilewati (jangan dicoba ulang tanpa membaca alasannya)
 
@@ -509,8 +511,9 @@ pengerjanya; yang bertanda **dugaan** belum diukur ke data.
 
 **Butir terbuka dari gelombang ini**: (1) **daftar karyawan MASUK per bulan belum bisa dijawab**, karena
 tak ada sumber bergerbang HR yang memuat `join_date` (hasil pencarian pengerjanya; belum diulang
-`git grep` oleh dokumen ini); butuh endpoint daftar karyawan masuk bergerbang HR. (2) **Apakah baris
-rincian KPI dikirim ke model atau hanya jumlahnya** belum diputuskan.
+`git grep` oleh dokumen ini); butuh endpoint daftar karyawan masuk bergerbang HR. (2) ~~Apakah baris
+rincian KPI dikirim ke model atau hanya jumlahnya belum diputuskan.~~ Diputuskan 2026-10-02: tetap dikirim
+(lihat butir di atas).
 
 **Aturan privasi yang ditegakkan di tool, bukan diserahkan ke model** (melanjutkan § Samaran identitas):
 
