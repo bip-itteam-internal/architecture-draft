@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-02",
-  "jumlah_dokumen": 522,
+  "jumlah_dokumen": 524,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1471,6 +1471,7 @@
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "HRIS - Recruitment",
+        "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
         "Microservices - Assistant Service",
         "HRIS - Organization Structure",
         "ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal",
@@ -1582,18 +1583,18 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "d7a2fc9e92fba8c1a80ef1970b563ab6d3cceb2803b9f8ef175cbd23204ca6e4",
-      "ukuran_kb": 574.7,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS One Bharata (erp-frontend), stack-nya, bagaimana login, SSO identity provider, dan role gating menu lewat cookie system_roles bekerja, serta bagaimana fitur multi-perusahaan (pemilih perusahaan, rekrutmen lintas perusahaan) dan Pengaturan HRGA terpusat disusun. Juga menjawab konvensi data-fetching TanStack Query untuk sidebar dan badge, konvensi bagan Recharts/ChartContainer, serta daftar modul yang sudah dan belum diimplementasikan.",
+      "hash": "5b9718f2fcc8f14b962c655a7054d8cca58868c74c253ca92dae6285ea21facf",
+      "ukuran_kb": 575.8,
+      "ringkasan": "Menjawab: apa saja modul dan fitur portal web ERP/HRIS (erp-frontend, \"One Bharata\"), bagaimana login, SSO, dan gating menu berdasarkan system_roles serta izin bekerja, dan bagaimana fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan) diatur. Juga menjelaskan susunan sidebar dan Pengaturan HRGA, konvensi data-fetching TanStack Query dan bagan Recharts, serta arah baru sidebar satu daftar urusan.",
       "kata_kunci": [
-        "Web ERP",
         "erp-frontend",
+        "web ERP",
         "One Bharata",
-        "SSO",
-        "system_roles",
-        "role gating",
         "sidebar",
+        "system_roles",
+        "SSO",
         "multi-tenant",
+        "CompanySwitcher",
         "TanStack Query",
         "Pengaturan HRGA"
       ]
@@ -8826,6 +8827,45 @@
         "employee_salary",
         "penawaran",
         "effective_date"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi.md",
+      "judul": "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan** (2026-10-02). Arah dan rancangan per departemen disetujui user; kode belum ada.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi",
+        "ADR - 0051 Pencabutan Tampilan Menu per Posisi",
+        "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang",
+        "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya",
+        "ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service",
+        "ADR - 0137 Model Persetujuan Tunggal dan Pemisahan Tugas Lintas Modul",
+        "REF - Dashboard per Posisi (Indeks Cakupan)",
+        "APP - Web ERP",
+        "CORE - RBAC dan Permission Set",
+        "REF - Layout Dashboard erp-frontend",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
+      ],
+      "hash": "cf57fee1ac96f7c702dfe8c754b322f9106e7943f684779a23455c2ecdf663e8",
+      "ukuran_kb": 19.6,
+      "ringkasan": "Menjawab: kenapa sidebar web ERP diubah dari kategori per departemen dan Portal Saya menjadi satu daftar urusan, bagaimana menu ditampilkan berdasarkan izin posisi per menu (perm + FALLBACK) dan data disaring server menurut cakupan posisi, serta bagaimana Beranda menjadi ruang kerja posisi. Juga menjawab urutan aman pencabutan kategori, perbaikan data hak akses yang dijalankan manusia, dan apa yang tidak dijanjikan perubahan ini.",
+      "kata_kunci": [
+        "sidebar",
+        "menu",
+        "izin posisi",
+        "permission",
+        "perm",
+        "FALLBACK",
+        "Portal Saya",
+        "Beranda",
+        "dashboard posisi",
+        "RBAC"
       ]
     },
     {
@@ -18212,6 +18252,35 @@
         "task breakdown",
         "KPI individu",
         "verifikasi lapangan"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Sidebar Satu Daftar Urusan.md",
+      "judul": "ANALISA - Sidebar Satu Daftar Urusan",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
+        "APP - Web ERP",
+        "CORE - RBAC dan Permission Set"
+      ],
+      "hash": "8ae97cd79872bd108a7a34187397021ddd55171915aa8740c5a930396926854a",
+      "ukuran_kb": 12.5,
+      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk mewujudkan sidebar satu daftar urusan, dalam urutan dan dependensi apa (penjaga gerbang per daun, urusan umum, penyatuan akhir), dan apa rincian task per departemen (Marketing, FAT, HRGA, Tech Development, Kesekretariatan, Manufaktur). Juga menjelaskan masalah sebenarnya di balik permintaan, asumsi yang disetujui, jenis task (S, G, B, D, X), dan cara verifikasinya.",
+      "kata_kunci": [
+        "analisa kebutuhan",
+        "sidebar",
+        "daftar task",
+        "gerbang menu",
+        "perbaikan data hak akses",
+        "ruang kerja Beranda",
+        "Marketing",
+        "FAT",
+        "HRGA",
+        "Manufaktur"
       ]
     },
     {
