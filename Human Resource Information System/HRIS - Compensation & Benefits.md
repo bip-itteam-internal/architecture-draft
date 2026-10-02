@@ -34,14 +34,14 @@ Master komponen ada di `payroll_db.salary_component` (seed `services/payroll/mod
 | **Struktur tetap** (`manual`, per orang) | Gaji Pokok | ya | 183 |
 | | Tunjangan Jabatan | ya | 175 |
 | | Tunjangan Makan | tidak | 175 |
-| | Tunjangan Kehadiran (nilai dasar) | tidak | **1** ⚠️ |
+| | Tunjangan Kehadiran (nilai dasar) | tidak | 176 (diukur ulang 2026-10-02) |
 | | Tunjangan PPh 21 | tidak | 1 |
 | | Tunjangan Masa Kerja | tidak | 0 |
 | | Tunjangan Shift | tidak | 0 |
 | **Variabel per run** (`manual`) | Bonus, Insentif, Kasbon, Lain-lain | tidak | diisi per run |
 | **Dihitung engine** (`computed`) | Lembur, BPJS (Kesehatan, JHT, JP, JKK, JKM), PPh 21, Potongan Telat/Izin/Mangkir/Uang Makan | - |: |
 
-⚠️ **Jangan menyalin komponen variabel ke struktur berikutnya.** Kasbon yang terbawa ke versi baru terpotong ulang tiap bulan tanpa galat. ⚠️ Tunjangan Kehadiran hanya terisi untuk 1 orang, padahal potongan telat, izin, dan mangkir dihitung dari nilai dasarnya (`baseKehadiran / 26`); bagi 182 orang lainnya potongan itu praktis nol. Ini belum ditanyakan ke HRD.
+⚠️ **Jangan menyalin komponen variabel ke struktur berikutnya.** Kasbon yang terbawa ke versi baru terpotong ulang tiap bulan tanpa galat. Potongan telat, izin, dan mangkir dihitung dari nilai dasar Tunjangan Kehadiran (`baseKehadiran / 26`). ⚠️ Koreksi 2026-10-02: catatan sebelumnya ("terisi untuk 1 orang") berasal dari kueri yang keliru; diukur ulang per `component_id`, Tunjangan Kehadiran terisi untuk 176 dari 183 karyawan dengan id komponen aktif di master.
 
 Selain komponen, struktur tetap memuat **dasar upah BPJS Kesehatan dan Ketenagakerjaan**, **kepesertaan BPJS**, **status PTKP**, dan **badan usaha penggaji**.
 
@@ -123,7 +123,6 @@ Contoh, periode 26 Agustus s.d. 25 September (31 hari), Gaji Pokok Rp 5.000.000:
 
 - **Pembagi prorata**: hari kalender (asumsi ADR 0148) vs 30 tetap vs hari kerja: menunggu HRD
 - **Komponen yang berubah per event** (mis. apakah TH/TM masa evaluasi berbeda dari masa kontrak): kebijakan HRD
-- **Tunjangan Kehadiran nyaris kosong di prod**: digabung ke komponen lain di sheet HRD, atau memang tidak diberikan?
 - Rentang gaji per jenjang (kaitan [[HRIS - Career & Promotion]]): sengaja di luar ADR 0148
 - Metode perhitungan **PPh21** (TER/PTKP) & pelaporan pajak
 - Daftar tunjangan/benefit resmi + aturannya

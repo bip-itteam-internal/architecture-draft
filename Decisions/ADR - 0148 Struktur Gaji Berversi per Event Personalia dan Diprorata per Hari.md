@@ -23,7 +23,6 @@
 - Rentang gaji per jenjang jabatan tidak termasuk; sistem mencatat angka yang diputuskan HR, tidak menyarankan atau membatasinya.
 - Riwayat sebelum sistem ini berjalan tidak direkonstruksi; ia tetap tersedia lewat slip impor dari spreadsheet.
 - Pembagi proporsional memakai **hari kalender** periode, dan itu masih **menunggu konfirmasi HRD**.
-- Kejanggalan data yang ditemukan saat analisa (tunjangan kehadiran hanya terisi untuk 1 dari 183 karyawan) dicatat, tetapi tidak diselesaikan oleh keputusan ini.
 
 **Besaran kerja.** Sekitar 13 pekerjaan di tiga aplikasi (satu di antaranya konfirmasi kebijakan ke HRD), dalam tiga tahap. Tahap pertama (riwayat dan jejak perubahan) sudah berguna sendiri dan menghentikan hilangnya angka lama.
 
@@ -152,7 +151,7 @@ Butir ketiga **merevisi** keputusan produk di [[ADR - 0035 HR Menonaktifkan Akun
 - ⚠️ **Pembagi hari kalender belum dikonfirmasi HRD.** Bila HRD memakai pembagi lain (mis. 30 tetap atau hari kerja), hanya fungsi prorata yang berubah, tetapi itu wajib diputuskan sebelum tahap 2 di-deploy.
 - Engine payroll menjadi lebih rumit: satu karyawan bisa punya dua sampai tiga versi dalam satu periode.
 - **recruitment-service mendapat ketergantungan baru ke payroll** (env `PAYROLL_MODULE_URL`, naik dengan `--force-recreate`). employee-service sudah memegangnya.
-- Tunjangan Kehadiran hanya terisi untuk 1 dari 183 karyawan di prod (2026-10-01), sehingga potongan kehadiran praktis nol bagi 182 orang. Ini **di luar** keputusan ini dan perlu ditanyakan ke HRD terpisah.
+- ~~Tunjangan Kehadiran hanya terisi untuk 1 dari 183 karyawan~~ **Dikoreksi 2026-10-02**: angka itu berasal dari kueri analisa yang keliru. Diukur ulang per `component_id`, Tunjangan Kehadiran terisi untuk 176 dari 183 karyawan dengan id komponen aktif di master, setara Tunjangan Jabatan dan Tunjangan Makan. Tidak ada kejanggalan data di sini.
 - Selama spreadsheet HRD masih dipakai paralel, versi bersumber `impor_sheet` akan terus muncul; manfaat ketertelusuran baru penuh setelah HR mengisi lewat event.
 
 ### Yang sengaja tidak dilakukan
