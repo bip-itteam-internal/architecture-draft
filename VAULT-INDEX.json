@@ -8808,20 +8808,22 @@
         "ADR - 0002 Database-per-Service",
         "HRIS - Kepatuhan Peraturan Perusahaan"
       ],
-      "hash": "329b6a78e6a60f5b1fb51cf7f2ba022130514b8d36eb9c7ae7b8f11404f4ed29",
-      "ukuran_kb": 19.8,
-      "ringkasan": "Menjawab: bagaimana menyimpan riwayat perubahan struktur gaji setiap karyawan, mengapa gaji perlu diprorata saat terjadi perubahan di tengah periode, dan bagaimana menghubungkan setiap perubahan gaji ke dokumen asalnya (offer, kontrak, promosi, resign). Keputusan ini menyelesaikan masalah hilangnya angka gaji lama dan pengetikan ulang gaji di berbagai tempat.",
+      "hash": "528b00b1cfdbfbb7fbffe88c4202cfecaba639b95f6dcf433d30bee19f306e8d",
+      "ukuran_kb": 20.9,
+      "ringkasan": "Menjawab: bagaimana mencegah hilangnya riwayat perubahan gaji karyawan, siapa yang memicu perubahan (offer/promosi/mutasi/kontrak), dan bagaimana gaji dihitung saat ada perubahan atau resign di tengah periode. Keputusan: gaji disimpan sebagai versi utuh bertanggal dengan rujukan dokumen hulu, dan payroll menghitung prorata per hari.",
       "kata_kunci": [
-        "struktur gaji",
-        "salary versioning",
-        "prorata",
-        "event personalia",
-        "compensation",
+        "gaji",
+        "payroll",
+        "versi",
         "riwayat gaji",
-        "surat penawaran",
-        "kontrak",
+        "prorata",
+        "struktur gaji",
         "resign",
-        "promosi"
+        "promosi",
+        "kontrak",
+        "employee_salary",
+        "penawaran",
+        "effective_date"
       ]
     },
     {
@@ -18284,21 +18286,23 @@
         "HRIS - Compensation & Benefits",
         "HRIS - Disciplinary (Surat Peringatan)"
       ],
-      "hash": "9cfb21220e1006a3971d61a10e0eb4011a9b0af8d8400ebca14bd8b1ce7e5030",
-      "ukuran_kb": 8.3,
-      "ringkasan": "Memecah rencana implementasi ADR 0148 menjadi 13 task terstruktur dalam tiga tahap, menentukan service mana saja yang terdampak (payroll, recruitment, employee, contract), urutan kerja, dan dependensi antar-task. Dokumen ini adalah papan kerja yang mengarahkan setiap tim (BE, FE, Mobile) dalam mengerjakan versioning dan prorata gaji.",
+      "hash": "c4a825d3ce5f2a430af900860168f1cff438f2335263752d1eb8b8fa7ddb202c",
+      "ukuran_kb": 8.8,
+      "ringkasan": "Rencana implementasi (papan kerja) untuk ADR 0148 yang dipecah 3 tahap: tahap 1 membangun koleksi versi gaji dan migrasi data lama; tahap 2 membuat engine payroll membaca versi per hari dan menghitung prorata saat perubahan/masuk/resign; tahap 3 menyambung hulu (offer/movement/kontrak) agar gaji mengalir otomatis. Total 13 subtask lintas backend Go, frontend React, dan mobile Flutter dengan urutan dan dependensi jelas.",
       "kata_kunci": [
-        "implementasi",
-        "tahap kerja",
-        "task",
-        "payroll",
-        "recruitment",
-        "employee service",
+        "rencana implementasi",
+        "tahap",
+        "prorata",
+        "koleksi versi",
+        "migrasi",
+        "engine payroll",
+        "offer",
+        "promosi",
         "kontrak",
-        "mutasi",
-        "BE",
-        "FE",
-        "Mobile"
+        "task",
+        "dependensi",
+        "frontend",
+        "backend"
       ]
     },
     {
