@@ -172,8 +172,8 @@ Keduanya membalas **200 dengan amplop `unavailable_channels: SEMUA`** saat sumbe
 | Method | Path | Catatan |
 |---|---|---|
 | GET | `/price-floor` | Daftar harga minimal per SKU (effective-dated) |
-| POST | `/price-floor` | Tambah baris |
-| POST | `/price-floor/upload` | Upload xlsx; laporan per-baris, unggahan yang tak menyimpan apa pun dibalas galat |
+| POST | `/price-floor` | Tambah baris. Digerbang `common.RequireMarketingLeader` (`price_floor_handler.go:49`) |
+| POST | `/price-floor/upload` | Digerbang `common.RequireMarketingLeader` (`price_floor_handler.go:50`). Upload xlsx; laporan per-baris, unggahan yang tak menyimpan apa pun dibalas galat |
 
 ## Asisten Analisa (katalog, kiriman terjadwal, riwayat hasil)
 

@@ -522,7 +522,7 @@ Penyatuannya **tidak** dilakukan sekarang dan itu disengaja: pipeline `toko.go` 
 
 | Endpoint | Isi |
 |---|---|
-| `GET /price-floor` · `POST /price-floor` · `POST /price-floor/upload` | Harga minimal per SKU, **effective-dated** (pola `product_costs`) |
+| `GET /price-floor` · `POST /price-floor` · `POST /price-floor/upload` | Harga minimal per SKU, **effective-dated** (pola `product_costs`). Kedua `POST` digerbang `common.RequireMarketingLeader`; `GET` terbuka bagi pembaca (`price_floor_handler.go:48-50`) |
 | `POST /jobs/:name/trigger?hari=N` | Picu job manual. `hari` bawaan **7**, maksimum **120**; job berjalan → **409** |
 | `GET /jobs/status` | Kesehatan penjadwal (`penjadwal_hidup`, alasan, `sync_state` tiap job) |
 | `GET /health` | `ok`, atau `degraded` (503) bila ada index unik gagal dibuat |

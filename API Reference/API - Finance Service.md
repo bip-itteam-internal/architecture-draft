@@ -97,15 +97,15 @@ Bahan KPI SPV Manufacture F3 "Kontrol ketat biaya produksi variabel" (bobot 10),
 
 | Method | Path | Fungsi |
 |---|---|---|
-| POST | `/biaya-variabel` | Catat satu baris (`periode`, `kategori` wajib; `kode_produk` opsional, tempat penempelan ke produksi, belum dikerjakan di FE) |
+| POST | `/biaya-variabel` | Catat satu baris (`periode`, `kategori` wajib; `kode_produk` opsional, tempat penempelan ke produksi, belum dikerjakan di FE). Digerbang izin `finance.accounting.view` (`gerbangTulisBiayaVariabel`, `biaya_variabel_gerbang.go`, `routes.go:62`); 403 tanpa izin |
 | GET | `/biaya-variabel?periode=YYYY-MM` | Daftar + total + cacah satu periode |
-| DELETE | `/biaya-variabel/:id` | Hapus milik pencatat sendiri |
+| DELETE | `/biaya-variabel/:id` | Hapus milik pencatat sendiri. Digerbang izin `finance.accounting.view` yang sama dengan POST (`routes.go:64`) |
 | GET | `/biaya-variabel/komparasi?periode=` | Total periode berjalan berdampingan bulan yang sama tahun lalu (dua angka mentah, bukan rasio) |
 | GET | `/internal/kpi/biaya-variabel?periode=` | Alias, HANDLER YANG SAMA dengan `/biaya-variabel/komparasi` di atas; dibaca sumber KPI `biaya_variabel_produksi` di employee-service (`services/employee/kpi_sumber_biaya_variabel.go:19`) |
 
 (`services/finance/routes.go:61-69`, `biaya_variabel_handler.go`, `biaya_variabel.go`)
 
-⛔ **Catatan keamanan (netral, belum diperbaiki)**: berbeda dari Cost Control dan Pajak di atas, **tak satu pun rute modul ini memanggil `common.HasPermission`**, nol gerbang izin (diverifikasi seluruh `biaya_variabel_handler.go`). `GET /biaya-variabel` dan `GET /internal/kpi/biaya-variabel` juga **tidak menyaring `company_id`**: struct `BiayaVariabelProduksi` (`biaya_variabel.go:34-53`) tidak punya field itu sama sekali, sehingga keduanya membalas data seluruh tenant yang mengisi periode yang sama. `POST`/`DELETE` tetap menuntut identitas pemanggil (bukan izin) untuk menentukan `dicatat_oleh`.
+⛔ **Gerbang dan cakupan**: hanya `POST` dan `DELETE` yang digerbang izin (`finance.accounting.view`, izin yang sama dengan yang membuka layarnya di FE); `GET /biaya-variabel`, `/biaya-variabel/komparasi`, dan `GET /internal/kpi/biaya-variabel` tidak digerbang izin. Baris biaya dijumlahkan sebagai sumber KPI SPV Manufaktur. `GET /biaya-variabel` dan `GET /internal/kpi/biaya-variabel` **tidak menyaring `company_id`**: struct `BiayaVariabelProduksi` (`biaya_variabel.go:34-53`) tidak punya field itu sama sekali, sehingga keduanya membalas data seluruh tenant yang mengisi periode yang sama. `POST`/`DELETE` tetap menuntut identitas pemanggil (bukan izin) untuk menentukan `dicatat_oleh`.
 
 ## Audit Internal
 

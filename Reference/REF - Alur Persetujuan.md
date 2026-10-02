@@ -47,7 +47,7 @@ Yang membuat inventaris ini sulit disusun, dan mudah salah:
 | Rekrutmen — putuskan hire | recruitment | HR admin **atau** `secretary` supervisor |
 | Rekrutmen — keputusan onboarding | recruitment | HR |
 | Dokumen HRD — publish | hrd-document | HR |
-| Quality — CAPA | employee | approver produksi / gudang |
+| Quality — CAPA | employee | approver produksi / gudang (ejaan peran tak peka spasi/underscore; penyetuju juga boleh membaca CAPA yang menunggunya, lihat [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]]) |
 | WMS — batch record, rekon MO, proposal, Sadewa | manufacture | peran WMS per tab |
 | Task Management — approve/reject tugas | task-management | `ticket.triage` / admin space |
 | Kotak Adopsi — adopt & reject draft | integration | peran integration |

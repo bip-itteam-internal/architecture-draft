@@ -79,6 +79,15 @@ Source di atas ditulis terhadap **bentuk data yang DIASUMSIKAN** (schema `produc
 2. **Buktikan lewat gateway**, bukan `docker ps`: panggil `GET /kpi/auto-values` untuk satu orang manufaktur, pastikan `auto_value`/`auto_rincian` konsisten dengan data WMS.
 3. Baru setelah itu **konfigurasi template** (map metrik → sumber) dan klaim metrik otomatis.
 
+## Layar yang sudah jujur soal data kosong (erp-frontend, merged 2026-10-01)
+
+Karena datanya belum ada, dua layar WMS dibuat **tidak mengarang angka** ([[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]] keputusan 3). erp-frontend [#1960](https://github.com/bip-itteam-internal/erp-frontend/pull/1960), diperiksa ke `origin/main`:
+
+- **Laporan Manufaktur (`ReportsView`)** kini menurunkan semua kartu KPI lewat `features/manufacture/lib/laporan-jujur.ts` (`hitungKpiDivisi`, `hitungKpiUmum`). Aturannya satu: sumber tak ada = status **`belum`**, pengambilan data gagal = status **`galat`**, dan keduanya **tidak pernah jadi angka**; galat menang atas belum, belum menang atas angka (`hasil()`). Layar lama menjatuhkan ke nilai tetap (98.4%, 1.34%, 100%, 96.8, 92.5, "18 Dok", "< 18 Jam") saat sumbernya kosong, sehingga layar kosong tampak berprestasi. Dua metrik **belum punya sumber sama sekali**: `expDispatch` (tak ada field jam berangkat di data transaksi) dan `umumKepatuhan` (kepatuhan CPOTB/audit; dulu dicetak "EXCELLENT" apa pun isinya). `manufacture-app.tsx` kini mencatat pengambilan data yang gagal per endpoint (`galatMuat`) dan memuat sumber fase-2 dengan `Promise.allSettled`, jadi satu endpoint yang gagal menampilkan galat di kartunya dan tidak menimpa data lama dengan daftar kosong.
+- **Blok "Kesimpulan" di `/manufacture/kpi`** (`kpi/components/kesimpulan-manufaktur.tsx`, di atas `KpiPageContent` dengan `lockedDepartment="Manufaktur"`): berbasis **aturan, tanpa AI** (mengikuti [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]]). Departemen "Manufaktur" dipisah jadi dua kelompok **Produksi** dan **Gudang** per **posisi** (`kelompokPosisi`: posisi memuat `warehouse`/`gudang` = Gudang, selain itu Produksi), lewat adapter lokal di `kpi/lib/kesimpulan-manufaktur.ts`. Band, ambang (`AMBANG_BAIK`/`AMBANG_KURANG`), dan klasifikasi **dipinjam** dari `features/hris/kpi/lib/kesimpulan.ts`, tidak disalin. Tiap kelompok menampilkan satu paragraf (jumlah per band, rata-rata skor yang sudah dinilai, jumlah naik/turun), donut, dan panel **"Metrik yang belum bisa dihitung"** dari `auto-overview` (status `belum`/`tanpa_karyawan`) dengan tautan ke layar input sumbernya (Produksi: `/manufacture/dokumen-produksi-batch`; Gudang: `/manufacture/cycle-count`). Satu metrik digambar sekali walau muncul di beberapa posisi.
+
+⚠️ Ini hanya **pernyataan jujur atas data kosong**, bukan bukti datanya sudah terisi: status data prod di atas tetap berlaku sampai diukur ulang.
+
 ## Dokumen Terkait
 
 - [[HRIS - Otomasi Skor KPI]] — mesin skor KPI (reduksi, arah, target)
