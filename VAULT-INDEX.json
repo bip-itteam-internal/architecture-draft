@@ -8811,22 +8811,20 @@
         "ADR - 0002 Database-per-Service",
         "HRIS - Kepatuhan Peraturan Perusahaan"
       ],
-      "hash": "528b00b1cfdbfbb7fbffe88c4202cfecaba639b95f6dcf433d30bee19f306e8d",
+      "hash": "d927a23d8d3f0843395637bf248f70e055f0afeca5ec51db20befd3cc49b44e0",
       "ukuran_kb": 20.9,
-      "ringkasan": "Menjawab: bagaimana mencegah hilangnya riwayat perubahan gaji karyawan, siapa yang memicu perubahan (offer/promosi/mutasi/kontrak), dan bagaimana gaji dihitung saat ada perubahan atau resign di tengah periode. Keputusan: gaji disimpan sebagai versi utuh bertanggal dengan rujukan dokumen hulu, dan payroll menghitung prorata per hari.",
+      "ringkasan": "Menjawab: bagaimana menyimpan riwayat lengkap setiap perubahan gaji karyawan beserta dokumentasi hulu (offer, kontrak, promosi, mutasi), bagaimana menghitung gaji pokok dan tunjangan secara proporsional per hari saat ada perubahan di tengah periode, dan siapa yang terdampak (personalia, finance, karyawan baru dan yang resign). Merevisi ADR 0035 satu poin: resign di tengah periode tidak lagi dibayar gaji penuh.",
       "kata_kunci": [
         "gaji",
-        "payroll",
+        "struktur",
         "versi",
-        "riwayat gaji",
+        "riwayat",
         "prorata",
-        "struktur gaji",
         "resign",
-        "promosi",
+        "offer",
         "kontrak",
-        "employee_salary",
-        "penawaran",
-        "effective_date"
+        "movement",
+        "payroll"
       ]
     },
     {
@@ -11121,20 +11119,20 @@
         "HRIS - Career & Promotion",
         "Microservices - Recruitment Service"
       ],
-      "hash": "c206faf2a550a185bcfed5d3b2d91359c760f8dbc2cabb54b2296d9e13e1fe43",
+      "hash": "df57ef669621579ad4f52a25e9ea59b818698b111815bee076fa76cc5baf2686",
       "ukuran_kb": 8.8,
-      "ringkasan": "Menjawab: komponen gaji apa saja yang ada (struktur tetap, variabel per run, dihitung engine) dan seberapa terisi di prod, siapa yang mengisi, menyetujui, dan membaca gaji, serta bagaimana struktur gaji berversi bekerja: status versi, isian per event personalia (offer, kontrak, promosi, kenaikan massal, impor), dua set gaji di offer, rumus prorata per hari dengan contoh, dan gerbang saat menyimpan.",
+      "ringkasan": "Menjawab: komponen apa saja yang membentuk gaji dan benefit karyawan (gaji pokok, tunjangan jabatan, tunjangan makan, kehadiran, BPJS, pajak PPh21), bagaimana struktur gaji berversi bekerja untuk berbagai event personalia (offer, kontrak, perpanjangan, promosi, mutasi, keputusan massal), dan bagaimana mengaplikasikan versi berlaku per tanggal dalam satu periode gaji. Melengkapi dokumentasi payroll dengan rincian komponen dan cara kerja struktur gaji berversi yang diputuskan ADR 0148.",
       "kata_kunci": [
         "kompensasi",
-        "compensation",
         "benefit",
         "komponen gaji",
-        "tunjangan",
         "gaji pokok",
+        "tunjangan",
         "BPJS",
+        "PPh21",
+        "struktur berversi",
         "prorata",
-        "versi gaji",
-        "PPh21"
+        "payroll"
       ]
     },
     {
@@ -18358,20 +18356,20 @@
         "HRIS - Compensation & Benefits",
         "HRIS - Disciplinary (Surat Peringatan)"
       ],
-      "hash": "054a64a1fa6a18687a5df24494e359a1a9529509d430b5fee0481c8f7b92fbe6",
-      "ukuran_kb": 9.1,
-      "ringkasan": "Daftar kerja tiga tahap untuk mengimplementasikan versi struktur gaji yang berubah per event personalia. Menjawab: bagaimana gaji dihitung saat karyawan dipromosi/dimutasi/berganti kontrak, bagaimana prorata per hari dijalankan, dan urutan pengembangan mulai dari migrasi data hingga integrasi dengan modul recruitment dan mutasi.",
+      "hash": "c0f1fb7bb3dcd386ce793c3c40858404aeac10fe22cb5f884bb8c53058e05584",
+      "ukuran_kb": 9.2,
+      "ringkasan": "Menjawab: urutan implementasi struktur gaji berversi dalam tiga tahap (riwayat dan jejak, prorata per hari, hulu mengalir), task spesifik yang perlu dikerjakan di setiap tahap di backend payroll, recruitment, employee service, frontend, dan mobile, dependensi antar task, dan status keselesaian. Papan kerja operasional untuk ADR 0148 yang mencakup estimasi besaran kerja, gerbang verifikasi, dan konfirmasi kebijakan ke HRD.",
       "kata_kunci": [
+        "implementasi",
+        "tahap",
+        "task",
         "payroll",
-        "struktur gaji",
-        "versi",
-        "event personalia",
-        "promosi",
-        "mutasi",
-        "kontrak",
+        "recruitment",
+        "riwayat",
         "prorata",
-        "task-plan",
-        "migrasi gaji"
+        "offer",
+        "movement",
+        "verifikasi"
       ]
     },
     {
