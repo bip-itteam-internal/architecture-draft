@@ -359,6 +359,34 @@ Aturan (berlaku untuk developer DAN agent):
   `main` padahal rilis store dari `dev`. Sebelum memindahkan status, ukur ke `origin/main`
   (MyBharata: `origin/dev`) dan data prod, lalu tulis komentar `Verifikasi <tanggal>` di issue.
 
+### ⛔ Definition of Ready: issue baru boleh dikerjakan agent bila berlabel `Siap Agent`
+
+Diukur 2026-10-02: dari 52 issue yang disentuh runner backlog, **4 jadi PR dan 46 berhenti di
+Butuh Info**, karena issue berisi masalah tanpa keputusan. Keputusannya
+[[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]].
+**Checklist ini satu-satunya sumber**; template issue di `bip-erp`/`erp-frontend` hanya memuat
+judul bagiannya. Label `Siap Agent` dipasang **manusia** (pembuat issue atau Pemutus) bila SEMUA terpenuhi:
+
+1. **Keputusan bisa ditunjuk**: tautan ADR berstatus **Diterima** (bukan Diusulkan), `ANALISA - *.md`,
+   atau bagian `## Keputusan` di badan issue yang menjawab "bentuknya apa" (penerima, ambang, kanal,
+   satuan, siapa boleh apa). Kalimat "pertimbangkan", "perlu disepakati", atau "dsb" = belum siap.
+2. **Satu repo, satu PR.** Lebih dari itu dipecah dulu (induk + sub-issue, `buat-sub-issue.ps1`).
+   PR agent wajib `Closes` issue-nya, jadi issue yang memuat T1-T7 sekaligus tak bisa dikerjakan sebagian.
+3. **`## Yang harus benar`** berisi kriteria yang bisa diperiksa (perilaku, angka, layar), bukan
+   "dashboard + analisa otomatis".
+4. **Data produksi yang dibutuhkan sudah ditempel** di issue. Runner dilarang membaca prod.
+5. **Prasyarat sudah merged** (issue lain, atau ADR yang disebut).
+6. **`**Pemutus:** <login>`** di badan: orang yang berwenang memutuskan bentuk solusinya (boleh beda
+   dari PIC). Pertanyaan agent ditujukan ke dia.
+
+Aturan turunan:
+- ⛔ **Persetujuan ADR ditulis di baris status ADR-nya**: `🟢 Diterima, <tanggal>, oleh <login/jabatan>`.
+  Disetujui lisan tapi baris status tetap "Diusulkan" = bagi agent belum disetujui.
+- **Menjawab Butuh Info**: jawab di issue, lalu **lepas label `Butuh Info`** (dan pasang `Siap Agent`
+  bila checklist terpenuhi). Komentar yang hanya menambah data tanpa melepas label tidak mengantre ulang.
+- ⚠️ **Status penerapan**: skrip runner (hanya di PC IT, lihat [[RUN - Agent Backlog Otonom]]) baru
+  memakai gerbang ini setelah diperbarui di sana. Ukur runbook-nya sebelum mengklaim runner sudah mematuhinya.
+
 Cara agent mengaksesnya:
 
 - Lewat `gh`, butuh scope **`project`** di mesin itu (`gh auth refresh -h github.com -s project`,
