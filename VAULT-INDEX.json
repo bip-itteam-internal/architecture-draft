@@ -752,22 +752,20 @@
         "ADR - 0001 Akuntansi via Accurate",
         "CORE - API Master Gateway"
       ],
-      "hash": "09891841071c09c0bb21fe8fb213a56d947d74fa4a1a66f490f7cc392d41eb5b",
-      "ukuran_kb": 47.0,
-      "ringkasan": "Menjawab: endpoint procurement-service untuk master Pemasok dan Barang & Jasa, cermin baca-saja Pembelian dari Accurate, Permintaan/Pesanan/Penerimaan ERP, Pengajuan Barang lima tipe, Tagihan Pemasok, Pembayaran Vendor, Aging Utang, Bukti Transfer, KPI AP, serta Kas Kecil dan Pengajuan Budget. Juga auth permission-set dan fallback tier yang berlaku.",
+      "hash": "f9c5aedf7489776dd9f87e747011079ca6daec6f60c94290ebb301abe122030c",
+      "ukuran_kb": 53.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan procurement-service lewat gateway /api/procurement/* (master Pemasok, master Barang & Jasa, cermin Pembelian dari Accurate, Permintaan/Pesanan/Penerimaan Barang ERP, Pengajuan Barang lima tipe, Tagihan Pemasok, Pembayaran, Aging Utang, Bukti Transfer, KPI Account Payable, Kas Kecil & Pengajuan Budget), beserta bentuk request body, response, dan kode galatnya. Juga menjawab bagaimana auth permission-set dan fallback tier procurement bekerja, serta arti sync_status PENDING/SYNCED/FAILED saat data disinkronkan ke Accurate.",
       "kata_kunci": [
-        "procurement",
-        "pengadaan",
+        "procurement-service",
         "pemasok",
         "vendor",
-        "supplier",
         "barang dan jasa",
+        "item",
         "pengajuan barang",
         "tagihan pemasok",
         "aging utang",
-        "kas kecil",
-        "Accurate",
-        "API procurement"
+        "Accurate sync",
+        "API endpoint"
       ]
     },
     {
@@ -3035,34 +3033,37 @@
         "Finance - Kas Kecil dan Pengajuan Budget",
         "APP - Web ERP",
         "API - Procurement Service",
+        "Finance - Proses Pengajuan Pengeluaran dan Persetujuan",
+        "Finance - Proses Pembayaran Keluar",
         "Microservices - Employee Service",
         "CORE - RBAC dan Permission Set",
         "ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget",
         "ADR - 0090 KONSUMSI Eskalasi ke Direktur di Ambang Berbagi, Bukan Kebal",
         "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
         "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
+        "RUN - Deploy Microservices bip-erp",
+        "ADR - 0131 Tanda Tangan Direktur-Sekutu pada BKK Otomatis Tanpa Approval",
+        "Microservices - Procurement Service",
         "HRIS - Otomasi Skor KPI",
         "ADR - 0001 Akuntansi via Accurate",
         "Microservices - Manufacture Service",
         "Microservices - Integration Service",
         "Finance - FAT Persona"
       ],
-      "hash": "4a7d407209c163bead4dc12f2b36ad0ae5c6b9c20faca7d1dcb728cb14024cb2",
-      "ukuran_kb": 54.5,
-      "ringkasan": "Menjawab: bagaimana procurement-service bekerja (master Pemasok dan Barang & Jasa yang disinkronkan ke Accurate, cermin Pembelian, Permintaan/Pesanan/Penerimaan ERP, Pengajuan Barang lima tipe, pembayaran vendor, KPI AP). Memuat penomoran, worker sync, import awal, model data, dan jebakan integrasi Accurate yang sudah terverifikasi.",
+      "hash": "18ff4f0f88d44d5259fdf2c57033c0f1b46b2550a04e25f95d60fe29ef8a8e23",
+      "ukuran_kb": 85.4,
+      "ringkasan": "Menjawab: bagaimana procurement-service dibangun (stack Go/Fiber/Mongo, port, database procurement_db, env seperti ACCURATE_KAS_PUSH dan PROCUREMENT_SERVICE_KEY, susunan berkas), bagaimana master Pemasok dan Barang disinkronkan ke Accurate lewat worker antrian, dan bagaimana Pembelian ditarik balik sebagai cermin baca-saja. Juga menjelaskan alur Pengajuan Barang lima tipe sisi uang (jenjang persetujuan, antrean per peran, jendela jam, BKK sebelum transfer, nominal realisasi), Tagihan/Faktur/Pembayaran vendor, KPI Account Payable, jebakan integrasi Accurate, model data, dan register kontrak vendor serta cost saving di employee-service.",
       "kata_kunci": [
-        "procurement service",
+        "procurement",
         "pengadaan",
+        "procurement_db",
         "pemasok",
-        "vendor",
-        "barang dan jasa",
-        "Accurate",
-        "sync Accurate",
+        "supplier",
         "pengajuan barang",
-        "penomoran",
-        "import awal",
-        "KPI AP",
-        "tagihan"
+        "worker sync Accurate",
+        "faktur pembelian",
+        "purchase invoice",
+        "KPI Account Payable"
       ]
     },
     {
@@ -9797,6 +9798,7 @@
       "publik": true,
       "tautan": [
         "Finance - Proses Bisnis dan Kebutuhan Sistem",
+        "Microservices - Procurement Service",
         "Finance - Buku Besar CV",
         "API - Procurement Service",
         "Finance - FAT Persona",
@@ -9804,21 +9806,20 @@
         "Finance - Kalender dan Rantai Tenggat",
         "Finance - Sambungan dan Permintaan Data Lintas Departemen"
       ],
-      "hash": "3afbb88a9757788a7e910a96f3b1e7578f51be81a8ac5b2bb6c8da47c851fde6",
-      "ukuran_kb": 12.2,
-      "ringkasan": "Menjawab: bagaimana pembayaran keluar (rekening PT dan kas CV) dikerjakan hari ini, apa yang sudah ada di ERP, alur targetnya, celah yang harus ditutup, dan kontrol wajib. Juga memuat berkas unggah Kopra yang diminta Finance dan ukuran efisiensi untuk membuktikan hasilnya.",
+      "hash": "c5c319dbcc5e4027b7dbb3e639946caf43aca42c4fdb7da3670333f81049f651",
+      "ukuran_kb": 13.5,
+      "ringkasan": "Menjawab: bagaimana proses pembayaran keluar (P2) dari rekening PT dan kas CV berjalan hari ini dibanding di ERP, siapa melakukan apa di tahap transfer (Cost Control, SPV Finance, AP/PIC transfer, Accounting), dan bagaimana BKK, bukti transfer, serta dokumen pembayaran ke Accurate ditangani. Juga menjawab pengaman layar untuk aksi yang menggerakkan uang, pengingat jatuh tempo hutang pemasok, celah yang harus ditutup, kontrol wajib, dan ukuran efisiensinya.",
       "kata_kunci": [
         "pembayaran keluar",
-        "payment out",
+        "outgoing payment",
         "transfer",
-        "kas CV",
-        "rekening PT",
-        "Kopra",
         "BKK",
+        "bukti kas keluar",
         "bukti transfer",
-        "proses bisnis finance",
-        "P2",
-        "kontrol pembayaran"
+        "kas CV",
+        "hutang pemasok",
+        "jatuh tempo",
+        "maker-checker"
       ]
     },
     {
@@ -9898,7 +9899,7 @@
       "area": "Finance System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)**. Pengajuan Barang, pengajuan budget, dan kas kecil ada di kode; pengajuan belum membawa pos anggaran, kotak persetujuan belum memuatnya, dan di prod hampir tak dipakai (1 pengajuan barang per 2026-09-12).",
+      "status_teks": "**Implemented (ada catatan)**. Pengajuan Barang, pengajuan budget, dan kas kecil ada di kode (disinkronkan 2026-10-02); pengajuan belum membawa pos anggaran, kotak persetujuan dashboard belum memuatnya, dan pemakaian prod terbaru belum diukur ulang (1 pengajuan barang per 2026-09-12; sesi sinkron ini tidak mengukur prod).",
       "publik": true,
       "tautan": [
         "Finance - Proses Bisnis dan Kebutuhan Sistem",
@@ -9911,20 +9912,20 @@
         "Finance - Sambungan dan Permintaan Data Lintas Departemen",
         "Finance - FAT Persona"
       ],
-      "hash": "b74a6bf58bb2d7053991ac450cbb359944fe1edc6ca0275b155f356d5e23223f",
-      "ukuran_kb": 3.9,
-      "ringkasan": "Menjawab tentang proses P1 Finance, pengajuan pengeluaran dan persetujuan: bagaimana permintaan pengeluaran masuk hari ini (WhatsApp, Excel, email), bagaimana Cost Control memeriksa anggaran, dan tahap approval Supervisor FAT serta Direktur di atas ambang lewat Pengajuan Barang lima tipe (UMUM, RAWMATERIAL, IKLAN, DANA, KONSUMSI). Juga menjawab celah seperti pengajuan yang belum membawa pos anggaran, kotak persetujuan dashboard yang belum memuat pengajuan barang, pajak/BPJS/hutang supplier CV yang belum punya tipe pengajuan, serta kontrol pemisahan peran dan ukuran lama persetujuan.",
+      "hash": "ec72072588122379ae39c7931f95f2aa238c718b2ed12f740fbd92bed3cc0352",
+      "ukuran_kb": 5.9,
+      "ringkasan": "Menjawab: bagaimana pengajuan pengeluaran (P1) diajukan dan disetujui, apa yang dialami tiap peran (pemohon, atasan divisi, Cost Control, SPV Finance, Direktur, staf AP, Accounting) di Pengajuan Barang lima tipe, dan kapan tahap Direktur disisipkan berdasarkan ambang. Juga menjawab celah yang tersisa seperti pos anggaran yang belum terbawa di pengajuan dan kotak persetujuan dashboard, serta kontrol pemisahan peran dan ukuran efisiensinya.",
       "kata_kunci": [
         "pengajuan pengeluaran",
         "expense request",
         "persetujuan",
         "approval",
-        "Pengajuan Barang",
-        "pos anggaran",
-        "budget",
+        "pengajuan barang",
         "Cost Control",
-        "Supervisor FAT",
-        "P1"
+        "SPV Finance",
+        "ambang Direktur",
+        "pos anggaran",
+        "budget"
       ]
     },
     {
