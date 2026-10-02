@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-02",
-  "jumlah_dokumen": 524,
+  "jumlah_dokumen": 526,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -8867,6 +8867,69 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0150 Survei Layanan Dinilai per Bagian, Tiap Bagian Dibaca KPI Satu Posisi.md",
+      "judul": "ADR - 0150 Survei Layanan Dinilai per Bagian, Tiap Bagian Dibaca KPI Satu Posisi",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-02, nol kode. Diputuskan user (Tech Development) dalam sesi kerja: survei \"Penilaian Layanan Tech Development\" disusun ulang jadi bagian per posisi, dan nilai Bagian \"Aplikasi ERP dan MyBharata\" menjadi sumber otomatis metrik KPI Fullstack Developer \"Penilaian Layanan Tech Development\" (bobot 0,2). Nomor 0150 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.",
+      "publik": true,
+      "tautan": [
+        "Microservices - Form Builder Service",
+        "HRIS - Matriks KPI per Departemen",
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "ADR - 0142 Pengisi Penilaian dan Survei Selalu Anonim, IT Membuka Identitas lewat Jalur Audit Bercatatan",
+        "HRIS - Otomasi Skor KPI"
+      ],
+      "hash": "07663ef63fe41340fc074b3ea555587f4f6fe75352a01748575778708b06cdfe",
+      "ukuran_kb": 6.7,
+      "ringkasan": "Menjawab: kenapa survei \"Penilaian Layanan Tech Development\" dipecah jadi Bagian A (Jaringan dan Perangkat, IT Support) dan Bagian B (Aplikasi ERP dan MyBharata, Fullstack Developer), bagaimana nilai per bagian dihitung dengan service_index/hitungIndeks yang sama, dan bagaimana nilai Bagian B menjadi sumber otomatis metrik KPI Fullstack bobot 0,2. Juga menjawab apa yang terjadi bila judul bagian berubah (galat, bukan nol) dan konsekuensi nilai tingkat departemen.",
+      "kata_kunci": [
+        "survei layanan",
+        "service_index",
+        "indeks layanan",
+        "Tech Development",
+        "Fullstack Developer",
+        "IT Support",
+        "KPI otomatis",
+        "bagian form",
+        "section",
+        "form-builder",
+        "sumber KPI"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia.md",
+      "judul": "ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-10-02, diajukan user (Tech Development). Menunggu persetujuan IT lead / pemilik runner; begitu disetujui, ubah baris ini jadi `🟢 Diterima, <tanggal>, oleh <login>` (butir 3 di bawah berlaku juga untuk ADR ini). Runner backlog **belum** memakai aturan ini; skripnya hanya ada di PC IT. Nomor 0151 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0143 Backlog Pindah dari Linear ke GitHub Project",
+        "RUN - Agent Backlog Otonom",
+        "LOG - Agent Backlog Otonom 2026-09",
+        "LOG - Agent Backlog Otonom 2026-10"
+      ],
+      "hash": "e9522982164f47b8e86577e095be6bfcdbeda16f76c15a6ae5132cdba42c046e",
+      "ukuran_kb": 6.1,
+      "ringkasan": "Menjawab: kapan sebuah issue di GitHub Project #15 dianggap siap dikerjakan agent backlog (Definition of Ready), kenapa runner butuh label `Siap Agent`, dan bagaimana antrean ulang (pelepasan label `Butuh Info`) serta pertanyaan ke Pemutus bekerja. Memuat data hasil runner (52 issue, 4 PR, 46 Butuh Info) sebagai alasan dan menyebut bahwa aturan ini masih diusulkan serta belum diterapkan di skrip runner.",
+      "kata_kunci": [
+        "Definition of Ready",
+        "DoR",
+        "Siap Agent",
+        "Butuh Info",
+        "agent backlog",
+        "runner",
+        "Pemutus",
+        "GitHub Project 15",
+        "issue template",
+        "ADR diusulkan",
+        "backlog otonom"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -13308,21 +13371,20 @@
         "ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual",
         "REF - PRD ERP"
       ],
-      "hash": "31773a112a8a2b5ecb0258ad8cfcf42f5172898058cb7084fe185b5a5d8ae7a1",
-      "ukuran_kb": 17.5,
-      "ringkasan": "Menjawab: issue backlog mana yang disentuh agent otonom pada Oktober 2026, apa hasilnya (PR terbuka, Butuh Info, dilewati), dan mengapa. Berisi tabel per issue dengan tanggal, estimasi, ketepatan, sebab terlambat, dan pelajaran, terutama alasan issue dikembalikan ke manusia karena butuh keputusan, ADR, atau toolchain tidak tersedia.",
+      "hash": "f2d9815eafcbc014497d82e6b52d6f1243065965e6d379cee38a28b5fa72bffb",
+      "ukuran_kb": 19.3,
+      "ringkasan": "Menjawab: issue apa saja yang disentuh agent backlog otonom pada Oktober 2026, apa hasilnya (PR terbuka, Butuh Info, dilewati karena toolchain), kapan mulai dan estimasi selesainya, serta pelajaran per issue. Berguna untuk menelusuri kenapa sebuah issue tertentu tidak dikerjakan agent atau apa pertanyaan yang diajukan agent ke manusia.",
       "kata_kunci": [
-        "agent backlog otonom",
-        "log operasional",
+        "log agent backlog",
+        "agent otonom",
         "Oktober 2026",
         "Butuh Info",
+        "PR agent",
+        "estimasi selesai",
+        "ketepatan",
+        "pelajaran",
         "GitHub Project 15",
-        "issue backlog",
-        "In Review",
-        "ketepatan estimasi",
-        "pelajaran agent",
-        "bip-erp",
-        "erp-frontend"
+        "runner backlog"
       ]
     },
     {
@@ -14761,6 +14823,7 @@
       "status_teks": "**Implemented (ada catatan)**. Berjalan sejak 2026-09-29 di satu PC IT; skrip runner belum masuk repo mana pun (hanya ada di PC itu), jadi belum bisa direplikasi dari git.",
       "publik": true,
       "tautan": [
+        "ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia",
         "Microservices - Notification Service",
         "ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak",
         "ADR - 0143 Backlog Pindah dari Linear ke GitHub Project",
@@ -14768,20 +14831,22 @@
         "LOG - Agent Backlog Otonom 2026-09",
         "IT - CI-CD"
       ],
-      "hash": "9e8109f5ef8a8696a3ea4b818f2f1f4d8f90da78fb382d19fa5cb55b9812c4de",
-      "ukuran_kb": 5.9,
-      "ringkasan": "Menjawab: bagaimana agent Claude Code tanpa pengawas mengerjakan backlog Low/Medium di GitHub Project #15 sampai PR, cara menyalakan, menghentikan, atau membatasi jadwalnya, dan batas apa yang dijaga (tanpa merge, deploy, atau status Done). Juga menjelaskan notifikasi WhatsApp grup IT, pencatatan ke vault, dan penanganan bila putaran agent gagal.",
+      "hash": "8514bf448697b6a52cd73294b788f4a28a5a2dfc439347155d72be78b12dbd7b",
+      "ukuran_kb": 6.4,
+      "ringkasan": "Menjawab: bagaimana agent Claude Code mengerjakan backlog Prioritas Low/Medium di Project #15 sampai PR terbuka (Task Scheduler tiap jam, putaran, kriteria kandidat, langkah per issue, notifikasi WhatsApp), cara menyalakan, menghentikan, dan memeriksanya, serta batas izin yang dijaga. Juga menjawab apa yang dilakukan bila putaran berakhir tanpa PR, dan bahwa skrip runner hanya ada di satu PC IT.",
       "kata_kunci": [
-        "agent otonom",
-        "autonomous agent",
+        "agent backlog otonom",
         "runner",
         "Task Scheduler",
-        "claude -p headless",
-        "backlog Low Medium",
-        "notifikasi WhatsApp",
-        "NotifAPI",
+        "claude -p",
+        "Project 15",
         "Butuh Info",
-        "mode terus"
+        "run.lock",
+        "NotifAPI",
+        "WhatsApp IT",
+        "/kerjakan",
+        "runbook",
+        "estimasi terlambat"
       ]
     },
     {
