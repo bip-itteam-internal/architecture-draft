@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan, menunggu konfirmasi finance** (2026-10-02). Dua butir keputusan (§1 dan §2) sudah dijawab finance lewat chat dan berkas balasan pada 2026-10-01 dan 2026-10-02; §6 dan beberapa butir lain masih **TBD** (lihat "Belum Diputuskan"). **Belum ada kode**: kaskade FO belum menangani INC yang menjadi kosong, dan pesan "dokumen ada di Accurate" belum memeriksa ke Accurate.
+> **Status**: 🟢 **Diterima, 2026-10-03, oleh Finance** (jawaban "setuju" pada berkas tanya-jawab audit penerimaan, 2026-10-02/03; keputusan §1 dan §2 sebelumnya sudah dijawab lewat chat pada 2026-10-01 dan 2026-10-02). Penghapus INC (§6) dan kewenangan atas uang FO sudah dijawab; butir lain masih **TBD** (lihat "Belum Diputuskan"). **Belum ada kode**: kaskade FO belum menangani INC yang menjadi kosong, belum ada fungsi hapus INC, dan pesan "dokumen ada di Accurate" belum memeriksa ke Accurate.
 
 ## Untuk Manajemen
 
@@ -10,8 +10,8 @@
 
 **Apa yang tidak dijanjikan.**
 - Keputusan ini **tidak mengubah angka historis** di Accurate. Perapian dokumen yang sudah ada dikerjakan terpisah, dengan dry-run, cadangan, dan dijalankan manusia.
-- **Belum diputuskan siapa yang menghapus INC**: sistem atau finance. Selama belum, finance menghapus manual dan sistem hanya mencatat.
-- Belum dijawab apakah uang order FO benar-benar cair ke rekening (lihat TBD).
+- **INC yang harus dihapus dihapus oleh sistem, tetapi hanya setelah finance menekan konfirmasi.** Sampai fungsi itu ada, finance menghapus manual dan sistem hanya mencatat.
+- Aturan untuk FO yang dilaporkan sesudah periode ditutup finance **belum diputuskan**.
 
 **Perkiraan besaran kerja.** Sedang (estimasi, belum diukur): satu perubahan di kaskade FO, satu pemeriksaan keberadaan dokumen di Accurate, dan satu pekerjaan data sekali jalan. Deploy backend saja, tanpa layar baru.
 
@@ -33,6 +33,8 @@
 5. **Klaim "dokumen ada di Accurate" tidak diverifikasi.** Penjagaan yang mencegah INC `SKIPPED` ditimpa hanya bersandar pada `accurate_id` yang tersimpan. Pembacaan dokumen yang hilang mengembalikan kosong tanpa galat. Pada 2026-10-02 finance menyatakan 18 INC yang dibahas tidak ditemukan di Accurate, padahal catatan sistem menyebutnya ada.
 6. **Dampak ke rekonsiliasi kas.** Menghapus INC mengurangi saldo kas toko di Accurate, sedangkan saldo marketplace tetap memuat uangnya. Itu menimbulkan selisih negatif di layar rekonsiliasi kas toko ([[Finance - Proses Rekonsiliasi Kas Toko dan Bank]]) sampai uang FO dibukukan ke akun yang sama.
 7. **Jawaban finance.** (a) FO yang dilaporkan sesudah cair harus dikurangi atau dihapus, karena dibiarkan berarti dobel input. (b) FO memang seharusnya tidak masuk penjualan karena bukan penjualan. Finance hanya memeriksa keberadaan dokumen, bukan isi faktur, karena faktur adalah data penjualan.
+8. **Jawaban finance 2026-10-02/03 (berkas tanya-jawab audit penerimaan).** (a) **Uang order FO cair** ke rekening toko dan dibukukan **accounting lewat jurnal umum**, jadi INC yang tetap memuat FO membukukan uang yang sama dua kali. (b) INC yang harus dihapus sebaiknya **dihapus sistem dengan tombol konfirmasi finance**, bukan manual di Accurate. (c) Siapa dan kapan 18 INC yang sudah hilang dihapus **tidak diketahui**. (d) Faktur kosong dan pencocokan faktur yang menyusut ditangani **tim Sales/AR**, bukan finance. (e) Receipt Juli sampai Agustus berstatus `FAILED` **boleh dirapikan di sistem**, asal tidak menyentuh data Accurate yang sudah sesuai. (f) Finance **hanya menerima** data FO dan tidak memasukkannya ke ERP.
+9. **Siapa melapor FO.** Staf AR Sales mengunggah daftar FO (Excel) ke ERP. Marketing yang melapor FO langsung memberi datanya ke IT atau lewat admin sales; finance bukan penginput. Perubahan dokumen Accurate oleh sistem boleh otomatis, **dengan syarat tidak mengubah data lain yang sudah sesuai**.
 
 ## Decision
 
@@ -41,20 +43,21 @@
 3. **Urutan: INC dulu, baru faktur.** Accurate menolak mengubah atau menghapus faktur yang masih ada pembayarannya, jadi dokumen yang membayar harus lebih dulu.
 4. **FO yang dilaporkan sebelum INC disusun tidak masuk INC sama sekali.** Ini sudah perilaku sekarang (order FO dikeluarkan saat INC dibangun) dan tidak berubah.
 5. **Hasil kaskade harus jujur.** Kaskade tidak boleh melaporkan "diselaraskan" bila INC yang kosong belum dihapus. Hasilnya dilaporkan sebagai butuh tindakan, dengan nomor dokumennya.
-6. **Siapa yang menghapus INC kosong: TBD** (lihat di bawah). Sampai diputuskan, finance menghapus manual dan sistem tidak menimpa apa pun.
+6. **INC kosong dihapus oleh sistem, dengan konfirmasi finance.** Penghapusan INC tidak bisa dibatalkan, jadi sistem tidak menghapus sendiri: ia menampilkan INC yang harus dihapus dan menghapusnya setelah finance mengonfirmasi, dengan jejak siapa dan kapan. Sampai fungsi itu ada, finance menghapus manual dan sistem tidak menimpa apa pun.
 7. **Klaim keberadaan dokumen di Accurate wajib diperiksa ke Accurate**, bukan disimpulkan dari `accurate_id` yang tersimpan. Pesan "dokumen ada di Accurate, perlu keputusan finance" hanya boleh keluar bila dokumennya benar-benar terbaca.
+8. **Perubahan otomatis hanya menyentuh order FO.** Dokumen Accurate yang sudah sesuai dan order lain di dalamnya tidak boleh berubah oleh kaskade FO (jawaban finance, §Context butir 8f).
 
 ## Belum Diputuskan (TBD)
 
-- **Penghapusan INC oleh sistem atau finance.** Opsi A: fungsi hapus INC baru di sistem, digerbang peran finance dan dengan konfirmasi (penghapusan tidak bisa dibatalkan). Opsi B: finance menghapus di Accurate, sistem mendeteksi dan menyelaraskan catatannya.
-- **Apakah uang order FO benar-benar cair ke rekening.** [[Microservices - Integration Service]] menyatakan uang FO tidak masuk rekening toko dan dibukukan manual finance, tetapi contoh di dok yang sama mencatat order FO yang sudah cair. Jawabannya menentukan apakah mengecilkan INC sesuai dengan kas yang sebenarnya.
-- **INC yang memuat order di luar batas tanggal toko** selain FO (dua INC pada 2026-10-02): apakah order itu sudah dibukukan manual terpisah.
+- **Batas antara "dikecilkan otomatis" dan "dihapus dengan konfirmasi".** Tafsiran tim IT dari dua jawaban finance: mengecilkan INC yang masih memuat order normal berjalan otomatis, sedangkan menghapus INC yang seluruhnya FO menunggu konfirmasi. Belum dikonfirmasi finance.
+- **Apakah faktur kosong boleh dihapus, dan faktur yang menyusut sesuai isinya.** Penanganannya diserahkan ke Sales/AR; jawaban boleh/tidak dan hasil pencocokan belum ada.
+- **INC yang memuat order di luar batas tanggal toko** selain FO (dua INC pada 2026-10-02): apakah order itu sudah dibukukan manual terpisah. Belum dijawab.
 - **INC yang tertahan di Kotak Adopsi** (isi Accurate berbeda dari sistem) dan memuat satu order FO: diputuskan lewat Kotak Adopsi, bukan lewat keputusan ini.
-- **FO yang dilaporkan terlambat untuk periode yang sudah ditutup finance.** Finance pernah menyatakan periode Agustus tidak boleh diubah; keputusan ini tidak menjawab bagaimana FO terlambat diperlakukan di periode tertutup.
+- **FO yang dilaporkan terlambat untuk periode yang sudah ditutup finance.** Finance pernah menyatakan periode Agustus tidak boleh diubah; jawaban 2026-10-03 hanya menjelaskan bahwa FO yang terlanjur masuk income biasanya terdeteksi lewat selisih (karena FO seharusnya diinput accounting), tanpa menjawab perlakuan di periode tertutup. Tetap TBD.
 
 ## Consequences
 
-- **Perbaikan kaskade FO** menangani INC yang menjadi kosong sesuai butir 1 dan 5. Perubahan ini tergantung jawaban butir 6.
+- **Perbaikan kaskade FO** menangani INC yang menjadi kosong sesuai butir 1 dan 5, dan fungsi hapus INC berkonfirmasi finance sesuai butir 6 (backend, ditambah satu tombol konfirmasi di layar finance).
 - **Pemeriksaan keberadaan dokumen** di Accurate sebelum menulis pesan atau penjagaan "dokumen ada" (butir 7).
 - **Perapian data sekali jalan** untuk catatan sistem atas INC yang sudah dihapus finance (ID Accurate basi, label gangguan lama, teks `last_error` lama). Dikerjakan dengan dry-run, cadangan, dan rollback, dijalankan manusia, dan baru sesudah finance memastikan INC-nya memang sudah dihapus.
 - **Faktur yang seharusnya kosong** (faktur hantu) dikoreksi atau dihapus sesuai butir 2 dan 3, sesudah INC pembayarnya tiada.

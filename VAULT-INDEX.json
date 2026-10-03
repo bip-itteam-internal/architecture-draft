@@ -8973,8 +8973,8 @@
       "judul": "ADR - 0152 FO yang Dilaporkan Sesudah Uang Cair Mengecilkan atau Menghapus INC, FO Tidak Masuk Penjualan",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan, menunggu konfirmasi finance** (2026-10-02). Dua butir keputusan (§1 dan §2) sudah dijawab finance lewat chat dan berkas balasan pada 2026-10-01 dan 2026-10-02; §6 dan beberapa butir lain masih **TBD** (lihat \"Belum Diputuskan\"). **Belum ada kode**: kaskade FO belum menangani INC yang menjadi kosong, dan pesan \"dokumen ada di Accurate\" belum memeriksa ke Accurate.",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima, 2026-10-03, oleh Finance** (jawaban \"setuju\" pada berkas tanya-jawab audit penerimaan, 2026-10-02/03; keputusan §1 dan §2 sebelumnya sudah dijawab lewat chat pada 2026-10-01 dan 2026-10-02). Penghapus INC (§6) dan kewenangan atas uang FO sudah dijawab; butir lain masih **TBD** (lihat \"Belum Diputuskan\"). **Belum ada kode**: kaskade FO belum menangani INC yang menjadi kosong, belum ada fungsi hapus INC, dan pesan \"dokumen ada di Accurate\" belum memeriksa ke Accurate.",
       "publik": true,
       "tautan": [
         "Microservices - Integration Service",
@@ -8985,22 +8985,22 @@
         "ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync",
         "ADR - 0077 Koreksi Faktur via Impor Rekap Lengkap Mengalir ke Master-Data, Bukan Override per Baris"
       ],
-      "hash": "d80f0e5613d9216a9e0570a23cf1eacd301c2e4b92d5950988758c7c521bdf2c",
-      "ukuran_kb": 9.4,
-      "ringkasan": "Menjawab: bagaimana order FO (fake order) yang baru ditandai sesudah uang cair dan INC dibukukan harus diperlakukan, kapan INC dikurangi atau dihapus, dan kenapa FO tidak boleh masuk penjualan sehingga faktur harian ikut dikoreksi atau di-VOID. Menjelaskan urutan INC dulu baru faktur, celah kaskade untuk INC yang seluruh ordernya FO (menjadi SKIPPED bernominal nol padahal dokumen Accurate tidak sinkron), kewajiban memeriksa keberadaan dokumen ke Accurate, serta butir TBD seperti siapa yang menghapus INC dan dampaknya ke rekonsiliasi kas toko.",
+      "hash": "e0ca893a0e00e253fffee9421a2425f98f27946196d246ebc39b3020570f76b5",
+      "ukuran_kb": 11.0,
+      "ringkasan": "Menjawab: apa yang harus terjadi pada INC (penerimaan) dan faktur penjualan bila sebuah order ditandai FO (fake order) sesudah uangnya cair, siapa yang menghapus INC yang menjadi kosong, dan siapa melapor FO. Memuat urutan koreksi INC dulu baru faktur, aturan hasil kaskade yang jujur, serta butir yang masih TBD seperti FO di periode yang sudah ditutup.",
       "kata_kunci": [
         "FO",
         "fake order",
         "INC",
-        "income",
+        "sales receipt",
         "penerimaan",
-        "Accurate",
+        "faktur",
+        "invoice",
         "kaskade",
-        "faktur harian",
-        "VOID",
-        "rekonsiliasi kas",
-        "ADR 0152",
-        "integration-service"
+        "Accurate",
+        "hapus INC",
+        "konfirmasi finance",
+        "Kotak Adopsi"
       ]
     },
     {
