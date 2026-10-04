@@ -123,7 +123,7 @@ Tidak ada pembatas Portal Saya; tidak ada induk berisi satu menu; tidak ada kata
 
 ## Rancangan per departemen
 
-Rancangan rinci (per posisi, matriks lihat, matriks aksi, pemisahan tugas, perbaikan data, uji pakai) hidup di enam Artifact privat bertanggal 2026-10-01, disetujui user 2026-10-02. Artifact adalah salinan rancangan, bukan sumber kebenaran; yang mengikat adalah ADR ini dan dok domain yang ditautkannya. Pokok per departemen:
+Rancangan rinci (per posisi, matriks lihat, matriks aksi, pemisahan tugas, perbaikan data, uji pakai) hidup di tujuh Artifact bertanggal 2026-10-01 sampai 2026-10-02 (enam departemen ditambah Direksi), disetujui user 2026-10-02; tautannya di § Tautan Artifact rancangan. Artifact adalah salinan rancangan, bukan sumber kebenaran; yang mengikat adalah ADR ini dan dok domain yang ditautkannya. Pokok per departemen:
 
 | Departemen | Urusan pekerjaan | Pokok khusus |
 |---|---|---|
@@ -133,6 +133,21 @@ Rancangan rinci (per posisi, matriks lihat, matriks aksi, pemisahan tugas, perba
 | Tech Development | Akun & Hak Akses, Infrastruktur, Integrasi Marketplace, Form Builder, Jejak & Akses Darurat | Helpdesk lewat Tugas; Integration dipecah; Akses Darurat menunggu ADR 0137 |
 | Kesekretariatan | Ruang Direktur, Legal & Perizinan, Registrasi & Pengembangan Produk, Audit Internal | Ruang Direktur digerbang paket Persetujuan: Direksi (Corporate Secretary tanpa tab Keuangan); tim kreatif lewat space Tugas |
 | Manufaktur | Perencanaan Produksi, Produksi, Gudang Bahan & Barang Jadi, Stok & Opname, Pengiriman Pesanan Online, K3 & Mutu, Master Data Produksi, Persetujuan & Riwayat | Tinggar dan Sadewa satu urusan; cakupan per gudang |
+| Direksi (Direktur, Corporate Secretary) | Menu baca dan memutus dari tiap departemen, memakai nama induk departemen pemiliknya | Tidak lagi "semua menu"; Ruang Direktur jadi tab Beranda (Persetujuan, Kinerja, Keuangan, Penjualan, SDM, Produksi, Legal); antrean keputusan satu sumber (ADR 0114); "setara Direktur" untuk payroll, anggaran, kas kecil belum diputuskan |
+
+### Tautan Artifact rancangan
+
+Artifact dibuka dengan akun pemiliknya atau akun yang diberi akses lewat menu Share. Isinya salinan rancangan bertanggal, bukan sumber kebenaran.
+
+| Rancangan | Artifact | Catatan berbagi |
+|---|---|---|
+| Marketing (percontohan) | https://claude.ai/artifact/URMnPPaVMhaCXNr2v5XeHv | sudah dibuka "anyone with link" |
+| FAT | https://claude.ai/artifact/XrGexzWCCuMhoy9A2Gkwxe | privat |
+| HRGA | https://claude.ai/artifact/9kNAFQjHdWJBcRX7YjsWiw | privat |
+| Tech Development | https://claude.ai/artifact/RzTJJpYTJqoN4Z73xjG28R | ⛔ tetap privat: memuat temuan keamanan yang belum ditambal |
+| Kesekretariatan | https://claude.ai/artifact/WEoMKBq79nE6PxVyyM8z8P | privat |
+| Manufaktur | https://claude.ai/artifact/1bLgSV8cg6kwoe3EPzvSbD | ⛔ tetap privat: memuat temuan keamanan yang belum ditambal |
+| Direksi | https://claude.ai/artifact/GcQNJJDdLDoem52XoescSe | privat; temuan keamanan ditulis tanpa rincian teknis |
 
 ## Consequences
 
