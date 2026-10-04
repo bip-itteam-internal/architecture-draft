@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-04",
-  "jumlah_dokumen": 527,
+  "jumlah_dokumen": 528,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -9001,6 +9001,36 @@
         "hapus INC",
         "konfirmasi finance",
         "Kotak Adopsi"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0153 KPI Bulan Lampau yang Belum Dinilai Tampil sebagai Pratinjau di MyBharata, Bukan Layar Kosong.md",
+      "judul": "ADR - 0153 KPI Bulan Lampau yang Belum Dinilai Tampil sebagai Pratinjau di MyBharata, Bukan Layar Kosong",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-04, oleh pengguna Tech Development dalam sesi kerja, nol kode. Nomor 0153 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
+        "HRIS - Otomasi Skor KPI",
+        "APP - MyBharata"
+      ],
+      "hash": "bffa270a6a2c9b840331a9320b843c1e8f2a23d6bcb8e85d8b87c9f8c2219671",
+      "ukuran_kb": 4.3,
+      "ringkasan": "Menjawab: mengapa karyawan melihat layar kosong \"Skor KPI Belum Tersedia\" untuk bulan lampau di MyBharata, dan apa keputusannya. Menjelaskan bahwa bulan lampau tanpa skor tersimpan kini ditampilkan sebagai pratinjau berpenanda \"belum dinilai\" lewat GET /me/kpi-score?preview=true tanpa mengubah backend, beserta data ukur produksi Agustus 2026 (62 dari 184 akun tanpa skor) dan konsekuensinya.",
+      "kata_kunci": [
+        "KPI",
+        "pratinjau",
+        "preview",
+        "MyBharata",
+        "skor KPI",
+        "belum dinilai",
+        "bulan lampau",
+        "kpi-score",
+        "finalisasi otomatis",
+        "template KPI",
+        "ADR 0153"
       ]
     },
     {
