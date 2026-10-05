@@ -2,6 +2,7 @@
 
 *Pengajuan Pembelian tipe **KONSUMSI** mengikuti ambang persetujuan Direktur yang berbagi dengan tipe lain (nominal ≥ ambang → Direktur disisipkan), persis seperti DANA. Ini **membalik** keputusan bisnis 2026-09-09 yang membuat KONSUMSI kebal Direktur dan berhenti di SPV Finance berapa pun nominalnya. KONSUMSI tetap tipe terpisah untuk pelaporan, bukan cabang jenjang.*
 
+- ⚠️ **Sebagian digantikan** (2026-10-05) oleh [[ADR - 0154 KONSUMSI Dibelikan Procurement seperti Raw Material, Bukan Permintaan Uang]]: §1 (jenjang identik DANA) dan §4 tidak berlaku lagi; §2 (ambang berbagi Rp 5 juta) tetap, kini dihitung dari harga Procurement.
 - **Status**: ✅ **Implemented** — kode di `main` bip-erp (`services/procurement/pengajuan_barang_jenjang.go`, `tipeKebalDirektur`) dan cermin `erp-frontend` (`TIPE_KEBAL_DIREKTUR`). Ambang berbagi `ambangDirekturBawaan` = Rp 5.000.000 tidak diubah.
 - ⚠️ **Nomor ganda**: nomor 0090 juga dipakai [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]]. Rujuk ADR ini dengan **judul**, bukan nomor saja. Diputuskan 2026-09-29 tidak dinomori ulang karena kutipan nomornya sudah tersebar di kode, PR, dan issue; nomor ganda baru ditolak pre-push (`gerbang-adr.py`).
 - **Path di repo**: `bip-erp/services/procurement/pengajuan_barang_jenjang.go` · `erp-frontend/src/features/pengajuan-barang/types/pengajuan-barang.ts`
