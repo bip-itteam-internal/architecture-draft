@@ -42,6 +42,7 @@
 4. **Antrean ulang = pelepasan label `Butuh Info` oleh manusia**, bukan sembarang komentar. Yang menjawab memasang `Siap Agent` sekaligus bila checklist sudah terpenuhi.
 5. **Pertanyaan diarahkan ke Pemutus.** Badan issue memuat `**Pemutus:** <login>` (orang yang berwenang memutuskan bentuk solusinya, bisa berbeda dari PIC yang mengerjakan). Komentar Butuh Info dari runner menyebut `@<Pemutus>`, dan ringkasan ke grup dikelompokkan per Pemutus.
 6. **Template issue** di `bip-erp` dan `erp-frontend` memuat bagian-bagian DoR, supaya keputusan ditanyakan saat issue ditulis.
+7. **Amandemen 2026-10-02 (pemecahan).** Syarat "satu repo, satu PR" sempat berbenturan dengan aturan [[ADR - 0143 Backlog Pindah dari Linear ke GitHub Project]] bahwa sub-issue tidak dipecah lagi (muncul di empat sub-issue sekaligus). Diputuskan IT lead: issue tingkat atas dipecah jadi issue **sejajar**; sub-issue yang kebesaran **diganti** sub-issue saudara di bawah induk yang sama, yang lama ditutup Canceled. Pemecahan dilakukan sesudah keputusannya ada. Rincian di team-memory.
 
 ## Konsekuensi
 

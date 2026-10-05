@@ -143,7 +143,7 @@
 
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/accounting/profit-loss` · `/balance-sheet` · `/account-balance` | Laporan keuangan Accurate. Param `startDate`/`endDate` (**`dd/MM/yyyy`**; `account-balance` juga menuntut `asOfDate`). ⚠️ Keys respons Accurate memuat **titik literal** (`"profitLoss.description"`) — bukan bersarang; diurai lewat `map[string]any`, bukan struct bertag. ⚠️ **`/balance-sheet` kini bergerbang `RequireMenuLaporanKeuangan`** (branch `feat/oneForAll`, **sudah merge** — terpasang di `services/integration/main.go` per `origin/main` 2026-08-10, dijaga `menu_gate_test.go`): 403 bila token membawa penanda `$menulock.finance.laporan` tanpa izin `menu.finance.laporan`. Dua saudaranya **sengaja dibiarkan terbuka** — halaman posisi SPV/Tax/Cost Control ikut memakainya. Panggilan tanpa header izin (worker/cron) selalu lolos. Lihat [[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]] |
+| GET | `/accounting/profit-loss` · `/balance-sheet` · `/account-balance` | Laporan keuangan Accurate. Param `startDate`/`endDate` (**`dd/MM/yyyy`**; `account-balance` juga menuntut `asOfDate`). ⚠️ Keys respons Accurate memuat **titik literal** (`"profitLoss.description"`) — bukan bersarang; diurai lewat `map[string]any`, bukan struct bertag. ⚠️ **`/balance-sheet` kini bergerbang `RequireMenuLaporanKeuangan`** (branch `feat/oneForAll`, **sudah merge** — terpasang di `services/integration/main.go` per `origin/main` 2026-08-10, dijaga `menu_gate_test.go`): 403 bila token membawa penanda `$menulock.finance.laporan` tanpa izin `menu.finance.laporan`. ~~Dua saudaranya **sengaja dibiarkan terbuka** — halaman posisi SPV/Tax/Cost Control ikut memakainya.~~ **Usang sejak gerbang baca uang (bip-erp#2509, 2026-10-02):** `/profit-loss` dan `/account-balance` kini bergerbang `GerbangFinanceLaporan` (`accounting.view` atau `pajak.view`, sehingga halaman Tax tetap terlayani), dan `/balance-sheet` bergerbang `GerbangFinanceNeraca` di depan `RequireMenuLaporanKeuangan` (`main.go:1566-1572`); lihat § Gerbang baca di bawah. Panggilan tanpa header izin (worker/cron) selalu lolos. Lihat [[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]] |
 | GET | `/accounting/receivables` | **Piutang B2B** + aging + DSO. Disaring kategori pelanggan lewat **dua langkah**: `customer/list.do` (`filter.customerCategoryId`) → id pelanggan → `sales-invoice/list.do` (`filter.customerId`). ⚠️ `sales-invoice/list` **tak punya** filter kategori — parameter itu diabaikan diam-diam, dan versi awal menarik 8.073 faktur marketplace. Kategori kosong dijawab `belum_diatur: true`, **bukan** "semua" |
 | GET | `/accounting/customer-categories` | Daftar kategori pelanggan (mengisi layar pengaturan kategori B2B) |
 | GET | `/accounting/journals` · `/journals/:id` | Jurnal umum berhalaman (~96 ribu; paginasi di sisi Accurate) + rincian debit/kredit. Filter rentang `dari`/`sampai` (`dd/MM/yyyy`). ⚠️ Bentuk filter **wajib** `filter.transDate.op=BETWEEN` + `val[0]`/`val[1]`; `transDateFilter` (nama yang disebut dokumentasi Accurate) **diabaikan diam-diam**, dan `GREATER_OR_EQUAL`/`LESS_OR_EQUAL` **ditolak** — rentang satu sisi memakai sentinel `01/01/1990`–`31/12/2090` |
@@ -192,6 +192,48 @@
 > ⚠️ **Berbeda dari realisasi non-ops sendiri, pendapatan ditarik LIVE dari Accurate**, tidak lewat salinan lokal. Alasannya: ia dipakai satu metrik KPI ringkas, bukan dirender berulang di layar, jadi biayanya cukup kecil untuk tak menuntut koleksi salinan + task penyegar sendiri.
 >
 > ⛔ **Rute `/admin-nonops/kpi` kini digerbangi kunci layanan integration-service SENDIRI (`INTEGRATION_SERVICE_KEY`), BUKAN `INTERNAL_GATEWAY_KEY`.** Gateway memasang `BIP-Gateway-ID` pada **setiap** permintaan yang lolos JWT ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]), sehingga rute yang bersandar padanya terbuka bagi **seluruh karyawan yang sudah login** — dan ini bahan penilaian KPI yang dipanggil mesin ([[Microservices - Employee Service]]) tanpa identitas pengguna. **Kunci yang belum dikonfigurasi MENUTUP rute, bukan membukanya**: satu env yang lupa dipasang saat deploy tidak boleh berubah jadi pintu terbuka. Env `INTEGRATION_SERVICE_KEY` wajib terpasang di **dua** blok compose dengan nilai sama — employee-service (mengirim) dan integration-service (memeriksa). Rute `/admin-nonops` biasa (untuk layar) **tidak** ikut digerbangi.
+
+### Gerbang baca uang (`RequireFinanceBaca`; ✅ merged 2026-10-02, bip-erp#2509, issue privat bip-erp#2389)
+
+Sebelumnya rute baca laporan keuangan, piutang, jurnal, kas, dan dompet toko hanya dijaga JWT (`ValidateGateway`): siapa pun yang login, tanpa peran finance, bisa memanggilnya langsung walau layar FE-nya sudah digerbang (`FinanceModuleGuard`). Sejak #2509 setiap rute baca uang memakai `RequireFinanceBaca(izin, peranTambahan...)` (`internal/interface/http/finance_baca_gate.go`). Urutan keputusannya (komentar kepala berkas, dibaca 2026-10-02):
+
+1. Env **`FINANCE_PERMISSION_ENFORCEMENT=off`** = semua lolos (saklar darurat). Dibaca **sekali saat proses start**; bawaannya **menyala**, hanya nilai `off` yang mematikan, salah ketik menyisakan gerbang.
+2. Tanpa header `BIP-Employee-ID` = **pemanggil mesin** (service-ke-service) = lolos. Aman karena `ValidateGateway` menuntut kunci internal dan gateway selalu membuang lalu mengisi ulang Employee-ID dari token, jadi klien tak bisa menyamar jadi mesin dengan membuang header.
+3. Klaim `BIP-Permissions` memuat salah satu izin kelompok (termasuk izin menu seperti `menu.finance.laporan`) = lolos.
+4. Klaim memuat izin modul finance tetapi bukan salah satunya = **403**: orang yang sudah dipasangi paket finance dinilai oleh paketnya, bukan tier.
+5. Klaim **belum** memuat izin finance dan cadangan tier masih menyala (`common.TierFallbackAktif("finance")`) = lolos bila punya peran finance (tier apa pun), IT (staff/supervisor/admin), atau salah satu peran tambahan kelompok. Ini cermin `useFinanceFallback` di erp-frontend; **bukan** `FinanceTierDefault` mentah, yang menurunkan izin tertentu dan lebih sempit dari menu yang dilihat orang.
+6. Selain itu **403**.
+
+⚠️ **Gerbang dipasang SEBELUM middleware cache** (`cache2`/`cache10`): cache respons menjawab tanpa memanggil handler di belakangnya, jadi gerbang yang berdiri sesudahnya tak pernah dilewati jawaban yang sudah tersimpan. Test `finance_baca_gate_test.go` memindai `main.go` agar tiap rute uang tetap bergerbang dan gerbangnya berdiri sebelum cache.
+
+| Kelompok | Izin (any-of) | Peran tambahan (tier cadangan) | Rute |
+|---|---|---|---|
+| `GerbangFinanceLaporan` | `accounting.view`, `pajak.view` | | `/accounting/profit-loss`, `/account-balance`, `/ppn-masukan` |
+| `GerbangFinanceNeraca` | `accounting.view`, `menu.finance.laporan` | | `/accounting/balance-sheet` (tetap diikuti `RequireMenuLaporanKeuangan`) |
+| `GerbangFinanceAkuntansi` | `accounting.view` | | persetujuan, jurnal, aset tetap (ringkasan), anggaran (daftar, mingguan), admin-nonops, opex-manual (baca), akun-saldo, sales-receipts mentah, kas identitas dan jurnal kas, customer-categories |
+| `GerbangFinancePiutang` | `ar.view`, `accounting.view` | | `/accounting/receivables`, `/transactions/orders/piutang/summary` dan `/tren` |
+| `GerbangFinancePiutangExport` | `ar.view` | | `/transactions/orders/piutang/export` (keputusan produk 2026-10-02: cukup `ar.view`) |
+| `GerbangFinanceArusKas` | `ar.view`, `accounting.view`, `profit.view` | | `/profit/cash-flow/orders` dan ekspornya |
+| `GerbangFinanceDompet` | `kas_toko.view` | `integration_accurate` | `/wallet/*` (balances, withdrawals, mutations, kpi, saldo, reconciliation, ekspor, sync-status) |
+| `GerbangFinanceDompetAgregat` | `kas_toko.view`, `ar.view` | `integration_accurate` | `/wallet/reconciliation/missing/agregat` |
+| `GerbangFinanceRekonsiliasiKas` | `kas_toko.view`, `accounting.view` | `integration_accurate` | `/accounting/kas/rekonsiliasi/*` (daftar, ringkasan, bukti, order, buku-besar, kesegaran) |
+
+Daftar izin hidup di **satu tempat**, `finance_baca_gate.go`; tabel ini peta ringkas bertanggal 2026-10-02, bila berbeda kodenya yang benar. Peran `integration_accurate` ikut karena menu kas toko/dompet/rekonsiliasi juga dilihat peran itu (`accurateBridgingMenus` di FE).
+
+**Rute baca yang SENGAJA tetap terbuka** (keputusan pemilik produk 2026-10-02, dikunci `ruteBacaSengajaTerbuka` di `finance_baca_gate_test.go:195`; rute baca baru yang tak ada di daftar bergerbang maupun daftar ini membuat test merah):
+
+| Rute | Alasan di kode | Pemakai |
+|---|---|---|
+| `GET /accounting/fixed-assets` | daftar aset tetap dipakai lintas halaman | halaman lain di FE |
+| `GET /accounting/anggaran/katalog` | katalog akun, bukan angka | dropdown anggaran |
+| `GET /accounting/anggaran/varians` | dipanggil layanan lain langsung | sumber KPI employee (`kpi_sumber_varians_anggaran.go:362`); pemakai lain (kartu efisiensi GA, menurut pemilik produk) belum diverifikasi |
+| `GET /accounting/anggaran/mingguan/kpi` | dikunci KPI | sumber KPI `forecast_kas` |
+| `GET /accounting/admin-nonops/kpi` | sudah kunci layanan | employee-service |
+| `GET /accounting/riwayat-akun` | sudah kunci layanan | rute mesin-ke-mesin |
+| `GET /accounting/tarif-engine` | tarif, bukan posisi keuangan | |
+| `GET /profit/cash-flow` | daftar putih FE | |
+
+⚠️ **Yang belum dicakup**: gerbang ini hanya untuk rute **BACA**. Rute tulis di grup `/accounting` belum memakainya; apakah perlu adalah keputusan terbuka, rinciannya di issue privat bip-erp#2389 dan tidak diuraikan di sini (repo publik). Pembaca Copilot untuk rute ini: [[Microservices - Assistant Service]] § Paket tool di luar HRGA dan marketing (paket akuntansi menurunkan `tidak_berhak` dari 403 gerbang ini).
 
 ## Items · Credentials · Holidays
 | Method | Path | Fungsi |

@@ -81,6 +81,7 @@ Saat merencanakan fitur yang menyentuh tanggal, jawab dulu:
 | [[Microservices - Form Builder Service]] | `form_period` | **Kaizen saja.** Hanya kaizen yang menyimpan snapshot peserta, jadi hanya di sana bisa dipastikan periode itu memang kewajiban pemanggil. Item ditaruh di `closes_at`, dan yang sudah memenuhi kuota dilewati lewat `countMyKaizenIdeas` yang sudah ada |
 | [[Microservices - Inventory Service]] | `room_booking` | Booking Ruang GA **milik pemanggil sendiri saja**, berjam, lingkup `personal`. Status booking dipetakan ke `tentative`/`confirmed`/`cancelled`, dan booking yang lahir dari modul lain dilewati. Rinciannya di § Aturan visibilitas feed Booking Ruang |
 | [[Microservices - Learning Service]] | `training` | Kelas pelatihan yang diikuti pemanggil **sebagai peserta saja**, lingkup `personal`. Berjam bila kelasnya satu hari dan kedua jamnya `HH:MM` sah, selain itu seharian. `Cancelled` → `cancelled`, sisanya `confirmed`. bip-erp [#1895](https://github.com/bip-itteam-internal/bip-erp/pull/1895), live PROD 2026-09-15. Rinciannya di § Aturan visibilitas feed Pelatihan |
+| [[Microservices - Recruitment Service]] | `interview` | ⏳ **Menunggu merge** PR [#2551](https://github.com/bip-itteam-internal/bip-erp/pull/2551) (bip-erp#2521). Sesi seleksi tempat pemanggil termasuk **panel saja** (`Interviewers[]` atau `Interviewer`), lingkup `personal`. Rinciannya di § Aturan visibilitas feed Sesi Seleksi |
 | **calendar (sendiri)** | `event` | Agenda mandiri. Satu-satunya jenis yang menampilkan orang lain, dan itu sah karena pesertanya dilibatkan dengan sengaja oleh pembuatnya |
 
 ### Aturan visibilitas agenda mandiri
@@ -162,6 +163,19 @@ Frontend: entri `training` di `src/features/calendar/lib/kind-style.ts` (ikon `G
 Uji: `services/learning/calendar_feed_test.go` (tanpa identitas 403, rentang tak sah 400, `items` tak pernah `null`, penyaring per dokumen dengan sumber tiruan yang ikut mengembalikan kelas orang lain, berjam vs seharian termasuk jam rusak, pemetaan status, batas kueri `$lt`/`$gte`).
 
 **Terverifikasi di produksi 2026-09-15** dari dalam `Calendar-Service`, baca-saja: identitas peserta nyata untuk Agustus 2026 menghasilkan 1 item, baik lewat feed langsung maupun lewat agregator `GET /` dengan `degraded: []`; identitas bukan peserta `{"items":[]}`; tanpa identitas 403. DEV belum dideploy.
+
+### Aturan visibilitas feed Sesi Seleksi (`interview`)
+
+> ⏳ Menunggu merge PR [#2551](https://github.com/bip-itteam-internal/bip-erp/pull/2551) (bip-erp#2521); isi di bawah grounded ke branch PR, belum ada di `main`.
+
+Provider `{Key: "recruitment", Label: "Seleksi"}` di `providers.go`, env `RECRUITMENT_MODULE_URL` di blok `calendar-service` pada `docker-compose.yml` (env baru, jadi `--force-recreate calendar-service`). Feed-nya `services/recruitment/calendar_feed.go`.
+
+- **Penerima = panel sesi saja** (`Interviewers[]` + `Interviewer`). Pemegang izin recruitment/HR yang bukan panel **tidak** melihatnya: boleh diakses bukan berarti layak muncul di kalender. Penjadwal tidak disimpan di record sesi, jadi tidak ikut.
+- Identitas pemanggil diperiksa di feed sendiri (tanpa header employee → 403), rentang cacat → 400.
+- Item: `id` `recruitment:interview:<_id>`, judul generik "Interview seleksi" **tanpa** data pribadi kandidat, waktu dari `ScheduledAt` (tanggal WIB) + `ScheduledTime` (`HH:mm`), durasi `DurationMinutes` (bawaan 60 menit), jam tak sah → seharian, sesi tanpa `ScheduledAt` dilewati.
+- Status: `Cancelled` → `cancelled` (tetap tampil supaya pewawancara tahu sesinya gugur), sisanya `confirmed`.
+- `deep_link` = `/portal/interviews` (Interview Saya, `GET /interviews/assigned`, cukup login). ⚠️ Bukan ke detail sesi `/hris/recruitment/selection-process/[interviewId]`, karena halaman itu memuat sesi lewat `GET /interviews` yang digerbang izin recruitment HR sehingga pewawancara non-HR tak bisa membukanya. Tautan langsung per-sesi butuh task FE terpisah (TBD).
+- Frontend: `kind: interview` belum punya entri di `kind-style.ts`, jadi tampil dengan gaya bawaan (TBD).
 
 ## Mesin kewajiban (irisan 3) — mesinnya jalan, jalur pemakainya belum
 

@@ -370,8 +370,16 @@ judul bagiannya. Label `Siap Agent` dipasang **manusia** (pembuat issue atau Pem
 1. **Keputusan bisa ditunjuk**: tautan ADR berstatus **Diterima** (bukan Diusulkan), `ANALISA - *.md`,
    atau bagian `## Keputusan` di badan issue yang menjawab "bentuknya apa" (penerima, ambang, kanal,
    satuan, siapa boleh apa). Kalimat "pertimbangkan", "perlu disepakati", atau "dsb" = belum siap.
-2. **Satu repo, satu PR.** Lebih dari itu dipecah dulu (induk + sub-issue, `buat-sub-issue.ps1`).
-   PR agent wajib `Closes` issue-nya, jadi issue yang memuat T1-T7 sekaligus tak bisa dikerjakan sebagian.
+2. **Satu repo, satu PR.** Lebih dari itu dipecah dulu. PR agent wajib `Closes` issue-nya, jadi issue
+   yang memuat T1-T7 sekaligus tak bisa dikerjakan sebagian. Cara memecah, supaya tidak melanggar
+   "Satu tingkat saja" di atas:
+   - issue **tingkat atas** satu repo: pecah jadi beberapa issue **sejajar** (bukan sub-issue), masing-masing
+     satu PR, saling merujuk di badan ("bagian 1/3, sesudah #<n>");
+   - issue yang sudah **sub-issue** (`[BE]`/`[FE]`): **ganti** dengan beberapa sub-issue **saudara** di bawah
+     induk yang sama (`buat-sub-issue.ps1 -Induk <induk>`), lalu tutup yang lama *not planned* + Status
+     Canceled dengan komentar "dipecah jadi #a, #b". Jangan membuat sub-issue di bawah sub-issue.
+   Pecah **sesudah** keputusannya ada (ADR Diterima), bukan sebelumnya: pecahan dari issue yang belum
+   diputuskan hanya memperbanyak kartu Butuh Info.
 3. **`## Yang harus benar`** berisi kriteria yang bisa diperiksa (perilaku, angka, layar), bukan
    "dashboard + analisa otomatis".
 4. **Data produksi yang dibutuhkan sudah ditempel** di issue. Runner dilarang membaca prod.
