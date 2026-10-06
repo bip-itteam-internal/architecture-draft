@@ -2656,9 +2656,9 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "39762a05eeb13a15b010c0ed1ff7b700ef62315e91e64f54a4ca70c215582bda",
-      "ukuran_kb": 453.4,
-      "ringkasan": "Menjawab: bagaimana order dan data marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) masuk ke ERP lewat webhook dan dinormalisasi jadi model transaction terpadu, bagaimana service ini menjembatani ke Accurate Online (invoice, ringkasan transaksi, Sales Invoice/Sales Return, penerimaan/INC), serta bagaimana kredensial OAuth per marketplace, hari libur untuk automasi auto-ship/auto-approve, ACL toko per departemen/ICC, dan job sync terjadwal dikelola. Juga menjawab status fitur mana yang sudah live di prod vs baru di kode, jalur legacy yang dinonaktifkan (Desty), dan perbaikan auto-sync penerimaan hasil audit #2199: kaskade FO untuk INC kosong, cara Accurate membalas dokumen yang tiada, perkakas perapian catatan receipt (cmd/incdihapus), serta penyisir baca-balik INC dan kegagalan webhook-renew yang masih terbuka.",
+      "hash": "63a624182b41a83295892be79e0960ff3f918cfedf58b3567f96c41c7c8c8a5d",
+      "ukuran_kb": 454.2,
+      "ringkasan": "Menjawab: bagaimana order marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) masuk real-time lewat webhook dan disinkronkan ke model transaksi terpadu, bagaimana kredensial OAuth tiap platform serta akses toko (Shop ACL, department shops, ICC account mapping) dikelola, dan bagaimana bridging finansial ke Accurate (invoice, sales return, rekonsiliasi income) serta automasi auto-ship/auto-approve yang sadar-holiday bekerja.",
       "kata_kunci": [
         "integration-service",
         "marketplace",
@@ -2669,16 +2669,9 @@
         "webhook",
         "Accurate",
         "OAuth",
-        "ICC",
         "auto-ship",
-        "shop ACL",
-        "receipt",
-        "INC",
-        "kaskade FO",
-        "BOOKED_EXTERNALLY",
-        "incdihapus",
-        "audit penerimaan",
-        "webhook-renew"
+        "ICC",
+        "Shop ACL"
       ]
     },
     {
@@ -10036,24 +10029,20 @@
         "Finance - Sambungan dan Permintaan Data Lintas Departemen",
         "Finance - FAT Persona"
       ],
-      "hash": "c18f2ba7fa371c1d8a2ee6f387dbd5529341b20608845e3e042364d9f5bf6b94",
-      "ukuran_kb": 7.1,
-      "ringkasan": "Menjawab: bagaimana proses P3 penjualan marketplace dan uang masuk dikerjakan finance hari ini, apa yang sudah ada di ERP (sinkron ke Accurate, dompet marketplace, halaman Auto-Sync Penerimaan dengan tab Perlu Tindakan), dan celah yang belum tertutup seperti pemetaan toko ke CV (T8) dan penerimaan gagal tak balance. Juga menjelaskan arti status FAILED tak balance, kontrol kolom tidak dijumlahkan ganda, risiko pencatatan ganda antara sinkron otomatis dan jurnal manual CV, serta ukuran efisiensinya.",
+      "hash": "51a3c71e262dfe05bac03fdfca3818c889c6c9dcd3d5cdd92910cc2c6df666db",
+      "ukuran_kb": 7.6,
+      "ringkasan": "Menjawab: bagaimana penjualan marketplace, potongan platform, dan penarikan saldo (settlement) dicatat serta direkonsiliasi ke Accurate per toko dan per entitas CV, apa yang sudah otomatis di ERP hari ini (sinkron faktur/retur/penerimaan, halaman Auto-Sync Penerimaan dengan penanganan status FAILED), dan celah yang masih manual (pemetaan toko ke CV, risiko pencatatan ganda penjualan per CV).",
       "kata_kunci": [
         "penjualan marketplace",
         "uang masuk",
-        "penerimaan",
-        "receipt",
-        "Auto-Sync Penerimaan",
-        "Perlu Tindakan",
-        "tak balance",
-        "Koreksi Manual",
-        "settlement",
-        "penarikan",
-        "CV",
+        "rekonsiliasi",
         "Accurate",
-        "P3",
-        "rekonsiliasi"
+        "Auto-Sync Penerimaan",
+        "penarikan saldo",
+        "settlement",
+        "CV",
+        "pencatatan ganda",
+        "income"
       ]
     },
     {
