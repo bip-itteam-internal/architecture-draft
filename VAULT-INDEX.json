@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-10-05",
+  "digenerate": "2026-10-06",
   "jumlah_dokumen": 529,
   "dokumen": [
     {
@@ -9043,27 +9043,27 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": null,
-      "status_teks": "🟢 **Diterima**, 2026-10-05, oleh pengguna Tech Development dalam sesi kerja. Fase 1 (bagian §1 sampai §6) dikerjakan lebih dulu; §7 dicatat sebagai keputusan untuk fase berikutnya. Nomor 0154 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.",
+      "status_teks": "🟢 **Diterima**, 2026-10-05, oleh pengguna Tech Development dalam sesi kerja. **Diperbarui 2026-10-06**: rancangan lengkapnya kini hidup di spec pembelian (lihat Deskripsi). ADR ini sengaja dipangkas jadi **penunjuk** plus satu keputusan yang tidak tertulis di spec (§2), supaya alur pembelian tidak punya dua sumber kebenaran.",
       "publik": true,
       "tautan": [
         "ADR - 0090 KONSUMSI Eskalasi ke Direktur di Ambang Berbagi, Bukan Kebal",
         "ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget",
         "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap"
       ],
-      "hash": "39e28627dcfc84107959a20a3055d34620868c9c0f87c029e4d50811a2891755",
-      "ukuran_kb": 8.6,
-      "ringkasan": "Menjawab: bagaimana alur pengajuan Konsumsi (pantry, jamuan, konsumsi rapat) setelah dipindah dari permintaan uang ke pembelian lewat Procurement seperti Raw Material, siapa mengisi harga, tahap persetujuan Finance/Direktur, dan bagaimana barangnya diterima Gudang GA ke stok konsumsi GA (ga_stok) alih-alih jadi aset. Juga menjelaskan kenapa SPV divisi dilewati bila pengajunya SPV, kenapa talangan dan jurnal Kas & Bank dihapus untuk Konsumsi, serta rencana fase berikutnya (metode bayar DP/Tempo/COD, pencatatan kedatangan barang, penerimaan sebagian, izin QC GA terpisah).",
+      "hash": "0e91e702c486a6b952a243ae55a3a67cf36ad2071faf8a2e808ae18ea2692072",
+      "ukuran_kb": 4.8,
+      "ringkasan": "Menjawab: bagaimana cara mengajukan konsumsi (pantry, jamuan, konsumsi rapat) di sistem ERP, siapa yang menyetujui di tiap tahap, dan kapan eskalasi ke Direktur diperlukan. ADR ini memindahkan konsumsi dari alur permintaan dana ke alur pengajuan pembelian barang (seperti Raw Material), dengan satu pengecualian: bila pengaju adalah supervisor HRGA, tahap persetujuan atasan dilewati untuk mencegah deadlock organisasi.",
       "kata_kunci": [
-        "KONSUMSI",
         "konsumsi",
+        "consumption",
+        "pengajuan barang",
         "procurement",
-        "pembelian barang",
-        "purchase request",
-        "raw material",
-        "Gudang GA",
-        "ga_stok",
-        "stok konsumsi",
-        "HRGA"
+        "pantry",
+        "jamuan",
+        "alur persetujuan",
+        "HRGA",
+        "supervisor exception",
+        "ambang direktur"
       ]
     },
     {
