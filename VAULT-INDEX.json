@@ -2656,23 +2656,24 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "e45c9d1a7645a2ae9773df8dc9d070b4424e157f6c8111a0f70ac8792d8efdc3",
-      "ukuran_kb": 456.3,
-      "ringkasan": "Menjawab: apa saja yang dilakukan integration-service (webhook marketplace TikTok/Shopee/Lazada, TikTok Business/GMV Max, Meta Ads, bridging ke Accurate), endpoint apa yang tersedia, dan bagaimana order/iklan dinormalkan jadi model transaction terpadu. Juga menjawab bagaimana ACL toko, kepemilikan toko per departemen, mapping akun ICC, ketahanan sync Shopee, dan status sinkron per toko bekerja, serta bagian mana yang belum diimplementasikan.",
+      "hash": "61194a0c0e5e06efff32977a0a5c2c5c5ba568c57bd2a3b60b43df8811847f34",
+      "ukuran_kb": 456.9,
+      "ringkasan": "Menjawab: service apa yang menghubungkan ERP ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) dan bagaimana order/webhook masuk serta dinormalkan jadi model transaction terpadu. Menjawab juga: bagaimana bridging finansial ke Accurate Online bekerja (invoice, ringkasan transaksi harian, push Sales Invoice/Return), bagaimana automasi auto-ship/auto-approve sadar-holiday dan sync master data terjadwal berjalan, serta rincian fitur per modul (GMV Max monitoring/overview, ICC video metrics, shop ACL, department_shops, fulfillment bridge ke WMS, review analytics marketplace) lengkap dengan status implementasi dan gotcha yang sudah tercatat (rate limit TikTok, bug field advertiser_id, bypass signature Shopee webhook).",
       "kata_kunci": [
-        "integration service",
+        "integration-service",
         "marketplace",
-        "webhook",
         "TikTok Shop",
+        "TikTok Business",
+        "Ads",
         "Shopee",
         "Lazada",
+        "webhook",
+        "Accurate Online",
+        "OAuth",
         "GMV Max",
-        "Accurate",
-        "transaction",
-        "shop ACL",
+        "sync master data",
         "ICC",
-        "Meta Ads",
-        "sync worker"
+        "shop ACL"
       ]
     },
     {
@@ -7754,7 +7755,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "✅",
-      "status_teks": "**Implemented & Deployed** — PR [#2004](https://github.com/bip-itteam-internal/bip-erp/pull/2004) merged, live prod 22 September 2026 19:17 WIB. Diverifikasi ke biner yang berjalan (tiga string khas, kontrol positif & negatif) dan ke data (11 order pasca-deploy cocok rumus baru, nol masih rumus lama). **Amandemen 2026-09-23**: pengecualian bertanggal untuk backfill September — lihat Decision §2a, kodenya di branch `fix/ongkir-shopee-backfill-september`, **belum merge, kv belum diisi**.",
+      "status_teks": "**Implemented & Deployed** — PR [#2004](https://github.com/bip-itteam-internal/bip-erp/pull/2004) merged, live prod 22 September 2026 19:17 WIB. Diverifikasi ke biner yang berjalan (tiga string khas, kontrol positif & negatif) dan ke data (11 order pasca-deploy cocok rumus baru, nol masih rumus lama). **Amandemen 2026-09-23**: pengecualian bertanggal untuk backfill September — lihat Decision §2a, kodenya di branch `fix/ongkir-shopee-backfill-september`, **belum merge, kv belum diisi**. **Amandemen 2026-10-06**: instance KEDUA dari kelas bug yang sama (premi proteksi pengiriman seller + order retur penuh) ditutup — lihat Decision §5, branch `fix/shopee-full-refund-breakdown-biaya` (bip-erp, commit `3c25cf02`/`7c3fcef8`/`854378e8`), **belum merge/deploy**.",
       "publik": true,
       "tautan": [
         "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
@@ -7764,20 +7765,22 @@
         "ADR - 0001 Akuntansi via Accurate",
         "APP - Web ERP"
       ],
-      "hash": "739bcf07d1ffe96ea4cfcb7f7c9f80aece6d2471d0bb99b37fc7ccd990f1b835",
-      "ukuran_kb": 19.8,
-      "ringkasan": "Menjawab: kenapa beban ongkir Shopee tercatat lebih besar daripada Subtotal Ongkos Kirim di Seller Center (3.870 pesanan, Rp96.826.227, +~Rp16 juta/bulan) dan kelebihannya mendarat di akun Beban Admin E-Commerce, serta rumus mana yang benar — beban ongkir = actual_shipping_fee − buyer_paid_shipping_fee + proteksi kirim + reverse_shipping_fee, sementara final_shipping_fee tidak dipakai sama sekali (terbukti == −(actual − rebate) pada 90.194 dari 90.194 dokumen escrow prod) dan shopee_shipping_rebate SENGAJA tidak dikurangkan karena sudah ditangani mekanisme 'Potongan Ongkos Kirim dari Shopee' di lapisan penerimaan. Menjelaskan juga kenapa gerbangnya PER-ORDER (rumusOngkirBaruBerlaku, ShopeeHariSudahDibukukan, OpsiTransformShopee{RumusOngkirBaru}, transformShopeeIncome) alih-alih kv tanggal, kenapa keterpercayaan bacaan paid_at dioper terpisah, dan amandemen 2026-09-23 yang menambah kv shopee-ongkir-rumus-cutover-date plus cmd/ongkirbackfillsep untuk backfill 644 order September (koreksi −Rp15.943.750 di 137 hari-penerimaan; Agustus tetap terlarang). Berguna saat menelusuri residual/total_adjustment yang tak bernama, fixture TestShopeeTransformIncomeIdentity_RealSample yang kehilangan actual_shipping_fee, atau saat finance melihat beban ongkir naik dan beban admin turun tanpa kas berubah sepeser pun.",
+      "hash": "4d7a4749403407de1c1518929ce4516203c1a8ce866baee74f53c3ffb05ebf09",
+      "ukuran_kb": 25.2,
+      "ringkasan": "Menjawab: mengapa beban ongkir Shopee di pembukuan bisa tercatat lebih besar daripada yang ditampilkan Shopee (rumus lama menghitung ongkir aktual dua kali lewat final_shipping_fee), dan bagaimana rumus yang benar dihitung — ongkir aktual dikurangi bagian pembeli, ditambah proteksi kirim dan ongkir retur, dengan subsidi Shopee sengaja tidak ikut dikurangkan di rumus ini karena sudah ditangani mekanisme lain. Menjawab juga sejarah penerapannya: tanggal cutover per-order, status deploy, amandemen backfill September yang belum merge, dan amandemen kedua (2026-10-06) untuk instance kedua dari kelas bug yang sama pada premi proteksi pengiriman seller dan order retur penuh.",
       "kata_kunci": [
         "ongkir Shopee",
         "shipping fee",
-        "escrow",
+        "ADR 0118",
+        "beban admin e-commerce",
+        "final_shipping_fee",
         "actual_shipping_fee",
         "buyer_paid_shipping_fee",
-        "final_shipping_fee",
         "shopee_shipping_rebate",
-        "shopee-ongkir-rumus-cutover-date",
-        "beban admin e-commerce",
-        "backfill September"
+        "subsidi ongkir",
+        "rekonsiliasi FAT/AR",
+        "Accurate",
+        "escrow"
       ]
     },
     {
