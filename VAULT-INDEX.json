@@ -2633,6 +2633,7 @@
         "REF - Kepemilikan Data",
         "ADR - 0088 Auto-Migrasi Padanan Perlengkapan Lewat ID Internal Accurate, Bukan Konfirmasi Manusia",
         "ADR - 0065 Payout yang Sudah Dibukukan Dokumen Lain Ditutup, Bukan Dibuat Ulang",
+        "ADR - 0152 FO yang Dilaporkan Sesudah Uang Cair Mengecilkan atau Menghapus INC, FO Tidak Masuk Penjualan",
         "ADR - 0118 Ongkir Shopee Dihitung Aktual Dikurangi Bagian Pembeli dan Subsidi",
         "Sales - ICC Account Manager Mapping",
         "Sales - ICC Affiliate Mapping",
@@ -2655,9 +2656,9 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "0e1aef2c180fa46107d787951d640e64938af15af72c2567be20d452ed6fccfa",
-      "ukuran_kb": 446.8,
-      "ringkasan": "Menjawab: bagaimana order dan data marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) masuk ke ERP lewat webhook dan dinormalisasi jadi model transaction terpadu, bagaimana service ini menjembatani ke Accurate Online (invoice, ringkasan transaksi, Sales Invoice/Sales Return), serta bagaimana kredensial OAuth per marketplace, hari libur untuk automasi auto-ship/auto-approve, ACL toko per departemen/ICC, dan job sync terjadwal dikelola. Juga menjawab status fitur mana yang sudah live di prod vs baru di kode tapi belum deploy (GMV Max Monitoring/Overview, ICC Video Metrics), serta jalur legacy yang sudah dinonaktifkan (Desty).",
+      "hash": "39762a05eeb13a15b010c0ed1ff7b700ef62315e91e64f54a4ca70c215582bda",
+      "ukuran_kb": 453.4,
+      "ringkasan": "Menjawab: bagaimana order dan data marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) masuk ke ERP lewat webhook dan dinormalisasi jadi model transaction terpadu, bagaimana service ini menjembatani ke Accurate Online (invoice, ringkasan transaksi, Sales Invoice/Sales Return, penerimaan/INC), serta bagaimana kredensial OAuth per marketplace, hari libur untuk automasi auto-ship/auto-approve, ACL toko per departemen/ICC, dan job sync terjadwal dikelola. Juga menjawab status fitur mana yang sudah live di prod vs baru di kode, jalur legacy yang dinonaktifkan (Desty), dan perbaikan auto-sync penerimaan hasil audit #2199: kaskade FO untuk INC kosong, cara Accurate membalas dokumen yang tiada, perkakas perapian catatan receipt (cmd/incdihapus), serta penyisir baca-balik INC dan kegagalan webhook-renew yang masih terbuka.",
       "kata_kunci": [
         "integration-service",
         "marketplace",
@@ -2670,7 +2671,14 @@
         "OAuth",
         "ICC",
         "auto-ship",
-        "shop ACL"
+        "shop ACL",
+        "receipt",
+        "INC",
+        "kaskade FO",
+        "BOOKED_EXTERNALLY",
+        "incdihapus",
+        "audit penerimaan",
+        "webhook-renew"
       ]
     },
     {
