@@ -53,7 +53,9 @@ $judulPenuh = "$($AWALAN[$Repo]) $Judul"
 # ConvertFrom-Json PS 5.1 mengembalikan array JSON sebagai SATU objek array; diratakan dulu supaya
 # Where-Object menyaring per issue, bukan sekaligus (tanpa ini pencocokan mengembalikan semua anak).
 $anak = @(GhApi @('api', "repos/$ORG/$repoInduk/issues/$noInduk/sub_issues?per_page=100") $null | ForEach-Object { $_ })
-$ada = $anak | Where-Object { $_.repository_url -match "/$Repo$" -and $_.title.StartsWith($AWALAN[$Repo]) } | Select-Object -First 1
+# Cocokkan JUDUL PENUH, bukan cuma awalan: sub saudara "bagian 2/2" di repo yang sama dulu dianggap
+# sudah ada (awalan [BE] sama) dan nomor bagian 1/2 dikembalikan diam-diam (review 2026-10-07).
+$ada = $anak | Where-Object { $_.repository_url -match "/$Repo$" -and $_.title -eq $judulPenuh } | Select-Object -First 1
 if ($ada) { "$Repo#$($ada.number) $($ada.html_url)"; return }
 
 $isiBadan = "Sub-issue dari $ORG/$repoInduk#$noInduk ($($induk.title)).`n`n"

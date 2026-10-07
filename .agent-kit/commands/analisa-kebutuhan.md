@@ -186,16 +186,20 @@ Siap Agent (team-memory § Definition of Ready, ADR 0151 "Issue Siap Dikerjakan 
 Keputusannya Bisa Ditunjuk, Ditandai Manusia"). Sengaja tidak di dalam ADR: ADR adalah keputusan,
 blueprint papan kerja.
 
-Kepala: wikilink ADR + dok domain, **ukuran** + alasannya, Pemutus. Ukuran ditentukan dari repo
-yang **harus berubah**, bukan repo yang sekadar memuat fitur terkait: untuk tiap repo konsumen
-(FE, mobile), periksa dulu apakah ia sudah merender bentuk baru secara generik sebelum
-menghitungnya. Alasan ukuran menyebut bukti itu (`file:line`).
+Kepala: wikilink ADR + dok domain, **ukuran** + alasannya, Pemutus, dan baris status
+**"Menunggu ADR <judul> Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk
+`/brief`."** Blokernya berisi bagian Keputusan dan Yang harus benar, jadi tanpa baris ini triase
+`/start-task` akan menerimanya sebagai sumber dan `/kerjakan` jalan atas ADR yang belum disetujui.
+
+Ukuran ditentukan dari repo yang **harus berubah**, bukan repo yang sekadar memuat fitur terkait:
+untuk tiap repo konsumen (FE, mobile), periksa dulu apakah ia sudah merender bentuk baru secara
+generik sebelum menghitungnya. Alasan ukuran menyebut bukti itu (`file:line`).
 
 | Ukuran | Kapan | Bentuk |
 |---|---|---|
-| **Kecil** | 1 repo, 1 PR | 1 issue, tanpa induk |
-| **Sedang** | > 1 repo | induk di repo tempat kontrak lahir (biasanya `bip-erp`, tanpa PR sendiri) + 1 sub-issue `[BE]`/`[FE]`/`[Mobile]` per repo |
-| **Besar** | ada repo yang butuh > 1 PR | seperti Sedang + sub-issue **saudara** "bagian i/N" di bawah induk yang sama; tak pernah sub di bawah sub |
+| **Kecil** | 1 repo | 1 issue tanpa induk. Butuh > 1 PR → issue **sejajar** "bagian i/N, sesudah #<n>", juga tanpa induk: team-memory "satu repo cukup satu issue", sub-issue tak dipakai di dalam satu repo |
+| **Sedang** | > 1 repo, tiap repo 1 PR | induk di repo tempat kontrak lahir (biasanya `bip-erp`, tanpa PR sendiri) + 1 sub-issue `[BE]`/`[FE]`/`[Mobile]` per repo |
+| **Besar** | > 1 repo, ada repo yang butuh > 1 PR | seperti Sedang + sub-issue **saudara** "bagian i/N" di bawah induk yang sama; tak pernah sub di bawah sub |
 
 Tiap issue satu blok berbagian persis template `bip-erp/.github/ISSUE_TEMPLATE/tugas.md`:
 `**Pemutus:**` / `**PIC:**`, `## Masalah`, `## Keputusan`, `## Yang harus benar`,
@@ -213,22 +217,29 @@ Tiap issue satu blok berbagian persis template `bip-erp/.github/ISSUE_TEMPLATE/t
   runner dilarang membaca prod), dan §8 menyebutnya sebagai langkah manusia.
 - **Prasyarat**: urutan deploy BE sebelum FE/Mobile ditulis di sub-issue FE/Mobile.
 
-**d. Buat issue** (sesudah a-c, **sebelum** commit vault), dari akar `erp/`, via PowerShell:
+**d. Buat issue.** Dijalankan **di dalam §7, sesudah merge `origin/main`**, bukan di sini: judul ADR
+memuat nomornya, dan nomor itu baru pasti tak bertabrakan sesudah merge. Dari akar `erp/`, via PowerShell:
 
 1. Induk / issue tunggal: cari dulu
-   `gh issue list --repo bip-itteam-internal/<repo> --state all --search "<judul> in:title"`;
-   belum ada → tulis badan ke berkas scratchpad, `gh issue create --repo bip-itteam-internal/<repo> --title "<judul>" --body-file <berkas>`,
+   `gh issue list --repo bip-itteam-internal/<repo> --state all --search "<judul> in:title" --json number,title,url`
+   dan anggap "sudah ada" hanya bila `title` **sama persis**; belum ada → tulis badan ke berkas
+   scratchpad, `gh issue create --repo bip-itteam-internal/<repo> --title "<judul>" --body-file <berkas>`,
    lalu `gh project item-add 15 --owner bip-itteam-internal --url <url>`.
-2. Sub-issue: `& '.claude/hooks/buat-sub-issue.ps1' -Induk <repo>#<n> -Repo <bip-erp|erp-frontend|my-bharata> -Judul '<judul>' -Badan <badan>`
-   (idempoten, memasukkan ke Project #15, menyalin Area + Prioritas induk).
+2. Sub-issue: `& '.claude/hooks/buat-sub-issue.ps1' -Induk <repo>#<n> -Repo <bip-erp|erp-frontend|my-bharata> -Judul '<judul>' -Badan <berkas-badan.md>`.
+   `-Badan` adalah **path berkas** (skrip membacanya dengan `ReadAllText`), bukan teks. Skrip
+   idempoten per judul penuh dan memasukkan issue ke Project #15.
 3. **TANPA label `Siap Agent`**, tanpa assignee: label dipasang manusia (ADR 0151), assignee saat In Progress.
-4. Tulis nomor + URL tiap issue balik ke blok-nya di ANALISA, supaya vault di-commit sekali di §7.
-5. **Gagal sebagian**: laporkan yang terbuat (URL) dan yang gagal (galat); jangan ulang buta.
-   Menjalankan ulang langkah ini aman karena butir 1-2 idempoten.
-6. `gh` tanpa scope `project` → issue tetap dibuat; catat item-add yang gagal dan perintah
+4. Pemutus "Belum tahu" di §4 → tulis `**Pemutus:** BELUM DITETAPKAN` di badan (DoR #6 menuntut login),
+   dan §8 menyebutnya sebagai langkah manusia.
+5. Tulis nomor + URL tiap issue balik ke blok-nya di ANALISA **sebelum** regenerasi indeks §6, supaya
+   vault di-commit dan di-push sekali.
+6. **Gagal sebagian**: laporkan yang terbuat (URL) dan yang gagal (galat); jangan ulang buta.
+   Menjalankan ulang aman karena butir 1-2 idempoten; indeks pencarian GitHub bisa tertinggal
+   beberapa detik, jadi tunggu sebentar sebelum mengulang butir 1.
+7. `gh` tanpa scope `project` → issue tetap dibuat; catat item-add yang gagal dan perintah
    `gh auth refresh -h github.com -s project` di laporan.
 
-Bila kesimpulannya **"tidak perlu dibangun"**, butir c dan d tidak dijalankan: tak ada blueprint, tak ada issue.
+Kesimpulan **"tidak perlu dibangun"** melewati seluruh §5-§8 (lihat §4): tak ada blueprint, tak ada issue.
 
 ## 6. Regenerasi indeks. WAJIB.
 
@@ -245,14 +256,19 @@ sudah basi lagi begitu merge selesai.
 
 Vault push **langsung ke `main`, tanpa PR**. Stage **per nama berkas**, jangan `git add -A`.
 Pakai `git -C <vault> -c core.fsmonitor=false`. Urutan: commit di `main` → merge
-`origin/main` → regenerasi indeks (langkah 6) → push. Bila `VAULT-INDEX.json` konflik saat
+`origin/main` → periksa nomor ADR baru tak dipakai dok lain sesudah merge (bila dipakai: nomori
+ulang, perbarui wikilink-nya) → **§5 butir d (buat issue)** → regenerasi indeks (langkah 6) →
+commit → push. Bila push ditolak `gerbang-adr.py` karena nomor ganda sesudah issue terbuat, nomori
+ulang ADR lalu sunting badan tiap issue yang mengutip judul lamanya
+(`gh issue edit <n> --repo bip-itteam-internal/<repo> --body-file <berkas>`). Bila `VAULT-INDEX.json` konflik saat
 merge, **jangan digabung baris per baris**: ambil salah satu sisi, selesaikan konflik
 dokumennya dulu, lalu regenerasi indeks **sekali di akhir**.
 
 ## 8. Serahkan
 
 Tutup dengan daftar URL issue yang dibuat (induk dulu), lalu langkah manusia berikutnya, konkret:
-setujui ADR dengan menulis `🟢 Diterima, <tanggal>, oleh <login>` di baris statusnya; untuk issue
-yang memuat **"Perlu ukur prod:"**, jalankan kuerinya (baca saja) dan tempel hasilnya; lalu pasang
+setujui ADR dengan menulis `🟢 Diterima, <tanggal>, oleh <login>` di baris statusnya (lalu hapus
+baris "Menunggu ADR … Diterima" di kepala ANALISA); untuk issue yang memuat **"Perlu ukur prod:"**,
+jalankan kuerinya (baca saja) dan tempel hasilnya; isi Pemutus yang masih **BELUM DITETAPKAN**; lalu pasang
 label `Siap Agent` pada issue yang lolos checklist Definition of Ready. Sebelum langkah-langkah itu,
 runner backlog tidak akan mengambil issue-nya.

@@ -393,7 +393,7 @@ Butuh Info**, karena issue berisi masalah tanpa keputusan. Keputusannya
 **Checklist ini satu-satunya sumber**; template issue di `bip-erp`/`erp-frontend` hanya memuat
 judul bagiannya. Label `Siap Agent` dipasang **manusia** (pembuat issue atau Pemutus) bila SEMUA terpenuhi:
 
-1. **Keputusan bisa ditunjuk**: tautan ADR berstatus **Diterima** (bukan Diusulkan), `ANALISA - *.md`,
+1. **Keputusan bisa ditunjuk**: tautan ADR berstatus **Diterima** (bukan Diusulkan), `ANALISA - *.md` yang ADR-nya sudah Diterima,
    atau bagian `## Keputusan` di badan issue yang menjawab "bentuknya apa" (penerima, ambang, kanal,
    satuan, siapa boleh apa). Kalimat "pertimbangkan", "perlu disepakati", atau "dsb" = belum siap.
 2. **Satu repo, satu PR.** Lebih dari itu dipecah dulu. PR agent wajib `Closes` issue-nya, jadi issue

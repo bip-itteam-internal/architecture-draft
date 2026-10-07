@@ -87,13 +87,29 @@ try {
   $ak = Get-Content (Join-Path $claude 'commands/analisa-kebutuhan.md') -Raw -Encoding UTF8
   $i1a = $ak.IndexOf('## 1a. Wawancara niat'); $i2 = $ak.IndexOf('## 2. Grounding'); $i1b = $ak.IndexOf('## 1b. Wawancara bentuk')
   Check ($i1a -ge 0 -and $i2 -gt $i1a -and $i1b -gt $i2) '/analisa-kebutuhan: urutan niat -> grounding -> bentuk'
-  Check ($ak -match 'AskUserQuestion' -and $ak -match 'menyebut sumbernya' -and $ak -match 'Belum tahu') '/analisa-kebutuhan: pilihan ganda bersumber + Belum tahu'
-  # -cmatch atas penanda tebal: -match tak peka huruf, dan 'Besar' sudah cocok "besaran kerja" di §5a
-  Check ($ak -cmatch '\*\*Kecil\*\*' -and $ak -cmatch '\*\*Sedang\*\*' -and $ak -cmatch '\*\*Besar\*\*' -and $ak -match 'tugas\.md') '/analisa-kebutuhan: blueprint berukuran, format tugas.md'
-  $i5d = $ak.IndexOf('**d. Buat issue'); $s5d = if ($i5d -ge 0) { $ak.Substring($i5d, [Math]::Min(3500, $ak.Length - $i5d)) } else { '' }
-  Check ($s5d -match 'buat-sub-issue\.ps1' -and $s5d -match 'item-add 15' -and $s5d -match 'TANPA label' -and $s5d -match 'tidak perlu dibangun') '/analisa-kebutuhan 5d: buat issue tanpa Siap Agent'
+  # Pemeriksaan dibatasi ke POTONGAN bagiannya: kata yang sama juga muncul di §3/§4, jadi -match atas
+  # seluruh berkas tetap hijau walau aturannya dihapus dari tempat yang seharusnya (review 2026-10-07).
+  function Potong($teks, $awal, $akhir) { $a = $teks.IndexOf($awal); if ($a -lt 0) { return '' }; $b = $teks.IndexOf($akhir, $a + 1); if ($b -lt 0) { $b = $teks.Length }; $teks.Substring($a, $b - $a) }
+  $s1b = Potong $ak '## 1b. Wawancara bentuk' '## 3.'
+  Check ($s1b -match 'AskUserQuestion' -and $s1b -match 'menyebut sumbernya' -and $s1b -match 'Belum tahu') '/analisa-kebutuhan: pilihan ganda bersumber + Belum tahu'
+  $s5c = Potong $ak '**c. Blueprint' '**d. Buat issue'
+  # -cmatch atas penanda tebal: -match tak peka huruf, dan 'Besar' sudah cocok "besaran kerja" di §5a.
+  # Satu repo > 1 PR = issue SEJAJAR, bukan induk + sub (team-memory: satu repo cukup satu issue).
+  Check ($s5c -cmatch '\*\*Kecil\*\*' -and $s5c -cmatch '\*\*Sedang\*\*' -and $s5c -cmatch '\*\*Besar\*\*' -and $s5c -cmatch '\*\*sejajar\*\*' -and $s5c -match 'tugas\.md') '/analisa-kebutuhan: blueprint berukuran, satu repo sejajar, format tugas.md'
+  Check ($s5c -match 'BUKAN keputusan yang bisa ditunjuk') '/analisa-kebutuhan: ANALISA belum bisa ditunjuk sebelum ADR Diterima'
+  $s5d = Potong $ak '**d. Buat issue' '## 6.'
+  Check ($s5d -match 'buat-sub-issue\.ps1' -and $s5d -match 'item-add 15' -and $s5d -match 'TANPA label' -and $s5d -match '-Badan <berkas' -and $s5d -match 'BELUM DITETAPKAN') '/analisa-kebutuhan 5d: buat issue tanpa Siap Agent, -Badan berkas, Pemutus kosong ditandai'
+  $s7 = Potong $ak '## 7. Commit' '## 8.'
+  Check ($s7 -match 'butir d' -and $s7 -match 'gh issue edit') '/analisa-kebutuhan 7: issue dibuat sesudah merge, judul ADR dinomori ulang ikut disunting'
+  Check ($ak -match 'tidak perlu dibangun') '/analisa-kebutuhan: kesimpulan tidak perlu dibangun'
   # Uji kering 2026-10-07: "Data = asumsi" membuat issue tak pernah lolos DoR #4 (runner dilarang baca prod).
-  Check ($ak -match 'Perlu ukur prod' -and $ak -match 'Definition of Ready #4') '/analisa-kebutuhan: data prod belum diukur ditandai, bukan asumsi'
+  Check ($s5c -match 'Perlu ukur prod' -and $s5c -match 'Definition of Ready #4') '/analisa-kebutuhan: data prod belum diukur ditandai, bukan asumsi'
+  $st = Get-Content (Join-Path $claude 'commands/start-task.md') -Raw -Encoding UTF8
+  Check ($st -match 'ADR yang ditautnya') '/start-task triase: ANALISA hanya bila ADR-nya Diterima'
+  # buat-sub-issue.ps1: idempotensi mencocokkan JUDUL PENUH. Dulu cukup repo + awalan [BE], sehingga
+  # sub saudara "bagian 2/2" diam-diam mengembalikan nomor bagian 1/2 tanpa galat.
+  $bsi = Get-Content (Join-Path $claude 'hooks/buat-sub-issue.ps1') -Raw -Encoding UTF8
+  Check ($bsi -match '\$_\.title -eq \$judulPenuh') 'buat-sub-issue: idempotensi per judul penuh, saudara tak tertukar'
   # akhir analisa-kebutuhan wawancara+blueprint
   $sdMd = Get-Content (Join-Path $claude 'commands/sync-docs.md') -Raw -Encoding UTF8
   Check ($sdMd -match 'dampak\.py --root architecture-draft --diff') '/sync-docs memanggil dampak.py --diff'
