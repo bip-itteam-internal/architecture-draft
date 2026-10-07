@@ -5,8 +5,9 @@
 #   & '.claude/hooks/buat-sub-issue.ps1' -Induk bip-erp#2162 -Repo erp-frontend -Judul 'Layar anonim' [-Badan <berkas.md>]
 #
 # Hasil (stdout, satu baris): <repo>#<nomor> <url>
-# Idempoten: bila induk SUDAH punya sub-issue di repo itu dengan awalan yang sama ([BE]/[FE]/[Mobile]),
-# yang lama dipakai, tidak dibuat ganda. Sub-issue dimasukkan ke Project #15 dengan Status Backlog,
+# Idempoten: bila induk SUDAH punya sub-issue di repo itu dengan JUDUL PENUH yang sama (awalan
+# [BE]/[FE]/[Mobile] + judul), yang lama dipakai, tidak dibuat ganda; saudara "bagian i/N" tetap
+# terpisah. -Judul boleh sudah berawalan; awalan tak ditambah dua kali. Sub-issue dimasukkan ke Project #15 dengan Status Backlog,
 # Area dan Prioritas disalin dari induk. Satu tingkat saja: induk yang sendirinya sub-issue ditolak.
 param(
   [Parameter(Mandatory = $true)][string]$Induk,
@@ -49,7 +50,9 @@ if ($induk.pull_request) { throw "$Induk adalah PR, bukan issue" }
 $indukDariInduk = Gql 'query($o:String!,$r:String!,$n:Int!){ repository(owner:$o,name:$r){ issue(number:$n){ parent { number repository { name } } } } }' @{ o = $ORG; r = $repoInduk; n = $noInduk }
 if ($indukDariInduk.repository.issue.parent) { throw "$Induk sendiri sudah sub-issue dari $($indukDariInduk.repository.issue.parent.repository.name)#$($indukDariInduk.repository.issue.parent.number); sub-issue hanya satu tingkat" }
 
-$judulPenuh = "$($AWALAN[$Repo]) $Judul"
+# -Judul yang sudah berawalan [BE]/[FE]/[Mobile] (disalin dari blueprint ANALISA) tak diberi awalan
+# kedua; tanpa ini judulnya jadi "[FE] [FE] ..." dan pencocokan judul penuh di bawah ikut meleset.
+$judulPenuh = if ($Judul.StartsWith($AWALAN[$Repo])) { $Judul } else { "$($AWALAN[$Repo]) $Judul" }
 # ConvertFrom-Json PS 5.1 mengembalikan array JSON sebagai SATU objek array; diratakan dulu supaya
 # Where-Object menyaring per issue, bukan sekaligus (tanpa ini pencocokan mengembalikan semua anak).
 $anak = @(GhApi @('api', "repos/$ORG/$repoInduk/issues/$noInduk/sub_issues?per_page=100") $null | ForEach-Object { $_ })

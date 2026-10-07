@@ -110,6 +110,12 @@ try {
   # sub saudara "bagian 2/2" diam-diam mengembalikan nomor bagian 1/2 tanpa galat.
   $bsi = Get-Content (Join-Path $claude 'hooks/buat-sub-issue.ps1') -Raw -Encoding UTF8
   Check ($bsi -match '\$_\.title -eq \$judulPenuh') 'buat-sub-issue: idempotensi per judul penuh, saudara tak tertukar'
+  # 1.39.1: tiga tundaan yang dikerjakan. Vault PUBLIK -> rincian issue keamanan tak boleh masuk ANALISA;
+  # gerbang 3 menunjuk cara baca prod (tanpanya agent langsung jatuh ke asumsi); awalan sub-issue tak ganda.
+  Check ($s5c -match 'keamanan' -and $s5c -match 'PUBLIK') '/analisa-kebutuhan: issue keamanan tak dirinci di vault publik'
+  $s2 = Potong $ak '## 2. Grounding' '## 1b. Wawancara bentuk'
+  Check ($s2 -match 'MongoDB ERP Production' -and $s2 -match 'deploy-bip-erp') '/analisa-kebutuhan gerbang 3: menunjuk cara baca prod'
+  Check ($bsi -match 'StartsWith\(\$AWALAN\[\$Repo\]\)' -and $bsi -match '\$judulPenuh = if') 'buat-sub-issue: awalan [BE]/[FE]/[Mobile] tak ditambah dua kali'
   # akhir analisa-kebutuhan wawancara+blueprint
   $sdMd = Get-Content (Join-Path $claude 'commands/sync-docs.md') -Raw -Encoding UTF8
   Check ($sdMd -match 'dampak\.py --root architecture-draft --diff') '/sync-docs memanggil dampak.py --diff'

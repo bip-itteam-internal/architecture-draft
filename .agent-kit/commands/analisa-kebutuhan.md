@@ -67,9 +67,11 @@ Tiap subagent wajib mengembalikan `file:line` untuk **setiap** klaim, dan satu b
 3. ⛔ **Data nyata.** Sebelum merancang apa pun yang membaca data yang sudah ada, **ukur isinya
    di prod**. Sudah berkali-kali terjadi: nol slip payroll terbit padahal kodenya live, nol
    dokumen `web_browser` padahal push notification live. Angka nol yang mencurigakan adalah
-   pertanyaan, bukan kabar baik. **Baca prod boleh, tulis TIDAK.** Bila akses prod tidak
-   tersedia, catat sebagai **asumsi eksplisit** dan tandai sebagai risiko di ADR; jangan
-   menebak isinya.
+   pertanyaan, bukan kabar baik. **Baca prod boleh, tulis TIDAK** (batasnya per perintah: skill
+   `deploy-bip-erp` §0). Alamat dan cara aksesnya ada di vault `IT - Server, VMs and Databases`
+   § **MongoDB ERP Production**; coba itu dulu, jangan langsung menyerah. Bila tetap tak terjangkau
+   dari mesin ini, catat sebagai **asumsi eksplisit**, tandai sebagai risiko di ADR, dan **tulis
+   kuerinya** supaya manusia bisa menjalankannya (jadi "Perlu ukur prod:" di §5c); jangan menebak isinya.
 4. ⛔ **Kolom.** Untuk tiap kolom angka yang masuk rancangan, jawab eksplisit: komponen sejajar,
    atau himpunan bagian dari kolom lain? `iklan_sia_sia` adalah porsi `ads_cost` yang **sudah**
    terpotong dari laba; `orders_dikirim` himpunan bagian dari `orders`. Menjumlahkannya
@@ -216,6 +218,10 @@ Tiap issue satu blok berbagian persis template `bip-erp/.github/ISSUE_TEMPLATE/t
   angka yang dibutuhkan dan kuerinya. Itu menahan issue dari `Siap Agent` (Definition of Ready #4:
   runner dilarang membaca prod), dan §8 menyebutnya sebagai langkah manusia.
 - **Prasyarat**: urutan deploy BE sebelum FE/Mobile ditulis di sub-issue FE/Mobile.
+- ⛔ **Issue bertopik keamanan** (celah, akses, kebocoran data): vault ini repo **PUBLIK**, jadi blok
+  di ANALISA hanya memuat judul, repo, dan kalimat "rincian di issue privat". Masalah, bukti, dan cara
+  reproduksi hanya ditulis di badan issue (repo kode privat). Rincian celah yang belum ditambal tak
+  pernah ditulis ke vault (team-memory § Backlog).
 
 **d. Buat issue.** Dijalankan **di dalam §7, sesudah merge `origin/main`**, bukan di sini: judul ADR
 memuat nomornya, dan nomor itu baru pasti tak bertabrakan sesudah merge. Dari akar `erp/`, via PowerShell:
