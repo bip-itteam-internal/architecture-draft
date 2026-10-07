@@ -73,6 +73,15 @@ try {
   $claude = Join-Path $tmp '.claude'
   Check (Test-Path (Join-Path $claude 'commands/start-task.md')) 'commands tersalin'
   Check (Test-Path (Join-Path $claude 'commands/analisa-kebutuhan.md')) 'command /analisa-kebutuhan tersalin'
+  # /dampak (kit 1.36.0): command tersalin, memakai skripnya, berhenti sebelum menyunting, dan dua
+  # command yang menyunting vault benar-benar memanggilnya (tanpa itu ia cuma diingat orang).
+  Check (Test-Path (Join-Path $claude 'commands/dampak.md')) 'command /dampak tersalin'
+  $dpMd = if (Test-Path (Join-Path $claude 'commands/dampak.md')) { Get-Content (Join-Path $claude 'commands/dampak.md') -Raw -Encoding UTF8 } else { '' }
+  Check ($dpMd -match 'dampak\.py' -and $dpMd -match 'BERHENTI' -and $dpMd -match 'AskUserQuestion') '/dampak: skrip, berhenti, persetujuan per dok'
+  $akMd = Get-Content (Join-Path $claude 'commands/analisa-kebutuhan.md') -Raw -Encoding UTF8
+  Check ($akMd -match '/dampak') '/analisa-kebutuhan memanggil /dampak'
+  $sdMd = Get-Content (Join-Path $claude 'commands/sync-docs.md') -Raw -Encoding UTF8
+  Check ($sdMd -match 'dampak\.py --root architecture-draft --diff') '/sync-docs memanggil dampak.py --diff'
   # Jumlah command diturunkan dari kit, JANGAN dipatok angka: assertion angka-mati
   # sudah pernah rot diam-diam saat index-vault.md dan skills.md ditambahkan (2026-08-28).
   $srcCmd = (Get-ChildItem (Join-Path $kitRoot 'commands') -Filter *.md).Count
