@@ -73,7 +73,7 @@ try {
   $claude = Join-Path $tmp '.claude'
   Check (Test-Path (Join-Path $claude 'commands/start-task.md')) 'commands tersalin'
   Check (Test-Path (Join-Path $claude 'commands/analisa-kebutuhan.md')) 'command /analisa-kebutuhan tersalin'
-  # /dampak (kit 1.36.0): command tersalin, memakai skripnya, berhenti sebelum menyunting, dan dua
+  # /dampak (kit 1.37.0): command tersalin, memakai skripnya, berhenti sebelum menyunting, dan dua
   # command yang menyunting vault benar-benar memanggilnya (tanpa itu ia cuma diingat orang).
   Check (Test-Path (Join-Path $claude 'commands/dampak.md')) 'command /dampak tersalin'
   $dpMd = if (Test-Path (Join-Path $claude 'commands/dampak.md')) { Get-Content (Join-Path $claude 'commands/dampak.md') -Raw -Encoding UTF8 } else { '' }

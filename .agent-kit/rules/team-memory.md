@@ -258,7 +258,7 @@ Yang membuatnya bergejala: `DepartmentFilterOptions` sengaja MENGGANTI anggota g
   Desain: `.agent-kit/docs/2026-08-28-analisa-kebutuhan-command-design.md`.
 - **Prosedur pencarian vault kini SATU tempat**: `.agent-kit/rules/vault-retrieval.md`, dirujuk
   `/ask`, `/start-task`, dan `/analisa-kebutuhan`. Jangan menyalinnya lagi ke command baru.
-- **`/dampak` (kit ≥ 1.36.0) sebelum mengubah FAKTA di vault** (ambang, rumus, daftar-izin, rute, field).
+- **`/dampak` (kit ≥ 1.37.0) sebelum mengubah FAKTA di vault** (ambang, rumus, daftar-izin, rute, field).
   Ia mendaftar dok lain dan berkas kode yang menyatakan fakta yang sama (`git grep` atas ref remote,
   bukan ripgrep), lalu menyunting dok hanya yang disetujui; kode tak pernah disentuh. Dipanggil sendiri
   oleh `/analisa-kebutuhan` §4 dan `/sync-docs`.

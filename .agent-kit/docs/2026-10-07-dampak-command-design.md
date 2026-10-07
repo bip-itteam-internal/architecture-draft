@@ -3,7 +3,7 @@
 - Tanggal: 2026-10-07
 - Status: DRAFT, menunggu review
 - Menyentuh: `Tools/dampak.py` (baru), `Tools/tests/test_dampak.py` (baru), `commands/dampak.md` (baru),
-  `commands/analisa-kebutuhan.md` §4-§5, `commands/sync-docs.md`, `rules/team-memory.md`, `VERSION` (1.36.0),
+  `commands/analisa-kebutuhan.md` §4-§5, `commands/sync-docs.md`, `rules/team-memory.md`, `VERSION` (1.37.0),
   `README.md` kit (changelog), `tests/test-init.ps1`
 - Tidak menyentuh: kode repo mana pun, `build-vault-index.py`, skema `VAULT-INDEX.json`, hook git, judge
 - Asal: sub-proyek 1 dari 3 hasil breakdown speckit.tech (2 lainnya, wawancara pilihan ganda dan blueprint
@@ -171,7 +171,7 @@ berkas), jadi `test_dampak.py` ikut tergerbang tanpa didaftarkan.
 
 ## 7. Rilis
 
-`VERSION` → `1.36.0`, entri changelog di `README.md` kit. `init` menyalin `commands/dampak.md` ke
+`VERSION` → `1.37.0` (1.36.0 sudah diklaim pekerjaan lain di origin saat implementasi), entri changelog di `README.md` kit. `init` menyalin `commands/dampak.md` ke
 `.claude/commands/`; `Tools/dampak.py` tinggal di vault sehingga cukup `git pull`.
 
 ## 8. Di luar lingkup
