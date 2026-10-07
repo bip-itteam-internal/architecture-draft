@@ -80,6 +80,20 @@ def test_graf_dok_yatim(vault_mini):
     assert dampak.kandidat_graf([CUTI], scan_vault(vault_mini)) == {}
 
 
+def test_fakta_vault_angka_utuh(vault_mini):
+    alasan, dilewati = dampak.kandidat_fakta_vault(["80"], scan_vault(vault_mini), [ADR])
+    assert set(alasan) == {INSENTIF, KPI}       # CUTI punya 8080/800/80.5: bukan 80
+    assert alasan[KPI] == ["fakta:80"]
+    assert dilewati == []
+
+
+def test_fakta_vault_terlalu_umum(vault_mini, monkeypatch):
+    monkeypatch.setattr(dampak, "AMBANG_TERLALU_UMUM", 1)
+    alasan, dilewati = dampak.kandidat_fakta_vault(["80"], scan_vault(vault_mini), [ADR])
+    assert alasan == {}
+    assert dilewati[0]["nilai"] == "80" and dilewati[0]["alasan"].startswith("terlalu umum")
+
+
 def test_adalah_angka():
     assert adalah_angka("80") and adalah_angka("1,5") and adalah_angka("12.5")
     assert not adalah_angka("target_profit") and not adalah_angka("/kpi")

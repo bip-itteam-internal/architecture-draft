@@ -103,3 +103,27 @@ def kandidat_graf(sumber_paths: list[str], entri: list[dict]) -> dict[str, list[
                 for p in sorted((k2 | m2) - keluar - masuk):
                     _catat(alasan, p, "adr-2hop", per_path, sumber_paths)
     return alasan
+
+
+def _cocok_isi(fakta: str, isi: str) -> bool:
+    if adalah_angka(fakta):
+        pola = r"(?<![\d.,])" + re.escape(fakta) + r"(?![\d]|[.,]\d)"
+        return re.search(pola, isi) is not None
+    return fakta in isi
+
+
+def kandidat_fakta_vault(fakta: list[str], entri: list[dict],
+                         sumber_paths: list[str]) -> tuple[dict[str, list[str]], list[dict]]:
+    """Dok vault lain yang menyatakan fakta literal yang sama."""
+    per_path = {e["path"]: e for e in entri}
+    alasan: dict[str, list[str]] = {}
+    dilewati: list[dict] = []
+    for f in fakta:
+        cocok = [e["path"] for e in entri if _cocok_isi(f, e["_isi"])]
+        if len(cocok) > AMBANG_TERLALU_UMUM:
+            dilewati.append({"jenis": "fakta", "nilai": f,
+                             "alasan": f"terlalu umum: {len(cocok)} dok vault"})
+            continue
+        for p in cocok:
+            _catat(alasan, p, f"fakta:{f}", per_path, sumber_paths)
+    return alasan, dilewati
