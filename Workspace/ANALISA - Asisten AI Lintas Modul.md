@@ -385,7 +385,15 @@ disalin ke vault (repo publik). Kemajuan **bagian A** (keandalan) per 2026-10-01
   `uji/pertanyaan-tetap.json` belum memuat kasus untuk paket itu.
 - [ ] **Keputusan rute tulis akuntansi integration** (belum bergerbang; rinci di issue privat bip-erp#2389) dan
   tool `aset_tetap` / `ppn_masukan` yang belum dibuat.
-- [ ] **Butir terbuka**: endpoint daftar karyawan masuk (butuh `join_date`) bergerbang HR.
+- [x] **Butir terbuka**: endpoint daftar karyawan masuk (butuh `join_date`) bergerbang HR. Selesai: `GET /karyawan-masuk`
+  (bip-erp #2554) + alat `karyawan_masuk` (#2562), merged 2026-10-03, diperiksa ke `origin/main` 2026-10-07.
+- [x] **Gelombang 2026-10-03..04** (diperiksa ke `origin/main` 2026-10-07): ringkasan karyawan tak lagi menelan galat jadi 0
+  dan basis aktif (bip-erp #2554, #2566); rute aset bergerbang `ga.view` (#2555); sepuluh alat HRGA (#2558); empat alat
+  headcount/masuk/aset (#2562); gerbang `/employer-cost` (#2565) + alat `biaya_karyawan` berjawaban tertutup (#2567);
+  `ringkasan_harian` (#2569); keterangan sumber, tautan, tren (#2570); progres polling + proyeksi (#2571); layar erp-frontend
+  #2043, #2044, #2047. Jumlah alat dan kontraknya: [[Microservices - Assistant Service]].
+- [ ] **Sisa dari gelombang itu**: uji end-to-end lewat gateway belum dilakukan; saran lanjutan belum disaring per alat;
+  `bukti_kpi` tidak dibuat; penyusutan belum mengecualikan aset yang di-soft-delete (tercatat di backlog).
 - [x] Diputuskan 2026-10-02 (pemilik produk): baris rincian KPI **tetap dikirim** ke model; bagian
   `klub_culture` **dipertahankan** walau pembacaan `/culture/clubs` menyemai klub bawaan bila koleksi kosong.
   Rincian di [[Microservices - Assistant Service]].
