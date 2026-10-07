@@ -3,8 +3,8 @@
 - Tanggal: 2026-10-07
 - Status: DRAFT, menunggu review
 - Menyentuh: `Tools/dampak.py` (baru), `Tools/tests/test_dampak.py` (baru), `commands/dampak.md` (baru),
-  `commands/analisa-kebutuhan.md` §5, `commands/sync-docs.md`, `rules/team-memory.md`, `VERSION` (1.36.0),
-  `README.md` kit (changelog)
+  `commands/analisa-kebutuhan.md` §4-§5, `commands/sync-docs.md`, `rules/team-memory.md`, `VERSION` (1.36.0),
+  `README.md` kit (changelog), `tests/test-init.ps1`
 - Tidak menyentuh: kode repo mana pun, `build-vault-index.py`, skema `VAULT-INDEX.json`, hook git, judge
 - Asal: sub-proyek 1 dari 3 hasil breakdown speckit.tech (2 lainnya, wawancara pilihan ganda dan blueprint
   per fitur, punya spec sendiri)
@@ -42,7 +42,9 @@ Deterministik, **read-only**, keluaran JSON ke stdout. Dijalankan dari venv vaul
 
 ```
 dampak.py --root architecture-draft --sumber "<path atau judul dok>" --teks "<perubahan yang dimaksud>"
-dampak.py --root architecture-draft --diff            # dok vault yang berubah di working tree vs HEAD
+dampak.py --root architecture-draft --diff [PATH ...] # dok vault yang berubah di working tree vs HEAD;
+                                                      # PATH membatasi ke dok yang disunting sesi ini
+                                                      # (pohon vault dipakai bersama sesi lain)
           [--repo-root <akar erp/>]                   # default: induk --root
 ```
 
@@ -70,7 +72,8 @@ dampak.py --root architecture-draft --diff            # dok vault yang berubah d
 
 ### Aturan yang dikunci di skrip
 
-1. **Graf** dari `VAULT-INDEX.json` (`dokumen[].tautan`):
+1. **Graf** dari `scan_vault()` milik `vault_index` (parser wikilink yang sama dengan yang mengisi
+   `dokumen[].tautan` di `VAULT-INDEX.json`, tapi dibaca langsung dari berkas sehingga tak bisa basi):
    - tautan keluar dan backlink sumber, satu lompatan;
    - bila sumber berjenis ADR (`Decisions/`), ditambah lompatan kedua;
    - dok di `Workspace/`, `Logs/`, `Templates/` tidak ikut sebagai kandidat (bukan arsitektur, rulebook §2).
@@ -131,9 +134,10 @@ Pemanggilan: `/dampak <dok-atau-ADR> "<perubahan yang dimaksud>"`, atau `/dampak
 
 Masing-masing satu langkah, merujuk `commands/dampak.md`, **tanpa menyalin prosedurnya**:
 
-- **`/analisa-kebutuhan` §5**: sebelum menulis ADR/dok domain yang **mengubah** fakta yang sudah tertulis di
-  dok lain, jalankan `/dampak` atas draf artefaknya. Usulan suntingan ikut disajikan bersama persetujuan
-  artefak, jadi tidak ada gerbang persetujuan kedua. Artefak yang murni menambah hal baru boleh lewat.
+- **`/analisa-kebutuhan` §4 dan §5**: di §4, sebelum menyajikan, bila keputusan **mengubah** fakta yang
+  sudah tertulis di dok lain, jalankan `/dampak` langkah 1-4 atas draf keputusannya; usulan suntingannya
+  ikut disajikan bersama keputusan, jadi tidak ada gerbang persetujuan kedua. Di §5, suntingan dok
+  terdampak yang disetujui diterapkan bersama artefak. Keputusan yang murni menambah hal baru boleh lewat.
 - **`/sync-docs`**, di antara langkah 4 dan 5: `dampak.py --diff` atas dok yang baru disunting, untuk
   menangkap dok **lain** yang masih menyatakan fakta lama.
 - **`rules/team-memory.md`** § Skill & tooling: satu butir "sebelum mengubah fakta di vault, `/dampak`".
@@ -158,8 +162,8 @@ pytest, fixture = vault mini + `VAULT-INDEX.json` kecil + repo git sementara den
 **Kontrol negatif** (dijalankan sekali saat implementasi, dicatat di PR/commit): ubah pencarian kode jadi
 working tree → kasus "hanya di working tree" merah; hapus pengecualian `Workspace/` → kasusnya merah.
 
-Sebelum implementasi, periksa apakah `Tools/tests/` dijalankan oleh pre-push vault / `hooks/gerbang-kit.py`.
-Bila tidak, `test_dampak.py` didaftarkan di sana (catatan 1.35.0: test yang tak didaftarkan tak pernah jalan).
+Diperiksa 2026-10-07: `hooks/gerbang-kit.py` menjalankan seluruh folder `Tools/tests` (bukan daftar
+berkas), jadi `test_dampak.py` ikut tergerbang tanpa didaftarkan.
 
 ## 7. Rilis
 
