@@ -2,7 +2,7 @@
 
 *Kontrak **webhook Accurate Online**: tipe event yang benar-benar ada, dua endpoint API untuk memperpanjang & memeriksa riwayat kiriman, dan — bagian yang paling mahal — **alat ukur mana yang sahih** saat webhook tampak tidak mengirim. Dipisah dari [[External - Accurate]] karena permukaannya berbeda: yang di sana kontrak DATA (faktur, retur, stok, akun), yang di sini kontrak PENDAFTARAN & PENGIRIMAN, dengan model per-aplikasi yang punya kelas kegagalannya sendiri.*
 
-- **Status**: ⚠️ Implemented (ada catatan) — konsumsi webhook stok `ITEM_QUANTITY`/`STOCK_MUTATION` live (lihat [[Microservices - Integration Service]] §Accurate); pembaru masa aktif otomatis ada (`accurate-webhook-renew`); **kiriman untuk database prod 1443290 belum terbukti tiba** (lihat §Belum Terjawab)
+- **Status**: ⚠️ Implemented (ada catatan) — konsumsi webhook stok `ITEM_QUANTITY`/`STOCK_MUTATION` live (lihat [[Microservices - Integration Service]] §Accurate); pembaru masa aktif otomatis (`accurate-webhook-renew`) **baru berfungsi sejak 2026-10-06** (alamat host diperbaiki, bip-erp PR #2654; sebelumnya nol sukses) dan belum terbukti memperpanjang webhook aplikasi yang benar (uji 2026-10-07, § Riwayat renew otomatis dan pemulihan); kiriman untuk database prod 1443290 **terbukti tiba** (diukur 2026-10-06, § Belum Terjawab)
 - **Sumber kebenaran tipe event**: `bip-erp/docs/accurate-api/accurate-api-resmi.json` (dokumentasi resmi, blok versi `1.0.0#5678`; berkas diambil 2026-07-28). Cara membuktikan: `python3 docs/accurate-api/lihat.py /api` lalu cari aksi `webhook-history` / `webhook-renew`.
 - **Endpoint pendaftaran**: `account.accurate.id/api/*` (bukan host data `zeus.accurate.id`)
 
@@ -38,6 +38,15 @@ X-Api-Signature: <hex HMAC-SHA256(timestamp, ACCURATE_SECRET_KEY)>
 - **Menerima GET maupun POST**, dan **tanpa body** (diukur 2026-09-10). Ini menutup pertanyaan yang sebelumnya terbuka di kode (`accurate_client_webhook.go` menulis "bentuk request BELUM TERVERIFIKASI" karena dokumentasi resmi hanya menyebut nama endpoint tanpa parameter).
 - Balasan sukses: `{"s":true,"d":"17/09/2026"}` — **`d` adalah tanggal aktif baru** (`dd/MM/yyyy`), bukan pesan. Bentuk ini juga terverifikasi 2026-09-10.
 - Di ERP dijalankan otomatis oleh job **`accurate-webhook-renew`** (harian 05:55 WIB, satu call per run) — harian, bukan tiap 7 hari, supaya satu run gagal masih menyisakan enam kesempatan pulih. `s=false` diperlakukan sebagai **galat** (bukan "tak ada data"), karena renew gagal yang dilaporkan sukses berarti webhook mati minggu depan tanpa jejak.
+
+### Riwayat renew otomatis dan pemulihan (diukur 2026-10-06)
+
+- **Job otomatis tidak pernah berhasil sampai 2026-10-06.** `RenewWebhook` memanggil host DATA (`baseURL`, mis. `zeus.accurate.id`) alih-alih host level-akun di atas, dan dibalas HTTP 404 `{"s":false,"d":["URL API tidak tepat"]}` tiap hari; `workers.worker_history` mencatat nol sukses dari 2026-09-18 sampai 2026-10-06 (riwayat sebelum 2026-09-18 belum dibaca). Alamat diperbaiki di bip-erp PR [#2654](https://github.com/bip-itteam-internal/bip-erp/pull/2654) (live prod 2026-10-06 15:21); balasan sukses kini diperiksa (`d` harus tanggal `dd/MM/yyyy` sah dan lebih dari hari ini WIB) dan tanggal berlaku di-log (`berlaku_sampai`).
+- **Kronologi webhook prod** (diukur dari `webhook_logs`, `platform=ACCURATE`): renew manual 2026-09-10 membalas `d=17/09/2026`; kiriman terakhir 2026-09-17 21:10:59 WIB (`SALES_RECEIPT`); **nol event selama 19 hari**, padahal ERP menulis ke Accurate tiap hari; Renew manual lewat portal 2026-10-06 ±09:28 WIB; event pertama sesudahnya 09:28:39 WIB. Kedua database berhenti bersamaan (`databaseId` 1443290 prod dan 2886480 Trial IT).
+- ⛔ **Status "ACTIVE" di portal TIDAK berarti masih mengirim.** Pada 2026-10-06 portal menampilkan Webhook Status ACTIVE sementara **Sisa Aktif 0 Hari**; yang menentukan adalah Sisa Aktif. Alat ukur yang sahih untuk "webhook hidup?" tetap `webhook_logs` (`created_at` event terbaru), bukan status.
+- **Memulihkan manual:** Area Developer → Aplikasi → (aplikasi pemilik webhook) → Webhook → tombol **Renew**; Sisa Aktif kembali 7 hari. Halaman yang sama memuat Debug Log, Hapus, dan Pengaturan (tipe event).
+- **Celah yang ada sebelum perbaikan:** tak ada pengawas "webhook senyap". Kegagalan renew hanya muncul sebagai notifikasi `Worker Failed` yang tenggelam di antara notifikasi sukses, dan 19 hari kiriman hilang tanpa ada yang berbunyi. Pengawas atas `webhook_logs` belum ada (butuh keputusan ambang jam).
+- 🟡 **Uji pembeda kandidat per-aplikasi (menunggu 2026-10-07):** token ERP diterbitkan aplikasi "Bharata", webhook diatur di aplikasi lain (lihat § ADA DUA aplikasi), dan belum diketahui apakah `webhook-renew.do` juga per-aplikasi seperti `webhook-history`. Trigger manual 2026-10-06 15:36 sukses (`berlaku_sampai=13/10/2026`), tetapi hari ini + 7 sama dengan hasil Renew manual, jadi belum membedakan. Sesudah renew terjadwal 2026-10-07 05:55: Sisa Aktif aplikasi pemilik webhook **7 hari** (`berlaku_sampai=14/10/2026`) berarti job memperpanjang webhook yang benar; **6 hari** berarti job memperpanjang milik aplikasi lain.
 
 ### `webhook-history.do` — riwayat kiriman
 
@@ -134,7 +143,7 @@ Receipt terkirim per jam WIB (prod, jendela 2 hari, diukur 2026-09-10):
 
 ## Belum Terjawab (hipotesis TERBUKA — jangan dibaca sebagai fakta)
 
-🟡 **Webhook aplikasi `4abce909…` belum terbukti mengirim untuk database prod 1443290**, meski aplikasi sudah dipasang di sana (2026-09-10), status **ACTIVE**, Target URL terbukti membalas **HTTP 200**, dan pendaftaran sudah di-renew. **Empat kali** uji membuat pelanggan via API di prod: **nol kiriman**. Sementara **Trial IT mengirim normal**.
+✅ **Terjawab 2026-10-06: webhook aplikasi `4abce909…` MENGIRIM untuk database prod 1443290.** `webhook_logs` memuat 60.003 entri `databaseId=1443290` dari 2026-09-10 14:33 sampai 2026-09-17 21:11 WIB (dan 1.535 entri Trial IT 2886480 sampai 20:01), lalu event prod kembali sejak Renew manual 2026-10-06 09:28 WIB. Dugaan lama "belum terbukti mengirim" gugur.
 
 ⛔ **Hipotesis yang SUDAH DICORET — jangan diulang** (masing-masing sudah dibuktikan salah, dan mengulangnya membakar waktu yang sama untuk kedua kalinya):
 
@@ -144,7 +153,7 @@ Receipt terkirim per jam WIB (prod, jendela 2 hari, diukur 2026-09-10):
 | "Setelan webhook per-database" | Setelannya **tunggal per-aplikasi** |
 | "Token aplikasi berbeda tak memicu" | ERP memakai token app **Bharata**, webhook app **lain** tetap terpicu di Trial IT |
 
-**Yang belum terjawab**: apakah pemasangan aplikasi ke database baru butuh **langkah aktivasi tambahan**, atau apakah status langganan **"Gratis coba integrasi"** (prod) vs **"Tagihan Aktif"** (Trial IT) memengaruhinya. **Perlu jawaban support Accurate** — bukan percobaan tambahan dari sisi kita, karena ketiga dugaan yang bisa diuji sendiri sudah habis.
+**Yang belum terjawab**: (1) apakah `webhook-renew.do` juga per-aplikasi: uji pembeda 2026-10-07, lihat § Riwayat renew otomatis dan pemulihan; (2) penyebab empat uji membuat pelanggan via API di prod (2026-09-10) menghasilkan nol kiriman: tidak ditelusuri (TBD), jangan dibaca sebagai bukti webhook prod mati. Dugaan lama soal langkah aktivasi tambahan dan status langganan ("Gratis coba integrasi" prod vs "Tagihan Aktif" Trial IT) **tidak lagi perlu dijawab support untuk soal ini**: prod terbukti mengirim.
 
 ## Dependensi & Integrasi
 

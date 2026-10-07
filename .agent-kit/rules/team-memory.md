@@ -20,6 +20,7 @@
 ## Gotchas lingkungan (dev Windows)
 - ⛔ **Satu byte NUL di berkas sumber membuatnya HILANG dari pencarian kode.** Git menggolongkannya **biner**, dan akibatnya senyap di tiga tempat: **ripgrep (dan tool `Grep`) melewatkan berkas itu sepenuhnya**, `git diff` menampilkannya sebagai `Bin <a> -> <b>` sehingga tak bisa direview, dan `git merge` menyerah dengan *"Cannot merge binary files"* lalu meninggalkan satu sisi utuh. Yang paling berbahaya yang pertama: hasil pencarian yang KURANG tak terbaca sebagai galat, jadi kesimpulan "fungsi ini cuma ada di satu tempat" atau "field ini tak dipakai siapa pun" bisa salah total tanpa satu pun tanda. Terbukti 2026-08-26: `templates-table.tsx` menyembunyikan definisi `kunciPosisi`-nya sendiri selama entah berapa lama (erp-frontend [#1230](https://github.com/bip-itteam-internal/erp-frontend/pull/1230)). **Curigai NUL setiap kali sebuah berkas muncul `Bin` di `--stat`.** Ukur byte-exact dengan `[IO.File]::ReadAllBytes`, JANGAN lewat pipeline PowerShell; untuk blob git pakai `cmd /c "... > berkas"`. ⚠️ **Jangan sapu-ganti `0x00` jadi spasi tanpa membaca konteksnya** — berkas kedua yang ditemukan sapuan itu, `form-builder/lib/filename.ts`, memakai NUL sebagai batas bawah **rentang karakter kontrol** di dalam regex (`/[\\/:*?"<>|\x00-\x1f]/`), dan menggantinya membalik rentangnya sehingga `RegExp` melempar. Klaim "X tidak ada di repo" yang bersandar pada Grep wajib dicek ulang dengan `git grep`, yang tidak melewati berkas biner.
 - ⛔ **`git stash` BERBAGI satu tumpukan untuk SELURUH repo, termasuk semua worktree.** `git stash pop` mengambil `stash@{0}` — yang bisa saja milik sesi/branch lain yang sedang berjalan paralel, dan konfliknya muncul di berkas yang sama sekali tak kamu sentuh. Terjadi 2026-09-01: `stash -u` lalu `stash pop` untuk mengukur baseline test menarik stash bertuliskan *"po_test milik sesi lain - jangan dicampur"* dari branch `feat/rbac-katalog-finance`, meninggalkan `UU services/procurement/po_test.go` di worktree yang sedang mengerjakan hal lain. Pemulihannya `git reset HEAD -- <berkas>` lalu `git checkout -- <berkas>` (checkout saja ditolak selama berkasnya `unmerged`); stash aslinya selamat justru karena pop-nya gagal. **Untuk mengukur baseline test, JANGAN pakai stash** — jalankan test di worktree terpisah atas `origin/main`, atau `git stash push -- <berkas yang kamu ubah saja>` dan pop dengan `stash@{n}` yang kamu catat sendiri, bukan yang teratas.
+- ⛔ **"Branch ini leluhur `origin/main`" BUKAN bukti branch-nya sudah merged.** Branch yang baru dicabang dan belum punya commit sendiri ber-HEAD tepat di `origin/main`, jadi `merge-base --is-ancestor` menyatakannya merged. `worktree-bersih.ps1` memakai uji itu sampai kit 1.36.0 dan membuang worktree yang **sedang disunting agen** (2026-10-05: `fe-2020-page-header` kehilangan `.git` di tengah kerja, pemulihannya menghasilkan folder campuran berkas basi 37 commit yang nyaris masuk PR). Bukti selesai yang sah: PR merged ber-head = ujung branch, atau commit **milik** branch itu (reflog `commit…`) yang reachable dari `main`. Dua jebakan lain di kelas yang sama: mtime folder akar Windows **tak berubah** saat berkas di dalam subfolder disunting (ukur berkas terbaru rekursif), dan `git status` biasa **menulis ulang index** sehingga pemeriksa "baru disentuh?" menyentuh sendiri — pakai `git --no-optional-locks status`. ⚠️ Worktree dengan berkas `.git` hilang dibaca git sebagai bukan-repo: `git status` gagal, dan skrip yang tak memeriksa exit code menganggapnya **bersih**.
 - ⛔ **Tool `Bash` praktis TIDAK BERFUNGSI di mesin dev Windows ini: pakai `PowerShell` dan `Read`.** Diukur 2026-09-03 atas 50 sesi terakhir (12.168 panggilan tool): **110 dari 118 panggilan `Bash` timeout, 93,2%**, lawan **4 dari 5.598 panggilan `PowerShell`, 0,1%**. Ini bukan soal git saja — `cat` polos pun menggantung. Tiap kejadian membakar 90 sampai 120 detik **lalu tetap harus diulang** dengan PowerShell, jadi ongkosnya dobel dan kumulatifnya sudah beberapa jam. Yang bikin jebakan: kegagalannya **tidak terbaca sebagai kegagalan** — perintahnya dilempar ke background dengan pesan yang terdengar normal, dan agent bisa lanjut menunggu hasil yang tak akan datang. **Kalau butuh POSIX sungguhan, tulis skrip `.sh` lalu jalankan lewat `ssh`/`plink` ke mesin Linux, jangan lewat tool `Bash` lokal.** ⚠️ Berlaku juga untuk CLI yang biasa dipanggil dari Bash (`agent-reach`, `yt-dlp`): bungkus lewat PowerShell.
 - **Git hang**: `core.fsmonitor` bikin git menggantung di path ber-spasi (`c:\Data utama\...`). Selalu jalankan `git -c core.fsmonitor=false ...` (atau sekali: `git config --global core.fsmonitor false`). Perintah yang men-scan worktree (`status`/`diff`) tetap lambat karena `node_modules` → pakai perintah ref-only (`rev-parse`, `log`, `diff <a>..<b>`) bila bisa.
 - **`.claude/` BUKAN git repo** (root `erp/` bukan repo). Isinya di-generate `init` dari agent-kit. Ubah standar/hook/command/**rules** → edit **`architecture-draft/.agent-kit/`** lalu re-run `init`; JANGAN edit file di `.claude/` (akan ketimpa saat init).
@@ -325,6 +326,20 @@ Aturan (berlaku untuk developer DAN agent):
   (kata kunci penutup, atau branch dari `gh issue develop`) yang menggerakkan otomasi; `Refs #<n>`
   tidak menyambungkan apa pun, dan issue-nya diam di In Review selamanya. Bentuk lengkap
   `<org>/<repo>#<n>` wajib saat PR dan issue beda repo (PR erp-frontend untuk issue bip-erp).
+- ⛔ **MyBharata: `Closes` TIDAK menutup issue, karena PR di-merge ke `dev` sedangkan branch default
+  repo `main`.** GitHub hanya menutup issue untuk PR yang masuk ke branch default, jadi issue
+  `my-bharata` tak pernah closed, workflow *Item closed* tak pernah terpicu, dan kartunya diam di
+  In Review. Kueri "issue terbuka dengan PR merged" pun **buta** terhadapnya: PR ke `dev` tidak
+  tercatat sebagai penutup (`closedByPullRequestsReferences` kosong). Terjadi pada my-bharata#175
+  (PR #176 merged 2026-10-04, ketahuan 2026-10-07 hanya dengan mencocokkan teks PR). **Sesudah PR
+  `my-bharata` merged ke `dev`, yang me-merge menutup issue-nya manual** (`gh issue close <n> -R
+  bip-itteam-internal/my-bharata --reason completed`) lalu memastikan kartunya di Menunggu Adopsi.
+  Done tetap menunggu rilis store dan bukti dipakai.
+- ⛔ **Item yang dimasukkan ke board WAJIB langsung diberi Status** (`gh project item-edit`), jangan
+  dibiarkan "No Status". Workflow bawaan project (*Item added*, *Item closed*) bisa MATI tanpa ada
+  yang berbunyi: diukur 2026-10-07, lima dari enam workflow Project #15 mati sejak 2026-09-29, dan
+  43 kartu merged diam di In Review plus 7 kartu tanpa Status sebelum ada yang bertanya. Otomasi
+  board itu bantuan, bukan jaminan.
 - ⛔ **Merge BUKAN Done.** Pelajaran audit Linear 2026-09-29 tetap berlaku: status meleset ke dua arah
   (BHA-249 Done tanpa satu baris kode, BHA-250 "Belum Mulai" padahal 127 sesi live sudah memakainya,
   BHA-22 kodenya lengkap di prod dengan 0 snapshot), dan 82 dari 105 issue Done tak punya PR tertaut.
@@ -349,10 +364,14 @@ Aturan (berlaku untuk developer DAN agent):
     hanya bila SEMUA anak sudah merged (induk ditutup manual saat itu); Done tetap manusia dengan bukti.
   - **Urutan deploy BE sebelum FE/Mobile** ditulis di badan sub-issue FE/Mobile ("deploy sesudah
     `bip-erp#<sub BE>`"); merged duluan boleh, deploy duluan tidak.
-- **Assignee = orang yang SEDANG mengerjakan, dipasang saat pekerjaan MULAI (In Progress)**, bukan saat
-  dijatahkan (keputusan user 2026-09-29). Issue Backlog/Todo tanpa assignee; PIC rencana cukup ditulis di
-  badan (`**PIC:** <login>`). Agent yang mulai mengerjakan issue meng-assign akun yang menjalankannya.
-  Pengawas ditulis di badan issue sebagai `**Pengawas:** <login>`.
+- ⛔ **Masuk Todo = WAJIB ber-assignee** (keputusan user 2026-10-07, menggantikan aturan 2026-09-29
+  yang membiarkan Todo tanpa assignee). Todo berarti "sudah dijatahkan, siap dikerjakan", jadi kartu
+  Todo tanpa nama tak punya pemilik dan tak ada yang merasa ditunggu. **Backlog** tetap boleh tanpa
+  assignee (belum dijatahkan); PIC rencana di Backlog cukup ditulis di badan (`**PIC:** <login>`).
+  Yang memindahkan kartu ke Todo memasang assignee-nya saat itu juga; tak tahu siapa = kartunya tetap
+  Backlog. Saat mulai (In Progress), assignee diganti/ditambah akun yang benar-benar mengerjakan;
+  agent yang mulai mengerjakan issue meng-assign akun yang menjalankannya. Pengawas ditulis di badan
+  issue sebagai `**Pengawas:** <login>`.
 - **Nama branch `<domain>/<n>-<slug>`**, `<n>` = nomor issue GitHub. Bukan syarat otomasi (yang
   menyambungkan adalah `Closes` di PR), tetapi membuat branch terbaca dan dipakai pre-push untuk
   mengingatkan. Branch lama `bha-<n>-` tetap diterima.
