@@ -92,6 +92,8 @@ try {
   Check ($ak -cmatch '\*\*Kecil\*\*' -and $ak -cmatch '\*\*Sedang\*\*' -and $ak -cmatch '\*\*Besar\*\*' -and $ak -match 'tugas\.md') '/analisa-kebutuhan: blueprint berukuran, format tugas.md'
   $i5d = $ak.IndexOf('**d. Buat issue'); $s5d = if ($i5d -ge 0) { $ak.Substring($i5d, [Math]::Min(3500, $ak.Length - $i5d)) } else { '' }
   Check ($s5d -match 'buat-sub-issue\.ps1' -and $s5d -match 'item-add 15' -and $s5d -match 'TANPA label' -and $s5d -match 'tidak perlu dibangun') '/analisa-kebutuhan 5d: buat issue tanpa Siap Agent'
+  # Uji kering 2026-10-07: "Data = asumsi" membuat issue tak pernah lolos DoR #4 (runner dilarang baca prod).
+  Check ($ak -match 'Perlu ukur prod' -and $ak -match 'Definition of Ready #4') '/analisa-kebutuhan: data prod belum diukur ditandai, bukan asumsi'
   # akhir analisa-kebutuhan wawancara+blueprint
   $sdMd = Get-Content (Join-Path $claude 'commands/sync-docs.md') -Raw -Encoding UTF8
   Check ($sdMd -match 'dampak\.py --root architecture-draft --diff') '/sync-docs memanggil dampak.py --diff'

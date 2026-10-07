@@ -101,9 +101,11 @@ Ajukan lewat **`AskUserQuestion`**, paling banyak tiga pertanyaan dalam **satu**
    dari hasil §2. Opsi tanpa sumber hanya boleh sebagai alternatif **"bangun baru"**, dan dilabeli begitu.
 2. `(Recommended)` hanya bila grounding mendukungnya, dengan alasan satu kalimat; opsi itu di urutan pertama.
 3. Selalu ada opsi **"Belum tahu"**: dicatat sebagai **asumsi eksplisit** di ADR, tak mandek.
-4. Pertanyaan yang **sudah terjawab grounding tidak ditanyakan**; jawabannya disajikan sebagai temuan
-   di §4. Bila grounding tak menemukan apa pun yang relevan, pertanyaannya **tetap diajukan** dengan
-   opsi "bangun baru" berlabel + "Belum tahu", bukan dilewati.
+4. Pertanyaan yang **sudah terjawab grounding atau jawaban §1a tidak ditanyakan**; jawabannya
+   disajikan sebagai temuan di §4. Bila grounding tak menemukan apa pun yang relevan, pertanyaannya
+   **tetap diajukan** dengan opsi "bangun baru" berlabel + "Belum tahu", bukan dilewati.
+5. `AskUserQuestion` menampung **paling banyak 4 opsi** per pertanyaan, dan "Belum tahu" memakan satu:
+   pilih tiga alternatif terkuat, sisanya sebut di teks §4.
 
 Contoh Q3: "pakai mart `<nama>` yang sudah ada, segar H-1 (`<berkas>:<baris>`)" ·
 "query langsung ke `<koleksi>` (bangun baru; jalur daftar berpaginasi, risiko compute-on-read)" · "Belum tahu".
@@ -130,8 +132,10 @@ Sajikan di chat:
   menyajikan**, dan sajikan laporannya di sini. Satu gerbang persetujuan untuk keduanya. Keputusan
   yang murni menambah hal baru boleh lewat.
 - **Blueprint**: daftar issue yang akan dibuat (judul, repo, ukuran Kecil/Sedang/Besar, urutan),
-  lihat §5c. Tanyakan **Pemutus** (login GitHub) lewat `AskUserQuestion`; pertanyaan ini tidak
-  dihitung dalam batas 7. Satu persetujuan mencakup ADR, dok, dan pembuatan issue.
+  lihat §5c. Tanyakan **Pemutus** (login GitHub) lewat `AskUserQuestion`: kandidatnya dari jawaban
+  Q1 ("oleh siapa") dan pemilik dok/ADR yang ditemukan grounding, plus "Belum tahu"; aturan opsi
+  bersumber §1b tidak berlaku di sini. Pertanyaan ini tidak dihitung dalam batas 7. Satu persetujuan
+  mencakup ADR, dok, dan pembuatan issue.
 
 ⛔ **BERHENTI. Tunggu persetujuan user. JANGAN menulis berkas apa pun sebelum disetujui.**
 
@@ -183,7 +187,9 @@ Keputusannya Bisa Ditunjuk, Ditandai Manusia"). Sengaja tidak di dalam ADR: ADR 
 blueprint papan kerja.
 
 Kepala: wikilink ADR + dok domain, **ukuran** + alasannya, Pemutus. Ukuran ditentukan dari repo
-yang ditemukan grounding:
+yang **harus berubah**, bukan repo yang sekadar memuat fitur terkait: untuk tiap repo konsumen
+(FE, mobile), periksa dulu apakah ia sudah merender bentuk baru secara generik sebelum
+menghitungnya. Alasan ukuran menyebut bukti itu (`file:line`).
 
 | Ukuran | Kapan | Bentuk |
 |---|---|---|
@@ -196,11 +202,15 @@ Tiap issue satu blok berbagian persis template `bip-erp/.github/ISSUE_TEMPLATE/t
 `## Di luar cakupan`, `## Data / bukti pendukung`, `## Prasyarat`; ditambah repo tujuan
 (`bip-erp`, `erp-frontend`, `my-bharata`; folder lokal mobile `mybharata-app`) dan urutan.
 
-- **Keputusan** menunjuk ADR **dengan judul** (nomor ADR bukan kunci unik), tidak menyalin isinya,
-  dan menulis terang: *layak `Siap Agent` sesudah ADR berstatus Diterima* (ADR baru masih 🟡 Diusulkan).
+- **Keputusan** menunjuk ADR **dengan judul** (nomor ADR bukan kunci unik) dan menulis terang:
+  *layak `Siap Agent` sesudah ADR berstatus Diterima* (ADR baru masih 🟡 Diusulkan). Boleh
+  ringkasan **bentuk** paling banyak tiga baris (ambang, satuan, penerima, siapa boleh apa) supaya
+  issue terbaca sendiri; alasan dan alternatif tetap hanya di ADR.
 - **Yang harus benar** diturunkan dari `## Decision` jadi kriteria yang bisa diperiksa (perilaku,
   angka, layar). "Pertimbangkan", "perlu disepakati", "dsb" dilarang.
-- **Data** diisi hasil ukur prod gerbang 3 §2; tak tersedia → ditulis sebagai asumsi.
+- **Data** diisi hasil ukur prod gerbang 3 §2. Tak tersedia → tulis **"Perlu ukur prod:"** diikuti
+  angka yang dibutuhkan dan kuerinya. Itu menahan issue dari `Siap Agent` (Definition of Ready #4:
+  runner dilarang membaca prod), dan §8 menyebutnya sebagai langkah manusia.
 - **Prasyarat**: urutan deploy BE sebelum FE/Mobile ditulis di sub-issue FE/Mobile.
 
 **d. Buat issue** (sesudah a-c, **sebelum** commit vault), dari akar `erp/`, via PowerShell:
@@ -242,6 +252,7 @@ dokumennya dulu, lalu regenerasi indeks **sekali di akhir**.
 ## 8. Serahkan
 
 Tutup dengan daftar URL issue yang dibuat (induk dulu), lalu langkah manusia berikutnya, konkret:
-setujui ADR dengan menulis `🟢 Diterima, <tanggal>, oleh <login>` di baris statusnya, lalu pasang
-label `Siap Agent` pada issue yang lolos checklist Definition of Ready. Sebelum dua langkah itu,
+setujui ADR dengan menulis `🟢 Diterima, <tanggal>, oleh <login>` di baris statusnya; untuk issue
+yang memuat **"Perlu ukur prod:"**, jalankan kuerinya (baca saja) dan tempel hasilnya; lalu pasang
+label `Siap Agent` pada issue yang lolos checklist Definition of Ready. Sebelum langkah-langkah itu,
 runner backlog tidak akan mengambil issue-nya.
