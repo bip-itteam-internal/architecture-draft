@@ -114,7 +114,8 @@ def repos(tmp_path: Path) -> Path:
     _git_uji(be, "init", "-q")
     (be / "a.go").write_text("x := target_profit\nambang := 80\n", encoding="utf-8")
     (be / "biner.go").write_bytes(b"\x00\x01\nvar y = target_profit\n")
-    (be / "port.go").write_text("port := 8080\n", encoding="utf-8")
+    # git grep -w menganggap "." batas kata: 80.5, 0.80, dan IP tak boleh terbaca sebagai fakta 80
+    (be / "port.go").write_text("port := 8080\nrasio := 80.5\nv := 0.80\nip := \"10.10.80.1\"\n", encoding="utf-8")
     (be / "wt.go").write_text("kosong\n", encoding="utf-8")
     _git_uji(be, "add", "-A")
     _git_uji(be, "commit", "-q", "-m", "awal")
@@ -227,6 +228,73 @@ def test_main_diff_dibatasi_path(vault_git, repos, capsys):
 
 def test_main_diff_tanpa_perubahan(vault_git, repos, capsys):
     assert dampak.main(["--root", str(vault_git), "--repo-root", str(repos), "--diff"]) == 2
+
+
+def test_ekstrak_fakta_pendek_dilewati_tercatat():
+    # Diukur 2026-10-07: fakta `/` dan `_` dari backtick cocok di 394 ribu baris bip-erp,
+    # grep 385 dtk. Fakta bukan angka di bawah 3 karakter atau tanpa huruf/angka tak menunjuk apa pun.
+    fakta, dilewati = ekstrak_fakta("pakai `/` atau `_`, kolom `id`, status `ok`, field `nil_x`")
+    assert fakta == ["nil_x"]
+    pendek = {d["nilai"] for d in dilewati if d["alasan"] == "terlalu pendek"}
+    assert pendek == {"/", "_", "id", "ok"}
+
+
+def test_ekstrak_angka_berpemisah_ganda_utuh():
+    fakta, dilewati = ekstrak_fakta("target Rp1.500.000 jadi Rp22.000.000, versi 1.36.0, tanggal 2026-09-07")
+    assert set(fakta) == {"1.500.000", "22.000.000", "1.36.0", "2026-09-07"}
+    assert dilewati == []
+
+
+def test_kode_angka_berpemisah_ganda(repos):
+    (repos / "bip-erp" / "a.go").write_text("x\n", encoding="utf-8")  # working tree saja, tak terbaca
+    kandidat, _ = dampak.cari_kode(["10.10.80.1"], repos)
+    assert {k["berkas"] for k in kandidat} == {"port.go"}
+
+
+def test_kode_dilewati_bila_fakta_terlalu_banyak(repos, monkeypatch):
+    # Diff raksasa (diukur 344 fakta = 57 menit) dilewati di sisi kode, tercatat, bukan menggantung.
+    monkeypatch.setattr(dampak, "BATAS_FAKTA_KODE", 2)
+    kandidat, dilewati = dampak.cari_kode(["target_profit", "ambang", "8080"], repos)
+    assert kandidat == []
+    assert any(d["jenis"] == "kode" and "3 fakta" in d["alasan"] for d in dilewati)
+
+
+def test_kode_grep_sekali_per_jenis_per_repo(repos, monkeypatch):
+    # Satu git grep per fakta per repo terukur +-4 dtk per fakta di repo nyata; commit docs
+    # nyata membawa sampai 400 fakta. Wajib digabung: paling banyak dua grep (angka dan
+    # bukan angka) per repo, berapa pun jumlah faktanya.
+    asli = dampak._git
+    panggilan = []
+
+    def hitung(repo, *args):
+        if args and args[0] == "grep":
+            panggilan.append(repo)
+        return asli(repo, *args)
+
+    monkeypatch.setattr(dampak, "_git", hitung)
+    kandidat, _ = dampak.cari_kode(["target_profit", "x", "ambang", "80", "8080"], repos)
+    assert len(panggilan) <= 2
+    per_fakta = {(k["fakta"], k["berkas"]) for k in kandidat}
+    assert ("target_profit", "a.go") in per_fakta and ("80", "a.go") in per_fakta
+    assert ("8080", "port.go") in per_fakta and ("80", "port.go") not in per_fakta
+
+
+def test_main_diff_path_relatif_akar_erp(vault_git, repos, capsys, monkeypatch):
+    # Semua path lain di /sync-docs relatif ke erp/, jadi PATH juga akan ditulis begitu.
+    (vault_git / KPI).write_text("- **Status**: ⚠️ Implemented\n\nAmbang KPI 75. [[Finance - Insentif]]\n",
+                                 encoding="utf-8")
+    monkeypatch.chdir(vault_git.parent)
+    kode, hasil = _jalankan(capsys, ["--root", "architecture-draft", "--repo-root", str(repos),
+                                     "--diff", "architecture-draft/" + KPI])
+    assert kode == 0 and hasil["sumber"] == [KPI]
+
+
+def test_main_diff_path_di_luar_vault_galat_bernama(vault_git, repos, capsys, tmp_path):
+    luar = tmp_path / "lain.md"
+    luar.write_text("x\n", encoding="utf-8")
+    kode = dampak.main(["--root", str(vault_git), "--repo-root", str(repos), "--diff", str(luar)])
+    assert kode == 2
+    assert "lain.md" in capsys.readouterr().err
 
 
 def test_adalah_angka():

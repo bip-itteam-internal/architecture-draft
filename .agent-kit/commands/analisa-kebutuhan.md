@@ -127,7 +127,8 @@ dan selesai. Analis yang selalu menghasilkan ADR adalah analis yang selalu bilan
 Tiga berkas, semuanya di `architecture-draft`.
 
 Suntingan dok terdampak hasil `/dampak` yang disetujui di §4 diterapkan bersama artefak ini, mengikuti
-`/dampak` langkah 6.
+`/dampak` langkah 6 sebagai **pemanggil** (sunting + cek wikilink saja); index, commit, dan push ikut
+§6-§7 di bawah, sekali untuk semuanya.
 
 **a. ADR di `Decisions/`.** Hitung nomor tertinggi saat ini dan tambah satu; **jangan pakai nomor
 hafalan**, orang lain bisa menambah lebih dulu dan seluruh wikilink memakai judul lengkap. Bentuk

@@ -15,8 +15,9 @@ Langkah:
 4. Update/buat dok sesuai template & konvensi; perbarui status marker.
 5. Cari dok **lain** yang masih menyatakan fakta lama:
    `architecture-draft/Tools/.venv/Scripts/python.exe architecture-draft/Tools/dampak.py --root architecture-draft --diff <dok yang kamu sunting>`
-   lalu ikuti `/dampak` langkah 2-6. §7 hanya memetakan repo → dok, jadi tanpa langkah ini salinan
-   fakta di dok lain tertinggal tanpa satu pun tanda.
+   (di background, lihat `/dampak` 1.2), lalu ikuti `/dampak` langkah 2-6 sebagai **pemanggil**: dok
+   terdampak yang disetujui ikut langkah 6-8 di bawah bersama dok yang kamu sunting. §7 hanya
+   memetakan repo → dok, jadi tanpa langkah ini salinan fakta di dok lain tertinggal tanpa satu pun tanda.
 6. Verifikasi 0 broken wikilink (§4).
 7. Segarkan index pencarian, dari akar `erp/`:
    `architecture-draft/Tools/.venv/Scripts/python.exe architecture-draft/Tools/build-vault-index.py --check --root architecture-draft`

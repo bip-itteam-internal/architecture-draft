@@ -19,9 +19,12 @@ Batas tegas: **tidak menyunting kode**, **tidak menyunting dok sumber** (itu tug
 
 1. `git -c core.fsmonitor=false -C architecture-draft pull --ff-only`. Gagal → lanjut, tulis
    "⚠️ salinan vault lokal basi: <alasan>" di kepala laporan.
-2. Dari akar `erp/`, jalankan dan simpan keluarannya ke scratchpad:
+2. Dari akar `erp/`, jalankan dengan **`run_in_background: true`** dan simpan keluarannya ke scratchpad:
    `architecture-draft/Tools/.venv/Scripts/python.exe architecture-draft/Tools/dampak.py --root architecture-draft --sumber "<dok>" --teks "<perubahan>"`
-   (atau `--diff <PATH ...>`). Exit 2 = sumber tak ditemukan / tak ada perubahan: laporkan, berhenti.
+   (atau `--diff <PATH ...>`; PATH boleh relatif `erp/`, relatif vault, atau absolut). Tiga repo kode
+   di-grep per jalan; di mesin yang sibuk itu bisa melewati batas tool foreground, dan perintah yang
+   terbunuh terbaca seperti galat skrip. Exit 2 = sumber/PATH tak ditemukan atau tak ada perubahan:
+   laporkan pesannya, berhenti.
 3. `index_segar: false` → catat di kepala laporan; jangan berhenti.
 4. Kode dibaca dari ref remote (`origin/main`, `mybharata-app` `origin/dev`). Repo yang ref-nya basi
    menjawab tentang kode lama: bila ragu, `git -C <repo> fetch` dulu (membaca, bukan mengubah kerja siapa pun).
@@ -66,6 +69,14 @@ tulis **"butuh ADR"** dan berhenti di sini tanpa langkah 5-6.
 
 1. Sunting dok terpilih; perbarui status marker bila berubah (rulebook vault §5).
 2. Verifikasi 0 wikilink rusak (rulebook §4).
+
+**Dipanggil dari command lain** (`/sync-docs`, `/analisa-kebutuhan`): berhenti di sini. Index, commit,
+dan push ikut alur pemanggil, sekali untuk seluruh suntingan. `/sync-docs` melarang push otomatis, dan
+`/analisa-kebutuhan` meregenerasi index sesudah merge; commit sendiri di tengah alur mereka
+menghasilkan push sepotong dan index basi.
+
+**Dipanggil langsung** (`/dampak`), lanjutkan:
+
 3. `--check` index (`/sync-docs` langkah 7); basi → `/index-vault`.
 4. Commit **per nama berkas**: `docs: selaraskan <fakta> (dampak dari <sumber>)`. Lalu merge
    `origin/main`, push `main` (konvensi vault: tanpa PR).

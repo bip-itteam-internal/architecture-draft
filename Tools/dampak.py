@@ -13,6 +13,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -22,6 +23,14 @@ from vault_index.build import NAMA_INDEX, muat_index, pilih_yang_perlu_diringkas
 # Fakta yang cocok di lebih dari sekian berkas (vault, atau per repo kode) tak menunjuk
 # apa pun dan hanya membanjiri laporan.
 AMBANG_TERLALU_UMUM = 40
+
+# Fakta bukan angka yang lebih pendek dari ini dicatat `terlalu pendek`, tidak dicari.
+PANJANG_MIN_FAKTA = 3
+
+# Di atas sekian fakta, pencarian kode dilewati (tercatat). Diukur 2026-10-07: 33-67 fakta
+# 26-27 dtk, tetapi 228 fakta 9 menit dan 344 fakta 57 menit. Diff sebesar itu dipersempit
+# per dok (`--diff PATH`), bukan ditunggu.
+BATAS_FAKTA_KODE = 60
 
 # Bukan dokumentasi arsitektur (rulebook vault §2), jadi tak pernah disunting /dampak.
 JENIS_BUKAN_KANDIDAT = frozenset({"workspace", "log", "template"})
@@ -38,8 +47,11 @@ _RE_BACKTICK = re.compile(r"`([^`\n]+)`")
 # itu membuang URL (`https://...`) dan pecahan path di tengah kata.
 _RE_RUTE = re.compile(r"(?<![\w.:/])/[A-Za-z0-9_\-:{}]+(?:/[A-Za-z0-9_\-:{}]+)*")
 _RE_SNAKE = re.compile(r"\b[A-Za-z][A-Za-z0-9]*(?:_[A-Za-z0-9]+)+\b")
+# Angka berpemisah ganda (Rupiah 1.500.000, versi 1.36.0, tanggal 2026-09-07) adalah SATU fakta.
+# Boleh didahului huruf (Rp1.500.000); diambil sebelum _RE_ANGKA supaya tak terpecah atau hilang.
+_RE_ANGKA_MAJEMUK = re.compile(r"(?<![\d.,-])\d+(?:[.,-]\d+){2,}(?!\d|[.,-]\d)")
 _RE_ANGKA = re.compile(r"(?<![\w.,])\d+(?:[.,]\d+)?(?![\w]|[.,]\d)")
-_RE_ANGKA_PENUH = re.compile(r"\d+(?:[.,]\d+)?")
+_RE_ANGKA_PENUH = re.compile(r"\d+(?:[.,-]\d+)*")
 
 
 def adalah_angka(fakta: str) -> bool:
@@ -53,8 +65,16 @@ def ekstrak_fakta(teks: str) -> tuple[list[str], list[dict]]:
 
     def tambah(f: str) -> None:
         f = f.strip().rstrip(".,;:)")
-        if f and f not in fakta:
-            fakta.append(f)
+        if not f or f in fakta:
+            return
+        # Fakta bukan angka yang pendek atau tanpa huruf/angka (`/`, `_`, `id`) cocok di ratusan
+        # ribu baris kode: diukur 2026-10-07, dua fakta begitu membuat satu grep bip-erp 385 dtk.
+        if not adalah_angka(f) and (len(f) < PANJANG_MIN_FAKTA or not any(c.isalnum() for c in f)):
+            catatan = {"jenis": "fakta", "nilai": f, "alasan": "terlalu pendek"}
+            if catatan not in dilewati:
+                dilewati.append(catatan)
+            return
+        fakta.append(f)
 
     for m in _RE_BACKTICK.finditer(teks):
         tambah(m.group(1))
@@ -63,6 +83,9 @@ def ekstrak_fakta(teks: str) -> tuple[list[str], list[dict]]:
         tambah(m.group(0))
     for m in _RE_SNAKE.finditer(sisa):
         tambah(m.group(0))
+    for m in _RE_ANGKA_MAJEMUK.finditer(sisa):
+        tambah(m.group(0))
+    sisa = _RE_ANGKA_MAJEMUK.sub(" ", sisa)
     for m in _RE_ANGKA.finditer(sisa):
         angka = m.group(0)
         if sum(c.isdigit() for c in angka) >= 2:
@@ -110,7 +133,7 @@ def kandidat_graf(sumber_paths: list[str], entri: list[dict]) -> dict[str, list[
 
 def _cocok_isi(fakta: str, isi: str) -> bool:
     if adalah_angka(fakta):
-        pola = r"(?<![\d.,])" + re.escape(fakta) + r"(?![\d]|[.,]\d)"
+        pola = r"(?<![\d.,-])" + re.escape(fakta) + r"(?!\d|[.,-]\d)"
         return re.search(pola, isi) is not None
     return fakta in isi
 
@@ -148,6 +171,11 @@ def cari_kode(fakta: list[str], akar_repo: Path, repo_ref=REPO_REF) -> tuple[lis
     """Berkas kode yang memuat fakta, dibaca dari REF remote (bukan working tree, bukan ripgrep)."""
     kandidat: list[dict] = []
     dilewati: list[dict] = []
+    if len(fakta) > BATAS_FAKTA_KODE:
+        dilewati.append({"jenis": "kode", "nilai": "semua repo",
+                         "alasan": f"{len(fakta)} fakta melebihi batas {BATAS_FAKTA_KODE}: "
+                                   "persempit dengan --diff PATH per dok"})
+        return kandidat, dilewati
     for nama, ref in repo_ref:
         repo = akar_repo / nama
         if not (repo / ".git").exists():
@@ -156,21 +184,23 @@ def cari_kode(fakta: list[str], akar_repo: Path, repo_ref=REPO_REF) -> tuple[lis
         if _git(repo, "rev-parse", "--verify", "--quiet", ref).returncode != 0:
             dilewati.append({"jenis": "repo", "nilai": nama, "alasan": f"ref {ref} tidak ada"})
             continue
-        for f in fakta:
-            # -a: berkas ber-byte NUL tetap dibaca sebagai teks (ripgrep melewatinya senyap).
-            args = ["grep", "-n", "-a", "-F"] + (["-w"] if adalah_angka(f) else []) + ["-e", f, ref, "--"]
-            r = _git(repo, *args)
-            if r.returncode not in (0, 1):
-                dilewati.append({"jenis": "kode", "nilai": f"{nama}:{f}",
-                                 "alasan": "git grep gagal: " + r.stderr.strip()[:200]})
+        # fakta -> berkas -> baris pertama yang BENAR-BENAR cocok
+        per_fakta: dict[str, dict[str, int]] = {f: {} for f in fakta}
+        for kelompok, kata_utuh in (([f for f in fakta if adalah_angka(f)], True),
+                                    ([f for f in fakta if not adalah_angka(f)], False)):
+            if not kelompok:
                 continue
-            per_berkas: dict[str, int] = {}
-            awalan = ref + ":"
-            for baris in r.stdout.splitlines():
-                if not baris.startswith(awalan):
-                    continue
-                berkas, nomor, _ = baris[len(awalan):].split(":", 2)
-                per_berkas.setdefault(berkas, int(nomor))
+            baris_cocok, galat = _grep_kelompok(repo, ref, kelompok, kata_utuh)
+            if galat:
+                dilewati.append({"jenis": "kode", "nilai": nama, "alasan": "git grep gagal: " + galat})
+                continue
+            for berkas, nomor, isi in baris_cocok:
+                for f in kelompok:
+                    # -w git grep menganggap "." batas kata (80 cocok di 80.5): saring ulang di sini.
+                    if _cocok_isi(f, isi):
+                        per_fakta[f].setdefault(berkas, nomor)
+        for f in fakta:
+            per_berkas = per_fakta[f]
             if len(per_berkas) > AMBANG_TERLALU_UMUM:
                 dilewati.append({"jenis": "fakta", "nilai": f,
                                  "alasan": f"terlalu umum: {len(per_berkas)} berkas di {nama}"})
@@ -178,6 +208,32 @@ def cari_kode(fakta: list[str], akar_repo: Path, repo_ref=REPO_REF) -> tuple[lis
             for berkas, nomor in sorted(per_berkas.items()):
                 kandidat.append({"repo": nama, "ref": ref, "berkas": berkas, "baris": nomor, "fakta": f})
     return kandidat, dilewati
+
+
+def _grep_kelompok(repo: Path, ref: str, pola: list[str],
+                   kata_utuh: bool) -> tuple[list[tuple[str, int, str]], str | None]:
+    """SATU git grep untuk banyak pola (lewat berkas -f): satu grep per fakta terukur +-4 dtk
+    per fakta di repo nyata, dan satu commit docs bisa membawa ratusan fakta."""
+    # newline="\n": di Windows mode teks menulis CRLF, dan git membaca \r sebagai bagian polanya.
+    with tempfile.NamedTemporaryFile("w", encoding="utf-8", newline="\n", suffix=".pola", delete=False) as t:
+        t.write("\n".join(pola) + "\n")
+        berkas_pola = t.name
+    try:
+        # -a: berkas ber-byte NUL tetap dibaca sebagai teks (ripgrep melewatinya senyap).
+        args = ["grep", "-n", "-a", "-F"] + (["-w"] if kata_utuh else []) + ["-f", berkas_pola, ref, "--"]
+        r = _git(repo, *args)
+    finally:
+        os.unlink(berkas_pola)
+    if r.returncode not in (0, 1):
+        return [], r.stderr.strip()[:200]
+    hasil: list[tuple[str, int, str]] = []
+    awalan = ref + ":"
+    for baris in r.stdout.splitlines():
+        if not baris.startswith(awalan):
+            continue
+        berkas, nomor, isi = baris[len(awalan):].split(":", 2)
+        hasil.append((berkas, int(nomor), isi))
+    return hasil, None
 
 
 def resolusi_sumber(nilai: str, entri: list[dict]) -> str | None:
@@ -188,6 +244,27 @@ def resolusi_sumber(nilai: str, entri: list[dict]) -> str | None:
     for e in entri:
         if e["path"][:-3] == n or e["judul"] == n:
             return e["path"]
+    return None
+
+
+def path_relatif_vault(nilai: str, root: Path) -> str | None:
+    """PATH relatif-vault, relatif-CWD (mis. `architecture-draft/...` dari akar erp/), atau absolut.
+
+    Relatif-CWD hanya dipakai bila berkasnya ADA: CWD bisa berada di dalam vault (mis. `Tools/`),
+    dan tanpa syarat itu path relatif-vault terbaca sebagai `Tools/<path>`. Selain itu dibaca
+    relatif-vault. Di luar vault -> None (galat bernama, bukan "tak ada perubahan").
+    """
+    p = Path(nilai)
+    if p.is_absolute():
+        calon = [p]
+    else:
+        dari_cwd = Path.cwd() / p
+        calon = ([dari_cwd] if dari_cwd.exists() else []) + [root / p]
+    for c in calon:
+        try:
+            return c.resolve().relative_to(root.resolve()).as_posix()
+        except ValueError:
+            continue
     return None
 
 
@@ -261,7 +338,14 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         sumber, teks = [sp], a.teks
     else:
-        berkas, teks = dari_diff(root, [p.replace("\\", "/") for p in a.diff])
+        paths = []
+        for p in a.diff:
+            rel = path_relatif_vault(p, root)
+            if rel is None:
+                print(f"PATH di luar vault {root}: {p}", file=sys.stderr)
+                return 2
+            paths.append(rel)
+        berkas, teks = dari_diff(root, paths)
         dikenal = {e["path"] for e in entri}
         sumber = [b for b in berkas if b in dikenal]
         if not sumber:

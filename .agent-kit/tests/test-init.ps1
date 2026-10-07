@@ -78,6 +78,9 @@ try {
   Check (Test-Path (Join-Path $claude 'commands/dampak.md')) 'command /dampak tersalin'
   $dpMd = if (Test-Path (Join-Path $claude 'commands/dampak.md')) { Get-Content (Join-Path $claude 'commands/dampak.md') -Raw -Encoding UTF8 } else { '' }
   Check ($dpMd -match 'dampak\.py' -and $dpMd -match 'BERHENTI' -and $dpMd -match 'AskUserQuestion') '/dampak: skrip, berhenti, persetujuan per dok'
+  # Dipanggil command lain, /dampak TIDAK commit/push sendiri: alur pemanggil yang memegangnya
+  # (sync-docs melarang push otomatis; analisa-kebutuhan meregenerasi index sesudah merge).
+  Check ($dpMd -match 'Dipanggil dari command lain' -and $dpMd -match 'run_in_background') '/dampak: serahkan commit ke pemanggil, jalankan skrip di background'
   $akMd = Get-Content (Join-Path $claude 'commands/analisa-kebutuhan.md') -Raw -Encoding UTF8
   Check ($akMd -match '/dampak') '/analisa-kebutuhan memanggil /dampak'
   $sdMd = Get-Content (Join-Path $claude 'commands/sync-docs.md') -Raw -Encoding UTF8
