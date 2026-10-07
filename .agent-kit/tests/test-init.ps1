@@ -73,6 +73,18 @@ try {
   $claude = Join-Path $tmp '.claude'
   Check (Test-Path (Join-Path $claude 'commands/start-task.md')) 'commands tersalin'
   Check (Test-Path (Join-Path $claude 'commands/analisa-kebutuhan.md')) 'command /analisa-kebutuhan tersalin'
+  # /dampak (kit 1.37.0): command tersalin, memakai skripnya, berhenti sebelum menyunting, dan dua
+  # command yang menyunting vault benar-benar memanggilnya (tanpa itu ia cuma diingat orang).
+  Check (Test-Path (Join-Path $claude 'commands/dampak.md')) 'command /dampak tersalin'
+  $dpMd = if (Test-Path (Join-Path $claude 'commands/dampak.md')) { Get-Content (Join-Path $claude 'commands/dampak.md') -Raw -Encoding UTF8 } else { '' }
+  Check ($dpMd -match 'dampak\.py' -and $dpMd -match 'BERHENTI' -and $dpMd -match 'AskUserQuestion') '/dampak: skrip, berhenti, persetujuan per dok'
+  # Dipanggil command lain, /dampak TIDAK commit/push sendiri: alur pemanggil yang memegangnya
+  # (sync-docs melarang push otomatis; analisa-kebutuhan meregenerasi index sesudah merge).
+  Check ($dpMd -match 'Dipanggil dari command lain' -and $dpMd -match 'run_in_background') '/dampak: serahkan commit ke pemanggil, jalankan skrip di background'
+  $akMd = Get-Content (Join-Path $claude 'commands/analisa-kebutuhan.md') -Raw -Encoding UTF8
+  Check ($akMd -match '/dampak') '/analisa-kebutuhan memanggil /dampak'
+  $sdMd = Get-Content (Join-Path $claude 'commands/sync-docs.md') -Raw -Encoding UTF8
+  Check ($sdMd -match 'dampak\.py --root architecture-draft --diff') '/sync-docs memanggil dampak.py --diff'
   # Jumlah command diturunkan dari kit, JANGAN dipatok angka: assertion angka-mati
   # sudah pernah rot diam-diam saat index-vault.md dan skills.md ditambahkan (2026-08-28).
   $srcCmd = (Get-ChildItem (Join-Path $kitRoot 'commands') -Filter *.md).Count
@@ -178,7 +190,8 @@ try {
   $sbSrc = Get-Content $sbPath -Raw -Encoding UTF8
   Check ($sbSrc.Contains('sub_issues?per_page=100") $null | ForEach-Object { $_ })') -and $sbSrc.Contains("ValidateSet('bip-erp', 'erp-frontend', 'my-bharata')")) 'buat-sub-issue: anak diratakan sebelum dicocokkan, repo dibatasi tiga repo kode'
   Check ($bfTriase.Contains('2c. **Sub-issue per repo**') -and $bfTriase.Contains('buat-sub-issue.ps1')) 'brief.md 2c: brief lintas repo memakai sub-issue lewat buat-sub-issue.ps1'
-  Check ($tmSrc.Contains('SATU sub-issue per repo') -and $tmSrc.Contains('Satu tingkat saja') -and $tmSrc.Contains('dipasang saat pekerjaan MULAI')) 'team-memory: aturan sub-issue per repo dan assignee saat mulai'
+  Check ($tmSrc.Contains('SATU sub-issue per repo') -and $tmSrc.Contains('Satu tingkat saja') -and $tmSrc.Contains('Masuk Todo = WAJIB ber-assignee')) 'team-memory: aturan sub-issue per repo dan assignee wajib di Todo'
+  Check ($tmSrc.Contains('MyBharata: `Closes` TIDAK menutup issue') -and $tmSrc.Contains('WAJIB langsung diberi Status')) 'team-memory: issue my-bharata ditutup manual sesudah merge ke dev, item board wajib ber-Status'
 
   # kit 1.35.0: gerbang nomor ADR ganda. Yang dipatok: skrip tersalin init, pre-push memanggilnya
   # atas POHON COMMIT (--rev HEAD, bukan working tree bersama), dan gerbang-kit menjalankan

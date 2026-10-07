@@ -106,6 +106,10 @@ Sajikan di chat:
 - **Asumsi eksplisit** dari pertanyaan yang tidak terjawab
 - **Konsekuensi deploy** bila ada: env baru butuh `--force-recreate`, kategori inbox baru butuh
   dua container naik bersama, perubahan kontrak berarti BE sebelum FE
+- **Dok terdampak** bila keputusannya **mengubah** fakta yang sudah tertulis di dok lain (ambang,
+  rumus, daftar-izin, rute): jalankan `/dampak` langkah 1-4 atas draf keputusan ini **sebelum
+  menyajikan**, dan sajikan laporannya di sini. Satu gerbang persetujuan untuk keduanya. Keputusan
+  yang murni menambah hal baru boleh lewat.
 
 ⛔ **BERHENTI. Tunggu persetujuan user. JANGAN menulis berkas apa pun sebelum disetujui.**
 
@@ -121,6 +125,10 @@ dan selesai. Analis yang selalu menghasilkan ADR adalah analis yang selalu bilan
 ## 5. Tulis artefak (hanya setelah disetujui)
 
 Tiga berkas, semuanya di `architecture-draft`.
+
+Suntingan dok terdampak hasil `/dampak` yang disetujui di §4 diterapkan bersama artefak ini, mengikuti
+`/dampak` langkah 6 sebagai **pemanggil** (sunting + cek wikilink saja); index, commit, dan push ikut
+§6-§7 di bawah, sekali untuk semuanya.
 
 **a. ADR di `Decisions/`.** Hitung nomor tertinggi saat ini dan tambah satu; **jangan pakai nomor
 hafalan**, orang lain bisa menambah lebih dulu dan seluruh wikilink memakai judul lengkap. Bentuk
