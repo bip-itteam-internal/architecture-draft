@@ -280,6 +280,32 @@ Gerbang umur image §1b tetap berlaku untuk keduanya. `/health` hijau tak membuk
    Harus 200 **berbentuk kontrak**, bukan sekadar 200: `has_form` dan `period_key` selalu ada; `orang[]` hanya bila `has_form` true, tiap butirnya `employee_id`, `forms_dinilai`, `forms_total`, `ada_kiriman`, `menunggu_cek_ulang` (plus `nilai`, `batas_cek_ulang`, `form_tanpa_skala` bila terisi), dan **tanpa** nama, departemen, atau jabatan. Header gateway wajib ikut karena form-builder memasang `ValidateGateway` untuk seluruh rutenya; tanpa header itu 401-nya datang dari gerbang tersebut dan tak mengatakan apa pun tentang kuncinya.
 3. **Sumbernya membaca, bukan gagal.** Untuk metrik yang sudah dipasang HR dengan sumber `nilai_inspeksi_satgas`, `GET /api/employee/kpi/auto-values?employee_id=<id>&period=<YYYY-MM>&template_id=<id>` harus mengembalikan `auto_value` terisi atau `auto_basis` berawalan `belum dapat dihitung:`, dengan `auto_gagal_sumber: false`. Berawalan `gagal mengambil data:` berarti sumbernya tak berhasil membaca, dan kalimat sesudahnya menyebut sebabnya, termasuk env mana yang belum benar. (`POST /kpi/auto-values/pratinjau` sudah dicabut, jadi pemeriksaan ini butuh metrik yang sudah terpasang di template.)
 
+## 3e. `integration-service`: jangan membuat ulang container saat putaran `receipt-sync` berjalan
+
+`receipt-sync` mulai **08:30, 11:30, 14:30, 17:30, 20:30 WIB** dan berjalan 40 sampai 58 menit (batas keras 60 menit; angka per jam ada di [[IT - Background Jobs & Schedulers]]). `docker compose up -d --build integration-service --no-deps` membuat ulang container, dan **putaran yang sedang jalan terpotong tanpa jejak**: proses mati tanpa melepas lock dan tanpa menulis catatan selesai, jadi yang tertinggal hanya baris riwayat yang tidak ada. Terukur 2026-10-06: putaran 14:30 terpotong di menit ke-51 oleh recreate pukul 15:21:56 yang dilakukan pihak lain.
+
+**Gerbang sebelum recreate (baca-saja; semuanya harus lolos):**
+
+```bash
+cd <folder stack>
+date '+%F %T %z'                      # harus sebelum 10 menit menjelang jam putaran berikutnya
+U=$(docker exec Integration-MongoDB printenv MONGO_INITDB_ROOT_USERNAME)
+P=$(docker exec Integration-MongoDB printenv MONGO_INITDB_ROOT_PASSWORD)
+docker exec Integration-MongoDB mongosh -u "$U" -p "$P" --authenticationDatabase admin --quiet \
+  --eval 'db.getSiblingDB("workers").worker_locks.countDocuments({_id:"lock:receipt-sync"})'   # harus 0
+ps aux | grep -E 'docker (compose|build)|buildx' | grep -v grep || echo "tak ada build lain"
+```
+
+- ⛔ **Database `workers`, BUKAN `integration_db`.** Koleksi `worker_locks` dan `worker_history` hidup di `workers` (`worker.DefaultDatabase`, `worker/app.go`). Bertanya di `integration_db` mengembalikan 0 dan terbaca "aman" padahal putaran sedang jalan (terjadi 2026-10-06; ketahuan karena hasilnya kosong justru pada jam putaran).
+- Angka 1 berarti putaran masih berjalan. Tunggu; lock hilang saat putaran selesai, atau otomatis saat TTL 60 menit habis.
+- **Jendela aman** = sesudah lock hilang dan sebelum 10 menit menjelang putaran berikutnya. Untuk jam putaran di atas: 09:30–11:20, 12:30–14:20, 15:30–17:20, 18:30–20:20 (batas bawah = batas terburuk 60 menit; biasanya lock hilang lebih awal).
+- Build memakai CPU server yang sama dengan putaran. Pengaruhnya pada durasi putaran **belum diukur**; karena putaran pagi dan siang bisa 58 menit, mulai build sesudah lock hilang, bukan sebelumnya.
+- Gerbang ini hanya melindungi deploy yang memakainya. Deploy pihak lain tidak tertahan olehnya, jadi umumkan jendela deploy ke tim yang memakai server yang sama.
+- Pembuktian biner sesudah naik memakai `docker exec Integration-Service sh -c 'grep -c -a "<string unik>" /proc/1/exe'` (PID 1 container = biner `/service`), berpasangan dengan kontrol positif (`gofiber`, ratusan) dan string karangan (0); hitungan sebelum deploy harus 0.
+- Bukti job berjalan lewat gateway: `POST /api/integration/jobs/<nama-job>/trigger` dan `GET /api/integration/jobs/<nama-job>/history` (rute `main.go`, grup `/jobs`; gateway membuang prefix `/api/integration`).
+
+[[ADR - 0155 Build Sekali di Lokal, Image yang Sama Naik ke Prod lewat Jenkins dan Docker Swarm]] (🟡 Diusulkan 2026-10-06, nol implementasi) mengusulkan rolling update Docker Swarm; sampai itu berlaku, prosedur di bagian ini yang dipakai.
+
 ## 4. Verifikasi pasca-deploy
 
 ```bash
@@ -316,6 +342,6 @@ docker logs <Container-Name> --tail 40
 - [[DB - Overview and Notes]]: koleksi baru Tahap 2 learning (`training_plan_item`, `training_certificate`, `training_certificate_counter`, `training_certificate_setting`) dan index-nya, §3d
 - [[Finance - Buku Besar CV]] · [[API - Payroll Service]]: pasangan `PAYROLL_SERVICE_KEY` payroll-service dan finance-service, plus env `PAYROLL_MODULE_URL` di blok finance-service (§3d)
 - [[Microservices - Recruitment Service]] · [[HRIS - Matriks KPI per Departemen]]: pasangan `RECRUITMENT_SERVICE_KEY` recruitment-service dan employee-service, plus env `RECRUITMENT_MODULE_URL` di blok employee-service (§3d)
-- [[IT - Background Jobs & Schedulers]] — poller in-process (reconciler + sweep) yang restart otomatis
+- [[IT - Background Jobs & Schedulers]] — poller in-process (reconciler + sweep) yang restart otomatis; durasi putaran `receipt-sync` dan lock `workers.worker_locks` (§3e)
 - [[RUN - Deploy Task Management Service]] — runbook deploy service lain (dengan migrasi data)
 - [[CORE - API Master Gateway]] — health via gateway

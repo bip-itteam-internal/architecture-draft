@@ -681,6 +681,9 @@ try {
   $antreTest = Join-Path $kitRoot 'tests/test-antre.ps1'
   $rcAntre = Invoke-Ps $antreTest @()
   Check ($rcAntre -eq 0) "tests/test-antre.ps1 lulus (exit $rcAntre; jalankan langsung untuk rinciannya)"
+  # worktree-bersih: worktree baru tanpa commit / kotor / baru disunting tak pernah dibuang (kit 1.36.0)
+  $rcWtb = Invoke-Ps (Join-Path $kitRoot 'tests/test-worktree-bersih.ps1') @()
+  Check ($rcWtb -eq 0) "tests/test-worktree-bersih.ps1 lulus (exit $rcWtb; jalankan langsung untuk rinciannya)"
   $bashEntry = $ptu | Where-Object { $_.matcher -eq 'Bash' }
   $psEntry   = $ptu | Where-Object { $_.matcher -eq 'PowerShell' }
   Check ($null -ne $bashEntry -and $null -ne $psEntry) "gerbang terpasang untuk tool Bash DAN PowerShell (matcher: $($ptu.matcher -join ', '))"

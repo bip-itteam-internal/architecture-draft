@@ -322,7 +322,8 @@ jalur ini itu satu-satunya tempat premisnya tercatat. Brief vault ber-`Sumber: t
 
 Perbarui `.task-plans/sesi/<id>.json`: `tahap` = `kerjakan`, `task` = judul brief. Cetak ringkas:
 brief, percobaan, gerbang, PR. Worktree **tidak dihapus** oleh command ini; setelah PR merged,
-`worktree-bersih.ps1` yang membuangnya.
+`worktree-bersih.ps1` yang membuangnya (kit ≥ 1.36.0: hanya bila PR merged atau commit sendiri
+branch-nya sudah di `origin/main`; worktree tanpa commit, kotor, atau baru disentuh dilewati).
 
 ## Jangan
 
