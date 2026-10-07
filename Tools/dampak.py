@@ -7,7 +7,9 @@ yang sama, dan tak ada yang dibuang diam-diam (semuanya tercatat di `dilewati`).
 
 Spec: .agent-kit/docs/2026-10-07-dampak-command-design.md
 """
+import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -127,3 +129,51 @@ def kandidat_fakta_vault(fakta: list[str], entri: list[dict],
         for p in cocok:
             _catat(alasan, p, f"fakta:{f}", per_path, sumber_paths)
     return alasan, dilewati
+
+
+def _env_bersih() -> dict[str, str]:
+    """Buang seluruh GIT_*: dipanggil dari dalam hook git, variabel itu membelokkan `git -C`."""
+    return {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+
+
+def _git(repo: Path, *args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        ["git", "-C", str(repo), "-c", "core.fsmonitor=false", "-c", "core.quotePath=false", *args],
+        capture_output=True, text=True, encoding="utf-8", errors="replace", env=_env_bersih(),
+    )
+
+
+def cari_kode(fakta: list[str], akar_repo: Path, repo_ref=REPO_REF) -> tuple[list[dict], list[dict]]:
+    """Berkas kode yang memuat fakta, dibaca dari REF remote (bukan working tree, bukan ripgrep)."""
+    kandidat: list[dict] = []
+    dilewati: list[dict] = []
+    for nama, ref in repo_ref:
+        repo = akar_repo / nama
+        if not (repo / ".git").exists():
+            dilewati.append({"jenis": "repo", "nilai": nama, "alasan": "folder tidak ada atau bukan repo git"})
+            continue
+        if _git(repo, "rev-parse", "--verify", "--quiet", ref).returncode != 0:
+            dilewati.append({"jenis": "repo", "nilai": nama, "alasan": f"ref {ref} tidak ada"})
+            continue
+        for f in fakta:
+            # -a: berkas ber-byte NUL tetap dibaca sebagai teks (ripgrep melewatinya senyap).
+            args = ["grep", "-n", "-a", "-F"] + (["-w"] if adalah_angka(f) else []) + ["-e", f, ref, "--"]
+            r = _git(repo, *args)
+            if r.returncode not in (0, 1):
+                dilewati.append({"jenis": "kode", "nilai": f"{nama}:{f}",
+                                 "alasan": "git grep gagal: " + r.stderr.strip()[:200]})
+                continue
+            per_berkas: dict[str, int] = {}
+            awalan = ref + ":"
+            for baris in r.stdout.splitlines():
+                if not baris.startswith(awalan):
+                    continue
+                berkas, nomor, _ = baris[len(awalan):].split(":", 2)
+                per_berkas.setdefault(berkas, int(nomor))
+            if len(per_berkas) > AMBANG_TERLALU_UMUM:
+                dilewati.append({"jenis": "fakta", "nilai": f,
+                                 "alasan": f"terlalu umum: {len(per_berkas)} berkas di {nama}"})
+                continue
+            for berkas, nomor in sorted(per_berkas.items()):
+                kandidat.append({"repo": nama, "ref": ref, "berkas": berkas, "baris": nomor, "fakta": f})
+    return kandidat, dilewati
