@@ -8,6 +8,12 @@ yang sama, dan tak ada yang dibuang diam-diam (semuanya tercatat di `dilewati`).
 Spec: .agent-kit/docs/2026-10-07-dampak-command-design.md
 """
 import re
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+from vault_index.build import NAMA_INDEX, muat_index, pilih_yang_perlu_diringkas, scan_vault  # noqa: E402,F401
 
 # Fakta yang cocok di lebih dari sekian berkas (vault, atau per repo kode) tak menunjuk
 # apa pun dan hanya membanjiri laporan.
@@ -62,3 +68,38 @@ def ekstrak_fakta(teks: str) -> tuple[list[str], list[dict]]:
             if catatan not in dilewati:
                 dilewati.append(catatan)
     return fakta, dilewati
+
+
+def _catat(alasan: dict[str, list[str]], path: str, sebab: str, per_path: dict,
+           sumber_paths: list[str]) -> None:
+    if path in sumber_paths or per_path[path]["jenis"] in JENIS_BUKAN_KANDIDAT:
+        return
+    daftar = alasan.setdefault(path, [])
+    if sebab not in daftar:
+        daftar.append(sebab)
+
+
+def _tetangga(e: dict, entri: list[dict], per_judul: dict) -> tuple[set[str], set[str]]:
+    keluar = {per_judul[t]["path"] for t in e["tautan"] if t in per_judul}
+    masuk = {x["path"] for x in entri if e["judul"] in x["tautan"]}
+    return keluar, masuk
+
+
+def kandidat_graf(sumber_paths: list[str], entri: list[dict]) -> dict[str, list[str]]:
+    """Tetangga wikilink satu lompatan; sumber ADR ditambah lompatan kedua."""
+    per_path = {e["path"]: e for e in entri}
+    per_judul = {e["judul"]: e for e in entri}
+    alasan: dict[str, list[str]] = {}
+    for sp in sumber_paths:
+        e = per_path[sp]
+        keluar, masuk = _tetangga(e, entri, per_judul)
+        for p in sorted(keluar):
+            _catat(alasan, p, "tautan", per_path, sumber_paths)
+        for p in sorted(masuk):
+            _catat(alasan, p, "backlink", per_path, sumber_paths)
+        if e["jenis"] == "adr":
+            for p1 in sorted(keluar | masuk):
+                k2, m2 = _tetangga(per_path[p1], entri, per_judul)
+                for p in sorted((k2 | m2) - keluar - masuk):
+                    _catat(alasan, p, "adr-2hop", per_path, sumber_paths)
+    return alasan

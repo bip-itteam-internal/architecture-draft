@@ -32,6 +32,54 @@ def test_ekstrak_unik_dan_tanpa_tanda_baca_ekor():
     assert fakta == ["/a/b", "80"]
 
 
+from vault_index.build import scan_vault  # noqa: E402
+
+ADR = "Decisions/ADR - 0079 Target Profit.md"
+INSENTIF = "Finance System/Finance - Insentif.md"
+KPI = "Human Resource Information System/HRIS - KPI.md"
+CUTI = "Human Resource Information System/HRIS - Cuti.md"
+ANALISA = "Workspace/ANALISA - Target.md"
+RUN = "Runbooks/RUN - Lain.md"
+
+
+@pytest.fixture
+def vault_mini(tmp_path: Path) -> Path:
+    v = tmp_path / "architecture-draft"
+    isi = {
+        ADR: "- **Status**: ✅ Diterima\n\nAmbang `target_profit` 80. Lihat [[Finance - Insentif]].\n",
+        INSENTIF: "- **Status**: ✅ Implemented\n\nTarget 80 dari [[ADR - 0079 Target Profit]]. "
+                  "Lihat [[HRIS - KPI]].\n",
+        KPI: "- **Status**: ⚠️ Implemented\n\nAmbang KPI 80. [[Finance - Insentif]]\n",
+        CUTI: "- **Status**: ✅ Implemented\n\nTidak terkait, port 8080, batas 800, rasio 80.5.\n",
+        ANALISA: "[[ADR - 0079 Target Profit]] 80\n",
+        RUN: "> **Status**: ✅\n\n[[HRIS - KPI]]\n",
+    }
+    for rel, teks in isi.items():
+        p = v / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(teks, encoding="utf-8")
+    return v
+
+
+def test_graf_adr_dua_lompatan(vault_mini):
+    hasil = dampak.kandidat_graf([ADR], scan_vault(vault_mini))
+    assert set(hasil[INSENTIF]) == {"tautan", "backlink"}
+    assert "adr-2hop" in hasil[KPI]
+    assert ANALISA not in hasil          # Workspace tak pernah kandidat
+    assert ADR not in hasil              # sumber bukan kandidat
+    assert RUN not in hasil              # tiga lompatan
+
+
+def test_graf_non_adr_satu_lompatan(vault_mini):
+    hasil = dampak.kandidat_graf([INSENTIF], scan_vault(vault_mini))
+    assert set(hasil) == {ADR, KPI}
+    assert RUN not in hasil
+
+
+def test_graf_dok_yatim(vault_mini):
+    assert dampak.kandidat_graf([CUTI], scan_vault(vault_mini)) == {}
+
+
 def test_adalah_angka():
     assert adalah_angka("80") and adalah_angka("1,5") and adalah_angka("12.5")
     assert not adalah_angka("target_profit") and not adalah_angka("/kpi")
