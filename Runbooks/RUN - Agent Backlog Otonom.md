@@ -14,8 +14,9 @@ Menjalankan agent Claude Code tanpa ditunggui untuk mengerjakan backlog **Priori
 
 1. **Pemicu**: Windows Task Scheduler, task `ERP Bharata - Agent Backlog`, tiap jam. Sebuah `run.lock` membuat pemicu yang jatuh saat run masih berjalan langsung keluar, jadi tak pernah ada dua run bersamaan.
 2. **Mode terus**: satu run terdiri dari beberapa putaran; tiap putaran menjalankan `claude -p` headless untuk maksimal 3 issue. Selesai satu putaran dan masih ada kandidat, putaran berikutnya langsung mulai. Run berhenti bila kandidat habis, atau bila 2 putaran berturut-turut tak menghasilkan PR (jeda; pemicu jam berikutnya mencoba lagi dan grup IT dikabari).
-3. **Kandidat**: item Project #15 berstatus Backlog/Todo, Prioritas Low atau Medium, bukan Jenis Keputusan, tanpa label `Butuh Info`.
-   - **Perubahan yang sudah diusulkan, belum diterapkan di skrip**: [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]] mensyaratkan label `Siap Agent` sebagai gerbang masuk, antrean ulang lewat pelepasan label `Butuh Info` (bukan komentar apa pun), dan pertanyaan yang menyebut `@<Pemutus>`. Kriteria di atas adalah perilaku skrip saat ini sampai skrip di PC IT diperbarui.
+3. **Kandidat**: item Project #15 berstatus Backlog/Todo, Prioritas Low atau Medium, **berlabel `Siap Agent`**, bukan Jenis Keputusan, tanpa label `Butuh Info`. Issue tanpa label `Siap Agent` tidak disentuh sama sekali (tidak dikerjakan, tidak dikomentari, tidak diberi `Butuh Info`).
+   - Gerbang `Siap Agent` dari [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]] diterapkan di skrip (`run.ps1` dan `prompt.md`) sejak 2026-10-07. Diukur hari itu: dari 40 kandidat menurut kriteria lama, 3 yang berlabel `Siap Agent`.
+   - **Belum diterapkan di skrip**: antrean ulang hanya lewat pelepasan label `Butuh Info` oleh manusia (skrip masih melepasnya sendiri bila ada komentar manusia sesudah pertanyaan agent), dan pertanyaan yang menyebut `@<Pemutus>`.
 4. **Per issue** agent: mengisi field **Mulai** dan **Estimasi Selesai** plus komentar dasar estimasinya, Status In Progress, lalu `/brief` dan `/kerjakan` (worktree, eksekutor `loop-fe`/`loop-be`, gerbang deterministik, `loop-judge`, perbaikan maks 2 kali), PR dengan `Closes bip-itteam-internal/<repo>#<n>`, Status **In Review**, komentar link PR.
    - Spesifikasi tak cukup atau brief `ragu`: komentar berisi pertanyaan, label `Butuh Info`, kembali ke Backlog. Begitu manusia menjawab di issue, agent mengambilnya lagi.
    - Gagal: kembali ke Backlog dengan komentar alasan.
@@ -57,6 +58,7 @@ Menjalankan agent Claude Code tanpa ditunggui untuk mengerjakan backlog **Priori
 - **Putaran berakhir tanpa PR dan log berhenti di "sedang berjalan di background"**: agent memakai perintah latar belakang; di mode headless sesi selesai begitu agent berhenti membalas. Prompt runner melarangnya; bila tetap terjadi, lanjutkan sesi yang sama dengan `claude -p --resume <id sesi>` dan instruksi mengerjakan semuanya di foreground.
 - **Path worktree ber-spasi ditolak** skrip worktree kit: agent memakai `C:\wt\<slug>`. Catatan untuk kit.
 - **Test penuh erp-frontend sekitar 14 menit**, melewati batas 10 menit per perintah; agent menunggunya di sesi yang sama.
+- **Run terputus di tengah issue** (kuota Claude habis, mesin mati): issue-nya tertinggal In Progress tanpa PR, dan runner tidak akan melanjutkannya karena hanya mengambil Backlog/Todo. Terjadi 2026-10-03 pada `erp-frontend#1821` dan `#1823`. Periksa item In Progress milik akun agent yang tak punya PR, lalu lanjutkan manual dari worktree-nya di `C:\wt\` (merge `main`, gerbang, judge, PR).
 - **Salah arah**: tutup PR-nya (tidak di-merge), kembalikan Status issue manual; agent tidak mengulang issue berstatus selain Backlog/Todo.
 
 ## Dokumen Terkait
