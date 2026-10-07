@@ -10,7 +10,7 @@ inst_file="$ws/.claude/.kit-version"
 
 ctx="Triase dulu: keputusannya sudah tertulis dan bisa DITUNJUK (ADR/dok/ANALISA)? -> /brief lalu /kerjakan, lewati flow manual."
 ctx="$ctx | Flow wajib (hanya bila triase menghasilkan \"tidak\"): /start-task -> /plan -> /implement -> /review -> /sync-docs -> /wrap"
-ctx="$ctx | Opsional sebelum flow: /analisa-kebutuhan <kebutuhan manajemen> (mentah -> ADR + dok + daftar task)"
+ctx="$ctx | Opsional sebelum flow: /analisa-kebutuhan <kebutuhan manajemen> (mentah -> ADR + dok + issue Siap Agent)"
 ctx="$ctx | Loop otonom: /brief <masalah> -> /kerjakan <brief> (judge otomatis, berhenti di PR). Sesi lain: /papan-sesi. Skill: /ekstrak-skill, /supervise"
 
 if [ -f "$kit_ver_file" ]; then

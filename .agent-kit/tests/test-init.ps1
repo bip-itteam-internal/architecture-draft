@@ -88,6 +88,10 @@ try {
   $i1a = $ak.IndexOf('## 1a. Wawancara niat'); $i2 = $ak.IndexOf('## 2. Grounding'); $i1b = $ak.IndexOf('## 1b. Wawancara bentuk')
   Check ($i1a -ge 0 -and $i2 -gt $i1a -and $i1b -gt $i2) '/analisa-kebutuhan: urutan niat -> grounding -> bentuk'
   Check ($ak -match 'AskUserQuestion' -and $ak -match 'menyebut sumbernya' -and $ak -match 'Belum tahu') '/analisa-kebutuhan: pilihan ganda bersumber + Belum tahu'
+  # -cmatch atas penanda tebal: -match tak peka huruf, dan 'Besar' sudah cocok "besaran kerja" di §5a
+  Check ($ak -cmatch '\*\*Kecil\*\*' -and $ak -cmatch '\*\*Sedang\*\*' -and $ak -cmatch '\*\*Besar\*\*' -and $ak -match 'tugas\.md') '/analisa-kebutuhan: blueprint berukuran, format tugas.md'
+  $i5d = $ak.IndexOf('**d. Buat issue'); $s5d = if ($i5d -ge 0) { $ak.Substring($i5d, [Math]::Min(3500, $ak.Length - $i5d)) } else { '' }
+  Check ($s5d -match 'buat-sub-issue\.ps1' -and $s5d -match 'item-add 15' -and $s5d -match 'TANPA label' -and $s5d -match 'tidak perlu dibangun') '/analisa-kebutuhan 5d: buat issue tanpa Siap Agent'
   # akhir analisa-kebutuhan wawancara+blueprint
   $sdMd = Get-Content (Join-Path $claude 'commands/sync-docs.md') -Raw -Encoding UTF8
   Check ($sdMd -match 'dampak\.py --root architecture-draft --diff') '/sync-docs memanggil dampak.py --diff'

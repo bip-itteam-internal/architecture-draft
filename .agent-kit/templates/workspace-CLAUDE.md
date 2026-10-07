@@ -20,7 +20,7 @@ bawah. Kriteria lengkap + tingkat keyakinan ada di `/start-task` langkah 0.
 
 ## Sebelum flow (opsional)
 `/analisa-kebutuhan <kebutuhan mentah dari manajemen>` — menerjemahkan kebutuhan manajemen jadi
-ADR + dok domain + daftar task di vault. Berhenti sebelum kode. Dipakai saat kebutuhannya datang
+ADR + dok domain + draf issue Siap Agent (dibuat di GitHub setelah disetujui) di vault. Berhenti sebelum kode. Dipakai saat kebutuhannya datang
 mentah dari manajemen; task teknis biasa tetap langsung `/start-task`.
 
 ## Loop otonom (kit ≥ 1.15.0)

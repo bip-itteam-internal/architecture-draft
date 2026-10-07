@@ -129,6 +129,9 @@ Sajikan di chat:
   rumus, daftar-izin, rute): jalankan `/dampak` langkah 1-4 atas draf keputusan ini **sebelum
   menyajikan**, dan sajikan laporannya di sini. Satu gerbang persetujuan untuk keduanya. Keputusan
   yang murni menambah hal baru boleh lewat.
+- **Blueprint**: daftar issue yang akan dibuat (judul, repo, ukuran Kecil/Sedang/Besar, urutan),
+  lihat §5c. Tanyakan **Pemutus** (login GitHub) lewat `AskUserQuestion`; pertanyaan ini tidak
+  dihitung dalam batas 7. Satu persetujuan mencakup ADR, dok, dan pembuatan issue.
 
 ⛔ **BERHENTI. Tunggu persetujuan user. JANGAN menulis berkas apa pun sebelum disetujui.**
 
@@ -143,7 +146,7 @@ dan selesai. Analis yang selalu menghasilkan ADR adalah analis yang selalu bilan
 
 ## 5. Tulis artefak (hanya setelah disetujui)
 
-Tiga berkas, semuanya di `architecture-draft`.
+Tiga berkas di `architecture-draft`, lalu issue di repo kode.
 
 Suntingan dok terdampak hasil `/dampak` yang disetujui di §4 diterapkan bersama artefak ini, mengikuti
 `/dampak` langkah 6 sebagai **pemanggil** (sunting + cek wikilink saja); index, commit, dan push ikut
@@ -174,9 +177,48 @@ service **baru** membuat dok baru dari `Templates/Template - Konsep Domain.md`. 
 domain **saling menaut** dengan wikilink: ADR menyimpan kenapa dan keputusannya, dok domain
 menyimpan cara kerjanya.
 
-**c. Daftar task di `Workspace/ANALISA - <judul>.md`.** Pecahan kerja berurutan dengan
-dependensinya, tiap item cukup jelas untuk langsung dilempar ke `/start-task`. **Bukan** rencana
-per berkas. Sengaja tidak di dalam ADR: ADR adalah keputusan, bukan papan kerja.
+**c. Blueprint di `Workspace/ANALISA - <judul>.md`.** Kumpulan **draf issue** yang lolos checklist
+Siap Agent (team-memory § Definition of Ready, ADR 0151 "Issue Siap Dikerjakan Agent Bila
+Keputusannya Bisa Ditunjuk, Ditandai Manusia"). Sengaja tidak di dalam ADR: ADR adalah keputusan,
+blueprint papan kerja.
+
+Kepala: wikilink ADR + dok domain, **ukuran** + alasannya, Pemutus. Ukuran ditentukan dari repo
+yang ditemukan grounding:
+
+| Ukuran | Kapan | Bentuk |
+|---|---|---|
+| **Kecil** | 1 repo, 1 PR | 1 issue, tanpa induk |
+| **Sedang** | > 1 repo | induk di repo tempat kontrak lahir (biasanya `bip-erp`, tanpa PR sendiri) + 1 sub-issue `[BE]`/`[FE]`/`[Mobile]` per repo |
+| **Besar** | ada repo yang butuh > 1 PR | seperti Sedang + sub-issue **saudara** "bagian i/N" di bawah induk yang sama; tak pernah sub di bawah sub |
+
+Tiap issue satu blok berbagian persis template `bip-erp/.github/ISSUE_TEMPLATE/tugas.md`:
+`**Pemutus:**` / `**PIC:**`, `## Masalah`, `## Keputusan`, `## Yang harus benar`,
+`## Di luar cakupan`, `## Data / bukti pendukung`, `## Prasyarat`; ditambah repo tujuan
+(`bip-erp`, `erp-frontend`, `my-bharata`; folder lokal mobile `mybharata-app`) dan urutan.
+
+- **Keputusan** menunjuk ADR **dengan judul** (nomor ADR bukan kunci unik), tidak menyalin isinya,
+  dan menulis terang: *layak `Siap Agent` sesudah ADR berstatus Diterima* (ADR baru masih 🟡 Diusulkan).
+- **Yang harus benar** diturunkan dari `## Decision` jadi kriteria yang bisa diperiksa (perilaku,
+  angka, layar). "Pertimbangkan", "perlu disepakati", "dsb" dilarang.
+- **Data** diisi hasil ukur prod gerbang 3 §2; tak tersedia → ditulis sebagai asumsi.
+- **Prasyarat**: urutan deploy BE sebelum FE/Mobile ditulis di sub-issue FE/Mobile.
+
+**d. Buat issue** (sesudah a-c, **sebelum** commit vault), dari akar `erp/`, via PowerShell:
+
+1. Induk / issue tunggal: cari dulu
+   `gh issue list --repo bip-itteam-internal/<repo> --state all --search "<judul> in:title"`;
+   belum ada → tulis badan ke berkas scratchpad, `gh issue create --repo bip-itteam-internal/<repo> --title "<judul>" --body-file <berkas>`,
+   lalu `gh project item-add 15 --owner bip-itteam-internal --url <url>`.
+2. Sub-issue: `& '.claude/hooks/buat-sub-issue.ps1' -Induk <repo>#<n> -Repo <bip-erp|erp-frontend|my-bharata> -Judul '<judul>' -Badan <badan>`
+   (idempoten, memasukkan ke Project #15, menyalin Area + Prioritas induk).
+3. **TANPA label `Siap Agent`**, tanpa assignee: label dipasang manusia (ADR 0151), assignee saat In Progress.
+4. Tulis nomor + URL tiap issue balik ke blok-nya di ANALISA, supaya vault di-commit sekali di §7.
+5. **Gagal sebagian**: laporkan yang terbuat (URL) dan yang gagal (galat); jangan ulang buta.
+   Menjalankan ulang langkah ini aman karena butir 1-2 idempoten.
+6. `gh` tanpa scope `project` → issue tetap dibuat; catat item-add yang gagal dan perintah
+   `gh auth refresh -h github.com -s project` di laporan.
+
+Bila kesimpulannya **"tidak perlu dibangun"**, butir c dan d tidak dijalankan: tak ada blueprint, tak ada issue.
 
 ## 6. Regenerasi indeks. WAJIB.
 
@@ -199,5 +241,7 @@ dokumennya dulu, lalu regenerasi indeks **sekali di akhir**.
 
 ## 8. Serahkan
 
-Tutup dengan kalimat konkret: task pertama apa, dan perintahnya, misalnya
-`jalankan /start-task <deskripsi task pertama>`.
+Tutup dengan daftar URL issue yang dibuat (induk dulu), lalu langkah manusia berikutnya, konkret:
+setujui ADR dengan menulis `🟢 Diterima, <tanggal>, oleh <login>` di baris statusnya, lalu pasang
+label `Siap Agent` pada issue yang lolos checklist Definition of Ready. Sebelum dua langkah itu,
+runner backlog tidak akan mengambil issue-nya.
