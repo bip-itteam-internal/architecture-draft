@@ -7,6 +7,8 @@ yang sama, dan tak ada yang dibuang diam-diam (semuanya tercatat di `dilewati`).
 
 Spec: .agent-kit/docs/2026-10-07-dampak-command-design.md
 """
+import argparse
+import json
 import os
 import re
 import subprocess
@@ -15,7 +17,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from vault_index.build import NAMA_INDEX, muat_index, pilih_yang_perlu_diringkas, scan_vault  # noqa: E402,F401
+from vault_index.build import NAMA_INDEX, muat_index, pilih_yang_perlu_diringkas, scan_vault  # noqa: E402
 
 # Fakta yang cocok di lebih dari sekian berkas (vault, atau per repo kode) tak menunjuk
 # apa pun dan hanya membanjiri laporan.
@@ -88,22 +90,21 @@ def _tetangga(e: dict, entri: list[dict], per_judul: dict) -> tuple[set[str], se
 
 
 def kandidat_graf(sumber_paths: list[str], entri: list[dict]) -> dict[str, list[str]]:
-    """Tetangga wikilink satu lompatan; sumber ADR ditambah lompatan kedua."""
+    """Tetangga wikilink satu lompatan, untuk sumber jenis apa pun.
+
+    Sengaja tanpa lompatan kedua: graf vault padat (median derajat 12, hub sampai 202), jadi dua
+    lompatan dari satu ADR menyapu ratusan dok. Dok jauh yang benar-benar memuat fakta yang
+    berubah ditangkap kandidat_fakta_vault, bukan graf.
+    """
     per_path = {e["path"]: e for e in entri}
     per_judul = {e["judul"]: e for e in entri}
     alasan: dict[str, list[str]] = {}
     for sp in sumber_paths:
-        e = per_path[sp]
-        keluar, masuk = _tetangga(e, entri, per_judul)
+        keluar, masuk = _tetangga(per_path[sp], entri, per_judul)
         for p in sorted(keluar):
             _catat(alasan, p, "tautan", per_path, sumber_paths)
         for p in sorted(masuk):
             _catat(alasan, p, "backlink", per_path, sumber_paths)
-        if e["jenis"] == "adr":
-            for p1 in sorted(keluar | masuk):
-                k2, m2 = _tetangga(per_path[p1], entri, per_judul)
-                for p in sorted((k2 | m2) - keluar - masuk):
-                    _catat(alasan, p, "adr-2hop", per_path, sumber_paths)
     return alasan
 
 
@@ -177,3 +178,102 @@ def cari_kode(fakta: list[str], akar_repo: Path, repo_ref=REPO_REF) -> tuple[lis
             for berkas, nomor in sorted(per_berkas.items()):
                 kandidat.append({"repo": nama, "ref": ref, "berkas": berkas, "baris": nomor, "fakta": f})
     return kandidat, dilewati
+
+
+def resolusi_sumber(nilai: str, entri: list[dict]) -> str | None:
+    """Judul, path relatif, dengan/tanpa .md, garis miring apa pun."""
+    n = nilai.replace("\\", "/").strip()
+    if n.endswith(".md"):
+        n = n[:-3]
+    for e in entri:
+        if e["path"][:-3] == n or e["judul"] == n:
+            return e["path"]
+    return None
+
+
+def dari_diff(vault: Path, paths: list[str]) -> tuple[list[str], str]:
+    """Dok yang berubah di working tree vs HEAD (plus yang belum dilacak), dan baris +/- nya."""
+    spec = paths or ["*.md"]
+    r = _git(vault, "diff", "HEAD", "-U0", "--", *spec)
+    berkas: list[str] = []
+    baris: list[str] = []
+    for b in r.stdout.splitlines():
+        if b.startswith("+++ b/"):
+            berkas.append(b[6:].rstrip("\t"))   # git bisa menambah TAB di header path berspasi
+        elif b.startswith(("+++", "---")):
+            continue
+        elif b.startswith(("+", "-")):
+            baris.append(b[1:])
+    baru = _git(vault, "ls-files", "--others", "--exclude-standard", "--", *spec)
+    for p in baru.stdout.splitlines():
+        berkas.append(p)
+        baris.append((vault / p).read_text(encoding="utf-8"))
+    return berkas, "\n".join(baris)
+
+
+def index_segar(root: Path, entri: list[dict]) -> bool:
+    """Aturan yang sama dengan `build-vault-index.py --check`, dipakai ulang, bukan disalin."""
+    return not pilih_yang_perlu_diringkas(entri, muat_index(root / NAMA_INDEX), full=False)
+
+
+def analisa(root: Path, akar_repo: Path, sumber_paths: list[str], teks: str, entri: list[dict]) -> dict:
+    per_path = {e["path"]: e for e in entri}
+    fakta, dilewati = ekstrak_fakta(teks)
+    alasan = kandidat_graf(sumber_paths, entri)
+    alasan_fakta, dil_vault = kandidat_fakta_vault(fakta, entri, sumber_paths)
+    for p, daftar in alasan_fakta.items():
+        for a in daftar:
+            if a not in alasan.setdefault(p, []):
+                alasan[p].append(a)
+    kode, dil_kode = cari_kode(fakta, akar_repo)
+    return {
+        "sumber": sumber_paths,
+        "fakta": fakta,
+        "kandidat_dok": [{"path": p, "alasan": alasan[p], "status_emoji": per_path[p]["status_emoji"]}
+                         for p in sorted(alasan)],
+        "kandidat_kode": kode,
+        "dilewati": dilewati + dil_vault + dil_kode,
+        "index_segar": index_segar(root, entri),
+    }
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description="Kandidat dok vault dan kode yang terdampak perubahan fakta.")
+    ap.add_argument("--root", required=True, help="akar vault architecture-draft")
+    ap.add_argument("--repo-root", help="folder berisi repo kode (default: induk --root)")
+    mode = ap.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--sumber", help="judul atau path dok yang akan diubah")
+    mode.add_argument("--diff", nargs="*", metavar="PATH",
+                      help="dok yang berubah vs HEAD; PATH membatasi (pohon vault dipakai bersama)")
+    ap.add_argument("--teks", help="perubahan yang dimaksud (wajib bersama --sumber)")
+    a = ap.parse_args(argv)
+
+    root = Path(a.root).resolve()
+    akar_repo = Path(a.repo_root).resolve() if a.repo_root else root.parent
+    entri = scan_vault(root)
+
+    if a.sumber is not None:
+        if not a.teks:
+            ap.error("--sumber butuh --teks")
+        sp = resolusi_sumber(a.sumber, entri)
+        if sp is None:
+            print(f"sumber tidak ditemukan di vault: {a.sumber}", file=sys.stderr)
+            return 2
+        sumber, teks = [sp], a.teks
+    else:
+        berkas, teks = dari_diff(root, [p.replace("\\", "/") for p in a.diff])
+        dikenal = {e["path"] for e in entri}
+        sumber = [b for b in berkas if b in dikenal]
+        if not sumber:
+            print("tidak ada dok vault yang berubah", file=sys.stderr)
+            return 2
+
+    hasil = analisa(root, akar_repo, sumber, teks, entri)
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    print(json.dumps(hasil, ensure_ascii=False, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

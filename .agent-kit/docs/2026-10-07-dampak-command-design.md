@@ -74,8 +74,12 @@ dampak.py --root architecture-draft --diff [PATH ...] # dok vault yang berubah d
 
 1. **Graf** dari `scan_vault()` milik `vault_index` (parser wikilink yang sama dengan yang mengisi
    `dokumen[].tautan` di `VAULT-INDEX.json`, tapi dibaca langsung dari berkas sehingga tak bisa basi):
-   - tautan keluar dan backlink sumber, satu lompatan;
-   - bila sumber berjenis ADR (`Decisions/`), ditambah lompatan kedua;
+   - tautan keluar dan backlink sumber, satu lompatan, untuk sumber jenis apa pun;
+   - ~~bila sumber berjenis ADR, ditambah lompatan kedua~~ **dibatalkan saat implementasi** (diukur
+     2026-10-07 di vault nyata: ADR 0079 punya 27 tetangga langsung tetapi 322 dok pada dua lompatan,
+     lewat hub seperti `APP - Web ERP` berderajat 202; median derajat vault 12). Dok jauh yang
+     benar-benar memuat fakta yang berubah sudah ditangkap pencarian fakta (aturan 3), jadi lompatan
+     kedua hanya menambah derau;
    - dok di `Workspace/`, `Logs/`, `Templates/` tidak ikut sebagai kandidat (bukan arsitektur, rulebook §2).
 2. **Ekstraksi fakta**, dari `--teks` atau dari baris tambah/hapus `--diff`:
    - angka dengan ≥ 2 digit (termasuk desimal dan persen);
