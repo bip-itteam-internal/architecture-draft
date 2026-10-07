@@ -83,6 +83,12 @@ try {
   Check ($dpMd -match 'Dipanggil dari command lain' -and $dpMd -match 'run_in_background') '/dampak: serahkan commit ke pemanggil, jalankan skrip di background'
   $akMd = Get-Content (Join-Path $claude 'commands/analisa-kebutuhan.md') -Raw -Encoding UTF8
   Check ($akMd -match '/dampak') '/analisa-kebutuhan memanggil /dampak'
+  # analisa-kebutuhan wawancara+blueprint (spec 2026-10-07-wawancara-blueprint-design)
+  $ak = Get-Content (Join-Path $claude 'commands/analisa-kebutuhan.md') -Raw -Encoding UTF8
+  $i1a = $ak.IndexOf('## 1a. Wawancara niat'); $i2 = $ak.IndexOf('## 2. Grounding'); $i1b = $ak.IndexOf('## 1b. Wawancara bentuk')
+  Check ($i1a -ge 0 -and $i2 -gt $i1a -and $i1b -gt $i2) '/analisa-kebutuhan: urutan niat -> grounding -> bentuk'
+  Check ($ak -match 'AskUserQuestion' -and $ak -match 'menyebut sumbernya' -and $ak -match 'Belum tahu') '/analisa-kebutuhan: pilihan ganda bersumber + Belum tahu'
+  # akhir analisa-kebutuhan wawancara+blueprint
   $sdMd = Get-Content (Join-Path $claude 'commands/sync-docs.md') -Raw -Encoding UTF8
   Check ($sdMd -match 'dampak\.py --root architecture-draft --diff') '/sync-docs memanggil dampak.py --diff'
   # Jumlah command diturunkan dari kit, JANGAN dipatok angka: assertion angka-mati

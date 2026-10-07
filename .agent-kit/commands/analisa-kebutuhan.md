@@ -22,25 +22,18 @@ Saring `architecture-draft/VAULT-INDEX.json` untuk mengenali area yang tersentuh
 dibaca utuh** — indeksnya ratusan dokumen dan pembacaan penuh akan terpotong diam-diam;
 cocokkan `area` + `kata_kunci` saja. Belum membaca dokumen apa pun di tahap ini.
 
-## 1. Wawancara
+## 1a. Wawancara niat
 
-Tanyakan **hanya yang tidak bisa dijawab indeks**. **Satu pertanyaan per pesan.** Maksimum 5.
-
-Lima hal yang harus terjawab, karena kelimanya membelokkan arsitektur:
+Dua pertanyaan **terbuka**, satu per pesan, **sebelum** grounding. Jawabannya tidak ada di kode,
+dan keduanya mempertajam apa yang dicari subagent di §2:
 
 1. **Keputusan apa yang diambil dari ini, oleh siapa?** Memisahkan kebutuhan dari solusi. Bila
    tidak ada keputusan yang berubah, yang diminta laporan hiasan, dan itu layak dikatakan.
 2. **Sekarang orangnya bagaimana?** Selalu sudah ada cara manual. Menunjukkan data sumbernya
    hidup di mana, dan sering mengungkap modul yang sudah menyelesaikan separuh masalahnya.
-3. **Sesering apa dilihat, seberapa segar datanya harus?** Pembelok paling keras: query langsung
-   vs mart terjadwal vs cron. Berbeda ongkos dan berbeda mode gagal.
-4. **Siapa yang boleh melihat?** Menentukan keterlibatan RBAC, jebakan HRGA, prinsip tiga lapis
-   kalender, dan data pribadi orang lain.
-5. **Apa akibatnya bila angkanya salah?** Angka untuk menggaji orang menuntut gerbang yang sama
-   sekali berbeda dari angka untuk rapat mingguan.
 
-**Berhenti** begitu kelimanya terjawab dari sumber mana pun. Jangan menuntaskan daftar demi
-lengkap. Jawaban "tidak tahu" dicatat sebagai **asumsi eksplisit**, jangan mandek menunggu.
+Lewati yang sudah dijawab kalimat pembuka user atau indeks. Jawaban "tidak tahu" dicatat sebagai
+**asumsi eksplisit**, jangan mandek menunggu. Tiga pertanyaan bentuk menyusul di §1b, sesudah grounding.
 
 ## 2. Grounding
 
@@ -90,11 +83,37 @@ Tiap subagent wajib mengembalikan `file:line` untuk **setiap** klaim, dan satu b
 klaim yang jadi **dasar keputusan** diverifikasi ulang sendiri, minimal dengan membuka
 `file:line` yang disebutnya.
 
+## 1b. Wawancara bentuk
+
+Tiga pertanyaan yang membelokkan arsitektur, diajukan **sesudah** grounding supaya opsinya
+berdiri di atas kode yang sudah ada, bukan tebakan:
+
+3. **Sesering apa dilihat, seberapa segar datanya harus?** Pembelok paling keras: query langsung
+   vs mart terjadwal vs cron. Berbeda ongkos dan berbeda mode gagal.
+4. **Siapa yang boleh melihat?** Menentukan keterlibatan RBAC, jebakan HRGA, prinsip tiga lapis
+   kalender, dan data pribadi orang lain.
+5. **Apa akibatnya bila angkanya salah?** Angka untuk menggaji orang menuntut gerbang yang sama
+   sekali berbeda dari angka untuk rapat mingguan.
+
+Ajukan lewat **`AskUserQuestion`**, paling banyak tiga pertanyaan dalam **satu** panggilan. Aturan opsi:
+
+1. **Tiap opsi menyebut sumbernya** di deskripsi: `file:line`, nama koleksi/mart, atau judul dok/ADR
+   dari hasil §2. Opsi tanpa sumber hanya boleh sebagai alternatif **"bangun baru"**, dan dilabeli begitu.
+2. `(Recommended)` hanya bila grounding mendukungnya, dengan alasan satu kalimat; opsi itu di urutan pertama.
+3. Selalu ada opsi **"Belum tahu"**: dicatat sebagai **asumsi eksplisit** di ADR, tak mandek.
+4. Pertanyaan yang **sudah terjawab grounding tidak ditanyakan**; jawabannya disajikan sebagai temuan
+   di §4. Bila grounding tak menemukan apa pun yang relevan, pertanyaannya **tetap diajukan** dengan
+   opsi "bangun baru" berlabel + "Belum tahu", bukan dilewati.
+
+Contoh Q3: "pakai mart `<nama>` yang sudah ada, segar H-1 (`<berkas>:<baris>`)" ·
+"query langsung ke `<koleksi>` (bangun baru; jalur daftar berpaginasi, risiko compute-on-read)" · "Belum tahu".
+
 ## 3. Pertanyaan lanjutan
 
 Maksimum 2, dan hanya yang **baru bisa muncul setelah baca kode**, misalnya "ternyata sudah ada X
-yang menyelesaikan 70% ini, dipakai ulang atau dipisah?". Total pertanyaan sepanjang command ini
-tidak pernah lebih dari 7. Sisanya jadi asumsi tertulis.
+yang menyelesaikan 70% ini, dipakai ulang atau dipisah?". Ajukan lewat `AskUserQuestion` dengan
+aturan opsi §1b. Total pertanyaan kebutuhan sepanjang command ini tidak pernah lebih dari 7.
+Sisanya jadi asumsi tertulis.
 
 ## 4. Sajikan, lalu BERHENTI
 
