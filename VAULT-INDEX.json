@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-08",
-  "jumlah_dokumen": 530,
+  "jumlah_dokumen": 531,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -8651,21 +8651,23 @@
       "status_emoji": null,
       "status_teks": "🟢 **Diterima**, 2026-09-29, **sedang diterapkan**: Project dan agent-kit 1.33.0 selesai; migrasi 245 issue berjalan sejak 2026-09-29 (status migrasi diukur di Project, bukan dicatat di sini). Diputuskan user (Tech Development). Linear `BHA` dibekukan jadi arsip baca. Nomor 0143 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.",
       "publik": true,
-      "tautan": [],
-      "hash": "e2dad39321a3fea4844a5dcf0f99552543ea0b272ea00f01fb81d5a9ba01624f",
-      "ukuran_kb": 4.4,
-      "ringkasan": "Menjawab: di mana backlog tim ERP sekarang (GitHub Project #15, bukan Linear), kenapa pindah (batas 250 issue paket Free Linear, hanya 3 dari 10 anggota punya akun), dan bagaimana status bekerja (Menunggu Adopsi, merge bukan Done, PR menyambung lewat Closes). Juga menjelaskan cara menerjemahkan rujukan lama BHA-n ke issue GitHub dan bahwa Linear dibekukan sebagai arsip.",
+      "tautan": [
+        "ADR - 0156 Backlog Menunggu Adopsi Tujuh Hari Otomatis Done"
+      ],
+      "hash": "119ca8d5803bf8175f38c54f62000fa8bc9cf2b002638998c1902033bb26829b",
+      "ukuran_kb": 4.5,
+      "ringkasan": "Keputusan untuk memindahkan backlog tim dari Linear ke GitHub Project #15 karena paket Free Linear sudah penuh (245 dari 250 issue) dan terbatas anggota. Menjelaskan struktur Project baru (field Status, Area, Prioritas, Bukti Adopsi), aturan yang tetap sama (status Menunggu Adopsi tetap bermakna kode selesai tapi belum terbukti dipakai, merge bukan Done), dan perubahan mekanisme penyambung PR dari nama branch `bha-<n>` menjadi kata kunci `Closes` di badan PR.",
       "kata_kunci": [
         "backlog",
         "Linear",
         "GitHub Project",
+        "status",
+        "merge",
         "issue",
-        "BHA",
-        "Menunggu Adopsi",
+        "PR",
         "Closes",
-        "migrasi",
-        "status issue",
-        "sub-issue"
+        "workflow",
+        "migrasi"
       ]
     },
     {
@@ -9105,6 +9107,33 @@
         "K3s Kubernetes",
         "Kafka",
         "GitOps"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0156 Backlog Menunggu Adopsi Tujuh Hari Otomatis Done.md",
+      "judul": "ADR - 0156 Backlog Menunggu Adopsi Tujuh Hari Otomatis Done",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-08, oleh irfanarfianto (Tech Development, pemilik board). **Belum berjalan**: otomasinya di bip-erp#2786 menunggu merge dan secret token (status diukur di Project #15, bukan dicatat di sini). Mengubah butir 2 [[ADR - 0143 Backlog Pindah dari Linear ke GitHub Project]]. Nomor 0156 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0143 Backlog Pindah dari Linear ke GitHub Project"
+      ],
+      "hash": "91097972b0356d56688ee7064cd883092f4a2b87a78e6e72e8256593d1b914f6",
+      "ukuran_kb": 4.8,
+      "ringkasan": "Keputusan untuk mengotomatisasi perpindahan kartu dari status Menunggu Adopsi ke Done setelah tujuh hari di status tersebut, menggunakan GitHub Actions terjadwal di bip-erp. Menjelaskan mekanisme otomasi (hanya issue tertutup dengan Menunggu Adopsi kosong), penanda di field Bukti Adopsi berupa `otomatis: 7 hari di Menunggu Adopsi (<tanggal>)`, dan perubahan makna Done (tidak lagi selalu berarti terbukti dipakai karena bisa juga otomatis).",
+      "kata_kunci": [
+        "otomasi",
+        "Done",
+        "Menunggu Adopsi",
+        "GitHub Actions",
+        "Bukti Adopsi",
+        "workflow",
+        "adopsi",
+        "tujuh hari",
+        "project",
+        "status"
       ]
     },
     {

@@ -318,7 +318,7 @@ jadi rujukan `BHA-<n>` di vault, ADR, dan brief tetap bisa dilacak (`gh search i
 | In Progress | branch sudah ada | pembuat branch (manusia atau agent) |
 | In Review | PR terbuka | pembuat PR (manusia atau agent) |
 | **Menunggu Adopsi** | kode merged; sisa deploy prod (manusia) dan fitur benar-benar dipakai | otomatis: PR merged menutup issue, workflow *Item closed* memindahkannya |
-| Done | terpasang di prod **dan terbukti dipakai** (field **Bukti Adopsi** terisi) | manusia, dengan bukti |
+| Done | terbukti dipakai (**Bukti Adopsi** diisi orang), **atau** sudah 7 hari di Menunggu Adopsi (Bukti Adopsi berawalan `otomatis:`) | manusia dengan bukti; atau otomasi harian sesudah 7 hari |
 | Canceled | tidak dikerjakan / duplikat | manusia |
 
 Aturan (berlaku untuk developer DAN agent):
@@ -337,7 +337,7 @@ Aturan (berlaku untuk developer DAN agent):
   (PR #176 merged 2026-10-04, ketahuan 2026-10-07 hanya dengan mencocokkan teks PR). **Sesudah PR
   `my-bharata` merged ke `dev`, yang me-merge menutup issue-nya manual** (`gh issue close <n> -R
   bip-itteam-internal/my-bharata --reason completed`) lalu memastikan kartunya di Menunggu Adopsi.
-  Done tetap menunggu rilis store dan bukti dipakai.
+  Issue yang tak ditutup juga **dilewati** otomasi 7-hari-ke-Done.
 - ⛔ **Item yang dimasukkan ke board WAJIB langsung diberi Status** (`gh project item-edit`), jangan
   dibiarkan "No Status". Workflow bawaan project (*Item added*, *Item closed*) bisa MATI tanpa ada
   yang berbunyi: diukur 2026-10-07, lima dari enam workflow Project #15 mati sejak 2026-09-29, dan
@@ -347,7 +347,18 @@ Aturan (berlaku untuk developer DAN agent):
   (BHA-249 Done tanpa satu baris kode, BHA-250 "Belum Mulai" padahal 127 sesi live sudah memakainya,
   BHA-22 kodenya lengkap di prod dengan 0 snapshot), dan 82 dari 105 issue Done tak punya PR tertaut.
   "Kode selesai" dan "dipakai" pemiliknya berbeda; satu status untuk keduanya menyembunyikan siapa
-  yang ditunggu. **Agent tidak pernah memindahkan issue ke Done.**
+  yang ditunggu. **Agent tidak pernah memindahkan issue ke Done secara manual.**
+- **Menunggu Adopsi 7 hari → Done otomatis** (keputusan 2026-10-08,
+  [[ADR - 0156 Backlog Menunggu Adopsi Tujuh Hari Otomatis Done]]). Diukur hari itu: 230 dari 578
+  kartu menumpuk di Menunggu Adopsi dan **0** berisi Bukti Adopsi. Otomasi harian (`bip-erp`
+  `scripts/board/adopsi_otomatis.py`, GitHub Actions) memindahkan kartu yang field Status-nya sudah
+  7 hari di Menunggu Adopsi dan issue-nya **tertutup**, lalu mengisi Bukti Adopsi
+  `otomatis: 7 hari di Menunggu Adopsi (<tanggal>)`. Dilewati: issue terbuka, *not planned*, bukan
+  issue. ⚠️ Akibatnya **Done tidak lagi selalu berarti terbukti dipakai**, dan kartu yang merged
+  tetapi belum di-deploy prod ikut jadi Done: laporan adopsi wajib menyaring Bukti Adopsi yang
+  **tidak** berawalan `otomatis:`. ⚠️ Ukur dulu apakah otomasinya benar-benar jalan (run Actions
+  terakhir, secret `PROJECT_TOKEN`) sebelum mengandalkannya; token kedaluwarsa membuat kartu
+  menumpuk lagi tanpa galat di board.
 - ⛔ **Jangan membuat issue di repo vault `architecture-draft`: repo itu PUBLIK.** Issue bertanda
   keamanan hanya di repo kode (privat), dan rincian celah yang belum ditambal tidak ditulis ke vault.
 - **Satu issue tinggal di satu repo.** Taruh di repo kode yang paling banyak disentuh.
@@ -364,7 +375,7 @@ Aturan (berlaku untuk developer DAN agent):
   - **Satu repo cukup satu issue**, tanpa sub-issue. Memecah pekerjaan satu repo jadi sub-issue per berkas
     membuat board tak terbaca.
   - **Status induk mengikuti anak-anaknya**: In Progress begitu satu anak mulai; **Menunggu Adopsi**
-    hanya bila SEMUA anak sudah merged (induk ditutup manual saat itu); Done tetap manusia dengan bukti.
+    hanya bila SEMUA anak sudah merged (induk ditutup manual saat itu); Done mengikuti aturan Menunggu Adopsi di atas.
   - **Urutan deploy BE sebelum FE/Mobile** ditulis di badan sub-issue FE/Mobile ("deploy sesudah
     `bip-erp#<sub BE>`"); merged duluan boleh, deploy duluan tidak.
 - ⛔ **Masuk Todo = WAJIB ber-assignee** (keputusan user 2026-10-07, menggantikan aturan 2026-09-29

@@ -31,7 +31,7 @@
 ## Decision
 
 1. **Wadah**: GitHub Project #15 (privat; judul awal "ERP Bharata - Backlog", diganti jadi "Semangatt guyss !!! 👏" pada hari yang sama, jadi rujuk lewat nomor, bukan judul), field Status (Backlog, Todo, In Progress, In Review, Menunggu Adopsi, Done, Canceled), Area (7 area sesuai project Linear), Prioritas, Jenis, Linear ID, Target, Bukti Adopsi. Repo kode ERP aktif ditautkan; repo vault `architecture-draft` **tidak**, karena publik.
-2. **Status tetap bermakna keadaan ERP**; field Status, bukan issue open/closed, yang menentukan selesai. Merge menutup issue dan workflow *Item closed* memindahkannya ke Menunggu Adopsi. Done hanya diisi manusia dengan Bukti Adopsi.
+2. **Status tetap bermakna keadaan ERP**; field Status, bukan issue open/closed, yang menentukan selesai. Merge menutup issue dan workflow *Item closed* memindahkannya ke Menunggu Adopsi. Done hanya diisi manusia dengan Bukti Adopsi. **Diubah 2026-10-08** oleh [[ADR - 0156 Backlog Menunggu Adopsi Tujuh Hari Otomatis Done]]: kartu yang tujuh hari di Menunggu Adopsi kini menjadi Done otomatis.
 3. **Penyambung**: `Closes bip-itteam-internal/<repo>#<n>` di badan PR. Nama branch `<domain>/<n>-<slug>` hanya untuk keterbacaan.
 4. **Satu issue satu repo**; pekerjaan lintas repo memakai issue induk + sub-issue per repo.
 5. **Migrasi**: seluruh 245 issue (termasuk Done), dipecah otomatis ke repo kode yang paling banyak disebut isinya; judul berakhiran `[BHA-<n>]`, badan memuat tautan Linear, komentar, dan lampiran; PIC menjadi assignee.
