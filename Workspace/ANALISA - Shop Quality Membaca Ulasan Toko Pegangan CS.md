@@ -14,7 +14,7 @@ Diukur prod 2026-10-08 sebagai titik awal (angka bergerak, ukur ulang sebelum di
 - Empat toko Shopee itu: 3.627 ulasan 30 hari terakhir, 3.599 belum dibalas, 67 berbintang 1 sampai 3.
 - Job `sync-reviews` sehat: 40 run terakhir sukses, sekitar 13 menit per run.
 
-## Status PR (diukur 2026-10-08; bergerak, ukur ulang lewat `gh pr view` sebelum dipakai)
+## Status PR (keempatnya MERGED 2026-10-09; kolom "Keadaan" di bawah adalah keadaan sebelum merge)
 
 | Task | Issue | PR | Keadaan saat ditulis |
 |---|---|---|---|
@@ -25,9 +25,9 @@ Diukur prod 2026-10-08 sebagai titik awal (angka bergerak, ukur ulang sebelum di
 
 Sisa yang hanya bisa dikerjakan manusia:
 
-- Merge keempat PR; T1 dan T2 menyentuh baris berdekatan di `services/integration/main.go`, jadi yang di-merge belakangan mungkin perlu menyelesaikan konflik kecil.
+- ~~Merge keempat PR~~: selesai 2026-10-09. Test T2 diselaraskan dulu dengan tanda tangan middleware baru dari T1 (gabungan keduanya tanpa itu tidak terkompilasi di paket test), lalu gabungan ketiga perubahan backend diuji di atas `main` sebelum PR terakhir di-merge.
 - Deploy `integration-service` (dan frontend), lalu T4: pasang paket izin ke tiga akun Shop Quality. Urutannya tidak boleh terbalik.
-- T5: klik URL Seller Center Shopee dari akun penjual sebelum merge, dan buka layarnya sekali.
+- T5: URL Seller Center Shopee ikut merged TANPA sempat diklik dari akun penjual. Klik di DEV sebelum frontend naik ke prod; bila salah, betulkan konstanta `SELLER_CENTER_SHOPEE`, dan bila benar hapus kalimat "klik manual sebelum merge" di komentarnya.
 - T3: picu satu pemberitahuan job gagal di DEV; putuskan apakah TikTok "sebagian produk gagal" layak menggagalkan job (risiko pemberitahuan harian yang berhenti dibaca).
 - Temuan di luar batas T3, belum punya issue: `Manager.TriggerNow` (pemicu manual job) memakai percobaan ulang bawaan manager, bukan pengaturan per-job, sehingga pemicu manual `sync-reviews` masih mengulang 3 kali dan menimpa pesan timeout.
 - Satu perjalanan utuh sebagai Shop Quality sesudah semuanya naik: buka menu Ulasan, pilih "Belum dibalas", salin nomor pesanan, buka Seller Center, balas, lalu lihat ulasan itu hilang dari "Belum dibalas" esok paginya.

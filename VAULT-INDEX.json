@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-10-08",
+  "digenerate": "2026-10-09",
   "jumlah_dokumen": 540,
   "dokumen": [
     {
@@ -2646,16 +2646,16 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "5430035cfda70ffb2cf665cb451656acaa3832e79396bfb4256f292fe23d0956",
-      "ukuran_kb": 459.8,
-      "ringkasan": "Menjawab: apa saja yang dikerjakan integration-service (webhook order TikTok Shop/Shopee/Lazada, laporan iklan TikTok Business dan GMV Max, model transaction terpadu, push Sales Invoice dan Sales Return ke Accurate), endpoint mana yang tersedia, dan bagaimana autentikasi webhook Shopee serta cron sinkronnya bekerja. Juga menjawab siapa boleh melihat toko apa (ICC account mapping, Shop ACL, kepemilikan toko per departemen, cakupan toko pada ulasan marketplace), bagaimana status sinkron per toko dan toko banned ditangani, serta jebakan agregasi ROI/ROAS GMV Max. Memuat pula rencana Meta Ads, status Desty yang soft-disabled, dan catatan performa index MongoDB.",
+      "hash": "d47341c0b0f0847059bdfae5f46429a786293a8c04ffa89d0158c78ed492fc68",
+      "ukuran_kb": 460.2,
+      "ringkasan": "Menjawab: apa saja yang dikerjakan integration-service (webhook direct TikTok Shop/Shopee/Lazada, laporan iklan TikTok Business dan GMV Max, model transaction terpadu, bridging invoice dan retur ke Accurate Online), endpoint apa yang tersedia, dan bagaimana webhook diautentikasi serta diproses. Juga menjawab siapa boleh melihat toko apa (ICC account mapping, Shop ACL, kepemilikan toko per departemen, cakupan toko di ulasan marketplace), worker/cron apa yang berjalan, status sinkron per toko, serta bagian mana yang dicabut seperti jalur Desty atau masih rencana seperti Meta Ads.",
       "kata_kunci": [
         "integration service",
-        "marketplace",
+        "integrasi marketplace",
+        "webhook",
         "TikTok Shop",
         "Shopee",
-        "Accurate",
-        "webhook",
+        "Accurate Online",
         "GMV Max",
         "ulasan marketplace",
         "review",
@@ -9249,8 +9249,8 @@
       "judul": "ADR - 0160 Cakupan Baca Ulasan Mencakup Toko Pegangan CS, Menu Dibuka lewat Paket Izin yang Ada",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Belum di kode**: PR terbuka, belum merged (bip-erp#2837 untuk keputusan ini; diukur 2026-10-08, ukur ulang sebelum dipakai). 🟢 Diterima, 2026-10-08, oleh irfanarfianto: Pemutus memerintahkan pengerjaannya di sesi analisa hari itu, dan baris ini ditulis agent atas perintah tersebut. Papan kerja: `ANALISA - Shop Quality Membaca Ulasan Toko Pegangan CS` di Workspace.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Di kode, belum dipakai**: bip-erp#2837 merged 2026-10-09 (cakupan baca mencakup toko pegangan CS). Yang belum: deploy prod dan pemasangan paket izin ke akun Shop Quality (§ Decision 3 dan 6), keduanya langkah manusia; menu lewat paket izin saja belum dibuktikan di layar. 🟢 Diterima, 2026-10-08, oleh irfanarfianto: Pemutus memerintahkan pengerjaannya di sesi analisa hari itu, dan baris ini ditulis agent atas perintah tersebut. Papan kerja: `ANALISA - Shop Quality Membaca Ulasan Toko Pegangan CS` di Workspace.",
       "publik": true,
       "tautan": [
         "Microservices - Integration Service",
@@ -9259,20 +9259,20 @@
         "ADR - 0145 Agen Pengelola Toko Tumbuh dari Mesin Keputusan yang Ada, Dampak Diukur Sebelum Eksekusi",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "f2e1c01a7ae613baff6bea7baacf8ac24e691e84a68bfaf34c8fff9e7ac40e96",
-      "ukuran_kb": 9.9,
-      "ringkasan": "Menjawab: kenapa staf Shop Quality (CS toko) tidak bisa melihat halaman Ulasan marketplace di `/integration/reviews`, toko mana saja yang boleh dibaca seseorang di rute `/reviews/*` (gabungan `icc_account_mappings` dan `cs_shop_mappings` yang aktif), dan paket izin apa yang membuka menu Ulasan (`marketing_akuntoko_pemegang`). Juga menjawab apa yang tidak ikut berubah atau tidak dijanjikan: hak mengajukan komplain tetap milik pemegang akun toko, balas ulasan dari ERP belum diputuskan, ulasan per pembeli hanya ada untuk Shopee (TikTok dan Lazada tidak), dan data tetap disinkronkan sekali sehari. Memuat pula kaitannya dengan ADR komplain dari ulasan, ADR izin posisi akuntoko, dan urutan pemasangannya.",
+      "hash": "a1bfa976bdbf2bf8b6842f2baffa24c9022a7c50f6cfa3a1fa6d8a3ac45f3167",
+      "ukuran_kb": 10.1,
+      "ringkasan": "Menjawab: kenapa staf Shop Quality tidak bisa melihat halaman Ulasan padahal fiturnya sudah ada, toko mana yang boleh dibaca seseorang di rute /reviews/* (gabungan icc_account_mappings dan cs_shop_mappings yang aktif), dan kenapa hak mengajukan komplain tidak ikut melebar ke CS. Juga menjawab paket izin mana yang membuka menu Ulasan (marketing_akuntoko_pemegang), urutan pemasangannya, serta apa yang tidak dijanjikan: ulasan TikTok per pembeli, ulasan Lazada, balas ulasan dari ERP, dan data yang hanya diperbarui sekali sehari.",
       "kata_kunci": [
-        "ulasan",
-        "review marketplace",
+        "ADR 0160",
+        "ulasan marketplace",
+        "review",
         "Shop Quality",
-        "CS toko",
+        "cakupan baca",
         "cs_shop_mappings",
         "icc_account_mappings",
-        "cakupan toko",
-        "review_scope",
+        "paket izin",
         "marketing_akuntoko_pemegang",
-        "komplain dari ulasan"
+        "komplain"
       ]
     },
     {
@@ -18791,18 +18791,18 @@
         "ADR - 0160 Cakupan Baca Ulasan Mencakup Toko Pegangan CS, Menu Dibuka lewat Paket Izin yang Ada",
         "Microservices - Integration Service"
       ],
-      "hash": "4c41ffb115eb1689273d0638e01fae54417098b4cc52a92aa597844fc8b67bfc",
-      "ukuran_kb": 10.7,
-      "ringkasan": "Menjawab: task apa saja yang lahir dari ADR cakupan baca ulasan untuk toko pegangan CS (T1 cakupan `cs_shop_mappings`, T2 status sinkron toko nonaktif, T3 kegagalan sinkron ulasan yang selalu melapor sukses, T4 pemasangan paket izin ke akun Shop Quality, T5 kartu ulasan dengan nomor pesanan dan jalan ke Seller Center), issue dan PR mana yang memuatnya, serta urutan dan ketergantungan merge, deploy, dan pemasangan izinnya. Juga menjawab kriteria \"yang harus benar\" tiap task, apa yang di luar cakupan, angka ukur prod yang jadi titik awal (jumlah ulasan Shopee, baris `review_sync_states`, kesehatan job `sync-reviews`), dan sisa pekerjaan yang hanya bisa dikerjakan manusia.",
+      "hash": "d81b5bd8ca0e6b3b30f52fcd4eececf154b55227cac214598560e44b8313312e",
+      "ukuran_kb": 11.0,
+      "ringkasan": "Menjawab: task apa saja yang lahir dari ADR cakupan baca ulasan untuk Shop Quality (T1 cakupan CS, T2 status sinkron toko nonaktif, T3 kegagalan sinkron ulasan harus berbunyi, T4 pemasangan paket izin oleh manusia, T5 kartu ulasan dengan nomor pesanan dan jalan ke Seller Center), issue dan PR mana untuk tiap task, serta urutan dan ketergantungannya. Juga menjawab kriteria yang harus benar per task, angka ukur prod yang jadi titik awal, dan sisa langkah yang hanya bisa dikerjakan manusia seperti deploy, pemasangan izin, dan satu perjalanan utuh sebagai Shop Quality.",
       "kata_kunci": [
         "analisa",
         "papan kerja",
+        "Shop Quality",
         "ulasan",
         "review",
-        "Shop Quality",
         "cs_shop_mappings",
         "sync-reviews",
-        "sync-status",
+        "status sinkron",
         "review_sync_states",
         "Seller Center"
       ]

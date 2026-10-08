@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Belum di kode**: PR terbuka, belum merged (bip-erp#2837 untuk keputusan ini; diukur 2026-10-08, ukur ulang sebelum dipakai). 🟢 Diterima, 2026-10-08, oleh irfanarfianto: Pemutus memerintahkan pengerjaannya di sesi analisa hari itu, dan baris ini ditulis agent atas perintah tersebut. Papan kerja: `ANALISA - Shop Quality Membaca Ulasan Toko Pegangan CS` di Workspace.
+> **Status**: ⚠️ **Di kode, belum dipakai**: bip-erp#2837 merged 2026-10-09 (cakupan baca mencakup toko pegangan CS). Yang belum: deploy prod dan pemasangan paket izin ke akun Shop Quality (§ Decision 3 dan 6), keduanya langkah manusia; menu lewat paket izin saja belum dibuktikan di layar. 🟢 Diterima, 2026-10-08, oleh irfanarfianto: Pemutus memerintahkan pengerjaannya di sesi analisa hari itu, dan baris ini ditulis agent atas perintah tersebut. Papan kerja: `ANALISA - Shop Quality Membaca Ulasan Toko Pegangan CS` di Workspace.
 
 ## Untuk Manajemen
 
