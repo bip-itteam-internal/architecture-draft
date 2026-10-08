@@ -14,7 +14,7 @@ Ditambahkan 2026-08-11, grounded ke `origin/main` bip-erp. Bab ini **tidak mengu
 | `kaizen_ide_diajukan`, `kaizen_ide_diterapkan` | `kpi_sumber_kaizen.go` | `FORM_BUILDER_MODULE_URL` — [[Microservices - Form Builder Service]] |
 | `kinerja_toko` (7 metrik) | `kpi_sumber_kinerja_toko.go` | `MARKETING_ANALYTICS_MODULE_URL` — [[Microservices - Marketing Analytics Service]] |
 | `kinerja_tiket` (3 metrik) | `kpi_sumber_tiket.go` | `TASK_MANAGEMENT_MODULE_URL` — [[Microservices - Task Management Service]] |
-| `kedisiplinan_absensi` (2 metrik) | `kpi_sumber_kedisiplinan.go` | `ATTENDANCE_MODULE_URL` + `ATTENDANCE_SERVICE_KEY` — [[Microservices - Attendance Service]] |
+| `kedisiplinan_absensi` (3 metrik sejak 2026-10-07) | `kpi_sumber_kedisiplinan.go` | `ATTENDANCE_MODULE_URL` + `ATTENDANCE_SERVICE_KEY` — [[Microservices - Attendance Service]] |
 
 Ditambah `skor_tim` yang membaca `kpi_score` employee-service sendiri (bukan konektor keluar), dan `akurasi_aset_ga` (`kpi_sumber_aset.go`) yang menarik dari **dua** modul sekaligus (inventory dan integration) — jadi begitu ia masuk, hitungannya menjadi enam.
 

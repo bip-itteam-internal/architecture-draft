@@ -160,6 +160,7 @@ Booking milik [[Microservices - Inventory Service]]; attendance membacanya lewat
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
 | GET | `/kpi/attendance` | Rekap kedisiplinan **per karyawan** satu periode, untuk sumber `kedisiplinan_absensi` di [[Microservices - Employee Service]] | `?key=` = `ATTENDANCE_SERVICE_KEY` |
+| GET | `/kpi/kehadiran-perusahaan` | Persen kartu Kehadiran **seluruh perusahaan** satu periode (`?periode=YYYY-MM&company_id=`, siklus 26-25), untuk metrik `kehadiran_perusahaan` sumber `kedisiplinan_absensi`. Meneruskan hasil `ringkasKehadiran` apa adanya: `{data:{periode,dari,sampai,hari_kerja,terlambat,persen}}`. Buku tamu gagal dibaca = **503**, tanpa hari kerja = **422**, keduanya tanpa field `persen`. PR [#2774](https://github.com/bip-itteam-internal/bip-erp/pull/2774), merged 2026-10-07 | `?key=` = `ATTENDANCE_SERVICE_KEY` |
 
 Parameter **semuanya wajib**: `periode` (`YYYY-MM`), `company_id`, `employee_id` (dipisah koma, maksimum **200** per permintaan), `key`. Yang kurang dibalas 400; `employee_id` melebihi batas juga 400 dan bukan dipotong diam-diam, supaya tak ada angka yang terlihat lengkap untuk sebagian orang saja.
 
