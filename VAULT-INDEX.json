@@ -9192,23 +9192,24 @@
         "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
         "ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync"
       ],
-      "hash": "b2130256161132f85d28bc0d665a73d9f24b1122646d44da95d52f3bcd9a4cae",
-      "ukuran_kb": 17.7,
-      "ringkasan": "Menjawab: mengapa retur gudang tercatat dua kali (simpan ganda dalam hitungan detik, hasil pengukuran produksi 60 hari), dan pagar apa yang dipasang di form dan layanan gudang (kunci tombol Simpan, konfirmasi bila jumlah kurang dari klaim, batas kumulatif per order dan SKU, jumlah kumulatif ke Accurate, form hanya menawarkan sisa). Juga menjawab bagaimana koreksi bertahap lewat Proposal dirancang, keputusan tanggal dokumen koreksi, prosedur manusia sementara, serta apa yang belum diputuskan. Mengamandemen ADR 0025 Decision #9 dan memuat pengukuran T4 frekuensi jumlah kurang pada komponen paket.",
+      "hash": "54b84e1f3ad35969fedb774d3ec420fab0f6bd770fa012694980d91592b48664",
+      "ukuran_kb": 18.4,
+      "ringkasan": "Menjawab: kenapa satu retur fisik bisa tercatat dua kali di gudang (simpan ganda dalam hitungan detik), pagar apa yang dipasang di form dan di layanan gudang (kunci tombol Simpan, konfirmasi bila jumlah kurang dari klaim, batas kumulatif per order dan SKU, jumlah kumulatif ke pembukuan), dan bagaimana koreksi bertahap dilakukan lewat Proposal. Memuat hasil pengukuran produksi 60 hari dan sejak 1 September 2026, insiden 2026-10-07 pada dokumen Retur Penjualan Accurate, keputusan tanggal dokumen koreksi, serta hal yang belum diputuskan.",
       "kata_kunci": [
         "retur gudang",
         "scan retur",
         "simpan ganda",
+        "duplikat scan",
         "idempotensi",
         "batas kumulatif",
+        "klaim marketplace",
         "Retur Penjualan",
         "Accurate",
-        "AutoSync",
+        "koreksi",
         "Proposal koreksi",
         "WMS",
         "manufacture service",
-        "order batal pasca-kirim",
-        "ADR 0158"
+        "stok gudang"
       ]
     },
     {
@@ -18240,22 +18241,23 @@
         "APP - Web ERP",
         "ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync"
       ],
-      "hash": "a8d7becd9708b43bc72ff16b4f11d92731de35d4244a25869a3ad258befd1da3",
+      "hash": "9ecfd8cda437055a67468e8ce4a7f1a37cd6efde71ba7919491fcecde10ff3dd",
       "ukuran_kb": 5.8,
-      "ringkasan": "Menjawab: daftar task (T0-T9) untuk mengimplementasikan ADR 0158, urutan dan dependensinya, serta mana yang sudah selesai atau masih terblokir. Menjelaskan pembagian tahap pagar (kunci Simpan, idempotensi dan batas kumulatif di BE, konfirmasi saat kurang di FE) dan tahap koreksi (T6-T8) yang menunggu gerbang keputusan T5, plus aturan issue induk dan sub-issue per repo. Berguna untuk tahu apa yang dikerjakan lebih dulu dan apa yang tidak boleh dimulai.",
+      "ringkasan": "Menjawab: apa saja daftar task (T0 sampai T9) untuk mengerjakan keputusan ADR 0158, mana yang masuk tahap pagar dan mana tahap koreksi, serta apa dependensi dan urutan antar task. Menjelaskan pembagian pekerjaan BE/FE sebagai issue induk dan sub-issue, hasil pengukuran T4, gerbang keputusan T5 yang memblokir tahap koreksi, dan dokumentasi/prosedur manusia yang perlu diterbitkan.",
       "kata_kunci": [
-        "task retur gudang",
-        "scan retur",
-        "pengaman scan",
+        "pengaman scan retur",
+        "retur gudang",
         "daftar task",
-        "brief",
+        "ANALISA",
+        "pagar",
+        "koreksi",
         "sub-issue BE FE",
-        "Siap Agent",
-        "T5 gerbang keputusan",
-        "koreksi retur",
-        "prosedur gudang finance",
-        "analisa kebutuhan",
-        "ADR 0158"
+        "brief",
+        "kunci tombol Simpan",
+        "konfirmasi jumlah kurang",
+        "Proposal koreksi",
+        "ADR 0158",
+        "prosedur gudang finance"
       ]
     },
     {
