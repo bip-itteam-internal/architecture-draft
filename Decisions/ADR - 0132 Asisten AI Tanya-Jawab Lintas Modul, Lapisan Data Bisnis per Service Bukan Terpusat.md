@@ -277,6 +277,7 @@ Jawaban model berbentuk data terstruktur (bukan cuma prosa), diklasifikasi jenis
 (teks/tabel/chart) sebelum dikirim ke frontend. Chart WAJIB pakai `ChartContainer` + Recharts yang
 sudah baku di erp-frontend (palet `--fb-seri-*`, `connectNulls={false}`, dst) — dilarang membangun
 sistem chart baru untuk fitur ini.
+Lihat juga [[REF - Penyajian Laporan Copilot]] untuk cara penyajiannya di kode per 2026-10-08.
 
 ### §8 File (Excel/PDF/dokumen) hanya dibuat saat diminta eksplisit
 
