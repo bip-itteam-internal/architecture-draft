@@ -1,6 +1,6 @@
 # ADR - 0158 Scan Retur Gudang Dijaga Satu Kali dan Selaras dengan Pembukuan, Koreksi Bertahap
 
-> **Status**: 🟡 **Diusulkan**, 2026-10-08, kode belum ada. Berdiri di atas pengukuran langsung produksi 2026-10-08 dan pembacaan kode lokal; mengamandemen satu butir [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]] (Decision #9, ✅ Implemented) dan menjalankan prinsip yang baru ditulis di [[ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok]] §5 (🟡 Diusulkan). Tahap koreksi (D6) **belum boleh dibangun** sebelum dua keputusan di bagian "Belum diputuskan" dijawab.
+> **Status**: 🟢 **Diterima**, 2026-10-08, oleh bagusizzanm (IT); kode belum ada. Berdiri di atas pengukuran langsung produksi 2026-10-08 dan pembacaan kode lokal; mengamandemen satu butir [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]] (Decision #9, ✅ Implemented) dan menjalankan prinsip yang baru ditulis di [[ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok]] §5 (🟡 Diusulkan). Tahap pagar (D1–D5) boleh dibangun. Tahap koreksi (D6) **belum boleh dibangun** sebelum butir di bagian "Belum diputuskan" dan tinjauan kewenangan Proposal terjawab; keputusan tanggal dokumen koreksi sudah ada (lihat bagian "Sudah diputuskan").
 
 ## Untuk Manajemen
 
@@ -77,7 +77,7 @@ Untuk paket yang sebagian sudah tercatat, form menampilkan SKU yang sudah tercat
 
 ### D6. Koreksi dibangun bertahap, lewat Proposal koreksi yang sudah ada
 
-Setelah pagar D1–D5 hidup, koreksi jumlah untuk transaksi retur tertaut dibangun dengan **memperluas Proposal koreksi**: setelah disetujui, jumlah kumulatif yang baru diteruskan ke pembukuan dalam langkah yang sama, supaya stok gudang dan pembukuan tidak berselisih. Ini sekaligus menutup selisih diam-diam yang sudah ada hari ini pada jalur itu. **Belum boleh dibangun** sampai tiga hal terjawab: (a) tanggal dokumen saat koreksi, (b) pembukuan menerima koreksi ke nol, (c) kewenangan persetujuan koreksi gudang dan pemeriksaan gerbang persetujuan jalur itu, yang dikerjakan sebagai pekerjaan terpisah di repo kode.
+Setelah pagar D1–D5 hidup, koreksi jumlah untuk transaksi retur tertaut dibangun dengan **memperluas Proposal koreksi**: setelah disetujui, jumlah kumulatif yang baru diteruskan ke pembukuan dalam langkah yang sama, supaya stok gudang dan pembukuan tidak berselisih. Ini sekaligus menutup selisih diam-diam yang sudah ada hari ini pada jalur itu. **Belum boleh dibangun** sampai dua hal terjawab: (a) tanggal dokumen saat koreksi, **sudah diputuskan: mengikuti tanggal koreksi** (lihat bagian "Sudah diputuskan"), (b) pembukuan menerima koreksi ke nol, (c) kewenangan persetujuan koreksi gudang dan pemeriksaan gerbang persetujuan jalur itu, yang dikerjakan sebagai pekerjaan terpisah di repo kode.
 
 ### D7. Prosedur manusia selama koreksi belum ada
 
@@ -87,10 +87,13 @@ Sampai D6 hidup, urutannya: gudang memeriksa fisik dulu; menginput **hanya SKU y
 
 Mengubah semantik "ganti" pembukuan, mengubah arti tiga kondisi (Reuse, Rework, Reject), mengubah gerbang konfirmasi gudang ADR 0025, dan menyentuh konfirmasi massal ADR 0124. Mengukur frekuensi jumlah kurang untuk komponen paket adalah pekerjaan terpisah dan tidak menahan D1–D5.
 
+## Sudah diputuskan setelah ADR ini diusulkan
+
+**Tanggal dokumen saat koreksi mengikuti tanggal koreksinya, bukan tanggal scan awal** (bagusizzanm, 2026-10-08). Alasannya: perubahan harus terlacak di pembukuan; dokumen yang tanggalnya tetap di tanggal scan awal menyembunyikan bahwa ada koreksi. Ini sejalan dengan perilaku yang sudah ada (tanggal dokumen mengikuti scan terbaru). Konsekuensi yang diterima sadar: koreksi atas retur yang sudah dibukukan di bulan lalu memindahkan pembalikan penjualannya ke periode koreksi (terlihat pada insiden 7 Okt: tiga dokumen berpindah dari 26 Sep, 12 Sep, dan 30 Sep ke 7 Okt), dan dokumen yang bulan bukunya sudah lewat batas sync toko bisa ditahan gerbang bulan buku, itu ranah finance. Finance perlu diberi tahu aturan ini sebelum tahap koreksi dibangun; ia tidak lagi menahan pembangunan.
+
 ## Belum diputuskan
 
-1. **Tanggal dokumen saat koreksi.** Diusulkan: **tetap tanggal scan awal**, karena mengikuti tanggal koreksi memindahkan pembalikan penjualan antar-periode (kasus 26 Sep, 12 Sep, dan 30 Sep yang berpindah ke 7 Okt pada insiden). Keputusan ini milik **finance** dan belum dikonfirmasi.
-2. **Koreksi ke nol.** Pembukuan membuang baris berjumlah nol, sehingga membuang satu SKU dari dokumen tidak bisa diungkapkan lewat jalur yang ada. Perlu aturan eksplisit sebelum D6.
+1. **Koreksi ke nol.** Pembukuan membuang baris berjumlah nol, sehingga membuang satu SKU dari dokumen tidak bisa diungkapkan lewat jalur yang ada. Perlu aturan eksplisit sebelum D6.
 
 ## Consequences
 

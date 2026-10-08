@@ -14,7 +14,7 @@ Dua brief draft sudah ada di `.task-plans/briefs/` (`2026-10-08-wms-retur-fe-kur
 
 Kedua brief ditulis sebelum analisa ini selesai dan memuat dua kekeliruan: `Sumber` menulis "tidak ada" (padahal ADR 0025 Decision #9 sudah memutuskan jumlah kurang hanya disorot, dan yang kita lakukan mengamandemennya), dan premisnya mengira penyebab duplikat adalah scan ulang (terukur: simpan ganda ≤60 detik 77%). Revisi: `Sumber` menunjuk ADR 0158 (setelah Diterima), tambah kriteria kunci Simpan dan idempotensi, tambah penanganan gagal-di-tengah-loop. Lalu buat issue induk + dua sub-issue.
 
-Dependensi: ADR 0158 disetujui (status Diterima).
+Dependensi: ADR 0158 disetujui (✅ Diterima 2026-10-08).
 
 ---
 
@@ -48,9 +48,9 @@ Dependensi: tidak ada.
 
 ## Gerbang keputusan
 
-### T5. Dua keputusan untuk membuka tahap koreksi
+### T5. Keputusan untuk membuka tahap koreksi
 
-**Blocking untuk T6–T8.** (1) Tanggal dokumen saat koreksi, keputusan **finance**: diusulkan tetap tanggal scan awal. (2) Aturan koreksi ke nol di pembukuan. Hasilnya ditulis ke ADR 0158 §Belum diputuskan lalu status D6 diperbarui.
+**Blocking untuk T6–T8.** (1) ✅ Tanggal dokumen saat koreksi: **mengikuti tanggal koreksinya** (diputuskan bagusizzanm, 2026-10-08; alasan dan konsekuensi di ADR 0158 §Sudah diputuskan). Sisa: kabari finance aturan ini sebelum T7 dibangun. (2) Aturan koreksi ke nol di pembukuan, masih terbuka. Hasilnya ditulis ke ADR 0158 §Belum diputuskan lalu status D6 diperbarui.
 
 Dependensi: tidak ada.
 
