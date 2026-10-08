@@ -4035,22 +4035,23 @@
         "Manufacture - Stock & Material Management",
         "ADR - 0015 Push Pergerakan WMS ke Accurate"
       ],
-      "hash": "6434390d8932dd67431261bc082f72b092cecb5812127cfcd0c5ebd1578a035e",
+      "hash": "f98367b5099a9413f19900e299833e03fed108fce61a90d338fec162266f6b68",
       "ukuran_kb": 96.6,
-      "ringkasan": "Menjawab: mengapa log tiap menu WMS dipecah jadi sub-tab Sumber vs Input WMS, kapan badge status sudah/belum dicatat boleh dipakai, dan resi berstatus apa yang dihitung keluar gudang. Juga menjelaskan stempel created_by_name oleh server sebagai jejak penginput, gerbang gudang per-order/per-SKU pada retur, serta form retur dan resi paket balik beserta follow-up-nya.",
+      "ringkasan": "Menjawab: kenapa log tiap menu WMS dipecah jadi sub-tab SUMBER dan INPUT WMS, menu mana saja yang kena, dan kapan badge status sudah/belum dicatat boleh dipakai. Juga menjelaskan aturan resi yang terhitung keluar gudang (COMPLETED + SHIPPED), agregasi per SKU di Keluar FG, stempel penginput `created_by_name` oleh server, serta follow-up gerbang gudang retur (per-order, per-SKU, resi paket balik).",
       "kata_kunci": [
-        "log WMS",
-        "sumber vs input",
+        "WMS",
+        "log sumber",
+        "input WMS",
         "created_by_name",
         "stempel penginput",
-        "retur ekspedisi",
+        "Return Dari Ekspedisi",
         "Keluar FG",
         "Inbound RM",
         "gerbang gudang",
-        "konfirmasi scan",
+        "retur",
+        "manufacture-service",
         "resi",
-        "audit trail",
-        "return"
+        "per SKU"
       ]
     },
     {
@@ -9178,8 +9179,8 @@
       "judul": "ADR - 0158 Scan Retur Gudang Dijaga Satu Kali dan Selaras dengan Pembukuan, Koreksi Bertahap",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-08, kode belum ada. Berdiri di atas pengukuran langsung produksi 2026-10-08 dan pembacaan kode lokal; mengamandemen satu butir [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]] (Decision #9, ✅ Implemented) dan menjalankan prinsip yang baru ditulis di [[ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok]] §5 (🟡 Diusulkan). Tahap koreksi (D6) **belum boleh dibangun** sebelum dua keputusan di bagian \"Belum diputuskan\" dijawab.",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-08, oleh bagusizzanm (IT); kode belum ada. Berdiri di atas pengukuran langsung produksi 2026-10-08 dan pembacaan kode lokal; mengamandemen satu butir [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]] (Decision #9, ✅ Implemented) dan menjalankan prinsip yang baru ditulis di [[ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok]] §5 (🟡 Diusulkan). Tahap pagar (D1–D5) boleh dibangun. Tahap koreksi (D6) **belum boleh dibangun** sebelum butir di bagian \"Belum diputuskan\" dan tinjauan kewenangan Proposal terjawab; keputusan tanggal dokumen koreksi sudah ada (lihat bagian \"Sudah diputuskan\").",
       "publik": true,
       "tautan": [
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
@@ -9191,22 +9192,23 @@
         "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
         "ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync"
       ],
-      "hash": "8e9afc3eb42fac6f69c1952b31a583b039a024f74878c9071bef77d74ace0f4e",
-      "ukuran_kb": 14.1,
-      "ringkasan": "Menjawab: mengapa retur gudang tercatat dobel (hasil pengukuran produksi 60 hari) dan apa pagar yang diusulkan: kunci tombol Simpan, idempotensi dan batas kumulatif per (order, SKU) di server, konfirmasi saat jumlah kurang, serta jumlah kumulatif ke Accurate. Juga menjelaskan koreksi bertahap lewat Proposal koreksi, prosedur manusia sementara, dan dua keputusan yang belum dijawab (tanggal dokumen, koreksi ke nol). Status Diusulkan, mengamandemen ADR 0025 Decision #9.",
+      "hash": "d917fb1a648d307f0f36aca0e6cc18fb3f2e8c18b41ea8dc44bacc5e4f73813d",
+      "ukuran_kb": 14.9,
+      "ringkasan": "Menjawab: bagaimana mencegah satu retur fisik tercatat dua kali di gudang (simpan ganda), kapan jumlah scan kurang dari klaim marketplace harus dikonfirmasi, dan bagaimana batas kumulatif per (order, SKU) serta jumlah kumulatif ke Accurate dijaga. Juga memuat pengukuran produksi 60 hari, rencana koreksi bertahap lewat Proposal koreksi, dan hal yang belum diputuskan (tanggal dokumen, koreksi ke nol, kewenangan).",
       "kata_kunci": [
         "retur gudang",
         "scan retur",
-        "duplikat",
         "simpan ganda",
+        "duplikat",
         "idempotensi",
         "batas kumulatif",
         "Retur Penjualan",
         "Accurate",
-        "proposal koreksi",
-        "ADR 0158",
-        "return warehouse",
-        "double scan"
+        "Proposal koreksi",
+        "WMS",
+        "manufacture",
+        "paket komponen",
+        "ADR 0158"
       ]
     },
     {
@@ -18238,21 +18240,22 @@
         "APP - Web ERP",
         "ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync"
       ],
-      "hash": "fe5dfd14694b776670fdae0d0c04bddc3bbba5a6a9b0b88276145673aa613f69",
-      "ukuran_kb": 5.4,
-      "ringkasan": "Menjawab: apa saja task (T0-T9) untuk menerapkan ADR 0158, urutan dan dependensinya, mana yang FE/BE, dan mana yang tidak boleh dimulai sebelum dua keputusan (T5) selesai. Berguna untuk tahu pagar retur gudang mana yang berdiri sendiri (kunci Simpan, idempotensi, konfirmasi kurang, sisa SKU) vs tahap koreksi, serta aturan issue induk dan sub-issue per repo.",
+      "hash": "4d70956bb9cb2f07a7b789afb2723179798998d7b908617694db7111f146ca9f",
+      "ukuran_kb": 5.5,
+      "ringkasan": "Menjawab: apa saja daftar task (T0-T9) untuk mengerjakan ADR 0158, mana yang boleh jalan lebih dulu (tahap pagar T1-T4) dan mana yang diblokir sampai keputusan T5 (tahap koreksi T6-T8). Juga merinci repo/tipe tiap task (BE/FE), dependensinya, dan perintah pertama yang disarankan.",
       "kata_kunci": [
         "daftar task",
         "pengaman scan retur",
         "retur gudang",
         "ADR 0158",
-        "sub-issue",
-        "brief",
-        "idempotensi",
+        "sub-issue BE FE",
+        "kunci Simpan",
+        "batas kumulatif",
         "koreksi",
+        "Proposal koreksi",
         "analisa kebutuhan",
-        "backlog",
-        "Proposal koreksi"
+        "WMS",
+        "brief"
       ]
     },
     {
