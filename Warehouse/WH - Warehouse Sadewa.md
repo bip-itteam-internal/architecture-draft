@@ -91,6 +91,7 @@ Untuk matriks akses WMS Tinggar/manufacture lengkap lihat [[Microservices - Manu
 - Halaman `/warehouse/sadewa/return` **me-reuse** `GudangBarangJadiView` mode `returOnly` — sumber data & alur **sama persis** dengan retur Tinggar (tab "Return Dari Ekspedisi" Gudang FG).
 - Menulis lewat **pipeline transaksi manufacture** (`POST /api/manufacture/transaksi`), **bukan** ke collection `sadewa_action`. Server menstempel `detail.sumberGudang = SADEWA` & `created_by_name` dari JWT (anti-palsu).
 - Alasan retur: Rework (Isi berkurang / Segel terbuka) & Reject (Pecah / Tidak sesuai).
+- **Pagar scan retur ikut berlaku di sini** (kode merged 2026-10-08, belum deploy prod per tanggal itu): karena halaman ini memakai layar dan endpoint yang sama, tombol Simpan terkunci, jumlah kurang dan SKU di luar klaim butuh konfirmasi, dan simpan ganda untuk (order, SKU) yang sama dijawab "sudah tercatat" tanpa menambah stok. Rincian di [[ADR - 0158 Scan Retur Gudang Dijaga Satu Kali dan Selaras dengan Pembukuan, Koreksi Bertahap]] dan [[APP - Web ERP]].
 
 ---
 

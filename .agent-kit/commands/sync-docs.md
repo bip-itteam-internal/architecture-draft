@@ -13,11 +13,16 @@ Langkah:
 2. `git -C architecture-draft pull` (vault dikerjakan paralel banyak orang).
 3. Tentukan dok terdampak dari diff kode (pakai §7).
 4. Update/buat dok sesuai template & konvensi; perbarui status marker.
-5. Verifikasi 0 broken wikilink (§4).
-6. Segarkan index pencarian, dari akar `erp/`:
+5. Cari dok **lain** yang masih menyatakan fakta lama:
+   `architecture-draft/Tools/.venv/Scripts/python.exe architecture-draft/Tools/dampak.py --root architecture-draft --diff <dok yang kamu sunting>`
+   (di background, lihat `/dampak` 1.2), lalu ikuti `/dampak` langkah 2-6 sebagai **pemanggil**: dok
+   terdampak yang disetujui ikut langkah 6-8 di bawah bersama dok yang kamu sunting. §7 hanya
+   memetakan repo → dok, jadi tanpa langkah ini salinan fakta di dok lain tertinggal tanpa satu pun tanda.
+6. Verifikasi 0 broken wikilink (§4).
+7. Segarkan index pencarian, dari akar `erp/`:
    `architecture-draft/Tools/.venv/Scripts/python.exe architecture-draft/Tools/build-vault-index.py --check --root architecture-draft`
    Exit 1 berarti `VAULT-INDEX.json` basi → jalankan `/index-vault` sebelum commit.
    Index basi lebih berbahaya daripada tidak ada index, karena `/ask` akan memakai
    ringkasan yang salah.
-7. Commit per-file (`git add -- "Folder/Nama.md"`, JANGAN `git add -A`), pesan `docs: ...`.
+8. Commit per-file (`git add -- "Folder/Nama.md"`, JANGAN `git add -A`), pesan `docs: ...`.
    Sertakan `VAULT-INDEX.json` bila ikut berubah. Jangan push otomatis kecuali user minta.

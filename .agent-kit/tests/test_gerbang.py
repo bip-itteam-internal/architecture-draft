@@ -491,3 +491,96 @@ def test_paritas_konstanta_ps_vs_py():
     assert list(ps["repo_tanpa_gerbang"]) == list(py["repo_tanpa_gerbang"])
     # urutan ikut dibandingkan: itulah yang menentukan pnpm menang atas npm di erp-frontend
     assert [list(x) for x in ps["pm_node"]] == [list(x) for x in py["pm_node"]]
+
+
+# ---------------------------------------------------------------- cakupan test Node (1.40.0)
+
+def test_rencana_vitest_related_untuk_berkas_sumber(tmp_path):
+    top = buat(tmp_path, "src/a.ts", "src/b.tsx")
+    r = gl.rencana_vitest(top, ["src/a.ts", "src/b.tsx", "README.md"])
+    assert r["mode"] == "related"
+    assert r["berkas"] == ["src/a.ts", "src/b.tsx"]
+
+
+@pytest.mark.parametrize("pemicu", [
+    "package.json", "pnpm-lock.yaml", "tsconfig.json", "tsconfig.build.json",
+    "vitest.config.ts", "vitest.setup.ts", "vite.config.mts", "src/setupTests.ts",
+    "src/test/utils.tsx", "test/setup.ts",
+])
+def test_rencana_vitest_penuh_saat_lingkungan_test_berubah(tmp_path, pemicu):
+    top = buat(tmp_path, "src/a.ts", pemicu)
+    r = gl.rencana_vitest(top, ["src/a.ts", pemicu])
+    assert r["mode"] == "penuh", pemicu
+    assert pemicu in r["alasan"]
+
+
+def test_rencana_vitest_pola_tidak_tertipu_nama_mirip(tmp_path):
+    # `my-package.json` atau `src/latest/x.ts` bukan berkas lingkungan test
+    top = buat(tmp_path, "src/my-package.json", "src/latest/x.ts")
+    r = gl.rencana_vitest(top, ["src/my-package.json", "src/latest/x.ts"])
+    assert r["mode"] == "related"
+
+
+def test_rencana_vitest_penuh_saat_berkas_sumber_terhapus(tmp_path):
+    # berkas yang tak ada di disk tak bisa ditelusuri `related`; pengimpornya tak ikut jalan
+    top = buat(tmp_path, "src/a.ts")
+    r = gl.rencana_vitest(top, ["src/a.ts", "src/hilang.ts"])
+    assert r["mode"] == "penuh"
+    assert "src/hilang.ts" in r["alasan"]
+
+
+def test_rencana_vitest_penuh_tanpa_berkas_sumber(tmp_path):
+    top = buat(tmp_path, "README.md")
+    assert gl.rencana_vitest(top, ["README.md"])["mode"] == "penuh"
+    assert gl.rencana_vitest(top, [])["mode"] == "penuh"
+
+
+def test_rencana_vitest_penuh_saat_melewati_batas(tmp_path):
+    n = gl.BATAS_BERKAS_RELATED + 1
+    berkas = ["src/f%d.ts" % i for i in range(n)]
+    top = buat(tmp_path, *berkas)
+    assert gl.rencana_vitest(top, berkas)["mode"] == "penuh"
+    assert gl.rencana_vitest(top, berkas[:-1])["mode"] == "related"
+
+
+def test_rencana_vitest_paksa_penuh(tmp_path):
+    top = buat(tmp_path, "src/a.ts")
+    assert gl.rencana_vitest(top, ["src/a.ts"], paksa_penuh=True)["mode"] == "penuh"
+
+
+def test_vitest_json_related_memakai_perintah_related(monkeypatch):
+    dipanggil = []
+    monkeypatch.setattr(gl, "jalankan", lambda nama, cwd, cmd, *a, **k: dipanggil.append(cmd) or {"exit": 0, "ekor": "", "semua": "", "durasi_detik": 0})
+    pm = {"exec": "pnpm exec"}
+    gl.vitest_json("x", pm, ["src/a.ts"])
+    gl.vitest_json("x", pm)
+    assert len(dipanggil) == 2
+    assert "vitest related" in dipanggil[0] and "src/a.ts" in dipanggil[0] and "--run" in dipanggil[0]
+    assert "vitest run" in dipanggil[1] and "related" not in dipanggil[1]
+
+
+def test_salinan_powershell_sama_dengan_python():
+    # dua salinan aturan cakupan: mengubah satu saja membuat jalur Windows dan mac/linux
+    # memilih cakupan berbeda tanpa satu pun galat
+    import re
+    ps = (HOOKS / "gerbang-lib.ps1").read_text(encoding="utf-8-sig")
+    pola = re.search(r"^\$POLA_TEST_PENUH = '([^']+)'", ps, re.M).group(1)
+    assert pola == gl.POLA_TEST_PENUH.pattern
+    batas = int(re.search(r"^\$BATAS_BERKAS_RELATED = (\d+)", ps, re.M).group(1))
+    assert batas == gl.BATAS_BERKAS_RELATED
+    eks = re.findall(r"'(\.[a-z]+)'", re.search(r"^\$EKSTENSI_SUMBER = @\(([^)]*)\)", ps, re.M).group(1))
+    assert tuple(eks) == gl.EKSTENSI_SUMBER
+
+def test_nol_test_related_sempit():
+    assert gl.nol_test_related({"exit": 0, "semua": ["x", "No test files found, exiting with code 0"]})
+    assert not gl.nol_test_related({"exit": 1, "semua": ["No test files found"]})
+    assert not gl.nol_test_related({"exit": 0, "semua": ["Error: Cannot find module"]})
+    assert not gl.nol_test_related({"exit": 0, "semua": None})
+
+
+def test_vitest_json_related_tanpa_test_terurai_nol(monkeypatch):
+    monkeypatch.setattr(gl, "jalankan", lambda *a, **k: {"exit": 0, "ekor": "", "semua": ["No test files found, exiting with code 0"], "durasi_detik": 0})
+    r = gl.vitest_json("x", {"exec": "pnpm exec"}, ["src/a.ts"])
+    assert r["terurai"] and r["jumlah"] == 0 and r["gagal"] == []
+    # suite penuh tanpa JSON tetap gagal: baseline tak boleh lolos kosong
+    assert not gl.vitest_json("x", {"exec": "pnpm exec"})["terurai"]

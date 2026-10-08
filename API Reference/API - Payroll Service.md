@@ -63,7 +63,15 @@ Seluruh config **singleton**, di-seed idempoten saat boot (`seedPayrollConfig`, 
 | GET | `/employee-salary/:employeeId` | `view` / `isHR` | Belum ditetapkan → **404 `gaji karyawan belum ditetapkan`**, bukan 200 bernilai nol. Konsumen lintas-service: employee-service (dokumen PKWT masa transisi, T18, di branch 2026-09-12) memanggilnya bersama `GET /salary-components` dengan identitas HR yang diteruskan. `BIP-Permissions` tidak ikut, jadi gerbang di sini jatuh ke predikat tier `isHR`; employee-service menilai `payroll.view` sendiri lebih dulu |
 | PUT | `/employee-salary/:employeeId` | **`salary.write`** / `isHR` | Izin terpisah — lihat §Model gerbang. ⚠️ **Upsert PENUH**: field yang tak dikirim jadi nol |
 | POST | `/employee-salary/bulk-bpjs-base` | **`salary.write`** / `isHR` | Isi massal DUA dasar upah BPJS dari Excel HR. ⛔ **Tanpa `upsert`** — karyawan tanpa penetapan gaji **dilaporkan gagal**, tidak dibuatkan record bergaji nol. `$set` hanya dua dasar upah + `updated_by/at`. Kegagalan **per baris** (`{diperbarui, tanpa_ubah, gagal[]}`), maks 1000 baris. Didaftarkan **sebelum** saudara ber-`:employeeId` |
-| GET | `/employer-cost` | ⚠️ **tanpa `gate()`** | Beban perusahaan per karyawan (bruto + iuran BPJS pemberi kerja), dikonsumsi **modul insentif** sebagai biaya operasional per orang. `?employee_ids=a,b,c&period=YYYY-MM`. Tanpa gerbang izin **secara sengaja**: pemanggilnya service lain yang tak membawa identitas orang. Penjaganya kunci gateway (`ValidateGateway` di `main.go`), dan ia hanya memulangkan satu angka beban per karyawan |
+| GET | `/employer-cost` | **`gerbangEmployerCost()`** (rincian di bawah tabel) | Beban perusahaan per karyawan (bruto + iuran BPJS pemberi kerja), dikonsumsi **modul insentif** sebagai biaya operasional per orang dan oleh alat Copilot `biaya_karyawan` ([[Microservices - Assistant Service]]). `?employee_ids=a,b,c&period=YYYY-MM` |
+
+**Gerbang `/employer-cost`** (`services/payroll/employer_cost_gate.go`, dipasang di pendaftaran rute `routes.go:67`; diukur ke `origin/main` 2026-10-07). Satu-satunya tempat aturan ini ditulis di vault; dok lain menaut ke sini. Urutan keputusan:
+
+1. **Kill-switch** `PAYROLL_EMPLOYER_COST_ENFORCEMENT=off` → lolos tanpa gerbang orang (`main.go:92-95` mencatatnya ke log). Bawaannya **menyala**; hanya nilai `off` yang mematikan. Kill-switch ini **terpisah** dari `PAYROLL_PERMISSION_ENFORCEMENT`: mematikan yang terakhir hanya mengembalikan `gate()` ke predikat tier, tidak menyentuh rute ini.
+2. **Pemanggil mesin** (permintaan tanpa header `BIP-Employee-ID`, mis. insentive-service lewat kunci gateway) → lolos. Klien tak bisa menyamar jadi mesin dengan membuang header itu: `ValidateGateway` menuntut kunci internal, dan gateway selalu membuang lalu mengisi ulang header `BIP-*` dari JWT (`shared-library/routes/gateway_request.go`).
+3. **Pemanggil ber-identitas orang** (lewat gateway dengan JWT) → wajib lolos `gate(common.PermPayrollView, isHR)`, sama dengan `/employee-salary`.
+
+⚠️ Gerbang dievaluasi saat registrasi rute (`employerCostGerbangAktif` di-set di `main` sebelum `RegisterRoutes`), jadi mengubah env menuntut container dibuat ulang, bukan sekadar menunggu.
 
 ## Payroll Run & THR
 

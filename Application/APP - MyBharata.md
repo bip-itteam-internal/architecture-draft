@@ -307,6 +307,10 @@ Petugas Satgas mencatat temuan 5R & K3 atas Office Boy dan Security, lalu mengec
 
 ### Sesi Live Host (`/live-shift`): ⚠️ live di `dev`, satu-satunya klien pencatatan sejak 2026-09-11
 
+> ⚠️ **Penolakan Mulai tidak menjelaskan sebabnya** (diukur di `origin/dev` 2026-10-08). `_mapMulaiError` (`live_shift_remote_datasource.dart`) hanya mengistimewakan 409; status lain menjadi `ServerFailure(r.message)`, dan `r.message` adalah reason phrase HTTP, bukan `data.error`. Jadi kalimat server seperti "akun live ini tidak tercatat bersiaran di toko yang dipilih ..." tidak terbaca host. Pembacaan `data.error` sudah ada, tetapi hanya di jalur ambil alih. Aplikasi juga **tidak pernah mengirim** `konfirmasi_toko`.
+>
+> 🟡 **Aplikasi ini sengaja TIDAK diubah** oleh [[ADR - 0157 Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Jadwal Ditolak]] (Diusulkan 2026-10-08, belum ada kode). Server akan menolak pilihan toko dan akun yang tidak sesuai jadwal siaran hari itu dan mengirim penjelasannya ke **inbox** host; pengingat jadwal sepuluh menit sebelum shift juga lewat inbox. Jadwalnya sendiri dilihat host di Kalender web ERP, bukan di aplikasi.
+
 Host live mencatat sendiri siaran TikTok-nya dari HP: Mulai (toko + akun), Jeda/Lanjutkan,
 Akhiri, plus riwayat **satu bulan kalender** dengan porsi GMV-nya sendiri. Ini catatan yang
 ditulis **host**, bukan hasil sync TikTok — sync datang terpisah sebagai `RingkasanShift`, dan

@@ -16,7 +16,8 @@ yang mestinya jadi brief adalah pekerjaan yang dibuang.
 Muat jadi brief bila SELURUHNYA benar:
 
 1. Keputusannya sudah tertulis dan bisa **ditunjuk**: ADR, dok domain vault, atau
-   `Workspace/ANALISA - *.md`. "Sudah jelas" tidak cukup.
+   `Workspace/ANALISA - *.md` yang ADR yang ditautnya sudah **Diterima** (ANALISA berbaris
+   "Menunggu ADR … Diterima" belum bisa ditunjuk). "Sudah jelas" tidak cukup.
 2. Apa yang harus benar bisa dinyatakan tanpa memilih pendekatan.
 3. Ada kriteria yang bisa dibuktikan mesin DAN satu yang terlihat di layar.
 4. Ukuran S per brief. Lintas repo dipecah, BE dulu — lintas repo BUKAN diskualifikasi.

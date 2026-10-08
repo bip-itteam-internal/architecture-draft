@@ -256,11 +256,44 @@ function Invoke-FlutterTestJson([string]$top) {
   return [pscustomobject]@{ gerbang = $g; jumlah = $jumlah; gagal = @($gagal | Sort-Object -Unique); terurai = $terurai }
 }
 
-function Invoke-VitestJson([string]$top, $pm) {
+# Cakupan langkah test Node (kit 1.40.0): bawaan `vitest related <berkas tersentuh>`, suite penuh
+# hanya bila lingkungan semua test berubah, ada berkas sumber terhapus, daftarnya terlalu panjang,
+# atau diminta (-TestPenuh). Alasan dan angka ukurnya di komentar POLA_TEST_PENUH, gerbang-lib.py;
+# dua salinan ini WAJIB sama (test_gerbang.py membandingkan keduanya).
+$POLA_TEST_PENUH = '(^|/)(package\.json|pnpm-lock\.yaml|package-lock\.json|yarn\.lock|bun\.lockb?|tsconfig[^/]*\.json|vitest\.(config|setup|workspace)[^/]*|vite\.config[^/]*|setupTests?\.[cm]?[jt]sx?)$|(^|/)src/test/|(^|/)test/setup'
+$EKSTENSI_SUMBER = @('.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.mts', '.cts', '.json', '.css')
+$BATAS_BERKAS_RELATED = 150
+
+function Get-RencanaVitest([string]$top, [string[]]$berkas, [bool]$paksaPenuh = $false) {
+  $penuh = { param($alasan) [pscustomobject]@{ mode = 'penuh'; berkas = @(); alasan = $alasan } }
+  if ($paksaPenuh) { return (& $penuh 'diminta (-TestPenuh)') }
+  # -cmatch: pola Python peka huruf; menyamakan perilaku supaya dua salinan memberi hasil sama
+  $pemicu = @($berkas | Where-Object { $_ -cmatch $POLA_TEST_PENUH })
+  if ($pemicu.Count -gt 0) { return (& $penuh ('berkas lingkungan test tersentuh: ' + (($pemicu | Select-Object -First 5) -join ', '))) }
+  $sumber = @($berkas | Where-Object { $b = $_.ToLower(); @($EKSTENSI_SUMBER | Where-Object { $b.EndsWith($_) }).Count -gt 0 })
+  if ($sumber.Count -eq 0) { return (& $penuh 'tidak ada berkas sumber JS/TS/JSON/CSS tersentuh') }
+  $hilang = @($sumber | Where-Object { -not (Test-Path -LiteralPath (Join-Path $top $_)) })
+  if ($hilang.Count -gt 0) { return (& $penuh ('berkas sumber terhapus/dipindah: ' + (($hilang | Select-Object -First 5) -join ', '))) }
+  if ($sumber.Count -gt $BATAS_BERKAS_RELATED) { return (& $penuh ('{0} berkas tersentuh (> {1})' -f $sumber.Count, $BATAS_BERKAS_RELATED)) }
+  return [pscustomobject]@{ mode = 'related'; berkas = $sumber; alasan = ('{0} berkas sumber tersentuh' -f $sumber.Count) }
+}
+
+# `vitest related` tanpa test terkait keluar 0 TANPA menulis --outputFile; cermin nol_test_related
+# di gerbang-lib.py (alasan di sana). Exit 0 DAN kalimat vitest-nya, supaya crash tetap gagal.
+function Test-NolTestRelated($g) { return ($g.exit -eq 0 -and @(@($g.semua) | Where-Object { ([string]$_).Contains('No test files found') }).Count -gt 0) }
+
+function Invoke-VitestJson([string]$top, $pm, [string[]]$related = $null) {
   # exit code vitest TIDAK dipakai sebagai lolos/gagal: yang menentukan adalah kegagalan BARU
   # terhadap baseline, karena `pnpm test` main tidak pernah hijau penuh di sini.
+  # $related = daftar berkas (relatif repo) -> `vitest related`; kosong -> seluruh suite (baseline).
   $tmp = Join-Path $env:TEMP ('vitest-' + [guid]::NewGuid().ToString('N') + '.json')
-  $g = Invoke-Gerbang 'test' $top ($pm.exec + ' vitest run --reporter=json --outputFile="' + $tmp + '"')
+  if ($related -and $related.Count -gt 0) {
+    $target = ($related | ForEach-Object { '"' + $_ + '"' }) -join ' '
+    $cmd = $pm.exec + ' vitest related ' + $target + ' --run --passWithNoTests --reporter=json --outputFile="' + $tmp + '"'
+  } else {
+    $cmd = $pm.exec + ' vitest run --reporter=json --outputFile="' + $tmp + '"'
+  }
+  $g = Invoke-Gerbang 'test' $top $cmd
   $gagal = @(); $jumlah = 0; $terurai = $false
   if (Test-Path $tmp) {
     try {
@@ -280,6 +313,7 @@ function Invoke-VitestJson([string]$top, $pm) {
     } catch {}
     Remove-Item $tmp -Force -ErrorAction SilentlyContinue
   }
+  elseif ($related -and $related.Count -gt 0 -and (Test-NolTestRelated $g)) { $terurai = $true }
   return [pscustomobject]@{ gerbang = $g; jumlah = $jumlah; gagal = @($gagal | Sort-Object -Unique); terurai = $terurai }
 }
 

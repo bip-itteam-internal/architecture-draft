@@ -22,25 +22,18 @@ Saring `architecture-draft/VAULT-INDEX.json` untuk mengenali area yang tersentuh
 dibaca utuh** — indeksnya ratusan dokumen dan pembacaan penuh akan terpotong diam-diam;
 cocokkan `area` + `kata_kunci` saja. Belum membaca dokumen apa pun di tahap ini.
 
-## 1. Wawancara
+## 1a. Wawancara niat
 
-Tanyakan **hanya yang tidak bisa dijawab indeks**. **Satu pertanyaan per pesan.** Maksimum 5.
-
-Lima hal yang harus terjawab, karena kelimanya membelokkan arsitektur:
+Dua pertanyaan **terbuka**, satu per pesan, **sebelum** grounding. Jawabannya tidak ada di kode,
+dan keduanya mempertajam apa yang dicari subagent di §2:
 
 1. **Keputusan apa yang diambil dari ini, oleh siapa?** Memisahkan kebutuhan dari solusi. Bila
    tidak ada keputusan yang berubah, yang diminta laporan hiasan, dan itu layak dikatakan.
 2. **Sekarang orangnya bagaimana?** Selalu sudah ada cara manual. Menunjukkan data sumbernya
    hidup di mana, dan sering mengungkap modul yang sudah menyelesaikan separuh masalahnya.
-3. **Sesering apa dilihat, seberapa segar datanya harus?** Pembelok paling keras: query langsung
-   vs mart terjadwal vs cron. Berbeda ongkos dan berbeda mode gagal.
-4. **Siapa yang boleh melihat?** Menentukan keterlibatan RBAC, jebakan HRGA, prinsip tiga lapis
-   kalender, dan data pribadi orang lain.
-5. **Apa akibatnya bila angkanya salah?** Angka untuk menggaji orang menuntut gerbang yang sama
-   sekali berbeda dari angka untuk rapat mingguan.
 
-**Berhenti** begitu kelimanya terjawab dari sumber mana pun. Jangan menuntaskan daftar demi
-lengkap. Jawaban "tidak tahu" dicatat sebagai **asumsi eksplisit**, jangan mandek menunggu.
+Lewati yang sudah dijawab kalimat pembuka user atau indeks. Jawaban "tidak tahu" dicatat sebagai
+**asumsi eksplisit**, jangan mandek menunggu. Tiga pertanyaan bentuk menyusul di §1b, sesudah grounding.
 
 ## 2. Grounding
 
@@ -74,9 +67,11 @@ Tiap subagent wajib mengembalikan `file:line` untuk **setiap** klaim, dan satu b
 3. ⛔ **Data nyata.** Sebelum merancang apa pun yang membaca data yang sudah ada, **ukur isinya
    di prod**. Sudah berkali-kali terjadi: nol slip payroll terbit padahal kodenya live, nol
    dokumen `web_browser` padahal push notification live. Angka nol yang mencurigakan adalah
-   pertanyaan, bukan kabar baik. **Baca prod boleh, tulis TIDAK.** Bila akses prod tidak
-   tersedia, catat sebagai **asumsi eksplisit** dan tandai sebagai risiko di ADR; jangan
-   menebak isinya.
+   pertanyaan, bukan kabar baik. **Baca prod boleh, tulis TIDAK** (batasnya per perintah: skill
+   `deploy-bip-erp` §0). Alamat dan cara aksesnya ada di vault `IT - Server, VMs and Databases`
+   § **MongoDB ERP Production**; coba itu dulu, jangan langsung menyerah. Bila tetap tak terjangkau
+   dari mesin ini, catat sebagai **asumsi eksplisit**, tandai sebagai risiko di ADR, dan **tulis
+   kuerinya** supaya manusia bisa menjalankannya (jadi "Perlu ukur prod:" di §5c); jangan menebak isinya.
 4. ⛔ **Kolom.** Untuk tiap kolom angka yang masuk rancangan, jawab eksplisit: komponen sejajar,
    atau himpunan bagian dari kolom lain? `iklan_sia_sia` adalah porsi `ads_cost` yang **sudah**
    terpotong dari laba; `orders_dikirim` himpunan bagian dari `orders`. Menjumlahkannya
@@ -90,11 +85,39 @@ Tiap subagent wajib mengembalikan `file:line` untuk **setiap** klaim, dan satu b
 klaim yang jadi **dasar keputusan** diverifikasi ulang sendiri, minimal dengan membuka
 `file:line` yang disebutnya.
 
+## 1b. Wawancara bentuk
+
+Tiga pertanyaan yang membelokkan arsitektur, diajukan **sesudah** grounding supaya opsinya
+berdiri di atas kode yang sudah ada, bukan tebakan:
+
+3. **Sesering apa dilihat, seberapa segar datanya harus?** Pembelok paling keras: query langsung
+   vs mart terjadwal vs cron. Berbeda ongkos dan berbeda mode gagal.
+4. **Siapa yang boleh melihat?** Menentukan keterlibatan RBAC, jebakan HRGA, prinsip tiga lapis
+   kalender, dan data pribadi orang lain.
+5. **Apa akibatnya bila angkanya salah?** Angka untuk menggaji orang menuntut gerbang yang sama
+   sekali berbeda dari angka untuk rapat mingguan.
+
+Ajukan lewat **`AskUserQuestion`**, paling banyak tiga pertanyaan dalam **satu** panggilan. Aturan opsi:
+
+1. **Tiap opsi menyebut sumbernya** di deskripsi: `file:line`, nama koleksi/mart, atau judul dok/ADR
+   dari hasil §2. Opsi tanpa sumber hanya boleh sebagai alternatif **"bangun baru"**, dan dilabeli begitu.
+2. `(Recommended)` hanya bila grounding mendukungnya, dengan alasan satu kalimat; opsi itu di urutan pertama.
+3. Selalu ada opsi **"Belum tahu"**: dicatat sebagai **asumsi eksplisit** di ADR, tak mandek.
+4. Pertanyaan yang **sudah terjawab grounding atau jawaban §1a tidak ditanyakan**; jawabannya
+   disajikan sebagai temuan di §4. Bila grounding tak menemukan apa pun yang relevan, pertanyaannya
+   **tetap diajukan** dengan opsi "bangun baru" berlabel + "Belum tahu", bukan dilewati.
+5. `AskUserQuestion` menampung **paling banyak 4 opsi** per pertanyaan, dan "Belum tahu" memakan satu:
+   pilih tiga alternatif terkuat, sisanya sebut di teks §4.
+
+Contoh Q3: "pakai mart `<nama>` yang sudah ada, segar H-1 (`<berkas>:<baris>`)" ·
+"query langsung ke `<koleksi>` (bangun baru; jalur daftar berpaginasi, risiko compute-on-read)" · "Belum tahu".
+
 ## 3. Pertanyaan lanjutan
 
 Maksimum 2, dan hanya yang **baru bisa muncul setelah baca kode**, misalnya "ternyata sudah ada X
-yang menyelesaikan 70% ini, dipakai ulang atau dipisah?". Total pertanyaan sepanjang command ini
-tidak pernah lebih dari 7. Sisanya jadi asumsi tertulis.
+yang menyelesaikan 70% ini, dipakai ulang atau dipisah?". Ajukan lewat `AskUserQuestion` dengan
+aturan opsi §1b. Total pertanyaan kebutuhan sepanjang command ini tidak pernah lebih dari 7.
+Sisanya jadi asumsi tertulis.
 
 ## 4. Sajikan, lalu BERHENTI
 
@@ -106,6 +129,15 @@ Sajikan di chat:
 - **Asumsi eksplisit** dari pertanyaan yang tidak terjawab
 - **Konsekuensi deploy** bila ada: env baru butuh `--force-recreate`, kategori inbox baru butuh
   dua container naik bersama, perubahan kontrak berarti BE sebelum FE
+- **Dok terdampak** bila keputusannya **mengubah** fakta yang sudah tertulis di dok lain (ambang,
+  rumus, daftar-izin, rute): jalankan `/dampak` langkah 1-4 atas draf keputusan ini **sebelum
+  menyajikan**, dan sajikan laporannya di sini. Satu gerbang persetujuan untuk keduanya. Keputusan
+  yang murni menambah hal baru boleh lewat.
+- **Blueprint**: daftar issue yang akan dibuat (judul, repo, ukuran Kecil/Sedang/Besar, urutan),
+  lihat §5c. Tanyakan **Pemutus** (login GitHub) lewat `AskUserQuestion`: kandidatnya dari jawaban
+  Q1 ("oleh siapa") dan pemilik dok/ADR yang ditemukan grounding, plus "Belum tahu"; aturan opsi
+  bersumber §1b tidak berlaku di sini. Pertanyaan ini tidak dihitung dalam batas 7. Satu persetujuan
+  mencakup ADR, dok, dan pembuatan issue.
 
 ⛔ **BERHENTI. Tunggu persetujuan user. JANGAN menulis berkas apa pun sebelum disetujui.**
 
@@ -120,7 +152,11 @@ dan selesai. Analis yang selalu menghasilkan ADR adalah analis yang selalu bilan
 
 ## 5. Tulis artefak (hanya setelah disetujui)
 
-Tiga berkas, semuanya di `architecture-draft`.
+Tiga berkas di `architecture-draft`, lalu issue di repo kode.
+
+Suntingan dok terdampak hasil `/dampak` yang disetujui di §4 diterapkan bersama artefak ini, mengikuti
+`/dampak` langkah 6 sebagai **pemanggil** (sunting + cek wikilink saja); index, commit, dan push ikut
+§6-§7 di bawah, sekali untuk semuanya.
 
 **a. ADR di `Decisions/`.** Hitung nomor tertinggi saat ini dan tambah satu; **jangan pakai nomor
 hafalan**, orang lain bisa menambah lebih dulu dan seluruh wikilink memakai judul lengkap. Bentuk
@@ -147,9 +183,69 @@ service **baru** membuat dok baru dari `Templates/Template - Konsep Domain.md`. 
 domain **saling menaut** dengan wikilink: ADR menyimpan kenapa dan keputusannya, dok domain
 menyimpan cara kerjanya.
 
-**c. Daftar task di `Workspace/ANALISA - <judul>.md`.** Pecahan kerja berurutan dengan
-dependensinya, tiap item cukup jelas untuk langsung dilempar ke `/start-task`. **Bukan** rencana
-per berkas. Sengaja tidak di dalam ADR: ADR adalah keputusan, bukan papan kerja.
+**c. Blueprint di `Workspace/ANALISA - <judul>.md`.** Kumpulan **draf issue** yang lolos checklist
+Siap Agent (team-memory § Definition of Ready, ADR 0151 "Issue Siap Dikerjakan Agent Bila
+Keputusannya Bisa Ditunjuk, Ditandai Manusia"). Sengaja tidak di dalam ADR: ADR adalah keputusan,
+blueprint papan kerja.
+
+Kepala: wikilink ADR + dok domain, **ukuran** + alasannya, Pemutus, dan baris status
+**"Menunggu ADR <judul> Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk
+`/brief`."** Blokernya berisi bagian Keputusan dan Yang harus benar, jadi tanpa baris ini triase
+`/start-task` akan menerimanya sebagai sumber dan `/kerjakan` jalan atas ADR yang belum disetujui.
+
+Ukuran ditentukan dari repo yang **harus berubah**, bukan repo yang sekadar memuat fitur terkait:
+untuk tiap repo konsumen (FE, mobile), periksa dulu apakah ia sudah merender bentuk baru secara
+generik sebelum menghitungnya. Alasan ukuran menyebut bukti itu (`file:line`).
+
+| Ukuran | Kapan | Bentuk |
+|---|---|---|
+| **Kecil** | 1 repo | 1 issue tanpa induk. Butuh > 1 PR → issue **sejajar** "bagian i/N, sesudah #<n>", juga tanpa induk: team-memory "satu repo cukup satu issue", sub-issue tak dipakai di dalam satu repo |
+| **Sedang** | > 1 repo, tiap repo 1 PR | induk di repo tempat kontrak lahir (biasanya `bip-erp`, tanpa PR sendiri) + 1 sub-issue `[BE]`/`[FE]`/`[Mobile]` per repo |
+| **Besar** | > 1 repo, ada repo yang butuh > 1 PR | seperti Sedang + sub-issue **saudara** "bagian i/N" di bawah induk yang sama; tak pernah sub di bawah sub |
+
+Tiap issue satu blok berbagian persis template `bip-erp/.github/ISSUE_TEMPLATE/tugas.md`:
+`**Pemutus:**` / `**PIC:**`, `## Masalah`, `## Keputusan`, `## Yang harus benar`,
+`## Di luar cakupan`, `## Data / bukti pendukung`, `## Prasyarat`; ditambah repo tujuan
+(`bip-erp`, `erp-frontend`, `my-bharata`; folder lokal mobile `mybharata-app`) dan urutan.
+
+- **Keputusan** menunjuk ADR **dengan judul** (nomor ADR bukan kunci unik) dan menulis terang:
+  *layak `Siap Agent` sesudah ADR berstatus Diterima* (ADR baru masih 🟡 Diusulkan). Boleh
+  ringkasan **bentuk** paling banyak tiga baris (ambang, satuan, penerima, siapa boleh apa) supaya
+  issue terbaca sendiri; alasan dan alternatif tetap hanya di ADR.
+- **Yang harus benar** diturunkan dari `## Decision` jadi kriteria yang bisa diperiksa (perilaku,
+  angka, layar). "Pertimbangkan", "perlu disepakati", "dsb" dilarang.
+- **Data** diisi hasil ukur prod gerbang 3 §2. Tak tersedia → tulis **"Perlu ukur prod:"** diikuti
+  angka yang dibutuhkan dan kuerinya. Itu menahan issue dari `Siap Agent` (Definition of Ready #4:
+  runner dilarang membaca prod), dan §8 menyebutnya sebagai langkah manusia.
+- **Prasyarat**: urutan deploy BE sebelum FE/Mobile ditulis di sub-issue FE/Mobile.
+- ⛔ **Issue bertopik keamanan** (celah, akses, kebocoran data): vault ini repo **PUBLIK**, jadi blok
+  di ANALISA hanya memuat judul, repo, dan kalimat "rincian di issue privat". Masalah, bukti, dan cara
+  reproduksi hanya ditulis di badan issue (repo kode privat). Rincian celah yang belum ditambal tak
+  pernah ditulis ke vault (team-memory § Backlog).
+
+**d. Buat issue.** Dijalankan **di dalam §7, sesudah merge `origin/main`**, bukan di sini: judul ADR
+memuat nomornya, dan nomor itu baru pasti tak bertabrakan sesudah merge. Dari akar `erp/`, via PowerShell:
+
+1. Induk / issue tunggal: cari dulu
+   `gh issue list --repo bip-itteam-internal/<repo> --state all --search "<judul> in:title" --json number,title,url`
+   dan anggap "sudah ada" hanya bila `title` **sama persis**; belum ada → tulis badan ke berkas
+   scratchpad, `gh issue create --repo bip-itteam-internal/<repo> --title "<judul>" --body-file <berkas>`,
+   lalu `gh project item-add 15 --owner bip-itteam-internal --url <url>`.
+2. Sub-issue: `& '.claude/hooks/buat-sub-issue.ps1' -Induk <repo>#<n> -Repo <bip-erp|erp-frontend|my-bharata> -Judul '<judul>' -Badan <berkas-badan.md>`.
+   `-Badan` adalah **path berkas** (skrip membacanya dengan `ReadAllText`), bukan teks. Skrip
+   idempoten per judul penuh dan memasukkan issue ke Project #15.
+3. **TANPA label `Siap Agent`**, tanpa assignee: label dipasang manusia (ADR 0151), assignee saat In Progress.
+4. Pemutus "Belum tahu" di §4 → tulis `**Pemutus:** BELUM DITETAPKAN` di badan (DoR #6 menuntut login),
+   dan §8 menyebutnya sebagai langkah manusia.
+5. Tulis nomor + URL tiap issue balik ke blok-nya di ANALISA **sebelum** regenerasi indeks §6, supaya
+   vault di-commit dan di-push sekali.
+6. **Gagal sebagian**: laporkan yang terbuat (URL) dan yang gagal (galat); jangan ulang buta.
+   Menjalankan ulang aman karena butir 1-2 idempoten; indeks pencarian GitHub bisa tertinggal
+   beberapa detik, jadi tunggu sebentar sebelum mengulang butir 1.
+7. `gh` tanpa scope `project` → issue tetap dibuat; catat item-add yang gagal dan perintah
+   `gh auth refresh -h github.com -s project` di laporan.
+
+Kesimpulan **"tidak perlu dibangun"** melewati seluruh §5-§8 (lihat §4): tak ada blueprint, tak ada issue.
 
 ## 6. Regenerasi indeks. WAJIB.
 
@@ -166,11 +262,19 @@ sudah basi lagi begitu merge selesai.
 
 Vault push **langsung ke `main`, tanpa PR**. Stage **per nama berkas**, jangan `git add -A`.
 Pakai `git -C <vault> -c core.fsmonitor=false`. Urutan: commit di `main` → merge
-`origin/main` → regenerasi indeks (langkah 6) → push. Bila `VAULT-INDEX.json` konflik saat
+`origin/main` → periksa nomor ADR baru tak dipakai dok lain sesudah merge (bila dipakai: nomori
+ulang, perbarui wikilink-nya) → **§5 butir d (buat issue)** → regenerasi indeks (langkah 6) →
+commit → push. Bila push ditolak `gerbang-adr.py` karena nomor ganda sesudah issue terbuat, nomori
+ulang ADR lalu sunting badan tiap issue yang mengutip judul lamanya
+(`gh issue edit <n> --repo bip-itteam-internal/<repo> --body-file <berkas>`). Bila `VAULT-INDEX.json` konflik saat
 merge, **jangan digabung baris per baris**: ambil salah satu sisi, selesaikan konflik
 dokumennya dulu, lalu regenerasi indeks **sekali di akhir**.
 
 ## 8. Serahkan
 
-Tutup dengan kalimat konkret: task pertama apa, dan perintahnya, misalnya
-`jalankan /start-task <deskripsi task pertama>`.
+Tutup dengan daftar URL issue yang dibuat (induk dulu), lalu langkah manusia berikutnya, konkret:
+setujui ADR dengan menulis `🟢 Diterima, <tanggal>, oleh <login>` di baris statusnya (lalu hapus
+baris "Menunggu ADR … Diterima" di kepala ANALISA); untuk issue yang memuat **"Perlu ukur prod:"**,
+jalankan kuerinya (baca saja) dan tempel hasilnya; isi Pemutus yang masih **BELUM DITETAPKAN**; lalu pasang
+label `Siap Agent` pada issue yang lolos checklist Definition of Ready. Sebelum langkah-langkah itu,
+runner backlog tidak akan mengambil issue-nya.

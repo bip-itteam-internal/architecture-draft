@@ -12,6 +12,7 @@ import datetime
 import glob
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -37,6 +38,41 @@ PM_NODE = (
     ("bun.lockb", {"nama": "bun", "jalan": "bun run", "exec": "bunx"}),
     ("bun.lock", {"nama": "bun", "jalan": "bun run", "exec": "bunx"}),
 )
+
+# Cakupan langkah test Node (kit 1.40.0). Bawaannya `vitest related <berkas tersentuh>`, bukan
+# seluruh suite: diukur 2026-10-07 di erp-frontend, suite penuh 22.182 test = 65 menit (ditambah
+# antrean mesin bersama), sedangkan `related` atas 5 berkas = 86 berkas test / 1.345 test dalam
+# 7 menit dengan kesimpulan yang sama (0 gagal baru). Pembandingnya tetap baseline PENUH, jadi
+# subset tidak mengubah arti `gagal_baru`. Suite penuh tetap dipakai bila yang berubah adalah
+# lingkungan SEMUA test (POLA_TEST_PENUH), bila ada berkas sumber terhapus (pengimpornya tak lagi
+# bisa ditelusuri dari berkas itu), bila daftarnya terlalu panjang untuk satu baris perintah, atau
+# bila diminta (--test-penuh / -TestPenuh). Cermin PowerShell: Get-RencanaVitest di gerbang-lib.ps1.
+POLA_TEST_PENUH = re.compile(
+    r"(^|/)(package\.json|pnpm-lock\.yaml|package-lock\.json|yarn\.lock|bun\.lockb?"
+    r"|tsconfig[^/]*\.json|vitest\.(config|setup|workspace)[^/]*|vite\.config[^/]*"
+    r"|setupTests?\.[cm]?[jt]sx?)$"
+    r"|(^|/)src/test/|(^|/)test/setup")
+EKSTENSI_SUMBER = (".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".mts", ".cts", ".json", ".css")
+BATAS_BERKAS_RELATED = 150
+
+
+def rencana_vitest(top, berkas, paksa_penuh=False):
+    """Putuskan cakupan langkah test: {'mode': 'related'|'penuh', 'berkas': [...], 'alasan': str}."""
+    if paksa_penuh:
+        return {"mode": "penuh", "berkas": [], "alasan": "diminta (--test-penuh)"}
+    pemicu = [b for b in berkas if POLA_TEST_PENUH.search(b)]
+    if pemicu:
+        return {"mode": "penuh", "berkas": [], "alasan": "berkas lingkungan test tersentuh: " + ", ".join(pemicu[:5])}
+    sumber = [b for b in berkas if b.lower().endswith(EKSTENSI_SUMBER)]
+    if not sumber:
+        return {"mode": "penuh", "berkas": [], "alasan": "tidak ada berkas sumber JS/TS/JSON/CSS tersentuh"}
+    hilang = [b for b in sumber if not os.path.exists(os.path.join(top, b))]
+    if hilang:
+        return {"mode": "penuh", "berkas": [], "alasan": "berkas sumber terhapus/dipindah: " + ", ".join(hilang[:5])}
+    if len(sumber) > BATAS_BERKAS_RELATED:
+        return {"mode": "penuh", "berkas": [], "alasan": "%d berkas tersentuh (> %d)" % (len(sumber), BATAS_BERKAS_RELATED)}
+    return {"mode": "related", "berkas": sumber, "alasan": "%d berkas sumber tersentuh" % len(sumber)}
+
 
 # Repo yang memang TIDAK punya suite mesin. Lubang yang disengaja dan diberi nama, supaya ia
 # terbaca sebagai keputusan alih-alih kelalaian. Repo KODE tidak boleh masuk sini.
@@ -191,9 +227,25 @@ def jalankan(nama, cwd, cmd, batas=None):
             "durasi_detik": round(time.time() - t, 1), "ekor": out[-25:], "semua": out}
 
 
-def vitest_json(top, pm):
+def nol_test_related(g):
+    # `vitest related` yang tak menemukan satu test pun keluar 0 TANPA menulis --outputFile
+    # (diukur vitest erp-frontend 2026-10-07). Tanpa pengecualian ini diff tanpa test terkait
+    # terbaca "JSON tak terurai" = gagal. Sempit sengaja: exit 0 DAN kalimat vitest-nya, supaya
+    # vitest yang mati sebelum menulis JSON tetap gagal.
+    return g.get("exit") == 0 and any("No test files found" in b for b in (g.get("semua") or []))
+
+
+def vitest_json(top, pm, related=None):
+    # related = daftar berkas (relatif repo) -> `vitest related`; None -> seluruh suite (baseline).
     tmp = os.path.join(tempfile.gettempdir(), "vitest-%d.json" % os.getpid())
-    g = jalankan("test", top, '%s vitest run --reporter=json --outputFile="%s"' % (pm["exec"], tmp))
+    if related:
+        target = " ".join('"%s"' % b for b in related)
+        cmd = '%s vitest related %s --run --passWithNoTests --reporter=json --outputFile="%s"' % (pm["exec"], target, tmp)
+    else:
+        cmd = '%s vitest run --reporter=json --outputFile="%s"' % (pm["exec"], tmp)
+    if os.path.exists(tmp):
+        os.remove(tmp)  # nama berbasis pid: sisa run lama tak boleh terbaca sebagai hasil run ini
+    g = jalankan("test", top, cmd)
     gagal, jumlah, terurai = [], 0, False
     if os.path.exists(tmp):
         try:
@@ -214,6 +266,8 @@ def vitest_json(top, pm):
         except Exception:
             pass
         os.remove(tmp)
+    elif related and nol_test_related(g):
+        terurai = True
     return {"gerbang": g, "jumlah": jumlah, "gagal": sorted(set(gagal)), "terurai": terurai}
 
 
@@ -305,6 +359,7 @@ def gerbang_test(nama_gerbang, t, bl):
 
 def cmd_gerbang(argv):
     path, base, kit, tanpa_build, tanpa_test, keluaran = None, "origin/main", None, False, False, None
+    test_penuh = False
     i = 0
     while i < len(argv):
         a = argv[i]
@@ -313,9 +368,10 @@ def cmd_gerbang(argv):
         elif a == "--keluaran": keluaran = argv[i + 1]; i += 2
         elif a == "--tanpa-build": tanpa_build = True; i += 1
         elif a == "--tanpa-test": tanpa_test = True; i += 1
+        elif a == "--test-penuh": test_penuh = True; i += 1
         else: path = a; i += 1
     if not path:
-        print("pakai: gerbang.sh <path> [--base X] [--kit K] [--tanpa-build] [--tanpa-test] [--keluaran F]", file=sys.stderr); return 2
+        print("pakai: gerbang.sh <path> [--base X] [--kit K] [--tanpa-build] [--tanpa-test] [--test-penuh] [--keluaran F]", file=sys.stderr); return 2
     kit = kit or kit_root(os.path.dirname(__file__))
     top = repo_top(path)
     if not top:
@@ -336,9 +392,15 @@ def cmd_gerbang(argv):
             if tanpa_build: catatan.append("BUILD DILEWATI atas permintaan (--tanpa-build); jalankan sebelum merge")
             else: gerbang.append(jalankan("build", top, "%s build" % pm["jalan"]))
         if not tanpa_test:
-            t = vitest_json(top, pm); bl = read_baseline(kit, nama)
+            rv = rencana_vitest(top, berkas, test_penuh)
+            catatan.append("cakupan test: %s (%s)" % (rv["mode"], rv["alasan"]))
+            t = vitest_json(top, pm, rv["berkas"] if rv["mode"] == "related" else None); bl = read_baseline(kit, nama)
             if bl is None: catatan.append("TIDAK ADA BASELINE untuk '%s' di %s/baseline; kegagalan test TIDAK dibandingkan dengan apa pun. Buat dengan baseline-test.sh." % (nama, kit))
-            gerbang.append(gerbang_test("test", t, bl))
+            gt = gerbang_test("test", t, bl)
+            gt["cakupan"] = rv["mode"]
+            if rv["mode"] == "related" and t["terurai"] and t["jumlah"] == 0:
+                catatan.append("cakupan related: tidak ada test yang mengimpor berkas tersentuh (0 test dijalankan)")
+            gerbang.append(gt)
             if not t["terurai"]: catatan.append("keluaran vitest JSON tidak terurai; gerbang test dianggap GAGAL")
     elif jenis == "go":
         svcs = services_tersentuh(top, berkas)

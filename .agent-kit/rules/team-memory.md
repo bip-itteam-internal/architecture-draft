@@ -259,6 +259,13 @@ Yang membuatnya bergejala: `DepartmentFilterOptions` sengaja MENGGANTI anggota g
   Desain: `.agent-kit/docs/2026-08-28-analisa-kebutuhan-command-design.md`.
 - **Prosedur pencarian vault kini SATU tempat**: `.agent-kit/rules/vault-retrieval.md`, dirujuk
   `/ask`, `/start-task`, dan `/analisa-kebutuhan`. Jangan menyalinnya lagi ke command baru.
+- **`/dampak` (kit ≥ 1.37.0) sebelum mengubah FAKTA di vault** (ambang, rumus, daftar-izin, rute, field).
+  Ia mendaftar dok lain dan berkas kode yang menyatakan fakta yang sama (`git grep` atas ref remote,
+  bukan ripgrep), lalu menyunting dok hanya yang disetujui; kode tak pernah disentuh. Dipanggil sendiri
+  oleh `/analisa-kebutuhan` §4 dan `/sync-docs`.
+- **`/analisa-kebutuhan` (kit ≥ 1.39.0) bertanya bentuk lewat pilihan ganda bersumber kode, dan
+  keluarannya draf issue Siap Agent** (Kecil/Sedang/Besar) yang dibuat di GitHub setelah disetujui,
+  **tanpa** label `Siap Agent`: label tetap dipasang manusia sesudah ADR-nya Diterima (ADR 0151).
 - **Alur pengguna kini ditanyakan di tiga tahap** (kit ≥ 1.12.0). Sebelum ini alur wajib `/start-task`→`/wrap` **tak pernah sekali pun** menanyakan apakah ORANGNYA bisa menyelesaikan pekerjaannya — semua gerbang bertanya apakah kodenya benar. Hasilnya benar secara kode dan membingungkan di layar. Sekarang: `/plan` §1b menuntut bagian **`## Alur Pengguna`** di artefak (langkah orang, bukan aliran data, dengan titik putusnya ditandai); `/review` §F mencari alur terputus sebagai temuan KRITIS; `/wrap` §5d menuntut satu perjalanan utuh sebagai orang, dan `curl` ke endpoint tidak menggantikannya. Tiga bentuk putus yang sudah terbukti: **langkah berikutnya di modul lain tanpa tautan** (kolom "belum ditugaskan" di Affiliate, betulnya di ICC Management), **aksi ditolak dengan cara membetulkan di layar lain** (assign butuh atasan di HRIS), dan **keadaan menunggu tanpa pemberitahuan**. Layar yang butuh paragraf panduan adalah gejala alurnya belum mengantar sendiri, bukan solusi.
 - **Checklist `/review` ada di `.agent-kit/rules/review-checklist.md`** (kit ≥ 1.7.0), dibaca **on-demand** saat `/review` jalan — sengaja TIDAK di-import ke `CLAUDE.md` karena akan membakar konteks tiap sesi. Isinya kelas bug yang sudah terbukti menggigit di sini, jadi **gotcha baru yang berulang taruh di situ**, bukan cuma di file ini. Yang paling menolong justru **gerbang verifikasi anti false-positive**-nya: klaim "field/handler ini tidak ada" wajib dibuktikan Grep dulu, karena diff saja tidak cukup dan review yang sering meleset akan diabaikan orang.
 - **`superpowers` WAJIB dipakai seluruh tim** (kit ≥ 1.11.0). `init` kini menulis
@@ -311,7 +318,7 @@ jadi rujukan `BHA-<n>` di vault, ADR, dan brief tetap bisa dilacak (`gh search i
 | In Progress | branch sudah ada | pembuat branch (manusia atau agent) |
 | In Review | PR terbuka | pembuat PR (manusia atau agent) |
 | **Menunggu Adopsi** | kode merged; sisa deploy prod (manusia) dan fitur benar-benar dipakai | otomatis: PR merged menutup issue, workflow *Item closed* memindahkannya |
-| Done | terpasang di prod **dan terbukti dipakai** (field **Bukti Adopsi** terisi) | manusia, dengan bukti |
+| Done | terbukti dipakai (**Bukti Adopsi** diisi orang), **atau** sudah 7 hari di Menunggu Adopsi (Bukti Adopsi berawalan `otomatis:`) | manusia dengan bukti; atau otomasi harian sesudah 7 hari |
 | Canceled | tidak dikerjakan / duplikat | manusia |
 
 Aturan (berlaku untuk developer DAN agent):
@@ -322,11 +329,36 @@ Aturan (berlaku untuk developer DAN agent):
   (kata kunci penutup, atau branch dari `gh issue develop`) yang menggerakkan otomasi; `Refs #<n>`
   tidak menyambungkan apa pun, dan issue-nya diam di In Review selamanya. Bentuk lengkap
   `<org>/<repo>#<n>` wajib saat PR dan issue beda repo (PR erp-frontend untuk issue bip-erp).
+- ⛔ **MyBharata: `Closes` TIDAK menutup issue, karena PR di-merge ke `dev` sedangkan branch default
+  repo `main`.** GitHub hanya menutup issue untuk PR yang masuk ke branch default, jadi issue
+  `my-bharata` tak pernah closed, workflow *Item closed* tak pernah terpicu, dan kartunya diam di
+  In Review. Kueri "issue terbuka dengan PR merged" pun **buta** terhadapnya: PR ke `dev` tidak
+  tercatat sebagai penutup (`closedByPullRequestsReferences` kosong). Terjadi pada my-bharata#175
+  (PR #176 merged 2026-10-04, ketahuan 2026-10-07 hanya dengan mencocokkan teks PR). **Sesudah PR
+  `my-bharata` merged ke `dev`, yang me-merge menutup issue-nya manual** (`gh issue close <n> -R
+  bip-itteam-internal/my-bharata --reason completed`) lalu memastikan kartunya di Menunggu Adopsi.
+  Issue yang tak ditutup juga **dilewati** otomasi 7-hari-ke-Done.
+- ⛔ **Item yang dimasukkan ke board WAJIB langsung diberi Status** (`gh project item-edit`), jangan
+  dibiarkan "No Status". Workflow bawaan project (*Item added*, *Item closed*) bisa MATI tanpa ada
+  yang berbunyi: diukur 2026-10-07, lima dari enam workflow Project #15 mati sejak 2026-09-29, dan
+  43 kartu merged diam di In Review plus 7 kartu tanpa Status sebelum ada yang bertanya. Otomasi
+  board itu bantuan, bukan jaminan.
 - ⛔ **Merge BUKAN Done.** Pelajaran audit Linear 2026-09-29 tetap berlaku: status meleset ke dua arah
   (BHA-249 Done tanpa satu baris kode, BHA-250 "Belum Mulai" padahal 127 sesi live sudah memakainya,
   BHA-22 kodenya lengkap di prod dengan 0 snapshot), dan 82 dari 105 issue Done tak punya PR tertaut.
   "Kode selesai" dan "dipakai" pemiliknya berbeda; satu status untuk keduanya menyembunyikan siapa
-  yang ditunggu. **Agent tidak pernah memindahkan issue ke Done.**
+  yang ditunggu. **Agent tidak pernah memindahkan issue ke Done secara manual.**
+- **Menunggu Adopsi 7 hari → Done otomatis** (keputusan 2026-10-08,
+  [[ADR - 0156 Backlog Menunggu Adopsi Tujuh Hari Otomatis Done]]). Diukur hari itu: 230 dari 578
+  kartu menumpuk di Menunggu Adopsi dan **0** berisi Bukti Adopsi. Otomasi harian (`bip-erp`
+  `scripts/board/adopsi_otomatis.py`, GitHub Actions) memindahkan kartu yang field Status-nya sudah
+  7 hari di Menunggu Adopsi dan issue-nya **tertutup**, lalu mengisi Bukti Adopsi
+  `otomatis: 7 hari di Menunggu Adopsi (<tanggal>)`. Dilewati: issue terbuka, *not planned*, bukan
+  issue. ⚠️ Akibatnya **Done tidak lagi selalu berarti terbukti dipakai**, dan kartu yang merged
+  tetapi belum di-deploy prod ikut jadi Done: laporan adopsi wajib menyaring Bukti Adopsi yang
+  **tidak** berawalan `otomatis:`. ⚠️ Ukur dulu apakah otomasinya benar-benar jalan (run Actions
+  terakhir, secret `PROJECT_TOKEN`) sebelum mengandalkannya; token kedaluwarsa membuat kartu
+  menumpuk lagi tanpa galat di board.
 - ⛔ **Jangan membuat issue di repo vault `architecture-draft`: repo itu PUBLIK.** Issue bertanda
   keamanan hanya di repo kode (privat), dan rincian celah yang belum ditambal tidak ditulis ke vault.
 - **Satu issue tinggal di satu repo.** Taruh di repo kode yang paling banyak disentuh.
@@ -343,13 +375,17 @@ Aturan (berlaku untuk developer DAN agent):
   - **Satu repo cukup satu issue**, tanpa sub-issue. Memecah pekerjaan satu repo jadi sub-issue per berkas
     membuat board tak terbaca.
   - **Status induk mengikuti anak-anaknya**: In Progress begitu satu anak mulai; **Menunggu Adopsi**
-    hanya bila SEMUA anak sudah merged (induk ditutup manual saat itu); Done tetap manusia dengan bukti.
+    hanya bila SEMUA anak sudah merged (induk ditutup manual saat itu); Done mengikuti aturan Menunggu Adopsi di atas.
   - **Urutan deploy BE sebelum FE/Mobile** ditulis di badan sub-issue FE/Mobile ("deploy sesudah
     `bip-erp#<sub BE>`"); merged duluan boleh, deploy duluan tidak.
-- **Assignee = orang yang SEDANG mengerjakan, dipasang saat pekerjaan MULAI (In Progress)**, bukan saat
-  dijatahkan (keputusan user 2026-09-29). Issue Backlog/Todo tanpa assignee; PIC rencana cukup ditulis di
-  badan (`**PIC:** <login>`). Agent yang mulai mengerjakan issue meng-assign akun yang menjalankannya.
-  Pengawas ditulis di badan issue sebagai `**Pengawas:** <login>`.
+- ⛔ **Masuk Todo = WAJIB ber-assignee** (keputusan user 2026-10-07, menggantikan aturan 2026-09-29
+  yang membiarkan Todo tanpa assignee). Todo berarti "sudah dijatahkan, siap dikerjakan", jadi kartu
+  Todo tanpa nama tak punya pemilik dan tak ada yang merasa ditunggu. **Backlog** tetap boleh tanpa
+  assignee (belum dijatahkan); PIC rencana di Backlog cukup ditulis di badan (`**PIC:** <login>`).
+  Yang memindahkan kartu ke Todo memasang assignee-nya saat itu juga; tak tahu siapa = kartunya tetap
+  Backlog. Saat mulai (In Progress), assignee diganti/ditambah akun yang benar-benar mengerjakan;
+  agent yang mulai mengerjakan issue meng-assign akun yang menjalankannya. Pengawas ditulis di badan
+  issue sebagai `**Pengawas:** <login>`.
 - **Nama branch `<domain>/<n>-<slug>`**, `<n>` = nomor issue GitHub. Bukan syarat otomasi (yang
   menyambungkan adalah `Closes` di PR), tetapi membuat branch terbaca dan dipakai pre-push untuk
   mengingatkan. Branch lama `bha-<n>-` tetap diterima.
@@ -368,7 +404,7 @@ Butuh Info**, karena issue berisi masalah tanpa keputusan. Keputusannya
 **Checklist ini satu-satunya sumber**; template issue di `bip-erp`/`erp-frontend` hanya memuat
 judul bagiannya. Label `Siap Agent` dipasang **manusia** (pembuat issue atau Pemutus) bila SEMUA terpenuhi:
 
-1. **Keputusan bisa ditunjuk**: tautan ADR berstatus **Diterima** (bukan Diusulkan), `ANALISA - *.md`,
+1. **Keputusan bisa ditunjuk**: tautan ADR berstatus **Diterima** (bukan Diusulkan), `ANALISA - *.md` yang ADR-nya sudah Diterima,
    atau bagian `## Keputusan` di badan issue yang menjawab "bentuknya apa" (penerima, ambang, kanal,
    satuan, siapa boleh apa). Kalimat "pertimbangkan", "perlu disepakati", atau "dsb" = belum siap.
 2. **Satu repo, satu PR.** Lebih dari itu dipecah dulu. PR agent wajib `Closes` issue-nya, jadi issue

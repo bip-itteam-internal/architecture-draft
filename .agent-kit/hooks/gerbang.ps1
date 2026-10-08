@@ -23,6 +23,7 @@ param(
   [string]$KitRoot,
   [switch]$TanpaBuild,
   [switch]$TanpaTest,
+  [switch]$TestPenuh,
   [string]$Keluaran
 )
 $ErrorActionPreference = 'Continue'
@@ -52,7 +53,10 @@ if ($jenis -eq 'node') {
     else { $gerbang += (Invoke-Gerbang 'build' $top ($pm.jalan + ' build')) }
   }
   if (-not $TanpaTest) {
-    $t = Invoke-VitestJson $top $pm
+    $rv = Get-RencanaVitest $top $berkas ([bool]$TestPenuh)
+    $catatan += ('cakupan test: {0} ({1})' -f $rv.mode, $rv.alasan)
+    $t = if ($rv.mode -eq 'related') { Invoke-VitestJson $top $pm $rv.berkas } else { Invoke-VitestJson $top $pm }
+    if ($rv.mode -eq 'related' -and $t.terurai -and $t.jumlah -eq 0) { $catatan += 'cakupan related: tidak ada test yang mengimpor berkas tersentuh (0 test dijalankan)' }
     $bl = Read-Baseline $KitRoot $nama
     $baru = @(); $blGagal = @()
     if ($null -ne $bl) { $blGagal = @($bl.gagal); $baru = @($t.gagal | Where-Object { $blGagal -notcontains $_ }) }
@@ -61,7 +65,7 @@ if ($jenis -eq 'node') {
     $gerbang += [pscustomobject]@{
       nama = 'test'; lolos = $lolosTest; exit = $t.gerbang.exit; durasi_detik = $t.gerbang.durasi_detik
       jumlah_test = $t.jumlah; gagal_total = $t.gagal.Count; gagal_di_baseline = @($t.gagal | Where-Object { $blGagal -contains $_ }).Count
-      gagal_baru = $baru; terurai = $t.terurai
+      gagal_baru = $baru; terurai = $t.terurai; cakupan = $rv.mode
       baseline = if ($null -ne $bl) { ('{0} @ {1}' -f $bl.tanggal, $bl.commit) } else { $null }
       ekor = $t.gerbang.ekor
     }

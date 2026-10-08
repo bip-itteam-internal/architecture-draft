@@ -73,6 +73,52 @@ try {
   $claude = Join-Path $tmp '.claude'
   Check (Test-Path (Join-Path $claude 'commands/start-task.md')) 'commands tersalin'
   Check (Test-Path (Join-Path $claude 'commands/analisa-kebutuhan.md')) 'command /analisa-kebutuhan tersalin'
+  # /dampak (kit 1.37.0): command tersalin, memakai skripnya, berhenti sebelum menyunting, dan dua
+  # command yang menyunting vault benar-benar memanggilnya (tanpa itu ia cuma diingat orang).
+  Check (Test-Path (Join-Path $claude 'commands/dampak.md')) 'command /dampak tersalin'
+  $dpMd = if (Test-Path (Join-Path $claude 'commands/dampak.md')) { Get-Content (Join-Path $claude 'commands/dampak.md') -Raw -Encoding UTF8 } else { '' }
+  Check ($dpMd -match 'dampak\.py' -and $dpMd -match 'BERHENTI' -and $dpMd -match 'AskUserQuestion') '/dampak: skrip, berhenti, persetujuan per dok'
+  # Dipanggil command lain, /dampak TIDAK commit/push sendiri: alur pemanggil yang memegangnya
+  # (sync-docs melarang push otomatis; analisa-kebutuhan meregenerasi index sesudah merge).
+  Check ($dpMd -match 'Dipanggil dari command lain' -and $dpMd -match 'run_in_background') '/dampak: serahkan commit ke pemanggil, jalankan skrip di background'
+  $akMd = Get-Content (Join-Path $claude 'commands/analisa-kebutuhan.md') -Raw -Encoding UTF8
+  Check ($akMd -match '/dampak') '/analisa-kebutuhan memanggil /dampak'
+  # analisa-kebutuhan wawancara+blueprint (spec 2026-10-07-wawancara-blueprint-design)
+  $ak = Get-Content (Join-Path $claude 'commands/analisa-kebutuhan.md') -Raw -Encoding UTF8
+  $i1a = $ak.IndexOf('## 1a. Wawancara niat'); $i2 = $ak.IndexOf('## 2. Grounding'); $i1b = $ak.IndexOf('## 1b. Wawancara bentuk')
+  Check ($i1a -ge 0 -and $i2 -gt $i1a -and $i1b -gt $i2) '/analisa-kebutuhan: urutan niat -> grounding -> bentuk'
+  # Pemeriksaan dibatasi ke POTONGAN bagiannya: kata yang sama juga muncul di §3/§4, jadi -match atas
+  # seluruh berkas tetap hijau walau aturannya dihapus dari tempat yang seharusnya (review 2026-10-07).
+  function Potong($teks, $awal, $akhir) { $a = $teks.IndexOf($awal); if ($a -lt 0) { return '' }; $b = $teks.IndexOf($akhir, $a + 1); if ($b -lt 0) { $b = $teks.Length }; $teks.Substring($a, $b - $a) }
+  $s1b = Potong $ak '## 1b. Wawancara bentuk' '## 3.'
+  Check ($s1b -match 'AskUserQuestion' -and $s1b -match 'menyebut sumbernya' -and $s1b -match 'Belum tahu') '/analisa-kebutuhan: pilihan ganda bersumber + Belum tahu'
+  $s5c = Potong $ak '**c. Blueprint' '**d. Buat issue'
+  # -cmatch atas penanda tebal: -match tak peka huruf, dan 'Besar' sudah cocok "besaran kerja" di §5a.
+  # Satu repo > 1 PR = issue SEJAJAR, bukan induk + sub (team-memory: satu repo cukup satu issue).
+  Check ($s5c -cmatch '\*\*Kecil\*\*' -and $s5c -cmatch '\*\*Sedang\*\*' -and $s5c -cmatch '\*\*Besar\*\*' -and $s5c -cmatch '\*\*sejajar\*\*' -and $s5c -match 'tugas\.md') '/analisa-kebutuhan: blueprint berukuran, satu repo sejajar, format tugas.md'
+  Check ($s5c -match 'BUKAN keputusan yang bisa ditunjuk') '/analisa-kebutuhan: ANALISA belum bisa ditunjuk sebelum ADR Diterima'
+  $s5d = Potong $ak '**d. Buat issue' '## 6.'
+  Check ($s5d -match 'buat-sub-issue\.ps1' -and $s5d -match 'item-add 15' -and $s5d -match 'TANPA label' -and $s5d -match '-Badan <berkas' -and $s5d -match 'BELUM DITETAPKAN') '/analisa-kebutuhan 5d: buat issue tanpa Siap Agent, -Badan berkas, Pemutus kosong ditandai'
+  $s7 = Potong $ak '## 7. Commit' '## 8.'
+  Check ($s7 -match 'butir d' -and $s7 -match 'gh issue edit') '/analisa-kebutuhan 7: issue dibuat sesudah merge, judul ADR dinomori ulang ikut disunting'
+  Check ($ak -match 'tidak perlu dibangun') '/analisa-kebutuhan: kesimpulan tidak perlu dibangun'
+  # Uji kering 2026-10-07: "Data = asumsi" membuat issue tak pernah lolos DoR #4 (runner dilarang baca prod).
+  Check ($s5c -match 'Perlu ukur prod' -and $s5c -match 'Definition of Ready #4') '/analisa-kebutuhan: data prod belum diukur ditandai, bukan asumsi'
+  $st = Get-Content (Join-Path $claude 'commands/start-task.md') -Raw -Encoding UTF8
+  Check ($st -match 'ADR yang ditautnya') '/start-task triase: ANALISA hanya bila ADR-nya Diterima'
+  # buat-sub-issue.ps1: idempotensi mencocokkan JUDUL PENUH. Dulu cukup repo + awalan [BE], sehingga
+  # sub saudara "bagian 2/2" diam-diam mengembalikan nomor bagian 1/2 tanpa galat.
+  $bsi = Get-Content (Join-Path $claude 'hooks/buat-sub-issue.ps1') -Raw -Encoding UTF8
+  Check ($bsi -match '\$_\.title -eq \$judulPenuh') 'buat-sub-issue: idempotensi per judul penuh, saudara tak tertukar'
+  # 1.39.1: tiga tundaan yang dikerjakan. Vault PUBLIK -> rincian issue keamanan tak boleh masuk ANALISA;
+  # gerbang 3 menunjuk cara baca prod (tanpanya agent langsung jatuh ke asumsi); awalan sub-issue tak ganda.
+  Check ($s5c -match 'keamanan' -and $s5c -match 'PUBLIK') '/analisa-kebutuhan: issue keamanan tak dirinci di vault publik'
+  $s2 = Potong $ak '## 2. Grounding' '## 1b. Wawancara bentuk'
+  Check ($s2 -match 'MongoDB ERP Production' -and $s2 -match 'deploy-bip-erp') '/analisa-kebutuhan gerbang 3: menunjuk cara baca prod'
+  Check ($bsi -match 'StartsWith\(\$AWALAN\[\$Repo\]\)' -and $bsi -match '\$judulPenuh = if') 'buat-sub-issue: awalan [BE]/[FE]/[Mobile] tak ditambah dua kali'
+  # akhir analisa-kebutuhan wawancara+blueprint
+  $sdMd = Get-Content (Join-Path $claude 'commands/sync-docs.md') -Raw -Encoding UTF8
+  Check ($sdMd -match 'dampak\.py --root architecture-draft --diff') '/sync-docs memanggil dampak.py --diff'
   # Jumlah command diturunkan dari kit, JANGAN dipatok angka: assertion angka-mati
   # sudah pernah rot diam-diam saat index-vault.md dan skills.md ditambahkan (2026-08-28).
   $srcCmd = (Get-ChildItem (Join-Path $kitRoot 'commands') -Filter *.md).Count
@@ -178,7 +224,8 @@ try {
   $sbSrc = Get-Content $sbPath -Raw -Encoding UTF8
   Check ($sbSrc.Contains('sub_issues?per_page=100") $null | ForEach-Object { $_ })') -and $sbSrc.Contains("ValidateSet('bip-erp', 'erp-frontend', 'my-bharata')")) 'buat-sub-issue: anak diratakan sebelum dicocokkan, repo dibatasi tiga repo kode'
   Check ($bfTriase.Contains('2c. **Sub-issue per repo**') -and $bfTriase.Contains('buat-sub-issue.ps1')) 'brief.md 2c: brief lintas repo memakai sub-issue lewat buat-sub-issue.ps1'
-  Check ($tmSrc.Contains('SATU sub-issue per repo') -and $tmSrc.Contains('Satu tingkat saja') -and $tmSrc.Contains('dipasang saat pekerjaan MULAI')) 'team-memory: aturan sub-issue per repo dan assignee saat mulai'
+  Check ($tmSrc.Contains('SATU sub-issue per repo') -and $tmSrc.Contains('Satu tingkat saja') -and $tmSrc.Contains('Masuk Todo = WAJIB ber-assignee')) 'team-memory: aturan sub-issue per repo dan assignee wajib di Todo'
+  Check ($tmSrc.Contains('MyBharata: `Closes` TIDAK menutup issue') -and $tmSrc.Contains('WAJIB langsung diberi Status')) 'team-memory: issue my-bharata ditutup manual sesudah merge ke dev, item board wajib ber-Status'
 
   # kit 1.35.0: gerbang nomor ADR ganda. Yang dipatok: skrip tersalin init, pre-push memanggilnya
   # atas POHON COMMIT (--rev HEAD, bukan working tree bersama), dan gerbang-kit menjalankan

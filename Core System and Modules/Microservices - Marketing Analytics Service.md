@@ -479,7 +479,11 @@ Gap fitur, bukan gap dokumentasi. Pemakai melaporkan (2026-09-01) banyak akun Ti
 
 Padanan di tingkat **toko** sudah ada dan bisa dijadikan cetakan ([[ADR - 0052 Status Sinkron per Toko]]: koleksi terpisah, `reason` wajib, riwayat append-only, auto-disable berambang beruntun). ⛔ Yang wajib ikut terbawa dari sana: **kegagalan tunggal bukan bukti ban**. Untuk akun sinyalnya bahkan lebih lemah, karena TikTok tak memberi tahu apa-apa dan satu-satunya sinyal adalah **sunyi**, yang juga berarti libur, ganti handle, atau pindah toko. Konteks sisi akun affiliate ada di [[Sales - ICC Affiliate Mapping]]. **Belum ada keputusan, belum ada ADR.**
 
-#### Penjaga pasangan akun+toko saat Mulai (🟡 branch `feat/live-shift-validasi-akun-toko`, 2026-09-21, belum PR)
+#### Penjaga pasangan akun+toko saat Mulai (⚠️ di `main` dan di PROD; biner PROD diperiksa 2026-10-08)
+
+> **Koreksi status 2026-10-08.** Judul bagian ini sebelumnya berbunyi "branch, belum PR". Kodenya sudah di `origin/main` (commit `37814752` dan `1c8dcf24` 2026-09-21, `2782957a` 2026-09-29) dan teks pesannya ada di biner service PROD (image dibangun 2026-10-08). Sejak `2782957a` berlaku **jendela 14 hari** (`jendelaTokoAktif`): toko yang siaran terakhir akunnya lebih tua dari 14 hari, diukur dari siaran terakhir akun itu di toko mana pun, dianggap sudah ditinggalkan dan tidak lagi meloloskan. Tabel tiga cabang di bawah belum memuat aturan itu.
+>
+> ⚠️ **Dua celah yang terukur 2026-10-08**, keduanya sebab penjaga ini tidak cukup: (1) akun yang **sedang pindah toko** punya siaran baru di dua toko, jadi dua-duanya lolos; 10 sesi salah toko antara 1 September dan 8 Oktober lolos lewat sini. (2) Di `origin/dev` MyBharata, pesan 400 penjaga **tidak sampai ke host** (`_mapMulaiError` memakai reason phrase HTTP, bukan `data.error`) dan aplikasi **tidak pernah mengirim** `konfirmasi_toko`. Jalan majunya diputuskan di [[ADR - 0157 Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Jadwal Ditolak]].
 
 Kunci penjodohan sesi ke penjualan menuntut `shop_id` + `akun_live` + `channel` cocok **persis** (`jodohkanSesiDenganPorsi`, `live_shift_penjualan.go`). Sampai penjaga ini ada, `POST /live-shifts` hanya memvalidasi karakter aman, jadi pasangan yang **mustahil terjodoh** diterima diam-diam: sesinya tersimpan, jam siarannya terhitung, dan GMV host tidak pernah masuk tanpa satu pun galat.
 
@@ -500,6 +504,38 @@ Tiga cabang, dan yang tengah alasan penjaga ini ada:
 ⛔ **Urutannya mengikat**: penjaga berjalan **sesudah** penurunan `channel`, bukan sebelum. Dibalik, toko yang belum terpetakan akan dijawab "akun tidak pernah bersiaran di toko ini" dan host pergi membetulkan sesuatu yang tak salah.
 
 **Titik putus alur yang diterima sadar**: akun yang benar-benar **dipindah** ke toko baru belum punya riwayat di sana, jadi pesannya akan menyebut toko **lama**. Jalan majunya field body `konfirmasi_toko: true`; sampai MyBharata memasang dialog konfirmasinya, jalan keluarnya lewat IT, dan itu disebut di pesan galatnya. Jalur ambil alih dijaga penjaga yang sama (ia menerima `shop_id` dari body dan hanya mencocokkan `akun_live`).
+
+#### 🟡 Jadwal Siaran Toko (Diusulkan 2026-10-08, belum ada kode)
+
+Keputusannya [[ADR - 0157 Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Jadwal Ditolak]]. Bagian ini mencatat **rancangan**; tidak satu pun di bawah sudah ada di kode.
+
+**Masalah yang dijawab.** Service ini tidak punya tempat menyimpan "akun ini siaran untuk toko itu". Fakta itu hanya lahir saat host menekan Mulai, dan penjaga di atas menebaknya dari riwayat. Terukur PROD 2026-10-08 (1 September sampai 8 Oktober, 785 sesi TikTok): 10 sesi salah toko dan 5 sesi salah akun, seluruhnya ditemukan manual dan dibetulkan lewat skrip tulis ke database.
+
+**Bentuk data.** Koleksi `jadwal_siaran_toko`: satu dokumen per `(tanggal WIB, channel, shop_id, akun_live)`, dengan `departemen` dan `channel` distempel server dari `department_shops`. Index unik `(tanggal, channel, akun_live)`: satu toko boleh banyak akun, satu akun hanya satu toko per tanggal. Perubahan pada hari-H dicatat di `jadwal_siaran_toko_jejak` (append-only).
+
+**Aturan tulis.** Tanggal D bebas diubah sampai saat kunci (bawaan 00.00 WIB tanggal D); sesudahnya wajib `alasan`; tanggal lampau ditolak. Penulis: pemegang izin `jadwal.siaran.manage` **atau** leader marketing (`common.IsMarketingLeader`), dan yang bukan IT hanya untuk toko departemennya.
+
+**Tiga pengaturan per departemen** (`jadwal_siaran_pengaturan`), supaya kebijakannya bisa digeser tanpa PR: `mode` (`catat` · `tolak` · `wajib`, bawaan `catat`), `kunci_menit_sebelum_hari` (bawaan 0), `menit_pengingat` (bawaan 10). ⚠️ Bawaan `catat` berarti fitur ini **tidak menolak siapa pun** sampai leader menyalakan `tolak`; selisihnya hanya ditulis ke `live_shifts.selisih_jadwal`.
+
+**Penjaga saat Mulai dan ambil alih**, berjalan sesudah penurunan `channel`. Tabel untuk mode `tolak`; pada `catat` baris kedua dan ketiga lolos dan hanya dicatat, pada `wajib` baris keempat ikut ditolak:
+
+| Keadaan pada tanggal WIB permintaan | Hasil |
+|---|---|
+| Akun dijadwalkan, toko sama | Lolos; penjaga 14 hari dilewati |
+| Akun dijadwalkan, toko beda | 400 menyebut toko yang dijadwalkan |
+| Akun tidak dijadwalkan, toko yang dipilih punya jadwal hari itu | 400 menyebut akun yang dijadwalkan untuk toko itu |
+| Akun tidak dijadwalkan, toko yang dipilih tanpa jadwal hari itu | Penjaga 14 hari seperti sekarang |
+| Jadwal tak terbaca | Penjaga 14 hari seperti sekarang, dicatat di log |
+
+Saat menolak karena jadwal, pesan yang sama dikirim ke inbox pemanggil (kategori `reminder`), karena MyBharata tidak menampilkan `data.error` dan diputuskan tidak diubah.
+
+**Tiga pekerjaan latar.**
+
+- **Pengingat sebelum shift** (`menit_pengingat`, bawaan sepuluh): tik lima menit; jam shift dari `GET /internal/jadwal-resolusi` attendance; daftar host dan tokonya diturunkan dari `live_shifts` 30 hari terakhir; sekali per host per tanggal.
+- **Pemeriksaan sesudah sync**: di akhir `sync-live-sessions` yang sukses, sesi tak terjodoh yang siaran akunnya ada di toko lain dikabarkan ke penyusun jadwal toko itu, sekali per sesi (`live_shifts.notif_salah_toko_pada`). ⚠️ Sync jalan dua hari sekali (`intervalPenjadwalBawaan` 48 jam), jadi kabarnya datang paling lambat sekitar dua hari.
+- **Feed kalender** `GET /internal/calendar-feed` ber-`kind: jadwal_siaran`, hanya toko departemen pemanggil ([[Microservices - Calendar Service]]).
+
+⛔ **Yang tidak ditutup rancangan ini**: host yang memilih akun terjadwal lain (jadwal tidak memuat host), pindah toko di tengah hari (satu akun satu toko per tanggal), dan pembetulan sesi yang telanjur salah (tetap skrip oleh manusia).
 
 #### ⚠️ Nama toko diturunkan di DUA pipeline, dan keduanya wajib sama
 

@@ -15,7 +15,16 @@ mencegah "mengakali satu metrik dengan mengorbankan yang lain".
 
 Argumen: `<path worktree>` (bawaan: repo di cwd), `--brief <path>` (bawaan: brief terbaru di
 `.task-plans/briefs/` yang slug-nya cocok dengan nama branch), `--tanpa-build`, `--tanpa-test`
-(hanya untuk iterasi cepat; verdict-nya dicatat sebagai **tidak lengkap**).
+(hanya untuk iterasi cepat; verdict-nya dicatat sebagai **tidak lengkap**), `--test-penuh`
+(`-TestPenuh`: suite Node penuh walau diff kecil).
+
+**Cakupan test Node (kit 1.40.0)**: bawaannya `vitest related <berkas tersentuh>` (test yang
+mengimpor berkas yang berubah, langsung atau lewat rantai impor), dibanding baseline penuh. Suite
+penuh otomatis bila lingkungan semua test berubah (`package.json`, lockfile, `tsconfig*`,
+`vitest/vite.config*`, setup test), ada berkas sumber terhapus/dipindah, atau lebih dari 150 berkas
+tersentuh. Gerbang menulis `cakupan test: <mode> (<alasan>)` di `catatan` dan `cakupan` di gerbang
+`test`; sebutkan di verdict. `0 test dijalankan` pada mode related bukan bukti aman: judge menilai
+apakah diff itu memang butuh test baru.
 
 ## Langkah
 

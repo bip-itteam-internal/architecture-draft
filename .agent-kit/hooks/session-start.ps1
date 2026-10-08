@@ -11,7 +11,7 @@ $instFile   = Join-Path $ws '.claude/.kit-version'
 $lines = @(
   'Triase dulu: keputusannya sudah tertulis dan bisa DITUNJUK (ADR/dok/ANALISA)? -> /brief lalu /kerjakan, lewati flow manual.',
   'Flow wajib (hanya bila triase menghasilkan "tidak"): /start-task -> /plan -> /implement -> /review -> /sync-docs -> /wrap',
-  'Opsional sebelum flow: /analisa-kebutuhan <kebutuhan manajemen> (mentah -> ADR + dok + daftar task)',
+  'Opsional sebelum flow: /analisa-kebutuhan <kebutuhan manajemen> (mentah -> ADR + dok + issue Siap Agent)',
   'Loop otonom: /brief <masalah> -> /kerjakan <brief> (judge otomatis, berhenti di PR). Sesi lain: /papan-sesi. Skill: /ekstrak-skill, /supervise'
 )
 
