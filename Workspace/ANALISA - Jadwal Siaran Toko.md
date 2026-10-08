@@ -1,6 +1,6 @@
 # ANALISA - Jadwal Siaran Toko
 
-> 🟢 ADR-nya **Diterima** 2026-10-08 oleh irfanarfianto. Label `Siap Agent` tetap dipasang manusia per issue.
+> 🟢 ADR-nya **Diterima** 2026-10-08 oleh irfanarfianto. Keadaan 2026-10-08 malam (bergerak, ukur ulang): bagian 1/4, 2/4, 3/4 backend dan layar web **merged** (bip-erp #2823, #2831, #2832; erp-frontend #2206); bagian 4/4 PR terbuka (bip-erp #2833). Belum ada yang terverifikasi di DEV maupun PROD.
 
 - **ADR**: [[ADR - 0157 Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Jadwal Ditolak]]
 - **Dok domain**: [[Microservices - Marketing Analytics Service]] § Jadwal Siaran Toko · [[API - Marketing Analytics Service]] · [[APP - Web ERP]] · [[Microservices - Calendar Service]] · [[REF - Kepemilikan Data]]
@@ -130,7 +130,7 @@ ADR **"Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Ja
 ### Yang harus benar
 
 - [ ] Koleksi `jadwal_siaran_toko` dengan field `tanggal` (`YYYY-MM-DD`, WIB), `channel`, `shop_id`, `akun_live`, `departemen`, `dibuat_oleh`, `dibuat_pada`, `diubah_oleh`, `diubah_pada`. Index unik `(tanggal, channel, akun_live)` dan index baca `(tanggal, shop_id)`, didaftarkan di `index.go`.
-- [ ] `GET /jadwal-siaran?dari&sampai[&shop_id]`: rentang memakai `bacaRentangHariWIB` (wajib, maksimal 92 hari, 400 bila tidak sah). Mengembalikan `{"rows": [...]}`, `rows` tidak pernah `null`. Tiap baris memuat `tanggal`, `channel`, `shop_id`, `shop_name`, `akun_live`, `terkunci` (`true` bila tanggal itu hari ini atau lampau menurut WIB).
+- [ ] `GET /jadwal-siaran?dari&sampai[&shop_id]`: rentang memakai `bacaRentangHariWIB` (wajib, maksimal 92 hari, 400 bila tidak sah). Mengembalikan `{"boleh_sunting": bool, "toko": [...]}`: **semua** toko departemen pemanggil (termasuk yang belum punya jadwal), masing-masing dengan `shop_id`, `shop_name`, `channel`, `departemen`, dan `hari[]` berisi **setiap** tanggal dalam rentang dengan `tanggal`, `status` (`lampau` · `terkunci` · `terbuka`), dan `akun_live[]`. Tidak ada array yang `null`. (Direvisi 2026-10-08 saat brief ditulis: bentuk datar per baris tidak memuat toko tanpa jadwal maupun status sel kosong, yang dibutuhkan layar.)
 - [ ] Baca disaring ke toko yang `department_shops.department`-nya sama dengan header `common.Header.Department` pemanggil; supervisor IT melihat semua. Gerbang baca: memegang `jadwal.siaran.manage`, **atau** `common.IsMarketingLeader`, **atau** lolos `common.RequireLiveShiftUser`; selain itu 403.
 - [ ] `PUT /jadwal-siaran/:tanggal/toko/:shop_id` dengan body `{"akun_live": ["..."], "alasan": "..."}` mengganti seluruh daftar akun toko itu pada tanggal itu. Daftar kosong menghapus jadwal toko pada tanggal itu. Akun yang berulang di body disimpan sekali.
 - [ ] `channel` dan `departemen` distempel server dari `department_shops` (sumber yang sama dengan `channelUntukToko`): toko belum terpetakan 400, master tak terbaca 503. Keduanya tidak diterima dari body.
@@ -138,7 +138,7 @@ ADR **"Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Ja
 - [ ] Tanggal lampau (WIB) dibalas 400 dan tidak menulis apa pun.
 - [ ] Saat kunci tanggal D = 00.00 WIB tanggal D dikurangi `kunci_menit_sebelum_hari` milik departemen toko itu. Sesudah saat kunci, tulis tanpa `alasan` (kosong sesudah di-trim) dibalas 400. Dengan `alasan`, perubahan tersimpan dan tepat satu dokumen masuk `jadwal_siaran_toko_jejak` berisi tanggal, toko, isi sebelum, isi sesudah, alasan, pelaku, dan waktu.
 - [ ] Sebelum saat kunci, tulis tersimpan tanpa `alasan` dan tanpa dokumen jejak.
-- [ ] `terkunci` di balasan `GET /jadwal-siaran` dihitung dari saat kunci yang sama (satu fungsi), bukan dari perbandingan tanggal terpisah.
+- [ ] `status` di balasan `GET /jadwal-siaran` dihitung dari saat kunci yang sama (satu fungsi), bukan dari perbandingan tanggal terpisah.
 - [ ] Izin baru `jadwal.siaran.manage` didaftarkan di katalog modul `jadwal` (`shared-library/common/catalog_jadwal.go`) dan di **setiap** tempat lain yang memuat `jadwal.hostlive.manage` sebagai entri katalog (cari dengan `git grep`), dengan label dan deskripsi sendiri.
 - [ ] Gerbang tulis: memegang `jadwal.siaran.manage` **atau** `common.IsMarketingLeader`. Ada test bahwa pemegang izin tanpa peran leader lolos, leader tanpa izin lolos, dan orang tanpa keduanya dibalas 403.
 - [ ] Pemanggil bukan supervisor IT yang menulis toko di luar departemennya dibalas 403, siapa pun dia.
@@ -401,7 +401,7 @@ ADR **"Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Ja
 - [ ] Tampilan: satu baris per toko departemen pemanggil, satu kolom per tanggal, tiap sel menampilkan akun yang dijadwalkan. Toko dibedakan dengan `shop_id` sebagai kunci, bukan nama (dua toko bernama `Beautyhack's`).
 - [ ] Leader membuka sel untuk menyunting lewat `Sheet` berangka tiga (header tetap, badan menggulir ber-padding, footer aksi). Akun dipilih jamak dari `GET /live-shifts/akun?shop_id=` dan bisa diketik untuk akun yang belum ada di daftar.
 - [ ] Menyimpan lewat `PUT /jadwal-siaran/:tanggal/toko/:shop_id`; berhasil memberi umpan balik dan memperbarui sel tanpa muat ulang halaman.
-- [ ] Sel yang `terkunci` tetapi belum lampau menampilkan kolom alasan yang wajib diisi sebelum tombol simpan aktif.
+- [ ] Sel ber-`status: "terkunci"` menampilkan kolom alasan yang wajib diisi sebelum tombol simpan aktif.
 - [ ] Sel tanggal lampau dan seluruh sel bagi pemakai yang bukan penyunting hanya baca: tidak ada tombol sunting. Penyunting = pemegang izin `jadwal.siaran.manage` atau leader marketing; backend penentu.
 - [ ] Balasan 400, 403, dan 409 dari server menampilkan pesan `error` dari server apa adanya (409 menyebut toko tempat akun itu sudah dijadwalkan).
 - [ ] Aksi "Salin dari hari sebelumnya" pada sebuah tanggal mengisi tiap toko dengan jadwal tanggal sebelumnya lewat pemanggilan `PUT` per toko; toko yang gagal disebut namanya, yang berhasil tetap tersimpan.
@@ -409,7 +409,7 @@ ADR **"Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Ja
 - [ ] Penyunting dapat mengubah tiga pengaturan lewat `PUT /jadwal-siaran/pengaturan`: mode, saat kunci, dan menit pengingat. Saat kunci diisi sebagai "hari-H" atau "H-1" ditambah jam, lalu dikirim sebagai `kunci_menit_sebelum_hari` (H-1 pukul 17.00 = 420); menit pengingat pilihan kelipatan 5 dari 5 sampai 120.
 - [ ] Mengganti mode ke `tolak` atau `wajib` meminta konfirmasi yang menyebut akibatnya bagi host.
 - [ ] Bagi pemakai yang bukan penyunting, pengaturan hanya baca.
-- [ ] Sel dianggap terkunci dari field `terkunci` milik server, bukan dari perbandingan tanggal di frontend.
+- [ ] Keadaan tiap sel diambil dari `status` milik server (`lampau` · `terkunci` · `terbuka` di `toko[].hari[]`), bukan dari perbandingan tanggal di frontend; tombol tulis mengikuti `boleh_sunting` dari server.
 - [ ] `?tanggal=YYYY-MM-DD` di URL membuat rentang dimulai dari tanggal itu (tautan dari Kalender). `useSearchParams` berada di dalam `Suspense`.
 - [ ] Lima keadaan layar ada: memuat (`Skeleton`, bukan spinner), kosong, galat, sebagian, penuh.
 - [ ] Semua teks lewat `t("marketing.jadwalSiaran.*")` di `id.ts` dan `en.ts`; tanggal diformat di render dengan `intlLocale(lang)`.
