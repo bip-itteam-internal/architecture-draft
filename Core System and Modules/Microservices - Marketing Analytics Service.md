@@ -513,9 +513,11 @@ Keputusannya [[ADR - 0157 Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live
 
 **Bentuk data.** Koleksi `jadwal_siaran_toko`: satu dokumen per `(tanggal WIB, channel, shop_id, akun_live)`, dengan `departemen` dan `channel` distempel server dari `department_shops`. Index unik `(tanggal, channel, akun_live)`: satu toko boleh banyak akun, satu akun hanya satu toko per tanggal. Perubahan pada hari-H dicatat di `jadwal_siaran_toko_jejak` (append-only).
 
-**Aturan tulis.** Tanggal D bebas diubah sampai sebelum 00.00 WIB tanggal D; pada hari-H wajib `alasan`; tanggal lampau ditolak. Penulis: leader marketing (`common.IsMarketingLeader`), dan yang bukan IT hanya untuk toko departemennya.
+**Aturan tulis.** Tanggal D bebas diubah sampai saat kunci (bawaan 00.00 WIB tanggal D); sesudahnya wajib `alasan`; tanggal lampau ditolak. Penulis: pemegang izin `jadwal.siaran.manage` **atau** leader marketing (`common.IsMarketingLeader`), dan yang bukan IT hanya untuk toko departemennya.
 
-**Penjaga saat Mulai dan ambil alih**, berjalan sesudah penurunan `channel`:
+**Tiga pengaturan per departemen** (`jadwal_siaran_pengaturan`), supaya kebijakannya bisa digeser tanpa PR: `mode` (`catat` · `tolak` · `wajib`, bawaan `catat`), `kunci_menit_sebelum_hari` (bawaan 0), `menit_pengingat` (bawaan 10). ⚠️ Bawaan `catat` berarti fitur ini **tidak menolak siapa pun** sampai leader menyalakan `tolak`; selisihnya hanya ditulis ke `live_shifts.selisih_jadwal`.
+
+**Penjaga saat Mulai dan ambil alih**, berjalan sesudah penurunan `channel`. Tabel untuk mode `tolak`; pada `catat` baris kedua dan ketiga lolos dan hanya dicatat, pada `wajib` baris keempat ikut ditolak:
 
 | Keadaan pada tanggal WIB permintaan | Hasil |
 |---|---|
@@ -529,7 +531,7 @@ Saat menolak karena jadwal, pesan yang sama dikirim ke inbox pemanggil (kategori
 
 **Tiga pekerjaan latar.**
 
-- **Pengingat sepuluh menit sebelum shift**: tik lima menit; jam shift dari `GET /internal/jadwal-resolusi` attendance; daftar host dan tokonya diturunkan dari `live_shifts` 30 hari terakhir; sekali per host per tanggal.
+- **Pengingat sebelum shift** (`menit_pengingat`, bawaan sepuluh): tik lima menit; jam shift dari `GET /internal/jadwal-resolusi` attendance; daftar host dan tokonya diturunkan dari `live_shifts` 30 hari terakhir; sekali per host per tanggal.
 - **Pemeriksaan sesudah sync**: di akhir `sync-live-sessions` yang sukses, sesi tak terjodoh yang siaran akunnya ada di toko lain dikabarkan ke penyusun jadwal toko itu, sekali per sesi (`live_shifts.notif_salah_toko_pada`). ⚠️ Sync jalan dua hari sekali (`intervalPenjadwalBawaan` 48 jam), jadi kabarnya datang paling lambat sekitar dua hari.
 - **Feed kalender** `GET /internal/calendar-feed` ber-`kind: jadwal_siaran`, hanya toko departemen pemanggil ([[Microservices - Calendar Service]]).
 

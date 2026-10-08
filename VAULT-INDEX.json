@@ -640,9 +640,9 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "64b6751f703142a0b4e161d5c8bcf9c1611af8b4c1f8f5e9480720e80ab120aa",
-      "ukuran_kb": 83.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki Marketing Analytics Service di balik prefix gateway /api/marketing-analytics, parameter dan bentuk amplop responsnya (rows, unavailable_channels, kolom_tidak_berlaku, paginasi drill), serta rute mana yang digerbang RequireAnalitikMarketing atau RequireMarketingLeader dan mana yang sengaja terbuka. Juga menjawab rute untuk beranda, ambang, pagu, kurva alokasi, laba, video dan live, pencatatan sesi live host (/live-shifts) termasuk ambil alih, setoran karya dan monitoring Live Support, jadwal siaran toko, Asisten Analisa, price floor, job, dan pengumpul KPI. Memuat pula cara mengaudit ulang kelengkapan daftar rute terhadap kode.",
+      "hash": "167e1037ab7d2eb3c59d7af8f813f627e954c3276a0b07200678f26f85f841d4",
+      "ukuran_kb": 84.0,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki Marketing Analytics Service di balik prefix gateway `/api/marketing-analytics`, parameter dan bentuk amplop responsnya (`rows`, `unavailable_channels`, `kolom_tidak_berlaku`, paginasi drill), serta rute mana yang digerbang `RequireAnalitikMarketing` atau `RequireMarketingLeader` dan mana yang sengaja terbuka. Juga menjawab rute per keluarga: beranda dan ambang/pagu, laba, video dan live, pencatatan sesi live host (`/live-shifts`) termasuk ambil alih, retur, price floor, Asisten Analisa, setoran karya dan monitoring Live Support, jadwal siaran toko yang masih diusulkan, pengumpul KPI, dan cara mengaudit ulang kelengkapan daftar rute terhadap kode.",
       "kata_kunci": [
         "marketing analytics",
         "endpoint",
@@ -650,10 +650,10 @@
         "daftar rute",
         "live-shifts",
         "sesi live",
-        "pagu iklan",
-        "ambang ROAS",
-        "gerbang baca analitik",
-        "laba profit"
+        "beranda ambang pagu",
+        "gerbang baca RequireAnalitikMarketing",
+        "profit laba",
+        "live support"
       ]
     },
     {
@@ -1585,20 +1585,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "3f62e9cbbcb219bec1593f45fc047be8bfec408e535ba222a537a2cec85e6c0f",
-      "ukuran_kb": 580.1,
-      "ringkasan": "Menjawab: apa itu portal web ERP One Bharata (repo erp-frontend, Next.js), bagaimana login, refresh token, dan perannya sebagai SSO Identity Provider bekerja, serta bagaimana menu sidebar digerbang lewat system_roles, izin posisi, dan paket izin. Juga menjawab bagaimana menu HRIS dikelompokkan (termasuk Pengaturan HRGA terpusat), fitur multi-perusahaan dan rekrutmen lintas perusahaan, konvensi data-fetching TanStack Query (hook sidebar ber-enabled, badge, pencacah), konvensi bagan Recharts dengan ChartContainer, dan modul apa saja yang sudah ada di web.",
+      "hash": "54b1fea8f911ff05ab8bfabdaa2775d56a81f2abd4672b537f77db339c426c23",
+      "ukuran_kb": 580.4,
+      "ringkasan": "Menjawab: apa itu portal web ERP \"One Bharata\" (repo `erp-frontend`, Next.js), stack-nya, bagaimana login, refresh token, dan perannya sebagai SSO Identity Provider bekerja, serta bagaimana sidebar dan menu digerbang lewat `system_roles`, izin posisi, dan paket izin. Juga menjawab bagaimana fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan) dan Pengaturan HRGA terpusat disusun, konvensi data-fetching TanStack Query dan konvensi bagan Recharts yang wajib diikuti, serta modul apa saja yang sudah dan belum diimplementasikan di web.",
       "kata_kunci": [
-        "Web ERP",
+        "web ERP",
         "erp-frontend",
         "One Bharata",
-        "Next.js",
-        "sidebar",
+        "hris-dashboard",
+        "SSO Identity Provider",
         "system_roles",
-        "SSO",
+        "sidebar menu",
+        "multi-perusahaan",
         "TanStack Query",
-        "Recharts",
-        "Pengaturan HRGA"
+        "Recharts ChartContainer"
       ]
     },
     {
@@ -2866,20 +2866,20 @@
         "Sales - Marketing Dashboard (Analisis Rekap)",
         "Sales - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "c9a487e7f35a89eb88afde5d17869e864401c6f38e9a3be0a0a345d1a7b804a0",
-      "ukuran_kb": 189.3,
-      "ringkasan": "Menjawab: bagaimana Marketing Analytics Service mengagregasi laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live ke koleksi mart_* dari integration_db yang dibaca baca-saja, prinsip arsitektur yang wajib dijaga, serta bagaimana penjadwal 48 jam dan job sync-nya berjalan. Juga menjawab cara kerja pencatatan sesi live host (/live-shifts: kepemilikan, ambil alih, tutup otomatis, penjaga pasangan akun dan toko, jadwal siaran toko), KPI host live dan Live Support, Asisten Analisa, sumber data per channel (TikTok, Shopee, Lazada), dan alokasi bundel serta mapping SKU. Memuat aturan pemakaian angka agar tidak hitung ganda (iklan_sia_sia, pembatalan, GMV live) dan catatan kejujuran data seperti revenue setelah diskon.",
+      "hash": "1c8a78b25b8720765e0d4844ad465dd7b88ad87103488da54e4d3622e876bc89",
+      "ukuran_kb": 189.9,
+      "ringkasan": "Menjawab: bagaimana Marketing Analytics Service mengagregasi laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live dari `integration_db` (baca-saja) ke koleksi `mart_*`, prinsip arsitektur yang wajib dijaga (penjaga tulis tiga lapis, `/health` degraded, gerbang rute baca), serta cara kerja job sync dan penjadwal internal 48 jam. Juga menjawab bagaimana pencatatan sesi live host (`/live-shifts`), ambil alih, tutup otomatis, KPI Host Live dan Live Support, serta Asisten Analisa bekerja, sumber data per channel (TikTok, Shopee, Lazada), dan aturan pemakaian angka supaya tidak terjadi hitung ganda (`iklan_sia_sia`, `pembatalan`, GMV live, `revenue` sebelum atau sesudah diskon).",
       "kata_kunci": [
-        "marketing analytics",
+        "marketing analytics service",
         "mart",
-        "laba",
-        "profit attribution",
-        "live shift",
+        "laba profit attribution",
         "sesi live host",
-        "Live Support",
+        "live_shifts",
+        "KPI live support",
+        "job sync penjadwal",
         "hitung ganda",
         "iklan_sia_sia",
-        "GMV"
+        "TikTok Shopee Lazada"
       ]
     },
     {
@@ -9143,29 +9143,29 @@
       "publik": true,
       "tautan": [
         "ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support",
-        "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
         "ADR - 0063 Siaran Serentak Dicatat sebagai Sesi Terpisah per Akun",
         "Microservices - Marketing Analytics Service",
         "ADR - 0086 Metrik Live Lintas Channel Digabung Satu Angka, Rincian Tetap per Channel",
+        "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
         "REF - Kepemilikan Data",
         "Microservices - Calendar Service",
         "ADR - 0088 Ambil Alih Sesi Live oleh Host Terjadwal dan Tutup Otomatis Akhir Shift",
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "994885573704a7207cd1937576f86eb7e7aa6e679428e25116c0501f29030634",
-      "ukuran_kb": 15.2,
-      "ringkasan": "Menjawab: kenapa sesi live yang dicatat dengan toko atau akun keliru tak pernah terjodoh ke penjualan TikTok, kenapa penjaga 14 hari `akunMilikToko` tidak menangkapnya, dan bagaimana jadwal siaran per tanggal, toko, dan akun live (koleksi `jadwal_siaran_toko` di marketing-analytics) dipakai untuk menolak `POST /live-shifts` dan ambil alih yang tak sesuai jadwal. Juga menjawab siapa yang berwenang menyusun jadwal (leader/SPV marketing untuk toko departemennya), sampai kapan jadwal boleh diubah (bebas sampai H-1, hari-H wajib beralasan dan berjejak, tanggal lampau terkunci), serta bagaimana host diberi tahu lewat inbox dan notifikasi sepuluh menit sebelum shift karena MyBharata tidak diubah. Memuat pula apa yang tidak dijanjikan, pemeriksaan jadwal keliru sesudah sync data TikTok, masuknya jadwal ke Kalender terpusat, dan penyimpangan sengaja dari ADR 0101 dan ADR 0072.",
+      "hash": "9c9268254a8b2900fc4ac4c0b4cd35fc58c43b81f6e766065f6f089b7b61967e",
+      "ukuran_kb": 19.0,
+      "ringkasan": "Menjawab: kenapa sesi live yang dicatat dengan toko atau akun keliru tidak pernah terjodoh ke penjualan TikTok, dan keputusan apa yang diusulkan untuk menutupnya: leader marketing menyusun jadwal siaran per tanggal, toko, dan akun live, lalu Mulai dan ambil alih sesi dicocokkan dengan jadwal hari itu. Juga menjawab aturan kunci jadwal (bebas sampai D-1, hari-H wajib beralasan), tiga pengaturan per departemen (mode `catat`/`tolak`/`wajib`, saat kunci, menit pengingat), izin `jadwal.siaran.manage`, penolakan dan pengingat lewat inbox karena MyBharata tidak diubah, pemeriksaan sesudah sync, feed ke Kalender terpusat, serta hal yang sengaja tidak dijanjikan.",
       "kata_kunci": [
+        "ADR 0157",
         "jadwal siaran toko",
-        "live schedule",
         "sesi live",
-        "live shift",
         "akun live",
         "salah toko salah akun",
         "leader marketing",
-        "host live",
-        "jadwal_siaran_toko",
+        "jadwal.siaran.manage",
+        "mode catat tolak wajib",
+        "live-shifts",
         "KPI live"
       ]
     },
@@ -14590,17 +14590,17 @@
         "REF - Rantai Pengajuan Lintas Modul",
         "Microservices - Manufacture Service"
       ],
-      "hash": "9428c4124f2d4bf8f806d774fdd51ddd2177b8b0fd3bc8210ec05d9321d537b9",
-      "ukuran_kb": 79.9,
-      "ringkasan": "Menjawab: service dan koleksi mana yang menjadi pemilik tiap fakta bisnis di ERP (karyawan, departemen, divisi, headcount, hak akses, kontrak, jadwal, master produk, vendor, toko, gudang, dan lainnya), siapa yang boleh menulisnya, dan lewat jalan mana service lain boleh membacanya. Juga menjawab salinan mana yang sah beserta arah dan penjaganya, pengecualian ADR 0002 yang masih hidup (pembaca database langsung), duplikasi yang belum diputuskan, keadaan jejak audit, dan fakta apa yang belum dipetakan. Dipakai untuk memeriksa apakah sebuah data sudah ada sebelum membangun penyimpanan atau fitur baru.",
+      "hash": "0309eefd0ac5cfbddcb09dea164595df8e50b4add8dee44237585e813169c288",
+      "ukuran_kb": 80.1,
+      "ringkasan": "Menjawab: service dan koleksi mana yang menjadi pemilik tiap fakta bisnis di ERP (karyawan, departemen, divisi, hak akses, kontrak, jadwal, master data produk/vendor/toko/gudang, dan lainnya), siapa yang boleh menulisnya, dan lewat jalan mana service lain boleh membacanya. Juga menjawab salinan mana yang sah beserta arah dan penjaganya, pengecualian ADR 0002 yang masih hidup di kode, duplikasi yang belum diputuskan, keadaan jejak audit lintas modul, dan apa yang harus diperiksa sebelum membangun penyimpanan baru atas data yang mungkin sudah dimiliki departemen lain.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
         "pemilik fakta",
+        "sumber kebenaran",
         "single source of truth",
         "duplikasi data",
-        "salinan sah",
-        "SyncCollection",
+        "salinan sah SyncCollection",
         "database-per-service",
         "master data",
         "audit trail"
@@ -17801,20 +17801,20 @@
         "Microservices - Calendar Service",
         "REF - Kepemilikan Data"
       ],
-      "hash": "746930192f8cfb4258b32e2d4916c09b35721fd1be531952a36b6a1bafc567d0",
-      "ukuran_kb": 27.8,
-      "ringkasan": "Menjawab: bagaimana kebutuhan Jadwal Siaran Toko dipecah jadi pekerjaan, yaitu issue induk bip-erp#2790, empat sub-issue backend (#2791 sampai #2794), dan satu sub-issue frontend erp-frontend#2184, beserta urutan, ketergantungan, dan urutan deploy-nya. Juga menjawab asumsi yang disetujui pemilik produk, apa yang sengaja tidak dikerjakan (perubahan MyBharata, penugasan host ke akun, layar pembetulan sesi), kriteria \"Yang harus benar\" tiap issue, dan data PROD pendukungnya. Menegaskan bahwa analisa ini menunggu ADR 0157 Diterima sebelum bisa ditunjuk /brief.",
+      "hash": "7b9e89582ede25651d091e07d5a7fadec844138a82e256962b4e29fd7f46f1a6",
+      "ukuran_kb": 34.9,
+      "ringkasan": "Menjawab: bagaimana kebutuhan Jadwal Siaran Toko dipecah jadi pekerjaan: issue induk bip-erp#2790, empat sub-issue backend (#2791 sampai #2794) dan satu frontend (erp-frontend#2184), urutan dan ketergantungannya, serta urutan deploy. Juga menjawab apa saja yang diputuskan pemilik produk, apa yang sengaja tidak dikerjakan (MyBharata, penugasan host ke akun, layar pembetulan sesi), kriteria \"yang harus benar\" tiap issue, dan data PROD pendukungnya; ANALISA ini baru bisa ditunjuk `/brief` sesudah ADR 0157 Diterima.",
       "kata_kunci": [
         "analisa kebutuhan",
         "jadwal siaran toko",
         "draf issue",
-        "sub-issue",
-        "bip-erp#2790",
         "Siap Agent",
+        "bip-erp#2790",
+        "sub-issue BE FE",
         "sesi live",
-        "leader marketing",
-        "pengingat shift",
-        "kalender"
+        "ADR 0157",
+        "urutan deploy",
+        "leader marketing"
       ]
     },
     {
