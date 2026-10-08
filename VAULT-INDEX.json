@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-08",
-  "jumlah_dokumen": 539,
+  "jumlah_dokumen": 540,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -2120,13 +2120,14 @@
       "judul": "Microservices - Assistant Service",
       "area": "Core System and Modules",
       "jenis": "domain",
-      "status_emoji": "🟡",
-      "status_teks": "**Konsep**, 2026-08-29. ~~0 kode, dikonfirmasi ulang lewat `git grep` langsung ke",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)**, ditetapkan 2026-10-08 saat sinkron ke `origin/main`",
       "publik": true,
       "tautan": [
         "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
         "ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI",
         "API - Integration Service",
+        "REF - Penyajian Laporan Copilot",
         "CORE - API Master Gateway",
         "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
         "Microservices - Marketing Analytics Service",
@@ -2163,19 +2164,19 @@
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "29b76c5dc2b7537a52f5044c52bb4a2cb36212ea8459c97e5acc1f3c1a6a3098",
-      "ukuran_kb": 125.4,
-      "ringkasan": "Menjawab: bagaimana Copilot (asisten AI tanya-jawab ERP) bekerja, yaitu merutekan pertanyaan ke endpoint yang sudah menghitung lewat gateway dengan JWT pemakai, tanpa berhitung sendiri, dan tool apa saja yang tersedia per modul (HRGA, marketing, finance, GA, dll). Juga menjelaskan keputusan rancangan, penjaga anti angka karangan, samaran identitas, riwayat percakapan, blok tabel/grafik, umpan balik, batas timeout gateway 30 detik, persona pengguna, dan Jadwal Tugas.",
+      "hash": "492145dfca34739d472f940c38e8b9723b5efde4ac7104e00620e0a7bfd97e62",
+      "ukuran_kb": 143.8,
+      "ringkasan": "Menjawab: bagaimana Copilot (asisten tanya-jawab di Web ERP) bekerja, kenapa ia merutekan pertanyaan ke endpoint lewat gateway dengan JWT penanya dan dilarang berhitung sendiri, serta siapa yang boleh memakainya. Juga menjawab tool apa saja yang ditawarkan per area (HRGA, marketing, finance, akuntansi, gudang, dll), sumber mana yang sengaja dilewati, bagaimana penjaga anti angka karangan, penggabungan data per orang, riwayat percakapan, umpan balik jempol, jawaban di latar, dan Jadwal Tugas dirancang. Dipakai juga untuk mencari batas gateway 30 detik yang mengikat rancangan, riwayat sinkron per gelombang PR, dan hal yang masih TBD.",
       "kata_kunci": [
         "Copilot",
-        "assistant-service",
+        "assistant service",
         "asisten AI",
-        "AI assistant",
-        "tool calling",
-        "LLM",
-        "ADR 0132",
         "tanya-jawab",
+        "tool runner",
+        "services/assistant",
+        "JWT pemakai",
         "penjaga jawaban",
+        "angka karangan",
         "Jadwal Tugas"
       ]
     },
@@ -8255,6 +8256,7 @@
         "CORE - Kapabilitas AI dan Machine Learning",
         "REF - Kepemilikan Data",
         "ADR - 0082",
+        "REF - Penyajian Laporan Copilot",
         "API - Integration Service",
         "ADR - 0058",
         "ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi",
@@ -8264,21 +8266,20 @@
         "CORE - RBAC dan Permission Set",
         "CORE - API Master Gateway"
       ],
-      "hash": "39ff4ce6d0a6aa51873af5ac0025fba1108a4608c1a27bdbe45960e099dea71f",
+      "hash": "ad96e99045ecabf6fe01b1aaf469727dec2c686ff5c535e9fd631cf0176bb21c",
       "ukuran_kb": 24.8,
-      "ringkasan": "Menjawab: kenapa asisten AI lintas modul dibangun sebagai service terpisah dengan endpoint baca di tiap service pemilik data, bukan lapisan data terpusat. Juga menjawab siapa yang boleh memakainya (RBAC), kendala gateway 30 detik, pilihan klien AI tipis OpenAI-compatible, aturan tidak menghitung dari data mentah, dan konsekuensi keamanan serta persetujuan Direksi.",
+      "ringkasan": "Menjawab: kenapa asisten AI lintas modul berdiri sebagai service terpisah sementara lapisan data bisnisnya dibangun sebagai endpoint baca baru di tiap service pemilik data, bukan satu lapisan terpusat, dan bagaimana itu menyimpang dari ADR 0058 serta ADR 0120. Menjawab pula siapa yang boleh memakainya (Supervisor, Direktur, IT), apa yang tidak dijanjikan ke manajemen, kenapa klien AI ditulis tipis OpenAI-compatible, dan bagaimana korelasi lintas modul dilakukan lewat banyak pemanggilan tool. Memuat kendala gateway (timeout 30 detik, tanpa SSE), alasan `InternalRequest` tak bisa menggantikan `Reroute`, dan koreksi bahwa klien `shared-library/ai` ternyata belum ada di kode.",
       "kata_kunci": [
         "ADR 0132",
         "asisten AI",
-        "lintas modul",
         "Copilot",
-        "RBAC",
-        "gateway timeout",
-        "klien AI",
-        "tool calling",
-        "keputusan arsitektur",
-        "data keluar perusahaan",
-        "assistant-service"
+        "lintas modul",
+        "lapisan data bisnis",
+        "RBAC Supervisor Direktur IT",
+        "gateway timeout 30 detik",
+        "klien AI OpenAI-compatible",
+        "InternalRequest",
+        "shared-library/ai"
       ]
     },
     {
@@ -8356,7 +8357,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-09-28, kode belum ada. Disetujui pemilik proposal lewat `/analisa-kebutuhan`. Dikerjakan **sesudah** fondasi [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] (klien AI, service, gate akses, minimal satu modul percontohan) terbukti jalan — keputusan eksplisit, bukan ditunda diam-diam.",
+      "status_teks": "**Diusulkan**, 2026-09-28. ~~Kode belum ada.~~ **Kodenya sudah di `main`** (diukur 2026-10-08: backend bip-erp #2382 merged 2026-09-30 dan #2788 merged 2026-10-08; layar erp-frontend #2179 merged 2026-10-08), lihat § Catatan implementasi. Status keputusannya sendiri belum diubah siapa pun yang berwenang. Disetujui pemilik proposal lewat `/analisa-kebutuhan`. Dikerjakan **sesudah** fondasi [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] (klien AI, service, gate akses, minimal satu modul percontohan) terbukti jalan — keputusan eksplisit, bukan ditunda diam-diam.",
       "publik": true,
       "tautan": [
         "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
@@ -8367,20 +8368,20 @@
         "Microservices - Notification Service",
         "Microservices - Assistant Service"
       ],
-      "hash": "93919d0169362603a64b0beca9cb0de3d5e4521ccebcc784ec4922e6e686e2a7",
-      "ukuran_kb": 11.4,
-      "ringkasan": "Menjawab: bagaimana fitur Jadwal Tugas (scheduled tasks) Copilot bekerja, kenapa saat jatuh tempo hanya mengirim notifikasi pengingat bertautan alih-alih menjalankan pertanyaan otomatis, dan masalah identitas/JWT kedaluwarsa apa yang membuat eksekusi otomatis ditunda. Juga menjelaskan siapa boleh membuat jadwal, isi tugas dan frekuensinya, pola penjadwal cron idempoten, kategori inbox baru, serta fitur PRD asli yang sengaja dibuang.",
+      "hash": "1c29db82538f5f84a763c2f380d9c75fafbb50f3b0ab4d9c1b8631368d703a0d",
+      "ukuran_kb": 13.6,
+      "ringkasan": "Menjawab: kenapa Jadwal Tugas Copilot hanya mengirim pengingat bertautan saat jatuh tempo dan tidak menjalankan pertanyaan sendiri, serta masalah identitas apa (JWT kedaluwarsa, cron tanpa header RBAC) yang membuat eksekusi otomatis ditolak atau ditunda. Menjawab pula tiga opsi yang ditimbang (snapshot izin, endpoint izin efektif, pengingat), apa yang dibuang dari PRD Scheduled Tasks asli, siapa yang boleh membuat jadwal, isi tugas, pola penjadwal idempoten per slot, kategori inbox `copilot-jadwal`, dan riwayat pengingat. Memuat catatan implementasi yang menunjuk berkas backend dan layar terkait.",
       "kata_kunci": [
-        "jadwal tugas",
+        "ADR 0135",
+        "Jadwal Tugas",
         "scheduled tasks",
         "Copilot",
         "pengingat",
         "reminder",
-        "notifikasi",
+        "copilot-jadwal",
         "cron",
-        "JWT",
-        "identitas service-to-service",
-        "ADR 0135"
+        "JWT kedaluwarsa",
+        "eksekusi otomatis"
       ]
     },
     {
@@ -9259,7 +9260,7 @@
         "CORE - RBAC dan Permission Set"
       ],
       "hash": "c1fe1df78a640bd087edf48c81d4e6285927607c553d6c623c95ca2de4c48e73",
-      "ukuran_kb": 9.3,
+      "ukuran_kb": 9.4,
       "ringkasan": "Menjawab: kenapa staf Shop Quality (CS toko) tidak bisa melihat halaman Ulasan marketplace di `/integration/reviews`, toko mana saja yang boleh dibaca seseorang di rute `/reviews/*` (gabungan `icc_account_mappings` dan `cs_shop_mappings`), dan paket izin apa yang membuka menunya (`marketing_akuntoko_pemegang`). Juga menjawab apa yang sengaja tidak ikut berubah: siapa yang boleh mengajukan komplain dari ulasan, kenapa ulasan TikTok dan Lazada tidak tersedia per pembeli, kenapa balas ulasan tetap di Seller Center, seberapa segar datanya (sync harian `sync-reviews`), serta urutan pemasangan backend sebelum paket izin dan asumsi yang wajib dibuktikan di DEV.",
       "kata_kunci": [
         "ulasan marketplace",
@@ -14761,22 +14762,23 @@
       "publik": true,
       "tautan": [
         "REF - Penamaan Metrik & Sumber KPI",
-        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "REF - Penyajian Laporan Copilot"
       ],
-      "hash": "7facf494330ce4d2e32284df5b82ba9937c2a1443ced4fafaf0095b38e25d378",
-      "ukuran_kb": 8.8,
-      "ringkasan": "Menjawab: bagaimana menyusun tata letak halaman dashboard/analytics di erp-frontend, mulai dari menentukan zona halaman (saringan di atas lewat `PageShell` yang memasang saringannya di laci `Banner` bergaya HRIS dan terbuka saat halaman dibuka, satu area fokus utama, ruang catatan), membuat satu insight utama yang dominan (`lg:col-span-2` di dalam `grid lg:grid-cols-3`), mengelompokkan kartu setema lewat jarak, sampai merancang urutan alur pandangan mata (saringan, kartu KPI, bagan inti, detail, catatan aksi). Menjelaskan bahwa `Container` layout `(main)` sudah memasang `p-4 sm:p-6` dan `gap-4 sm:gap-6` sehingga padding sendiri di halaman menghasilkan padding ganda, aturan jarak vertikal `gap-6` antar-seksi dan `gap-4` antar-kartu, serta kapan `PageShell tanpaKartu` dipakai dan mengapa kepala halamannya memakai kartu Banner. Memuat juga hasil pengukuran ke kode per 2026-09-03 (18 komponen bagan `ChartContainer`, 16 pemakai `PageShell`, 126 pemakai `MainTable`), catatan dua sistem desain di `marketing-insight` beserta dampak `bg-white` pada mode gelap, dan batas ruang lingkupnya terhadap aturan warna/bagan di team-memory serta skill `/migrasi-tabel-hris`.",
+      "hash": "38c0f8f7540ea00a58dfb8b96ff5129e9e08501f25ac973fba2a6e3ca912b242",
+      "ukuran_kb": 8.9,
+      "ringkasan": "Menjawab: bagaimana menyusun tata letak halaman berisi angka (dashboard, ringkasan, analytics) di erp-frontend, yaitu enam aturan komposisi dari kerangka zona, satu insight dominan, pengelompokan per tema, jarak yang konsisten, lebih sedikit kotak, sampai alur pandangan mata, beserta komponen yang sudah ada untuk tiap aturan. Menjawab pula nilai jarak mana yang berlaku (`gap-6` antar-seksi, `gap-4` antar-kartu), kapan memakai `PageShell` dan `col-span-2`, serta seberapa jauh aturan ini sudah diadopsi menurut pengukuran kode. Juga menjelaskan kenapa `features/marketing-insight/` dianggap sistem desain tandingan dan temuan apa yang bisa langsung diperbaiki di sana.",
       "kata_kunci": [
         "layout dashboard",
-        "dashboard layout",
-        "tata letak halaman",
+        "tata letak",
         "erp-frontend",
-        "jarak antar-kartu",
-        "padding ganda Container",
         "PageShell",
-        "laci saringan Banner",
-        "col-span-2 insight dominan",
-        "marketing-insight"
+        "col-span-2",
+        "jarak gap spacing",
+        "insight dominan",
+        "marketing-insight",
+        "sistem desain tandingan",
+        "Container padding"
       ]
     },
     {
@@ -14845,6 +14847,38 @@
         "SATUAN_PER_METRIK",
         "METRIK_PER_SUMBER",
         "i18n"
+      ]
+    },
+    {
+      "path": "Reference/REF - Penyajian Laporan Copilot.md",
+      "judul": "REF - Penyajian Laporan Copilot",
+      "area": "Reference",
+      "jenis": "reference",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)**. Diukur 2026-10-08 ke `origin/main` bip-erp `ff3ea482` dan erp-frontend `a4151449c`. **Laporan penuh baru berlaku untuk dua alat**, `laba_produk` dan `laba_toko`; alat lain memakai jalur umum (§ Cakupan hari ini). Belum ada pengukuran PROD maupun uji end-to-end lewat gateway atas gelombang ini: yang terbukti kode dan test di repo.",
+      "publik": true,
+      "tautan": [
+        "REF - Layout Dashboard erp-frontend",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "Microservices - Assistant Service",
+        "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
+        "Microservices - Marketing Analytics Service",
+        "APP - Web ERP"
+      ],
+      "hash": "e344852d683d8149bdd4b2edfe898d516e1e566b586c8980e0913673cc41967e",
+      "ukuran_kb": 28.6,
+      "ringkasan": "Menjawab: bagaimana Copilot menyajikan jawaban berangka sebagai laporan, mulai dari kartu angka utama dengan perubahan periode, judul grafik berupa kesimpulan, bentuk grafik yang dipilih sistem menurut jenis temuan, satu paragraf penjelasan per grafik, tabel lengkap tanpa pemotongan, disiplin warna, sampai unduhan PDF dan Excel. Menjawab pula alat mana yang mendapat laporan penuh (`laba_produk`, `laba_toko`) dan apa yang didapat alat lain lewat jalur umum, bagaimana periode pembanding ditentukan, dan kenapa margin ditulis dalam poin. Dipakai sebagai daftar periksa saat menambah alat baru ke Copilot, lengkap dengan berkas kode penegak tiap aturan dan hal yang belum berlaku.",
+      "kata_kunci": [
+        "penyajian laporan",
+        "Copilot",
+        "laporan laba",
+        "laba_produk",
+        "laba_toko",
+        "kartu angka utama",
+        "temuan",
+        "bentuk grafik",
+        "periode pembanding",
+        "PDF Excel"
       ]
     },
     {
@@ -18758,7 +18792,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "d0fa3787dc7b6ad777de7cfc58d2bbd60c3e861832b41fd144facdb261b662fc",
-      "ukuran_kb": 8.0,
+      "ukuran_kb": 8.2,
       "ringkasan": "Menjawab: task apa saja yang lahir dari permintaan Shop Quality membaca ulasan toko pegangan CS, urutan dan ketergantungannya, serta kriteria \"yang harus benar\" tiap task (T1 cakupan baca ulasan lewat `cs_shop_mappings`, T2 `/reviews/sync-status` tidak menghitung toko DISABLED, T3 `SyncAll` harus melapor gagal, T4 pemasangan paket izin oleh manusia). Juga menjawab nomor issue bip-erp tiap task, angka ukur prod yang jadi titik awal, kenapa frontend tidak perlu berubah, dan apa yang sengaja tidak dikerjakan.",
       "kata_kunci": [
         "analisa",
