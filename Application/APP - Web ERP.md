@@ -1031,7 +1031,7 @@ Menyentuh empat modul, dan **dua di antaranya memperbaiki cacat yang sudah hidup
 	- **Plural i18n** `marketing.jadwalHostLive.ruasHari_one/_other` (pola `bypassHours`): ruas libur 1 hari lazim, dan tanpa itu versi Inggris menulis "Off 1 days". Dikunci uji instance i18next asli.
 	- ⚠️ **Gap lama, belum ditutup**: bila `GET /jadwal-host-live/anggota` gagal, `MainTable` tak merender `summary` sehingga tab Pola Shift ikut hilang dan pola tak terjangkau sama sekali.
 
-**Jadwal Siaran Toko** (`/marketing/jadwal-siaran-toko`) — 🟡 *Diusulkan 2026-10-08, belum ada kode*. Keputusan: [[ADR - 0157 Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Jadwal Ditolak]].
+**Jadwal Siaran Toko** (`/marketing/jadwal-siaran-toko`) — ⚠️ *merged 2026-10-08 (erp-frontend [#2206](https://github.com/bip-itteam-internal/erp-frontend/pull/2206)), dibangun terhadap kontrak dengan balasan tiruan, belum pernah dijalankan terhadap backend sungguhan*. Keputusan: [[ADR - 0157 Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Jadwal Ditolak]].
 
 - **Yang dijadwalkan akun dan toko, bukan orang.** Beda dari Jadwal Host Live di atas (orang dan pola shift, milik attendance-service): di sini leader marketing mengisi per tanggal akun live mana siaran untuk toko mana, dan datanya milik marketing-analytics.
 - **Rancangan layar**: rentang tanggal (bawaan tujuh hari ke depan), satu baris per toko departemen, satu sel per tanggal berisi akun yang dijadwalkan. Mengisi lewat `Sheet` berangka tiga; akun dipilih dari `GET /live-shifts/akun?shop_id=` atau diketik untuk akun baru. Tanggal hari ini meminta alasan; tanggal lampau hanya baca.

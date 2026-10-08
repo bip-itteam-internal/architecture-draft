@@ -1,4 +1,4 @@
-> **Status**: 🟢 **Diterima**, 2026-10-08, oleh irfanarfianto · 🟡 belum ada kode. Rincian di `## Deskripsi`.
+> **Status**: 🟢 **Diterima**, 2026-10-08, oleh irfanarfianto · ⚠️ kode merged ke `main` 2026-10-08, belum terverifikasi di DEV maupun PROD. Rincian di `## Deskripsi`.
 
 ## Untuk Manajemen
 
@@ -26,7 +26,7 @@ Tiga hal bisa diatur dari menu itu tanpa mengubah program: seberapa keras jadwal
 
 *Leader marketing menyusun jadwal siaran per tanggal (akun live mana untuk toko mana), dan `POST /live-shifts` menolak pasangan toko dan akun yang tidak sesuai jadwal hari itu. Seberapa keras jadwal ditegakkan, kapan ia terkunci, dan kapan host diingatkan adalah pengaturan per departemen, bukan konstanta. Pada mode `tolak` dan `wajib` keputusan ini menyimpang dengan sengaja dari [[ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support]] §2; alasannya dicatat di bawah.*
 
-- **Status**: 🟢 **Diterima**, 2026-10-08, oleh irfanarfianto (Pemutus; persetujuan diberikan di sesi analisa dan baris ini ditulis agent atas perintahnya) · 🟡 belum ada kode.
+- **Status**: 🟢 **Diterima**, 2026-10-08, oleh irfanarfianto (Pemutus; persetujuan diberikan di sesi analisa dan baris ini ditulis agent atas perintahnya) · ⚠️ kode merged ke `main` 2026-10-08, belum terverifikasi di DEV maupun PROD. Bagian 1/4, 2/4, 3/4 backend: bip-erp [#2823](https://github.com/bip-itteam-internal/bip-erp/pull/2823), [#2831](https://github.com/bip-itteam-internal/bip-erp/pull/2831), [#2832](https://github.com/bip-itteam-internal/bip-erp/pull/2832) (merged). Layar: erp-frontend [#2206](https://github.com/bip-itteam-internal/erp-frontend/pull/2206) (merged). Bagian 4/4 (feed kalender): bip-erp [#2833](https://github.com/bip-itteam-internal/bip-erp/pull/2833), PR terbuka saat baris ini ditulis; ukur ulang sebelum dipakai. Jalur tulis ke MongoDB sungguhan dan seluruh alur lewat gateway belum pernah dijalankan.
 - **Path di repo**: `bip-erp/services/marketing-analytics/jadwal_siaran*.go` (baru) · `bip-erp/shared-library/common/catalog_jadwal.go` (izin `jadwal.siaran.manage`, baru) · `bip-erp/services/marketing-analytics/live_shift_handler.go` dan `live_shift_ambil_alih.go` (penjaga jadwal) · `bip-erp/services/marketing-analytics/sync_live_sessions.go` (pemeriksaan sesudah sync) · `bip-erp/services/calendar/providers.go` (satu baris) · `erp-frontend/src/features/marketing/jadwal-siaran-toko/` (baru) · `erp-frontend/src/app/(main)/marketing/jadwal-siaran-toko/page.tsx` (baru)
 - **Tanggal**: 2026-10-08
 

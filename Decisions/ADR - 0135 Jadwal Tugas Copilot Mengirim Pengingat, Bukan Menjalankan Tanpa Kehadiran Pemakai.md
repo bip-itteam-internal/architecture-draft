@@ -1,6 +1,6 @@
 # ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai
 
-> **Status**: 🟡 **Diusulkan**, 2026-09-28, kode belum ada. Disetujui pemilik proposal lewat `/analisa-kebutuhan`. Dikerjakan **sesudah** fondasi [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] (klien AI, service, gate akses, minimal satu modul percontohan) terbukti jalan — keputusan eksplisit, bukan ditunda diam-diam.
+> **Status**: 🟡 **Diusulkan**, 2026-09-28. ~~Kode belum ada.~~ **Kodenya sudah di `main`** (diukur 2026-10-08: backend bip-erp #2382 merged 2026-09-30 dan #2788 merged 2026-10-08; layar erp-frontend #2179 merged 2026-10-08), lihat § Catatan implementasi. Status keputusannya sendiri belum diubah siapa pun yang berwenang. Disetujui pemilik proposal lewat `/analisa-kebutuhan`. Dikerjakan **sesudah** fondasi [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] (klien AI, service, gate akses, minimal satu modul percontohan) terbukti jalan — keputusan eksplisit, bukan ditunda diam-diam.
 >
 > **Issue GitHub**: [bip-erp#2355](https://github.com/bip-itteam-internal/bip-erp/issues/2355) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 
@@ -39,9 +39,11 @@ ketika pemakainya membuka tautan itu, sehingga seluruh panggilan tetap memakai J
 persis seperti Tanya Jawab biasa. Tidak ada eksekusi tanpa kehadiran pemakai, dan karena itu tidak
 ada mekanisme identitas baru.*
 
-- **Path di repo**: `bip-erp/services/assistant/` (penjadwal + koleksi jadwal, **baru**);
-  `bip-erp/shared-library/models/notification/models.go` (satu kategori inbox **baru**);
-  `erp-frontend/src/features/assistant/` (layar Jadwal Tugas + penerima tautan pre-fill, **baru**)
+- **Path di repo**: `bip-erp/services/assistant/` (penjadwal + koleksi jadwal; kini `jadwal_rute.go`,
+  `pengingat.go`, `internal/jadwal/`);
+  `bip-erp/shared-library/models/notification/models.go` (kategori inbox `copilot-jadwal`);
+  ~~`erp-frontend/src/features/assistant/`~~ `erp-frontend/src/features/copilot/` (layar Jadwal Tugas +
+  penerima tautan; folder `features/assistant` tidak ada di `origin/main`)
 - **Tanggal**: 2026-09-28
 
 ## Context
@@ -102,6 +104,8 @@ yang aman lintas replika ada di `services/integration/internal/worker/lock.go` (
 belum bisa menjawab apa pun (baru klien AI dasar T1 dan menu placeholder). ADR ini berdiri di atas
 rencana, bukan kenyataan, dan karena itu tidak bisa dikerjakan sebelum fondasinya ada: tautan
 pengingat menunjuk ke layar Tanya Jawab yang belum ada.
+**Keadaan 2026-10-08**: paragraf di atas adalah keadaan saat ADR ditulis. Tanya Jawab Copilot dan Jadwal
+Tugas kini ada di `main` kedua repo; rinciannya di [[Microservices - Assistant Service]].
 
 ## Decision
 
@@ -173,6 +177,23 @@ sebagai jalan pintas.
 - Eksekusi tanpa kehadiran pemakai, dalam bentuk apa pun.
 - Menyimpan atau membekukan izin pemakai.
 - WhatsApp/Telegram.
+
+## Catatan implementasi (2026-10-08, diukur ke `origin/main` bip-erp `ff3ea482` dan erp-frontend `a4151449c`)
+
+Bagian ini hanya mencatat apa yang dilakukan kode terhadap tiap butir keputusan; ia tidak mengubah keputusan
+maupun statusnya. Cara kerja lengkapnya di [[Microservices - Assistant Service]] § Jadwal Tugas.
+
+| Butir | Di kode |
+|---|---|
+| §1 pengingat, bukan eksekusi | Sesuai. Pemindai hanya mengirim inbox; tak ada panggilan model atau endpoint data (`internal/jadwal/`, `pengingat.go`). Instruksi tidak ikut di notifikasi; layar mengambilnya lewat `GET /jadwal/:id` saat tautan dibuka |
+| §2 gate yang sama | Sesuai. Semua rute `/jadwal*` di belakang `common.RequireCopilot`; milik orang lain dibalas 404 |
+| §3 isi tugas | Sesuai: nama, instruksi, frekuensi (harian, hari kerja, mingguan, bulanan), jam, zona Asia/Jakarta. Bulanan dibatasi tanggal 1 sampai 28. "Jalankan sekarang" ada sebagai tombol yang mengisi kotak tanya (`sheet-jadwal.tsx`) |
+| §4 penjadwal | **Berbeda dari rencana**: ticker 1 menit di proses service, bukan `robfig/cron` (tak ada di `go.mod` service ini). Idempoten per slot lewat indeks unik (jadwal, slot) tetap sesuai. Tambahan implementasi: pengingat yang telat lebih dari 2 jam tidak dikirim |
+| §5 kategori inbox | `copilot-jadwal`. Tujuan klik web diturunkan notification-service dari `AppRoute` (bip-erp #2788) |
+| §6 riwayat | Sesuai: `GET /jadwal/:id/riwayat` dan `POST /jadwal/:id/dibuka` |
+| Batas jumlah tugas dan interval minimum | Tetap **TBD**, tak ada di kode (`internal/jadwal/jadwal.go` menyatakannya) |
+
+⚠️ Belum ada pengukuran PROD atas fitur ini pada 2026-10-08.
 
 ## Dokumen Terkait
 

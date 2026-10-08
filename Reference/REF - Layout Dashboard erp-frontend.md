@@ -105,4 +105,5 @@ Ini bukan soal selera. Modul itu juga memakai jarak yang berbeda (`gap-5`, `gap-
 
 - [[REF - Penamaan Metrik & Sumber KPI]] (label yang muncul di kartu ini)
 - [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]
+- [[REF - Penyajian Laporan Copilot]] (lihat juga: susunan dan gaya jawaban berangka di layar Copilot, yang tidak diatur dokumen ini)
 - `.agent-kit/rules/team-memory.md` § Konvensi FE / UI, § Bagan/chart

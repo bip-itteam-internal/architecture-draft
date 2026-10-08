@@ -505,9 +505,9 @@ Tiga cabang, dan yang tengah alasan penjaga ini ada:
 
 **Titik putus alur yang diterima sadar**: akun yang benar-benar **dipindah** ke toko baru belum punya riwayat di sana, jadi pesannya akan menyebut toko **lama**. Jalan majunya field body `konfirmasi_toko: true`; sampai MyBharata memasang dialog konfirmasinya, jalan keluarnya lewat IT, dan itu disebut di pesan galatnya. Jalur ambil alih dijaga penjaga yang sama (ia menerima `shop_id` dari body dan hanya mencocokkan `akun_live`).
 
-#### 🟡 Jadwal Siaran Toko (Diusulkan 2026-10-08, belum ada kode)
+#### ⚠️ Jadwal Siaran Toko (merged ke `main` 2026-10-08, belum terverifikasi DEV/PROD)
 
-Keputusannya [[ADR - 0157 Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Jadwal Ditolak]]. Bagian ini mencatat **rancangan**; tidak satu pun di bawah sudah ada di kode.
+Keputusannya [[ADR - 0157 Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Jadwal Ditolak]]. Kodenya di `services/marketing-analytics/jadwal_siaran*.go` (bip-erp #2823, #2831, #2832 merged 2026-10-08; feed kalender #2833 PR terbuka saat ditulis). ⚠️ Seluruh test handler memakai penyimpanan tiruan: **jalur tulis ke MongoDB sungguhan dan alur lewat gateway belum pernah dijalankan**, jadi bagian ini belum boleh dibaca sebagai terbukti.
 
 **Masalah yang dijawab.** Service ini tidak punya tempat menyimpan "akun ini siaran untuk toko itu". Fakta itu hanya lahir saat host menekan Mulai, dan penjaga di atas menebaknya dari riwayat. Terukur PROD 2026-10-08 (1 September sampai 8 Oktober, 785 sesi TikTok): 10 sesi salah toko dan 5 sesi salah akun, seluruhnya ditemukan manual dan dibetulkan lewat skrip tulis ke database.
 
