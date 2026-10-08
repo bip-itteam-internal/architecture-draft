@@ -8,6 +8,8 @@ Di aplikasi MyBharata tidak ada yang berubah. Host tetap memilih toko dan akun s
 
 Bila ternyata jadwalnya sendiri yang keliru, sistem memberi tahu penyusun jadwal sesudah data penjualan TikTok masuk.
 
+Tiga hal bisa diatur dari menu itu tanpa mengubah program: seberapa keras jadwal ditegakkan (hanya mencatat selisih, menolak yang bertentangan, atau mewajibkan setiap toko terjadwal), kapan jadwal terkunci, dan berapa menit sebelum shift pengingat dikirim. Saat pertama naik, jadwal **hanya mencatat selisih dan belum menolak siapa pun**; penolakan dinyalakan leader sesudah jadwalnya terbukti terisi benar. Siapa yang boleh mengisi jadwal juga bisa ditambah IT lewat hak per posisi.
+
 **Siapa yang terdampak.** Leader dan SPV marketing (pekerjaan baru: mengisi jadwal), host live (pilihan yang salah kini ditolak), dan Live Support serta pembaca KPI live (angka penjualan per sesi lebih jarang kosong).
 
 **Yang tidak dijanjikan.**
@@ -22,10 +24,10 @@ Bila ternyata jadwalnya sendiri yang keliru, sistem memberi tahu penyusun jadwal
 
 ## Deskripsi
 
-*Leader marketing menyusun jadwal siaran per tanggal (akun live mana untuk toko mana), dan `POST /live-shifts` menolak pasangan toko dan akun yang tidak sesuai jadwal hari itu. Menyimpang dengan sengaja dari [[ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support]] §2 dan dari pola izin per posisi di [[ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan]]; alasannya dicatat di bawah.*
+*Leader marketing menyusun jadwal siaran per tanggal (akun live mana untuk toko mana), dan `POST /live-shifts` menolak pasangan toko dan akun yang tidak sesuai jadwal hari itu. Seberapa keras jadwal ditegakkan, kapan ia terkunci, dan kapan host diingatkan adalah pengaturan per departemen, bukan konstanta. Pada mode `tolak` dan `wajib` keputusan ini menyimpang dengan sengaja dari [[ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support]] §2; alasannya dicatat di bawah.*
 
 - **Status**: 🟡 **Diusulkan**, 2026-10-08. Belum ada kode. Bentuknya disetujui pemilik produk di sesi analisa 2026-10-08; baris ini berubah jadi Diterima saat ia menuliskannya di sini.
-- **Path di repo**: `bip-erp/services/marketing-analytics/jadwal_siaran*.go` (baru) · `bip-erp/services/marketing-analytics/live_shift_handler.go` dan `live_shift_ambil_alih.go` (penjaga jadwal) · `bip-erp/services/marketing-analytics/sync_live_sessions.go` (pemeriksaan sesudah sync) · `bip-erp/services/calendar/providers.go` (satu baris) · `erp-frontend/src/features/marketing/jadwal-siaran-toko/` (baru) · `erp-frontend/src/app/(main)/marketing/jadwal-siaran-toko/page.tsx` (baru)
+- **Path di repo**: `bip-erp/services/marketing-analytics/jadwal_siaran*.go` (baru) · `bip-erp/shared-library/common/catalog_jadwal.go` (izin `jadwal.siaran.manage`, baru) · `bip-erp/services/marketing-analytics/live_shift_handler.go` dan `live_shift_ambil_alih.go` (penjaga jadwal) · `bip-erp/services/marketing-analytics/sync_live_sessions.go` (pemeriksaan sesudah sync) · `bip-erp/services/calendar/providers.go` (satu baris) · `erp-frontend/src/features/marketing/jadwal-siaran-toko/` (baru) · `erp-frontend/src/app/(main)/marketing/jadwal-siaran-toko/page.tsx` (baru)
 - **Tanggal**: 2026-10-08
 
 ## Context
@@ -61,17 +63,17 @@ Koleksi baru `jadwal_siaran_toko` di marketing-analytics. Satu dokumen = satu ak
 
 ### 2. Jadwal tanggal D bebas diubah sampai D-1; pada hari-H wajib beralasan; tanggal lampau terkunci
 
-- Selama belum pukul 00.00 WIB tanggal D, jadwal tanggal D ditulis tanpa syarat.
-- Sejak 00.00 WIB tanggal D sampai akhir hari itu, setiap perubahan wajib membawa `alasan` (tidak kosong) dan dicatat di `jadwal_siaran_toko_jejak` (append-only: siapa, kapan, isi sebelum, isi sesudah, alasan).
+- Sebelum **saat kunci** tanggal D, jadwal tanggal D ditulis tanpa syarat. Saat kunci bawaannya 00.00 WIB tanggal D, dan bisa dimajukan lewat pengaturan (§10), misalnya ke H-1 pukul 17.00.
+- Sejak saat kunci sampai akhir tanggal D, setiap perubahan wajib membawa `alasan` (tidak kosong) dan dicatat di `jadwal_siaran_toko_jejak` (append-only: siapa, kapan, isi sebelum, isi sesudah, alasan).
 - Tanggal yang sudah lewat tidak bisa diubah (400).
 
 "Final H-1" jadi **aturan dengan jalan darurat yang berjejak**, bukan kunci mati. Kunci mati membuat strategi yang berubah pagi itu menolak host untuk siaran yang sebenarnya benar, dan sesinya tidak tercatat sama sekali.
 
 ### 3. Mulai dan ambil alih dicocokkan dengan jadwal hari itu
 
-Berjalan sesudah penurunan `channel`, memakai tanggal WIB saat permintaan tiba:
+Berjalan sesudah penurunan `channel`, memakai tanggal WIB saat permintaan tiba. Tabel ini berlaku pada mode **`tolak`**; mode diatur per departemen pemilik toko yang dipilih (§10):
 
-| Keadaan | Hasil |
+| Keadaan | Hasil pada mode `tolak` |
 |---|---|
 | Akun punya baris jadwal hari itu, tokonya **sama** dengan yang dipilih | Lolos. Penjaga 14 hari **dilewati**: jadwal menang atas riwayat, jadi akun yang baru pindah toko tidak lagi butuh `konfirmasi_toko` |
 | Akun punya baris jadwal hari itu, tokonya **beda** | **400**: "Akun X hari ini dijadwalkan untuk toko Y, bukan Z. Pilih toko Y lalu ulangi." |
@@ -79,7 +81,14 @@ Berjalan sesudah penurunan `channel`, memakai tanggal WIB saat permintaan tiba:
 | Akun tidak dijadwalkan dan toko yang dipilih **tidak punya** jadwal hari itu | Perilaku lama: penjaga 14 hari (`akunMilikToko`) |
 | Jadwal tidak terbaca | Perilaku lama, dan dicatat di log. Gagal-terbuka |
 
+Dua mode lainnya memakai keputusan yang sama, berbeda hanya pada akibatnya:
+
+- **`catat`** (bawaan): tidak ada yang ditolak karena jadwal. Baris kedua dan ketiga tetap lolos ke perilaku lama, tetapi selisihnya ditulis ke sesi yang lahir sebagai `live_shifts.selisih_jadwal` (`jenis`: `toko_beda` atau `akun_tak_terjadwal`, serta toko yang dijadwalkan). Baris pertama tetap melewati penjaga 14 hari. Tidak ada inbox ke host.
+- **`wajib`**: seperti `tolak`, ditambah baris keempat ikut ditolak 400: "Toko Z belum punya jadwal siaran hari ini. Hubungi leader." Jadwal yang tidak terbaca tetap gagal-terbuka.
+
 Nama toko di pesan diambil dari sumber yang sama dengan pemilih (`namaTokoUntukPesan`).
+
+Bawaan `catat` dipilih supaya fitur bisa naik tanpa risiko host tertolak oleh jadwal yang belum terisi rapi: leader melihat dulu berapa sesi yang berselisih, lalu menyalakan `tolak` dari layar, tanpa deploy.
 
 **Ini menyimpang dari [[ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support]] §2** ("menahan, tapi boleh dilanjut dengan alasan"). Penyimpangannya disengaja dan sempit: yang ditolak hanya pilihan yang **bertentangan dengan jadwal yang ada**, dan pesannya menyebut pilihan yang benar, sehingga host dapat langsung mengulang. Tanggal atau toko tanpa jadwal, dan gangguan baca, tetap tidak mematikan pencatatan.
 
@@ -89,15 +98,15 @@ Saat menolak karena jadwal, server mengirim pesan yang sama ke inbox pemanggil l
 
 Kategori `reminder` dipakai ulang dengan sengaja: kategori baru menuntut daftar-izin di notification-service **dan** pemetaan label di MyBharata, sedangkan MyBharata diputuskan tidak disentuh. Konsekuensinya notifikasi ini berlabel pengingat.
 
-### 5. Wewenang: leader marketing, hanya untuk toko departemennya
+### 5. Wewenang: izin `jadwal.siaran.manage`, dengan leader marketing sebagai bawaan
 
-Tulis: `common.IsMarketingLeader`, dan pemanggil yang bukan IT hanya boleh menulis toko yang `department_shops.department`-nya sama dengan departemennya (header gateway). Baca: leader marketing dan pemakai sesi live (`RequireLiveShiftUser`), disaring ke toko departemennya.
+Tulis (jadwal maupun pengaturan §10): memegang izin baru **`jadwal.siaran.manage`** **atau** lolos `common.IsMarketingLeader`, berdampingan, pola yang sama dengan `jadwal.hostlive.manage` di attendance. Siapa pun penulisnya, yang bukan IT hanya boleh menulis toko yang `department_shops.department`-nya sama dengan departemennya (header gateway). Baca: penulis di atas dan pemakai sesi live (`RequireLiveShiftUser`), disaring ke toko departemennya.
 
-**Ini menyimpang dari pola [[ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan]]**, yang menolak "SPV marketing" sebagai dasar wewenang jadwal dan memilih izin per posisi. Pemilik produk memutuskan wewenang jadwal siaran mengikuti jabatan (2026-10-08). Presedennya Kepemilikan Toko di ICC Management, yang juga digerbang leader marketing per departemen. Yang dimaksud "SPV/leader" adalah peran leader marketing di hak akses modul, **bukan** `work_data.is_supervisor`.
+Pemilik produk memutuskan SPV/leader marketing yang menyusun jadwal (2026-10-08), jadi leader lolos **tanpa perlu dipasangi apa pun**. Izinnya ada supaya orang lain yang kelak ditunjuk mengisi (admin, staf) cukup dipasangi IT lewat Hak per Posisi, tanpa perubahan kode. Ini sejalan dengan [[ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan]]: wewenangnya izin, dan peran hanya jalur bawaan. Izin ditaruh di modul `jadwal`, bukan `marketing`, karena prefiks izin menentukan kategori sidebar (ADR yang sama). Yang dimaksud "SPV/leader" adalah peran leader marketing di hak akses modul, **bukan** `work_data.is_supervisor`.
 
 ### 6. Host diberi tahu sepuluh menit sebelum shift-nya
 
-Tik latar di marketing-analytics (selang lima menit). Untuk tiap host yang jam mulai shift-nya hari itu jatuh dalam sepuluh menit ke depan, kirim satu inbox `reminder` berisi jadwal siaran hari itu: tiap toko beserta akunnya.
+Tik latar di marketing-analytics (selang lima menit). Untuk tiap host yang jam mulai shift-nya hari itu jatuh dalam `menit_pengingat` ke depan (bawaan sepuluh, diatur per departemen di §10), kirim satu inbox `reminder` berisi jadwal siaran hari itu: tiap toko beserta akunnya.
 
 - Jam shift dari `GET /internal/jadwal-resolusi` attendance, rute yang sudah dipakai sesi live.
 - **Daftar host dan tokonya diturunkan dari sesi live 30 hari terakhir**: host yang pernah tercatat di `live_shifts.host[]`, dan toko-toko milik departemen tempat ia bersiaran. Marketing-analytics sengaja tidak memanggil employee-service ([[REF - Kepemilikan Data]]), dan jadwalnya tidak memuat host.
@@ -121,12 +130,27 @@ Kalender pernah menolak memuat shift karena shift keadaan sehari-hari. Jadwal si
 
 Tidak ada layar jadwal, tidak ada perubahan dialog Mulai, tidak ada perbaikan pembacaan pesan galat. Semua yang perlu sampai ke host lewat inbox yang sudah ada.
 
+### 10. Tiga aturan yang kemungkinan berubah disimpan sebagai pengaturan, bukan konstanta
+
+Koleksi `jadwal_siaran_pengaturan`, satu dokumen per `departemen`, diubah dari menu yang sama oleh penulis §5 dan berjejak di `jadwal_siaran_toko_jejak`:
+
+| Pengaturan | Nilai | Bawaan (dokumen belum ada) |
+|---|---|---|
+| `mode` | `catat` · `tolak` · `wajib` (§3) | `catat` |
+| `kunci_menit_sebelum_hari` | 0 sampai 1.440: berapa menit sebelum 00.00 WIB tanggal D jadwal tanggal D terkunci (§2). 420 berarti H-1 pukul 17.00 | 0 |
+| `menit_pengingat` | 5 sampai 120, kelipatan 5: berapa menit sebelum jam mulai shift pengingat dikirim (§6) | 10 |
+
+Ketiganya dipilih karena pemilik produk menyebutnya sebagai kebijakan ("H-1", "10 menit", "ditolak") dan kebijakan seperti itu lazim digeser sesudah dipakai. Menanamnya sebagai konstanta berarti tiap pergeseran menuntut PR dan deploy.
+
+Yang **sengaja tidak** dijadikan pengaturan: satu akun untuk dua toko pada tanggal yang sama (terukur 1 dari 160 hari-akun, 1 September sampai 8 Oktober 2026, dan itu bergantian, tidak bersamaan), kolom host pada jadwal (fitur baru, bukan perubahan nilai), dan kalimat pesan penolakan.
+
 ## Consequences
 
 **Yang membaik.** Keputusan "akun ini untuk toko itu" diambil satu orang, sekali, dan tertulis. Salah toko pada tanggal berjadwal berhenti di pintu, bukan ditemukan berminggu-minggu kemudian. Akun yang pindah toko tidak lagi bergantung pada riwayat 14 hari.
 
 **Yang diterima sadar.**
 
+- ⚠️ **Sesudah naik, fitur ini belum menolak siapa pun.** Bawaan `mode` adalah `catat`. Selama leader belum menggantinya ke `tolak`, salah toko tetap lolos persis seperti sebelumnya; yang bertambah hanya catatan selisih di sesi. Fitur yang merged dan deployed tetapi tidak pernah dinyalakan adalah kegagalan yang tidak berbunyi, jadi penyalaan `tolak` per departemen dicatat sebagai langkah tersendiri di issue induk.
 - ⚠️ **Penolakan tampil sebagai galat umum di layar Mulai.** Host yang tidak membuka inbox tidak tahu sebabnya. Ini harga dari tidak menyentuh MyBharata, dan menutupnya kelak cukup dengan membaca `data.error` di `_mapMulaiError`.
 - ⚠️ **Jadwal yang keliru menolak host yang benar**, untuk semua sesi akun itu hari itu. Jalan keluarnya perubahan hari-H beralasan (§2), dan jaring pengamannya §7.
 - ⚠️ **Tanggal tanpa jadwal tidak terjaga.** Hari ketika leader lupa mengisi berperilaku persis seperti sebelum keputusan ini.
@@ -141,5 +165,6 @@ Tidak ada layar jadwal, tidak ada perubahan dialog Mulai, tidak ada perbaikan pe
 - Backend sebelum frontend.
 - calendar-service ikut naik, dan env `MARKETING_ANALYTICS_MODULE_URL` di blok `calendar-service` compose baru terbaca bila container-nya **dibuat ulang** (`--force-recreate`), bukan `restart`.
 - notification-service tidak perlu naik: tidak ada kategori inbox baru.
+- Izin `jadwal.siaran.manage` masuk katalog di `shared-library`, jadi employee-service (penerbit klaim izin) ikut dibangun ulang; orang yang baru dipasangi izin wajib login ulang. Leader marketing tidak terpengaruh karena lolos lewat perannya.
 
 **Dok terkait.** Cara kerjanya di [[Microservices - Marketing Analytics Service]] § Jadwal Siaran Toko; rute di [[API - Marketing Analytics Service]]; layar di [[APP - Web ERP]]; pemilik fakta di [[REF - Kepemilikan Data]].

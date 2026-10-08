@@ -267,10 +267,12 @@ Keputusan: [[ADR - 0157 Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live y
 | Method | Path | Fungsi | Gerbang |
 |---|---|---|---|
 | GET | `/jadwal-siaran` `?dari=YYYY-MM-DD&sampai=YYYY-MM-DD[&shop_id]` | Baris jadwal dalam rentang WIB, hanya toko departemen pemanggil (IT: semua). Tiap baris `tanggal`·`channel`·`shop_id`·`shop_name`·`akun_live`·`terkunci` | Leader marketing atau pemakai sesi live |
-| PUT | `/jadwal-siaran/:tanggal/toko/:shop_id` | Mengganti seluruh daftar akun satu toko pada satu tanggal. Body `akun_live[]`·`alasan`. **400** tanggal lampau, atau hari-H tanpa `alasan`; **403** toko bukan milik departemen pemanggil; **409** akun sudah dijadwalkan untuk toko lain pada tanggal itu, pesan menyebut tokonya | Leader marketing |
+| PUT | `/jadwal-siaran/:tanggal/toko/:shop_id` | Mengganti seluruh daftar akun satu toko pada satu tanggal. Body `akun_live[]`·`alasan`. **400** tanggal lampau, atau sesudah saat kunci tanpa `alasan`; **403** toko bukan milik departemen pemanggil; **409** akun sudah dijadwalkan untuk toko lain pada tanggal itu, pesan menyebut tokonya | Izin `jadwal.siaran.manage` atau leader marketing |
+| GET | `/jadwal-siaran/pengaturan` | Pengaturan departemen pemanggil: `mode`·`kunci_menit_sebelum_hari`·`menit_pengingat` (nilai bawaan bila belum pernah disimpan), plus `selisih_7_hari` = jumlah sesi tujuh hari terakhir yang ber-`selisih_jadwal` | Leader marketing, pemegang izin, atau pemakai sesi live |
+| PUT | `/jadwal-siaran/pengaturan` | Menyimpan ketiga pengaturan untuk departemen pemanggil. **400** nilai di luar batas (`mode` bukan `catat`/`tolak`/`wajib`; kunci di luar 0 sampai 1.440; pengingat di luar 5 sampai 120 atau bukan kelipatan 5) | Izin `jadwal.siaran.manage` atau leader marketing |
 | GET | `/internal/calendar-feed` `?from&to` | Feed kalender `kind: jadwal_siaran`, satu item per tanggal per toko | Identitas pemanggil diperiksa di handler; hanya toko departemennya |
 
-**Perubahan pada rute yang sudah ada** (juga belum ada di kode): `POST /live-shifts` dan `POST /live-shifts/:id/ambil-alih` mendapat dua balasan **400** baru berbentuk `{"error": "<pesan>"}`, yaitu akun dijadwalkan untuk toko lain dan akun tidak dijadwalkan untuk toko yang punya jadwal hari itu. Bentuk body tidak berubah.
+**Perubahan pada rute yang sudah ada** (juga belum ada di kode): pada mode `tolak`, `POST /live-shifts` dan `POST /live-shifts/:id/ambil-alih` mendapat dua balasan **400** baru berbentuk `{"error": "<pesan>"}`, yaitu akun dijadwalkan untuk toko lain dan akun tidak dijadwalkan untuk toko yang punya jadwal hari itu; mode `wajib` menambah **400** ketiga untuk toko tanpa jadwal hari itu. Pada mode `catat` (bawaan) tidak ada balasan baru; sesi yang lahir membawa `selisih_jadwal`. Bentuk body tidak berubah.
 
 ## Pengumpul KPI
 
