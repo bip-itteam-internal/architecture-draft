@@ -260,6 +260,18 @@ Keduanya membalas **200 dengan amplop `unavailable_channels: SEMUA`** saat sumbe
 
 **Galat khusus lingkup**: `departemen` + `department_shops` gagal dibaca → **503**; `departemen` tanpa toko terpetakan (atau header departemen kosong) → **200** `toko_kosong: true`, `rows: []`; `semua` + sesi TikTok gagal dibaca → **503**; store gagal → **500**.
 
+## 🟡 Jadwal siaran toko (`/jadwal-siaran*`): Diusulkan 2026-10-08, belum ada kode
+
+Keputusan: [[ADR - 0157 Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Jadwal Ditolak]]; cara kerja: [[Microservices - Marketing Analytics Service]] § Jadwal Siaran Toko. **Rute di bawah belum ada di kode**; tabel ini kontrak yang direncanakan dan wajib dicocokkan ulang saat mendarat.
+
+| Method | Path | Fungsi | Gerbang |
+|---|---|---|---|
+| GET | `/jadwal-siaran` `?dari=YYYY-MM-DD&sampai=YYYY-MM-DD[&shop_id]` | Baris jadwal dalam rentang WIB, hanya toko departemen pemanggil (IT: semua). Tiap baris `tanggal`·`channel`·`shop_id`·`shop_name`·`akun_live`·`terkunci` | Leader marketing atau pemakai sesi live |
+| PUT | `/jadwal-siaran/:tanggal/toko/:shop_id` | Mengganti seluruh daftar akun satu toko pada satu tanggal. Body `akun_live[]`·`alasan`. **400** tanggal lampau, atau hari-H tanpa `alasan`; **403** toko bukan milik departemen pemanggil; **409** akun sudah dijadwalkan untuk toko lain pada tanggal itu, pesan menyebut tokonya | Leader marketing |
+| GET | `/internal/calendar-feed` `?from&to` | Feed kalender `kind: jadwal_siaran`, satu item per tanggal per toko | Identitas pemanggil diperiksa di handler; hanya toko departemennya |
+
+**Perubahan pada rute yang sudah ada** (juga belum ada di kode): `POST /live-shifts` dan `POST /live-shifts/:id/ambil-alih` mendapat dua balasan **400** baru berbentuk `{"error": "<pesan>"}`, yaitu akun dijadwalkan untuk toko lain dan akun tidak dijadwalkan untuk toko yang punya jadwal hari itu. Bentuk body tidak berubah.
+
 ## Pengumpul KPI
 
 | Method | Path | Fungsi | Gerbang |
