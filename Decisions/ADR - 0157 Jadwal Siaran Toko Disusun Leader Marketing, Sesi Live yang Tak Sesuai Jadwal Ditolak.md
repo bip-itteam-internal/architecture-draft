@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan**, 2026-10-08. Belum ada kode. Rincian di `## Deskripsi`.
+> **Status**: 🟢 **Diterima**, 2026-10-08, oleh irfanarfianto · 🟡 belum ada kode. Rincian di `## Deskripsi`.
 
 ## Untuk Manajemen
 
@@ -26,7 +26,7 @@ Tiga hal bisa diatur dari menu itu tanpa mengubah program: seberapa keras jadwal
 
 *Leader marketing menyusun jadwal siaran per tanggal (akun live mana untuk toko mana), dan `POST /live-shifts` menolak pasangan toko dan akun yang tidak sesuai jadwal hari itu. Seberapa keras jadwal ditegakkan, kapan ia terkunci, dan kapan host diingatkan adalah pengaturan per departemen, bukan konstanta. Pada mode `tolak` dan `wajib` keputusan ini menyimpang dengan sengaja dari [[ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support]] §2; alasannya dicatat di bawah.*
 
-- **Status**: 🟡 **Diusulkan**, 2026-10-08. Belum ada kode. Bentuknya disetujui pemilik produk di sesi analisa 2026-10-08; baris ini berubah jadi Diterima saat ia menuliskannya di sini.
+- **Status**: 🟢 **Diterima**, 2026-10-08, oleh irfanarfianto (Pemutus; persetujuan diberikan di sesi analisa dan baris ini ditulis agent atas perintahnya) · 🟡 belum ada kode.
 - **Path di repo**: `bip-erp/services/marketing-analytics/jadwal_siaran*.go` (baru) · `bip-erp/shared-library/common/catalog_jadwal.go` (izin `jadwal.siaran.manage`, baru) · `bip-erp/services/marketing-analytics/live_shift_handler.go` dan `live_shift_ambil_alih.go` (penjaga jadwal) · `bip-erp/services/marketing-analytics/sync_live_sessions.go` (pemeriksaan sesudah sync) · `bip-erp/services/calendar/providers.go` (satu baris) · `erp-frontend/src/features/marketing/jadwal-siaran-toko/` (baru) · `erp-frontend/src/app/(main)/marketing/jadwal-siaran-toko/page.tsx` (baru)
 - **Tanggal**: 2026-10-08
 

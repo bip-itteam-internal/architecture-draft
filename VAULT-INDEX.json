@@ -2797,22 +2797,21 @@
       ],
       "hash": "a6188eb1400524cba3d672eb56e1f7648513bbe36ff22861bc77cd802bcf2ff6",
       "ukuran_kb": 68.6,
-      "ringkasan": "Menjawab: apa saja yang dilakukan manufacture-service (WMS manufaktur) dan di mana kodenya, port, serta database-nya. Menjelaskan sumber master bahan, produk/bundle, dan stok (Accurate, data HPP, import Excel), endpoint sync/align, saldo awal bulanan, serta push pergerakan WMS ke Accurate beserta kegagalan format transDate dan HPP nol. Cocok untuk pertanyaan tentang stok, formula/BOM, produksi, PO, proposal koreksi, dan integrasi Accurate di modul manufaktur.",
+      "ringkasan": "Menjawab: apa saja yang dikerjakan manufacture-service (WMS manufaktur) beserta stack, port, database, dan rute utamanya; dari mana master bahan, produk/bundle, formula, dan angka stok bersumber (Accurate, data HPP, import Excel); dan bagaimana push pergerakan WMS ke Accurate, saldo awal bulanan, serta rekonsiliasi dan align stok bekerja. Juga memuat jebakan yang pernah terjadi (mis. format transDate ke Accurate, HPP nol) serta model data manufacture_db, keputusan teknis, dan dependensi service lain.",
       "kata_kunci": [
         "manufacture-service",
-        "manufaktur",
         "WMS",
-        "warehouse",
+        "manufaktur",
         "master bahan",
         "master produk",
         "bundle",
         "stok",
-        "stock sync Accurate",
-        "saldo awal bulanan",
+        "sync Accurate",
         "push Accurate",
         "penyesuaian persediaan",
-        "formula BOM",
-        "manufacture_db"
+        "saldo awal bulanan",
+        "manufacture_db",
+        "HPP"
       ]
     },
     {
@@ -4038,21 +4037,20 @@
       ],
       "hash": "6434390d8932dd67431261bc082f72b092cecb5812127cfcd0c5ebd1578a035e",
       "ukuran_kb": 96.6,
-      "ringkasan": "Menjawab: kenapa log tiap menu WMS dipecah jadi sub-tab Sumber dan Input WMS, menu mana yang punya badge status, dan resi berstatus apa yang dihitung keluar gudang. Menjelaskan stempel nama penginput oleh server (created_by_name), agregasi Keluar FG per SKU, serta gerbang gudang untuk retur (per-order, per-SKU) dan form retur beserta follow-up-nya.",
+      "ringkasan": "Menjawab: mengapa log tiap menu WMS dipecah jadi sub-tab Sumber vs Input WMS, kapan badge status sudah/belum dicatat boleh dipakai, dan resi berstatus apa yang dihitung keluar gudang. Juga menjelaskan stempel created_by_name oleh server sebagai jejak penginput, gerbang gudang per-order/per-SKU pada retur, serta form retur dan resi paket balik beserta follow-up-nya.",
       "kata_kunci": [
         "log WMS",
-        "sub-tab sumber",
-        "input WMS",
-        "stempel penginput",
+        "sumber vs input",
         "created_by_name",
+        "stempel penginput",
         "retur ekspedisi",
-        "gerbang gudang",
         "Keluar FG",
         "Inbound RM",
-        "resi COMPLETED SHIPPED",
-        "konfirmasi scan per-SKU",
-        "audit penginput",
-        "ADR 0025"
+        "gerbang gudang",
+        "konfirmasi scan",
+        "resi",
+        "audit trail",
+        "return"
       ]
     },
     {
@@ -9144,8 +9142,8 @@
       "judul": "ADR - 0157 Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Jadwal Ditolak",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-08. Belum ada kode. Rincian di `## Deskripsi`.",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-08, oleh irfanarfianto · 🟡 belum ada kode. Rincian di `## Deskripsi`.",
       "publik": true,
       "tautan": [
         "ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support",
@@ -9159,19 +9157,19 @@
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "9c9268254a8b2900fc4ac4c0b4cd35fc58c43b81f6e766065f6f089b7b61967e",
+      "hash": "7bdbc40f6a0c8cee618d54994f93df277e5f3770cb7cc67b6b4789d0125d102b",
       "ukuran_kb": 19.2,
-      "ringkasan": "Menjawab: kenapa sesi live yang dicatat dengan toko atau akun keliru tidak pernah terjodoh ke penjualan TikTok, dan keputusan apa yang diusulkan untuk menutupnya: leader marketing menyusun jadwal siaran per tanggal, toko, dan akun live, lalu Mulai dan ambil alih sesi dicocokkan dengan jadwal hari itu. Juga menjawab aturan kunci jadwal (bebas sampai D-1, hari-H wajib beralasan), tiga pengaturan per departemen (mode `catat`/`tolak`/`wajib`, saat kunci, menit pengingat), izin `jadwal.siaran.manage`, penolakan dan pengingat lewat inbox karena MyBharata tidak diubah, pemeriksaan sesudah sync, feed ke Kalender terpusat, serta hal yang sengaja tidak dijanjikan.",
+      "ringkasan": "Menjawab: kenapa sesi live yang dicatat dengan toko atau akun keliru tidak pernah terjodoh ke penjualan TikTok, siapa yang menyusun jadwal siaran per tanggal (akun live mana untuk toko mana), dan bagaimana `POST /live-shifts` serta ambil alih dicocokkan dengan jadwal itu. Juga menjawab kapan jadwal terkunci dan wajib beralasan, apa beda mode penegakan `catat`/`tolak`/`wajib` sebagai pengaturan per departemen, bagaimana host diberi tahu lewat inbox dan pengingat sebelum shift, serta kenapa MyBharata tidak diubah dan apa yang tidak dijanjikan. Memuat bentuk koleksi `jadwal_siaran_toko`, izin `jadwal.siaran.manage`, feed ke Kalender terpusat, pemeriksaan sesudah sync, dan alasan menyimpang dari ADR 0101 §2.",
       "kata_kunci": [
-        "ADR 0157",
         "jadwal siaran toko",
         "sesi live",
+        "live shift",
+        "host live",
         "akun live",
-        "salah toko salah akun",
-        "leader marketing",
+        "salah toko",
+        "jadwal_siaran_toko",
         "jadwal.siaran.manage",
-        "mode catat tolak wajib",
-        "live-shifts",
+        "mode penegakan catat tolak wajib",
         "KPI live"
       ]
     },
@@ -9195,21 +9193,20 @@
       ],
       "hash": "8e9afc3eb42fac6f69c1952b31a583b039a024f74878c9071bef77d74ace0f4e",
       "ukuran_kb": 14.1,
-      "ringkasan": "Menjawab: kenapa retur gudang tercatat dua kali, seberapa sering terjadi (hasil pengukuran produksi 60 hari), dan bagaimana mencegahnya. Memuat keputusan D1-D8: kunci tombol Simpan, idempotensi server, konfirmasi bila jumlah kurang, batas kumulatif per (order, SKU), jumlah kumulatif ke Accurate, serta koreksi bertahap lewat Proposal koreksi dan hal yang belum diputuskan. Status Diusulkan, mengamandemen ADR 0025 Decision #9.",
+      "ringkasan": "Menjawab: mengapa retur gudang tercatat dobel (hasil pengukuran produksi 60 hari) dan apa pagar yang diusulkan: kunci tombol Simpan, idempotensi dan batas kumulatif per (order, SKU) di server, konfirmasi saat jumlah kurang, serta jumlah kumulatif ke Accurate. Juga menjelaskan koreksi bertahap lewat Proposal koreksi, prosedur manusia sementara, dan dua keputusan yang belum dijawab (tanggal dokumen, koreksi ke nol). Status Diusulkan, mengamandemen ADR 0025 Decision #9.",
       "kata_kunci": [
         "retur gudang",
         "scan retur",
-        "duplikat retur",
+        "duplikat",
         "simpan ganda",
         "idempotensi",
         "batas kumulatif",
-        "Retur Penjualan Accurate",
+        "Retur Penjualan",
+        "Accurate",
         "proposal koreksi",
-        "stok gudang",
-        "pembukuan",
-        "konfirmasi jumlah kurang",
         "ADR 0158",
-        "return scan"
+        "return warehouse",
+        "double scan"
       ]
     },
     {
@@ -17844,20 +17841,20 @@
         "Microservices - Calendar Service",
         "REF - Kepemilikan Data"
       ],
-      "hash": "7b9e89582ede25651d091e07d5a7fadec844138a82e256962b4e29fd7f46f1a6",
+      "hash": "6b62a992c24a9e89b6ff20cca14747d41144f7a7e1e03a51eda6033da7fd6eff",
       "ukuran_kb": 35.3,
-      "ringkasan": "Menjawab: bagaimana kebutuhan Jadwal Siaran Toko dipecah jadi pekerjaan: issue induk bip-erp#2790, empat sub-issue backend (#2791 sampai #2794) dan satu frontend (erp-frontend#2184), urutan dan ketergantungannya, serta urutan deploy. Juga menjawab apa saja yang diputuskan pemilik produk, apa yang sengaja tidak dikerjakan (MyBharata, penugasan host ke akun, layar pembetulan sesi), kriteria \"yang harus benar\" tiap issue, dan data PROD pendukungnya; ANALISA ini baru bisa ditunjuk `/brief` sesudah ADR 0157 Diterima.",
+      "ringkasan": "Menjawab: pekerjaan Jadwal Siaran Toko dipecah jadi issue apa saja (induk bip-erp#2790, empat bagian [BE] #2791 sampai #2794, dan [FE] erp-frontend#2184), urutan serta prasyarat antar-issue, dan urutan deploy-nya. Juga menjawab apa saja yang sudah diputuskan pemilik produk, apa yang sengaja tidak dikerjakan (MyBharata, penugasan host ke akun, layar pembetulan sesi), dan kriteria \"yang harus benar\" tiap issue termasuk langkah menyalakan mode `tolak` sesudah PROD. Memuat data pendukung terukur soal sesi salah toko dan salah akun.",
       "kata_kunci": [
         "analisa kebutuhan",
         "jadwal siaran toko",
         "draf issue",
+        "sub-issue",
         "Siap Agent",
         "bip-erp#2790",
-        "sub-issue BE FE",
+        "erp-frontend#2184",
         "sesi live",
-        "ADR 0157",
-        "urutan deploy",
-        "leader marketing"
+        "marketing analytics",
+        "urutan deploy"
       ]
     },
     {
@@ -18243,21 +18240,19 @@
       ],
       "hash": "fe5dfd14694b776670fdae0d0c04bddc3bbba5a6a9b0b88276145673aa613f69",
       "ukuran_kb": 5.4,
-      "ringkasan": "Menjawab: apa saja daftar task (T0-T9) untuk mengerjakan ADR 0158, urutan dan dependensinya, serta mana yang FE, BE, atau baca-saja. Menjelaskan pembagian tahap pagar (T1-T4) dan tahap koreksi (T6-T8) yang diblokir oleh gerbang keputusan T5, aturan issue induk dan sub-issue per repo, serta revisi brief yang diperlukan.",
+      "ringkasan": "Menjawab: apa saja task (T0-T9) untuk menerapkan ADR 0158, urutan dan dependensinya, mana yang FE/BE, dan mana yang tidak boleh dimulai sebelum dua keputusan (T5) selesai. Berguna untuk tahu pagar retur gudang mana yang berdiri sendiri (kunci Simpan, idempotensi, konfirmasi kurang, sisa SKU) vs tahap koreksi, serta aturan issue induk dan sub-issue per repo.",
       "kata_kunci": [
         "daftar task",
         "pengaman scan retur",
         "retur gudang",
-        "ANALISA",
-        "T0-T9",
-        "sub-issue BE FE",
-        "brief",
-        "tahap pagar",
-        "tahap koreksi",
-        "dependensi task",
         "ADR 0158",
-        "Siap Agent",
-        "work plan"
+        "sub-issue",
+        "brief",
+        "idempotensi",
+        "koreksi",
+        "analisa kebutuhan",
+        "backlog",
+        "Proposal koreksi"
       ]
     },
     {
