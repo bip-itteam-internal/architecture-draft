@@ -59,7 +59,7 @@ Yang terbaca:
 
 Batas pengukuran: "tak discan" adalah keadaan pada saat ukur dan tidak membedakan "belum sempat discan susulan" dari "memang tidak balik"; hanya order yang sudah punya scan yang terukur (order yang barangnya belum datang tidak ikut); "kurang jumlah" hanya 7 order sehingga persentasenya kasar; ambang keputusan (di bawah sekitar 2% = D2 tetap) adalah usulan yang saya tetapkan sebelum melihat angka dan belum ditegaskan pemutus.
 
-Kesimpulan untuk D2: **tetap**. Frekuensinya rendah (paket non-parsial 1,2%) sehingga konfirmasi jarang muncul, retur parsial praktis tidak ada (3 order) sehingga dialog tidak bertabrakan dengan kasus sah, dan kurang terkonsentrasi pada retur marketplace nyata, tempat konfirmasi paling berguna. Temuan yang tidak tertutup D2 dan D3: SKU scan di luar klaim (lihat "Belum diputuskan" butir 2).
+Kesimpulan untuk D2: **tetap**. Frekuensinya rendah (paket non-parsial 1,2%) sehingga konfirmasi jarang muncul, retur parsial praktis tidak ada (3 order) sehingga dialog tidak bertabrakan dengan kasus sah, dan kurang terkonsentrasi pada retur marketplace nyata, tempat konfirmasi paling berguna. Temuan yang tidak tertutup oleh D2 versi awal dan D3: SKU scan di luar klaim, kini diputuskan di D2 (konfirmasi keras, server tidak menolak).
 
 ### Yang sudah ada
 
@@ -85,9 +85,11 @@ Tombol Simpan form retur terkunci selama proses penyimpanan berjalan, dan sisi s
 
 Mengamandemen ADR 0025 Decision #9. Jumlah **lebih** dari klaim tetap diblokir. Jumlah **kurang** kini membuka konfirmasi yang menyebut tiap barang dan selisihnya; petugas memilih kembali melengkapi atau tetap menyimpan karena barang memang tidak ikut kembali. Alasan kekurangan **tidak disimpan** di tahap ini. Baris tanpa jumlah tidak lagi dibuang diam-diam: ia dihitung sebagai kurang.
 
+**SKU yang discan tetapi tidak ada di klaim order** (diputuskan bagusizzanm, 2026-10-08): diizinkan dengan **konfirmasi keras**, tidak ditolak. Konfirmasinya menyebut SKU itu tidak ada di klaim order ini dan bahwa pembukuan menolak membukukan SKU yang tidak pernah dibeli pesanan tersebut, sehingga stok gudang bertambah sementara dokumen retur tertahan. Server tidak membatasi SKU berklaim nol, karena data klaim tidak membedakan "tidak pernah dibeli" dari "dibeli tetapi tidak diretur" (yang kedua sah, mis. koreksi). Dasarnya pengukuran T4: 26 order (0,4%) sejak 1 September punya scan di luar klaim; dari 25 yang ditemukan di pembukuan, 3 tertahan di gerbang SKU asing, 22 sudah terbukukan dan 18 dari itu sudah dikoreksi manual (`[KOREKSI-SCAN]`). Pembukuan tetap menjadi penjaga terakhir; gerbangnya tidak diubah di sini.
+
 ### D3. Batas kumulatif per (order, SKU), dijaga di server
 
-Total jumlah (reuse + rework + reject) seluruh transaksi retur tertaut untuk satu (order, SKU) tidak boleh melebihi jumlah klaim marketplace untuk komponen itu. Pemeriksaan ada di layanan gudang, bukan hanya di form. Permintaan yang melanggar ditolak dan **tidak mengubah apa pun**, termasuk stok. Klaim per komponen dihitung dari klaim per SKU listing dikali isi paket. Bila SKU tidak dikenal oleh pemetaan, pemeriksaan tidak menolak (arah aman: tidak menghalangi retur yang sah karena data pemetaan basi).
+Total jumlah (reuse + rework + reject) seluruh transaksi retur tertaut untuk satu (order, SKU) tidak boleh melebihi jumlah klaim marketplace untuk komponen itu. Pemeriksaan ada di layanan gudang, bukan hanya di form. Permintaan yang melanggar ditolak dan **tidak mengubah apa pun**, termasuk stok. Klaim per komponen dihitung dari klaim per SKU listing dikali isi paket. Bila SKU tidak dikenal oleh pemetaan, pemeriksaan tidak menolak (arah aman: tidak menghalangi retur yang sah karena data pemetaan basi). Hal yang sama untuk SKU berklaim nol: server tidak menolak, konfirmasinya ada di form (lihat D2).
 
 ### D4. Pembukuan menerima jumlah kumulatif
 
@@ -116,7 +118,7 @@ Mengubah semantik "ganti" pembukuan, mengubah arti tiga kondisi (Reuse, Rework, 
 ## Belum diputuskan
 
 1. **Koreksi ke nol.** Pembukuan membuang baris berjumlah nol, sehingga membuang satu SKU dari dokumen tidak bisa diungkapkan lewat jalur yang ada. Perlu aturan eksplisit sebelum D6.
-2. **SKU yang discan tetapi tidak ada di klaim order.** Terukur 21 order (0,3%) sejak 1 September. D3 menolak jumlah yang melebihi klaim; untuk SKU berklaim nol, menolaknya bisa menghalangi pengembalian barang berbeda yang sah, membiarkannya meloloskan salah SKU. Belum diputuskan; menahan D3 hanya pada bagian ini, bukan batas kumulatif untuk SKU yang berklaim.
+(Butir "SKU yang discan tetapi tidak ada di klaim order" sudah diputuskan, lihat D2.)
 
 ## Consequences
 

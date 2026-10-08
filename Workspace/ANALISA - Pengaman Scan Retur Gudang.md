@@ -40,7 +40,7 @@ Dependensi: T1 (berkas dan fungsi murni yang sama).
 
 ### T4. Ukur frekuensi jumlah kurang pada komponen paket (baca-saja)
 
-✅ **Selesai 2026-10-08.** Order yang discan sejak 1 September: paket kurang atau tak discan 1,2% (22 dari 1.778), semua order 0,6%; retur parsial praktis tidak ada (3 order); "lebih" hampir seluruhnya simpan ganda (83 dari 85). Asumsi D2 tetap. Tabel dan batas ukur di ADR 0158 §Pengukuran T4. Temuan baru: 21 order dengan SKU scan di luar klaim, jadi butir "Belum diputuskan" nomor 2 di ADR (menyentuh T2).
+✅ **Selesai 2026-10-08.** Order yang discan sejak 1 September: paket kurang atau tak discan 1,2% (22 dari 1.778), semua order 0,6%; retur parsial praktis tidak ada (3 order); "lebih" hampir seluruhnya simpan ganda (83 dari 85). Asumsi D2 tetap. Tabel dan batas ukur di ADR 0158 §Pengukuran T4. Temuan baru: 26 order (0,4%) dengan SKU scan di luar klaim; diputuskan 2026-10-08: konfirmasi keras di form (masuk T3), server tidak menolak (T2 tidak berubah).
 
 Dependensi: tidak ada.
 
