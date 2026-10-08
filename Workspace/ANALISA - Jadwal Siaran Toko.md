@@ -1,6 +1,6 @@
 # ANALISA - Jadwal Siaran Toko
 
-> ⛔ **Menunggu ADR "Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Jadwal Ditolak" Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**
+> 🟢 ADR-nya **Diterima** 2026-10-08 oleh irfanarfianto. Label `Siap Agent` tetap dipasang manusia per issue.
 
 - **ADR**: [[ADR - 0157 Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Jadwal Ditolak]]
 - **Dok domain**: [[Microservices - Marketing Analytics Service]] § Jadwal Siaran Toko · [[API - Marketing Analytics Service]] · [[APP - Web ERP]] · [[Microservices - Calendar Service]] · [[REF - Kepemilikan Data]]

@@ -9138,8 +9138,8 @@
       "judul": "ADR - 0157 Jadwal Siaran Toko Disusun Leader Marketing, Sesi Live yang Tak Sesuai Jadwal Ditolak",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-08. Belum ada kode. Rincian di `## Deskripsi`.",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-08, oleh irfanarfianto · 🟡 belum ada kode. Rincian di `## Deskripsi`.",
       "publik": true,
       "tautan": [
         "ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support",
@@ -9153,19 +9153,19 @@
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "9c9268254a8b2900fc4ac4c0b4cd35fc58c43b81f6e766065f6f089b7b61967e",
+      "hash": "7bdbc40f6a0c8cee618d54994f93df277e5f3770cb7cc67b6b4789d0125d102b",
       "ukuran_kb": 19.0,
-      "ringkasan": "Menjawab: kenapa sesi live yang dicatat dengan toko atau akun keliru tidak pernah terjodoh ke penjualan TikTok, dan keputusan apa yang diusulkan untuk menutupnya: leader marketing menyusun jadwal siaran per tanggal, toko, dan akun live, lalu Mulai dan ambil alih sesi dicocokkan dengan jadwal hari itu. Juga menjawab aturan kunci jadwal (bebas sampai D-1, hari-H wajib beralasan), tiga pengaturan per departemen (mode `catat`/`tolak`/`wajib`, saat kunci, menit pengingat), izin `jadwal.siaran.manage`, penolakan dan pengingat lewat inbox karena MyBharata tidak diubah, pemeriksaan sesudah sync, feed ke Kalender terpusat, serta hal yang sengaja tidak dijanjikan.",
+      "ringkasan": "Menjawab: kenapa sesi live yang dicatat dengan toko atau akun keliru tidak pernah terjodoh ke penjualan TikTok, siapa yang menyusun jadwal siaran per tanggal (akun live mana untuk toko mana), dan bagaimana `POST /live-shifts` serta ambil alih dicocokkan dengan jadwal itu. Juga menjawab kapan jadwal terkunci dan wajib beralasan, apa beda mode penegakan `catat`/`tolak`/`wajib` sebagai pengaturan per departemen, bagaimana host diberi tahu lewat inbox dan pengingat sebelum shift, serta kenapa MyBharata tidak diubah dan apa yang tidak dijanjikan. Memuat bentuk koleksi `jadwal_siaran_toko`, izin `jadwal.siaran.manage`, feed ke Kalender terpusat, pemeriksaan sesudah sync, dan alasan menyimpang dari ADR 0101 §2.",
       "kata_kunci": [
-        "ADR 0157",
         "jadwal siaran toko",
         "sesi live",
+        "live shift",
+        "host live",
         "akun live",
-        "salah toko salah akun",
-        "leader marketing",
+        "salah toko",
+        "jadwal_siaran_toko",
         "jadwal.siaran.manage",
-        "mode catat tolak wajib",
-        "live-shifts",
+        "mode penegakan catat tolak wajib",
         "KPI live"
       ]
     },
@@ -17801,20 +17801,20 @@
         "Microservices - Calendar Service",
         "REF - Kepemilikan Data"
       ],
-      "hash": "7b9e89582ede25651d091e07d5a7fadec844138a82e256962b4e29fd7f46f1a6",
-      "ukuran_kb": 34.9,
-      "ringkasan": "Menjawab: bagaimana kebutuhan Jadwal Siaran Toko dipecah jadi pekerjaan: issue induk bip-erp#2790, empat sub-issue backend (#2791 sampai #2794) dan satu frontend (erp-frontend#2184), urutan dan ketergantungannya, serta urutan deploy. Juga menjawab apa saja yang diputuskan pemilik produk, apa yang sengaja tidak dikerjakan (MyBharata, penugasan host ke akun, layar pembetulan sesi), kriteria \"yang harus benar\" tiap issue, dan data PROD pendukungnya; ANALISA ini baru bisa ditunjuk `/brief` sesudah ADR 0157 Diterima.",
+      "hash": "6b62a992c24a9e89b6ff20cca14747d41144f7a7e1e03a51eda6033da7fd6eff",
+      "ukuran_kb": 34.8,
+      "ringkasan": "Menjawab: pekerjaan Jadwal Siaran Toko dipecah jadi issue apa saja (induk bip-erp#2790, empat bagian [BE] #2791 sampai #2794, dan [FE] erp-frontend#2184), urutan serta prasyarat antar-issue, dan urutan deploy-nya. Juga menjawab apa saja yang sudah diputuskan pemilik produk, apa yang sengaja tidak dikerjakan (MyBharata, penugasan host ke akun, layar pembetulan sesi), dan kriteria \"yang harus benar\" tiap issue termasuk langkah menyalakan mode `tolak` sesudah PROD. Memuat data pendukung terukur soal sesi salah toko dan salah akun.",
       "kata_kunci": [
         "analisa kebutuhan",
         "jadwal siaran toko",
         "draf issue",
+        "sub-issue",
         "Siap Agent",
         "bip-erp#2790",
-        "sub-issue BE FE",
+        "erp-frontend#2184",
         "sesi live",
-        "ADR 0157",
-        "urutan deploy",
-        "leader marketing"
+        "marketing analytics",
+        "urutan deploy"
       ]
     },
     {
