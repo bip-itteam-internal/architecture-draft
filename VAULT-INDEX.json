@@ -596,24 +596,23 @@
         "API - Integration Service",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line"
       ],
-      "hash": "0823852e3f70e13275ac4fff458212e880dae279c014b7e5f8b457fc0e9780c2",
+      "hash": "edf3dbd3cbce239802d86148f39301918c4b67e8e59df9309780ef2e11e1d5c1",
       "ukuran_kb": 22.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan manufacture-service lewat gateway /api/manufacture/*, mulai dari master bahan/produk, stok, sync dan align dengan Accurate/HPP, saldo awal bulanan, import Stock Opname, hingga laporan Tarikan Mutasi dan Transparansi Substitusi RM. Juga menjawab method, path, perilaku khusus (dry_run, force, kill switch push Accurate, konversi satuan) dan bagian lain seperti transaksi, formula, produksi, resi retur ekspedisi, retur marketplace, PO/proposal/audit, serta mutasi gudang dan konsinyasi. Bagian akhir dokumen terpotong, jadi detail endpoint di bagian itu hanya terlihat dari daftar heading.",
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki manufacture-service (gateway `/api/manufacture/*`) untuk master bahan/produk, stok, saldo awal, dan laporan mutasi/substitusi, beserta method, path, dan fungsinya. Menjelaskan juga sync/align dari Accurate dan HPP, push pergerakan WMS ke Accurate, import Stock Opname, serta bagian transaksi, formula, produksi, resi retur ekspedisi, feed retur marketplace, PO/proposal/audit, dan mutasi gudang/konsinyasi (bagian yang terpotong hanya terlihat dari daftar heading).",
       "kata_kunci": [
         "manufacture service",
         "WMS",
+        "API endpoint",
         "master bahan",
-        "master product",
+        "master produk",
         "stok",
-        "sync Accurate",
-        "align",
         "saldo awal",
         "stock opname",
-        "tarikan mutasi",
-        "substitusi RM",
-        "API endpoint",
+        "sync Accurate",
+        "align",
         "retur marketplace",
-        "resi"
+        "resi",
+        "mutasi"
       ]
     },
     {
@@ -1591,14 +1590,15 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "39d70844928174b885440c06a25726705ffaa34cb697a3db055a4fc229c2c31d",
+      "hash": "809e53a283508a7a9f0c08bdc884402bb01489732b5e23ec7d40288efa317e54",
       "ukuran_kb": 583.2,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS \"One Bharata\" (hris-dashboard, erp-frontend), stack-nya, bagaimana login, SSO, dan gating role/menu lewat system_roles bekerja, serta bagaimana sidebar dikelompokkan (induk bersarang, Pengaturan HRGA terpusat, arah baru sidebar ADR 0149). Juga memuat fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), konvensi data-fetching TanStack Query, konvensi bagan Recharts, daftar modul yang sudah ada, dan catatan yang belum diimplementasikan. Isi dokumen terpotong di bagian Pengaturan HRGA, sehingga bagian setelahnya hanya terlihat dari daftar heading.",
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS \"One Bharata\" (erp-frontend), stack-nya, bagaimana login, SSO Identity Provider, dan role gating via `system_roles` bekerja, serta bagaimana sidebar dan menu dikelompokkan (termasuk Pengaturan HRGA terpusat dan dukungan multi-perusahaan). Juga memuat konvensi data-fetching TanStack Query dan konvensi bagan Recharts, daftar modul yang sudah diimplementasikan, catatan yang belum selesai, dan dependensi integrasi.",
       "kata_kunci": [
         "web ERP",
         "erp-frontend",
-        "hris-dashboard",
         "One Bharata",
+        "hris-dashboard",
+        "Next.js",
         "sidebar",
         "menu",
         "system_roles",
@@ -1606,11 +1606,9 @@
         "SSO",
         "login",
         "multi-perusahaan",
-        "CompanySwitcher",
         "TanStack Query",
         "Recharts",
-        "i18n",
-        "Pengaturan HRGA"
+        "i18n"
       ]
     },
     {
@@ -2802,24 +2800,23 @@
         "DB - Overview and Notes",
         "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace"
       ],
-      "hash": "69e248a94eeae137f3f362148cc86805c50165e19b04fcdce39d46359f5e22a6",
-      "ukuran_kb": 70.5,
-      "ringkasan": "Menjawab: bagaimana manufacture-service (WMS manufaktur, port 6978, manufacture_db) bekerja, dari sumber master bahan/produk (Accurate, HPP, import Excel), sync dan align kode, stok yang mengikuti Accurate, hingga push pergerakan WMS ke Accurate (ADR 0015) beserta akar kegagalan format transDate dan masalah HPP nol. Juga menjelaskan saldo awal bulanan dan saldo akhir yang tersimpan, model data, keputusan teknis, dan catatan yang belum diimplementasikan. Isi terpotong di bagian saldo awal, sehingga bagian setelahnya hanya terlihat dari daftar heading.",
+      "hash": "64fc46eb73abd448deba48036ac8c795bb9b2566ddbbed18e4302ad92b72e764",
+      "ukuran_kb": 70.7,
+      "ringkasan": "Menjawab: apa peran manufacture-service sebagai WMS manufaktur (port, database `manufacture_db`, stack), dari mana sumber master bahan, produk, stok, dan formula, serta bagaimana alur sync/align dengan Accurate dan HPP bekerja. Menjelaskan push pergerakan WMS ke Accurate (outbox, kill switch, masalah format transDate), saldo awal bulanan, model data, keputusan teknis, dan hal yang belum diimplementasikan.",
       "kata_kunci": [
         "manufacture service",
         "WMS",
         "manufacture_db",
-        "Accurate",
-        "sync stok",
-        "push Accurate",
-        "penyesuaian persediaan",
-        "saldo awal bulanan",
         "master bahan",
         "master produk",
-        "bundle",
+        "stok",
+        "Accurate",
         "HPP",
-        "transDate",
-        "outbox"
+        "push Accurate",
+        "outbox",
+        "saldo awal bulanan",
+        "bundle",
+        "formula BOM"
       ]
     },
     {
@@ -4043,23 +4040,22 @@
         "Manufacture - Stock & Material Management",
         "ADR - 0015 Push Pergerakan WMS ke Accurate"
       ],
-      "hash": "59bb22325b0fcee2e0d32993bca5a765e337f213c34dc6e4b10bd69c84241f95",
+      "hash": "a3de424cce1d91b955e83164171f9e436427f1bfde30424f32f5898796e48ea7",
       "ukuran_kb": 96.6,
-      "ringkasan": "Menjawab: kenapa log tiap menu WMS dipecah jadi sub-tab Sumber dan Input WMS, kapan badge status sudah/belum dicatat dipakai, mengapa tab sumber Keluar FG diagregasi per SKU dan hanya resi COMPLETED+SHIPPED yang dihitung, serta bagaimana nama penginput distempel server (created_by_name). Juga memuat follow-up seperti gerbang gudang per-order untuk retur, konfirmasi scan per-SKU, dan form retur yang dilengkapi. Isi terpotong setelah Decision #6, jadi keputusan #7 dan seterusnya serta Consequences hanya terlihat dari daftar heading.",
+      "ringkasan": "Menjawab: mengapa log lima menu WMS dipecah menjadi sub-tab SUMBER dan INPUT WMS, kapan badge status \"sudah/belum dicatat\" boleh dipakai, dan mengapa nama penginput distempel server (`created_by_name`) bukan dikirim client. Memuat juga aturan agregasi Keluar FG per SKU dan status resi yang dihitung keluar gudang, plus follow-up gerbang gudang per-order dan konfirmasi scan per-SKU pada retur.",
       "kata_kunci": [
         "ADR 0025",
         "log WMS",
         "sumber vs input",
         "created_by_name",
-        "stempel penginput",
+        "penginput",
         "Keluar FG",
         "Inbound RM",
-        "retur ekspedisi",
+        "retur gudang",
         "gerbang gudang",
-        "audit",
-        "Finance",
-        "resi COMPLETED",
-        "per SKU"
+        "scan retur",
+        "resi",
+        "audit"
       ]
     },
     {
@@ -9188,7 +9184,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": null,
-      "status_teks": "🟢 **Diterima**, 2026-10-08, oleh bagusizzanm (IT). ✅ **Tahap pagar (D1–D5) kodenya sudah merged ke `main` 2026-10-08** (bip-erp#2809, erp-frontend#2194) tetapi **belum deploy prod per tanggal itu** (urutan BE dulu); tahap koreksi (D6) belum ada. Berdiri di atas pengukuran langsung produksi 2026-10-08 dan pembacaan kode lokal; mengamandemen satu butir [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]] (Decision #9, ✅ Implemented) dan menjalankan prinsip yang baru ditulis di [[ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok]] §5 (🟡 Diusulkan). Tahap pagar (D1–D5) boleh dibangun. Tahap koreksi (D6) **belum boleh dibangun** sebelum butir di bagian \"Belum diputuskan\" dan tinjauan kewenangan Proposal terjawab; keputusan tanggal dokumen koreksi sudah ada (lihat bagian \"Sudah diputuskan\").",
+      "status_teks": "🟢 **Diterima**, 2026-10-08, oleh bagusizzanm (IT). ✅ **Tahap pagar (D1–D5) kodenya sudah merged ke `main` 2026-10-08** (bip-erp#2809, erp-frontend#2194) dan **sudah deploy prod 2026-10-08** (FE sekitar 14:06 WIB, BE 14:29 WIB; keduanya terverifikasi di prod); tahap koreksi (D6) belum ada. Berdiri di atas pengukuran langsung produksi 2026-10-08 dan pembacaan kode lokal; mengamandemen satu butir [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]] (Decision #9, ✅ Implemented) dan menjalankan prinsip yang baru ditulis di [[ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok]] §5 (🟡 Diusulkan). Tahap pagar (D1–D5) boleh dibangun. Tahap koreksi (D6) **belum boleh dibangun** sebelum butir di bagian \"Belum diputuskan\" dan tinjauan kewenangan Proposal terjawab; keputusan tanggal dokumen koreksi sudah ada (lihat bagian \"Sudah diputuskan\").",
       "publik": true,
       "tautan": [
         "ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput",
@@ -9200,23 +9196,23 @@
         "ADR - 0040 Retur Paket Utuh via Baris Induk Faktur",
         "ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync"
       ],
-      "hash": "826ab1b6aa1cfd362b0c13450a1ba17d7dea3a41c6851b56c4134fded2dca7eb",
+      "hash": "1db073080ec5afe94a911c1b3e30ac27f163cf761e291c7233401c1784d5baa1",
       "ukuran_kb": 18.6,
-      "ringkasan": "Menjawab: mengapa retur gudang tercatat dua kali (simpan ganda dalam hitungan detik, diukur di produksi 60 hari), apa pagar yang diputuskan (kunci tombol Simpan, konfirmasi bila jumlah kurang, batas kumulatif per order dan SKU di server, jumlah kumulatif ke pembukuan, form hanya menawarkan sisa), dan bagaimana koreksi dibangun bertahap lewat Proposal. Juga memuat insiden 2026-10-07, pengukuran T4, prosedur manusia sementara, serta apa yang belum diputuskan. Isi terpotong di bagian Context \"Yang sudah ada\", jadi Decision D1-D8 dan Consequences hanya terlihat dari daftar heading.",
+      "ringkasan": "Menjawab: mengapa retur gudang tercatat dua kali (simpan ganda dalam hitungan detik), seberapa sering itu terjadi menurut pengukuran produksi, dan keputusan D1-D8 untuk mencegahnya: kunci Simpan, konfirmasi bila jumlah kurang, batas kumulatif per (order, SKU) di server, jumlah kumulatif ke pembukuan, dan koreksi bertahap. Juga menyebut status tiap tahap (pagar sudah deploy, koreksi belum boleh dibangun), apa yang belum diputuskan, dan prosedur manusia sementara.",
       "kata_kunci": [
         "ADR 0158",
-        "retur gudang",
         "scan retur",
-        "simpan ganda",
+        "retur gudang",
+        "duplikat",
         "idempotensi",
         "batas kumulatif",
         "Retur Penjualan",
         "Accurate",
+        "koreksi",
         "Proposal koreksi",
+        "simpan ganda",
         "WMS",
-        "Sadewa",
-        "pagar",
-        "koreksi"
+        "manufacture"
       ]
     },
     {
@@ -17193,22 +17189,21 @@
         "RUN - Panduan WMS Fulfillment Gudang Tinggarjaya",
         "WH - Management System"
       ],
-      "hash": "8c4320081992da76815df403536967e689abdc02173954df923db4f21c84f8b2",
+      "hash": "ef6fa8211fbc6b33f60a6d0c783967b840b7dc6a6956188349c916f9c9df7290",
       "ukuran_kb": 14.5,
-      "ringkasan": "Menjawab: bagaimana gudang Sadewa (barang titipan) bekerja di modul fulfillment bersama Tinggar, menu dan route apa saja yang ada, siapa yang boleh mengakses (bolehAksesSadewa, admin_gudang_sadewa, PPIC/SPV), dan bagaimana alur cetak resi Sadewa melewati persetujuan Sadewa ke Tinggar (PENDING, APPLIED, REJECTED). Juga menjelaskan pencabutan pewarisan admin_gudang_sadewa ke admin_gudang, atribusi riwayat cetak resi per gudang (printed_by_role), dan data aksi di collection manufacture_sadewa_action. Isi terpotong di bagian Riwayat Cetak Resi, jadi alur Retur, menu Toko Gudang Sadewa, dan catatan hanya terlihat dari daftar heading.",
+      "ringkasan": "Menjawab: bagaimana gudang Sadewa (barang titipan) beroperasi sebagai warehouse kedua di modul fulfillment, siapa yang boleh mengakses menu Pengemasan, Retur, dan Persetujuan, serta bagaimana alur cetak resi diajukan Sadewa lalu disetujui Tinggar. Menjelaskan aturan status aksi, atribusi riwayat cetak per gudang, alur retur langsung, menu Toko Gudang Sadewa, pencabutan pewarisan role `admin_gudang_sadewa`, dan data aksi di `manufacture_sadewa_action`.",
       "kata_kunci": [
         "Sadewa",
-        "warehouse Sadewa",
-        "admin_gudang_sadewa",
+        "gudang Sadewa",
+        "Tinggar",
         "cetak resi",
         "approval",
         "persetujuan",
-        "Tinggar",
+        "admin_gudang_sadewa",
         "PackingBoard",
-        "fulfillment",
         "retur Sadewa",
-        "riwayat cetak resi",
-        "manufacture_sadewa_action",
+        "fulfillment",
+        "warehouse",
         "RBAC"
       ]
     },
@@ -18252,23 +18247,22 @@
         "APP - Web ERP",
         "ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync"
       ],
-      "hash": "6ff1a59c9a8e64829b6ab8c9099b11ed3dfec9c6802a05a8b8bbfafbb4402f89",
+      "hash": "055761dd2a4bdd0d80f24139bfc1f9f275619df80f07309476c8586211a25943",
       "ukuran_kb": 6.1,
-      "ringkasan": "Menjawab: apa saja daftar task (T0-T9) untuk mengerjakan ADR 0158, mana yang sudah merged (T1-T3 pagar FE/BE, T4 pengukuran), mana yang diblokir keputusan (T5) dan menahan tahap koreksi T6-T8, beserta dependensi antar task dan repo yang disentuh. Juga menjawab status deploy tiap task, aturan satu issue induk dengan sub-issue BE/FE, dan perintah pertama untuk melanjutkan.",
+      "ringkasan": "Menjawab: daftar task T0-T9 turunan ADR 0158 untuk pengaman scan retur gudang, mana yang sudah merged dan deploy (T1-T4), mana yang menunggu keputusan (T5), dan mana yang belum boleh dimulai (koreksi T6-T8). Menjelaskan dependensi antar task, pembagian BE/FE per sub-issue, hasil pengukuran T4, dan perintah pertama untuk melanjutkan.",
       "kata_kunci": [
         "ANALISA",
         "pengaman scan retur",
-        "ADR 0158",
-        "daftar task",
-        "T1 T2 T3",
-        "tahap koreksi",
-        "dependensi",
-        "sub-issue",
-        "brief",
         "retur gudang",
-        "kunci Simpan",
-        "idempotensi",
-        "prosedur gudang finance"
+        "daftar task",
+        "ADR 0158",
+        "sub-issue",
+        "BE FE",
+        "brief",
+        "koreksi",
+        "pembukuan",
+        "WMS",
+        "T5 keputusan"
       ]
     },
     {
