@@ -58,6 +58,10 @@ Bukan selera. Untuk halaman berisi angka dan bagan, komposisinya diatur
 baca); untuk halaman daftar, skill `/migrasi-tabel-hris`; untuk warna bagan, `team-memory.md`
 § Bagan/chart. Yang di bawah berlaku untuk semua layar.
 
+- **Tampilan jawaban atau laporan Copilot** (blok, grafik, paragraf, PDF/Excel): baca
+  [[REF - Penyajian Laporan Copilot]] dulu. Bentuknya dipilih sistem dan dirakit dari
+  komponen serta token yang ada; jangan membangun gaya sendiri per alat.
+
 1. **Tujuan utama terbaca dari bentuk layarnya.** Pembaca tahu harus mulai dari mana tanpa
    paragraf panduan. Satu **aksi utama** per area memakai `Button` bawaan; aksi lain memakai
    varian `outline` atau `ghost`. Dua tombol utama bersebelahan berarti belum ada keputusan

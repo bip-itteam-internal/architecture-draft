@@ -238,6 +238,13 @@ Kode: `erp-frontend/src/features/pengajuan-barang/` dan rute `src/app/(main)/pen
 - **Combobox bersama tidak lagi memotong nama** (erp-frontend #2033, issue #2541; `src/components/ui/combobox.tsx`): daftar pilihan minimal selebar pemicu dan boleh melebar sampai `min(36rem, 90vw)`, label panjang dilipat ke baris berikut; kotak pemicu tidak berubah. Komponen ini dipakai banyak layar lain, jadi perubahan ukurannya tampak di luar modul ini.
 - Lain-lain yang sudah masuk: detail di luar cakupan departemen menyebut sebabnya (#1961), harga wajib diisi dan "Dana sebesar" jadi teks (#1959), BKK mencetak rincian per baris lalu Jumlah (#1944), Accounting satu tombol "Catat & kirim" (#1935), pemilihan sumber dana CV/PT oleh Procurement/HRGA dengan PT Bharata terpilih di awal (#1945), kartu BKK hanya sisi finance dan sesudah transfer (#1939; sebagian diperluas #2031), teks toast/peringatan AP/penjelasan PIC/label "Ajukan" (#1992), galat baca 403/500 terbaca sebagai galat (#1999).
 
+### Pengajuan Barang: serapan anggaran (`pengajuan_barang_serapan.go`) ⚠️ 2026-10-08
+
+Dua rute BACA di grup `/pengajuan-barang` untuk tab Serapan di layar Anggaran & Cost Control (bip-erp#2795, merged 2026-10-08, **deploy prod TBD**): `GET /serapan-anggaran` dan `GET /serapan-anggaran/rincian`. Bentuk respons, gerbang, dan aturan periode ada di [[API - Procurement Service]] §Pengajuan Barang; **aturan membaca angkanya** (bagian dari Terpakai, tidak dijumlahkan, tidak dipetakan ke pos) di [[Finance - Serapan Anggaran dan Cost Control]]. Yang khas service ini:
+
+- **Periode `tercatat` memakai fungsi yang sama dengan pembangun jurnal** (`tanggalJurnalPengajuan`, `pengajuan_barang_jurnal_kirim.go:23`); jangan membuat salinan aturan tanggal.
+- **Gerbang membaca dua izin dari dua modul** (`gerbangSerapanAnggaran`, `pengajuan_barang_serapan.go:60-74`): `budget.jurnal.view` lewat `izinBudgetEfektif` (termasuk super-akses), `finance.accounting.view` langsung dari header. **Tanpa cadangan tier finance** karena cadangan itu hidup di paket `internal` integration-service dan tidak diimpor; menyalinnya melahirkan sumber kebenaran kedua. Akibatnya terbuka sebagai keputusan ([[Finance - Serapan Anggaran dan Cost Control]] §Belum Diputuskan).
+- **Pembacaan lewat seam** (`bacaPengajuanSerapan`) supaya handler teruji lewat `app.Test` tanpa Mongo. Filter Mongo hanya penyempit kasar; keputusan akhir di Go (`sudahBerjurnal`, `menungguDicatat`, `periodeSerapanPengajuan`).
 ### Tagihan, Faktur Pemasok, Pembayaran Vendor & Kas Bank (`main.go:822-918`)
 
 Bab ini melengkapi §Model Data di bawah (Dependensi & Integrasi) dengan endpoint-nya, yang belum pernah tercatat di dokumen ini.

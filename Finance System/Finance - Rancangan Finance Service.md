@@ -218,13 +218,13 @@ flowchart LR
 
 Seluruhnya di `bip-erp/shared-library/common/catalog_finance.go` — `finance.ar.view`, `finance.ar.export`, `finance.ap.view`, `finance.profit.view`, `finance.payout.view`, `finance.kastoko.view`, `finance.accounting.view`.
 
-> ⚠️ **Ketujuh-tujuhnya izin BACA. Modul finance belum punya satu pun izin TULIS.** Akibatnya layar tulis `/finance/anggaran` hari ini dijaga `finance.accounting.view` — izin *melihat laporan keuangan* menjaga tombol *hapus baris anggaran*. Ini harus dibetulkan bersamaan, bukan diwariskan ke modul baru.
+> ⚠️ **Ketujuh-tujuhnya izin BACA. Modul finance belum punya satu pun izin TULIS.** Akibatnya layar tulis `/finance/anggaran` hari ini dijaga `finance.accounting.view` — izin *melihat laporan keuangan* menjaga tombol *hapus baris anggaran*. Ini harus dibetulkan bersamaan, bukan diwariskan ke modul baru. ✅ **Dibetulkan 2026-10-08 untuk anggaran**: lima rute tulis `/accounting/anggaran*` kini digerbang `finance.anggaran.kelola`, bukan lagi izin baca (lihat tabel "izin yang diusulkan" di bawah).
 >
 > ✅ **Koreksi 2026-09-12, khusus modul Tax**: kalimat di atas usang untuknya. `finance.pajak.view` / `finance.pajak.kelola` / `finance.pajak.tenggat` **sudah ada** (`catalog_finance.go:39-41`, diverifikasi langsung), dan dua di antaranya (`kelola`, `tenggat`) memang izin TULIS. Tier `supervisor` memegang ketiganya; tier `staff` finance **tidak memegang satu pun** izin pajak sama sekali (`catalog_finance.go:69-85`). Paket siap-pakai `finance_pajak` = `pajak.view` + `pajak.kelola` **tanpa** `pajak.tenggat` (`catalog_finance.go:140-149`), dirancang untuk Tax Officer, orang yang justru dinilai oleh tenggat itu sendiri; menggeser tenggat tetap kewenangan SPV FAT. Diukur prod 2026-09-12: Account Payable dan Tax Staff tidak memegang paket apa pun (lihat [[Finance - FAT Persona]]).
 
 ### Izin yang diusulkan (belum ada)
 
-⚠️ **Tabel ini sebagian usang sejak 2026-09-12**: dua baris pertama SUDAH ada (lihat koreksi di atas), disisakan di sini apa adanya sebagai jejak keputusan awal. Dua baris terakhir **masih benar-benar belum ada**: diverifikasi `finance.costcontrol.*` dan `finance.anggaran.kelola` nihil di `catalog_finance.go` (Grep, 2026-09-12).
+⚠️ **Tabel ini sebagian usang sejak 2026-09-12**: dua baris pertama SUDAH ada (lihat koreksi di atas), disisakan di sini apa adanya sebagai jejak keputusan awal. Baris `finance.costcontrol.*` **masih benar-benar belum ada** (diverifikasi nihil di `catalog_finance.go`, Grep, 2026-09-12). ✅ **Koreksi 2026-10-08**: `finance.anggaran.kelola` kini ADA (`catalog_finance.go:40`, dibaca dari `origin/main`).
 
 | Izin | Untuk | Diberikan ke | Status 2026-09-12 |
 |---|---|---|---|
@@ -232,7 +232,7 @@ Seluruhnya di `bip-erp/shared-library/common/catalog_finance.go` — `finance.ar
 | `finance.pajak.kelola` | mencatat & mengubah kewajiban, SPT, temuan, klasifikasi deductible | Tax Officer, SPV FAT | ✅ ADA |
 | `finance.costcontrol.view` | melihat register penghematan & forecast | Finance staff, SPV | 🟡 belum ada |
 | `finance.costcontrol.kelola` | mencatat & mengubah penghematan, forecast | Cost Control, SPV FAT | 🟡 belum ada |
-| `finance.anggaran.kelola` | menulis & menghapus baris anggaran OPEX | Cost Control, SPV FAT | 🟡 belum ada |
+| `finance.anggaran.kelola` | menulis & menghapus baris anggaran OPEX | Cost Control, SPV FAT | ✅ ADA sejak 2026-10-08 (merged bip-erp#2811, deploy prod TBD): tier supervisor/admin + paket `finance_anggaran`; lihat [[CORE - RBAC dan Permission Set]] dan [[Finance - Serapan Anggaran dan Cost Control]] |
 
 Penambahan izin dilakukan di `catalog_finance.go` (satu sumber: dipakai seed employee-service, service penegak, dan gerbang halaman FE) plus mendaftarkan titik penegakannya.
 
