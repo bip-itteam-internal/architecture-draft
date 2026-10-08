@@ -3,13 +3,13 @@
 *Endpoint **warehouse-service** (WMS Tinggarjaya fulfillment MVP: event ingestion, state machine, reconciler, operasi gudang). Gateway: `/api/warehouse/*`. Grounded ke `services/warehouse/`.*
 
 - **Implementasi**: [[Microservices - Warehouse Service]] · **Status**: ⚠️ Implemented (ada catatan) — event ingestion ✅; operasi WMS lengkap termasuk handover ✅; master produk CRUD ✅; frontend sebagian ✅
-- **Indeks**: [[API - Index]] · Auth: gateway key `BIP-Gateway-ID` untuk semua route. Operasional WMS tambahan: role guard via `BIP-System-Roles` header (`system_roles["warehouse"]`). ⚠️ **Kecuali rute komplain**, yang gerbangnya berbeda per method dan menyertakan peran marketing — lihat *Komplain Gudang*.
+- **Indeks**: [[API - Index]] · Auth: gateway key `BIP-Gateway-ID` untuk semua route, **kecuali** `POST /fulfillment/events` dan `/kpi/*` yang digerbang kunci layanan `?key=` (lihat tabel Event Ingestion). Operasional WMS tambahan: role guard via `BIP-System-Roles` header (`system_roles["warehouse"]`). ⚠️ **Kecuali rute komplain**, yang gerbangnya berbeda per method dan menyertakan peran marketing — lihat *Komplain Gudang*.
 
 ## Fulfillment — Event Ingestion (✅ Diimplementasikan)
 
 | Method | Path | Fungsi |
 |---|---|---|
-| POST | `/fulfillment/events` | Terima event order dari integration service. Idempoten upsert by `order_id + channel`; abaikan bila `update_time` ≤ existing. Buat `status_wms: NEW` untuk order TO_SHIP baru. Propagasi CANCELLED ke order WMS yang belum final (HANDED_OVER/CANCELLED). |
+| POST | `/fulfillment/events` | Terima event order dari integration service. Idempoten upsert by `order_id + channel`; abaikan bila `update_time` ≤ existing. Buat `status_wms: NEW` untuk order TO_SHIP baru. Propagasi CANCELLED ke order WMS yang belum final (HANDED_OVER/CANCELLED). **Digerbang KUNCI LAYANAN, bukan `BIP-Gateway-ID`** (bip-erp#2538, merged 2026-10-02): query `?key=` harus sama dengan env `WAREHOUSE_SERVICE_KEY`, kosong atau beda → `401 {"error":"kunci layanan tidak sah"}` (`gerbangKunciLayananWarehouse`, `kpi_gerbang.go:30`, gerbang yang SAMA dengan rute `/kpi/*`). Rute didaftarkan SEBELUM grup `/fulfillment` (`main.go:132`) karena Fiber mencocokkan menurut urutan pendaftaran, dan gateway memasang `BIP-Gateway-ID` pada setiap permintaan ber-JWT sehingga header itu saja bukan bukti pemanggilnya service. Pemanggil sahnya hanya integration-service (`warehousehook`), yang menempelkan `?key=` dari env `WAREHOUSE_SERVICE_KEY` miliknya (`hook.go:161-173`); env itu wajib bernilai SAMA di blok warehouse-service dan integration-service. Kunci kosong/beda membuat event ditolak 401 dan hanya tertambal reconciler, jadi gejalanya senyap (hook mencatat peringatan di log integration). |
 | GET | `/health` | Health check |
 
 **Request body** `POST /fulfillment/events`:

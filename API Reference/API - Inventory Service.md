@@ -24,7 +24,7 @@
 | POST | `/item` | Buat item inventaris | GeneralAffair |
 | GET | `/items` | List item | publik |
 | GET/PATCH/DELETE | `/item/:id` | Detail/update/hapus item (PATCH juga = serahkan/ubah pemegang **& ceklis rekonsiliasi** via `accurate_asset_no`) | GeneralAffair |
-| PATCH | `/item/:id/approve-handover` | SPV menyetujui serah-terima | **SPV penaung** (gate `SupervisedDepartments`, bukan GeneralAffair) |
+| PATCH | `/item/:id/approve-handover` | SPV menyetujui serah-terima | **SPV penaung STRICT** departemen penyerah DAN bukan penyerahnya sendiri (`putuskanApproveHandover`, `approve_handover.go:80`), bukan GeneralAffair |
 | GET | `/item/master/:master_id/spec-template` | Template spesifikasi | GeneralAffair |
 | POST/GET | `/item/upload/presigned-url` · `/item/upload/presigned-get` | Presigned upload/download dokumen (`purchase` · `arrived` · `handover`) | GeneralAffair |
 
@@ -168,7 +168,13 @@ Detail berikut grounded ke `services/inventory` (`controller.go`, `validation.go
 - Grounded: `CreateInventory` (held_by opsional, `resolveCategory`, `ValidateDocumentsExists`) + `ValidateSpecs` + `generateUniqueID`.
 
 ### `PATCH /item/:id/approve-handover` — SPV menyetujui serah-terima
-- **Otorisasi non-standar**: di **luar** grup `/item` (tak di-gate `RequireGeneralAffair`). Handler menolak `403` bila `held_by.handover_dept` **tidak** ada di `common.SupervisedDepartments(c)` (klaim `supervised_departments` / header `BIP-Supervised-Departments`). Tolak `400` bila status ≠ `menunggu_spv`.
+- **Otorisasi non-standar**: di **luar** grup `/item` (tak di-gate `RequireGeneralAffair`; didaftarkan SEBELUM grup itu, `daftarkanRuteInventory`, supaya lantai `ga.view` tak berlaku: penyetujunya SPV departemen penyerah yang biasanya bukan orang GA). Keputusan dijatuhkan di handler (`putuskanApproveHandover`, bip-erp#2539 merged 2026-10-02), `403` bila salah satu:
+  - identitas pemanggil (`BIP-Employee-ID`) tak dikenal;
+  - dokumen tak punya data penyerah sama sekali (serah-terima lama, "ajukan ulang");
+  - pemanggil adalah **penyerahnya sendiri**: dibandingkan dengan `held_by.handover_by_id`; pada data lama tanpa id, dibandingkan lewat **nama** (`handover_by`), dan nama kosong atau sama dengan nama pemanggil ditolak;
+  - `held_by.handover_dept` **tidak** ada di cakupan supervisi **STRICT** pemanggil (`common.SupervisedDepartmentsStrict`, via `menaungiDepartemen`, `permintaan_gate.go:129`). Varian non-strict jatuh kembali ke departemen pemanggil sendiri bila header cakupan kosong sehingga setiap staf tampak menaungi departemennya; varian itu tidak dipakai di sini.
+  Tolak `400` bila status ≠ `menunggu_spv`.
+- **Data penyerah distempel SERVER, bukan diterima dari body**: id, nama, dan departemen penyerah (`held_by.handover_by_id` / `handover_by` / `handover_dept`) diisi dari identitas pemanggil lewat `serahkanUnitAset` (departemen = konstanta GA) dan `PATCH /item/:id` (`stempelSerahTerima`, `controller.go:537`; nilai klien diabaikan bila status `menunggu_spv`). Hasil persetujuan juga tak bisa ditentukan klien lewat `PATCH /item/:id`: status `disetujui` dan `known_by_spv(_id)` dari body dibuang kecuali dokumen tersimpan memang sudah disetujui untuk pemegang yang sama (`kunciHasilPersetujuan`, `controller.go:535`). Satu-satunya jalan ke `disetujui` adalah endpoint ini.
 - **Efek**: `held_by.known_by_spv` = nama SPV (dari body), `known_by_spv_id` dari header, `handover_status=disetujui`.
 - Grounded: `ApproveHandover` + `common.SupervisedDepartments`.
 
