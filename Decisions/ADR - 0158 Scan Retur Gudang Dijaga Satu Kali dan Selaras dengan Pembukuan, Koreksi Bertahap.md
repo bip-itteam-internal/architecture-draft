@@ -37,7 +37,29 @@ Pada 2026-10-07 empat retur (dua Shopee, dua TikTok) berakhir dengan dokumen Ret
 | Dibandingkan dengan jumlah di AutoSync (292 pasangan yang bisa dicocokkan) | 209 hanya memegang transaksi terakhir (stok gudang lebih besar), 82 sama dengan total gudang, 1 lain |
 | Jumlah scan lawan klaim, SKU tunggal (221 order) | pas 112 · kurang 0 · lebih 8 · tak discan 12 |
 
-Kesimpulan yang boleh ditarik: penyebab dominan adalah **simpan ganda dalam hitungan detik oleh orang yang sama**, bukan scan ulang berhari-hari (17 pasangan, termasuk empat order insiden). Kekurangan jumlah pada SKU tunggal tidak ditemukan; kasus kurang yang terlihat semuanya komponen paket atau paket "isi 2", dan **frekuensinya untuk paket belum diukur**. Jalur persis yang meloloskan scan ulang empat order insiden, padahal form menolak membuka order yang sudah punya catatan, **belum teridentifikasi**.
+Kesimpulan yang boleh ditarik: penyebab dominan adalah **simpan ganda dalam hitungan detik oleh orang yang sama**, bukan scan ulang berhari-hari (17 pasangan, termasuk empat order insiden). Kekurangan jumlah pada SKU tunggal tidak ditemukan; kasus kurang yang terlihat semuanya komponen paket atau paket "isi 2"; frekuensinya untuk paket diukur kemudian (bagian "Pengukuran T4" di bawah). Jalur persis yang meloloskan scan ulang empat order insiden, padahal form menolak membuka order yang sudah punya catatan, **belum teridentifikasi**.
+
+### Pengukuran T4 (2026-10-08, order yang discan sejak 1 September 2026 00:00 WIB)
+
+Baca-saja ke produksi. Populasi: 6.982 order yang punya sedikitnya satu scan retur tertaut; 6.977 dianalisis (5 tanpa rincian klaim dikeluarkan). Klaim per komponen = jumlah retur per SKU listing × `qty_per_unit` pemetaan integration (dedup per master, seperti jalur pembukuan). Sekitar 98% populasi adalah order batal pasca-kirim (klaim disintesis dari seluruh qty order), 142 adalah retur marketplace nyata, dan hanya 3 bertanda parsial.
+
+| Kelompok | Order | Pas | Jumlah kurang | Komponen tak discan | Lebih |
+|---|---|---|---|---|---|
+| Semua | 6.977 | 98,2% | 7 (0,1%) | 34 (0,5%) | 85 (1,2%) |
+| SKU tunggal | 5.199 | 98,5% | 1 | 18 | 55 |
+| Paket | 1.778 | 97,2% | 6 (0,3%) | 16 (0,9%) | 30 (1,7%) |
+| Paket, batal pasca-kirim | 1.716 | 98,0% | 4 | 7 | 25 |
+| Paket, retur marketplace | 62 | 75,8% | 2 (3,2%) | 9 (14,5%) | 5 (8,1%) |
+
+Yang terbaca:
+- **Kurang atau tak discan: 41 order (0,6%); paket 22 (1,2%).** Terkonsentrasi pada retur marketplace nyata (20 dari 142, 14%), bukan pada order batal (0,2–0,6%).
+- **21 dari 34 "tak discan" bersamaan dengan SKU scan yang tak ada di klaim** (indikasi barang berbeda atau salah SKU, 0,3% order); 13 sisanya komponen yang betul-betul belum atau tidak discan.
+- **"Lebih" hampir seluruhnya simpan ganda:** 83 dari 85 order "lebih" punya lebih dari satu transaksi, dan 83 dari 86 order bersimpan ganda berakhir "lebih". Ini memperkuat D1.
+- **Pemetaan paket sama di dua sisi:** dari 32 listing paket yang muncul, pemetaan integration dan manufacture identik semua; risiko "pemetaan basi menolak scan sah" di D3 rendah hari ini.
+
+Batas pengukuran: "tak discan" adalah keadaan pada saat ukur dan tidak membedakan "belum sempat discan susulan" dari "memang tidak balik"; hanya order yang sudah punya scan yang terukur (order yang barangnya belum datang tidak ikut); "kurang jumlah" hanya 7 order sehingga persentasenya kasar; ambang keputusan (di bawah sekitar 2% = D2 tetap) adalah usulan yang saya tetapkan sebelum melihat angka dan belum ditegaskan pemutus.
+
+Kesimpulan untuk D2: **tetap**. Frekuensinya rendah (paket non-parsial 1,2%) sehingga konfirmasi jarang muncul, retur parsial praktis tidak ada (3 order) sehingga dialog tidak bertabrakan dengan kasus sah, dan kurang terkonsentrasi pada retur marketplace nyata, tempat konfirmasi paling berguna. Temuan yang tidak tertutup D2 dan D3: SKU scan di luar klaim (lihat "Belum diputuskan" butir 2).
 
 ### Yang sudah ada
 
@@ -94,6 +116,7 @@ Mengubah semantik "ganti" pembukuan, mengubah arti tiga kondisi (Reuse, Rework, 
 ## Belum diputuskan
 
 1. **Koreksi ke nol.** Pembukuan membuang baris berjumlah nol, sehingga membuang satu SKU dari dokumen tidak bisa diungkapkan lewat jalur yang ada. Perlu aturan eksplisit sebelum D6.
+2. **SKU yang discan tetapi tidak ada di klaim order.** Terukur 21 order (0,3%) sejak 1 September. D3 menolak jumlah yang melebihi klaim; untuk SKU berklaim nol, menolaknya bisa menghalangi pengembalian barang berbeda yang sah, membiarkannya meloloskan salah SKU. Belum diputuskan; menahan D3 hanya pada bagian ini, bukan batas kumulatif untuk SKU yang berklaim.
 
 ## Consequences
 
