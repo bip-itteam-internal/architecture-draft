@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan**, 2026-10-08, kode belum ada. Papan kerja: `ANALISA - Shop Quality Membaca Ulasan Toko Pegangan CS` di Workspace.
+> **Status**: 🟡 **Belum di kode**: PR terbuka, belum merged (bip-erp#2837 untuk keputusan ini; diukur 2026-10-08, ukur ulang sebelum dipakai). 🟢 Diterima, 2026-10-08, oleh irfanarfianto: Pemutus memerintahkan pengerjaannya di sesi analisa hari itu, dan baris ini ditulis agent atas perintah tersebut. Papan kerja: `ANALISA - Shop Quality Membaca Ulasan Toko Pegangan CS` di Workspace.
 
 ## Untuk Manajemen
 
@@ -11,7 +11,7 @@
 - **Ulasan TikTok per pembeli tidak ada.** TikTok tidak memberikan isi ulasan lewat jalur yang dipakai ERP, hanya sebaran bintang per produk. Untuk toko TikTok, ulasan tetap dibaca di Seller Center.
 - **Ulasan Lazada belum ada sama sekali** di ERP.
 - **Membalas ulasan dari ERP belum dibangun.** Balasan tetap dilakukan di Seller Center. Itu keputusan terpisah yang menunggu kepastian izin dari marketplace.
-- **Mengajukan komplain dari ulasan tetap hak pemegang akun toko.** Shop Quality membaca ulasan dan melihat mana yang sudah dikomplainkan, tetapi tidak mengajukannya.
+- **Mengajukan komplain dari ulasan tetap hak pemegang akun toko.** Shop Quality membaca ulasan, tetapi tidak mengajukan komplain dan tidak melihat penanda ulasan mana yang sudah dikomplainkan.
 - **Data diperbarui sekali sehari, pagi hari.** Ulasan yang masuk siang ini terlihat besok pagi.
 
 **Besaran kerja.** Kecil: satu perubahan di sisi server, tanpa perubahan tampilan, lalu satu langkah pemasangan hak akses ke tiga akun.
@@ -61,7 +61,7 @@ Kedua koleksi tetap terpisah. Entity `CsShopMapping` sudah melarang penggabungan
 
 ### 2. Hak mengajukan komplain tidak ikut melebar
 
-Tombol "Ajukan komplain" dan gerbang tulis kedua register komplain tetap diturunkan dari `icc_account_mappings` saja, sesuai ADR Komplain dari Ulasan Marketplace. Pemegang CS membaca ulasan dan melihat lencana "Sudah dikomplain", tanpa tombol mengajukan. Alasannya: mengajukan komplain menggerakkan KPI gudang dan antrean QC, dan belum ada yang meminta CS menjadi pengaju.
+Tombol "Ajukan komplain" dan gerbang tulis kedua register komplain tetap diturunkan dari `icc_account_mappings` saja, sesuai ADR Komplain dari Ulasan Marketplace. Pemegang CS membaca ulasan tanpa tombol mengajukan dan tanpa lencana "Sudah dikomplain": frontend hanya meminta riwayat komplain bagi pemegang akun toko (pembaca lain ditolak 403), dan itu tidak diubah. Alasannya: mengajukan komplain menggerakkan KPI gudang dan antrean QC, dan belum ada yang meminta CS menjadi pengaju.
 
 ### 3. Menu dibuka lewat paket izin yang sudah ada, tanpa izin baru
 
@@ -87,7 +87,7 @@ Backend naik lebih dulu, baru paket izin dipasang. Bila terbalik, menu Ulasan mu
 
 **Yang didapat.** Pemegang CS melihat ulasan Shopee toko yang dilayaninya dalam satu daftar, dengan filter "Belum dibalas" dan "Semua bintang" yang sudah ada. Tidak ada layar baru dan tidak ada salinan aturan cakupan baru.
 
-**Yang tidak didapat.** Toko TikTok dan Lazada tetap tidak punya ulasan per pembeli di ERP. Pemohon tetap membalas di Seller Center.
+**Yang tidak didapat.** Toko TikTok dan Lazada tetap tidak punya ulasan per pembeli di ERP. Pemohon tetap membalas di Seller Center; supaya langkah itu tidak buntu, kartu ulasan diberi nomor pesanan yang bisa disalin dan tautan ke Seller Center Shopee (pekerjaan frontend terpisah, erp-frontend#2207, tidak mengubah keputusan ini).
 
 **Risiko.**
 

@@ -1,9 +1,9 @@
 Papan kerja untuk [[ADR - 0160 Cakupan Baca Ulasan Mencakup Toko Pegangan CS, Menu Dibuka lewat Paket Izin yang Ada]]. Cara kerja cakupan ulasan ada di [[Microservices - Integration Service]] § cakupan toko.
 Berubah tiap item selesai; keputusannya ada di ADR, bukan di sini.
 
-⛔ **Menunggu ADR "Cakupan Baca Ulasan Mencakup Toko Pegangan CS, Menu Dibuka lewat Paket Izin yang Ada" Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.** Pengecualian: T2 dan T3 tidak bergantung ADR itu, keputusannya tertulis di badan issue masing-masing.
+✅ ADR Diterima 2026-10-08 oleh irfanarfianto. Brief keempat task ada di `.task-plans/briefs/2026-10-08-{2824,2825,2826,2207}-*.md` (lokal, bukan di vault).
 
-- **Ukuran**: **Kecil**. Hanya `bip-erp` yang harus berubah. `erp-frontend` tidak dihitung: tab Ulasan sudah merender daftar lintas toko, nama toko, tanggal, bintang, dan filter "Belum dibalas" untuk toko mana pun yang dikirim server (`src/features/integration/reviews/components/review-card.tsx:76-94`, `daftar-ulasan.tsx:133-137`), dan tombol komplain memang sengaja tetap hanya untuk pemegang akun toko (`lib/boleh-ajukan.ts:24-39`). `mybharata-app` tidak punya layar ulasan.
+- **Ukuran**: **Kecil** untuk keputusan ADR-nya (hanya `bip-erp`), ditambah satu issue `erp-frontend` yang berdiri sendiri (T5) untuk menutup jalan buntu sesudah membaca. Untuk cakupan, `erp-frontend` tidak perlu berubah: tab Ulasan sudah merender daftar lintas toko, nama toko, tanggal, bintang, dan filter "Belum dibalas" untuk toko mana pun yang dikirim server (`src/features/integration/reviews/components/review-card.tsx:76-94`, `daftar-ulasan.tsx:133-137`), dan tombol komplain memang sengaja tetap hanya untuk pemegang akun toko (`lib/boleh-ajukan.ts:24-39`). `mybharata-app` tidak punya layar ulasan.
 - **Pemutus**: irfanarfianto
 - **Asal**: permintaan Shop Quality, "membuka toko satu per satu untuk melihat ada ulasan atau tidak". Fiturnya sudah ada; yang hilang aksesnya.
 
@@ -14,12 +14,30 @@ Diukur prod 2026-10-08 sebagai titik awal (angka bergerak, ukur ulang sebelum di
 - Empat toko Shopee itu: 3.627 ulasan 30 hari terakhir, 3.599 belum dibalas, 67 berbintang 1 sampai 3.
 - Job `sync-reviews` sehat: 40 run terakhir sukses, sekitar 13 menit per run.
 
+## Status PR (diukur 2026-10-08; bergerak, ukur ulang lewat `gh pr view` sebelum dipakai)
+
+| Task | Issue | PR | Keadaan saat ditulis |
+|---|---|---|---|
+| T1 cakupan CS | bip-erp#2824 | [bip-erp#2837](https://github.com/bip-itteam-internal/bip-erp/pull/2837) | terbuka; gerbang 24 service + judge lolos |
+| T2 status sinkron toko nonaktif | bip-erp#2825 | [bip-erp#2835](https://github.com/bip-itteam-internal/bip-erp/pull/2835) | terbuka; gerbang + judge lolos |
+| T3 kegagalan sinkron berbunyi | bip-erp#2826 | [bip-erp#2836](https://github.com/bip-itteam-internal/bip-erp/pull/2836) | terbuka; lolos di percobaan 2 |
+| T5 kartu ulasan | erp-frontend#2207 | [erp-frontend#2209](https://github.com/bip-itteam-internal/erp-frontend/pull/2209) | terbuka; lolos di percobaan 2 |
+
+Sisa yang hanya bisa dikerjakan manusia:
+
+- Merge keempat PR; T1 dan T2 menyentuh baris berdekatan di `services/integration/main.go`, jadi yang di-merge belakangan mungkin perlu menyelesaikan konflik kecil.
+- Deploy `integration-service` (dan frontend), lalu T4: pasang paket izin ke tiga akun Shop Quality. Urutannya tidak boleh terbalik.
+- T5: klik URL Seller Center Shopee dari akun penjual sebelum merge, dan buka layarnya sekali.
+- T3: picu satu pemberitahuan job gagal di DEV; putuskan apakah TikTok "sebagian produk gagal" layak menggagalkan job (risiko pemberitahuan harian yang berhenti dibaca).
+- Temuan di luar batas T3, belum punya issue: `Manager.TriggerNow` (pemicu manual job) memakai percobaan ulang bawaan manager, bukan pengaturan per-job, sehingga pemicu manual `sync-reviews` masih mengulang 3 kali dan menimpa pesan timeout.
+- Satu perjalanan utuh sebagai Shop Quality sesudah semuanya naik: buka menu Ulasan, pilih "Belum dibalas", salin nomor pesanan, buka Seller Center, balas, lalu lihat ulasan itu hilang dari "Belum dibalas" esok paginya.
 ## Urutan dan ketergantungan
 
 ```
 ADR Diterima ──► T1 (cakupan CS) ──► deploy integration-service PROD ──► T4 (pasang paket izin, manusia)
 T2 (status sinkron toko nonaktif)   bebas
 T3 (kegagalan sinkron berbunyi)     bebas
+T5 (kartu ulasan: nomor pesanan + Seller Center, erp-frontend)   bebas
 ```
 
 T2 sebaiknya naik sebelum T4: tanpa itu, hal pertama yang dibaca Shop Quality di halaman Ulasan adalah peringatan "toko gagal sinkron" yang palsu.
@@ -117,6 +135,11 @@ Tidak ada.
 
 Sesudah T1 naik ke prod: pasang paket `marketing_akuntoko_pemegang` ke tiga akun berjabatan Shop Quality. Buktikan dulu di DEV bahwa menu Ulasan muncul bagi akun tanpa peran marketing (asumsi ADR § Decision 3). Tulis prod dijalankan manusia.
 
+### T5. Kartu ulasan menampilkan nomor pesanan dan jalan ke Seller Center untuk membalas
+
+- **Repo**: `erp-frontend` · **Issue**: [erp-frontend#2207](https://github.com/bip-itteam-internal/erp-frontend/issues/2207) · **Urutan**: bebas
+
+Ditemukan saat menelusuri alur dari sudut pemohon: sesudah membaca ulasan di ERP, langkah membalasnya ada di Seller Center tanpa pegangan apa pun, karena kartu tidak memuat nomor pesanan. Keputusan dan kriterianya tertulis di badan issue: nomor pesanan dengan tombol salin, dan tautan "Balas di Seller Center" untuk ulasan Shopee. Tanpa perubahan backend. ⚠️ URL Seller Center Shopee wajib diklik manusia yang punya akses sebelum merge.
 ## Tidak dikerjakan
 
 - **Balas ulasan dari ERP.** Menunggu cek izin scope API Shopee dan ADR tersendiri.
