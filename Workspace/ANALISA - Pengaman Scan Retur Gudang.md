@@ -22,7 +22,7 @@ Dependensi: ADR 0158 disetujui (✅ Diterima 2026-10-08).
 
 ### T1. Kunci Simpan dan penanganan gagal di tengah [FE]
 
-✅ **Merged 2026-10-08, belum deploy prod per tanggal itu** (erp-frontend#2194; satu PR dengan T3).
+✅ **Merged dan deploy prod 2026-10-08** (erp-frontend#2194; satu PR dengan T3).
 
 D1 dan bagian D5. Tombol Simpan form retur terkunci selama proses penyimpanan; bila satu baris gagal, baris itu tetap di form dan petugas melihat daftar yang gagal (pola yang sudah ada di form penerimaan surat jalan di layar yang sama). Fungsi murni dipisah dan diuji dengan kontrol negatif. Teks baru lewat i18n id+en.
 
@@ -30,7 +30,7 @@ Dependensi: T0.
 
 ### T2. Idempotensi dan batas kumulatif di layanan gudang [BE]
 
-✅ **Merged 2026-10-08, belum deploy prod per tanggal itu** (bip-erp#2809).
+✅ **Merged dan deploy prod 2026-10-08** (bip-erp#2809).
 
 D1 (sisi server), D3, D4. Permintaan retur tertaut dengan referensi identik tidak menambah stok; total per (order, SKU) tidak boleh melebihi klaim per komponen (klaim per SKU listing dikali isi paket dari pemetaan paket yang sudah ada di layanan gudang); konfirmasi ke pembukuan membawa jumlah kumulatif. Ditolak = tidak ada transaksi dan stok tidak berubah. Uji lewat handler (bukan hanya fungsi murni). **Berhenti dan lapor** bila data klaim per komponen ternyata tidak tersedia di layanan gudang tanpa mengubah pembukuan, jangan menebak.
 
@@ -38,7 +38,7 @@ Dependensi: T0. Tidak bergantung pada T1; titik temunya hanya jalur galat penyim
 
 ### T3. Konfirmasi saat kurang dan tawarkan hanya sisa [FE]
 
-✅ **Merged 2026-10-08, belum deploy prod per tanggal itu** (erp-frontend#2194; SKU di luar klaim = konfirmasi keras, ADR 0158 D2).
+✅ **Merged dan deploy prod 2026-10-08** (erp-frontend#2194; SKU di luar klaim = konfirmasi keras, ADR 0158 D2).
 
 D2 dan D5. Jumlah kurang membuka konfirmasi yang menyebut barang dan selisihnya (jumlah lebih tetap diblokir); paket sebagian tercatat hanya menawarkan SKU yang belum tercatat, memakai daftar yang sudah dikirim backend (tipe layar perlu ditambah). Tanpa alasan yang disimpan.
 
