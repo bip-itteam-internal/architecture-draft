@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-08",
-  "jumlah_dokumen": 537,
+  "jumlah_dokumen": 539,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -2632,6 +2632,7 @@
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate",
         "ADR - 0008 Profit Engine Join via item_group_id",
         "LOG - 2026-09-17 Audit Checklist Marketing dan Integration",
+        "ADR - 0160 Cakupan Baca Ulasan Mencakup Toko Pegangan CS, Menu Dibuka lewat Paket Izin yang Ada",
         "LOG - Shopee API Rate Limit Request",
         "RUN - Backfill shipped_at Shopee",
         "ADR - 0052 Status Sinkron per Toko",
@@ -2644,20 +2645,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "de86ddf65eece0ccd24e7226c0378229412ee26f88cca1682b6eb1590d774c10",
-      "ukuran_kb": 459.3,
-      "ringkasan": "Menjawab: bagaimana Integration Service menghubungkan ERP ke marketplace e-commerce (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) lewat webhook dan OAuth per platform, serta bagaimana order dan laporan iklan dinormalisasi menjadi model \"transaction\" terpadu. Juga menjawab bagaimana bridging finansial ke Accurate Online bekerja (pembuatan invoice, ringkasan transaksi harian per-shop/channel, push Sales Invoice dan Sales Return), serta bagaimana automasi auto-ship/auto-approve yang sadar-holiday, manajemen kredensial per marketplace, dan job sync terjadwal berjalan. Mencakup juga detail fitur TikTok Business/Ads seperti GMV Max Monitoring/Overview dan ICC Video Metrics, serta status jalur middleware Desty yang soft-disabled.",
+      "hash": "5430035cfda70ffb2cf665cb451656acaa3832e79396bfb4256f292fe23d0956",
+      "ukuran_kb": 459.8,
+      "ringkasan": "Menjawab: apa saja yang dikerjakan integration-service (webhook order TikTok Shop/Shopee/Lazada, laporan iklan TikTok Business dan GMV Max, model transaction terpadu, push Sales Invoice dan Sales Return ke Accurate), endpoint mana yang tersedia, dan bagaimana autentikasi webhook Shopee serta cron sinkronnya bekerja. Juga menjawab siapa boleh melihat toko apa (ICC account mapping, Shop ACL, kepemilikan toko per departemen, cakupan toko pada ulasan marketplace), bagaimana status sinkron per toko dan toko banned ditangani, serta jebakan agregasi ROI/ROAS GMV Max. Memuat pula rencana Meta Ads, status Desty yang soft-disabled, dan catatan performa index MongoDB.",
       "kata_kunci": [
-        "integration-service",
+        "integration service",
         "marketplace",
         "TikTok Shop",
-        "TikTok Business/Ads",
         "Shopee",
-        "Lazada",
-        "Accurate Online",
+        "Accurate",
         "webhook",
-        "OAuth",
-        "GMV Max"
+        "GMV Max",
+        "ulasan marketplace",
+        "review",
+        "ICC account mapping"
       ]
     },
     {
@@ -6367,7 +6368,7 @@
         "APP - Web ERP"
       ],
       "hash": "cbe50357be0f60ff0c955244db65d7ea6a789c7e20f47bc80ee593d394467e49",
-      "ukuran_kb": 11.6,
+      "ukuran_kb": 11.7,
       "ringkasan": "Menjawab: kenapa modul Industrial Relation menyimpan catatan pelanggaran kepatuhan ringan (atribut kerja: sepatu, lanyard) di koleksi baru compliance_note yang terpisah dari Surat Peringatan dan kpi_score, dan kenapa catatan itu bukan sanksi, tidak memotong gaji, tidak menerbitkan SP otomatis, serta tidak masuk skor KPI. Menjelaskan siapa yang boleh mencatat (petugas IR/HR yang ditunjuk, lewat MyBharata, ditegakkan di server), siapa yang boleh membaca (visibilitas tiga-arah: petugas HR, karyawan atas dirinya, atasan atas departemennya via SupervisedDepartmentsStrict), dan kenapa jenis pelanggaran dibuat master data bukan enum Go. Juga menjawab kenapa data ini sensitif sehingga tidak didaftarkan ke calendar-service atau feed lintas modul.",
       "kata_kunci": [
         "industrial relation",
@@ -7314,26 +7315,28 @@
         "HRIS - Otomasi Skor KPI",
         "CORE - RBAC dan Permission Set",
         "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
+        "Microservices - Integration Service",
+        "ADR - 0160 Cakupan Baca Ulasan Mencakup Toko Pegangan CS, Menu Dibuka lewat Paket Izin yang Ada",
         "CORE - API Master Gateway",
         "APP - Web ERP",
         "Sales - ICC Account Manager Mapping",
         "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
         "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada"
       ],
-      "hash": "21cf3f8ba093480c6c61448313172527c9197f78106bd66a660b5a4231a11cc2",
-      "ukuran_kb": 10.1,
-      "ringkasan": "Menjawab: kenapa alat kerja pemegang akun toko marketplace (Performa Saya, Ulasan, Komplain ke Gudang, Komplain ke QC) dibuka lewat modul izin `akuntoko` yang dipasang HR ke posisi, bukan dengan menambahkan peran baru ke daftar peran atau menilai kepemilikan toko di setiap gerbang. Juga menjawab kenapa prefiks modulnya sengaja bukan `marketing`, kenapa paketnya tidak boleh dipecah, kenapa cakupan barisnya tetap ditentukan kepemilikan toko, dan bagaimana menu Marketing dikelompokkan ulang jadi \"Pekerjaan Saya\" dan \"Kelola Tim\".",
+      "hash": "6896c15dda8104e437f7911f672d712e58a5270ee495b66d6c371bf688082610",
+      "ukuran_kb": 10.5,
+      "ringkasan": "Menjawab: kenapa menu Performa Saya, Ulasan, Komplain ke Gudang, dan Komplain ke QC dibuka lewat izin modul `akuntoko` yang dipasang HR ke posisi (paket `marketing_akuntoko_pemegang`), bukan lewat daftar peran, dan apa bedanya bagi Account Specialist serta Marketplace Advertiser. Juga menjawab kenapa prefiksnya bukan `marketing`, kenapa paketnya tidak boleh dipecah, bagaimana cakupan data tetap mengikuti kepemilikan toko, dan bagaimana menu dikelompokkan ke induk \"Pekerjaan Saya\" dan \"Kelola Tim\". Memuat koreksi bahwa Ulasan tidak lagi menampilkan semua toko sejak cakupan toko dipasang.",
       "kata_kunci": [
         "akuntoko",
-        "izin posisi",
-        "permission set",
+        "pemegang akun toko",
         "Account Specialist",
         "Marketplace Advertiser",
+        "permission set",
+        "izin posisi",
+        "RBAC",
+        "marketing_akuntoko_pemegang",
         "Pekerjaan Saya",
-        "menu marketing",
-        "kepemilikan toko",
-        "komplain gudang",
-        "ADR 0107"
+        "komplain gudang"
       ]
     },
     {
@@ -7892,7 +7895,7 @@
         "Microservices - Attendance Service"
       ],
       "hash": "d17340c57b6557ac0854f599e6dec6710b07c4c33edb90ac812f5b938a810e8f",
-      "ukuran_kb": 20.6,
+      "ukuran_kb": 20.7,
       "ringkasan": "Menjawab: kenapa inspeksi Satgas 5R & K3 untuk Office Boy dan Security pindah dari Form Builder ke entitas sendiri `satgas_finding` di employee-service, bagaimana petugas mencatat temuan bebas (tanpa form/periode pra-bangun) lengkap dengan foto dan tenggat SLA, dan bagaimana eskalasi memakai ulang mekanisme tahan-clock-out yang sudah ada. Menjelaskan juga bagaimana skor KPI kebersihan dihitung otomatis 0–100 dari temuan bulan itu (tanpa temuan = 100, tiap temuan mengurangi), kenapa 'menahan clock-out' adalah nudge bukan sanksi dan bukan potong gaji, serta batas terhadap Inspeksi Area (ADR 0111), Catatan Kepatuhan (ADR 0085), dan Surat Peringatan.",
       "kata_kunci": [
         "Satgas",
@@ -9048,7 +9051,7 @@
         "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap"
       ],
       "hash": "0e91e702c486a6b952a243ae55a3a67cf36ad2071faf8a2e808ae18ea2692072",
-      "ukuran_kb": 4.8,
+      "ukuran_kb": 4.9,
       "ringkasan": "Menjawab: bagaimana cara mengajukan konsumsi (pantry, jamuan, konsumsi rapat) di sistem ERP, siapa yang menyetujui di tiap tahap, dan kapan eskalasi ke Direktur diperlukan. ADR ini memindahkan konsumsi dari alur permintaan dana ke alur pengajuan pembelian barang (seperti Raw Material), dengan satu pengecualian: bila pengaju adalah supervisor HRGA, tahap persetujuan atasan dilewati untuk mencegah deadlock organisasi.",
       "kata_kunci": [
         "konsumsi",
@@ -9225,7 +9228,7 @@
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi"
       ],
       "hash": "2f1943fa67f1c6c7f4c6a975cdae67f14ba03a7986d5724f9e0d80fddcf9c8ee",
-      "ukuran_kb": 8.4,
+      "ukuran_kb": 8.5,
       "ringkasan": "Menjawab: bagaimana serapan anggaran dibaca di layar Anggaran & Cost Control (Terpakai tetap realisasi Accurate, dana dari pengajuan hanya bagian darinya dan tidak dijumlahkan), bagaimana pengajuan yang belum dicatat Accounting ditampilkan, dan siapa yang boleh menulis anggaran lewat izin baru finance.anggaran.kelola. Juga menjawab sembilan keputusan K1 sampai K9, apa yang sengaja tidak dijanjikan (lewat anggaran hanya memperingatkan, tanpa anggaran per proyek), konsekuensi urutan deploy, dan hal yang belum diputuskan.",
       "kata_kunci": [
         "ADR 0159",
@@ -9238,6 +9241,37 @@
         "dari pengajuan",
         "menunggu dicatat Accounting",
         "finance.anggaran.kelola"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0160 Cakupan Baca Ulasan Mencakup Toko Pegangan CS, Menu Dibuka lewat Paket Izin yang Ada.md",
+      "judul": "ADR - 0160 Cakupan Baca Ulasan Mencakup Toko Pegangan CS, Menu Dibuka lewat Paket Izin yang Ada",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-10-08, kode belum ada. Papan kerja: `ANALISA - Shop Quality Membaca Ulasan Toko Pegangan CS` di Workspace.",
+      "publik": true,
+      "tautan": [
+        "Microservices - Integration Service",
+        "ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada",
+        "ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko",
+        "ADR - 0145 Agen Pengelola Toko Tumbuh dari Mesin Keputusan yang Ada, Dampak Diukur Sebelum Eksekusi",
+        "CORE - RBAC dan Permission Set"
+      ],
+      "hash": "c1fe1df78a640bd087edf48c81d4e6285927607c553d6c623c95ca2de4c48e73",
+      "ukuran_kb": 9.3,
+      "ringkasan": "Menjawab: kenapa staf Shop Quality (CS toko) tidak bisa melihat halaman Ulasan marketplace di `/integration/reviews`, toko mana saja yang boleh dibaca seseorang di rute `/reviews/*` (gabungan `icc_account_mappings` dan `cs_shop_mappings`), dan paket izin apa yang membuka menunya (`marketing_akuntoko_pemegang`). Juga menjawab apa yang sengaja tidak ikut berubah: siapa yang boleh mengajukan komplain dari ulasan, kenapa ulasan TikTok dan Lazada tidak tersedia per pembeli, kenapa balas ulasan tetap di Seller Center, seberapa segar datanya (sync harian `sync-reviews`), serta urutan pemasangan backend sebelum paket izin dan asumsi yang wajib dibuktikan di DEV.",
+      "kata_kunci": [
+        "ulasan marketplace",
+        "review",
+        "Shop Quality",
+        "CS toko",
+        "cs_shop_mappings",
+        "icc_account_mappings",
+        "cakupan baca ulasan",
+        "MiddlewareCakupanUlasan",
+        "marketing_akuntoko_pemegang",
+        "komplain dari ulasan"
       ]
     },
     {
@@ -10453,7 +10487,7 @@
         "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya"
       ],
       "hash": "24ffb00ec9a8710ee32ca2b63c3ba7acdc69bcad535dc08da13ec230f3427f6c",
-      "ukuran_kb": 12.9,
+      "ukuran_kb": 13.0,
       "ringkasan": "Menjawab: bagaimana membaca angka di layar Anggaran & Cost Control (/finance/anggaran): arti Anggaran, Terpakai, Sisa, Lewat anggaran, Dari pengajuan, Jurnal lain, dan Menunggu dicatat, serta kolom mana yang tidak boleh dijumlahkan agar rupiah tidak terhitung dua kali. Juga menjawab isi tiap tab (Serapan, Opex Marketing, Rekomendasi, Anggaran Bulanan, Forecast Mingguan), dari mana angka pengajuan berasal dan periodenya, alur pengguna per peran, urutan deploy, dan hal yang belum diputuskan.",
       "kata_kunci": [
         "serapan anggaran",
@@ -10996,7 +11030,7 @@
         "GA - Form Pengadaan dan Pengajuan Dana"
       ],
       "hash": "5a506ef2f6690f2d0fd48bd5da4134bc63d99b6af98efef405cd97c1c4ee6447",
-      "ukuran_kb": 7.6,
+      "ukuran_kb": 7.7,
       "ringkasan": "Menjawab: apa saja 11 SOP Procurement resmi PT Bharata (perencanaan kebutuhan, PR, seleksi vendor, RFQ, penerbitan PO, monitoring pengiriman, penerimaan+QC, verifikasi invoice, pembayaran, evaluasi vendor, cost saving, pelaporan) dan sejauh mana masing-masing sudah didukung ERP. Memetakan tahap SOP mana yang sudah ada di kode (Permintaan/Pesanan/Penerimaan), mana yang sebagian, dan mana yang belum dibangun (RFQ 3-vendor, matriks approval nominal >Rp50jt, AVL & dokumen legalitas vendor, scorecard/OTD vendor, pelaporan formal). Berguna untuk mengecek kepatuhan SOP sebelum merancang fitur procurement/manufacture baru.",
       "kata_kunci": [
         "procurement",
@@ -13973,7 +14007,7 @@
         "WH - Management System"
       ],
       "hash": "d7681551e6b278c2d9306ee84c0b78eafb246b94071bacf6b2fe2eb2b765e041",
-      "ukuran_kb": 10.0,
+      "ukuran_kb": 10.1,
       "ringkasan": "Menjawab: seberapa siap otomasi skor KPI posisi Manufaktur (produksi dan gudang), mengapa source KPI sudah ada tetapi dorman karena WMS belum dipakai, dan apa yang bisa dikerjakan sekarang tanpa WMS. Memuat status data prod manufacture_db, peta kesiapan per posisi, dan gerbang verifikasi saat WMS live.",
       "kata_kunci": [
         "otomasi KPI",
@@ -17677,7 +17711,7 @@
         "Microservices - Form Builder Service"
       ],
       "hash": "0a7626b938a8ed09b938634e03c022c604145b021c548a80c3fc8136f1b250d7",
-      "ukuran_kb": 6.3,
+      "ukuran_kb": 6.4,
       "ringkasan": "Menjawab: fitur pengelolaan Program Culture (klub Badminton, Football, Ladies Sport, Billiard, Music) apa saja yang sudah ada di ERP versus yang masih dilakukan manual di Excel, dan gap mana yang layak dibangun. Merinci mengapa jadwal berulang, matriks distribusi per-pekan, target frekuensi vs realisasi, dokumentasi/biaya sesi, dan indikator per-klub belum tersedia, serta mana yang sengaja tidak dibuat (RSVP, KPI officer-centric). Papan kerja temuan yang tiap kandidat scope-nya masih menunggu keputusan pemilik produk sebelum jadi ADR + task.",
       "kata_kunci": [
         "program culture",
@@ -18539,7 +18573,7 @@
         "ANALISA - Inspeksi Satgas 5R dan K3"
       ],
       "hash": "78e2ab91fcd6914460f26a0a31fd8223880d6ea613808144abc0dfb1b0469391",
-      "ukuran_kb": 9.3,
+      "ukuran_kb": 9.4,
       "ringkasan": "Menjawab: apa saja task turunan (T1–T8) dari redesign Satgas menjadi input bebas dengan SLA temuan, apa status pengerjaan tiap task, di branch dan repo mana pekerjaannya (bip-erp `feat/satgas-finding`, erp-frontend `feat/satgas-finding-web`, my-bharata `feat/satgas-finding-mobile`), serta urutan dan dependensinya (backend dulu, lalu mobile & web, retire form-builder paling akhir). Menjelaskan juga penyempurnaan keputusan user 2026-09-24 (toggle 'Ada temuan?' dibuang, tanpa temuan sebulan skor 100 otomatis, approve tanpa mengetik nilai) dan gerbang 'selesai bila' tiap task. Ini papan kerja, bukan sumber kebenaran — detail keputusan ada di ADR 0122.",
       "kata_kunci": [
         "ANALISA Satgas",
@@ -18709,6 +18743,34 @@
         "i18n",
         "urutan deploy",
         "integration service"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Shop Quality Membaca Ulasan Toko Pegangan CS.md",
+      "judul": "ANALISA - Shop Quality Membaca Ulasan Toko Pegangan CS",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0160 Cakupan Baca Ulasan Mencakup Toko Pegangan CS, Menu Dibuka lewat Paket Izin yang Ada",
+        "Microservices - Integration Service"
+      ],
+      "hash": "d0fa3787dc7b6ad777de7cfc58d2bbd60c3e861832b41fd144facdb261b662fc",
+      "ukuran_kb": 8.0,
+      "ringkasan": "Menjawab: task apa saja yang lahir dari permintaan Shop Quality membaca ulasan toko pegangan CS, urutan dan ketergantungannya, serta kriteria \"yang harus benar\" tiap task (T1 cakupan baca ulasan lewat `cs_shop_mappings`, T2 `/reviews/sync-status` tidak menghitung toko DISABLED, T3 `SyncAll` harus melapor gagal, T4 pemasangan paket izin oleh manusia). Juga menjawab nomor issue bip-erp tiap task, angka ukur prod yang jadi titik awal, kenapa frontend tidak perlu berubah, dan apa yang sengaja tidak dikerjakan.",
+      "kata_kunci": [
+        "analisa",
+        "Shop Quality",
+        "ulasan",
+        "review",
+        "cs_shop_mappings",
+        "sync-reviews",
+        "status sinkron",
+        "review_sync_states",
+        "SyncAll",
+        "paket izin"
       ]
     },
     {
@@ -19039,7 +19101,7 @@
         "2026-07-17 Temuan - Reject retur menambah stok FG"
       ],
       "hash": "9d3cb08e3ec79fdef0d632d66bc62b30a2de8d865bc976e0fcdbbd00aae7462e",
-      "ukuran_kb": 11.2,
+      "ukuran_kb": 11.5,
       "ringkasan": "Menjawab pertanyaan tentang desain perbaikan performa menu Master Resi yang lambat dibuka karena puluhan ribu dokumen resi, mencakup pagination sisi server per-hari (endpoint /resi/days), pencarian prefix no_resi di server, dan kontrak urutan data yang dibagi dengan menu Gudang FG (lookup resi, ambil rentang).",
       "kata_kunci": [
         "Master Resi",
