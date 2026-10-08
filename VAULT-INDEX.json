@@ -2639,25 +2639,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "7819cf50bfcd1deb4a706aaa0ec8bc14001810e0067511ff795732aa277acc5a",
-      "ukuran_kb": 457.1,
-      "ringkasan": "Menjawab: apa saja yang dilakukan Integration Service (service integrasi marketplace dan bridge akuntansi ke Accurate), endpoint apa yang sudah ada untuk webhook, TikTok Business/Ads, Shopee, TikTok Shop, Transactions, Accurate, dan worker/cron, serta bagaimana order dinormalkan menjadi model transaction terpadu. Juga menjawab bagaimana Shop ACL, kepemilikan toko per departemen, ICC account mapping, dan observability Shopee bekerja, apa yang masih konsep (Meta Ads) atau legacy (Desty soft-disabled), dan dependency ke service lain.",
+      "hash": "de86ddf65eece0ccd24e7226c0378229412ee26f88cca1682b6eb1590d774c10",
+      "ukuran_kb": 459.3,
+      "ringkasan": "Menjawab: bagaimana Integration Service menghubungkan ERP ke marketplace e-commerce (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) lewat webhook dan OAuth per platform, serta bagaimana order dan laporan iklan dinormalisasi menjadi model \"transaction\" terpadu. Juga menjawab bagaimana bridging finansial ke Accurate Online bekerja (pembuatan invoice, ringkasan transaksi harian per-shop/channel, push Sales Invoice dan Sales Return), serta bagaimana automasi auto-ship/auto-approve yang sadar-holiday, manajemen kredensial per marketplace, dan job sync terjadwal berjalan. Mencakup juga detail fitur TikTok Business/Ads seperti GMV Max Monitoring/Overview dan ICC Video Metrics, serta status jalur middleware Desty yang soft-disabled.",
       "kata_kunci": [
-        "integration service",
+        "integration-service",
         "marketplace",
-        "webhook",
         "TikTok Shop",
-        "TikTok Ads",
-        "GMV Max",
+        "TikTok Business/Ads",
         "Shopee",
         "Lazada",
-        "Accurate",
-        "sales invoice",
-        "transaction",
-        "Desty",
-        "shop ACL",
-        "ICC",
-        "cron sync"
+        "Accurate Online",
+        "webhook",
+        "OAuth",
+        "GMV Max"
       ]
     },
     {
