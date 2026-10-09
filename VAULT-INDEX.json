@@ -9318,28 +9318,29 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-09, oleh agent (AI Engineering Loop) atas jawaban tim Finance tanggal yang sama. **Belum Diterima**: butir 1 dan 2 adalah jawaban Finance; bentuk penanda, akun penempatan selisih, dan perlakuan receipt lama (§ Pertanyaan Terbuka) menunggu keputusan Finance dan persetujuan Tech Development. Belum ada kode. Nomor 0162 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.",
+      "status_teks": "**Diusulkan**, 2026-10-09, oleh agent (AI Engineering Loop) atas jawaban tim Finance tanggal yang sama. **Belum Diterima**: butir 1 sampai 5 di § Decision adalah jawaban Finance (dua yang terakhir, 2026-10-09 siang); akun untuk selisih yang jenis biayanya belum terbaca, ambang selisih, dan perlakuan receipt lama (§ Pertanyaan Terbuka) menunggu keputusan Finance dan persetujuan Tech Development. Belum ada kode. Nomor 0162 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.",
       "publik": true,
       "tautan": [
         "ADR - 0119 Kompensasi TikTok Dipisah Menurut Sudah atau Belum Ada Uang Masuk",
         "Microservices - Integration Service",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "ab890d97646c20ca7ccd5ff1cc55b0a64577027362bac8313b7dc04955b70a4e",
-      "ukuran_kb": 6.7,
-      "ringkasan": "Menjawab: kenapa receipt Lazada di Accurate selama ini memakai hitungan per-order dan membuang angka payout, apa yang diputuskan Finance (cheque mengikuti uang cair, selisih tetap ditandai tanpa menahan receipt), dan apa saja pertanyaan yang masih terbuka (akun penempatan selisih, bentuk penanda, ambang, nasib receipt lama). Juga menjelaskan sebab pergeseran antar hari akibat baris keuangan Lazada yang terbit susulan.",
+      "hash": "fdd91a812124d7bedaf726499e378abc91771b1b4eb2e587006bdfd65730159f",
+      "ukuran_kb": 8.3,
+      "ringkasan": "Menjawab: kenapa receipt Lazada di Accurate bisa berbeda dari uang yang benar-benar cair, dasar angka mana yang harus dipakai untuk cheque (payout, bukan hitungan per-order), dan bagaimana selisihnya ditandai di layar INC. Juga menjelaskan sebab pergeseran antar hari (baris keuangan Lazada yang terbit susulan), pemetaan akun biaya menurut sheet Mapping COA Finance, serta pertanyaan terbuka yang menunggu Finance (akun sementara selisih, ambang selisih, nasib receipt lama).",
       "kata_kunci": [
-        "ADR 0162",
-        "receipt Lazada",
+        "receipt",
+        "Lazada",
         "payout",
         "chequeAmount",
         "selisih",
         "uang cair",
+        "INC",
         "Accurate",
-        "Finance",
-        "affiliate fee",
-        "rekonsiliasi",
-        "BHA-297"
+        "biaya affiliate",
+        "Mapping COA",
+        "BHA-297",
+        "integration-service"
       ]
     },
     {

@@ -1,6 +1,6 @@
 # ADR - 0162 Receipt Lazada Mengikuti Uang yang Benar-benar Cair, Selisih terhadap Hitungan Order Ditandai
 
-> **Status**: 🟡 **Diusulkan**, 2026-10-09, oleh agent (AI Engineering Loop) atas jawaban tim Finance tanggal yang sama. **Belum Diterima**: butir 1 dan 2 adalah jawaban Finance; bentuk penanda, akun penempatan selisih, dan perlakuan receipt lama (§ Pertanyaan Terbuka) menunggu keputusan Finance dan persetujuan Tech Development. Belum ada kode. Nomor 0162 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.
+> **Status**: 🟡 **Diusulkan**, 2026-10-09, oleh agent (AI Engineering Loop) atas jawaban tim Finance tanggal yang sama. **Belum Diterima**: butir 1 sampai 5 di § Decision adalah jawaban Finance (dua yang terakhir, 2026-10-09 siang); akun untuk selisih yang jenis biayanya belum terbaca, ambang selisih, dan perlakuan receipt lama (§ Pertanyaan Terbuka) menunggu keputusan Finance dan persetujuan Tech Development. Belum ada kode. Nomor 0162 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.
 
 %% Status di blockquote atas supaya terbaca VAULT-INDEX.json (15 baris pertama). %%
 
@@ -14,7 +14,9 @@
 
 **Yang berubah bagi Finance.** Angka kas di penerimaan cocok dengan uang yang masuk. Selisih tidak lagi hilang diam-diam; ia muncul sebagai tanda untuk diperiksa.
 
-**Yang belum diputuskan.** Ke akun mana selisih dibukukan sementara, seperti apa tandanya, dan bagaimana penerimaan lama yang sudah terkirim dibereskan (§ Pertanyaan Terbuka).
+**Sudah diputuskan Finance juga.** Biaya ditempatkan ke akun menurut jenisnya (sheet pemetaan COA Finance, yang sudah dipakai sistem), dan tanda selisih tampil di layar INC.
+
+**Yang belum diputuskan.** Akun sementara untuk selisih yang jenis biayanya belum terbaca (usulan: Beban Admin E-Commerce), ambang selisih yang ditandai, dan bagaimana penerimaan lama yang sudah terkirim dibereskan (§ Pertanyaan Terbuka).
 
 ## Deskripsi
 
@@ -36,13 +38,15 @@
 1. **Cheque receipt Lazada = payout (uang yang benar-benar cair)**, bukan jumlah hitungan per-order. (Finance, 2026-10-09.)
 2. **Bila payout berbeda dari jumlah hitungan per-order, selisihnya ditandai** supaya Finance dapat memeriksa penempatan biayanya. Penanda **tidak menahan** receipt: uang yang benar-benar masuk tetap dibukukan. (Finance, 2026-10-09.)
 3. Tidak ada syarat tambahan dari Finance. (Finance, 2026-10-09.)
+4. **Akun penempatan biaya berbeda tergantung jenis biayanya, mengikuti sheet "Mapping COA" Finance**: 6112 Beban Admin E-Commerce (komisi, biaya transaksi, order processing, penyesuaian komisi debit dan kredit, Lazada Funded Commission), 6113 Potongan Afiliasi E-Commerce (biaya afiliasi bersponsor), 6114 Beban Ongkir E-Commerce (Free Shipping Max), 4003 Potongan Penjualan (diskon, LazKoin, price cut, co-fund kedua sisi, seluruh biaya promosi, voucher max), dan klaim barang hilang diperlakukan seperti uang masuk biasa. (Finance, 2026-10-09; sheet berisi 19 jenis biaya.) **Pemetaan ini sudah dipakai kode** (`KlasifikasiFeeLazada`, dari sheet yang sama yang diterima 2026-09-07), jadi bagian ini tidak butuh perubahan kode. Yang baru hanya menyangkut selisih yang jenis biayanya BELUM terbaca (§ Pertanyaan Terbuka 1).
+5. **Penanda selisih tampil di layar INC.** (Finance, 2026-10-09.)
 
 ## Pertanyaan Terbuka
 
-Tidak diisi dengan tebakan; tiap butir butuh jawaban sebelum kode ditulis.
+Tidak diisi dengan tebakan; tiap butir butuh jawaban sebelum kode ditulis. Dua yang tadinya terbuka sudah dijawab Finance (akun per jenis biaya, penanda di layar INC; butir 4 dan 5 di atas).
 
-1. **Akun penempatan selisih** (Finance). Karena jumlah pembayaran per faktur harus sama dengan cheque, selisih payout terhadap hitungan perlu dibukukan ke satu akun sementara. Akun mana, dan apakah sama untuk semua sebab selisih atau berbeda per jenis biaya?
-2. **Bentuk penanda** (Finance + Tech). Pilihan yang masuk akal: field di receipt yang tampil di layar receipt atau Kotak Adopsi, pesan lewat notifier yang sudah ada, atau keduanya. Penanda bukan `hold_reason`, karena menahan berarti uang nyata tidak terbukukan.
+1. **Akun untuk selisih yang jenis biayanya belum terbaca** (Finance). Pemetaan per jenis biaya hanya berlaku bila baris biayanya sudah diketahui sistem. Selisih yang muncul justru karena barisnya BELUM terbaca (susulan), sehingga jenisnya tidak diketahui. Karena jumlah pembayaran per faktur harus sama dengan cheque, selisih itu perlu dibukukan ke satu akun sementara sampai barisnya terbaca. Usulan: **6112 Beban Admin E-Commerce**, sama dengan akun bawaan sistem untuk biaya yang tak dikenal (`KlasifikasiFeeLazada`), lalu dipindahkan Finance ke akun yang tepat setelah penandanya diperiksa. Butuh konfirmasi Finance.
+2. ~~**Bentuk penanda**~~ Terjawab: tampil di layar INC (butir 5). Yang tersisa untuk Tech: letak persisnya di layar (kolom, label, atau detail), dan apakah ada pesan notifikasi tambahan.
 3. **Ambang selisih yang ditandai**. Usulan: sama dengan ambang debu-float yang dipakai jalur receipt (Rp0,5), supaya pembulatan tidak membanjiri penanda.
 4. **Receipt Lazada yang sudah terkirim** dengan angka lama. Tidak diubah otomatis (konsisten keputusan 2026-09-29); apakah dibereskan lewat Retry per dokumen atau koreksi manual Finance belum diputuskan. Belum diukur apakah penghitungan ulang sejak 2026-09-29 sudah menutup sebagian selisih yang diukur.
 
