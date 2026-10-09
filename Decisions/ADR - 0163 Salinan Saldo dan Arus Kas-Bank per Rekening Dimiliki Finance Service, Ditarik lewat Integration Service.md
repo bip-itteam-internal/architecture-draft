@@ -1,6 +1,6 @@
 # ADR - 0163 Salinan Saldo dan Arus Kas-Bank per Rekening Dimiliki Finance Service, Ditarik lewat Integration Service
 
-> **Status**: 🟢 Diterima, 2026-10-09, oleh wirkancil sebagai Pemutus bip-erp#2880 (aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Bentuknya dipilih di sesi brainstorming 2026-10-09, sesudah pengukuran ke Accurate prod (baca saja) dan `origin/main` hari itu. 🟡 **Belum berjalan**: per 2026-10-09 backend-nya baru dikerjakan di branch (bip-erp#2880), belum merged; layarnya erp-frontend#2235 menyusul.
+> **Status**: 🟢 Diterima, 2026-10-09, oleh wirkancil sebagai Pemutus bip-erp#2880 (aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Bentuknya dipilih di sesi brainstorming 2026-10-09, sesudah pengukuran ke Accurate prod (baca saja) dan `origin/main` hari itu. 🟡 **Belum berjalan**: per 2026-10-09 backend-nya berupa PR terbuka (bip-erp#2896 untuk bip-erp#2880), belum merged dan belum pernah dijalankan terhadap Mongo maupun Accurate sungguhan; layarnya erp-frontend#2235 menyusul. Ukur ulang sebelum mengandalkan kalimat ini.
 
 ## Untuk Manajemen
 
@@ -38,7 +38,7 @@ Dibaca dari `bip-erp` `origin/main` dan diukur ke Accurate prod (baca saja) pada
 
 - **Saldo** semua akun neraca tersedia dalam satu panggilan Accurate lewat integration `GET /accounting/account-balance`. Rute itu tidak mengenal entitas.
 - **Arus** hanya tersedia per akun (`glaccount/history.do`, lewat integration `GET /accounting/riwayat-akun`). Satu rekening satu panggilan, tanpa paginasi. Menarik seluruh rekening saat layar dibuka melewati batas 30 detik gateway.
-- **Pemilik rekening hanya diketahui finance-service, dan jenisnya tiga**: CV lewat `akun_accurate_no` di master entitas; PT Bharata lewat lingkup Rekonsiliasi Bank (`rekon_bank_lingkup.go`: `rekening_bayar` digabung anak langsung akun 1200, tanpa 1224); dan PT lain (PT01 sampai PT21) lewat `kandidatPemilikRekeningPT`, yang memasangkan rekening anak 1298 ke entitas lewat nama. Aturan terakhir sudah dipakai kop BKK dan transfer AP; komentarnya sendiri melarang aturan kedua.
+- **Pemilik rekening hanya diketahui finance-service, dan jenisnya tiga**: CV lewat `akun_accurate_no` di master entitas; PT Bharata lewat pohon rekening Rekonsiliasi Bank (`rekeningDiBawahKasDiBank` di `rekon_bank_sumber.go`: akun daun yang menjadi anak langsung akun 1200, tanpa 1224); dan PT lain (PT01 sampai PT21) lewat `kandidatPemilikRekeningPT`, yang memasangkan rekening anak 1298 ke entitas lewat nama. Aturan terakhir sudah dipakai kop BKK dan transfer AP; komentarnya sendiri melarang aturan kedua.
 - **Terukur**: 87 rekening milik 62 entitas (26 PT Bharata, 21 PT lain, 40 CV); 21 dari 21 PT lain cocok tepat satu rekening. Satu penyegaran bulan berjalan berarti 87 panggilan riwayat ditambah panggilan saldo.
 - **Batas laju Accurate berlaku per token.** Token utama dipakai lebih dari satu service dengan pembatas yang tidak saling tahu; integration-service menggilir lima token untuk semua pekerjaannya. Riwayat pekerjaan Accurate tujuh hari terakhir tidak mencatat penolakan batas laju (pekerjaan yang menelan galatnya sendiri tidak terlihat di catatan itu).
 - **Finance-service sudah menarik buku Accurate per rekening** untuk Rekonsiliasi Bank lewat antarmuka `SumberRekon`, dan sudah punya penjadwal berbasis ticker (`rekon_bank_jadwal.go`).
@@ -46,11 +46,11 @@ Dibaca dari `bip-erp` `origin/main` dan diukur ke Accurate prod (baca saja) pada
 
 ## Decision
 
-- **K1. Pemilik salinan: finance-service.** Satu dokumen per rekening per bulan: saldo awal, uang masuk, uang keluar, saldo akhir, waktu disalin. Uang masuk adalah jumlah debit dan uang keluar jumlah kredit pada buku akun itu.
-- **K2. Pengelompokan ke entitas dihitung saat dibaca**, tidak disimpan. Master entitas tetap satu-satunya tempat fakta "rekening ini milik siapa"; perubahannya langsung terlihat tanpa menarik ulang.
+- **K1. Pemilik salinan: finance-service.** Fakta disimpan per rekening per bulan: saldo awal, uang masuk, uang keluar, saldo akhir, waktu disalin. Uang masuk adalah jumlah debit dan uang keluar jumlah kredit pada buku akun itu. Seluruh rekening satu bulan ditulis sebagai **satu dokumen** dalam satu operasi, supaya pembaca hanya pernah melihat salinan lama yang utuh atau salinan baru yang utuh.
+- **K2. Pengelompokan ke entitas dihitung saat dibaca**, tidak disimpan. Master entitas tetap satu-satunya tempat fakta "rekening ini milik siapa"; perubahannya langsung terlihat tanpa menarik ulang. Rute baca **tidak memanggil integration-service maupun Accurate**: struktur bagan akun yang dibutuhkan untuk menentukan pemilik ikut disimpan bersama salinan saat penyegaran.
 - **K3. Penarikan wajib lewat integration-service**, memakai rute yang sudah ada. Finance-service tidak membuat sambungan Accurate sendiri.
 - **K4. Jadwal.** Bulan berjalan tiap 2 jam antara 07.00 dan 19.00 WIB, setiap hari. Tiga bulan sebelumnya sekali tiap dini hari, untuk menangkap jurnal susulan. Bulan di luar jendela itu membeku pada salinan terakhirnya.
-- **K5. Tombol Segarkan** tersedia bagi semua pembaca. Rutenya menjawab seketika dan menolak bila penyegaran sedang berjalan.
+- **K5. Tombol Segarkan** tersedia bagi semua pembaca dan menyalin ulang **satu bulan** (yang sedang dilihat; bawaannya bulan berjalan). Rutenya menjawab seketika dan menolak bila penyegaran sedang berjalan.
 - **K6. Pelan dan mengalah.** Sekitar 2 panggilan per detik. Bila Accurate menolak karena batas laju, penyegaran berhenti, salinan terakhir tetap dipakai beserta jamnya, dan dicoba lagi di jadwal berikutnya.
 - **K7. Izin baca dan Segarkan: `finance.accounting.view`**, sama dengan menu Tim Accounting. Pemegangnya sudah bisa membaca saldo seluruh akun lewat laporan yang ada, jadi izin baru tidak menambah perlindungan.
 - **K8. Semua entitas di master ikut**, termasuk PT01 sampai PT21, lewat `kandidatPemilikRekeningPT` yang sudah ada. Rekening PT Bharata mengikuti lingkup Rekonsiliasi Bank (seluruh rekening bank PT, bukan rekening pembayar BKK saja), supaya aturan rekening PT Bharata tetap satu. Master tidak diisi ulang dan tidak ada aturan pasangan kedua. Entitas yang rekeningnya tidak ditemukan, atau rekening yang diklaim lebih dari satu entitas, tampil berketerangan.
@@ -71,6 +71,8 @@ Pilihan yang ditolak:
 - **Pasangan PT lain bergantung pada kesamaan nama** antara master dan akun Accurate. Mengganti nama di salah satu sisi membuat PT itu tampil "rekening tidak ditemukan". Kerapuhan ini diwarisi dari aturan yang ada, bukan diperkenalkan di sini.
 - **Bulan di luar jendela membeku.** Jurnal susulan yang dibukukan lebih dari tiga bulan ke belakang tidak mengubah angka bulan itu di layar.
 - **Beban ke Accurate** sekitar 87 panggilan tiap penyegaran bulan berjalan, tujuh kali sehari, ditambah tiga bulan sebelumnya tiap dini hari. Karena lewat integration-service, bebannya terbagi ke kelima token.
+- **Segarkan dua kali dalam 10 menit memberi data yang sama.** Integration-service menyimpan jawaban Accurate selama 10 menit, dan salinan ini tidak melewatinya. Karena saldo dan mutasi di-cache terpisah, saldo akhir rekening yang punya mutasi diambil dari baris mutasi terakhir, bukan dari saldo neraca.
+- **Ada jalur kedua untuk angka total kas-bank**: procurement-service membaca total saldo kas dan bank langsung dari Accurate untuk dasbor lain. Kedua angka bisa berselisih sampai dua jam; penyatuannya di luar keputusan ini.
 - **Angka per entitas tidak sama dengan total kas-bank Accurate.** Selisihnya dijelaskan baris "kas dan bank lain" (K9); tanpa baris itu pembaca yang membandingkan dengan neraca akan menduga ada yang hilang.
 
 ## Belum diputuskan
