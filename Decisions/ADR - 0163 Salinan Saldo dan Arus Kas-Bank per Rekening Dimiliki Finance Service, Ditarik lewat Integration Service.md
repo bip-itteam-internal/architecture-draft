@@ -1,6 +1,6 @@
 # ADR - 0163 Salinan Saldo dan Arus Kas-Bank per Rekening Dimiliki Finance Service, Ditarik lewat Integration Service
 
-> **Status**: 🟢 Diterima, 2026-10-09, oleh wirkancil sebagai Pemutus bip-erp#2880 (aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Bentuknya dipilih di sesi brainstorming 2026-10-09, sesudah pengukuran ke Accurate prod (baca saja) dan `origin/main` hari itu. 🟡 **Belum berjalan**: per 2026-10-09 backend-nya berupa PR terbuka (bip-erp#2896 untuk bip-erp#2880), belum merged dan belum pernah dijalankan terhadap Mongo maupun Accurate sungguhan; layarnya erp-frontend#2235 menyusul. Ukur ulang sebelum mengandalkan kalimat ini.
+> **Status**: 🟢 Diterima, 2026-10-09, oleh wirkancil sebagai Pemutus bip-erp#2880 (aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Bentuknya dipilih di sesi brainstorming 2026-10-09, sesudah pengukuran ke Accurate prod (baca saja) dan `origin/main` hari itu. ⚠️ **Sebagian berjalan**: backend-nya (bip-erp#2896) merged dan berjalan di prod sejak 2026-10-09 sore, dengan jadwal lama tiap 2 jam; perubahan jadwal ke jam tetap pagi dan sore (K4, bip-erp#2903) dan layarnya (erp-frontend#2235) masih dikerjakan per 2026-10-09. Ukur ulang sebelum mengandalkan kalimat ini.
 
 ## Untuk Manajemen
 
@@ -8,7 +8,7 @@
 
 Aturan yang dijaga sistem:
 
-- Angkanya **salinan dari Accurate**, tidak pernah diketik orang. Bulan berjalan disegarkan tiap 2 jam antara 07.00 dan 19.00 WIB; tiga bulan sebelumnya sekali tiap dini hari.
+- Angkanya **salinan dari Accurate**, tidak pernah diketik orang. Bulan berjalan disegarkan dua kali sehari pada jam tetap, 07.00 dan 16.00 WIB; tiga bulan sebelumnya sekali tiap dini hari.
 - Salinan yang belum ada atau gagal diambil tampil sebagai **keterangan**, tidak pernah sebagai Rp 0.
 - CV atau PT yang rekeningnya tidak ditemukan di Accurate **disebut**, tidak diam-diam dilewati.
 
@@ -16,7 +16,7 @@ Aturan yang dijaga sistem:
 
 **Apa yang TIDAK dijanjikan.**
 
-- **Bukan angka detik ini.** Pada jam kerja umurnya paling lama sekitar 2 jam; di luar itu bisa sampai pagi berikutnya. Tombol Segarkan mengambil ulang saat itu juga.
+- **Bukan angka detik ini.** Di antara dua jam tetap itu angkanya hanya berubah bila ada yang menekan Segarkan, jadi umurnya bisa sampai sembilan jam di siang hari dan sampai pagi berikutnya sesudah sore. Tombol Segarkan mengambil ulang saat itu juga.
 - **Bukan mutasi bank.** Ini buku Accurate. Selisihnya dengan rekening koran tetap urusan layar Rekonsiliasi Bank.
 - Tidak ada rincian transaksi per rekening di tab ini.
 - Uang masuk dan keluar **tidak** dihitung untuk "kas dan bank lain"; yang tampil hanya saldonya.
@@ -49,7 +49,7 @@ Dibaca dari `bip-erp` `origin/main` dan diukur ke Accurate prod (baca saja) pada
 - **K1. Pemilik salinan: finance-service.** Fakta disimpan per rekening per bulan: saldo awal, uang masuk, uang keluar, saldo akhir, waktu disalin. Uang masuk adalah jumlah debit dan uang keluar jumlah kredit pada buku akun itu. Seluruh rekening satu bulan ditulis sebagai **satu dokumen** dalam satu operasi, supaya pembaca hanya pernah melihat salinan lama yang utuh atau salinan baru yang utuh.
 - **K2. Pengelompokan ke entitas dihitung saat dibaca**, tidak disimpan. Master entitas tetap satu-satunya tempat fakta "rekening ini milik siapa"; perubahannya langsung terlihat tanpa menarik ulang. Rute baca **tidak memanggil integration-service maupun Accurate**: struktur bagan akun yang dibutuhkan untuk menentukan pemilik ikut disimpan bersama salinan saat penyegaran.
 - **K3. Penarikan wajib lewat integration-service**, memakai rute yang sudah ada. Finance-service tidak membuat sambungan Accurate sendiri.
-- **K4. Jadwal.** Bulan berjalan tiap 2 jam antara 07.00 dan 19.00 WIB, setiap hari. Tiga bulan sebelumnya sekali tiap dini hari, untuk menangkap jurnal susulan. Bulan di luar jendela itu membeku pada salinan terakhirnya.
+- **K4. Jadwal.** Bulan berjalan dua kali sehari pada jam tetap, 07.00 dan 16.00 WIB, setiap hari. Tiga bulan sebelumnya sekali tiap dini hari, untuk menangkap jurnal susulan. Bulan di luar jendela itu membeku pada salinan terakhirnya. *Diubah Pemutus 2026-10-09 malam, sesudah melihat jadwal semula (tiap 2 jam sejak salinan terakhir, antara 07.00 dan 19.00) berjalan di prod: jamnya bergeser mengikuti kapan service naik dan Accurate dipanggil sampai tujuh kali sehari, padahal tokennya dipakai bersama pihak lain. Jam 07.00 dan 16.00 adalah usulan pelaksana atas keputusan "pagi dan sore".*
 - **K5. Tombol Segarkan** tersedia bagi semua pembaca dan menyalin ulang **satu bulan** (yang sedang dilihat; bawaannya bulan berjalan). Rutenya menjawab seketika dan menolak bila penyegaran sedang berjalan.
 - **K6. Pelan dan mengalah.** Sekitar 2 panggilan per detik. Bila Accurate menolak karena batas laju, penyegaran berhenti, salinan terakhir tetap dipakai beserta jamnya, dan dicoba lagi di jadwal berikutnya.
 - **K7. Izin baca dan Segarkan: `finance.accounting.view`**, sama dengan menu Tim Accounting. Pemegangnya sudah bisa membaca saldo seluruh akun lewat laporan yang ada, jadi izin baru tidak menambah perlindungan.
@@ -60,7 +60,8 @@ Pilihan yang ditolak:
 
 - **Salinan di integration-service.** Sejalan dengan salinan Accurate lain dan mesin jadwalnya sudah ada, tetapi ia tidak mengenal entitas, sehingga dua service harus berubah dan aturan pemilik rekening terancam tersalin.
 - **Tarik langsung saat layar dibuka.** Melewati batas waktu gateway dan membebani token tiap kali halaman dibuka.
-- **Sekali sehari saja.** Lebih ringan, tetapi angka siang hari selalu angka kemarin. Selisih bebannya terukur kecil.
+- **Sekali sehari saja.** Lebih ringan, tetapi angka siang hari selalu angka kemarin.
+- **Tiap 2 jam pada jam kerja** (keputusan semula, sempat berjalan di prod): diganti jam tetap pagi dan sore, lihat K4.
 - **Izin khusus.** Baru berarti bila laporan saldo yang sudah ada ikut ditutup.
 - **Mengisi `akun_accurate_no` PT01 sampai PT21.** Melahirkan tempat kedua untuk fakta yang sudah diturunkan `kandidatPemilikRekeningPT`.
 
@@ -70,7 +71,7 @@ Pilihan yang ditolak:
 - **Finance-service tidak punya mesin job seperti integration-service.** Penjadwalnya ticker seperti Rekonsiliasi Bank, dan riwayat penyegarannya tidak masuk `workers.worker_history`. Keadaan penyegaran (sedang berjalan, galat terakhir) harus ikut di respons rute baca supaya terlihat tanpa membuka log.
 - **Pasangan PT lain bergantung pada kesamaan nama** antara master dan akun Accurate. Mengganti nama di salah satu sisi membuat PT itu tampil "rekening tidak ditemukan". Kerapuhan ini diwarisi dari aturan yang ada, bukan diperkenalkan di sini.
 - **Bulan di luar jendela membeku.** Jurnal susulan yang dibukukan lebih dari tiga bulan ke belakang tidak mengubah angka bulan itu di layar.
-- **Beban ke Accurate** sekitar 87 panggilan tiap penyegaran bulan berjalan, tujuh kali sehari, ditambah tiga bulan sebelumnya tiap dini hari. Karena lewat integration-service, bebannya terbagi ke kelima token.
+- **Beban ke Accurate** sekitar 87 panggilan tiap penyegaran bulan berjalan, dua kali sehari, ditambah tiga bulan sebelumnya tiap dini hari. Terukur di prod 2026-10-09: satu penyegaran selesai dalam sekitar 45 detik tanpa penolakan batas laju. Karena lewat integration-service, bebannya terbagi ke kelima token.
 - **Segarkan dua kali dalam 10 menit memberi data yang sama.** Integration-service menyimpan jawaban Accurate selama 10 menit, dan salinan ini tidak melewatinya. Karena saldo dan mutasi di-cache terpisah, saldo akhir rekening yang punya mutasi diambil dari baris mutasi terakhir, bukan dari saldo neraca.
 - **Ada jalur kedua untuk angka total kas-bank**: procurement-service membaca total saldo kas dan bank langsung dari Accurate untuk dasbor lain. Kedua angka bisa berselisih sampai dua jam; penyatuannya di luar keputusan ini.
 - **Angka per entitas tidak sama dengan total kas-bank Accurate.** Selisihnya dijelaskan baris "kas dan bank lain" (K9); tanpa baris itu pembaca yang membandingkan dengan neraca akan menduga ada yang hilang.
