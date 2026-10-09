@@ -94,6 +94,13 @@
   (§ Penyajian laporan). Alat `aset_tetap` dan `ppn_masukan` ada (§ Paket tool di luar HRGA dan marketing, butir terbuka 2),
   dan Jadwal Tugas hidup di backend dan layar (§ Jadwal Tugas). Panduan gayanya untuk alat berikutnya:
   [[REF - Penyajian Laporan Copilot]]. ⚠️ Belum ada uji end-to-end lewat gateway maupun pengukuran PROD atas gelombang ini.
+  **Sinkron 2026-10-09 (diukur ke `origin/main` bip-erp `8a1f9905` dan erp-frontend `0c96129b0`; PR merged 2026-10-08 malam
+  sampai 2026-10-09: bip-erp #2829, #2863, #2870; erp-frontend #2210, #2213, #2227, #2228, #2229, #2236)**: alat baru
+  `ringkasan_kehadiran` dan saringan `jenis`/`subtipe` di `cuti_tim` (§ Tool gelombang 2026-10-09); prompt aturan 15 dan
+  penjaga `tabel_diketik` (§ Penjaga jawaban sisi server); butir dan paragraf AI dipotong di akhir kalimat (§ Penyajian
+  laporan); di layar, katalog pertanyaan per departemen menjadi tampilan awal, saran jadwal, dan latar animasi
+  (§ Layar Copilot). Kelas kekurangan yang terbaca dari kode dicatat di § Kekurangan yang diketahui (2026-10-09).
+  ⚠️ Belum ada uji end-to-end lewat gateway maupun pengukuran PROD atas gelombang ini; yang terbukti kode dan test di repo.
 - **Stack**: Go, `net/http` langsung (klien tipis hand-roll, BUKAN SDK Anthropic — divalidasi
   2026-09-28, lihat
   [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]]
@@ -180,9 +187,14 @@ Satu tool per endpoint baca, sekitar delapan sampai dua belas untuk irisan perta
 (sesudah #2464) ada 51 tool.~~ ~~Per 2026-10-02 (sesudah #2474, #2475,
 #2484) ada 62 tool.~~ ~~Per 2026-10-02 (sesudah #2510 dan #2535) ada 97 tool.~~
 
-⚠️ **Angka 113 di bawah diukur 2026-10-07 dan belum diukur ulang.** Sesudahnya `DaftarAkuntansi` bertambah dari 5 menjadi 7
-alat (`aset_tetap`, `ppn_masukan`; `alat_akuntansi.go` pada `origin/main` `ff3ea482`, bip-erp #2728). Daftar lain tidak
-dihitung ulang pada sinkron 2026-10-08, jadi jumlah terkini **TBD** sampai test pencacah dijalankan lagi.
+**Per 2026-10-09 (dibaca dari `origin/main` bip-erp `8a1f9905`) ada 116 tool yang ditawarkan ke model.** Cara
+menghitung kali ini **membaca elemen daftar di kode**, bukan menjalankan test pencacah seperti 2026-10-07: 3 tool lama
+(`daftarAlat()` di `tanya.go`), 12 marketing (`alatMarketing()` di `main.go`), dan 101 lewat 17 fungsi `Daftar*` yang dirakit
+`alatHrga()`: Kepegawaian 7, Presensi **6**, Payroll 4, RekrutmenGA 10, KPIInsentif 7, Jadwal 6, PelatihanDokumen 8,
+HubunganIndustrial 11, Finance 4, Akuntansi **7**, Tiket 4, Procurement 5, Gudang 4, Manufaktur 7, LintasModul 6,
+HeadcountAset 4, RingkasanHarian 1. 3 + 12 + 101 = **116**. Selisih dari 113: `aset_tetap` dan `ppn_masukan` (bip-erp #2728)
+dan `ringkasan_kehadiran` (bip-erp #2870). Keunikan nama tidak dicacah ulang; penjaganya tetap
+`TestDaftarAlat_NamaUnikDanHrgaLengkap`. Angka 113 di bawah dipertahankan sebagai riwayat.
 
 **Per 2026-10-07 (diukur ke `origin/main` bip-erp `5f4b0859`) ada 113 tool yang ditawarkan ke model, 113 nama unik.**
 Cara menghitung: test sementara di salinan `origin/main` (`git archive`, tidak di-commit) yang merakit `Penanya` persis
@@ -247,7 +259,8 @@ melihatnya karena belum sampai tahap HR.
 yang cuti minggu ini": `/request/view` hanya memuat pengajuan yang pernah ditinjau pemanggil.
 Cakupan "tim" sama persis dengan `rekap_telat_tim`, rentang maks 62 hari, hanya status menunggu dan
 disetujui, dan alasan/lampiran pengajuan tidak pernah dikirim. ⚠️ **Belum diuji end-to-end di DEV**
-(per 2026-09-30).
+(per 2026-09-30). Sejak 2026-10-09 (bip-erp #2863) alat ini punya saringan `jenis` dan `subtipe` serta ringkasan yang
+dihitung sistem; lihat § Tool gelombang 2026-10-09.
 
 ### Tool marketing (2026-09-30, bip-erp #2367 + #2374, erp-frontend #1906 + #1910)
 
@@ -701,6 +714,71 @@ dan **`analisa_ai` serta paragraf penjelasan per grafik ikut ditutup** (keduanya
 `TestRekapUmpan_PenjelasanIkutDitutup`). **`komponen_gaji` sengaja tidak**
 ditutup (isinya master tanpa nominal per orang, komentar kode). Daftar ini satu-satunya; § Rekap umpan menaut ke sini.
 
+### Tool gelombang 2026-10-09 (bip-erp #2863 dan #2870, merged)
+
+Dua perubahan ini lahir dari satu kejadian PROD 2026-10-09 (dicatat di komentar `cuti_tim.go`, `tanya.go`, dan
+`uji/pertanyaan-tetap.json`): pertanyaan "izin yang subtipenya tidak masuk kerja saja" untuk satu periode gaji dijawab
+`cuti_tim` dengan 235 catatan campuran, karena alat itu belum punya saringan jenis walau sumber mengirim jenis dan
+subtipenya. Model lalu menyaring barisnya sendiri, mengetik tabelnya sebagai teks, dan menghitungnya sendiri: 50 di satu
+jawaban, 60 di jawaban berikutnya untuk data yang sama. Untuk "izin dibagi total hari kerja" ia menjumlah dan membagi sendiri
+angka `rekap_kehadiran` dan menghasilkan 3,64% dengan pembilang yang salah.
+
+**`cuti_tim`: saringan dan ringkasan** (`internal/alat/cuti_tim.go`).
+
+- Argumen baru `jenis[]` dan `subtipe[]`. Nilai sahnya **diturunkan dari katalog attendance di shared-library**
+  (`attendance.LeaveTypes`, `attendance.LeaveSubtypes`, katalog yang sama dengan yang memvalidasi pengajuan), jadi tak ada
+  daftar kedua; kodenya turunan mekanis dari nama katalog (`kodeNilaiCuti`, mis. "Tidak masuk kerja" menjadi
+  `tidak_masuk_kerja`), ejaan sumber tidak dibetulkan. Dua subtipe yang sudah dicabut dari katalog tetapi masih ada di catatan
+  lama tetap bisa disaring (`subtipeCutiLama`). Nilai di luar daftar ditolak sebagai `argumen_tidak_sah` **sebelum**
+  permintaan keluar: saringan yang diam-diam diabaikan mengembalikan kejadian di atas.
+- Saringan diterapkan **alat** atas seluruh baris sumber, sebelum ringkasan, data untuk model, dan blok dibuat; ketiganya
+  berangkat dari slice yang sama. Bila `jenis` dan `subtipe` sama-sama diisi, catatan harus cocok dengan keduanya.
+- Tabel daftar mendapat kolom `subtipe`. Di depannya ada blok `kartu` berbagian `ringkasan_cuti` (`jumlah_catatan`,
+  `jumlah_hari_kalender`), lalu tabel kecil `cuti_per_jenis` dan `cuti_per_subtipe` yang hanya tampil bila berisi minimal 2
+  baris. Angka yang sama ikut ke model di kunci `ringkasan`, supaya ia menyebut ulang, bukan menghitung.
+- ⚠️ **`jumlah_hari_kalender` adalah hari kalender, bukan hari kerja**: sumber tidak mengirim hari kerja. Catatan yang
+  melewati batas rentang dipotong ke rentang; izin berjam tetap terhitung 1 hari; tanggal yang sama pada dua catatan terhitung
+  dua kali; hari yang tak bisa ditentukan = `null`, bukan 0.
+- Nol baris dibedakan: sumber memang kosong (`tidak_ada_data`) lawan tak satu pun cocok saringan
+  (`tidak_ada_yang_cocok_saringan`, kartu bercatatan `tak_cocok_saringan`). Yang kedua bukan bukti tak ada cuti sama sekali.
+- `Sumber.saringan[]` (`{kunci, nilai[]}`, field baru di `Sumber`) mencatat saringan isi yang benar-benar diterapkan alat;
+  layar menulisnya "disaring: ..." di keterangan sumber (erp-frontend #2227, `lib/keterangan-sumber.ts`). Bukan saringan
+  karyawan dan bukan rentang tanggal.
+
+**`ringkasan_kehadiran(periode?)`** (`internal/alat/ringkasan_kehadiran.go`, terdaftar di `DaftarPresensi`) membaca
+`GET /internal/summary` attendance (gerbang `common.RequireHRISStaff` di pendaftaran rute, `attendance/main.go`) dan
+meneruskan kunci `kehadiran`-nya **apa adanya**. Rumus tiap angka milik attendance, bukan alat:
+
+| Angka | Arti menurut sumber | Berkas sumber |
+|---|---|---|
+| `hari_kerja` | hari-orang yang menuntut kehadiran: hadir tepat waktu + terlambat + tanpa keterangan. Sakit, izin, cuti, dinas, libur, event perusahaan, libur pengganti tukar shift, dan pengajuan yang belum diputus **tidak** termasuk | `kehadiran_ringkas.go` (`statusHadir`, `statusTakDihitung`) |
+| `hadir` | hari berstatus tepat waktu atau terlambat | sama |
+| `persen_kehadiran` | (hari kerja dikurangi terlambat menurut **buku tamu security**) dibagi hari kerja; tanpa keterangan tidak mengurangi angka ini | `tercatat_security.go` (`terapkanTelatSecurity`) |
+| `terlambat` lawan `terlambat_sistem` | kejadian menurut buku tamu security lawan cacah status Terlambat di presensi; dua definisi, sengaja dikirim keduanya | `kehadiran_ringkas.go` (`AngkaKehadiran`) |
+| `izin_tidak_masuk` | hari berstatus Izin bersubtipe "Tidak masuk kerja" saja; berada **di luar** `hari_kerja` | `izin_tidak_masuk.go` |
+| `persen_izin_tidak_masuk` | izin tidak masuk dibagi hari kerja kali 100, satu desimal. Penyebutnya tidak memuat hari izin, jadi ini **rasio**, bukan porsi, dan secara teori bisa melampaui 100 | `izin_tidak_masuk.go` (`terapkanIzinTidakMasuk`) |
+
+Batasnya, semuanya dari kode:
+
+- **Hanya periode gaji 26-25, hanya seluruh perusahaan.** `periode` = `YYYY-MM` bulan tempat tanggal 25 penutupnya jatuh;
+  kosong = periode berjalan. Tak bisa dipecah per departemen, per orang, per jenis izin lain, atau per rentang tanggal bebas.
+- **Hanya untuk yang lolos `RequireHRISStaff`**; selain itu `tidak_berhak`. Alat tak menambah gerbang.
+- Periode berjalan dihitung sampai saat permintaan dan dibandingkan dengan jendela **sepanjang yang sama** di periode
+  sebelumnya; periode selesai dibandingkan penuh lawan penuh. Kartu periode berjalan bercatatan `periode_berjalan`.
+- Sumber diam-diam menjawab periode masa depan (dan periode tak terurai) dengan periode berjalan. Alat menolak format yang
+  salah sebelum memanggil, dan untuk periode masa depan menyuruh model mengatakan terus terang bahwa angkanya milik periode lain.
+- `kehadiran: null` di sumber berarti agregasinya gagal, bukan nol hari: status gagal, tanpa angka. Cacah yang gagal sendiri
+  (buku tamu, izin) tiba sebagai `null` dan menandai sumber `nilai tak diketahui`.
+- **Satu-satunya hitungan di alat**: selisih poin persen izin terhadap pembanding. Sumber mengirim `selisih_poin` hanya untuk
+  persen kehadiran, dan rumus alat menyalin rumus itu atas dua persen yang juga dari sumber.
+- Satuannya **hari-orang**, bukan hari kalender. Sengaja **tidak** masuk `alatJawabanTertutup` (agregat tanpa data per orang
+  dan tanpa uang; `ringkasan_kehadiran_tertutup_test.go`).
+- Deskripsi `rekap_kehadiran` kini mengarahkan pertanyaan persen ke alat ini dan melarang menjumlah atau membagi angkanya.
+
+`uji/pertanyaan-tetap.json` bertambah dua kasus dari kejadian itu (kini 40 kasus), dan pelari uji mendapat syarat baru
+`saringan_wajib`: alat harus dipanggil dengan saringan isi yang **persis** diminta, dibaca dari `Sumber.saringan`
+(`cmd/ujitetap/uji.go`). `tabel_diketik` masuk daftar penanda terlarang bawaan.
+
 ### Kontrak sumber dan blok (bip-erp #2570, #2571)
 
 - **Keterangan sumber seragam.** `Sumber` kini membawa `jumlah_baris`, `dari`, `sampai`, `lengkap`, diisi **terpusat** di
@@ -856,8 +934,10 @@ merged 2026-10-08, diukur ke `origin/main` `500ed91e`). Teks yang melampaui bata
 karakter; `maksRuneButirAnalisa`, `maksRunePenjelasan`) dipotong di akhir kalimat terakhir yang masih muat, tanpa elipsis;
 bila tak ada kalimat utuh yang muat, butir atau paragraf itu dibuang (`potongDiKalimat` di `analisa_ai.go`, dipakai
 `potongButirAnalisa` dan `potongPenjelasan`). Sebelum #2829 keduanya memotong di 200 dan 400 karakter lalu menempelkan
-elipsis. ⚠️ Berlaku sesudah `assistant-service` di-deploy. Bagian layar keputusan yang sama (nama kategori di sumbu grafik
-dibungkus, bukan dipotong elipsis) belum ada di `origin/main` erp-frontend.
+elipsis. ⚠️ Berlaku sesudah `assistant-service` di-deploy. Bagian layar keputusan yang sama sudah di `origin/main`
+erp-frontend untuk grafik batang (erp-frontend #2210: nama kategori dibungkus lewat `bungkusLabel` di `lib/visual-blok.ts`);
+legend donat dan label sumbu radar masih memakai pemotong lama (`grafik-jenis.tsx`), lihat
+[[REF - Penyajian Laporan Copilot]] §5.
 
 **Layar dan unduhan** (erp-frontend `src/features/copilot/`):
 
@@ -892,12 +972,31 @@ dibungkus, bukan dipotong elipsis) belum ada di `origin/main` erp-frontend.
 
 - **Saran lanjutan dan chip saran tidak disaring per alat.** Satu-satunya aturan akses di layar adalah `GET /akses`, yang
   hanya membalas `{boleh}` (`main.go:88-89`); saran untuk alat yang tak boleh dipakai penanya tetap tampil, dan baru ditolak
-  backend (`tidak_berhak`) saat ditanyakan (`lib/saran-lanjutan.ts`, kepala berkas).
+  backend (`tidak_berhak`) saat ditanyakan (`lib/saran-lanjutan.ts`, kepala berkas). Sejak 2026-10-09 chip saran di
+  tampilan awal diganti katalog pertanyaan, yang juga hanya diurutkan dan tidak disaring per alat (§ Layar Copilot).
 - **`bukti_kpi` tidak dibuat** (`git grep bukti_kpi` di `services/assistant` nol hasil); alasan pengerjanya: sumbernya
   menyempit diam-diam menurut penanya. `kpi/evidence` tetap di § Sumber yang sengaja dilewati.
 - **BPJS hanya "nomor tercatat atau belum"**, bukan status kepesertaan (batas data sumber, `bpjs_karyawan.go`).
 - **Penyusutan hanya keadaan saat ini**: tak ada penyusutan per bulan lampau; dan cakupan sumbernya belum mengecualikan aset
   yang di-soft-delete ([[Microservices - Inventory Service]]).
+
+### Kekurangan yang diketahui (2026-10-09)
+
+Kelas kekurangan yang terbaca dari kode `origin/main` bip-erp `8a1f9905`. Tiap contoh di bawah dibuka sendiri di kode saat
+dokumen ini ditulis; ini **bukan** daftar lengkap, dan hal yang menyangkut hak akses sengaja tidak dicatat di vault (repo
+publik; tempatnya issue privat repo kode).
+
+| Kelas | Contoh yang diverifikasi di kode | Status |
+|---|---|---|
+| **"Bulan ini" berarti hal berbeda antar alat**, sementara prompt aturan 5 menyuruh mengosongkan periode untuk "bulan ini" | Periode kosong = **30 hari terakhir** di alat marketing (`SaringanMarketing`, `marketing.go`); = **periode gaji berjalan** di `rekap_telat_tim` dan `ringkasan_kehadiran`; = **hari ini** di `cuti_tim`; = **bulan berjalan** di `kpi_ringkasan_departemen` dan `ppn_masukan`; = **semua bulan** (1.000 terbaru) di `komplain_gudang`; = **seluruh riwayat** di `status_antrean_gudang` | 🟡 Terbuka di backend. Di layar, katalog menghindarinya dengan menyebut periode eksplisit dan `PERIODE_ALAT` melarang kartu tanpa periode untuk alat marketing dan antrean gudang; pertanyaan yang **diketik** tetap kena |
+| **Penjaga hanya menjaga rupiah dan bentuk tabel** | Angka tanpa `Rp`, persentase, rasio, dan hitungan di dalam kalimat tidak diperiksa (§ Penjaga jawaban sisi server, Batas yang diketahui) | 🟡 Terbuka. Penahannya hari ini aturan 15 dan alat yang menghitung di sumber, bukan penjaga |
+| **Angka yang sudah dihitung sumber tetapi belum dipakai alat** | `GET /accounting/anggaran/varians` (anggaran lawan realisasi) belum dijadikan alat; komentar `akt_anggaran_mingguan.go` dan `alat_akuntansi.go` menyatakan halangan lamanya sudah tak ada dan pengerjaannya pekerjaan tersendiri | 🟡 Terbuka |
+| **Hitungan yang wajar diminta tetapi tak dikirim sumber** | `cuti_tim` hanya bisa menghitung hari **kalender** karena `/cuti/tim` tak mengirim hari kerja; `ringkasan_kehadiran` tak bisa dipecah per departemen atau per orang karena sumbernya satu angka perusahaan | 🟡 Terbuka, butuh perubahan di sumber |
+| **Saringan yang wajar diminta tetapi belum ada di alat** | Sebelum #2863 `cuti_tim` tak punya saringan jenis walau sumber mengirimnya. Alat lain yang kolomnya dikirim sumber tanpa argumen saringannya **tidak** diperiksa satu per satu oleh dokumen ini | ✅ Tertutup untuk `cuti_tim`; **TBD** untuk alat lain |
+| **Fakta backend yang dicerminkan di frontend** | `PERIODE_ALAT` (`lib/katalog-pertanyaan.ts`) dan validasi jadwal (`lib/jadwal.ts`) menyalin aturan Go; penjaganya test di sisi frontend saja, jadi perubahan di backend tidak memerahkan apa pun | 🟡 Terbuka (dua salinan satu fakta, lintas repo) |
+
+Aturan yang lahir dari kelas-kelas ini (model tidak menyaring, menghitung, atau mengetik tabel; angka turunan diambil dari
+sumber) ada di [[REF - Penyajian Laporan Copilot]].
 
 ### Sumber yang sengaja dilewati (jangan dicoba ulang tanpa membaca alasannya)
 
@@ -1081,10 +1180,40 @@ Label layar kedua penanda baru sudah ada di `main` erp-frontend (`copilot.penand
 `akses_tak_terbukti`, `src/i18n/locales/id.ts:15228-15229`, diperiksa 2026-10-01; ~~branch lokal belum
 merged~~). Penjaga baru cukup ditambahkan ke `daftarPenjaga`.
 
-⛔ **Batas yang diketahui**: penjaga **mengurangi** kegagalan ini, tidak menghapusnya. Ia tidak
-memeriksa angka non-rupiah (persen, jumlah), tidak memeriksa kebenaran nama, dan bergantung pada pola
-teks (kalimat penolakan yang diparafrasa di luar pola lolos). **TBD**: apakah pola akses perlu diperluas
-belum diukur terhadap jawaban PROD.
+**Penjaga keempat: `tabel_diketik`** (bip-erp #2863, `penjaga_tabel.go`; kejadian pemicunya di § Tool gelombang 2026-10-09).
+Yang dijaga adalah **bentuk** jawaban, karena baris data yang diketik model adalah tempat angka karangan lahir:
+
+- **Tabel bergaris**: minimal 2 baris yang masing-masing memuat minimal dua `|`. Selalu pelanggaran. Satu `|` di dalam
+  kalimat, atau hanya satu baris ber-`|`, tidak ditandai.
+- **Daftar baris**: minimal 6 baris bernomor atau berbutir, **hanya bila** giliran itu sudah menghasilkan blok tampilan
+  (`konteksPenjaga.adaTampilan`). Tanpa blok, daftar satu baris per orang masih bentuk yang diizinkan aturan prompt 6.
+- Pesan pelanggarannya berisi jenis dan jumlah baris, **bukan** potongan teksnya (potongan itu berisi baris data bertoken
+  samaran dan ikut ke penanda di layar). Koreksinya sengaja tidak mengizinkan panggilan alat (`bolehAlat` false): memanggil
+  ulang dengan saringan adalah tugas aturan 15 di putaran pertama, dan koreksi yang memanggil alat menghabiskan putaran di
+  jalur langsung. Label layarnya `copilot.penanda.tabel_diketik` (erp-frontend #2227).
+
+**Prompt aturan 15** (`tanya.go`, bip-erp #2863) menuliskan larangannya per perbuatan, karena aturan 1 ("jangan menghitung
+angka baru") terbukti tak menahannya: model dilarang (a) menyaring atau memilih baris sendiri dari hasil alat, (b) menghitung
+jumlah baris, orang, atau hari sendiri, (c) menjumlah, mengurangi, mengali, membagi, atau merata-rata angka alat untuk
+membuat angka baru termasuk persentase dan rasio, (d) mengetik tabel atau daftar baris data walaupun penanya meminta
+"buatkan tabel". Bila penanya meminta sebagian data, model memanggil ulang alat dengan argumen saringannya; bila alat tak punya
+saringan itu atau angkanya tak ada di hasil alat, model mengatakan terus terang bahwa angka itu belum tersedia sebagai
+hitungan sistem.
+
+⛔ **Batas yang diketahui** (diperbarui 2026-10-09): penjaga **mengurangi** kegagalan ini, tidak menghapusnya.
+
+- **Angka non-rupiah tidak dijaga.** Pola penjaga skala mensyaratkan awalan `Rp` (`polaRupiah`, `penjaga_rupiah.go`), jadi
+  jumlah orang, hari, pesanan, jam, dan qty lolos tanpa pemeriksaan.
+- **Persentase dan rasio tidak dijaga**, begitu pula **hitungan di dalam kalimat biasa** ("ada 50 orang", "3,64%"). Kepala
+  `penjaga_tabel.go` menyatakannya sendiri: itu ditahan dari hulu, lewat alat yang menghitung dan aturan 15, bukan lewat penjaga.
+- **Saringan oleh model tidak terlihat penjaga mana pun**: hanya aturan 15 yang melarangnya. Yang bisa diperiksa hanyalah
+  sisi positifnya, yaitu `Sumber.saringan` terisi bila alat benar-benar menyaring (dipakai uji pertanyaan tetap).
+- Rupiah dicocokkan dengan angka **mana pun** dari alat mana pun pada giliran itu, jadi nilai yang benar dengan label yang
+  salah lolos; rupiah di bawah 1.000 dilewati; jawaban tanpa alat tidak diperiksa.
+- Daftar 2 sampai 5 butir saat ada blok, dan daftar berapa pun saat tak ada blok, tidak ditandai.
+- Penjaga tidak memeriksa kebenaran nama, dan bergantung pada pola teks (kalimat penolakan yang diparafrasa di luar pola
+  lolos). Satu jatah koreksi dipakai bersama; pelanggaran yang tersisa hanya menjadi penanda, jawabannya tidak ditolak.
+- **TBD**: apakah pola akses perlu diperluas belum diukur terhadap jawaban PROD.
 
 ### Rekap umpan untuk tinjauan IT (bip-erp #2438, merged 2026-10-01, merge commit `74ef4bf5`)
 
@@ -1215,6 +1344,42 @@ JWT penanya berikutnya (ditemukan di bip-erp #2382).
     (`AMBANG_KOTAK_CARI`), tabel diringkas 10 baris (`BATAS_BARIS_RINGKAS`); yang dicari teks yang terlihat, data tak berubah.
   - **Keterangan sumber, tombol tautan, grafik tren dengan garis proyeksi putus-putus, indikator "Membaca: <alat>", sumbu skor
     KPI 0-100** (#2047): kontraknya di § Kontrak sumber dan blok dan § Progres alat.
+- **Gelombang 2026-10-09 (erp-frontend #2210, #2213, #2227, #2228, #2229, #2236, diukur ke `origin/main` `0c96129b0`)**:
+  - **Katalog pertanyaan per departemen menjadi tampilan awal** (#2213, #2228, #2229; `lib/katalog-pertanyaan.ts`,
+    `components/katalog-pertanyaan.tsx`), menggantikan chip saran. Empat tab (`marketing`, `hrga`, `keuangan`, `gudang`),
+    departemen pemakai lebih dulu (`departemenKatalog` dari `work_data.department`; Human Resource dan General Affair
+    dua-duanya ke tab HR & GA). Pemakai memilih kartu dan isian **pilihan** (bulan, periode gaji, divisi, channel, waktu),
+    melihat kalimat yang akan dikirim dan apa yang didapat, lalu menekan Tanyakan atau Jadwalkan; tak ada yang diketik.
+    Kotak tulis bebas tetap ada di kaki, dan selama percakapan berjalan katalog tetap satu klik lewat tombol "Pilih
+    pertanyaan" (dialog). Tanyakan memakai jalur kirim yang sama dengan kotak tulis.
+  - **Katalog hanya diurutkan, tidak disaring per hak akses.** Boleh-tidaknya sebuah alat tetap diputuskan modul sumbernya
+    saat ditanya; tiap kartu menyimpan nama `alat`-nya supaya penyaringan bisa ditambahkan kelak.
+  - **`PERIODE_ALAT` = satu-satunya tempat di frontend untuk fakta "alat ini menerima periode apa"** (bulan kalender,
+    periode gaji, rentang, atau tanpa periode), disalin dari deskripsi argumen alat di backend dan dikunci
+    `katalog-pertanyaan.test.ts`: tiap kartu dan templat hanya menanyakan periode dalam bentuk yang diterima alatnya, dan
+    tak menjanjikan hal di luar isi alat. ⚠️ Ini cermin lintas repo: argumen periode yang berubah di backend wajib
+    disunting di sini juga.
+  - **Pilihan divisi marketing** Kyura dan Beauty Hacks (nama dari `hris/kpi/lib/departemen-marketing.ts`), bawaannya divisi
+    pemakai (`divisiPemakai`), selain itu "Semua divisi". Daftar hidup `GET /divisi` sengaja tidak dipakai karena digerbang
+    modul marketing dan akan gagal bagi pemakai departemen lain. Kartu perbandingan dua divisi meminta tiap divisi diambil
+    terpisah (backend menolak dua divisi dalam satu panggilan), jadi hasilnya dua blok, bukan satu grafik banding.
+  - **Kalimat Tanyakan lawan kalimat jadwal**: isian bulan dan periode gaji menyebut periodenya eksplisit saat ditanyakan
+    ("Oktober 2026", "periode gaji 26 Agustus sampai 25 September 2026") dan relatif saat dijadwalkan ("bulan lalu"),
+    karena nama bulan di jadwal berulang akan menanyakan bulan yang sama selamanya. Isian waktu cuti dan waktu antrean
+    (minggu ini, bulan ini, tujuh hari) memakai frasa relatif di kedua mode.
+  - **Saran jadwal** (#2228; `components/saran-jadwal.tsx`): bagian "Disarankan" di sheet Jadwal Tugas menawarkan templat
+    jadwal departemen pemakai dari katalog yang sama; templat yang pertanyaannya sudah dijadwalkan tidak ditawarkan lagi.
+    Form jadwal terbuka **sudah terisi** (nama, pertanyaan, frekuensi, jam) untuk diperiksa lalu disimpan, dan memuat
+    satu kalimat kapan pengingat datang (`kalimatPengingat`), yang tak pernah menjanjikan laporan terkirim.
+  - **Label jenis dan subtipe cuti, "disaring: ..." di keterangan sumber, dan penanda `tabel_diketik`** (#2227):
+    `lib/format-blok.ts` `labelNilaiKode`, `lib/keterangan-sumber.ts`, `lib/penanda.ts`. Kode subtipe yang belum punya label
+    dirapikan jadi kata, tidak ditampilkan bergaris bawah.
+  - **Nama kategori di grafik batang dibungkus, tanpa elipsis; sorotan peringkat = n teratas temuan konsentrasi; tick sumbu
+    bulat** (#2210): rinciannya di [[REF - Penyajian Laporan Copilot]].
+  - **Latar animasi DarkVeil di keadaan awal** (#2236; `lib/latar.ts`, `components/latar-copilot.tsx`,
+    `components/latar-dark-veil.tsx`, dependensi baru `ogl`): hanya tampil sebelum ada giliran tanya-jawab dan **tidak
+    dirender sama sekali** begitu percakapan berjalan. Pengecualian atas aturan komponen bersama yang diminta pemilik
+    produk; alasan dan peredam kontrasnya di [[REF - Penyajian Laporan Copilot]].
 
 ### Realisasi pengukuran T8 (PROD 2026-09-30, dari log `[Copilot] giliran`)
 

@@ -218,6 +218,7 @@
 - [[Microservices - Inventory Service]]: daftar pengajuan terpadu membaca `/peminjaman/saya` dan `/peminjaman/perlu-aksi` bila klien meminta `include=booking` (irisan 2 Booking Ruang, bip-erp #1898 merged 2026-09-15, belum di PROD). Dependensinya **lunak dengan pola yang sama** seperti form-builder: `INVENTORY_MODULE_URL` di blok compose `attendance-service` tetapi di luar `InternalURL`, kosong = booking `degraded` dan presensi tetap jalan; klien HTTP sendiri ber-timeout 5 detik, berjalan berbarengan dengan pembacaan Mongo. Header `BIP-Gateway-ID` dan identitas pemanggil diteruskan karena inventory yang menyaring hak. Env baru menuntut `--force-recreate attendance-service`.
 - [[CORE - API Master Gateway]] — entry point routing request ke service.
 - [[CORE - HRIS Orchestrator]] — konsumen `internal/summary`, `report`, `payroll-supplement`, dan force-update entry.
+- [[Microservices - Assistant Service]]: Copilot membaca `internal/summary` (alat `ringkasan_kehadiran`, sejak 2026-10-09), `cuti/tim` (alat `cuti_tim`, dengan saringan jenis dan subtipe di sisi assistant), dan `rekap-telat/tim`, semuanya lewat gateway dengan JWT penanya; tak ada jalur atau gerbang khusus.
 - **MinIO** — penyimpanan file metadata fingerprint export.
 
 ## Dokumen Terkait
