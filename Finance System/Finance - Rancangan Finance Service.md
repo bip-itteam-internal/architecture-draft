@@ -728,11 +728,11 @@ menerima seperlima anggaran sebulan, lalu realisasi tiga harinya dibandingkan ja
 dan akurasi minggu terakhir selalu tampak anjlok tanpa ada yang salah pada belanjanya. Sisa
 pembulatan ditimpakan ke minggu terakhir supaya jumlahnya kembali **tepat** ke anggaran bulanan.
 
-> 🟡 **Direncanakan berubah (2026-10-09, kode belum ada):** porsi tiap minggu akan bisa diatur Cost
+> ⚠️ **Berubah 2026-10-09 (kode merged, deploy prod TBD):** porsi tiap minggu bisa diatur Cost
 > Control dengan jumlah sebulan tetap sama dengan RAPB; pembagian menurut jumlah hari menjadi
 > bawaan untuk periode yang tidak diatur. Keputusannya
 > [[ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB]].
-> Paragraf di atas tetap menggambarkan yang berjalan hari ini.
+> Paragraf di atas kini hanya menggambarkan periode yang tidak diatur.
 
 **Minggu = potongan 7 hari dari tanggal 1, bukan minggu kalender Senin–Minggu.** Minggu kalender
 melintasi batas bulan (29 Juli–4 Agustus adalah satu minggu), sedangkan anggaran dan realisasi
@@ -765,6 +765,8 @@ murni memberi −442,81% pada baris itu, dan nilai negatif tak berarti pada skal
 **Akurasi dihitung dari TOTAL, bukan rata-rata akurasi mingguan.** Rata-rata memberi bobot sama
 pada minggu 3 hari dan minggu 7 hari, sehingga satu minggu pendek menggeser nilai sebulan; rekap
 Finance sendiri menutup bulannya dari total.
+
+> ⚠️ **Sejak 2026-10-09 (bip-erp #2872, merged, deploy prod TBD):** total itu hanya menjumlahkan **minggu yang sudah selesai** (hari terakhirnya lewat menurut WIB). Minggu berjalan dan yang belum mulai tidak ikut, supaya akurasi bulan berjalan tidak anjlok hanya karena bulannya belum tutup. Periode lampau tidak berubah. Rinciannya di [[Finance - Serapan Anggaran dan Cost Control]].
 
 **Pencocokan nama akun WAJIB ternormalisasi.** Nama yang tersimpan di `anggaran_opex` berasal dari
 **katalog Accurate**, sedangkan daftar enam akun disalin dari berkas Finance — keduanya tak

@@ -1,6 +1,6 @@
 # ANALISA - Proyeksi Forecast Kas Mingguan Diatur per Minggu
 
-> 🟢 ADR-nya **Diterima** 2026-10-09 oleh Azzerith. Issue sudah dibuat (lihat §Urutan). Keadaan 2026-10-09 (bergerak, ukur ulang sebelum dipakai): bip-erp#2865 PR terbuka (bip-erp #2872); pekerjaan BE dan FE fitur ini belum mulai.
+> 🟢 ADR-nya **Diterima** 2026-10-09 oleh Azzerith. Issue sudah dibuat (lihat §Urutan). Keadaan 2026-10-09 siang (bergerak, ukur ulang sebelum dipakai): keempat PR **merged** (bip-erp #2872 dan #2882; erp-frontend #2237 dan #2238). Belum deploy prod; penyimpanan belum diuji terhadap Mongo hidup dan layar belum dilihat di browser. Issue induk bip-erp#2877 masih terbuka.
 
 - **ADR**: [[ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB]]
 - **Dok domain**: [[Finance - Serapan Anggaran dan Cost Control]] § Proyeksi Mingguan Diatur per Minggu · [[Finance - Rancangan Finance Service]] · [[API - Integration Service]]
