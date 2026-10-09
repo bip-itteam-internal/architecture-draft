@@ -9280,8 +9280,8 @@
       "judul": "ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** (belum ada baris `🟢 Diterima, <tanggal>, oleh <login/jabatan>`; aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Asal keputusan: permintaan atasan Finance yang disampaikan Azzerith, bentuknya dipilih di sesi analisa 2026-10-09. **Kodenya belum ada.**",
+      "status_emoji": null,
+      "status_teks": "🟢 Diterima, 2026-10-09, oleh Azzerith (aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Asal keputusan: permintaan atasan Finance yang disampaikan Azzerith, bentuknya dipilih di sesi analisa 2026-10-09. 🟡 **Kodenya belum ada.**",
       "publik": true,
       "tautan": [
         "ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia",
@@ -9293,9 +9293,9 @@
         "API - Integration Service",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "dcef46e7f4f054710da0cfd93b5613ede91335f44d794522eece1fe55b4d9778",
-      "ukuran_kb": 11.4,
-      "ringkasan": "Menjawab: bolehkah proyeksi Forecast Kas Mingguan diatur manual oleh Cost Control, apa yang diketik (total rupiah per minggu) dan apa yang disimpan (porsi per minggu, jumlah sebulan wajib sama dengan RAPB), serta kapan sebuah minggu terkunci dan berapa kali boleh diubah. Menjelaskan juga kenapa riwayat perubahan wajib, izin apa yang dipakai (finance.anggaran.kelola), keputusan lama mana yang dibalik (proyeksi pro-rata jumlah hari tanpa isian, ADR 0159 K7), dan kenapa skor KPI Cost Control #4 akhir bulan tidak berubah karena fitur ini. Memuat daftar berkas bip-erp dan erp-frontend yang akan disentuh serta hal yang belum diputuskan.",
+      "hash": "3c2d85418699a768a395771db42b6c7bba35c4c4dfc21dec7a03c6799e9c6213",
+      "ukuran_kb": 11.7,
+      "ringkasan": "Menjawab: bolehkah proyeksi Forecast Kas Mingguan diatur manual, siapa yang boleh mengaturnya, dan aturan apa yang dijaga sistem (jumlah sebulan harus sama dengan RAPB, minggu terkunci sejak hari pertamanya menurut WIB, tiap minggu maksimal 2 kali diubah, riwayat perubahan wajib). Menjelaskan juga mengapa yang disimpan porsi per minggu dan bukan nominal, izin apa yang dipakai (finance.anggaran.kelola), keputusan lama mana yang dibalik (\"tidak diketik siapa pun\", ADR 0159 K7), serta mengapa menggeser porsi antar-minggu tidak mengubah skor KPI Cost Control #4 yang dihitung dari total sebulan.",
       "kata_kunci": [
         "forecast kas mingguan",
         "proyeksi mingguan",
@@ -9306,7 +9306,7 @@
         "kunci minggu",
         "batas ubah 2 kali",
         "riwayat perubahan",
-        "ADR 0161"
+        "akurasi forecast KPI"
       ]
     },
     {
@@ -10523,9 +10523,9 @@
         "Finance - FAT Persona",
         "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya"
       ],
-      "hash": "c54d2a48296321b1046f472e34b1207194a997f2a84a138321028ac9beb55bb2",
-      "ukuran_kb": 14.7,
-      "ringkasan": "Menjawab: bagaimana membaca angka di layar Anggaran & Cost Control (/finance/anggaran), yaitu arti Anggaran, Terpakai, Sisa, Lewat anggaran, Dari pengajuan, Jurnal lain, dan Menunggu dicatat, serta kolom mana yang merupakan bagian dari kolom lain sehingga tidak boleh dijumlahkan. Menjelaskan isi tiap tab (Serapan, Opex Marketing, Rekomendasi, Anggaran Bulanan, Forecast Mingguan), beda pos tanpa anggaran dengan Sisa Rp 0, kotak sisa pos di form pencatatan Accounting, dan rencana proyeksi mingguan yang porsinya bisa diatur per minggu (ADR 0161). Memuat juga persona, alur pengguna, urutan deploy, dan keputusan yang masih terbuka.",
+      "hash": "fec3161ef214d57f5b0f7be70d843df637ceedef2699b3a95dbc7336c2082322",
+      "ukuran_kb": 14.9,
+      "ringkasan": "Menjawab: bagaimana membaca angka di layar Anggaran & Cost Control (/finance/anggaran), yaitu apa arti Anggaran, Terpakai, Sisa, Lewat anggaran, Dari pengajuan, Jurnal lain, dan Menunggu dicatat, serta kolom mana yang merupakan bagian dari kolom lain sehingga tidak boleh dijumlahkan (mencegah rupiah terhitung dua kali dan pos tanpa anggaran terbaca Rp 0). Menjelaskan juga isi tiap tab (Serapan, Opex Marketing, Rekomendasi, Anggaran Bulanan, Forecast Mingguan), dari mana angka serapan pengajuan berasal, siapa penggunanya, urutan deploy, dan rencana pengaturan porsi proyeksi mingguan oleh Cost Control.",
       "kata_kunci": [
         "serapan anggaran",
         "cost control",
@@ -10535,7 +10535,7 @@
         "sisa anggaran",
         "dari pengajuan",
         "menunggu dicatat",
-        "pengajuan barang/dana",
+        "realisasi Accurate",
         "forecast mingguan"
       ]
     },
@@ -18582,20 +18582,20 @@
         "Finance - Rancangan Finance Service",
         "API - Integration Service"
       ],
-      "hash": "466367c41e6e188f6dd579f0920b39c901939b11bd152a0adaa818e3bdbe5116",
-      "ukuran_kb": 4.6,
-      "ringkasan": "Menjawab: task apa saja yang dibutuhkan untuk membuat proyeksi Forecast Kas Mingguan bisa diatur per minggu, urutannya (bip-erp#2865, issue induk, [BE], lalu [FE]), dan apa yang menunggu apa. Merinci kriteria \"yang harus benar\" untuk task backend (simpan porsi, kunci minggu WIB, batas ubah 2 kali, riwayat, gerbang izin) dan task frontend (form Atur proyeksi, tabel riwayat, i18n), keputusan pemohon, serta hal yang sengaja tidak dikerjakan. Menyebut juga hal yang masih terbuka dan pesan untuk manajemen bahwa skor KPI akhir bulan tidak berubah.",
+      "hash": "9c0b0ce1d1d29047658fb848123b5dac06103013e418e87149c19f106a2fd0a4",
+      "ukuran_kb": 5.1,
+      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk fitur pengaturan proyeksi Forecast Kas Mingguan, di repo mana, dalam urutan apa, dan menunggu apa (bip-erp#2865, induk bip-erp#2877, [BE] bip-erp#2878, [FE] erp-frontend#2232). Memuat kriteria \"yang harus benar\" untuk backend dan frontend, sembilan hal yang diputuskan pemohon, apa yang sengaja tidak dikerjakan, hal yang masih terbuka, dan pesan untuk manajemen bahwa skor KPI akhir bulan tidak berubah.",
       "kata_kunci": [
         "analisa kebutuhan",
         "forecast kas mingguan",
         "proyeksi mingguan",
         "daftar task",
-        "ADR 0161",
-        "Cost Control",
-        "porsi per minggu",
+        "sub-issue BE FE",
+        "porsi mingguan",
+        "atur proyeksi",
         "riwayat perubahan",
-        "bip-erp#2865",
-        "sub-issue BE FE"
+        "Cost Control",
+        "ADR 0161"
       ]
     },
     {
