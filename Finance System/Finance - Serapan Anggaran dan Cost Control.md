@@ -30,7 +30,7 @@ Keputusan: [[ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Mingg
 Cara kerja yang direncanakan:
 
 - Cost Control (pemegang `finance.anggaran.kelola`) mengetik **total rupiah per minggu**. Jumlah seluruh minggu harus sama dengan anggaran RAPB kas-keluar bulan itu, kalau tidak simpan ditolak.
-- Sistem menyimpan **porsi** tiap minggu, bukan nominalnya. Proyeksi tiap akun pada sebuah minggu = anggaran akun × porsi minggu itu, jadi tabel rincian per akun mengikuti tabel ringkasan. Semua akun memakai porsi yang sama.
+- Sistem menyimpan **porsi** tiap minggu (sebagai bobot: rupiah yang diketik saat simpan, dibagi jumlahnya), bukan nominal yang dibekukan. Proyeksi tiap akun pada sebuah minggu = anggaran akun × porsi minggu itu, jadi tabel rincian per akun mengikuti tabel ringkasan. Semua akun memakai porsi yang sama.
 - Minggu terkunci sejak hari pertamanya (WIB). Pergeseran hanya antar-minggu yang belum mulai.
 - Tiap minggu paling banyak 2 kali diubah per periode; sekali simpan menghitung tiap minggu yang angkanya berubah.
 - Riwayat perubahan (siapa, kapan, sebelum → sesudah per minggu) tampil di bawah tabel.

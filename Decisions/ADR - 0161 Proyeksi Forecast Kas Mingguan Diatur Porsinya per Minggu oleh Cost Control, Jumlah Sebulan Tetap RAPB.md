@@ -1,6 +1,6 @@
 # ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB
 
-> **Status**: 🟢 Diterima, 2026-10-09, oleh Azzerith (aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Asal keputusan: permintaan atasan Finance yang disampaikan Azzerith, bentuknya dipilih di sesi analisa 2026-10-09. 🟡 **Kodenya belum ada.**
+> **Status**: 🟢 Diterima, 2026-10-09, oleh Azzerith (aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Asal keputusan: permintaan atasan Finance yang disampaikan Azzerith, bentuknya dipilih di sesi analisa 2026-10-09. 🟡 **Belum berjalan**: per 2026-10-09 kodenya baru berupa PR terbuka (bip-erp#2878, erp-frontend#2232), belum merged dan belum deploy; ukur ulang sebelum dipakai.
 
 ## Untuk Manajemen
 
@@ -50,7 +50,7 @@ Aturan yang dijaga sistem:
 | K1 | Proyeksi mingguan **boleh diatur orang**. Ini membalik "tidak diketik siapa pun" di [[Finance - Rancangan Finance Service]] dan bagian "tanpa isian" pada ADR 0159 K7. Rumus akurasi, cakupan 6 akun kas-keluar, dan cara KPI #4 dihitung **tidak berubah**. |
 | K2 | Yang diketik adalah **total rupiah per minggu** (seluruh akun kas-keluar digabung), bukan per akun. |
 | K3 | **Jumlah seluruh minggu harus sama dengan anggaran RAPB kas-keluar bulan itu.** Simpan ditolak bila tidak sama. |
-| K4 | Yang **disimpan adalah porsi tiap minggu** terhadap total bulan, satu set per periode (tahun, bulan), bukan nominalnya. Proyeksi akun × minggu = anggaran akun × porsi minggu itu, sehingga tabel rincian per akun selalu cocok dengan tabel ringkasan, dan RAPB tetap satu-satunya sumber angka anggaran. Sisa pembulatan tetap ditimpakan ke minggu terakhir. |
+| K4 | Yang **disimpan adalah porsi tiap minggu** terhadap total bulan, satu set per periode (tahun, bulan), bukan nominalnya. Proyeksi akun × minggu = anggaran akun × porsi minggu itu, sehingga tabel rincian per akun selalu cocok dengan tabel ringkasan, dan RAPB tetap satu-satunya sumber angka anggaran. Bentuk tersimpannya **bobot** per minggu (rupiah yang diketik saat simpan); porsi = bobot dibagi jumlah bobot. Pembulatan di jalur ini: total tiap minggu ditentukan lebih dulu (sisa ke minggu terakhir), lalu sel akun × minggu dibulatkan dengan metode sisa terbesar, supaya total minggu **sama persis** dengan angka yang diketik selama RAPB tidak berubah dan jumlah tiap akun tetap sama dengan anggarannya. Aturan lama "sisa per akun ke minggu terakhir" hanya berlaku untuk periode tanpa isian (K5). *(Rincian pembulatan ditetapkan saat implementasi, bip-erp#2878.)* |
 | K5 | Periode **tanpa** isian memakai pembagian menurut jumlah hari seperti sekarang (bawaan). |
 | K6 | **Kunci**: sebuah minggu terkunci sejak hari pertamanya menurut WIB. Minggu yang sedang berjalan dan yang sudah lewat tidak bisa diubah. Karena itu pergeseran hanya terjadi antar-minggu yang belum mulai, dan jumlah minggu-minggu itu harus tetap. |
 | K7 | **Batas ubah**: tiap minggu paling banyak **2 kali** diubah per periode. Sekali simpan menambah hitungan pada **tiap minggu yang angkanya berubah**. Minggu yang sudah 2 kali ditolak. |
