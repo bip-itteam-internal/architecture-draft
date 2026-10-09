@@ -31,11 +31,24 @@
 - **Route pengiriman (ber-service-key, `?key=` cocok `NotificationServiceKey`):** ⚠️ kunci layanan TIDAK menggantikan gerbang gateway. `validation.ValidateGateway` dipasang global (`app.Use` di `main.go`) sebelum rute-rute ini didaftarkan, jadi pemanggil wajib mengirim header `BIP-Gateway-ID` (nilai `INTERNAL_GATEWAY_KEY`) selain `?key=`. Tanpa header itu balasannya 401 `Unauthorized gateway` sebelum kunci layanan sempat diperiksa, dan pengirim yang best-effort hanya mencatatnya di log. Klien HTTP yang merakit permintaannya sendiri wajib memasang header ini; contoh yang lolos berminggu-minggu adalah `kirimInbox` di [[Microservices - Inventory Service]] (2026-08-27 sampai 2026-09-14), yang tak tertangkap test karena pengirimnya selalu diganti tiruan.
 	- `POST /inbox/send`
 	- `POST /wa/send-personal`
-	- `POST /wa/send-group`
+	- `POST /wa/send-group` — body `{"group": "<alias>", "message": "...", "title": "opsional"}`. `group` dan `message` wajib (kosong → 400 berikut `example_request`), field di luar ketiganya juga 400 (`VerboseRequestCheck` menolak field tak dikenal). Bila `title` diisi, pesan yang terkirim `title + "\n" + message`. Rincian alias dan perilaku senyapnya di **WhatsApp grup** di bawah.
 	- `POST /fcm/send-personal`
 	- `POST /fcm/send-department`
 	- `POST /fcm/send-broadcast` (batch 500 token)
 	- `POST /email/send` — Email via **Resend** (`resend-go/v3`); body `html`/`text`, attachment (base64 `content` atau `path` URL, mis. offer letter PDF), dan `idempotency_key` opsional untuk retry-safe. Field **`from` opsional**: bila kosong dipakai `RESEND_FROM_EMAIL`; **tidak divalidasi** handler (hanya `to`/`subject`/body/attachment yang dicek) → diteruskan apa adanya ke Resend, sehingga format RFC `Nama <email>` didukung — ini dasar **identitas pengirim per-service** (lihat catatan di bawah).
+- **WhatsApp grup: lewat NotifAPI, grup dirujuk dengan ALIAS, bukan id** (`shared-library/notification/whatsapp/whatsapp.go`):
+	- `SendGroupMessage(group, message)` mengirim `POST https://notifapi.com/send_message_group_id` berisi `{group_id, key, message}`, batas waktu 10 detik. `key` dari env `WHATSAPP_NOTIFAPI_KEY`; `group_id` hasil `GetGroupChatID(alias)`, tidak peka huruf besar-kecil:
+
+		| Alias `group` | Env id grup |
+		|---|---|
+		| `it` atau `tech development` | `WHATSAPP_IT_GROUP_ID` |
+		| `it-alert` | `WHATSAPP_IT_ALERT_GROUP_ID` |
+		| `sales` | `WHATSAPP_SALES_GROUP_ID` |
+
+	- ⚠️ **Alias tak dikenal TIDAK ditolak di sini.** `GetGroupChatID` mengembalikan string kosong dan permintaan tetap dikirim ke NotifAPI dengan `group_id` kosong; ditolak atau tidaknya bergantung pada balasan NotifAPI (selain 200 → handler membalas 500 `failed to send notification`). Env id grup yang belum diisi berperilaku sama. Menambah grup baru berarti menambah `case` di `GetGroupChatID` **dan** env-nya.
+	- **Pemanggil yang ada**: rute publik gateway `POST /public/feedback?group=<alias>` (dipakai [[APP - MyBharata]]) dan `transaction_handler.go` di [[Microservices - Integration Service]] (alias `sales`).
+	- ⚠️ **`/public/feedback` membalas `{"success": true}` selama notification-service bisa dihubungi**, karena gateway membuang status dan badan balasannya (hanya galat transport yang jadi 502). Alias salah, `?group=` kosong (400 di sini), kunci NotifAPI kosong, maupun NotifAPI menolak semuanya tetap terbaca sukses dari sisi klien. `group` dibaca dari **query** (nilai di body ditimpa) dan `title` tidak diteruskan. Komentar kodenya melarang mengubah balasan itu karena sudah dipakai aplikasi mobile. Bukti terkirim yang sah: pesannya muncul di grup, atau log `[INFO] WhatsApp: group message sent to "<alias>"`; bila 200 tetapi pesan tak muncul, komentar kode menyuruh memeriksa status akun NotifAPI.
+	- `/wa/send-personal` memakai `https://notifapi.com/send_message` (`phone_no`); nomor `08…` dinormalkan jadi `62…`. ⚠️ Handler-nya tidak memeriksa galat `SendPersonalMessage`, jadi balasannya 200 `{"success": true}` walau NotifAPI menolak.
 - **Push DUA KANAL — fan-out dari `/inbox/send`, bukan dari tiap pengirim** (browser sejak 2026-08-20, ponsel menyusul 2026-08-22):
 	- Semua service pengirim sudah memanggil `/inbox/send`, jadi kipasnya dipusatkan di situ. **Nol service pengirim yang perlu disentuh**, sekarang maupun saat pengirim baru lahir — sekaligus menutup kelas bug "pengirim yang lupa" yang sudah dua kali menggigit lewat kategori inbox.
 	- Dipicu **setelah insert berhasil dan di goroutine**. Keduanya perlu: pengiriman di sisi pemanggil best-effort dan hanya nge-log, jadi bila FCM yang lambat sampai menggagalkan permintaan, yang hilang bukan push-nya melainkan **notifikasinya sendiri**.
@@ -76,7 +89,7 @@
 
 - **MongoDB** — penyimpanan inbox, splash, dan article.
 - **FCM** — push notification (via shared-library).
-- **WhatsApp** — pesan personal/grup (via shared-library).
+- **WhatsApp** — pesan personal/grup lewat **NotifAPI** (via shared-library `notification/whatsapp`); butuh env `WHATSAPP_NOTIFAPI_KEY` dan id grup `WHATSAPP_IT_GROUP_ID`, `WHATSAPP_IT_ALERT_GROUP_ID`, `WHATSAPP_SALES_GROUP_ID`.
 - **Resend** — provider email transactional (via `resend-go/v3` di shared-library `notification/email`); butuh env `RESEND_API_KEY` & `RESEND_FROM_EMAIL` (sender pada domain terverifikasi). Alasan memakai layanan pihak ketiga alih-alih mail server sendiri: [[ADR - 0026 Email Transaksional via Resend (bukan Mail Server Sendiri)]].
 - Service lain:
 	- [[Microservices - Employee Service]] — sumber nomor telepon & FCM token (by id/nama/department/platform).
