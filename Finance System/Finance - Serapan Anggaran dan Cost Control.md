@@ -4,7 +4,7 @@
 
 - **Status**: ⚠️ Implemented (ada catatan), **kode merged ke `main` 2026-10-08, deploy prod TBD**. Catatan: belum ada layar yang dilihat di browser dan belum ada endpoint yang dicoba lewat gateway (catatan penutup bip-erp#2779, 2026-10-08); keputusan terbuka dilacak di bip-erp#2814.
 - **Implementasi**: [[API - Procurement Service]] (`/pengajuan-barang/serapan-anggaran*`) · [[API - Integration Service]] (`/accounting/anggaran*`) · [[Microservices - Procurement Service]] · [[APP - Web ERP]] (layar) · izin: [[CORE - RBAC dan Permission Set]]
-- **Path di repo**: `bip-erp/services/procurement/pengajuan_barang_serapan.go` · `bip-erp/services/integration/internal/domain/entity/anggaran.go` · `erp-frontend/src/features/finance/anggaran/` · `erp-frontend/src/features/pengajuan-barang/` (kotak sisa pos, kartu Anggaran)
+- **Path di repo**: `bip-erp/services/procurement/pengajuan_barang_serapan.go` · `bip-erp/services/integration/internal/domain/entity/anggaran.go` · `erp-frontend/src/features/finance/anggaran/` · `erp-frontend/src/features/pengajuan-barang/` (kotak sisa pos, kartu Anggaran) · forecast mingguan: `bip-erp/services/integration/internal/usecase/laporan_mingguan.go` + `minggu_periode.go` + `proyeksi_mingguan.go`, `internal/interface/http/anggaran_mingguan_handler.go` + `anggaran_proyeksi_handler.go`
 
 ## Latar Belakang
 
@@ -21,23 +21,32 @@ Tab di `/finance/anggaran`, urutan di layar (`tab-anggaran.ts`, array `TAB_ANGGA
 | Opex Marketing | Panel OPEX Marketing yang sudah ada; **tidak** disatukan ke Serapan |
 | Rekomendasi | Pencatatan rekomendasi efisiensi (bekas `/finance/cost-control`); periodenya mengikuti Tahun/Bulan halaman, akun dari katalog |
 | **Anggaran Bulanan** | Isian anggaran: unduh template, unggah Excel, tambah baris, koreksi, hapus (hapus meminta konfirmasi). `?tab=master` lama dipetakan **eksplisit** ke tab ini |
-| **Forecast Mingguan** | Panel lama apa adanya, ditambah rincian per akun per minggu. **Tidak** mengubah forecast kas maupun KPI Cost Control #4. 🟡 Direncanakan: porsi proyeksi tiap minggu bisa diatur, lihat §Proyeksi Mingguan Diatur per Minggu |
+| **Forecast Mingguan** | Ringkasan per minggu dan rincian per akun per minggu. Sejak 2026-10-09 (merged, deploy prod TBD): minggu **Berjalan** dan **Belum mulai** berpenanda, akurasi hanya dihitung atas minggu yang sudah selesai, dan baris total ringkasan berbunyi "Total minggu selesai (n dari m)" (lihat §Minggu yang Belum Selesai Tidak Dihitung); pemegang izin kelola bisa **Atur proyeksi** dan semua pembaca melihat **Riwayat perubahan** (lihat §Proyeksi Mingguan Diatur per Minggu) |
 
-### Proyeksi Mingguan Diatur per Minggu (🟡 Direncanakan, kode belum ada)
+### Minggu yang Belum Selesai Tidak Dihitung (⚠️ merged 2026-10-09, deploy prod TBD)
 
-Keputusan: [[ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB]]. Yang berlaku hari ini tetap pembagian menurut jumlah hari, tanpa isian.
+Asal: bip-erp#2865 dan erp-frontend#2230 (PR bip-erp #2872, erp-frontend #2237).
 
-Cara kerja yang direncanakan:
+- Sebuah minggu **selesai** begitu hari terakhirnya lewat menurut WIB. Minggu yang sedang berjalan dan yang belum mulai **tidak** punya akurasi (tampil "—", bukan 0%) dan **tidak masuk** total yang dipakai akurasi bulan maupun bahan KPI Cost Control #4.
+- Baris total tabel **ringkasan** hanya menjumlahkan minggu selesai. Baris dan kolom total tabel **rincian per akun** tetap menjumlahkan semua minggu dan berlabel "(sebulan penuh)". **Kedua total itu sengaja berbeda cakupan; jangan dibandingkan atau dijumlahkan.**
+- Realisasi minggu berjalan tetap tampil; realisasi minggu yang belum mulai (jurnal bertanggal maju di Accurate) tidak ditampilkan di ringkasan.
+- Periode yang sudah lewat seluruhnya tidak berubah angkanya.
+
+### Proyeksi Mingguan Diatur per Minggu (⚠️ merged 2026-10-09, deploy prod TBD)
+
+Keputusan: [[ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB]]. Kode: PR bip-erp #2882 dan erp-frontend #2238. ⚠️ Per 2026-10-09 penyimpanannya belum diuji terhadap Mongo hidup, layarnya belum dilihat di browser, dan belum ada endpoint yang dicoba lewat gateway.
+
+Cara kerja:
 
 - Cost Control (pemegang `finance.anggaran.kelola`) mengetik **total rupiah per minggu**. Jumlah seluruh minggu harus sama dengan anggaran RAPB kas-keluar bulan itu, kalau tidak simpan ditolak.
 - Sistem menyimpan **porsi** tiap minggu (sebagai bobot: rupiah yang diketik saat simpan, dibagi jumlahnya), bukan nominal yang dibekukan. Proyeksi tiap akun pada sebuah minggu = anggaran akun × porsi minggu itu, jadi tabel rincian per akun mengikuti tabel ringkasan. Semua akun memakai porsi yang sama.
 - Minggu terkunci sejak hari pertamanya (WIB). Pergeseran hanya antar-minggu yang belum mulai.
 - Tiap minggu paling banyak 2 kali diubah per periode; sekali simpan menghitung tiap minggu yang angkanya berubah.
-- Riwayat perubahan (siapa, kapan, sebelum → sesudah per minggu) tampil di bawah tabel.
+- Riwayat perubahan (siapa, kapan, sebelum → sesudah per minggu) tampil di bawah tabel. Form isian berupa Sheet; penolakan backend (jumlah tidak sama, minggu terkunci, batas ubah) ditampilkan apa adanya. Layar tidak menghitung kunci maupun batas ubah sendiri.
 - Periode tanpa isian tetap memakai pembagian menurut jumlah hari.
 - Bila RAPB diunggah ulang, porsi yang tersimpan diterapkan ke anggaran baru untuk semua minggu, termasuk yang sudah terkunci. Bulan mendatang boleh diatur sebelum bulannya mulai. Tidak ada tombol kembalikan ke bawaan.
 
-⚠️ **Jangan dibaca sebagai cara menaikkan KPI.** Akurasi bulan dan KPI Cost Control #4 dihitung dari **total** sebulan, dan total itu tidak berubah saat porsi digeser antar-minggu. Yang berubah hanya akurasi **per minggu**.
+⚠️ **Jangan dibaca sebagai cara menaikkan KPI.** Akurasi bulan dan KPI Cost Control #4 dihitung dari **total** sebulan, dan total itu tidak berubah saat porsi digeser antar-minggu. Yang berubah hanya akurasi **per minggu**, dan akurasi **bulan berjalan** (karena hanya minggu selesai yang dihitung, porsi minggu-minggu awal ikut menentukan angka tengah bulan). Angka akhir bulan tidak terpengaruh.
 
 Tambahan di luar halaman ini: kotak **sisa pos** di bawah tiap baris form pencatatan Accounting, dan kartu **Anggaran** baca-saja di tahap Cost Control pada detail pengajuan (pos yang sudah lewat anggaran bulan ini, maksimal 5, sisanya diringkas, plus tautan ke tab Serapan). Kartu itu tidak memperkirakan pos pengajuan, karena pos baru ditetapkan Accounting.
 
