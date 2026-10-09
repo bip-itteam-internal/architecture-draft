@@ -1590,20 +1590,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "507753b8e1b4249e4666f55677994126f4d967c621cb94b508c71d7d20165fe1",
-      "ukuran_kb": 585.5,
-      "ringkasan": "Menjawab: apa itu portal web ERP One Bharata (erp-frontend), stack-nya, bagaimana login, SSO Identity Provider, dan role gating dari cookie system_roles bekerja, serta bagaimana sidebar dan menu dikelompokkan termasuk Pengaturan HRGA terpusat dan arah baru sidebar satu daftar urusan. Juga menjawab konvensi data-fetching TanStack Query dan konvensi bagan Recharts yang wajib diikuti, modul apa saja yang sudah diimplementasikan, dan bagaimana fitur multi-perusahaan serta rekrutmen lintas perusahaan tampil di web.",
+      "hash": "036a07adba2eba1f3c4e547d06228a03b549bc892fef84a2fa8cbf48bcb957c2",
+      "ukuran_kb": 587.8,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS \"One Bharata\" (repo erp-frontend, Next.js), bagaimana login, refresh token, dan perannya sebagai SSO Identity Provider bekerja, serta bagaimana sidebar dan menu digerbang lewat cookie system_roles, izin posisi (perm), dan pengelompokan menu induk HRIS termasuk Pengaturan HRGA terpusat. Juga menjawab fitur multi-perusahaan apa saja yang ada (CompanySwitcher, Kelola Perusahaan, rekrutmen lintas perusahaan), konvensi data-fetching TanStack Query (hook sidebar ber-enabled, badge, pencacah) dan konvensi bagan Recharts + ChartContainer, serta modul mana yang sudah dan belum diimplementasikan di web.",
       "kata_kunci": [
         "Web ERP",
         "erp-frontend",
         "One Bharata",
-        "Next.js",
-        "SSO",
+        "hris-dashboard",
+        "sidebar menu",
         "system_roles",
-        "sidebar",
         "role gating",
-        "TanStack Query",
-        "Recharts"
+        "SSO Identity Provider",
+        "multi-perusahaan CompanySwitcher",
+        "TanStack Query Recharts"
       ]
     },
     {
