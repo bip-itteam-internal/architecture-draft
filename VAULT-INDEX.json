@@ -9356,7 +9356,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": null,
-      "status_teks": "🟢 Diterima, 2026-10-09, oleh wirkancil sebagai Pemutus bip-erp#2880 (aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Bentuknya dipilih di sesi brainstorming 2026-10-09, sesudah pengukuran ke Accurate prod (baca saja) dan `origin/main` hari itu. 🟡 **Belum berjalan**: per 2026-10-09 backend-nya baru dikerjakan di branch (bip-erp#2880), belum merged; layarnya erp-frontend#2235 menyusul.",
+      "status_teks": "🟢 Diterima, 2026-10-09, oleh wirkancil sebagai Pemutus bip-erp#2880 (aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Bentuknya dipilih di sesi brainstorming 2026-10-09, sesudah pengukuran ke Accurate prod (baca saja) dan `origin/main` hari itu. 🟡 **Belum berjalan**: per 2026-10-09 backend-nya berupa PR terbuka (bip-erp#2896 untuk bip-erp#2880), belum merged dan belum pernah dijalankan terhadap Mongo maupun Accurate sungguhan; layarnya erp-frontend#2235 menyusul. Ukur ulang sebelum mengandalkan kalimat ini.",
       "publik": true,
       "tautan": [
         "ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia",
@@ -9366,20 +9366,26 @@
         "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya",
         "ADR - 0001 Akuntansi via Accurate"
       ],
-      "hash": "e7fcf121f2aeee050818d9801e9d62a2e3b68a6fe28733803c08c8a175873957",
-      "ukuran_kb": 10.1,
-      "ringkasan": "Menjawab: service mana yang memiliki salinan saldo dan arus kas-bank per rekening per bulan dari Accurate, kenapa ditarik lewat integration-service, bagaimana rekening dikelompokkan ke CV dan PT, seberapa sering disegarkan, dan izin apa yang dipakai untuk membaca serta menekan Segarkan. Juga menjawab apa yang dijanjikan dan tidak dijanjikan tab Kas dan Bank di halaman Tim Accounting, bagaimana batas laju Accurate dihadapi, perlakuan akun kas-bank di luar master entitas, serta pilihan yang ditolak beserta alasannya.",
+      "hash": "8fdf03603cf6f152d33e507875468ce16418e71196be476dc9c6d3995c837e15",
+      "ukuran_kb": 11.2,
+      "ringkasan": "Menjawab: service mana yang memiliki salinan saldo dan arus kas-bank per rekening dari Accurate, bagaimana datanya ditarik (lewat integration-service, jadwal tiap 2 jam di jam kerja plus tombol Segarkan), dan bagaimana rekening dikelompokkan ke CV/PT saat dibaca. Juga menjawab apa yang tampil di tab Kas dan Bank halaman Tim Accounting, siapa yang boleh melihatnya (finance.accounting.view), apa yang tidak dijanjikan (bukan angka real-time, bukan mutasi bank), serta alternatif yang ditolak dan alasan batas laju Accurate.",
       "kata_kunci": [
         "kas dan bank",
         "cash and bank",
         "saldo rekening",
         "arus kas",
+        "cash flow",
         "Accurate",
         "finance-service",
         "integration-service",
         "Tim Accounting",
-        "entitas CV dan PT",
-        "ADR 0163"
+        "Segarkan",
+        "refresh",
+        "rate limit",
+        "batas laju",
+        "CV dan PT",
+        "rekonsiliasi bank",
+        "finance.accounting.view"
       ]
     },
     {
