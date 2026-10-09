@@ -5,6 +5,7 @@
 - **Status**: ✅ **Implemented** — merged ke `main` erp-frontend 2026-09-26; deploy prod **belum diverifikasi** (ukur ulang sebelum dipakai). Perbaikan terjemahan menu Tim Accounting yang hilang saat merge: erp-frontend #1753. PR 1 `feat/finance-rapikan-tab` (erp-frontend #1750, merge `cba2bf1bd`), PR 2 `feat/finance-rapikan-sidebar` (erp-frontend #1751, merge `70e7c13bf`). Linear BHA-274 (induk), BHA-275, BHA-276.
 - **Path di repo**: `erp-frontend/src/features/finance/posisi/` (tab `/finance` + ruang kerja portal) · `erp-frontend/src/features/finance/ar/` (tab Penagihan/Retur/Uang Masuk, baru) · `erp-frontend/src/features/finance/tim-accounting/` (baru) · `erp-frontend/src/features/finance/ap/components/kartu-costing-hpp.tsx` (baru) · `erp-frontend/src/features/finance/pajak/components/kartu-pajak-lanjutan.tsx` (baru)
 - **Tanggal**: 2026-09-26
+- **Catatan 2026-10-09**: keputusan di bawah tidak berubah. Hanya keadaan layar Tim Accounting yang bergeser: erp-frontend #2240 mengganti isinya (tab Ringkasan, Jurnal, Histori; semua penanda "belum ada sumber data" dibuang dari layar). Keadaan kini ada di [[Finance - Dashboard per Posisi (FAT)]] § Tim Accounting.
 
 ## Context
 
