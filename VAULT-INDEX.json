@@ -57,6 +57,7 @@
         "ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web",
         "Microservices - Inventory Service",
         "API - Inventory Service",
+        "Microservices - Assistant Service",
         "HRIS - Disciplinary (Surat Peringatan)",
         "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
         "Microservices - Marketing Analytics Service",
@@ -65,20 +66,20 @@
         "HRIS - Attendance Correction",
         "HRIS - Payroll"
       ],
-      "hash": "a4a3fc1c26b9a80b00bf540f43294c127b2858c331e4c05937aca0e21ba32c20",
-      "ukuran_kb": 33.4,
-      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki attendance-service di balik gateway `/api/attendance/*`, parameter dan format tanggalnya, serta gerbang auth/RBAC tiap rute (HRIS, Security, IT, open, header). Mencakup tap clock-in/out, `/entries`, `/history`, `/report`, `/today`, payroll-supplement, definisi shift dan rotasi grup, hari libur, pengajuan cuti/izin, tukar jadwal, koreksi absen, roster, perjalanan dinas, HR requests terpadu, guestbook, WiFi, dan panggilan mesin untuk Sesi Live Host serta KPI. Juga menjawab jebakan perilaku seperti `/today` yang mengembalikan catatan terbaru bukan hari ini, `schedule_id` unik global, dan shift bawaan yang membalas 404 saat dihapus.",
+      "hash": "4b7de0d3f2bd2c79aad3572d9f283d15af7ea9071be2562ec9b21e7be9630c83",
+      "ukuran_kb": 34.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan attendance-service di balik `/api/attendance/*`, apa method, path, parameter, dan gerbang aksesnya (HRIS, Security, IT, header, kunci layanan), serta kode galat yang dibalas. Bisa dipakai untuk mencari kontrak clock-in/out `/tap`, daftar dan laporan entri kehadiran, definisi shift dan rotasi perusahaan, hari libur, pengajuan cuti/izin, tukar jadwal, koreksi absen, roster, perjalanan dinas, HR requests terpadu, guestbook, WiFi, serta rute panggilan mesin untuk Sesi Live Host dan KPI. Juga menjawab jebakan perilaku seperti `/today` yang mengembalikan catatan terbaru bukan hari ini, format tanggal filter `/entries`, dan batas hari tukar jadwal per tipe.",
       "kata_kunci": [
         "attendance-service",
         "API absensi",
-        "kehadiran",
-        "presensi",
-        "clock-in tap",
+        "endpoint kehadiran",
+        "clock-in clock-out tap",
+        "leave request cuti izin",
         "tukar jadwal schedule-exchange",
         "koreksi absen correction",
-        "cuti leave request",
-        "company-work-schedule shift",
-        "payroll-supplement"
+        "company-work-schedule shift rotasi",
+        "payroll-supplement",
+        "hari libur holiday"
       ]
     },
     {
@@ -2164,20 +2165,20 @@
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "492145dfca34739d472f940c38e8b9723b5efde4ac7104e00620e0a7bfd97e62",
-      "ukuran_kb": 143.8,
-      "ringkasan": "Menjawab: bagaimana Copilot (asisten tanya-jawab di Web ERP) bekerja, kenapa ia merutekan pertanyaan ke endpoint lewat gateway dengan JWT penanya dan dilarang berhitung sendiri, serta siapa yang boleh memakainya. Juga menjawab tool apa saja yang ditawarkan per area (HRGA, marketing, finance, akuntansi, gudang, dll), sumber mana yang sengaja dilewati, bagaimana penjaga anti angka karangan, penggabungan data per orang, riwayat percakapan, umpan balik jempol, jawaban di latar, dan Jadwal Tugas dirancang. Dipakai juga untuk mencari batas gateway 30 detik yang mengikat rancangan, riwayat sinkron per gelombang PR, dan hal yang masih TBD.",
+      "hash": "0c48f49a820845486c3363cc46564c3a2185f02536b697aca2bcb288dd3baf6a",
+      "ukuran_kb": 161.5,
+      "ringkasan": "Menjawab: bagaimana Copilot (asisten AI tanya-jawab di Web ERP, `services/assistant`) dirancang, kenapa ia merutekan pertanyaan ke endpoint yang sudah menghitung alih-alih berhitung sendiri, dan kenapa tool memanggil lewat gateway dengan JWT penanya. Bisa dipakai untuk mencari tool apa saja yang ditawarkan per paket (HRGA, marketing, finance, akuntansi, tiket, procurement, gudang, manufaktur), siapa yang boleh memakainya, penjaga anti angka karangan, penggabungan data per orang, riwayat percakapan, umpan balik jempol, jawaban di latar, Jadwal Tugas, dan sumber yang sengaja dilewati. Juga menjawab riwayat keputusan lintas ADR 0058, 0120, dan 0132, batas 30 detik gateway, serta hal yang masih TBD.",
       "kata_kunci": [
         "Copilot",
         "assistant service",
         "asisten AI",
-        "tanya-jawab",
+        "tanya-jawab lintas modul",
         "tool runner",
-        "services/assistant",
-        "JWT pemakai",
-        "penjaga jawaban",
-        "angka karangan",
-        "Jadwal Tugas"
+        "ADR 0132",
+        "penjaga jawaban angka karangan",
+        "JWT pemakai lewat gateway",
+        "Jadwal Tugas",
+        "tool HRGA marketing"
       ]
     },
     {
@@ -2224,20 +2225,20 @@
         "CORE - HRIS Orchestrator",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "11edd8caf0cb00b0af3971124adad4a1a2252a173597ef6923fe7efa21147384",
-      "ukuran_kb": 57.9,
-      "ringkasan": "Menjawab: apa tanggung jawab attendance-service (clock-in/out multi-metode, resolusi dan rotasi jadwal, cuti, perjalanan dinas, guestbook, hari libur, laporan) dan fitur mana yang sudah ada, serta di mana aturan jam kerja, ambang telat, dan sanksinya sebenarnya didefinisikan (Peraturan Perusahaan di repo mobile). Juga menjawab bagaimana rute internal dan KPI digerbang (`ATTENDANCE_SERVICE_KEY` vs header gateway), bagaimana rekap telat untuk SP dan kedisiplinan KPI dihitung, integrasinya dengan payroll, employee, marketing-analytics (Sesi Live Host), dan Copilot, serta catatan multi-tenant yang masih parsial.",
+      "hash": "1d649fe4a340cffb38c2489fab0d661e3f6a183b5094f775a83f57448775bc9a",
+      "ukuran_kb": 58.2,
+      "ringkasan": "Menjawab: apa tanggung jawab attendance-service (clock-in/out multi-metode, resolusi dan rotasi jadwal, leave request, perjalanan dinas, guestbook, hari libur, laporan untuk payroll), fitur mana yang sudah ada, dan service lain mana yang bergantung padanya. Bisa dipakai untuk mencari rute integrasi seperti rekap telat untuk usulan SP (`/internal/late-recap`), rekap kedisiplinan dan kehadiran perusahaan untuk KPI, resolusi jadwal dan status tap untuk Sesi Live Host, serta rekap telat dan cuti tim untuk Copilot, berikut cara tiap rute digerbang (kunci layanan `ATTENDANCE_SERVICE_KEY`, header gateway, RBAC HRIS). Juga menjawab di mana aturan jadwal, ambang telat, dan sanksi sebenarnya ditetapkan (Peraturan Perusahaan di repo mobile), periode telat 26 ke 25, dan catatan multi-tenant presensi.",
       "kata_kunci": [
         "attendance service",
         "absensi",
-        "presensi",
-        "jadwal kerja",
-        "shift",
-        "rekap telat",
-        "late-recap",
+        "presensi kehadiran",
+        "jadwal kerja shift rotasi",
+        "rekap telat late-recap",
+        "KPI kedisiplinan absensi",
         "ATTENDANCE_SERVICE_KEY",
-        "guestbook",
-        "multi-tenant"
+        "Peraturan Perusahaan SP",
+        "multi-tenant company_id",
+        "WiFi guestbook"
       ]
     },
     {
@@ -14896,24 +14897,25 @@
         "REF - Layout Dashboard erp-frontend",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "Microservices - Assistant Service",
+        "ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai",
         "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
         "Microservices - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "e344852d683d8149bdd4b2edfe898d516e1e566b586c8980e0913673cc41967e",
-      "ukuran_kb": 28.9,
-      "ringkasan": "Menjawab: bagaimana Copilot menyajikan jawaban berangka sebagai laporan, mulai dari kartu angka utama dengan perubahan periode, judul grafik berupa kesimpulan, bentuk grafik yang dipilih sistem menurut jenis temuan, satu paragraf penjelasan per grafik, tabel lengkap tanpa pemotongan, disiplin warna, sampai unduhan PDF dan Excel. Menjawab pula alat mana yang mendapat laporan penuh (`laba_produk`, `laba_toko`) dan apa yang didapat alat lain lewat jalur umum, bagaimana periode pembanding ditentukan, dan kenapa margin ditulis dalam poin. Dipakai sebagai daftar periksa saat menambah alat baru ke Copilot, lengkap dengan berkas kode penegak tiap aturan dan hal yang belum berlaku.",
+      "hash": "5adb6cf9d4b324c87ed960f8ca2fccfb0389359f5276d9dad62ef3d57b1e803c",
+      "ukuran_kb": 40.9,
+      "ringkasan": "Menjawab: bagaimana Copilot menyajikan jawaban berangka sebagai laporan (kartu angka utama dengan perubahan periode, grafik berjudul kesimpulan, satu paragraf per grafik, tabel lengkap, unduhan PDF dan Excel) dan berkas kode mana yang menegakkan tiap aturannya. Bisa dipakai untuk mencari cara periode pembanding dipilih, kenapa sistem dan bukan model yang memilih bentuk grafik, aturan data tidak dipotong, disiplin warna, serta apa beda laporan penuh `laba_produk`/`laba_toko` dengan jalur umum alat lain. Juga menjawab langkah yang harus diikuti saat menambah alat baru ke Copilot supaya tampil dengan gaya yang sama.",
       "kata_kunci": [
-        "penyajian laporan",
-        "Copilot",
+        "penyajian laporan Copilot",
         "laporan laba",
-        "laba_produk",
-        "laba_toko",
+        "laba_produk laba_toko",
         "kartu angka utama",
-        "temuan",
-        "bentuk grafik",
+        "grafik chart judul kesimpulan",
+        "temuan konsentrasi negatif",
         "periode pembanding",
-        "PDF Excel"
+        "bentuk_bawaan PutuskanBentuk",
+        "unduh PDF Excel",
+        "menambah alat baru"
       ]
     },
     {
