@@ -728,6 +728,12 @@ menerima seperlima anggaran sebulan, lalu realisasi tiga harinya dibandingkan ja
 dan akurasi minggu terakhir selalu tampak anjlok tanpa ada yang salah pada belanjanya. Sisa
 pembulatan ditimpakan ke minggu terakhir supaya jumlahnya kembali **tepat** ke anggaran bulanan.
 
+> 🟡 **Direncanakan berubah (2026-10-09, kode belum ada):** porsi tiap minggu akan bisa diatur Cost
+> Control dengan jumlah sebulan tetap sama dengan RAPB; pembagian menurut jumlah hari menjadi
+> bawaan untuk periode yang tidak diatur. Keputusannya
+> [[ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB]].
+> Paragraf di atas tetap menggambarkan yang berjalan hari ini.
+
 **Minggu = potongan 7 hari dari tanggal 1, bukan minggu kalender Senin–Minggu.** Minggu kalender
 melintasi batas bulan (29 Juli–4 Agustus adalah satu minggu), sedangkan anggaran dan realisasi
 keduanya dikunci per periode bulanan; minggu yang kakinya di dua bulan tak punya anggaran

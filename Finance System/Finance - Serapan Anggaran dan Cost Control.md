@@ -21,7 +21,22 @@ Tab di `/finance/anggaran`, urutan di layar (`tab-anggaran.ts`, array `TAB_ANGGA
 | Opex Marketing | Panel OPEX Marketing yang sudah ada; **tidak** disatukan ke Serapan |
 | Rekomendasi | Pencatatan rekomendasi efisiensi (bekas `/finance/cost-control`); periodenya mengikuti Tahun/Bulan halaman, akun dari katalog |
 | **Anggaran Bulanan** | Isian anggaran: unduh template, unggah Excel, tambah baris, koreksi, hapus (hapus meminta konfirmasi). `?tab=master` lama dipetakan **eksplisit** ke tab ini |
-| **Forecast Mingguan** | Panel lama apa adanya, ditambah rincian per akun per minggu. **Tidak** mengubah forecast kas maupun KPI Cost Control #4 |
+| **Forecast Mingguan** | Panel lama apa adanya, ditambah rincian per akun per minggu. **Tidak** mengubah forecast kas maupun KPI Cost Control #4. 🟡 Direncanakan: porsi proyeksi tiap minggu bisa diatur, lihat §Proyeksi Mingguan Diatur per Minggu |
+
+### Proyeksi Mingguan Diatur per Minggu (🟡 Direncanakan, kode belum ada)
+
+Keputusan: [[ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB]]. Yang berlaku hari ini tetap pembagian menurut jumlah hari, tanpa isian.
+
+Cara kerja yang direncanakan:
+
+- Cost Control (pemegang `finance.anggaran.kelola`) mengetik **total rupiah per minggu**. Jumlah seluruh minggu harus sama dengan anggaran RAPB kas-keluar bulan itu, kalau tidak simpan ditolak.
+- Sistem menyimpan **porsi** tiap minggu, bukan nominalnya. Proyeksi tiap akun pada sebuah minggu = anggaran akun × porsi minggu itu, jadi tabel rincian per akun mengikuti tabel ringkasan. Semua akun memakai porsi yang sama.
+- Minggu terkunci sejak hari pertamanya (WIB). Pergeseran hanya antar-minggu yang belum mulai.
+- Tiap minggu paling banyak 2 kali diubah per periode; sekali simpan menghitung tiap minggu yang angkanya berubah.
+- Riwayat perubahan (siapa, kapan, sebelum → sesudah per minggu) tampil di bawah tabel.
+- Periode tanpa isian tetap memakai pembagian menurut jumlah hari.
+
+⚠️ **Jangan dibaca sebagai cara menaikkan KPI.** Akurasi bulan dan KPI Cost Control #4 dihitung dari **total** sebulan, dan total itu tidak berubah saat porsi digeser antar-minggu. Yang berubah hanya akurasi **per minggu**.
 
 Tambahan di luar halaman ini: kotak **sisa pos** di bawah tiap baris form pencatatan Accounting, dan kartu **Anggaran** baca-saja di tahap Cost Control pada detail pengajuan (pos yang sudah lewat anggaran bulan ini, maksimal 5, sisanya diringkas, plus tautan ke tab Serapan). Kartu itu tidak memperkirakan pos pengajuan, karena pos baru ditetapkan Accounting.
 
@@ -88,9 +103,12 @@ Dilacak di bip-erp#2814 (Pemutus: wirkancil):
 - Sisa teknis yang tercatat di issue yang sama: aturan "supervisor/admin finance" untuk izin kelola tertulis di dua tempat di FE; `GET /katalog/departemen` terdaftar dua kali di procurement (yang terpakai mengirim nama; bila urutan berubah, kotak sisa pos salah tanpa galat).
 - **Verifikasi**: belum ada layar yang dilihat di browser dan belum ada endpoint yang dicoba lewat gateway.
 
+Untuk proyeksi mingguan yang diatur (ADR 0161, Pemutus TBD): nasib proyeksi minggu terkunci saat RAPB diunggah ulang, pengaturan untuk bulan mendatang, asal nama pengubah di riwayat, dan ada tidaknya "kembalikan ke bawaan". Rinciannya di ADR-nya.
+
 ## Dokumen Terkait
 
 - [[ADR - 0159 Serapan Anggaran Dibaca dari Pengajuan sebagai Bagian dari Terpakai, Rute Tulis Anggaran Digerbang Izin Sendiri]]
+- [[ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB]]
 - [[Finance - Rancangan Finance Service]] · [[Finance - Proses Pengajuan Pengeluaran dan Persetujuan]] · [[Finance - FAT Persona]]
 - [[API - Procurement Service]] · [[API - Integration Service]] · [[Microservices - Procurement Service]]
 - [[CORE - RBAC dan Permission Set]] · [[APP - Web ERP]] · [[REF - Kepemilikan Data]]
