@@ -1,6 +1,6 @@
 # ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB
 
-> **Status**: 🟡 **Diusulkan** (belum ada baris `🟢 Diterima, <tanggal>, oleh <login/jabatan>`; aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Asal keputusan: permintaan atasan Finance yang disampaikan Azzerith, bentuknya dipilih di sesi analisa 2026-10-09. **Kodenya belum ada.**
+> **Status**: 🟢 Diterima, 2026-10-09, oleh Azzerith (aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Asal keputusan: permintaan atasan Finance yang disampaikan Azzerith, bentuknya dipilih di sesi analisa 2026-10-09. 🟡 **Kodenya belum ada.**
 
 ## Untuk Manajemen
 
@@ -57,6 +57,9 @@ Aturan yang dijaga sistem:
 | K8 | **Riwayat perubahan** wajib, hanya-tambah: siapa, kapan, dan per minggu angka sebelum → sesudah. Ditampilkan di bawah tabel Forecast Mingguan. Simpan **gagal** bila riwayatnya gagal tercatat. Hitungan K7 diturunkan dari riwayat ini, bukan disimpan sebagai angka kedua. |
 | K9 | **Izin**: mengatur proyeksi memakai `finance.anggaran.kelola` yang sudah ada; membaca proyeksi dan riwayat memakai izin baca halaman (`finance.accounting.view`). Tidak ada izin baru. |
 | K10 | Kunci, batas ubah, dan kesamaan jumlah **diputuskan backend**. Layar hanya menampilkan keadaan (terkunci, sisa kesempatan ubah) yang dikirim backend dan tidak menghitungnya sendiri. |
+| K11 | **Unggah ulang RAPB di tengah bulan**: porsi yang tersimpan diterapkan ke anggaran baru untuk **semua** minggu, termasuk yang sudah terkunci. Nominal minggu terkunci boleh ikut bergeser; jumlah sebulan selalu sama dengan RAPB. Tidak ada potret nominal per minggu. *(Diputuskan Azzerith 2026-10-09.)* |
+| K12 | **Bulan mendatang boleh diatur** sebelum bulannya mulai, selama anggaran bulan itu sudah diunggah. Bulan yang sudah lewat seluruhnya tidak bisa diatur (semua minggunya terkunci). *(Diputuskan Azzerith 2026-10-09.)* |
+| K13 | **Tidak ada tombol kembalikan ke bawaan.** Kembali ke pembagian menurut jumlah hari dilakukan dengan mengetik ulang angkanya, dan itu terhitung sebagai perubahan biasa (K7). *(Diputuskan Azzerith 2026-10-09.)* |
 
 Di luar cakupan: pengaturan per akun per minggu; mengubah rumus KPI menjadi rata-rata akurasi mingguan; persetujuan atasan per perubahan; mengubah total anggaran dari tab ini; pemicu manual penarikan realisasi.
 
@@ -73,7 +76,7 @@ Di luar cakupan: pengaturan per akun per minggu; mengubah rumus KPI menjadi rata
 - **Angka KPI akhir bulan tidak berubah** oleh fitur ini. Bila yang diharapkan manajemen adalah skor KPI membaik, itu keputusan lain (rumus KPI), dan harus dikatakan terang saat fitur diserahkan.
 - Semua akun mengikuti porsi minggu yang sama, padahal jadwal bayar tiap akun bisa berbeda. Rincian per akun karena itu tetap perkiraan.
 - **Turunan K6 + K7**: bila tinggal satu minggu yang belum mulai, atau pasangan gesernya sudah habis kesempatannya, minggu itu tidak bisa diubah lagi.
-- Karena yang disimpan porsi, **unggah ulang RAPB sesudah bulan berjalan ikut mengubah nominal proyeksi minggu yang sudah terkunci**. Lihat §Belum diputuskan.
+- Karena yang disimpan porsi, **unggah ulang RAPB sesudah bulan berjalan ikut mengubah nominal proyeksi minggu yang sudah terkunci**. Ini diterima sadar (K11).
 - Teks alat asisten AI yang menyatakan "proyeksi = anggaran dibagi menurut jumlah hari" menjadi salah untuk periode yang diatur, dan harus diperbarui bersama backend.
 - Kalimat di layar "tidak ada yang diisi di tab ini" harus diganti.
 
@@ -87,11 +90,7 @@ Di luar cakupan: pengaturan per akun per minggu; mengubah rumus KPI menjadi rata
 
 ## Belum diputuskan
 
-- **Unggah ulang RAPB di tengah bulan**: apakah nominal proyeksi minggu yang sudah terkunci boleh ikut berubah (akibat K4), atau harus dibekukan saat minggunya mulai.
-- **Bulan mendatang**: apakah porsi boleh diatur sebelum bulannya mulai (usulan: boleh, selama anggaran bulan itu sudah diunggah).
-- **Nama pengubah di riwayat**: gateway hanya meneruskan id karyawan; nama disalin saat simpan atau diambil saat tampil.
-- **Mengembalikan ke bawaan** (hapus isian): apakah ada, dan apakah dihitung sebagai satu kali ubah.
-- **Konfirmasi Pemutus** atas K6, K7, dan K9.
+- **Nama pengubah di riwayat**: gateway hanya meneruskan id karyawan; nama disalin saat simpan atau diambil saat tampil. Diserahkan ke pelaksana backend, dicatat di PR.
 
 ## Dokumen Terkait
 

@@ -35,6 +35,7 @@ Cara kerja yang direncanakan:
 - Tiap minggu paling banyak 2 kali diubah per periode; sekali simpan menghitung tiap minggu yang angkanya berubah.
 - Riwayat perubahan (siapa, kapan, sebelum → sesudah per minggu) tampil di bawah tabel.
 - Periode tanpa isian tetap memakai pembagian menurut jumlah hari.
+- Bila RAPB diunggah ulang, porsi yang tersimpan diterapkan ke anggaran baru untuk semua minggu, termasuk yang sudah terkunci. Bulan mendatang boleh diatur sebelum bulannya mulai. Tidak ada tombol kembalikan ke bawaan.
 
 ⚠️ **Jangan dibaca sebagai cara menaikkan KPI.** Akurasi bulan dan KPI Cost Control #4 dihitung dari **total** sebulan, dan total itu tidak berubah saat porsi digeser antar-minggu. Yang berubah hanya akurasi **per minggu**.
 
@@ -103,7 +104,7 @@ Dilacak di bip-erp#2814 (Pemutus: wirkancil):
 - Sisa teknis yang tercatat di issue yang sama: aturan "supervisor/admin finance" untuk izin kelola tertulis di dua tempat di FE; `GET /katalog/departemen` terdaftar dua kali di procurement (yang terpakai mengirim nama; bila urutan berubah, kotak sisa pos salah tanpa galat).
 - **Verifikasi**: belum ada layar yang dilihat di browser dan belum ada endpoint yang dicoba lewat gateway.
 
-Untuk proyeksi mingguan yang diatur (ADR 0161, Pemutus TBD): nasib proyeksi minggu terkunci saat RAPB diunggah ulang, pengaturan untuk bulan mendatang, asal nama pengubah di riwayat, dan ada tidaknya "kembalikan ke bawaan". Rinciannya di ADR-nya.
+Untuk proyeksi mingguan yang diatur (ADR 0161, Diterima 2026-10-09): yang tersisa hanya asal nama pengubah di riwayat (diserahkan ke pelaksana). Sudah diputuskan di ADR-nya: unggah ulang RAPB menerapkan porsi ke anggaran baru untuk semua minggu, bulan mendatang boleh diatur, dan tidak ada tombol kembalikan ke bawaan.
 
 ## Dokumen Terkait
 

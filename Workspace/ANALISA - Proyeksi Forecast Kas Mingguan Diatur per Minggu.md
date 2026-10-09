@@ -1,10 +1,10 @@
 # ANALISA - Proyeksi Forecast Kas Mingguan Diatur per Minggu
 
-> 🟡 ADR-nya **Diusulkan** (belum Diterima). Issue untuk task di bawah **belum dibuat**. Keadaan 2026-10-09; bergerak, ukur ulang sebelum dipakai.
+> 🟢 ADR-nya **Diterima** 2026-10-09 oleh Azzerith. Issue sudah dibuat (lihat §Urutan). Keadaan 2026-10-09 (bergerak, ukur ulang sebelum dipakai): bip-erp#2865 PR terbuka (bip-erp #2872); pekerjaan BE dan FE fitur ini belum mulai.
 
 - **ADR**: [[ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB]]
 - **Dok domain**: [[Finance - Serapan Anggaran dan Cost Control]] § Proyeksi Mingguan Diatur per Minggu · [[Finance - Rancangan Finance Service]] · [[API - Integration Service]]
-- **Pemutus**: TBD
+- **Pemutus**: `Azzerith`
 - **Dibuat**: 2026-10-09, hasil `/analisa-kebutuhan`
 - **Ukuran**: **Sedang**. Dua repo (`bip-erp`, `erp-frontend`), masing-masing satu PR. `my-bharata` tidak tersentuh: tidak ada pembaca endpoint mingguan di sana yang ditemukan, dan repo itu tidak diperiksa lebih jauh.
 
@@ -20,15 +20,18 @@ Yang diminta: proyeksi Forecast Mingguan bisa diedit manual. Kebutuhannya: penge
 4. Riwayat pengeditan di bawah tabel: siapa, kapan, apa yang berubah.
 5. Bentuk simpan: porsi per minggu (Opsi 1), supaya tabel rincian per akun ikut dan RAPB tetap satu sumber.
 6. Tetap dibangun walau skor KPI akhir bulan tidak berubah.
+7. Unggah ulang RAPB di tengah bulan: porsi diterapkan ke anggaran baru untuk semua minggu, termasuk yang terkunci.
+8. Bulan mendatang boleh diatur sebelum bulannya mulai.
+9. Tidak ada tombol kembalikan ke bawaan.
 
 ## Urutan
 
 | Urutan | Task | Repo | Menunggu |
 |---|---|---|---|
 | 0 | bip-erp#2865: minggu yang belum selesai tidak dihitung ke akurasi dan KPI | `bip-erp` | Pemutus menegaskan rinciannya |
-| Induk | Proyeksi mingguan diatur per minggu (issue induk, tanpa PR sendiri) | `bip-erp` | ADR 0161 Diterima |
-| 1 | [BE] Simpan porsi mingguan, kunci, batas ubah, riwayat; laporan mingguan memakai porsi | `bip-erp` | #2865 merged (berkas yang sama) |
-| 2 | [FE] Form atur proyeksi dan tabel riwayat di tab Forecast Mingguan | `erp-frontend` | task 1 ada di DEV |
+| Induk | [bip-erp#2877](https://github.com/bip-itteam-internal/bip-erp/issues/2877) (tanpa PR sendiri) | `bip-erp` | |
+| 1 | [bip-erp#2878](https://github.com/bip-itteam-internal/bip-erp/issues/2878) [BE] Simpan porsi mingguan, kunci, batas ubah, riwayat | `bip-erp` | #2865 merged (berkas yang sama) |
+| 2 | [erp-frontend#2232](https://github.com/bip-itteam-internal/erp-frontend/issues/2232) [FE] Form atur proyeksi dan tabel riwayat | `erp-frontend` | erp-frontend#2230 merged; deploy sesudah task 1 |
 
 Deploy backend sebelum frontend.
 
@@ -64,7 +67,7 @@ Yang harus benar:
 
 ## Yang masih terbuka
 
-Lihat ADR § Belum diputuskan. Yang paling menentukan sebelum task 1 dimulai: nasib proyeksi minggu terkunci bila RAPB diunggah ulang di tengah bulan.
+Tinggal asal nama pengubah di riwayat (disalin saat simpan atau diambil saat tampil), diserahkan ke pelaksana backend. Kontrak endpoint ada di badan kedua sub-issue, identik.
 
 ## Yang perlu disampaikan ke manajemen
 
