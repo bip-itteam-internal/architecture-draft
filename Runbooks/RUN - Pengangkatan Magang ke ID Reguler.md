@@ -1,4 +1,4 @@
-> **Status**: ⚠️ Live PROD 2026-09-27, belum pernah dijalankan untuk karyawan nyata. Kodenya ada di bip-erp [#2106](https://github.com/bip-itteam-internal/bip-erp/pull/2106) (rute ganti-ID di tiap service), bip-erp [#2107](https://github.com/bip-itteam-internal/bip-erp/pull/2107) (koordinator), dan erp-frontend [#1760](https://github.com/bip-itteam-internal/erp-frontend/pull/1760) (tombol). Ketiganya merged. Terverifikasi 06.08 WIB, baca saja: ke-20 biner memuat rute, indeks `kunci_aktif_unik` terbentuk, bundel FE memuat tombol. Keputusannya [[ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service]].
+> **Status**: ✅ Live PROD 2026-09-27, pertama dijalankan untuk karyawan nyata 2026-10-09 (gagal di tengah tahap apply, tuntas sesudah bip-erp [#2908](https://github.com/bip-itteam-internal/bip-erp/pull/2908) ter-deploy; pelajarannya masuk §2, §4, §5, §7). Kodenya ada di bip-erp [#2106](https://github.com/bip-itteam-internal/bip-erp/pull/2106) (rute ganti-ID di tiap service), bip-erp [#2107](https://github.com/bip-itteam-internal/bip-erp/pull/2107) (koordinator), dan erp-frontend [#1760](https://github.com/bip-itteam-internal/erp-frontend/pull/1760) (tombol). Ketiganya merged. Terverifikasi 06.08 WIB, baca saja: ke-20 biner memuat rute, indeks `kunci_aktif_unik` terbentuk, bundel FE memuat tombol. Keputusannya [[ADR - 0128 Pengangkatan Magang Dijalankan HR dari ERP, Ganti employee_id oleh Tiap Service]].
 
 ## Tujuan
 
@@ -17,7 +17,7 @@ Mengangkat karyawan magang (ID `<KODE>-MG-<NNNN>-<MM>-<YY>`) ke PKWT/PKWTT denga
 
 ## 2. HR: angkat
 
-1. Di panel yang sama muncul tombol **"Angkat dan terbitkan ID reguler"**. Pilih waktu yang tidak mengganggu karyawannya, karena loginnya akan putus sekali.
+1. Di panel yang sama muncul tombol **"Angkat dan terbitkan ID reguler"**. Pilih waktu **di luar jam kerja karyawannya**, karena dua hal: loginnya putus sekali, dan sesudah selesai jadwal dasarnya di presensi bisa tertinggal sampai 30 menit sehingga presensinya bisa gagal selama jeda itu (salinan `work_schedule` di attendance baru menyusul pada sinkronisasi berikutnya, tiap menit ke-00 dan ke-30; bip-erp [#2911](https://github.com/bip-itteam-internal/bip-erp/issues/2911)).
 2. Baca dialog konfirmasi, lalu tekan Angkat.
 3. Panel menampilkan status **berjalan**. Sistem memeriksa semua service dulu (tahap dry). Baru setelah **semua** lolos, sistem mengganti ID di tiap service satu per satu, dengan employee-service paling akhir.
 4. **Selesai**: panel menampilkan ID lama → ID baru, dan riwayat kontrak kini terbaca atas ID baru.
@@ -40,6 +40,20 @@ Panel menampilkan status **gagal**, pesan galat, dan tombol **Ulangi**.
 - **Klik ganda aman.** Tombol Angkat yang ditekan dua kali, atau dari dua tab, hanya menjalankan satu proses. Permintaan kedua ditolak dengan 409 karena satu orang hanya boleh punya satu pengangkatan yang belum tuntas. Hal yang sama berlaku untuk Ulangi. Nomor ID yang sudah dipesan untuk permintaan yang ditolak ikut terbuang, dan itu diterima.
 - **employee-service dimulai ulang di tengah proses** (deploy atau crash): saat service naik lagi, pengangkatan yang masih "berjalan" otomatis ditandai **gagal** dengan pesan "proses terputus karena employee-service dimulai ulang". HR cukup menekan Ulangi.
 
+### 4a. Gagal di tahap apply dan perbaikannya tidak bisa naik hari itu juga
+
+Gagal di tahap apply berarti service di awal urutan **sudah ber-ID baru** sementara employee-service (login) masih ber-ID lama. Yang paling terasa adalah attendance, service pertama di urutan: karyawannya masih login dengan ID lama, jadi **riwayat presensinya tampak kosong, jadwalnya jatuh ke bawaan, dan presensinya bisa ditolak**. Tidak ada data yang hilang; datanya utuh di ID baru. Terjadi 2026-10-09 (attendance 200 dokumen dan form-builder 33 dokumen terlanjur ditulis).
+
+Bila sebabnya bisa dibereskan dan di-deploy sebelum orangnya bekerja lagi, cukup Ulangi. Bila tidak:
+
+1. **Ukur dulu** service mana yang benar-benar menulis: `employee_db.employee_pengangkatan`, field `services[]`, yang berstatus `selesai` dengan `jumlah` > 0.
+2. **Balikkan service itu ke ID lama** dengan alat §6 (pasangan terbalik, hanya container Mongo service tersebut). Dry dulu, `mongodump` sebelum menulis. Dry akan menolak dengan "ID TUJUAN SUDAH DIPAKAI" karena salinan `work_schedule` di attendance sudah kembali ber-ID lama oleh sinkronisasi; itu salinan, bukan data baru, jadi mode lanjutan sah **setelah** dipastikan tak ada bentrok di indeks unik.
+3. **Biarkan** status `selesai` di dokumen pengangkatan apa adanya selama perbaikan belum naik. Dengan begitu Ulangi yang tertekan tak sengaja hanya gagal lagi di service yang sama tanpa menulis apa pun.
+4. Sesudah perbaikan ter-deploy dan **tepat sebelum** HR menekan Ulangi, ubah status service yang dibalikkan dari `selesai` ke `lolos_dry` di dokumen pengangkatan. Tanpa langkah ini Ulangi **melewati** service itu dan datanya terbelah ke arah sebaliknya.
+5. HR menekan Ulangi. Sesudah selesai, ukur ulang semua database: nol nilai ID lama selain catatan pemetaan.
+
+Langkah 2 dan 4 menulis ke database PROD, jadi dijalankan manusia. Kerangka skrip yang terpakai 2026-10-09 ada di `.task-plans/` workspace IT (`balik-pengangkatan-1004.ps1`), belum di repo mana pun.
+
 ## 5. IT: membaca galat
 
 Galat tingkat proses berbentuk `dry ditolak <service>: ...` atau `apply gagal di <service>: ...`. Rincian per service tersimpan di `employee_db.employee_pengangkatan`, field `services[]`.
@@ -51,7 +65,8 @@ Galat tingkat proses berbentuk `dry ditolak <service>: ...` atau `apply gagal di
 | `service <x> menolak (status 404)` | image service itu belum memuat rute `POST /internal/employee-id/ganti` | build ulang service itu (perubahan `shared-library` menaikkan **semua** service) |
 | `service <x> menolak (status 401)` | kunci gateway tidak cocok. Rute ganti-ID memeriksa `BIP-Gateway-ID` di rantainya sendiri, dan vault-mcp memakai gerbang kunci miliknya sendiri | pastikan `INTERNAL_GATEWAY_KEY` sama di employee-service dan service itu, lalu `--force-recreate` service yang env-nya berubah |
 | `gerbang menolak run (...): <koleksi>\|<path>: ...` (422) | ID lama muncul sebagai **potongan teks** di path yang tidak ada di daftar-izin service itu, atau ID tujuan sudah dipakai | periksa isi path tersebut. Potongan yang sah (path berkas, teks notifikasi) masuk ke daftar-izin **service itu** lewat perubahan kode dan PR, bukan dilewati |
-| `... koleksi besar tak terpindai ...` (422) | koleksi di atas 50 ribu dokumen yang sampelnya tak memuat field ber-ID | pemindaian manual dengan alat §6 untuk koleksi itu, lalu putuskan. Jangan menyalakan `AllowUnscannable` tanpa bukti |
+| `gerbang menolak dry ...: <n> koleksi besar belum dideklarasikan dan tak terpindai: <koleksi>` (422, sejak 2026-10-09 muncul di tahap **pemeriksaan**, jadi belum ada yang ditulis) | koleksi service itu melewati 50 ribu dokumen dan belum dideklarasikan, sementara sampelnya tak memuat field ber-ID | ukur koleksi itu (sampel besar + struct entity dan penulisnya), lalu deklarasikan di `LargeCollections` pada `services/<service>/ganti_employee_id_route.go` lewat PR: path ber-ID-nya, atau daftar kosong bila memang tanpa ID karyawan (ADR 0128 §6). Deploy service itu, baru Ulangi. Jangan menyalakan `AllowUnscannable` |
+| `gerbang menolak apply ...: ... koleksi besar tak terpindai ...` (422, pesan **lama**) | service itu masih menjalankan biner sebelum bip-erp #2908, yang hanya memeriksa saat apply. Service sebelumnya di urutan **sudah ditulis** | deploy service itu dengan kode terbaru, lalu ikuti §4a |
 | `masih ada ID lama sesudah apply ...` (422) | ada tulisan baru ber-ID lama selagi proses berjalan | Ulangi (idempoten) setelah sebabnya jelas |
 
 ## 6. Pembalikan dan alat IT (interim)
@@ -63,7 +78,7 @@ Galat tingkat proses berbentuk `dry ditolak <service>: ...` atau `apply gagal di
 
 Urutan: **rute di semua service → koordinator employee-service → frontend**. Frontend terakhir, karena tombolnya memanggil rute yang belum ada.
 
-- Rute ganti-ID ada di image setiap service. Buktinya `docker exec <Container> sh -c "strings /service | grep -c /internal/employee-id/ganti"` bernilai **> 0** untuk tiap service. `docker ps` dan `/health` bukan bukti ([[RUN - Deploy Microservices bip-erp]]).
+- Rute ganti-ID ada di image setiap service. Buktinya `docker exec <Container> sh -c "tr '\000' '\n' < /proc/1/exe | LC_ALL=C grep -c -F '/internal/employee-id/ganti'"` bernilai **> 0** untuk tiap service. ⚠️ Pakai `grep -F` (byte-persis): `grep` mode regex di image ini terbukti membalas **0 untuk string yang ada** pada sebagian biner (2026-10-09, Integration-Service dan TikTok-Shop-Service terbaca "belum ter-deploy" padahal sudah), dan kontrol positif `gofiber` tidak menangkapnya. Sertakan satu service yang sengaja belum di-deploy sebagai kontrol negatif. `docker ps` dan `/health` bukan bukti ([[RUN - Deploy Microservices bip-erp]]).
 - employee-service dibuat ulang (`--force-recreate`) karena ada env URL service baru.
 - vault-mcp dibuat ulang karena ada env `INTERNAL_GATEWAY_KEY`.
 - Uji pertama: `GET /api/employee/pengangkatan/kelayakan?employee_id=<ID magang>` lewat gateway harus membalas `layak` beserta `tanggal_diangkat`, bukan 404.
