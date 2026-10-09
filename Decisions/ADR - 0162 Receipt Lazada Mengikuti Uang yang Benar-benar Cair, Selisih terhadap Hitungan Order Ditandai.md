@@ -1,6 +1,6 @@
 # ADR - 0162 Receipt Lazada Mengikuti Uang yang Benar-benar Cair, Selisih terhadap Hitungan Order Ditandai
 
-> **Status**: 🟢 **Diterima**, 2026-10-09, oleh bagusizzanm (Tech Development). Butir 1 sampai 5 di § Decision adalah jawaban Finance (2026-10-09); butir 6 sampai 8 diputuskan Tech Development pada hari yang sama atas usulan agent, **belum dikonfirmasi Finance**, dan sengaja dibuat sementara serta mudah dibalik (Finance bisa memindahkan selisih ke akun lain tanpa perubahan kode). Belum ada kode. Nomor 0162 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.
+> **Status**: 🟢 **Diterima**, 2026-10-09, oleh bagusizzanm (Tech Development). Butir 1 sampai 5 di § Decision adalah jawaban Finance (2026-10-09); butir 6 diputuskan Tech Development atas usulan agent dan **dikonfirmasi Finance pada hari yang sama** (selisih masuk Beban Admin); butir 7 dan 8 diputuskan Tech Development dan belum dikonfirmasi Finance. Semuanya sengaja sementara dan mudah dibalik (Finance bisa memindahkan selisih ke akun lain tanpa perubahan kode). Belum ada kode. Nomor 0162 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.
 
 %% Status di blockquote atas supaya terbaca VAULT-INDEX.json (15 baris pertama). %%
 
@@ -16,7 +16,7 @@
 
 **Sudah diputuskan Finance juga.** Biaya ditempatkan ke akun menurut jenisnya (sheet pemetaan COA Finance, yang sudah dipakai sistem), dan tanda selisih tampil di layar INC.
 
-**Diputuskan Tech Development (belum dikonfirmasi Finance, mudah dibalik).** Selisih yang jenis biayanya belum terbaca dibukukan sementara ke Beban Admin E-Commerce lalu dipindahkan Finance setelah diperiksa; selisih di bawah Rp0,5 tidak ditandai; penerimaan lama yang sudah terkirim tidak diubah otomatis, Finance mendapat daftar yang selisihnya masih ada.
+**Diputuskan Tech Development (akun Beban Admin dikonfirmasi Finance 2026-10-09; ambang dan perlakuan receipt lama belum dikonfirmasi; semuanya mudah dibalik).** Selisih yang jenis biayanya belum terbaca dibukukan sementara ke Beban Admin E-Commerce lalu dipindahkan Finance setelah diperiksa; selisih di bawah Rp0,5 tidak ditandai; penerimaan lama yang sudah terkirim tidak diubah otomatis, Finance mendapat daftar yang selisihnya masih ada.
 
 ## Deskripsi
 
@@ -40,7 +40,7 @@
 3. Tidak ada syarat tambahan dari Finance. (Finance, 2026-10-09.)
 4. **Akun penempatan biaya berbeda tergantung jenis biayanya, mengikuti sheet "Mapping COA" Finance**: 6112 Beban Admin E-Commerce (komisi, biaya transaksi, order processing, penyesuaian komisi debit dan kredit, Lazada Funded Commission), 6113 Potongan Afiliasi E-Commerce (biaya afiliasi bersponsor), 6114 Beban Ongkir E-Commerce (Free Shipping Max), 4003 Potongan Penjualan (diskon, LazKoin, price cut, co-fund kedua sisi, seluruh biaya promosi, voucher max), dan klaim barang hilang diperlakukan seperti uang masuk biasa. (Finance, 2026-10-09; sheet berisi 19 jenis biaya.) **Pemetaan ini sudah dipakai kode** (`KlasifikasiFeeLazada`, dari sheet yang sama yang diterima 2026-09-07), jadi bagian ini tidak butuh perubahan kode. Yang baru hanya menyangkut selisih yang jenis biayanya BELUM terbaca (§ Pertanyaan Terbuka 1).
 5. **Penanda selisih tampil di layar INC.** (Finance, 2026-10-09.)
-6. **Selisih yang jenis biayanya belum terbaca dibukukan sementara ke 6112 Beban Admin E-Commerce**, sama dengan akun bawaan sistem untuk biaya yang tak dikenal (`KlasifikasiFeeLazada`). Finance memindahkannya ke akun yang tepat setelah memeriksa penandanya. (Tech Development, 2026-10-09, atas usulan agent; belum dikonfirmasi Finance.) Begitu baris biayanya terbaca, pemetaan per jenis (butir 4) yang berlaku, bukan akun sementara ini.
+6. **Selisih yang jenis biayanya belum terbaca dibukukan sementara ke 6112 Beban Admin E-Commerce**, sama dengan akun bawaan sistem untuk biaya yang tak dikenal (`KlasifikasiFeeLazada`). Finance memindahkannya ke akun yang tepat setelah memeriksa penandanya. (Tech Development, 2026-10-09, atas usulan agent; **dikonfirmasi Finance 2026-10-09**: selisih masuk Beban Admin.) Begitu baris biayanya terbaca, pemetaan per jenis (butir 4) yang berlaku, bukan akun sementara ini.
 7. **Ambang tanda selisih = Rp0,5**: selisih di bawahnya dianggap pembulatan dan tidak ditandai; selisih sama atau di atasnya ditandai. Sama dengan ambang debu-float yang dipakai jalur receipt. (Tech Development, 2026-10-09.)
 8. **Receipt Lazada yang sudah terkirim tidak diubah otomatis** (konsisten keputusan 2026-09-29: receipt yang sudah ditutup buku tidak berubah diam-diam). Bila Finance membutuhkannya, sistem menyediakan daftar receipt lama yang selisihnya masih ada, dan Finance memutuskan satu-satu; receipt yang tanggal cairnya sebelum 2026-09-01 tidak disentuh. (Tech Development, 2026-10-09.)
 
