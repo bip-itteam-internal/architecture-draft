@@ -43,6 +43,22 @@ Ini adalah fitur yang terikat dan dimiliki oleh HRIS untuk attendance
 		- ⛔ **Jangan memakai `rentangPeriodeTelat` (`late_recap.go`) untuk kartu ini.** Ia menerima bentuk masukan yang sama persis (`YYYY-MM`) dan namanya terdengar tepat, tetapi mengembalikan batas **siklus payroll 26→25**; kartu kehadiran konsep **kalender**. Memakainya menghasilkan kartu berlabel "Juni" yang menghitung 26 Mei–25 Juni: tak ada galat, angkanya masuk akal, dan salah.
 		- Tiga kartu lain (Tanpa Keterangan, Terlambat, Hari Kerja) ikut berganti angka mengikuti bulan yang sama, tetapi **belum menyebut periodenya sendiri** di judul.
 
+	### Kartu Izin Tidak Masuk Kerja
+
+	> 🔜 **Belum live.** Menunggu bip-erp#2860 dan erp-frontend#2222 (induk bip-erp#2859) merged dan di-deploy; ukur ulang sebelum mengandalkannya.
+
+	Kartu kelima, diputuskan pemilik layar 2026-10-09:
+
+	```
+	Persen izin tidak masuk = IzinTidakMasuk / HariKerja × 100
+	```
+
+	- **Pembilang hanya subtipe "Tidak masuk kerja".** Yang dicacah entri `attendance_entries` berstatus `Izin` dengan `leave_subtype` persis itu. Status `Izin` saja tidak cukup karena ia juga dipakai izin sebagian hari (pulang cepat, meninggalkan pekerjaan sementara), dan itu mayoritasnya. Periode September 2026 (26 Agu sampai 25 Sep) di prod: 174 entri Izin, hanya **63** yang "Tidak masuk kerja"; menghitung semuanya menghasilkan 3,9%, bukan 1,4%.
+	- ⛔ **`izin_tidak_masuk` JANGAN dijumlahkan ke `hari_kerja`.** Penyebutnya `hari_kerja` yang sama dengan kartu "Hari kerja tercatat" (tepat waktu + terlambat + tanpa keterangan), dan status Izin sudah dibuang dari sana. Jadi angka ini berada **di luar** penyebutnya: ia rasio, bukan porsi. Periode September 2026: 63 / 4.509 = **1,4%**.
+	- **Dicacah lewat kueri terpisah yang boleh gagal sendiri** (`cacahIzinTidakMasuk`, `services/attendance/izin_tidak_masuk.go`). Gagal dicacah terbit `null`, dan kartunya menampilkan "-" sementara kartu lain tetap terisi; nol izin terbit `0`. Persen `null` saat tak ada hari kerja.
+	- Jendelanya mengikuti `rentangKartu` yang sama dengan kartu lain (siklus payroll 26 sampai 25), berikut pembandingnya.
+	- Nada kartunya netral: tak ada ambang izin resmi, dan izin itu sah menurut Peraturan Perusahaan.
+
 	### Kartu Terlambat bersumber BUKU TAMU, bukan status entri
 
 	> 🔜 **Belum live.** bip-erp [#1614](https://github.com/bip-itteam-internal/bip-erp/pull/1614) dan erp-frontend [#1380](https://github.com/bip-itteam-internal/erp-frontend/pull/1380) masih OPEN dan belum di-deploy. Sampai keduanya merge, yang berlaku adalah perilaku lama: kartu Terlambat = cacah status `Terlambat`, dan persentase = `Hadir / HariKerja`.
