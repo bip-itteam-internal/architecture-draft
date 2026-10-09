@@ -9281,7 +9281,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": null,
-      "status_teks": "🟢 Diterima, 2026-10-09, oleh Azzerith (aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Asal keputusan: permintaan atasan Finance yang disampaikan Azzerith, bentuknya dipilih di sesi analisa 2026-10-09. 🟡 **Kodenya belum ada.**",
+      "status_teks": "🟢 Diterima, 2026-10-09, oleh Azzerith (aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Asal keputusan: permintaan atasan Finance yang disampaikan Azzerith, bentuknya dipilih di sesi analisa 2026-10-09. 🟡 **Belum berjalan**: per 2026-10-09 kodenya baru berupa PR terbuka (bip-erp#2878, erp-frontend#2232), belum merged dan belum deploy; ukur ulang sebelum dipakai.",
       "publik": true,
       "tautan": [
         "ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia",
@@ -9293,9 +9293,9 @@
         "API - Integration Service",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "3c2d85418699a768a395771db42b6c7bba35c4c4dfc21dec7a03c6799e9c6213",
-      "ukuran_kb": 11.7,
-      "ringkasan": "Menjawab: bolehkah proyeksi Forecast Kas Mingguan diatur manual, siapa yang boleh mengaturnya (Cost Control, izin finance.anggaran.kelola), dan apa aturannya: jumlah sebulan harus tetap sama dengan RAPB, minggu terkunci sejak hari pertamanya (WIB), tiap minggu maksimal 2 kali diubah, dan riwayat perubahan wajib tercatat. Menjelaskan juga mengapa yang disimpan porsi per minggu dan bukan nominal, keputusan lama mana yang dibalik (\"tidak diketik siapa pun\", ADR 0159 K7), serta mengapa skor KPI akurasi forecast kas akhir bulan tidak berubah karena fitur ini.",
+      "hash": "cb1137aec4c345f2dafacffb4e5407edfe8cb6347aae0aaebe79b3ff7aa0bd71",
+      "ukuran_kb": 12.4,
+      "ringkasan": "Menjawab: bolehkah proyeksi di tab Forecast Mingguan diatur manual, siapa yang boleh mengaturnya, dan aturan apa yang dijaga sistem (jumlah sebulan harus tetap sama dengan RAPB kas-keluar, minggu terkunci sejak hari pertamanya menurut WIB, batas 2 kali ubah per minggu, riwayat perubahan wajib). Menjelaskan juga kenapa yang disimpan adalah porsi/bobot per minggu dan bukan nominal, bagaimana proyeksi per akun diturunkan dan dibulatkan, serta kenapa menggeser porsi antar-minggu tidak mengubah akurasi bulanan maupun KPI Cost Control #4. Berguna untuk mengetahui keputusan mana yang dibalik dari Rancangan Finance Service dan ADR 0159 K7, berkas kode yang akan disentuh, dan apa yang sengaja tidak dijanjikan (tanpa pengaturan per akun, tanpa persetujuan atasan).",
       "kata_kunci": [
         "forecast kas mingguan",
         "proyeksi mingguan",
@@ -10523,17 +10523,17 @@
         "Finance - FAT Persona",
         "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya"
       ],
-      "hash": "fec3161ef214d57f5b0f7be70d843df637ceedef2699b3a95dbc7336c2082322",
-      "ukuran_kb": 14.9,
-      "ringkasan": "Menjawab: bagaimana membaca angka di layar Anggaran & Cost Control (/finance/anggaran), yaitu apa arti Anggaran, Terpakai, Sisa, Dari pengajuan, Jurnal lain, dan Menunggu dicatat, kolom mana yang merupakan bagian dari kolom lain dan tidak boleh dijumlahkan, serta kapan sebuah pos dianggap lewat anggaran atau tidak punya anggaran. Menjelaskan juga isi tiap tab (Serapan, Opex Marketing, Rekomendasi, Anggaran Bulanan, Forecast Mingguan), dari mana angka serapan pengajuan berasal, siapa penggunanya, urutan deploy, dan rencana pengaturan porsi proyeksi per minggu.",
+      "hash": "d7091601cfd11b06dc3ebcfb426df25d74d0ee2d9b25c4b6f58faa58e9e9b024",
+      "ukuran_kb": 15.0,
+      "ringkasan": "Menjawab: apa isi tiap tab di layar Anggaran & Cost Control (`/finance/anggaran`) dan bagaimana membaca angkanya, yaitu arti Anggaran, Terpakai, Sisa, Lewat anggaran, Dari pengajuan, Jurnal lain, dan Menunggu dicatat. Menjadi rujukan kolom mana yang merupakan bagian dari kolom lain dan tidak boleh dijumlahkan (Dari pengajuan adalah bagian dari Terpakai), kenapa pos tanpa anggaran tidak boleh tampil Rp 0, dan dari mana angka pengajuan berasal. Memuat juga rencana pengaturan porsi proyeksi Forecast Mingguan per minggu, persona, alur pengguna, urutan deploy, dan hal yang belum diputuskan.",
       "kata_kunci": [
         "serapan anggaran",
         "cost control",
         "anggaran",
         "budget",
         "terpakai",
-        "sisa anggaran",
         "realisasi Accurate",
+        "sisa anggaran",
         "pengajuan barang/dana",
         "menunggu dicatat",
         "forecast mingguan"
@@ -14903,7 +14903,7 @@
         "APP - Web ERP"
       ],
       "hash": "5adb6cf9d4b324c87ed960f8ca2fccfb0389359f5276d9dad62ef3d57b1e803c",
-      "ukuran_kb": 40.9,
+      "ukuran_kb": 41.1,
       "ringkasan": "Menjawab: bagaimana Copilot menyajikan jawaban berangka sebagai laporan (kartu angka utama dengan perubahan periode, grafik berjudul kesimpulan, satu paragraf per grafik, tabel lengkap, unduhan PDF dan Excel) dan berkas kode mana yang menegakkan tiap aturannya. Bisa dipakai untuk mencari cara periode pembanding dipilih, kenapa sistem dan bukan model yang memilih bentuk grafik, aturan data tidak dipotong, disiplin warna, serta apa beda laporan penuh `laba_produk`/`laba_toko` dengan jalur umum alat lain. Juga menjawab langkah yang harus diikuti saat menambah alat baru ke Copilot supaya tampil dengan gaya yang sama.",
       "kata_kunci": [
         "penyajian laporan Copilot",
