@@ -1,3 +1,7 @@
+# ADR - 0168 Departemen Beauty Hacks Diganti Nama Jadi Beautyhacks Bertahap, Kedua Nama Diterima selama Transisi
+
+> **Status**: 🟡 **Diusulkan**, 2026-10-10, kode belum ada. Pemutus: irfanarfianto. Pekerjaan di bip-erp#2944 dan sub-issue-nya; blueprint [[ANALISA - Ganti Nama Departemen Beauty Hacks Jadi Beautyhacks]].
+
 ## Untuk Manajemen
 
 **Yang berubah di layar.** Di semua layar ERP web dan MyBharata, nama departemen akan tertulis **Beautyhacks**, sama dengan nama brand di dokumen SOP perusahaan, menggantikan "Beauty Hacks". Ini berlaku untuk filter, kartu KPI, daftar karyawan, plafon kas, mapping toko, dan laporan.
@@ -16,7 +20,6 @@
 
 *Departemen `beauty_hacks` diganti nama dari "Beauty Hacks" menjadi "Beautyhacks" lewat tiga fase expand → migrate → contract. Selama transisi, backend menerima kedua nama untuk departemen yang sama. Key modul, rute, dan nama departemen di Accurate tetap.*
 
-- **Status**: 🟡 **Diusulkan**, 2026-10-10, kode belum ada. Blueprint: [[ANALISA - Ganti Nama Departemen Beauty Hacks Jadi Beautyhacks]]
 - **Path di repo**: `bip-erp/shared-library/models/employee/master_data.go` · `bip-erp/shared-library/common/roles.go` · `bip-erp/shared-library/common/departemen_marketing.go` · `bip-erp/shared-library/models/manufacture/models.go` · `bip-erp/services/attendance/schedule_list.go` · `bip-erp/services/integration/internal/usecase/beban_marketing.go` · `bip-erp/services/integration/internal/usecase/beban_marketing_footage.go` · `bip-erp/services/form-builder/culture_club_seed.json` · `bip-erp/scripts/ganti-nama-beautyhacks/` (baru) · `erp-frontend/src/features/hris/kpi/lib/departemen-marketing.ts` · `erp-frontend/src/features/finance/opex-manual/types.ts` · `erp-frontend/src/features/marketing-analytics/hooks/use-anggaran-iklan.ts` · `erp-frontend/src/components/layout/sidebar-kategori.ts` · `erp-frontend/src/i18n/locales/{id,en}.ts` · `mybharata-app/lib/src/core/utils/department_color_utils.dart`
 - **Tanggal**: 2026-10-10
 

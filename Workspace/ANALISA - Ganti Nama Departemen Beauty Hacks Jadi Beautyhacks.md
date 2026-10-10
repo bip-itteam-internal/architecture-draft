@@ -49,7 +49,7 @@ db.adminCommand({listDatabases:1}).databases.map(d=>d.name)
 ### Induk: Ganti nama departemen Beauty Hacks jadi Beautyhacks
 
 - **Repo**: `bip-erp` (tanpa PR sendiri, ditutup manual sesudah semua sub-issue merged)
-- **Issue**: [bip-erp#INDUK](TBD)
+- **Issue**: [bip-erp#2944](https://github.com/bip-itteam-internal/bip-erp/issues/2944)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -80,7 +80,7 @@ ADR 0168 Diterima.
 ### 1. [BE] Ganti nama Beautyhacks bagian 1/3: backend menerima kedua nama (Expand)
 
 - **Repo**: `bip-erp` · **Urutan**: pertama
-- **Issue**: [bip-erp#1](TBD)
+- **Issue**: [bip-erp#2945](https://github.com/bip-itteam-internal/bip-erp/issues/2945)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -117,7 +117,7 @@ ADR 0168 Diterima. Deploy: semua service yang memakai `shared-library` dan disen
 ### 2. [BE] Ganti nama Beautyhacks bagian 2/3: skrip migrasi data
 
 - **Repo**: `bip-erp` · **Urutan**: kedua (skrip boleh merged kapan saja, **apply prod sesudah issue 1 ter-deploy**)
-- **Issue**: [bip-erp#2](TBD)
+- **Issue**: [bip-erp#2946](https://github.com/bip-itteam-internal/bip-erp/issues/2946)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -152,7 +152,7 @@ ADR 0168 Diterima. Apply prod sesudah issue 1 ter-deploy di prod.
 ### 3. [FE] Ganti nama departemen Beautyhacks di erp-frontend
 
 - **Repo**: `erp-frontend` · **Urutan**: sesudah issue 1 ter-deploy
-- **Issue**: [erp-frontend#3](TBD)
+- **Issue**: [erp-frontend#2290](https://github.com/bip-itteam-internal/erp-frontend/issues/2290)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -187,7 +187,7 @@ Deploy sesudah `bip-erp` issue 1 ter-deploy (BE harus menerima `?department=Beau
 ### 4. [Mobile] Warna departemen MyBharata mengenali Beautyhacks
 
 - **Repo**: `my-bharata` (folder lokal `mybharata-app`, PR ke `dev`) · **Urutan**: sesudah issue 1 ter-deploy
-- **Issue**: [my-bharata#4](TBD)
+- **Issue**: [my-bharata#202](https://github.com/bip-itteam-internal/my-bharata/issues/202)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -219,7 +219,7 @@ Sesudah `bip-erp` issue 1 ter-deploy. Sesudah PR merged ke `dev`, issue ditutup 
 ### 5. [BE] Ganti nama Beautyhacks bagian 3/3: buang nama lama (Contract)
 
 - **Repo**: `bip-erp` · **Urutan**: terakhir
-- **Issue**: [bip-erp#5](TBD)
+- **Issue**: [bip-erp#2947](https://github.com/bip-itteam-internal/bip-erp/issues/2947)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
