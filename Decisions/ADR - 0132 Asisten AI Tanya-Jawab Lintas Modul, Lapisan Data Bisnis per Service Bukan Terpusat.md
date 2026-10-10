@@ -341,4 +341,4 @@ bip-erp#2389). Belum ada uji end-to-end lewat gateway per alat.
 - [[REF - Kepemilikan Data]] — prinsip "konsumsi lewat pemilik" yang mendasari §2
 - [[CORE - Kapabilitas AI dan Machine Learning]] — peta kapabilitas AI, aturan kolom Marketing
 - [[CORE - API Master Gateway]] — mekanisme `Reroute`, batas §6
-- Lihat juga (2026-10-10): [[ADR - 0164 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang]] (gerbang tambahan yang lebih sempit di atas gerbang §3 untuk data upah) · [[ADR - 0165 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Satu Sumber, Cek Silang Dikerjakan Sistem dengan Tiga Keadaan]] (cek silang dan penjaga angka)
+- Lihat juga (2026-10-10): [[ADR - 0165 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang]] (gerbang tambahan yang lebih sempit di atas gerbang §3 untuk data upah) · [[ADR - 0166 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Satu Sumber, Cek Silang Dikerjakan Sistem dengan Tiga Keadaan]] (cek silang dan penjaga angka)

@@ -899,7 +899,7 @@ sekaligus. **Server tidak menyimpan rute**: peta nama alat ke halaman, label, da
 (`lib/tautan-halaman.ts`).
 
 **Gerbang data upah** (`shared-library/common/akses_copilot.go`, `akses_payroll.go`, `alat_hrga_payroll.go`; bip-erp #2922,
-#2928). Keputusannya di [[ADR - 0164 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang]].
+#2928). Keputusannya di [[ADR - 0165 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang]].
 
 - Aturannya satu tempat, `common.BolehPayrollCopilot`: **Direktur** (jabatan Direktur, bukan daftar setara-Direktur),
   **supervisor HRD** (`SupervisorHRD`: cakupan supervisi memuat departemen Human Resource **dan** peran modul HRIS

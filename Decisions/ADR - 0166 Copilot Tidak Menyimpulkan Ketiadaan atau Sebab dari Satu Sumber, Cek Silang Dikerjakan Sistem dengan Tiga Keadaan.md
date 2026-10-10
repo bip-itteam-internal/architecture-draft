@@ -1,4 +1,4 @@
-# ADR - 0165 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Satu Sumber, Cek Silang Dikerjakan Sistem dengan Tiga Keadaan
+# ADR - 0166 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Satu Sumber, Cek Silang Dikerjakan Sistem dengan Tiga Keadaan
 
 > **Status**: 🟡 Diusulkan, 2026-10-10. Persetujuan ditulis manusia di baris ini (`🟢 Diterima, <tanggal>, oleh <login/jabatan>`). Bentuk keputusan dirumuskan dari perilaku yang sudah merged di `main` (bip-erp #2906 sampai #2919, erp-frontend #2272, #2273, #2276); ukur ulang sebelum mengandalkan kalimat ini.
 

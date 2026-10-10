@@ -220,7 +220,7 @@ Kalimat Copilot boleh menyuruh penanya membuka halaman, dan tautannya hanya bisa
 
 ### 14. Label cek silang: jujur terhadap tiga keadaan
 
-Cek silang ([[ADR - 0165 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Satu Sumber, Cek Silang Dikerjakan Sistem dengan Tiga Keadaan]]) menghasilkan tiga status dan label layar wajib mempertahankan bedanya:
+Cek silang ([[ADR - 0166 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Satu Sumber, Cek Silang Dikerjakan Sistem dengan Tiga Keadaan]]) menghasilkan tiga status dan label layar wajib mempertahankan bedanya:
 
 | Status backend | Label bermakna | Yang DILARANG |
 |---|---|---|
@@ -230,7 +230,7 @@ Cek silang ([[ADR - 0165 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Sa
 
 Kolom cek di tabel (mis. status libur per tanggal, host yang mencatat shift) memakai label yang sama; contoh bentuk datanya di `lib/cek-libur.contoh.ts` dan `lib/live.contoh.ts`. Hari berjalan dan hari yang belum tersinkron tidak ikut deret harian `live`; layar menyebutnya sebagai hari yang tak ikut.
 
-Rekap payroll per departemen menampilkan keterangan asal departemennya (sal_departemen: saat gaji dihitung, saat ini, atau campuran) dan baris departemen kecil yang digabung; kartu, templat, dan saran beralat payroll hanya ditawarkan bila oleh_payroll benar (lib/akses-payroll.ts), sedangkan penegakannya di backend ([[ADR - 0164 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang]]).
+Rekap payroll per departemen menampilkan keterangan asal departemennya (`asal_departemen`: saat gaji dihitung, saat ini, atau campuran) dan baris departemen kecil yang digabung. Kartu, templat, dan saran beralat payroll hanya ditawarkan bila `boleh_payroll` benar (`lib/akses-payroll.ts`), sedangkan penegakannya di backend ([[ADR - 0165 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang]]).
 
 ### 15. Jebakan tata letak: area gulir yang tak berposisi
 
@@ -316,7 +316,7 @@ Kalimat bebas adalah tempat pertanyaan meleset dari kemampuan alat: periode yang
 - [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]], §4 (tak pernah menghitung dari data mentah) dan §7 (keluaran terstruktur dari komponen yang sudah ada)
 - [[REF - Layout Dashboard erp-frontend]], komposisi halaman berangka di luar Copilot
 - [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]], kalimat dan label milik layar
-- [[ADR - 0164 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang]] · [[ADR - 0165 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Satu Sumber, Cek Silang Dikerjakan Sistem dengan Tiga Keadaan]]
+- [[ADR - 0165 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang]] · [[ADR - 0166 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Satu Sumber, Cek Silang Dikerjakan Sistem dengan Tiga Keadaan]]
 - [[Microservices - Marketing Analytics Service]], sumber angka dan aturan pemakaian kolom laba
 - [[APP - Web ERP]], tempat layar Copilot berdiri
 - `.agent-kit/rules/ui-checklist.md` dan `.agent-kit/rules/team-memory.md` § Bagan/chart, aturan komponen dan warna yang dipakai di sini

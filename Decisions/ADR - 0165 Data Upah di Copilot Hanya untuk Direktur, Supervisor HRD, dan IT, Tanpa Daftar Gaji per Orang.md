@@ -1,4 +1,4 @@
-# ADR - 0164 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang
+# ADR - 0165 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang
 
 > **Status**: 🟡 Diusulkan, 2026-10-10. Persetujuan ditulis manusia di baris ini (`🟢 Diterima, <tanggal>, oleh <login/jabatan>`). Arah dasarnya berasal dari keputusan pemilik produk 2026-10-10 untuk batas penanya; bentuk selebihnya (ambang rekap, batas peringkat, penentuan bulan gaji) dipilih pelaksana dan menunggu persetujuan. Kodenya sudah merged di `main` (bip-erp #2922, #2928, #2929); ukur ulang sebelum mengandalkan kalimat ini.
 
