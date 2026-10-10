@@ -12,13 +12,13 @@
 
 | Urut | Issue | Repo | Judul |
 |---|---|---|---|
-| induk, tanpa PR sendiri | (belum dibuat) | `bip-erp` | Hak akses satu pintu: paket hak membawa peran |
-| 1 | (belum dibuat) | `bip-erp` | [BE] Alat banding isi token per akun, baca saja (bagian 1/4) |
-| 2 | (belum dibuat) | `bip-erp` | [BE] Paket peran dan perakitannya saat token terbit, di belakang sakelar (bagian 2/4) |
-| 3, deploy sesudah BE 2/4 | (belum dibuat) | `erp-frontend` | [FE] Hak Akses: hak efektif per orang dan pemasangan paket peran (bagian 1/2) |
-| 4, lalu pemindahan data dan penyalaan sakelar oleh manusia | (belum dibuat) | `bip-erp` | [BE] Skrip pemindahan data peran ke paket peran (bagian 3/4) |
-| 5, sesudah sakelar menyala di produksi | (belum dibuat) | `erp-frontend` | [FE] Akun Karyawan tanpa form peran, tab Role Modul akun pihak luar ditiadakan (bagian 2/2) |
-| 6, sesudah FE 2/2 terpasang di produksi | (belum dibuat) | `bip-erp` | [BE] Tutup jalur tulis peran per akun dan bongkar tabel peran di kode (bagian 4/4) |
+| induk, tanpa PR sendiri | bip-erp#2933 | `bip-erp` | Hak akses satu pintu: paket hak membawa peran |
+| 1 | bip-erp#2934 | `bip-erp` | [BE] Alat banding isi token per akun, baca saja (bagian 1/4) |
+| 2 | bip-erp#2935 | `bip-erp` | [BE] Paket peran dan perakitannya saat token terbit, di belakang sakelar (bagian 2/4) |
+| 3, deploy sesudah BE 2/4 | erp-frontend#2285 | `erp-frontend` | [FE] Hak Akses: hak efektif per orang dan pemasangan paket peran (bagian 1/2) |
+| 4, lalu pemindahan data dan penyalaan sakelar oleh manusia | bip-erp#2936 | `bip-erp` | [BE] Skrip pemindahan data peran ke paket peran (bagian 3/4) |
+| 5, sesudah sakelar menyala di produksi | erp-frontend#2286 | `erp-frontend` | [FE] Akun Karyawan tanpa form peran, tab Role Modul akun pihak luar ditiadakan (bagian 2/2) |
+| 6, sesudah FE 2/2 terpasang di produksi | bip-erp#2937 | `bip-erp` | [BE] Tutup jalur tulis peran per akun dan bongkar tabel peran di kode (bagian 4/4) |
 
 ## Langkah manusia di antara issue
 
@@ -31,7 +31,7 @@
 
 ### Hak akses satu pintu: paket hak membawa peran
 
-Repo tujuan: `bip-erp` Â· Urutan: induk, tanpa PR sendiri
+Repo tujuan: `bip-erp` Â· Urutan: induk, tanpa PR sendiri Â· https://github.com/bip-itteam-internal/bip-erp/issues/2933
 
 **Pemutus:** @irfanarfianto
 **PIC:** belum ditetapkan
@@ -75,7 +75,7 @@ Issue ini induk dan tidak punya PR sendiri. Urutan: BE 1/4, BE 2/4, FE 1/2, BE 3
 
 ### [BE] Alat banding isi token per akun, baca saja (bagian 1/4)
 
-Repo tujuan: `bip-erp` Â· Urutan: 1
+Repo tujuan: `bip-erp` Â· Urutan: 1 Â· https://github.com/bip-itteam-internal/bip-erp/issues/2934
 
 **Pemutus:** @irfanarfianto
 **PIC:** belum ditetapkan
@@ -117,7 +117,7 @@ Tidak ada. Bagian 1/4.
 
 ### [BE] Paket peran dan perakitannya saat token terbit, di belakang sakelar (bagian 2/4)
 
-Repo tujuan: `bip-erp` Â· Urutan: 2
+Repo tujuan: `bip-erp` Â· Urutan: 2 Â· https://github.com/bip-itteam-internal/bip-erp/issues/2935
 
 **Pemutus:** @irfanarfianto
 **PIC:** belum ditetapkan
@@ -167,7 +167,7 @@ Bagian 1/4 merged. Bagian 2/4.
 
 ### [FE] Hak Akses: hak efektif per orang dan pemasangan paket peran (bagian 1/2)
 
-Repo tujuan: `erp-frontend` Â· Urutan: 3, deploy sesudah BE 2/4
+Repo tujuan: `erp-frontend` Â· Urutan: 3, deploy sesudah BE 2/4 Â· https://github.com/bip-itteam-internal/erp-frontend/issues/2285
 
 **Pemutus:** @irfanarfianto
 **PIC:** belum ditetapkan
@@ -212,7 +212,7 @@ Sub-issue BE bagian 2/4 merged dan terpasang di dev (menyediakan paket peran dan
 
 ### [BE] Skrip pemindahan data peran ke paket peran (bagian 3/4)
 
-Repo tujuan: `bip-erp` Â· Urutan: 4, lalu pemindahan data dan penyalaan sakelar oleh manusia
+Repo tujuan: `bip-erp` Â· Urutan: 4, lalu pemindahan data dan penyalaan sakelar oleh manusia Â· https://github.com/bip-itteam-internal/bip-erp/issues/2936
 
 **Pemutus:** @irfanarfianto
 **PIC:** belum ditetapkan
@@ -260,7 +260,7 @@ Bagian 2/4 merged dan terpasang di dev. Bagian 3/4. Selama pemindahan di sebuah 
 
 ### [FE] Akun Karyawan tanpa form peran, tab Role Modul akun pihak luar ditiadakan (bagian 2/2)
 
-Repo tujuan: `erp-frontend` Â· Urutan: 5, sesudah sakelar menyala di produksi
+Repo tujuan: `erp-frontend` Â· Urutan: 5, sesudah sakelar menyala di produksi Â· https://github.com/bip-itteam-internal/erp-frontend/issues/2286
 
 **Pemutus:** @irfanarfianto
 **PIC:** belum ditetapkan
@@ -302,7 +302,7 @@ Sub-issue FE bagian 1/2 terpasang di produksi, dan pemindahan data serta penyala
 
 ### [BE] Tutup jalur tulis peran per akun dan bongkar tabel peran di kode (bagian 4/4)
 
-Repo tujuan: `bip-erp` Â· Urutan: 6, sesudah FE 2/2 terpasang di produksi
+Repo tujuan: `bip-erp` Â· Urutan: 6, sesudah FE 2/2 terpasang di produksi Â· https://github.com/bip-itteam-internal/bip-erp/issues/2937
 
 **Pemutus:** @irfanarfianto
 **PIC:** belum ditetapkan
