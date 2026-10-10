@@ -4,7 +4,7 @@
 
 - **Status**: 🟡 **Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap tiap SOP belum dipetakan (TBD), kecuali Procurement di [[GA - SOP Procurement]].
 - **Sumber**: folder Google Drive "SOP BHARATA 2026", diekspor 2026-10-10 (di luar repo). Dokumen sumber yang menang bila salinan berbeda.
-- **Cara salin**: skrip, bukan ringkasan. Teks dan urutan langkah apa adanya; nama orang di blok tanda tangan dibuang.
+- **Cara salin**: skrip `Tools/sop_bharata/` (cara pakai di README-nya), bukan ringkasan. Teks dan urutan langkah apa adanya; nama orang di blok tanda tangan dibuang.
 
 ## Peta Posisi
 
