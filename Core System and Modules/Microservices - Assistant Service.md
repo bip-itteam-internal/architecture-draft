@@ -101,6 +101,12 @@
   laporan); di layar, katalog pertanyaan per departemen menjadi tampilan awal, saran jadwal, dan latar animasi
   (§ Layar Copilot). Kelas kekurangan yang terbaca dari kode dicatat di § Kekurangan yang diketahui (2026-10-09).
   ⚠️ Belum ada uji end-to-end lewat gateway maupun pengukuran PROD atas gelombang ini; yang terbukti kode dan test di repo.
+  **Sinkron 2026-10-10 (diukur ke `origin/main` bip-erp `9dcd3d4a` dan erp-frontend `e4d020d5a`; PR merged 2026-10-09 sore
+  sampai 2026-10-10: bip-erp #2906, #2907, #2910, #2913, #2914, #2915, #2916, #2917, #2918, #2919, #2922, #2928, #2929;
+  erp-frontend #2267, #2268, #2271, #2272, #2273, #2274, #2275, #2276, #2277, #2280, #2282, #2284)**: keadaan "belum final"
+  dan kolom andal, lingkup blok (`saringan`), alamat penjelasan untuk semua alat berdata, temuan deret waktu, cek silang
+  tiga keadaan, penjaga `hitungan_model`, token tautan halaman, dan gerbang data upah. Semuanya di § Gelombang 2026-10-10.
+  Jumlah alat yang ditawarkan tidak berubah (116). ⚠️ Belum ada pengukuran PROD maupun uji end-to-end atas gelombang ini.
 - **Stack**: Go, `net/http` langsung (klien tipis hand-roll, BUKAN SDK Anthropic — divalidasi
   2026-09-28, lihat
   [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]]
@@ -778,6 +784,160 @@ Batasnya, semuanya dari kode:
 `uji/pertanyaan-tetap.json` bertambah dua kasus dari kejadian itu (kini 40 kasus), dan pelari uji mendapat syarat baru
 `saringan_wajib`: alat harus dipanggil dengan saringan isi yang **persis** diminta, dibaca dari `Sumber.saringan`
 (`cmd/ujitetap/uji.go`). `tabel_diketik` masuk daftar penanda terlarang bawaan.
+
+### Gelombang 2026-10-10 (bip-erp #2906 sampai #2929, merged)
+
+Bagian ini mencatat kontraknya. Cara menyajikannya di layar (urutan baca, pita belum final, kepala kelompok, tautan, label
+cek silang) ada di [[REF - Penyajian Laporan Copilot]].
+
+**Field baru di `Blok`** (`internal/alat/tampilan.go`):
+
+| Field | Arti | Diisi oleh |
+|---|---|---|
+| `keadaan` | `belum_final` = angka blok ini sementara. Blok seperti itu tak membawa temuan, pembanding, atau penjelasan atas angka sementaranya | alat (`laporan_laba.go`) |
+| `kolom_andal[]` | kunci kolom atau kartu blok belum final yang **tidak** menunggu settlement, jadi tetap sah dipakai. Blok belum final yang menggambar kolom andal disorot, diberi temuan, dan dijelaskan seperti biasa (`nilaiSementara`) | alat |
+| `saringan[]` | **lingkup** panggilan alat (divisi, channel, departemen, level, lingkup, ditambah saringan isi yang dicatat alat). Hanya di blok **akar** tiap panggilan, dan akar **selalu** membawanya walau kosong (`[]`); blok anak dan blok lama tidak membawa kuncinya. Layar mengenali akar panggilan dari adanya kunci ini | satu tempat, `saringan_blok.go` `SaringanBlok`, dipanggil `jawab.go` |
+
+**Keadaan belum final dan kolom andal** (`laporan_laba.go`, `keadaan_belum_final.go`; bip-erp #2906, #2907, #2913).
+Laba di sumber = settlement yang sudah cair dikurangi HPP dan biaya iklan yang sudah tercatat penuh, jadi laba periode yang
+order terakhirnya belum cair terbaca minus sampai uangnya masuk. Itu bukan kerugian, dan sebelum perubahan ini ia tersaji
+sebagai kerugian lengkap dengan sebab dugaan dan saran.
+
+- `labaBelumFinal` (fungsi murni): tak ada baris bertanda belum matang = final; periode yang **masih berjalan** dengan baris
+  bertanda = belum final berapa pun porsinya; periode lewat = belum final bila porsi omzet baris bertanda melewati 5%
+  (`ambangPorsiBelumMatangLaporan`, angka yang sama dengan yang dipakai sumber untuk menyebut sebuah jendela "matang").
+  Porsi yang tak terukur = belum final (arah yang aman). Penanda sumber menular saat digabung, jadi porsinya batas atas.
+- Laporan belum final (`susunLaporanBelumFinal`): kartu laba kotor dan margin bercatatan `belum_final` tanpa perubahan,
+  peringkat tetap dikirim, sedangkan `urai_selisih`, `penyumbang`, dan `omzet_margin` **tidak dikirim**.
+- **Kolom andal**: omzet, unit terjual, biaya iklan, dan ROAS (omzet dibagi biaya iklan) tidak menunggu settlement; margin
+  tidak andal. `laba_toko` mengirim keempatnya, `laba_produk` omzet dan unit terjual. Dengan kolom andal, laporan belum
+  final tetap punya batang peringkat, temuan, dan penjelasan atas kolom itu, jadi jawabannya tidak berhenti di "belum bisa
+  disimpulkan".
+- Hasil alat untuk model membawa `keadaan`, `kolom_andal`, dan `catatan_keadaan`. Server membuang paragraf penjelasan dan
+  butir dugaan/saran yang menyinggung laba, margin, HPP, atau untung-rugi pada giliran yang memuat data belum final
+  (`saringPenilaianLaba`), dan seluruh `analisa_ai` bila **semua** data giliran itu belum final tanpa kolom andal.
+- `ringkasan_marketing` menahan perubahan terhadap periode sebelumnya bila periode yang diminta belum selesai
+  (`pembandingRentangSetara`: porsi hari yang belum selesai melewati sepertujuh rentang), karena sumbernya membandingkan
+  dengan rentang sepanjang itu sebelumnya dan setiap delta akan terbaca turun.
+
+**Alamat penjelasan untuk semua alat berdata** (`alamat_blok.go`; bip-erp #2910). Blok grafik selalu beralamat. Tabel dan
+kartu beralamat **hanya** sebagai blok utama panggilan yang tak punya satu pun grafik (`tandaiBlokUtama`), supaya alat yang
+hanya bertabel tetap mendapat paragraf. Tak pernah beralamat: blok kosong, radial, dan blok belum final yang angkanya
+sementara. Dalam satu jawaban tiap alamat unik: blok kedua beralamat dasar sama mendapat akhiran `_2`, `_3`
+(`alamatJawaban`, `SesuaikanAlamat`). **Panggilan kembar** (alat dan argumen sama sesudah dinormalkan, `kunciPanggilan`)
+tidak dijalankan lagi; model menerima isi yang sama dan blok serta sumbernya tidak digandakan.
+
+**Temuan baru** (`temuan.go`): `tren_arah` (titik pertama lawan titik terakhir) dan `puncak` (tertinggi dan terendah) untuk
+blok deret waktu berseri tunggal, minimal 3 titik, tanpa null, dan **tanpa periode yang belum selesai**; arahnya selalu
+netral karena jalur umum tak tahu naik itu baik atau buruk. `belanja_di_bawah_target` (alat `iklan`): berapa rupiah biaya
+iklan berada di baris ber-ROAS di bawah target. Blok porsi (komposisi, donat) kini bisa mendapat `konsentrasi`. Sumber
+bertanda belum matang membuat jalur umum tidak membuat `konsentrasi` dan `negatif`.
+
+**Cek silang dikerjakan sistem, tiga keadaan** (bip-erp #2916, #2917, #2918). Nol atau turun di satu alat sering punya
+penjelas di data departemen lain; sistem yang memeriksanya, dan hasilnya **ada**, **tidak ada**, atau **tidak diperiksa**,
+tak pernah dilebur:
+
+| Alat | Yang dicek | Nilai status | Sumber cek |
+|---|---|---|---|
+| `live` | hari ber-GMV studio nol: adakah host yang mencatat shift hari itu, dan apakah tanggal itu libur | `ada_shift_tercatat`, `tanpa_shift_tercatat`, `tidak_diperiksa` | `GET /live-shifts/performa` marketing-analytics, paling banyak 7 hari terbaru per panggilan (`liveBatasCekShift`); sisanya `tidak_diperiksa` |
+| `live`, `produksi`, `ringkasan_kehadiran` | tanggal terhadap kalender libur perusahaan | `libur_tercatat`, `tanpa_libur_tercatat`, `tidak_diperiksa` | satu panggilan `GET /holiday` attendance dengan JWT penanya (`cek_hari_libur.go`) |
+| `laba_toko` | toko berlaba negatif dan lima toko berlaba terendah (maks 10 baris): sudah dipetakan ke penanggung jawab atau belum | `ada_penanggung_jawab`, `tanpa_penanggung_jawab`, `tidak_diperiksa` | kolom `icc.status` di baris `/profit/shops` yang sama, tanpa panggilan kedua (`mkt_labatoko_cek_pj.go`) |
+
+- "Tidak diperiksa" membawa sebabnya (`tak_berhak`, `sumber_gagal`, `kalender_tahun_kosong`, `melewati_batas`,
+  `sumber_tak_mengirim_status`). Kalender tahun yang kosong sama sekali diperlakukan tidak diperiksa: kalender yang belum
+  diisi tak bisa dibedakan dari tahun tanpa libur.
+- Cek penanggung jawab toko hanya menampilkan ada atau tidak ada; nama dan penilaian orangnya tidak ikut.
+- Hari Sabtu dan Minggu bukan isi kalender libur; jadwal kerja per orang tidak diperiksa di sini.
+- **Hari berjalan dan hari yang belum tersinkron dibuang dari deret harian `live`** (`livePilahHari`): nol di sana berarti
+  belum ada data, bukan tak ada GMV. Harinya disebut ke model lewat `hari_tak_ikut`.
+- Rencana jadwal siaran dan daftar shift mentah **sengaja tidak dipakai** untuk cek ini: daftar yang isinya bergantung pada
+  pemanggil tak bisa menjadi dasar menyatakan "tidak ada" (kepala `mkt_live_laporan.go`).
+
+**Alat `iklan`: kartu, nama toko, mata uang** (`mkt_iklan_ringkas.go`; bip-erp #2914, #2915). Kartu angka utama (biaya
+iklan, omzet, ROAS gabungan, jumlah di bawah target) dengan pembanding rentang setara; nama toko dipetakan dari
+`/profit/shops`. Aturan menjumlahnya: baris berbiaya yang mata uangnya **tidak diketahui** membuat kartu, pembanding, dan
+temuan belanja **tidak dibuat sama sekali**; baris bermata uang selain rupiah tidak dijumlah dan kartunya bercatatan;
+omzet tak diketahui tak pernah dianggap nol; ROAS gabungan = total omzet dibagi total biaya atas baris yang keduanya
+diketahui, tak pernah dirata-rata. Mata uang dibaca dari pecahan kiriman sumber, lihat
+[[Microservices - Marketing Analytics Service]] § Mata uang belanja di kawat laba.
+
+**Penjaga dan pembersih** (melengkapi § Penjaga jawaban sisi server):
+
+- **`hitungan_model`** (`penjaga_hitungan.go`, bip-erp #2916), penjaga kelima di `daftarPenjaga`: kelipatan ("150 kali
+  lipat", "150x"), rata-rata, dan kisaran yang angkanya **tidak ada di hasil alat** giliran itu. Aturan cocoknya sama
+  dengan penjaga rupiah (toleransi tulisan atau 1%). Berlaku juga untuk paragraf penjelasan dan dugaan/saran. Yang tidak
+  tertangkap, dan diterima sebagai batas: rata-rata atau kisaran yang kebetulan memakai angka yang ada di hasil alat,
+  hitungan tanpa kata pemicu, dan angka polos tanpa `Rp`, satuan, atau persen sesudah kata pemicu.
+- **`tabel_diketik` diperketat** (bip-erp #2914): daftar berbutir kini pelanggaran sejak **2 butir** (sebelumnya 6) bila
+  giliran itu sudah punya blok, karena jawaban berdata dibatasi 3 kalimat. Baris sistem (`PENJELASAN`, `DUGAAN`, `SARAN`)
+  bukan butir jawaban.
+- **Penjaga rupiah membaca rentang** ("Rp24-28 juta": satuan di ujung berlaku untuk kedua angka).
+- **Pembersih format** (`format_jawaban.go`, bip-erp #2913): tanda tebal, miring, kepala baris, dan tanda pisah panjang
+  dibersihkan server sebelum teks dipisah jadi jawaban, penjelasan, dugaan, dan saran; versi yang disimpan juga bersih.
+- **Saran yang menjadwalkan sesuatu pada tanggal lewat atau hari berjalan dibuang** butirnya saja
+  (`saranMenyasarTanggalLewat`).
+- Daftar penanda kini: `angka_tak_cocok`, `token_disingkat`, `akses_tak_terbukti`, `tabel_diketik`, `hitungan_model`.
+
+**Aturan prompt yang berubah** (`tanya.go` `promptSistem`; isi lengkapnya di kode):
+
+| Aturan | Isi sesudah gelombang ini |
+|---|---|
+| 2 | Di luar kemampuan alat: katakan belum tersedia. Model tetap dilarang menyebut nama layar dengan kata-katanya sendiri; rujukan halaman ditulis sebagai token `[[buka:<nama_alat>]]`, paling banyak 4 per jawaban |
+| 5, 8, 9 | Rentang tanggal, cakupan, dan jumlah baris tampilan **tidak lagi wajib** disebut; yang wajib hanya batas yang mengubah cara membaca angkanya |
+| 7 | Jawaban berdata **paling banyak 3 kalimat**; kalimat pertama = kesimpulan yang wajib memuat angka kuncinya beserta arahnya; tanpa salam, tanpa daftar berbutir; batas bacaan cukup satu anak kalimat |
+| 13 | Paling banyak 3 `SARAN` dan 2 `DUGAAN`, 300 karakter per butir (batas pengaman server 500), untuk setiap data agregat yang bisa ditindaklanjuti. Saran berbentuk tindakan + sasaran yang ada di hasil alat + angka dasarnya, urut dari dampak terbesar; saran yang menambah biaya atau usaha wajib menyebut angka efisiensinya; tak boleh menyasar tanggal lewat; tak ada saran atau penilaian atas karyawan tertentu |
+| 14 | Penjelasan untuk tiap alamat di `tampilan.penjelasan_untuk` (grafik, tabel, atau kartu); paragraf wajib memuat angka dari hasil alat dan pembanding, porsi, atau implikasinya, bukan mengulang baris |
+| 16 (baru) | Data belum final: laba dan margin sementara, tak boleh disimpulkan; dengan `kolom_andal`, kesimpulan diambil dari kolom itu lalu satu kalimat batas |
+| 17 (baru) | Ketiadaan dan sebab di luar hasil alat tak boleh ditulis sebagai fakta: panggil alat yang bisa memeriksanya, atau tulis sebagai dugaan yang menyebut data mana yang perlu dicek. Status `tidak_diperiksa` bukan nol dan bukan "tidak ada" |
+
+Jawaban berdata tidak lagi disapa (`sapaanJawaban`).
+
+**Token tautan halaman** (`token_tautan.go`, bip-erp #2919). Model tidak menulis nama halaman; ia menulis
+`[[buka:<nama_alat>]]`. Server hanya memvalidasi nama terhadap daftar alat yang ditawarkan pada giliran itu: nama sah
+dibakukan, nama lain dibuang beserta kata depan yang menggantung. Berlaku untuk jawaban, penjelasan, dugaan, dan saran
+sekaligus. **Server tidak menyimpan rute**: peta nama alat ke halaman, label, dan boleh-tidaknya diklik ada di frontend
+(`lib/tautan-halaman.ts`).
+
+**Gerbang data upah** (`shared-library/common/akses_copilot.go`, `akses_payroll.go`, `alat_hrga_payroll.go`; bip-erp #2922,
+#2928). Keputusannya di [[ADR - 0164 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang]].
+
+- Aturannya satu tempat, `common.BolehPayrollCopilot`: **Direktur** (jabatan Direktur, bukan daftar setara-Direktur),
+  **supervisor HRD** (`SupervisorHRD`: cakupan supervisi memuat departemen Human Resource **dan** peran modul HRIS
+  supervisor atau admin, dua-duanya dituntut), dan **IT** (predikat yang sama dengan cabang IT gerbang Copilot).
+- Tiga lapis: (1) alat keluarga data upah tidak ditawarkan ke model untuk penanya di luar golongan itu; (2) bila tetap
+  dipanggil, alatnya tidak dijalankan dan dibalas `tidak_berhak`; (3) gerbang payroll-service di bawahnya tetap berlaku
+  untuk yang lolos. Hak dibawa lewat context, dan tanpa nilai berarti tidak berhak (gagal tertutup).
+- **Keluarga data upah** = satu daftar, `NamaAlatDataUpah()`: seluruh isi `DaftarPayroll` (`ringkasan_payroll`,
+  `rincian_payroll`, `komponen_gaji`, `biaya_karyawan`; alat payroll baru otomatis ikut) ditambah `insentif_snapshot`,
+  yang tetap **tidak didaftarkan** ke model. `insentif_saya` (milik penanya sendiri) bukan anggota.
+- `GET /api/assistant/akses` kini membalas `{boleh, boleh_payroll}`. Layar memakainya hanya untuk **menawarkan** kartu,
+  templat, dan saran beralat payroll (`lib/akses-payroll.ts`); field yang tak ada diperlakukan "belum diketahui".
+
+**Alat payroll** (`payroll_umum.go`, `payroll_ringkasan.go`, `payroll_rincian.go`, `payroll_departemen.go`; bip-erp #2922,
+#2929):
+
+- **Bulan gaji ditentukan sistem dari jendela run**, bukan dari kunci `period`: bulan kalender yang memuat hari terbanyak
+  dari `pay_period_start..pay_period_end` (seri = bulan akhir). Untuk jendela baku 26-25 hasilnya sama dengan aturan
+  payroll-service (bulan `pay_period_end`); lihat [[Microservices - Payroll Service]]. Tanpa jendela (mis. THR): kunci
+  `period` apa adanya. Run lingkup utama dan magang adalah run terpisah dan tidak dijumlahkan.
+- Penanda `run_draft` di sumber bila yang dibaca run berstatus draf.
+- **Daftar gaji seluruh karyawan tidak tersedia**: peringkat paling banyak 20 orang (`batasBarisPayroll`).
+- **Rekap per departemen** (`per_departemen=true`, bagian `payroll_per_departemen`): jumlah karyawan, total gross, total net,
+  dihitung alat dari seluruh baris run. `asal_departemen` selalu disebut: `saat_gaji_dihitung` (baris membawa snapshot
+  `department`), `saat_ini` (baris tanpa snapshot: departemen karyawan hari ini dari employee-service, jadi orang yang
+  pindah terhitung di departemen barunya), atau `campuran`. Karyawan tanpa departemen masuk baris
+  `tanpa_departemen_tercatat`; bila departemen saat ini tak bisa dibaca atau daftarnya tak lengkap, rekap untuk baris tanpa
+  snapshot **tidak dibuat**.
+- **Ambang 3 orang** (`payrollAmbangOrangDept`): departemen berisi kurang dari 3 orang digabung ke satu baris
+  `departemen_kecil_digabung`, dan departemen terkecil berikutnya ikut dilebur sampai gabungannya mencapai ambang, supaya
+  nominalnya tak bisa dihitung balik dari total run.
+- Field rekening dan identitas pajak perusahaan tidak pernah dibaca alat (gugur saat decode).
+
+**Layar** (erp-frontend #2267 sampai #2284; rinciannya di [[REF - Penyajian Laporan Copilot]]): urutan baca 3-30-3 dan kartu
+pembuka, pita "Angka sementara, belum final" dengan tombol periode sebelumnya, kepala kelompok per saringan atau periode,
+kotak rekomendasi bernomor, tautan halaman (`lib/tautan-halaman.ts`, `components/teks-bertautan.tsx`), kepala dan kaki yang
+mengambang di atas area gulir (`lib/tepi-melayang.ts`), subjudul halaman "ERP AI Assistant", dan katalog yang kartunya
+berbentuk pertanyaan keputusan (draf).
 
 ### Kontrak sumber dan blok (bip-erp #2570, #2571)
 

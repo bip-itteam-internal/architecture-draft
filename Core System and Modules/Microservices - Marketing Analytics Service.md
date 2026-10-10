@@ -827,6 +827,21 @@ Penandanya **`shipped_at`** (fakta tercatat), bukan perkiraan dari kolom kurir. 
 
 Penggabungan lintas-koleksi ini (mart + `transaction_orders`) berdiri di atas tiga syarat yang **diperiksa, bukan diasumsikan**: `shop_id` bertipe string di kedua koleksi dengan ruang-nama sama (verifikasi prod 2026-08-03, kelima `shop_id` `team_shops` ditemukan apa adanya di mart, jadi pencocokannya **lurus tanpa normalisasi** — memangkas atau melapisi id "supaya cocok" justru akan menyamakan id mirip lintas channel); kuncinya terisi pada populasi yang dipakai; dan saringannya sebangun. **Bila salah satu syarat kelak tak berlaku, yang benar adalah MENCABUT kolom ini, bukan menambalnya.**
 
+### Mata uang belanja di kawat laba (`/profit/campaigns`, `/profit/ads`; `kawat_mata_uang_iklan.go`, bip-erp #2915)
+
+Mart menyimpan mata uang `ads_cost` per baris harian, tetapi kawat dulu tidak meneruskannya, sehingga konsumen yang menjumlah `ads_cost` lintas baris (Copilot, alat `iklan`) hanya bisa memilih antara menjumlah semuanya sebagai rupiah atau tidak menjumlah sama sekali. Kini baris level **campaign** dan **ad** membawa pecahannya, bukan satu field `currency`:
+
+| Field | Isi |
+|---|---|
+| `ads_cost_mata_uang` | `[{mata_uang, nilai}]`: belanja per mata uang yang **diketahui** |
+| `ads_cost_tanpa_mata_uang` | belanja yang mata uangnya kosong di mart |
+
+- **Kenapa bukan satu `currency`**: baris bulanan dibentuk dengan menyalin baris hari pertama lalu menjumlah `ads_cost` seluruh hari. Satu label tunggal akan mencap bulan yang harinya berbeda mata uang, atau sebagian harinya belum bermata uang, dengan satu mata uang saja. Pecahan dijumlah dari baris **harian** sebelum digabung (`mataUangIklanBulanan`, kunci sama dengan `GabungBulanan`).
+- `ads_cost` sendiri **tidak berubah**: tetap jumlah seluruhnya apa adanya.
+- **Aturan baca konsumen**: `ads_cost_tanpa_mata_uang` > 0, atau `ads_cost` > 0 tanpa satu pun entri `ads_cost_mata_uang`, berarti mata uang **tidak diketahui** dan bukan rupiah. Tepat satu mata uang di `ads_cost_mata_uang` = itulah mata uang baris. Lebih dari satu = baris campur, `ads_cost`-nya bukan rupiah dan bukan dolar.
+- Kedua field `omitempty`: **kunci yang hilang tidak pernah berarti rupiah**, ia berarti tak ada yang dinyatakan.
+- Level shop, product, dan SKU **tidak** disentuh (`ads_cost` mereka hasil alokasi lintas kampanye); Beranda punya pecahannya sendiri dari jalur lain.
+- Pemakai: alat `iklan` di [[Microservices - Assistant Service]] (kartu biaya iklan dan ROAS gabungan hanya dari baris yang mata uangnya diketahui).
 ### `kepemilikan` vs `collaboration_type` di `/affiliate` (`kepemilikan_affiliate.go`)
 
 Dua **sumbu independen** yang mudah tertukar, dan yang satu tak boleh menggantikan yang lain:

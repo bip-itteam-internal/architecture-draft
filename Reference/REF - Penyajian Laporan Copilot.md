@@ -6,7 +6,8 @@
 - **Ruang lingkup**: tampilan jawaban Copilot di layar `/copilot` (`erp-frontend/src/features/copilot/`), blok yang dibangun `bip-erp/services/assistant/internal/alat/`, dan unduhan PDF/Excel-nya. Tata letak halaman dashboard lain diatur [[REF - Layout Dashboard erp-frontend]]; warna dan keputusan Recharts tetap di `.agent-kit/rules/team-memory.md` § Bagan/chart.
 - **Dasar keputusan**: keputusan pemilik produk 2026-10-08 ("jangan semua dalam bentuk kalimat"; "harus bisa buat analisa data buat memudahkan pengambilan keputusan manajemen"; "menampilkan datanya jangan setengah setengah"), dikutip di kepala `bentuk_bawaan.go`, `temuan.go`, `laporan_laba.go`, dan `lib/laporan-visual.ts`.
 - **Sinkron 2026-10-09** (diukur ke `origin/main` bip-erp `8a1f9905` dan erp-frontend `0c96129b0`): keputusan "teks tak boleh dipotong dengan elipsis" kini di `main` untuk backend (bip-erp #2829) dan untuk label grafik batang (erp-frontend #2210); sisanya di §5. Ditambah satu aturan baru (§10 model tidak menyaring, menghitung, atau mengetik tabel), bagian § Jalur tanpa mengetik, dan pengecualian latar di §6. Bagian lain dokumen ini tetap hasil ukur 2026-10-08 dan tidak dibaca ulang seluruhnya.
-- **PR**: bip-erp #2789, #2822, #2827, #2829, #2863, #2870; erp-frontend #2195, #2204, #2205, #2208, #2210, #2213, #2227, #2228, #2229, #2236 (merged 2026-10-08 dan 2026-10-09).
+- **Sinkron 2026-10-10** (diukur ke `origin/main` bip-erp `9dcd3d4a` dan erp-frontend `e4d020d5a`): urutan baca 3-30-3 dengan pita "belum final" dan kolom andal (§11), kepala kelompok bila alat yang sama dipanggil lebih dari sekali (§12), tautan halaman dengan hak klik (§13), label jujur untuk cek silang (§14), dan jebakan tata letak area gulir (§15). Kontrak sisi backend ada di [[Microservices - Assistant Service]] § Gelombang 2026-10-10. Bagian lain dokumen ini tetap hasil ukur 2026-10-08 dan 2026-10-09. ⚠️ Belum ada pengukuran PROD atas gelombang ini.
+- **PR**: bip-erp #2789, #2822, #2827, #2829, #2863, #2870; erp-frontend #2195, #2204, #2205, #2208, #2210, #2213, #2227, #2228, #2229, #2236 (merged 2026-10-08 dan 2026-10-09). Gelombang 2026-10-10: bip-erp #2906, #2907, #2910, #2913, #2914, #2916, #2917, #2918, #2919, #2922, #2928, #2929; erp-frontend #2267, #2268, #2271, #2272, #2273, #2274, #2275, #2276, #2277, #2280, #2282, #2284.
 
 ## Kenapa dokumen ini ada
 
@@ -186,6 +187,60 @@ Angka yang dihitung model berubah dari jawaban ke jawaban dan tidak bisa ditelus
 
 Yang menegakkannya: prompt aturan 15 (`tanya.go`, larangan per perbuatan), penjaga `tabel_diketik` (`penjaga_tabel.go`: tabel bergaris minimal 2 baris, atau daftar minimal 6 butir saat blok sudah tampil), deskripsi alat yang mengarahkan pertanyaan persen ke alat yang menghitungnya, dan uji pertanyaan tetap bersyarat `saringan_wajib` (`cmd/ujitetap/uji.go`). ⚠️ **Yang tidak dijaga penjaga mana pun**: hitungan dan persentase di dalam kalimat biasa, angka tanpa awalan `Rp`, dan saringan yang dilakukan model diam-diam. Untuk itu satu-satunya penahan adalah aturan prompt dan ketersediaan alat yang menghitung; rinciannya di [[Microservices - Assistant Service]] § Penjaga jawaban sisi server.
 
+### 11. Urutan baca 3-30-3, pita belum final, dan kolom andal
+
+Rumusnya: **3 detik** pertama menjawab angkanya, **30 detik** menjawab artinya, **3 menit** menjawab rinciannya (`panel-tanya.tsx` `BadanJawaban`, erp-frontend #2272, #2273).
+
+- **Jawaban yang dibuka kartu angka** (`kartuPembuka`, `lib/susunan-blok.ts`): kartu itu dulu, lalu kalimat jawaban, lalu "Perlu diperiksa", baru grafik beserta paragrafnya dan tabel. Jawaban lain memakai urutan lama; kalimat jawaban dirender tepat sekali di kedua cabang.
+- **Rekomendasi bernomor** (`temuan-analisa.tsx`): `saran` tampil lebih dulu sebagai daftar bernomor berjudul "Rekomendasi" (server mengurutkannya dari dampak terbesar, jadi nomor berarti prioritas), baru `dugaan` berjudul "Yang perlu dicek". Kotak ini berlabel "bukan fakta" karena butirnya ditulis model.
+- **Pita "Angka sementara, belum final"** selalu paling atas bila ada blok `keadaan: "belum_final"`. Isinya judul, keterangan, kalimat tentang apa yang aman dipakai, dan tombol "periode sebelumnya" (hanya di giliran terakhir, dinonaktifkan selagi jawaban lain diproses). Ia ikut tercetak di PDF.
+- **Angka sementara tampil tanpa penilaian**: kartu tanpa panah dan tanpa warna baik/buruk (`belumFinal`, `lib/sorot-blok.ts`). Hijau penilaian memakai teks `emerald-700` supaya terbaca di mode terang (#2268).
+- **Kolom andal** (`kolom_andal`, #2273): blok belum final yang membawa daftar kunci kolom yang tidak menunggu settlement digambar dan dijelaskan seperti biasa pada kolom itu (`nilaiSementara`), sedangkan kolom lain bertanda "(sementara)" di kepalanya (`kepalaKolom`, juga di PDF). Kalimat pita menyebut apa yang sudah bisa dipakai (omzet, unit terjual, biaya iklan, ROAS), dan hanya bila kuncinya punya label. Tanpa `kolom_andal` (backend lama) seluruh blok diredam. Daftar kolom andal milik backend; layar tidak memutuskannya.
+
+### 12. Kepala kelompok bila alat yang sama dipanggil lebih dari sekali
+
+Satu jawaban bisa memuat dua panggilan alat yang sama (dua divisi, dua periode). Tanpa pemisah, blok berjudul sama terbaca tanpa pemilik. `kepalaKelompok` (`lib/susunan-blok.ts`, #2273) membuka tiap kelompok dengan garis pemisah dan judul yang menyebut apa yang **membedakan** panggilan itu:
+
+- saringan yang nilainya berbeda antar panggilan ("Divisi Kyura"); panggilan yang tak membawa saringan itu berjudul "Semua divisi";
+- periode blok akarnya bila berbeda; keduanya berbeda = digabung;
+- tak ada yang berbeda = tanpa judul.
+
+Asalnya `Blok.saringan` di blok **akar** panggilan (selalu hadir walau `[]`, hanya di blok akar; jawaban lama tanpa kunci ini tampil seperti sebelumnya). Label kunci dan nilai memakai `butirSaringan`, sama dengan keterangan sumber. Kelompok alat lain sesudah kelompok berjudul mendapat garis pemisah tanpa judul. PDF mencetak per kelompok bila ada kepala kelompok.
+
+### 13. Tautan halaman dan hak klik
+
+Kalimat Copilot boleh menyuruh penanya membuka halaman, dan tautannya hanya bisa diklik oleh yang berhak (#2276, #2282, #2284). Model tidak menulis nama halaman; ia menulis token `[[buka:<nama_alat>]]` dan server membuang nama yang bukan alat yang ditawarkan ([[Microservices - Assistant Service]] § Gelombang 2026-10-10). Semua sisi layar ada di satu berkas, `lib/tautan-halaman.ts`:
+
+- **Peta nama alat ke rute** (`PETA_HALAMAN_ALAT`): hanya alat yang halamannya ada **dan** jelas memuat data alat itu. Alat yang tak dipetakan tampil sebagai nama sumbernya, teks biasa. Menebak rute membuat tautan mendarat di halaman yang salah tanpa galat. Dua uji menjaga peta: tiap rute punya `page.tsx`, dan terdaftar sebagai menu sidebar di kategori yang didukung.
+- **Label tautan = label menu sidebar rute itu** (`keySidebar`), supaya teks tautan dan nama menu tak pernah berbeda. Satu pengecualian bernama (`LABEL_DARI_SUMBER`): `ringkasan_marketing` memakai nama sumbernya, karena "Ringkasan" di tengah kalimat tak menunjuk apa pun.
+- **Boleh-tidaknya diklik memakai fungsi sidebar** (`bolehBukaHalaman`: `kunciModulAktif` + `bolehItemSidebar`), bukan aturan RBAC baru. Tiga hasil: **tautan** (berhak), **terkunci** (terpetakan tetapi tak berhak: label redup, bukan tautan), **label** (tak terpetakan). Ini keputusan **menu**, bukan keamanan: datanya tetap dijaga halaman dan backend tujuan.
+- **Kategori yang didukung** (`KATEGORI_DIDUKUNG`) hanya yang gerbangnya "kategori aktif + izin item". Portal Saya, manufacture, warehouse, dan integration tidak, karena gerbangnya hidup di komponen sidebar dan menirunya melahirkan aturan akses kedua. Alat yang halamannya terbelah di dua halaman atau tak terdaftar di sidebar kategori itu sengaja tak dipetakan (daftarnya di komentar berkas).
+- **Teks polos untuk PDF dan judul percakapan** (`teksTanpaTautan`): token jadi label halamannya, token tak dikenal dibuang rapi.
+- Tombol unduh PDF memakai ikon unduh (label lewat tooltip).
+
+### 14. Label cek silang: jujur terhadap tiga keadaan
+
+Cek silang ([[ADR - 0165 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Satu Sumber, Cek Silang Dikerjakan Sistem dengan Tiga Keadaan]]) menghasilkan tiga status dan label layar wajib mempertahankan bedanya:
+
+| Status backend | Label bermakna | Yang DILARANG |
+|---|---|---|
+| `libur_tercatat`, `ada_shift_tercatat`, `ada_penanggung_jawab` | ada, dengan jenis libur bila ada | menyatakannya pasti lengkap |
+| `tanpa_libur_tercatat`, `tanpa_shift_tercatat`, `tanpa_penanggung_jawab` | "tanpa X **tercatat**" | "tidak ada X" |
+| `tidak_diperiksa` | "tidak diperiksa" (sebab bila ada) | "tidak ada", atau angka nol |
+
+Kolom cek di tabel (mis. status libur per tanggal, host yang mencatat shift) memakai label yang sama; contoh bentuk datanya di `lib/cek-libur.contoh.ts` dan `lib/live.contoh.ts`. Hari berjalan dan hari yang belum tersinkron tidak ikut deret harian `live`; layar menyebutnya sebagai hari yang tak ikut.
+
+Rekap payroll per departemen menampilkan keterangan asal departemennya (sal_departemen: saat gaji dihitung, saat ini, atau campuran) dan baris departemen kecil yang digabung; kartu, templat, dan saran beralat payroll hanya ditawarkan bila oleh_payroll benar (lib/akses-payroll.ts), sedangkan penegakannya di backend ([[ADR - 0164 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang]]).
+
+### 15. Jebakan tata letak: area gulir yang tak berposisi
+
+Kepala (judul + Percakapan baru, Jadwal Tugas, Riwayat) dan kaki (pilih pertanyaan + kotak tulis) halaman Copilot **mengambang** di atas area gulir; isi memudar di belakangnya dan diberi ruang setinggi tepi itu, yang **diukur** (`ResizeObserver`), bukan ditulis mati (`lib/tepi-melayang.ts`, #2267, #2274). Aturan yang berlaku:
+
+- **Area gulir wajib `relative`** (`AREA_GULIR` = `relative min-h-0 flex-1 overflow-y-auto overscroll-contain`, #2280). Elemen `position: absolute` di dalam area gulir yang tak berposisi (mis. `sr-only`) berinduk ke leluhur di **luar** area itu: ia tak ikut tergulir, tak terpotong, dan menambah tinggi **dokumen** sebesar letaknya di dalam isi. Diukur 2026-10-10 di Chrome (1907x870, dua jawaban): dokumen 2476 px untuk jendela 870 px, hanya karena dua `sr-only` di tautan terkunci; roda tetikus di dasar percakapan lalu menggulir dokumen dan panel terdorong keluar layar. jsdom tidak menangkapnya (tak ada mesin layout), jadi penjaganya mengunci kelas, bukan hasil (`lib/area-gulir.test.ts`).
+- **`overscroll-contain`** menahan gulir yang mentok agar tak berantai ke leluhur.
+- **Jangan `scrollIntoView`** di dalam area ini: ia menggulir semua leluhur termasuk dokumen. Pakai `gulirkanKeDalam`, yang hanya mengubah `scrollTop` wadah bertanda `data-area-gulir`.
+- Kepala diredam hanya saat isi sudah digulir (`sudahTergulir`), supaya latar animasi terlihat utuh di posisi paling atas.
+- Subjudul halaman "ERP AI Assistant" (#2271). Katalog pertanyaan 18 dari 21 kartunya kini berbentuk pertanyaan keputusan; statusnya **draf** sampai wawancara manajemen.
 ## Jalur tanpa mengetik
 
 Kalimat bebas adalah tempat pertanyaan meleset dari kemampuan alat: periode yang tak diterima, saringan yang tak ada, janji yang tak bisa dipenuhi. Karena itu sejak 2026-10-09 pintu utama halaman Copilot adalah **katalog pertanyaan per departemen** (erp-frontend #2213, #2228, #2229; `lib/katalog-pertanyaan.ts`), dan kotak tulis bebas tetap ada tetapi bukan hal pertama.
@@ -261,6 +316,7 @@ Kalimat bebas adalah tempat pertanyaan meleset dari kemampuan alat: periode yang
 - [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]], §4 (tak pernah menghitung dari data mentah) dan §7 (keluaran terstruktur dari komponen yang sudah ada)
 - [[REF - Layout Dashboard erp-frontend]], komposisi halaman berangka di luar Copilot
 - [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]], kalimat dan label milik layar
+- [[ADR - 0164 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang]] · [[ADR - 0165 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Satu Sumber, Cek Silang Dikerjakan Sistem dengan Tiga Keadaan]]
 - [[Microservices - Marketing Analytics Service]], sumber angka dan aturan pemakaian kolom laba
 - [[APP - Web ERP]], tempat layar Copilot berdiri
 - `.agent-kit/rules/ui-checklist.md` dan `.agent-kit/rules/team-memory.md` § Bagan/chart, aturan komponen dan warna yang dipakai di sini
