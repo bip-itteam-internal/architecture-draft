@@ -1,6 +1,6 @@
 # ADR - 0168 Departemen Beauty Hacks Diganti Nama Jadi Beautyhacks Bertahap, Kedua Nama Diterima selama Transisi
 
-> **Status**: 🟡 **Diusulkan**, 2026-10-10, kode belum ada. Pemutus: irfanarfianto. Pekerjaan di bip-erp#2944 dan sub-issue-nya; blueprint [[ANALISA - Ganti Nama Departemen Beauty Hacks Jadi Beautyhacks]].
+> **Status**: 🟢 **Diterima**, 2026-10-10, oleh irfanarfianto (diusulkan 2026-10-10). Kode belum ada. Pemutus: irfanarfianto. Pekerjaan di bip-erp#2944 dan sub-issue-nya; blueprint [[ANALISA - Ganti Nama Departemen Beauty Hacks Jadi Beautyhacks]].
 
 ## Untuk Manajemen
 

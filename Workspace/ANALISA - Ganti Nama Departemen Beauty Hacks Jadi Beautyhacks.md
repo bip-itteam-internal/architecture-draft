@@ -2,9 +2,7 @@
 
 *Blueprint (draf issue Siap Agent) untuk [[ADR - 0168 Departemen Beauty Hacks Diganti Nama Jadi Beautyhacks Bertahap, Kedua Nama Diterima selama Transisi]]. Cara kerjanya di [[REF - Peta Departemen]] § "Rename Beauty Hacks menjadi Beautyhacks (direncanakan)". Ini bukan rencana per berkas, karena itu tugas `/plan`.*
 
-> ⛔ **Menunggu ADR "Departemen Beauty Hacks Diganti Nama Jadi Beautyhacks Bertahap, Kedua Nama Diterima selama Transisi" Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**
-
-- **Status**: 🟡 Belum dikerjakan (2026-10-10).
+- **Status**: 🟡 Dikerjakan (2026-10-10). ADR Diterima 2026-10-10.
 - **Tanggal**: 2026-10-10
 - **Pemutus**: `irfanarfianto`
 - **Ukuran**: **Besar**. Tiga repo harus berubah, dan `bip-erp` butuh tiga PR yang terpisah waktu (Expand, skrip Migrate, Contract). Alasannya: FE tidak merender nama ini secara generik di semua tempat. Ada kesamaan persis di `erp-frontend/src/features/hris/kpi/lib/departemen-marketing.ts:23`, `opex-manual/types.ts:71-74`, `marketing-analytics/hooks/use-anggaran-iklan.ts:26,64`, dan `components/layout/sidebar-kategori.ts:223`. Mobile juga mencocokkan persis di `mybharata-app/lib/src/core/utils/department_color_utils.dart:25,69`.
