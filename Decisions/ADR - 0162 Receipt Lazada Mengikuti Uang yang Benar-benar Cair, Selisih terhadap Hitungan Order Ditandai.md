@@ -1,6 +1,6 @@
 # ADR - 0162 Receipt Lazada Mengikuti Uang yang Benar-benar Cair, Selisih terhadap Hitungan Order Ditandai
 
-> **Status**: 🟢 **Diterima**, 2026-10-09, oleh bagusizzanm (Tech Development). Butir 1 sampai 5 di § Decision adalah jawaban Finance (2026-10-09); butir 6 diputuskan Tech Development atas usulan agent dan **dikonfirmasi Finance pada hari yang sama** (selisih masuk Beban Admin); butir 7 dan 8 diputuskan Tech Development dan belum dikonfirmasi Finance. Semuanya sengaja sementara dan mudah dibalik (Finance bisa memindahkan selisih ke akun lain tanpa perubahan kode). Belum ada kode. Nomor 0162 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.
+> **Status**: 🟢 **Diterima**, 2026-10-09, oleh bagusizzanm (Tech Development). Butir 1 sampai 5 di § Decision adalah jawaban Finance (2026-10-09); butir 6 diputuskan Tech Development atas usulan agent dan **dikonfirmasi Finance pada hari yang sama** (selisih masuk Beban Admin); butir 7 dan 8 diputuskan Tech Development dan belum dikonfirmasi Finance. Semuanya sengaja sementara dan mudah dibalik (Finance bisa memindahkan selisih ke akun lain tanpa perubahan kode). **Kode live**: BE (bip-erp#2897, 2026-10-09 18:39) dan FE (erp-frontend#2270, 2026-10-10 06:17); **belum terbukti pada data** (nol receipt bertanda per 2026-10-10 05:50, karena aturan hanya berlaku untuk receipt Lazada yang belum pernah terkirim). Nomor 0162 diklaim saat push; bila sudah terpakai, geser ke nomor bebas berikutnya.
 
 %% Status di blockquote atas supaya terbaca VAULT-INDEX.json (15 baris pertama). %%
 
