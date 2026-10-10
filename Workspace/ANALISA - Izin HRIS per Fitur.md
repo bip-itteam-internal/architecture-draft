@@ -12,10 +12,10 @@
 
 | Urut | Issue | Repo | Judul |
 |---|---|---|---|
-| induk, tanpa PR sendiri | (belum dibuat) | `bip-erp` | Izin HRIS dipecah per fitur |
-| 1 | (belum dibuat) | `bip-erp` | [BE] Katalog izin HRIS per fitur, cadangan per fitur, gerbang beralih (bagian 1/2) |
-| 2, deploy sesudah BE 1/2 | (belum dibuat) | `erp-frontend` | [FE] Menu HRIS dan tombol cuti ke izin per fitur |
-| 3, lalu fase dua hris oleh manusia | (belum dibuat) | `bip-erp` | [BE] Paket hris setara untuk pemegang peran, lompatan ke attendance membawa izin (bagian 2/2) |
+| induk, tanpa PR sendiri | bip-erp#2941 | `bip-erp` | Izin HRIS dipecah per fitur |
+| 1 | bip-erp#2942 | `bip-erp` | [BE] Katalog izin HRIS per fitur, cadangan per fitur, gerbang beralih (bagian 1/2) |
+| 2, deploy sesudah BE 1/2 | erp-frontend#2289 | `erp-frontend` | [FE] Menu HRIS dan tombol cuti ke izin per fitur |
+| 3, lalu fase dua hris oleh manusia | bip-erp#2943 | `bip-erp` | [BE] Paket hris setara untuk pemegang peran, lompatan ke attendance membawa izin (bagian 2/2) |
 
 ## Langkah manusia
 
@@ -28,7 +28,7 @@
 
 ### Izin HRIS dipecah per fitur
 
-Repo tujuan: `bip-erp` Â· Urutan: induk, tanpa PR sendiri
+Repo tujuan: `bip-erp` Â· Urutan: induk, tanpa PR sendiri Â· https://github.com/bip-itteam-internal/bip-erp/issues/2941
 
 **Pemutus:** @irfanarfianto
 **PIC:** belum ditetapkan
@@ -72,7 +72,7 @@ Issue ini induk tanpa PR sendiri. Urutan: BE 1/2, FE 1/1, BE 2/2, lalu perapian 
 
 ### [BE] Katalog izin HRIS per fitur, cadangan per fitur, gerbang beralih (bagian 1/2)
 
-Repo tujuan: `bip-erp` Â· Urutan: 1
+Repo tujuan: `bip-erp` Â· Urutan: 1 Â· https://github.com/bip-itteam-internal/bip-erp/issues/2942
 
 **Pemutus:** @irfanarfianto
 **PIC:** belum ditetapkan
@@ -118,7 +118,7 @@ Tidak ada untuk kodenya. Penyalaan di produksi menunggu alat banding bip-erp#293
 
 ### [FE] Menu HRIS dan tombol cuti ke izin per fitur
 
-Repo tujuan: `erp-frontend` Â· Urutan: 2, deploy sesudah BE 1/2
+Repo tujuan: `erp-frontend` Â· Urutan: 2, deploy sesudah BE 1/2 Â· https://github.com/bip-itteam-internal/erp-frontend/issues/2289
 
 **Pemutus:** @irfanarfianto
 **PIC:** belum ditetapkan
@@ -162,7 +162,7 @@ Sub-issue BE bagian 1/2 merged dan terpasang di dev. Deploy sesudah BE.
 
 ### [BE] Paket hris setara untuk pemegang peran, lompatan ke attendance membawa izin (bagian 2/2)
 
-Repo tujuan: `bip-erp` Â· Urutan: 3, lalu fase dua hris oleh manusia
+Repo tujuan: `bip-erp` Â· Urutan: 3, lalu fase dua hris oleh manusia Â· https://github.com/bip-itteam-internal/bip-erp/issues/2943
 
 **Pemutus:** @irfanarfianto
 **PIC:** belum ditetapkan

@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-10",
-  "jumlah_dokumen": 613,
+  "jumlah_dokumen": 615,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1916,6 +1916,7 @@
         "ADR - 0104 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres",
         "ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya",
         "ADR - 0164 Hak Akses Satu Pintu, Peran Dibawa Paket Hak dan Dirakit saat Token Terbit",
+        "ADR - 0167 Izin HRIS Dipecah per Fitur dengan Cadangan Peran per Fitur",
         "API - Integration Service",
         "ADR - 0051 Pencabutan Tampilan Menu per Posisi",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
@@ -1968,23 +1969,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "08c8030731d619b09106b5d39bae46fdbcb2895f2eefa265901e5087fc4e592d",
-      "ukuran_kb": 142.8,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja (tiga sumbu modul, tingkat aksi, cakupan data), bagaimana paket hak (permission set) menempel pada posisi/jabatan, dan bagaimana penegakannya di gateway, service, dan frontend. Juga menjawab modul mana yang sudah punya katalog izin dan penegakan per-aksi, bagaimana klaim JWT permissions dibentuk, serta apa status fase dua tier fallback dan arah satu pintu (ADR 0164).",
+      "hash": "0700d0970729ec07e89d802a7dbc20a2d2aacb47ab0f071ba81abed587471396",
+      "ukuran_kb": 143.2,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja (tiga sumbu modul, tingkat aksi, cakupan data), bagaimana paket hak (permission set) menempel pada posisi/jabatan dan diresolusi ke klaim JWT saat login, serta di mana penegakannya di gateway, service, dan frontend. Juga menjawab katalog izin per modul yang terdaftar, cadangan tier `system_roles` (fase dua, sakelar TIER_FALLBACK), dan modul mana yang sudah atau belum menegakkan izin per aksi.",
       "kata_kunci": [
         "RBAC",
         "permission set",
         "paket hak",
         "hak akses",
+        "access control",
         "katalog izin",
-        "reach",
-        "JWT permissions",
-        "tier fallback",
         "system_roles",
-        "posisi",
-        "gate",
-        "RequirePermission",
-        "menu terbatas"
+        "tier fallback",
+        "posisi jabatan",
+        "RequirePermission"
       ]
     },
     {
@@ -2883,7 +2881,7 @@
         "Marketing - Marketing Analytics (Audit Ketersediaan Data)"
       ],
       "hash": "6ba76cc87a601a6a58e6812770c8aa695ef9bca9655cc91e249795670cf27b0b",
-      "ukuran_kb": 192.0,
+      "ukuran_kb": 192.1,
       "ringkasan": "Menjawab: endpoint marketing-analytics (beranda, laba per level, live, KPI host, jadwal siaran), kapan angka boleh dijumlahkan atau tidak, dan bagaimana pecahan mata uang belanja iklan dikirim di kawat /profit/campaigns dan /profit/ads (ads_cost_mata_uang, ads_cost_tanpa_mata_uang). Juga aturan kejujuran data per kolom.",
       "kata_kunci": [
         "marketing analytics",
@@ -9473,7 +9471,7 @@
         "buka:<nama_alat>"
       ],
       "hash": "dae16599a99bdc62c9141bf70255f393603c5f4a289510eb57bc098a4ffe2398",
-      "ukuran_kb": 8.2,
+      "ukuran_kb": 8.3,
       "ringkasan": "Menjawab: mengapa Copilot tidak boleh menyimpulkan ketiadaan atau sebab dari satu sumber, bagaimana cek silang dikerjakan sistem dengan tiga keadaan (ada, tidak ada tercatat, tidak diperiksa), bagaimana angka tak pernah dihitung model, dan pasangan cek silang mana yang masih pekerjaan terbuka. Status Diusulkan.",
       "kata_kunci": [
         "cek silang",
@@ -9484,6 +9482,40 @@
         "tidak diperiksa",
         "kalender libur",
         "ADR 0166"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0167 Izin HRIS Dipecah per Fitur dengan Cadangan Peran per Fitur.md",
+      "judul": "ADR - 0167 Izin HRIS Dipecah per Fitur dengan Cadangan Peran per Fitur",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-10-10. Arah dan empat pilihan bentuknya diputuskan pemilik produk (irfanarfianto) pada tanggal itu; kode belum ada. Persetujuan ADR ditulis di baris ini menurut [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]].",
+      "publik": true,
+      "tautan": [
+        "ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia",
+        "ADR - 0164 Hak Akses Satu Pintu, Peran Dibawa Paket Hak dan Dirakit saat Token Terbit",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
+        "CORE - RBAC dan Permission Set",
+        "Microservices - Employee Service",
+        "Microservices - Attendance Service",
+        "APP - Web ERP"
+      ],
+      "hash": "914788199c12e2937e4555bd4a518caed6d17ad3b946e9f9845f68d00d8a10bf",
+      "ukuran_kb": 13.0,
+      "ringkasan": "Menjawab: kenapa izin modul HRIS (`hris.view`/`work`/`manage`) dipecah menjadi pasangan lihat/kelola per fitur (karyawan, kontrak, mutasi, resign, SP, presensi, cuti), bagaimana rute backend dan menu web dipetakan ke izin baru, dan kenapa cadangan peran dinilai per fitur alih-alih per modul. Juga menjelaskan langkah netral (hak setiap akun tidak berubah, dibuktikan alat banding) sebelum penyempitan per jabatan.",
+      "kata_kunci": [
+        "izin HRIS",
+        "HRIS permission",
+        "per fitur",
+        "cadangan peran",
+        "tier fallback",
+        "hris.manage",
+        "gateHris",
+        "paket hak",
+        "RBAC",
+        "ADR 0167"
       ]
     },
     {
@@ -17314,7 +17346,7 @@
         "APP - Web ERP"
       ],
       "hash": "2dbe632c030db44fc37eb03caaa090db366ce53bcbf442015f72c0f357868051",
-      "ukuran_kb": 49.6,
+      "ukuran_kb": 49.9,
       "ringkasan": "Menjawab: bagaimana Copilot menyajikan jawaban berangka sebagai laporan (angka utama, grafik berjudul kesimpulan, paragraf penjelasan, tabel lengkap, PDF/Excel), urutan baca 3-30-3, pita belum final dan kolom andal, kepala kelompok, tautan halaman dengan hak klik, label jujur cek silang, jebakan area gulir, dan daftar periksa menambah alat baru.",
       "kata_kunci": [
         "penyajian laporan",
@@ -20035,6 +20067,34 @@
         "Office Boy",
         "Security",
         "ADR 0090"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Izin HRIS per Fitur.md",
+      "judul": "ANALISA - Izin HRIS per Fitur",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0167 Izin HRIS Dipecah per Fitur dengan Cadangan Peran per Fitur",
+        "CORE - RBAC dan Permission Set"
+      ],
+      "hash": "560535a374ad4c6c5e284acae0b8a6ed017c93ae7379fdaeaee4b8f7a8162079",
+      "ukuran_kb": 13.6,
+      "ringkasan": "Menjawab: bagaimana pekerjaan pemecahan izin HRIS per fitur dipecah jadi issue induk dan sub-issue BE/FE beserta urutan deploy-nya, apa kriteria 'yang harus benar' tiap issue, dan langkah manusia apa yang dibutuhkan (alat banding, perapian paket sempit, menyalakan HRIS_TIER_FALLBACK=off). Juga memuat data pendukung produksi tentang siapa memegang peran dan paket hris.",
+      "kata_kunci": [
+        "analisa kebutuhan",
+        "izin HRIS",
+        "HRIS permission",
+        "draf issue",
+        "sub-issue",
+        "fase dua",
+        "HRIS_TIER_FALLBACK",
+        "paket setara",
+        "alat banding",
+        "bip-erp#2941"
       ]
     },
     {
