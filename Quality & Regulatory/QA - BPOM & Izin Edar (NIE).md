@@ -7,7 +7,7 @@
 
 ## Latar Belakang
 
-- Produk obat hanya boleh beredar bila punya **Nomor Izin Edar (NIE)** dari BPOM. NIE punya masa berlaku & wajib diperpanjang. Penjualan via marketplace ([[Sales - Marketplace Integration]]) tetap terikat aturan ini.
+- Produk obat hanya boleh beredar bila punya **Nomor Izin Edar (NIE)** dari BPOM. NIE punya masa berlaku & wajib diperpanjang. Penjualan via marketplace ([[Marketing - Marketplace Integration]]) tetap terikat aturan ini.
 
 ## Ruang Lingkup / Cakupan (business view)
 
@@ -17,7 +17,7 @@
 
 ## Konsumen Data
 
-- [[Sales - Marketplace Integration]] / [[Microservices - Integration Service]] — hanya produk ber-NIE valid yang boleh dijual (TBD enforcement)
+- [[Marketing - Marketplace Integration]] / [[Microservices - Integration Service]] — hanya produk ber-NIE valid yang boleh dijual (TBD enforcement)
 - [[Microservices - Inventory Service]] — kaitan SKU ↔ NIE (TBD)
 
 ## Belum Diputuskan (TBD)
@@ -28,4 +28,4 @@
 ## Dokumen Terkait
 
 - [[QA - Big Pictures]] · [[QA - CPOB (GMP)]] · [[REF - Glossary]]
-- [[Sales - Marketplace Integration]] · [[Microservices - Integration Service]]
+- [[Marketing - Marketplace Integration]] · [[Microservices - Integration Service]]

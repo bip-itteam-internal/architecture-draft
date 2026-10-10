@@ -20,12 +20,12 @@
 ## Posisi vs Dokumen Lain
 
 - **Berbeda** dari scraping TikTok di [[Microservices - Integration Service]] — yang itu untuk **order/iklan marketplace** (Accurate bridging); ini untuk **sentimen komentar kompetitor**.
-- **Beririsan** secara fungsi dengan riset tren konten di [[Sales - Veo (Gemini) Implementation]] (Ideamills) yang juga memakai Apify untuk discovery tren TikTok.
+- **Beririsan** secara fungsi dengan riset tren konten di [[Marketing - Veo (Gemini) Implementation]] (Ideamills) yang juga memakai Apify untuk discovery tren TikTok.
 
 ## Dokumen Terkait
 
 - [[APP - Tiktok Insight Analyzer]] — implementasi (pipeline, API, dashboard)
-- [[Sales - GMV Creative]]
-- [[Sales - Veo (Gemini) Implementation]]
-- [[Sales - Dashboard]]
-- [[Sales - Big Pictures]]
+- [[Marketing - GMV Creative]]
+- [[Marketing - Veo (Gemini) Implementation]]
+- [[Marketing - Dashboard]]
+- [[Marketing - Big Pictures]]

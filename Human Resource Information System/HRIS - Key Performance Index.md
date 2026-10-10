@@ -11,7 +11,7 @@
 > Grounded ke [[Microservices - Insentive Service]] (✅ production). Cakupan: **9 role marketing** (Supervisor, ADV Leader TikTok, ADV Marketplace, ADV Meta, Host Live, Affiliate, CRM, CS, ICC) — **bukan** seluruh karyawan/departemen.
 
 - `master-kpi` (CRUD; bobot total 100) · `POST /calculate` (scoring bertingkat per-role) · hasil + workflow approve/override · cron harian menarik metrik iklan (TikTok GMV-Max / Shopee GMS) dari [[Microservices - Integration Service]].
-- Skor → **insentif** ([[Finance - Incentive]] / [[Sales - Incentive]]). Koleksi: `master_kpis`, `kpi_score`, `incentive_results` ([[DB - Overview and Notes]]).
+- Skor → **insentif** ([[Finance - Incentive]] / [[Marketing - Incentive]]). Koleksi: `master_kpis`, `kpi_score`, `incentive_results` ([[DB - Overview and Notes]]).
 
 ## Sudah Diimplementasikan — appraisal per-karyawan (employee-service)
 
@@ -158,7 +158,7 @@ Kami menginginkan cara yang mudah untuk mengisi catatan dan kalkulasi otomatis u
 
 ## Dokumen Terkait
 
-- **Implementasi**: [[Microservices - Insentive Service]] (engine KPI→insentif marketing) · [[Finance - Incentive]] · [[Sales - Incentive]]
+- **Implementasi**: [[Microservices - Insentive Service]] (engine KPI→insentif marketing) · [[Finance - Incentive]] · [[Marketing - Incentive]]
 - [[HRIS - Otomasi Skor KPI]] — analisis kelayakan mengisi skor otomatis dari data ERP (peta 311 metrik ke sumber datanya, modul yang ada tapi datanya kosong, dan rencana bertahap)
 - [[HRIS - Work Review]] — penilaian kualitatif (KPI = sisi kuantitatif); pertimbangkan **berbagi satu Review Cycle** ketimbang sistem terpisah
 - [[HRIS - Career & Promotion]] — masukan keputusan promosi

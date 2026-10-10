@@ -11,7 +11,7 @@ KLASIFIKASI: dict[str, tuple[str, bool]] = {
     "Human Resource Information System": ("domain", True),
     "Manufacture": ("domain", True),
     "Quality & Regulatory": ("domain", True),
-    "Sales": ("domain", True),
+    "Marketing": ("domain", True),
     "Third-party Software": ("domain", True),
     "Unknown or not listed": ("domain", True),
     "Warehouse": ("domain", True),

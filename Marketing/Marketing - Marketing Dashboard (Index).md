@@ -16,17 +16,17 @@ Analisis + spec untuk membangun dashboard **Marketing & Ads Command Center** (mo
 
 ## Isi
 
-- [[Sales - Marketing Dashboard (Analisis Rekap)]] — **INDEX, baca dulu** (9 poin + scope + blocker)
-- [[Sales - Marketing Dashboard (Master Roadmap)]] — roadmap 8 scope + 9 engine + strategi join + affiliate
-- [[Sales - Profit Engine (Design)]] — spec profit engine + HPP master
-- [[Sales - HPP Master (Plan)]] — plan implementasi HPP (field cost + upload xlsx)
-- [[Sales - Affiliate Seller Sync (Design)]] — spec affiliate auto-sync (API, bukan CSV)
-- [[Sales - Affiliate Seller Sync (Plan)]] — plan implementasi affiliate (7 task; token via GetOrRefreshToken)
-- [[Sales - Affiliate Integration (TikTok Docs)]] — dok resmi TikTok (endpoint + onboarding)
-- [[Sales - TikTok Affiliate Rules (Docs)]] — dok resmi TikTok (aturan onboarding)
+- [[Marketing - Marketing Dashboard (Analisis Rekap)]] — **INDEX, baca dulu** (9 poin + scope + blocker)
+- [[Marketing - Marketing Dashboard (Master Roadmap)]] — roadmap 8 scope + 9 engine + strategi join + affiliate
+- [[Marketing - Profit Engine (Design)]] — spec profit engine + HPP master
+- [[Marketing - HPP Master (Plan)]] — plan implementasi HPP (field cost + upload xlsx)
+- [[Marketing - Affiliate Seller Sync (Design)]] — spec affiliate auto-sync (API, bukan CSV)
+- [[Marketing - Affiliate Seller Sync (Plan)]] — plan implementasi affiliate (7 task; token via GetOrRefreshToken)
+- [[Marketing - Affiliate Integration (TikTok Docs)]] — dok resmi TikTok (endpoint + onboarding)
+- [[Marketing - TikTok Affiliate Rules (Docs)]] — dok resmi TikTok (aturan onboarding)
 
 ## Terkait
 
-**Keadaan sekarang (baca ini lebih dulu):** [[Microservices - Marketing Analytics Service]] · [[API - Marketing Analytics Service]] · [[Sales - Marketing Analytics (Audit Ketersediaan Data)]] · [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]]
+**Keadaan sekarang (baca ini lebih dulu):** [[Microservices - Marketing Analytics Service]] · [[API - Marketing Analytics Service]] · [[Marketing - Marketing Analytics (Audit Ketersediaan Data)]] · [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]]
 
-**Konteks asal:** [[Microservices - Integration Service]] · [[Sales - GMV Creative]] · [[ADR - 0008 Profit Engine Join via item_group_id]] · [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]]
+**Konteks asal:** [[Microservices - Integration Service]] · [[Marketing - GMV Creative]] · [[ADR - 0008 Profit Engine Join via item_group_id]] · [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]]

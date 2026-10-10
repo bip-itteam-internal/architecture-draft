@@ -3,7 +3,7 @@ status: ⚠️ Implemented (ada catatan) — Shopee live, TikTok menunggu approv
 diukur: 2026-09-08
 ---
 
-# Sales - SLA Chat CS (Shopee & TikTok)
+# Marketing - SLA Chat CS (Shopee & TikTok)
 
 Metrik SLA respons chat toko untuk KPI Customer Service. Seluruh angka di
 dokumen ini berasal dari **panggilan API nyata ke produksi**, bukan dari

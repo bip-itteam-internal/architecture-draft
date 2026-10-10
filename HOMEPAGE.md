@@ -14,7 +14,7 @@ Tiga hal yang dikejar, dan cara ERP Bharata menempuhnya berbeda dari rumusan ERP
 
 ## Seperti apa sistem ERP itu?
 
-**Backend** ERP (`bip-erp`) berupa **mono-repo microservices Go** (di belakang satu API Gateway). **Frontend & aplikasi** berada di **repo terpisah**: web ([[APP - Web ERP]]), mobile ([[APP - MyBharata]]), Task Manager ([[APP - Dynamic Task Tracker]]), generator konten (Ideamills → [[Sales - Veo (Gemini) Implementation]]), dan beberapa tool lain.
+**Backend** ERP (`bip-erp`) berupa **mono-repo microservices Go** (di belakang satu API Gateway). **Frontend & aplikasi** berada di **repo terpisah**: web ([[APP - Web ERP]]), mobile ([[APP - MyBharata]]), Task Manager ([[APP - Dynamic Task Tracker]]), generator konten (Ideamills → [[Marketing - Veo (Gemini) Implementation]]), dan beberapa tool lain.
 
 Interaksi antar service dapat diinterpretasikan seperti gambar di bawah ini
 ![[erp-request-nutshell.png]]
@@ -77,7 +77,7 @@ Service adalah end-point yang berinteraksi dengan database-nya masing-masing (da
 
 **Aplikasi** → [[BASE - Enterance Point]] · [[APP - Web ERP]] · [[APP - MyBharata]] · [[APP - Dynamic Task Tracker]] · [[APP - Ideamills]] · [[APP - Tiktok Insight Analyzer]] · [[APP (Extension) - Fingerprint Listener (Complete)]] · [[APP - Portal Karir Bharata]] (portal karir publik) · [[APP - Buku Besar Konsolidasi CV FINCON]] (akuntansi 40 CV, **di luar ERP** — [[ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate]])
 
-**Domain (Big Pictures)** → [[HRIS - Big Pictures]] · [[Sales - Big Pictures]] · [[GA - Big Pictures]] · [[IT - Big Pictures]] · [[WH - Management System]] · [[Finance - Big Pictures]] · [[Unlisted - Kesekretariatan (Big Pictures)]] (departemen tanpa folder domain)
+**Domain (Big Pictures)** → [[HRIS - Big Pictures]] · [[Marketing - Big Pictures]] · [[GA - Big Pictures]] · [[IT - Big Pictures]] · [[WH - Management System]] · [[Finance - Big Pictures]] · [[Unlisted - Kesekretariatan (Big Pictures)]] (departemen tanpa folder domain)
 
 **Quality & Regulatory** → [[QA - Big Pictures]] (CPOB/GMP · BPOM/izin edar · batch & traceability · deviation/CAPA · ED & recall — farmasi)
 

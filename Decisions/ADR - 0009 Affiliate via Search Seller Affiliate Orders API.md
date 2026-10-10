@@ -2,7 +2,7 @@
 
 - **Status**: ✅ Implemented (terverifikasi live 2026-07-01: re-auth toko OK, 95 order tertarik ke `affiliate_orders`)
 - **Tanggal**: 2026-07-01 (impl 2026-07-02)
-- **Konteks dok**: [[Microservices - Integration Service]] · [[Microservices - TikTok Shop Service]] · [[Sales - GMV Creative]] · [[ADR - 0008 Profit Engine Join via item_group_id]]
+- **Konteks dok**: [[Microservices - Integration Service]] · [[Microservices - TikTok Shop Service]] · [[Marketing - GMV Creative]] · [[ADR - 0008 Profit Engine Join via item_group_id]]
 
 ## Context
 
@@ -41,9 +41,9 @@ Dashboard tab Affiliate #7 butuh: roster creator, komisi per order, GMV affiliat
 ## Dokumen Terkait
 
 Folder `Marketing Dashboard Analysis/`:
-- [[Sales - Affiliate Seller Sync (Design)]] — spec auto-sync (client, cron, koleksi affiliate_orders, handler)
-- [[Sales - Affiliate Seller Sync (Plan)]] — **plan implementasi** (bite-sized, 7 task; token via GetOrRefreshToken karena token DB stale)
-- [[Sales - Marketing Dashboard (Analisis Rekap)]] — index analisis
-- [[Sales - Marketing Dashboard (Master Roadmap)]] — §B4 affiliate lengkap (scope, endpoint, blocker)
-- Dok resmi TikTok: [[Sales - Affiliate Integration (TikTok Docs)]] · [[Sales - TikTok Affiliate Rules (Docs)]]
+- [[Marketing - Affiliate Seller Sync (Design)]] — spec auto-sync (client, cron, koleksi affiliate_orders, handler)
+- [[Marketing - Affiliate Seller Sync (Plan)]] — **plan implementasi** (bite-sized, 7 task; token via GetOrRefreshToken karena token DB stale)
+- [[Marketing - Marketing Dashboard (Analisis Rekap)]] — index analisis
+- [[Marketing - Marketing Dashboard (Master Roadmap)]] — §B4 affiliate lengkap (scope, endpoint, blocker)
+- Dok resmi TikTok: [[Marketing - Affiliate Integration (TikTok Docs)]] · [[Marketing - TikTok Affiliate Rules (Docs)]]
 - [[ADR - 0008 Profit Engine Join via item_group_id]] (join via product_id==item_group_id)

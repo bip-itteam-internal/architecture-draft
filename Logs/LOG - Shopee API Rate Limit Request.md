@@ -1,5 +1,5 @@
 > **Tipe:** Log operasional (artefak korespondensi) — bukan dokumentasi arsitektur.
-> **Tanggal:** 2026-06-23 · **Konteks arsitektur:** [[Sales - Marketplace Integration]] · [[Microservices - Integration Service]]
+> **Tanggal:** 2026-06-23 · **Konteks arsitektur:** [[Marketing - Marketplace Integration]] · [[Microservices - Integration Service]]
 
 # Shopee API Rate Limit Increase — Response to OpenAPI Team
 

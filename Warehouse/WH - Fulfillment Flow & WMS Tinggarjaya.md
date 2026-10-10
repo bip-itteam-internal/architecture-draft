@@ -460,6 +460,6 @@ bukan body request).
 
 ## Dokumen Terkait
 
-- [[Sales - Marketplace Integration]] — konsep bisnis integrasi marketplace
+- [[Marketing - Marketplace Integration]] — konsep bisnis integrasi marketplace
 - [[Microservices - Integration Service]] — implementasi backend + proxy API marketplace
 - [[DB - Overview and Notes]] — MongoDB & Redis

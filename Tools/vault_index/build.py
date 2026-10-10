@@ -388,7 +388,7 @@ def _muat_berkas_hasil(p: Path) -> tuple[dict | None, str | None]:
             'bentuknya salah. Diharapkan objek JSON level atas dengan key '
             '"hasil" berisi peta path -> {"ringkasan": ..., "kata_kunci": '
             '[...], "hash": ...}. Contoh:\n'
-            '  {"hasil": {"Sales/Sales - A.md": {"ringkasan": "...", '
+            '  {"hasil": {"Marketing/Marketing - A.md": {"ringkasan": "...", '
             '"kata_kunci": ["..."], "hash": "..."}}}'
         )
     return data["hasil"], None

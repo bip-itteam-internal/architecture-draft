@@ -30,7 +30,7 @@ Akibatnya "prediksi retur" dan "prediksi pembatalan" ternyata satu kandidat yang
 
 Vault ini memuat 57 ADR sebelum keputusan ini, dan **tidak satu pun mengatur kapan AI layak dipakai**. [[ADR - 0028 Code Index bip-erp]] menyinggung LLM hanya untuk menyatakan bahwa Code Index sengaja TIDAK memakainya.
 
-Sementara itu kapabilitas AI sudah berjalan di empat tempat yang tidak saling menaut sebagai satu kapabilitas: [[APP - Ideamills]] dan [[Sales - Veo (Gemini) Implementation]] (video iklan lewat Veo/Gemini, matang), [[Sales - Veo (Gemini) Automation Layer]] (LangGraph dengan human-in-the-loop, WIP), [[APP - Tiktok Insight Analyzer]] dan [[Sales - TikTok Sentiment Pipeline]] (analisis sentimen lewat Claude, berjalan tiap awal pekan), serta [[CORE - OCR Document Service]] (OCR dan RAG, masih konsep).
+Sementara itu kapabilitas AI sudah berjalan di empat tempat yang tidak saling menaut sebagai satu kapabilitas: [[APP - Ideamills]] dan [[Marketing - Veo (Gemini) Implementation]] (video iklan lewat Veo/Gemini, matang), [[Marketing - Veo (Gemini) Automation Layer]] (LangGraph dengan human-in-the-loop, WIP), [[APP - Tiktok Insight Analyzer]] dan [[Marketing - TikTok Sentiment Pipeline]] (analisis sentimen lewat Claude, berjalan tiap awal pekan), serta [[CORE - OCR Document Service]] (OCR dan RAG, masih konsep).
 
 Empat-empatnya lahir dari kesempatan, bukan dari saringan. Akibatnya usulan AI berikutnya tidak punya dasar untuk ditolak selain selera, dan itu berbahaya di modul yang menggerakkan uang.
 
@@ -143,7 +143,7 @@ Ditolak agar tidak diusulkan berulang tanpa data baru: **prediksi karyawan mengu
 
 **Prediksi paket COD gagal antar: ditinjau ulang, belum dibangun** (dikoreksi 2026-09-14; dulu tercatat terpisah sebagai "prediksi retur, ditolak, 412 label" dan "prediksi pembatalan, ditunda"). Labelnya ternyata ada, 5.742 order. Aturan sederhana yang bebas kebocoran data sudah diuji dan lemah: segmen paling tajam, COD dari pembeli yang sebelumnya pernah gagal diantar, lajunya 15,7% tetapi hanya menangkap 2,6% retur, sementara 86% retur datang dari pembeli COD yang baru pertama kali order sehingga tidak punya riwayat untuk dinilai; aturan yang lebih lebar menandai mayoritas order karena 81% order TikTok memang COD. Riwayat pembeli wajib dihitung dari waktu kejadian, bukan dari status tersimpan (versi pertama koreksi ini memakai status tersimpan dan menghasilkan 10,8% yang sedikit bocor). Jadi model punya alasan untuk diuji (§3), tetapi belum boleh dibangun sebelum dua pertanyaan yang bukan teknis terjawab: **berapa ongkos satu paket COD yang gagal diantar**, dan **tindakan apa yang tersedia bagi toko terhadap order COD berisiko sebelum dikirim**. Tanpa jawaban kedua, prediksi apa pun hanya laporan (§1, syarat ketiga).
 
-**Analisis keluhan produk dari ulasan** dikerjakan dengan LLM, bukan model yang dilatih, karena 342 contoh negatif terlalu sedikit untuk melatih apa pun sementara teksnya sudah tersedia dan pipeline sejenis sudah berjalan di [[Sales - TikTok Sentiment Pipeline]].
+**Analisis keluhan produk dari ulasan** dikerjakan dengan LLM, bukan model yang dilatih, karena 342 contoh negatif terlalu sedikit untuk melatih apa pun sementara teksnya sudah tersedia dan pipeline sejenis sudah berjalan di [[Marketing - TikTok Sentiment Pipeline]].
 
 ## Consequences
 
@@ -162,4 +162,4 @@ Ditolak agar tidak diusulkan berulang tanpa data baru: **prediksi karyawan mengu
 - [[Microservices - Marketing Analytics Service]]
 - [[API - Marketing Analytics Service]]
 - [[ADR - 0028 Code Index bip-erp]]
-- [[Sales - Marketing Analytics (Audit Ketersediaan Data)]]
+- [[Marketing - Marketing Analytics (Audit Ketersediaan Data)]]

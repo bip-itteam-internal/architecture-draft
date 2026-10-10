@@ -15,4 +15,4 @@
 > Juga tersedia publik via gateway: `/ext/tiktok-shop/callback` & `/ext/tiktok-shop/webhook`.
 
 ## Dokumen Terkait
-- [[Microservices - TikTok Shop Service]] · [[Microservices - Integration Service]] · [[Sales - Marketplace Integration]] · [[API - Index]]
+- [[Microservices - TikTok Shop Service]] · [[Microservices - Integration Service]] · [[Marketing - Marketplace Integration]] · [[API - Index]]

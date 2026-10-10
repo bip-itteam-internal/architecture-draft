@@ -24,7 +24,7 @@
 
 Proses bisnis ditulis per domain. Pintu tiap domain adalah dok Big Pictures, dan tiap dok domain memuat bagian **Persona / Pengguna** (siapa memakai, tujuan, pain point, aksi utama).
 
-- [[HRIS - Big Pictures]] · [[Sales - Big Pictures]] · [[GA - Big Pictures]] · [[Finance - Big Pictures]] · [[WH - Management System]] · [[IT - Big Pictures]] · [[QA - Big Pictures]]
+- [[HRIS - Big Pictures]] · [[Marketing - Big Pictures]] · [[GA - Big Pictures]] · [[Finance - Big Pictures]] · [[WH - Management System]] · [[IT - Big Pictures]] · [[QA - Big Pictures]]
 - **Manufacture** belum punya dok Big Pictures; pintunya [[Manufacture - Stock & Material Management]] dan [[Manufacture - Order Production Workflow (Flow Source)]].
 - Alur banyak-aktor yang dipisah jadi dok persona sendiri: [[HRIS - Payroll Persona]].
 - Rantai bisnis yang di kode terpecah jadi beberapa pengajuan terpisah: [[REF - Rantai Pengajuan Lintas Modul]].
@@ -67,7 +67,7 @@ Proses bisnis ditulis per domain. Pintu tiap domain adalah dok Big Pictures, dan
 ## 06 Integration Requirements
 
 - **Akuntansi (Accurate)**: [[External - Accurate]] · [[ADR - 0001 Akuntansi via Accurate]] · [[ADR - 0014 Accurate Token DB-backed via OAuth]] · [[ADR - 0015 Push Pergerakan WMS ke Accurate]] · runbook [[RUN - Accurate API Access Token (OAuth)]].
-- **Marketplace dan iklan**: [[Sales - Marketplace Integration]] · [[Microservices - Integration Service]] · [[Microservices - TikTok Shop Service]] · [[Sales - Affiliate Integration (TikTok Docs)]] · [[RUN - Onboarding Meta Ads]]. Cache dokumentasi Shopee Open API v2 di-generate skrip di folder `API Reference/Shopee Open API v2/` dan dibaca lewat path, bukan wikilink.
+- **Marketplace dan iklan**: [[Marketing - Marketplace Integration]] · [[Microservices - Integration Service]] · [[Microservices - TikTok Shop Service]] · [[Marketing - Affiliate Integration (TikTok Docs)]] · [[RUN - Onboarding Meta Ads]]. Cache dokumentasi Shopee Open API v2 di-generate skrip di folder `API Reference/Shopee Open API v2/` dan dibaca lewat path, bukan wikilink.
 - **Orkestrasi order pihak ketiga**: [[External - Desty]] (soft-disabled, kodenya masih ada) · [[Vendor - CRM]].
 - **Logistik**: [[RUN - Onboarding KiriminAja]].
 - **Perangkat**: [[APP (Extension) - Fingerprint Listener (Complete)]].

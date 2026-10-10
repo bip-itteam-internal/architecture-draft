@@ -5,7 +5,7 @@
 - **Stack:** Go + Fiber v2 + MongoDB (backend) · Next.js (frontend)
 - **Path:** `bip-erp/services/integration/` (backend) · `erp-frontend/src/features/integration/icc/` (frontend, halaman `/icc/management`)
 - **Status**: ⚠️ Implemented (ada catatan) — Phase 1–3 selesai; Phase 4 belum; lihat gap model leader di [[#Relasi Leader & Akumulasi Insentif]]
-- **Dokumen terkait:** [[Sales - ICC Affiliate Mapping]] · [[Microservices - Integration Service]] · [[Microservices - Insentive Service]] · [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] · [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]]
+- **Dokumen terkait:** [[Marketing - ICC Affiliate Mapping]] · [[Microservices - Integration Service]] · [[Microservices - Insentive Service]] · [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] · [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]]
 
 > ⚠️ **Pencocokan posisi "ICC" sudah pindah ke `position_key`, bukan lagi label `position`.** Rename posisi 18 Agt 2026 ("ICC" → "Account Specialist") sempat mematahkan seluruh pencocokan string `position === "icc"` di beberapa modul (ICC Management, RBAC menu, Finance Opex, HRIS KPI). Di modul ini sudah diperbaiki: kode HRIS-hierarchy (`hierarki-leader.ts`) mencocokkan `position_key` bila terisi, fallback ke label `position` untuk data transisi. **Kalau menyentuh modul LAIN yang masih cocok ke label posisi, periksa dulu — itu gap terpisah yang belum tentu ikut diperbaiki.**
 
@@ -32,7 +32,7 @@ ICC Employee → ?                    (shop + ads account, belum ada)
 
 ```
 ICC Employee → {
-  tiktok_creator_usernames[],    ← sudah ada (Sales - ICC Affiliate Mapping)
+  tiktok_creator_usernames[],    ← sudah ada (Marketing - ICC Affiliate Mapping)
   tiktok_shop_ids[],             ← BARU: 0 atau lebih toko yang dikelola
   tiktok_advertiser_ids[],       ← BARU: 0 atau lebih akun ads yang dikelola
 }
@@ -50,7 +50,7 @@ ICC Employee → {
 |---|---|---|---|
 | TikTok Shop | `tt_shop_authorized_shops` | Integration | 16 toko aktif, berisi `id`, `name`, `cipher` |
 | TikTok Ads Advertiser | `tt_business_advertisers` | Integration | Akun iklan per-toko, berisi `advertiser_id`, `advertiser_name` |
-| ICC Affiliate Username | Konstanta FE | Frontend | Lihat [[Sales - ICC Affiliate Mapping]] |
+| ICC Affiliate Username | Konstanta FE | Frontend | Lihat [[Marketing - ICC Affiliate Mapping]] |
 | Employee Mapping (ADV) | `employee_performance_mappings` | Insentive | Mapping karyawan ADV Leader → advertiser_id + store_id |
 | ICC Account Mapping | `icc_account_mappings` | Integration | ✅ Phase 1–3: Mapping ICC employee → shop_id + advertiser_id + team |
 
@@ -87,7 +87,7 @@ ICC Employee → {
 - Minimal salah satu (`tiktok_shop_id` atau `tiktok_advertiser_id`) wajib diisi
 - **1 karyawan boleh handle >1 toko dan >1 ads** — tidak ada unique index pada `employee_id`
 - Satu shop hanya boleh di-assign ke satu karyawan aktif — unique index `(tiktok_shop_id != "", is_active=true)`
-- **Satu advertiser BOLEH dipegang lebih dari satu karyawan aktif (sejak 2026-08-26)** — unique index `(tiktok_advertiser_id, employee_id, is_active=true)`, bukan unique global seperti shop. Yang dicegah cuma karyawan yang SAMA dobel-assign ke advertiser yang sama (`409 ErrIccAdvertiserAlreadyAssigned`); karyawan LAIN bebas memegang advertiser itu juga. Pola ini sama dengan `unique(employee_id, username)` di `icc_affiliate_accounts` — lihat [[Sales - ICC Affiliate Mapping]].
+- **Satu advertiser BOLEH dipegang lebih dari satu karyawan aktif (sejak 2026-08-26)** — unique index `(tiktok_advertiser_id, employee_id, is_active=true)`, bukan unique global seperti shop. Yang dicegah cuma karyawan yang SAMA dobel-assign ke advertiser yang sama (`409 ErrIccAdvertiserAlreadyAssigned`); karyawan LAIN bebas memegang advertiser itu juga. Pola ini sama dengan `unique(employee_id, username)` di `icc_affiliate_accounts` — lihat [[Marketing - ICC Affiliate Mapping]].
 - Partial filter index menyertakan `$gt: ""` agar baris tanpa shop/advertiser (string kosong) tidak dikenai unique constraint
 
 ---
@@ -320,7 +320,7 @@ bersifat global. Pipeline: `$unwind → $group by advertiser_id` untuk deduplika
 | **4** | Integrasi Insentive Service: hitung KPI AM dari mapping ini | 🟡 Belum |
 | **5** | Relasi leader saat assign, model `icc_leaders` (lihat [[#Relasi Leader & Akumulasi Insentif]]) | ⚠️ Backend masih jadi guard aktif; FE-nya sudah digantikan Fase 8 |
 | **6** | Tampilan ICC Management dipisah per team (kartu per team, satu leader per kartu) | ⛔ Superseded oleh Fase 8 |
-| **7** | Akun affiliate (username TikTok) ikut dikelola di ICC Management — desain & fasenya di [[Sales - ICC Affiliate Mapping]] | ✅ Selesai |
+| **7** | Akun affiliate (username TikTok) ikut dikelola di ICC Management — desain & fasenya di [[Marketing - ICC Affiliate Mapping]] | ✅ Selesai |
 | **8** | Kartu per LEADER (bukan per team) diturunkan dari `work_data.supervisor_id`; kartu "Langsung di bawah SPV" + "Belum ditugaskan"; hapus Set Leader manual (lihat [[#Tampilan ICC Management — kartu per leader (menggantikan kartu per team)]]) | ✅ Selesai — sudah ter-merge ke `main` |
 | **9** | Edit mapping yang sudah ada: ganti toko/advertiser per channel, pemegang, dan tim tanpa deaktivasi+assign ulang (lihat `PATCH /icc/mappings/:id` di atas) | ✅ Selesai — Backend (`feat/icc-mapping-edit`) + Frontend (`feat/icc-mapping-edit-ui`) sudah ter-merge ke `main` |
 | **10** | Advertiser TikTok Ads boleh dipegang >1 karyawan aktif: index diganti dari unique global jadi unique per-pasangan `(tiktok_advertiser_id, employee_id)`, `available-advertisers` tak lagi menyaring yang sudah assigned. Toko/Shopee/Lazada TETAP 1:1 (tidak diubah) | ✅ Selesai (2026-08-26), branch `feat/icc-advertiser-shared` |
@@ -454,7 +454,7 @@ Ikon **✎ (Ubah)** di tiap baris membuka dialog assign yang sama dalam mode edi
 - **Departemen** tetap unit teratas (sesuai Fase 6): distinct department karyawan berposisi ICC.
 - **Di dalam satu departemen**, `susunTimLeader` mengelompokkan karyawan ICC menurut **atasan langsungnya** (`supervisor_id`) — leader = siapa pun dengan ≥1 bawahan langsung berposisi ICC, BUKAN orang berlabel jabatan "leader". Bisa nol, satu, atau **lebih dari satu** kartu leader per departemen.
 - **Kartu "Langsung di bawah SPV"** (`tanpa-leader`, `leader-card-khusus.tsx`) — karyawan APA PUN posisinya di departemen itu yang lapor langsung ke SPV (bukan lagi terbatas ICC — lihat Fase 11). **Punya tombol Assign** (`modeLangsungSpv`, kandidat tidak dibatasi posisi ICC); mengedit mapping yang sudah ada tetap lewat ikon Ubah seperti biasa.
-- **Kartu "Belum ditugaskan"** — akun affiliate (dari [[Sales - ICC Affiliate Mapping]]) yang belum punya pemegang sama sekali. Juga tanpa tombol Assign.
+- **Kartu "Belum ditugaskan"** — akun affiliate (dari [[Marketing - ICC Affiliate Mapping]]) yang belum punya pemegang sama sekali. Juga tanpa tombol Assign.
 - **Pencocokan posisi ICC** pakai `position_key` bila terisi, fallback ke label `position` — lihat catatan rename di bagian atas dokumen.
 - **Urutan**: nama leader, abjad, deterministik.
 - **Kartu collapsible**, default terbuka. Isi kartu = tabel per-karyawan dengan seluruh tokonya ditumpuk (`kelompokkanMappingPerKaryawan`, tak berubah dari Fase 6).
@@ -554,7 +554,7 @@ pengelompokannya**, bukan alur kerja assign-nya.
 | **Team field pada data lama** | Mapping yang dibuat sebelum Phase 3 tidak memiliki field `team` — query filter `?team=X` tidak akan menemukan data lama. Migrasi data lama perlu dijalankan manual atau via script |
 | **Risiko: rotasi** | Jika mapping sering berubah, laporan historis perlu snapshot — perlu `effective_from`/`effective_to` di fase berikutnya |
 | **Belum terintegrasi insentif** | Insentive Service belum konsumsi endpoint ini; integrasi dilakukan saat jabatan ICC → AM resmi berubah |
-| 🟡 **TBD: atribusi insentif advertiser bersama** | Sejak Fase 10, satu advertiser boleh dipegang >1 karyawan aktif. Saat Fase 4 (Laporan Akuntabilitas AM) dibangun, GMV Ads dari advertiser yang dipegang bersama itu dihitung ke siapa — dibagi rata, salah satu ditandai pemilik utama, atau penuh ke semua? **Harus diputuskan sebelum Fase 4**, tapi tidak menghalangi Fase 10 karena Fase 4 belum dibangun. Sejajar dengan TBD "Atribusi order akun bersama" di [[Sales - ICC Affiliate Mapping]]. |
+| 🟡 **TBD: atribusi insentif advertiser bersama** | Sejak Fase 10, satu advertiser boleh dipegang >1 karyawan aktif. Saat Fase 4 (Laporan Akuntabilitas AM) dibangun, GMV Ads dari advertiser yang dipegang bersama itu dihitung ke siapa — dibagi rata, salah satu ditandai pemilik utama, atau penuh ke semua? **Harus diputuskan sebelum Fase 4**, tapi tidak menghalangi Fase 10 karena Fase 4 belum dibangun. Sejajar dengan TBD "Atribusi order akun bersama" di [[Marketing - ICC Affiliate Mapping]]. |
 | ⛔ **`icc_leaders` beku, guard BE independen dari FE** | FE berhenti membaca/menulis `icc_leaders` sejak kartu-per-leader (Fase 8), tapi `POST`/`PATCH /icc/mappings` masih menggerbanginya. Team tanpa baris aktif di `icc_leaders` akan gagal 400 walau kartunya tampil normal di FE. Lihat [[#⛔ Gap nyata: dua model bisa saling bertentangan]] — **belum diverifikasi** isi `icc_leaders` untuk `kyura`/`beautyhacks` di produksi saat ini |
 | **Rename posisi ICC → Account Specialist** | 18 Agt 2026, 33/40 karyawan. Modul ini sudah dipindah ke `position_key`; modul LAIN (RBAC menu, Finance Opex, HRIS KPI) belum tentu ikut — periksa sebelum menyentuhnya |
 | 🟡 **TBD: `position_key` stabil untuk Marketplace Advertiser** | Fase 11 memisah TAMPILAN-nya, tapi posisi ini masih dideteksi dari label `position` bebas (bukan `position_key` seperti ICC) karena belum punya kategori/tim formal sendiri di HRIS master data. Rentan sama seperti ICC pra-rename: label berganti tanpa pemberitahuan = filter berhenti mengenali (fallback aman ke tercampur lagi, bukan hilang). Membutuhkan keputusan HR/product, bukan pekerjaan FE murni |
@@ -565,20 +565,20 @@ pengelompokannya**, bukan alur kerja assign-nya.
 ## Hubungan dengan Dokumen Lain
 
 ```
-Sales - ICC Affiliate Mapping     ← mapping kreator username (affiliate)
-Sales - ICC Account Manager Mapping  ← dokumen ini: mapping shop + ads (AM)
+Marketing - ICC Affiliate Mapping     ← mapping kreator username (affiliate)
+Marketing - ICC Account Manager Mapping  ← dokumen ini: mapping shop + ads (AM)
     ↕
 Microservices - Integration Service  ← sumber data shop & advertiser
     ↕
 Microservices - Insentive Service    ← konsumen mapping (fase 4)
     ↕
-Sales - Incentive                    ← aturan insentif AM (TBD)
+Marketing - Incentive                    ← aturan insentif AM (TBD)
 ```
 
 ## Dokumen Terkait
 
-- [[Sales - ICC Affiliate Mapping]] — mapping kreator username TikTok per anggota ICC
+- [[Marketing - ICC Affiliate Mapping]] — mapping kreator username TikTok per anggota ICC
 - [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]] — sumber data affiliate
 - [[Microservices - Integration Service]] — service target implementasi endpoint baru
 - [[Microservices - Insentive Service]] — konsumen data mapping (fase 4, saat jabatan berubah)
-- [[Sales - Incentive]] — aturan insentif role ICC & (rencana) AM
+- [[Marketing - Incentive]] — aturan insentif role ICC & (rencana) AM

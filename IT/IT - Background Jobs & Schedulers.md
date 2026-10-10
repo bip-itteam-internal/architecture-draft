@@ -158,6 +158,6 @@
 - [[IT - Monitoring System]] · [[IT - Runbooks]] · [[IT - Environment Inventory]] · [[IT - Backup & DR]]
 - [[DB - Overview and Notes]] (`cron_locks`, `webhook_tasks`) · [[Microservices - Integration Service]] · [[Microservices - Insentive Service]] · [[Microservices - Employee Service]] · [[Microservices - Attendance Service]] · [[Microservices - Notification Service]] · [[Microservices - Task Management Service]] · [[Microservices - Procurement Service]]
 - Finance-service **tak punya** dok `Microservices - *` sendiri, tetapi jadwalnya BUKAN cuma tercatat di sini: penerbitan & pengingat pajak ada di [[API - Finance Service]] dan [[Finance - Rancangan Finance Service]]; buka periode audit kertas kerja ada di [[Finance - Audit Internal]] §H+2. Baris finance-service di tabel di atas sengaja dipersempit ke mekanisme ticker + file:line, bukan mengulang rasionalnya (SATU FAKTA SATU TEMPAT)
-- [[External - Desty]] · [[Sales - Marketplace Integration]]
+- [[External - Desty]] · [[Marketing - Marketplace Integration]]
 - [[API - Integration Service]] — endpoint `/jobs/*` (status, histori, config, enable/disable/trigger)
 - [[External - Accurate]] · [[External - Accurate Webhook]] — limiter 6 req/s dibagi seluruh service (alasan jadwal job Accurate disebar) & job `accurate-webhook-renew`

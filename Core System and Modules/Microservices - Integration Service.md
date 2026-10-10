@@ -41,7 +41,7 @@
 
 > 🟡 **Bagian ini KONSEP/RENCANA — belum ada kode.** Ditulis untuk grounding rencana implementasi client Meta Marketing API (pola ads/reporting seperti TikTok Business/Ads di atas, **bukan** pola order-sync Shopee/TikTok Shop). Update marker ke ✅ per sub-bagian begitu client Meta Ads nyata di-merge. Detail teknis di bawah bersumber dari dokumentasi publik Meta for Developers (`developers.facebook.com`) per Juli 2026 — **bukan dari kode BIP** — jadi wajib diverifikasi ulang sebelum implementasi (API vendor bisa berubah).
 
-- **Kondisi saat ini**: `TIDAK ada client Meta Ads` di backend `services/integration`. Konsepnya sudah eksis di sisi lain: FE Finance/Incentive (`erp-frontend`) punya role `adv_meta`, `PLATFORMS = ["tiktok", "shopee", "meta"]`, setting "Meta Ads PPN (%)", dan Master Integration (mapping employee↔platform/campaign) — tapi semua **manual entry**, bukan API sync. [[Finance - Incentive]] §Arsitektur & Sumber Data eksplisit hanya menyebut `[[Sales - GMV Creative]]`/Dashboard TikTok sebagai sumber "Jumlah konversi" — Meta **tidak** disebut sebagai sumber otomatis sama sekali, konsisten dengan skema "ADV META DAN MARKETPLACE SHOPEE" di dokumen yang sama yang juga tidak punya jalur data otomatis.
+- **Kondisi saat ini**: `TIDAK ada client Meta Ads` di backend `services/integration`. Konsepnya sudah eksis di sisi lain: FE Finance/Incentive (`erp-frontend`) punya role `adv_meta`, `PLATFORMS = ["tiktok", "shopee", "meta"]`, setting "Meta Ads PPN (%)", dan Master Integration (mapping employee↔platform/campaign) — tapi semua **manual entry**, bukan API sync. [[Finance - Incentive]] §Arsitektur & Sumber Data eksplisit hanya menyebut `[[Marketing - GMV Creative]]`/Dashboard TikTok sebagai sumber "Jumlah konversi" — Meta **tidak** disebut sebagai sumber otomatis sama sekali, konsisten dengan skema "ADV META DAN MARKETPLACE SHOPEE" di dokumen yang sama yang juga tidak punya jalur data otomatis.
 - **Rencana App/Auth**: buat app tipe **Business** di Meta for Developers → hubungkan ke **Business Manager** Bharata → buat **System User** di Business Manager → assign ad account + permission (`ads_read` minimal, `ads_management` bila perlu tulis, `business_management` untuk kelola aset) → generate token System User (**tidak expired**, beda dari token user biasa yang cuma 60 hari). **App Review hanya perlu bila akses ad account di luar Business Manager Bharata sendiri** — untuk kebutuhan internal saat ini kemungkinan tidak perlu App Review sama sekali (lebih sederhana dari OAuth per-shop Shopee/TikTok). Detail langkah operasional: [[RUN - Onboarding Meta Ads]].
 - **Kredensial**: rencana reuse entity generik `PlatformToken`/`Credential` yang sudah ada — komentar kode entity saat ini baru sebut "tiktokshop, shopee, lazada, ..." (belum sebut "meta" eksplisit, perlu ditambah saat implementasi) — **bukan** entity baru dari nol.
 - **Data pull**: `GET /act_{ad_account_id}/insights` (fields `campaign_name`, `impressions`, `clicks`, `spend`, `actions`, `cost_per_action_type`) — pola mirip `/report/integrated` TikTok Business/Ads (laporan/reporting), **BUKAN** order sync. Tidak ada order/transaksi dari Meta, jadi **tidak** menyentuh `TransactionChannel`/`transaction_orders` sama sekali (beda dari Shopee/TikTok Shop/rencana Lazada sebelumnya).
@@ -297,7 +297,7 @@
 
 ### ICC Account Mapping (marketing leader + staff ICC)
 
-> Grounded ke `internal/interface/http/icc_mapping_handler.go`. Lihat [[Sales - ICC Account Manager Mapping]].
+> Grounded ke `internal/interface/http/icc_mapping_handler.go`. Lihat [[Marketing - ICC Account Manager Mapping]].
 
 - `GET /icc/mappings/me` — mapping milik staff ICC yang sedang login; **tanpa** `RequireMarketingLeader`; filter otomatis dari `BIP-Employee-ID` header
 - `GET /icc/mappings` — daftar mapping aktif; `RequireMarketingLeader`; filter: `employee_id`, `tiktok_shop_id`, `tiktok_advertiser_id`, **`team`** (isolasi per departemen), `is_active` (default `true`)
@@ -311,7 +311,7 @@ Koleksi `icc_account_mappings`. Field baru (Phase 3): **`team string`** (diisi o
 
 ### Leader team ICC (leader-first)
 
-> Grounded ke `internal/interface/http/icc_leader_handler.go` + `usecase/icc_leader_usecase.go`. Lihat [[Sales - ICC Account Manager Mapping]].
+> Grounded ke `internal/interface/http/icc_leader_handler.go` + `usecase/icc_leader_usecase.go`. Lihat [[Marketing - ICC Account Manager Mapping]].
 
 - `GET /icc/leaders` — daftar leader aktif; filter `team`, `is_active`
 - `POST /icc/leaders` — tetapkan/ganti leader; `team` dari body atau `BIP-Department`; mengganti leader **menonaktifkan** baris lama lalu membuat yang baru (riwayat tersimpan, bukan ditimpa); idempotent bila karyawannya sama
@@ -321,7 +321,7 @@ Koleksi `icc_leaders`; partial unique `(team, is_active=true)` — satu leader a
 
 ### Akun affiliate ICC (daftar akun internal)
 
-> Grounded ke `internal/interface/http/icc_affiliate_account_handler.go` + `usecase/icc_affiliate_account_usecase.go`. Lihat [[Sales - ICC Affiliate Mapping]].
+> Grounded ke `internal/interface/http/icc_affiliate_account_handler.go` + `usecase/icc_affiliate_account_usecase.go`. Lihat [[Marketing - ICC Affiliate Mapping]].
 
 - `GET /icc/affiliate-accounts` — filter `team`, `employee_id`, `username`, `belum_ditugaskan`, `is_active`
 - `POST /icc/affiliate-accounts` — tambah akun; `employee_id` **opsional**
@@ -649,9 +649,9 @@ External lain: TikTok Shop, TikTok Business/Ads, Shopee, Telegram (notifier erro
 - [[RUN - Onboarding Meta Ads]] — langkah operasional pembuatan akun/app Meta Ads (rencana)
 - [[RUN - Onboarding KiriminAja]] — langkah operasional partnership & API key KiriminAja (rencana)
 - [[Finance - Incentive]] — konsumen data konversi/CPA Meta Ads untuk skema insentif ADV Meta
-- [[Sales - Marketplace Integration]] (konsep sisi marketing)
+- [[Marketing - Marketplace Integration]] (konsep sisi marketing)
 - [[Finance - Bridging App]]
-- [[Sales - GMV Creative]]
+- [[Marketing - GMV Creative]]
 - [[Vendor - CRM]]
 - [Referensi API — docs-api-greget](https://docs-api-greget.vercel.app/) — REST API lengkap (129 endpoint, Nextra)
 - [[IT - Background Jobs & Schedulers]] — cron + webhook dispatcher service ini (sync TikTok/Shopee; konsumsi webhook tiap 5 dtk). ⛔ Jadwal cron di kode bisa **ditimpa senyap** oleh `workers.worker_configs` — lihat §Catatan & risiko operasional di sana sebelum mengubah jadwal.

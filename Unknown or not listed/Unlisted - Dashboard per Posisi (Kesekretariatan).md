@@ -64,7 +64,7 @@ Ini bukan kelalaian dokumentasi. Pekerjaan divisi ini sebagian besar **tidak mel
 
 ⛔ Tiga dari empat metriknya, bobot 0,85, menunggu satu hal: **akun Instagram dan TikTok organik perusahaan tidak terintegrasi.** Yang tersambung hanya TikTok Business/Shop, Shopee, Lazada, dan Accurate, yaitu kanal jualan, bukan akun korporat.
 
-⚠️ **Jangan menambalnya dengan data TikTok Shop yang tebal itu.** Engagement rate akun korporat dan performa iklan marketplace adalah dua hal berbeda; angkanya akan mulus dan menjawab pertanyaan lain. Kelas yang sama sudah dicatat untuk Video Editor di [[Sales - Dashboard per Posisi (Beauty Hacks & Kyura)]].
+⚠️ **Jangan menambalnya dengan data TikTok Shop yang tebal itu.** Engagement rate akun korporat dan performa iklan marketplace adalah dua hal berbeda; angkanya akan mulus dan menjawab pertanyaan lain. Kelas yang sama sudah dicatat untuk Video Editor di [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]].
 
 ### Graphic Design dan Video Editor
 
@@ -103,4 +103,4 @@ Kenapa tetap tidak direkomendasikan sekarang: matriks KPI menyatakan kedelapan m
 - [[Finance - Audit Internal]] · [[APP - Audit Internal]] — modul Audit Internal
 - [[Microservices - Calendar Service]] · [[Microservices - Task Management Service]] — kandidat sumber agenda dan instruksi Direktur
 - [[QA - Dashboard per Posisi]] — berbagi kebutuhan tracker BPOM
-- [[Sales - Dashboard per Posisi (Beauty Hacks & Kyura)]] — berbagi kebutuhan tracker garapan video
+- [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]] — berbagi kebutuhan tracker garapan video

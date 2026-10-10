@@ -16,8 +16,8 @@ Kunci modul dari `deptKeyToNames` (`shared-library/common/roles.go`). Kategori s
 | Tech Development | `it` | 11 / 6 | 3 / 4 | `it` | [[IT - Big Pictures]] | [[IT - Dashboard per Posisi]] |
 | Kesekretariatan | `secretary` | 11 / 8 | 7 / 1 | `secretary` (label SEKRETARIAT) | [[Unlisted - Kesekretariatan (Big Pictures)]] | [[QA - Register Perizinan & Sertifikasi]] · [[QA - R&D Regulatory (Registrasi & Pipeline Produk)]] · [[Unlisted - Dashboard per Posisi (Kesekretariatan)]] |
 | Finance | `finance` | 19 / 16 | 12 / 2 | `finance` (label FAT) | [[Finance - Big Pictures]] | [[Finance - Dashboard per Posisi (FAT)]] · [[Finance - Rancangan Finance Service]] |
-| Beauty Hacks | `beauty_hacks` | 54 / 47 | 12 / 7 | `marketing` | [[Sales - Big Pictures]] | [[Sales - Dashboard per Posisi (Beauty Hacks & Kyura)]] |
-| Kyura | `kyura` | 38 / 32 | 12 / 5 | `marketing` | [[Sales - Big Pictures]] | [[Sales - Dashboard per Posisi (Beauty Hacks & Kyura)]] |
+| Beauty Hacks | `beauty_hacks` | 54 / 47 | 12 / 7 | `marketing` | [[Marketing - Big Pictures]] | [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]] |
+| Kyura | `kyura` | 38 / 32 | 12 / 5 | `marketing` | [[Marketing - Big Pictures]] | [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]] |
 | Manufaktur | `manufacture` | 34 / 33 | 11 / 10 | `manufacture` (label WMS ERP OPERATIONAL), juga memegang `warehouse` | tidak ada dok induk tunggal | [[Manufacture - Dashboard per Posisi]] · [[WH - Management System]] · [[Microservices - Manufacture Service]] · [[Microservices - Warehouse Service]] |
 | Quality | `quality` | 6 / 6 | 4 / 0 | `quality` | [[QA - Big Pictures]] | [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]] · [[QA - Dashboard per Posisi]] |
 | Procurement | `procurement` | 4 / 3 | 2 / 0 | `procurement` | tidak ada dok induk tunggal | [[Microservices - Procurement Service]] · [[GA - Dashboard per Posisi]] (memuat Procurement) · [[GA - Form Pengadaan dan Pengajuan Dana]] |

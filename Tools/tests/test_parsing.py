@@ -58,7 +58,7 @@ def test_status_format_blockquote_bold():
 
 
 def test_status_format_blockquote_tanpa_bold():
-    """`Sales - Landing page` memakai '> Status:' tanpa bold."""
+    """`Marketing - Landing page` memakai '> Status:' tanpa bold."""
     teks = "> Status: 🟡 **Konsep**. Catatan: beda dari website korporat.\n"
     emoji, txt = ekstrak_status(teks)
     assert emoji == "🟡"

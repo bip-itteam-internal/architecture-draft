@@ -59,4 +59,4 @@ Tiga cara membuka akses ditimbang:
 
 ## Terkait
 
-[[CORE - RBAC dan Permission Set]] · [[APP - Web ERP]] · [[Sales - ICC Account Manager Mapping]] · [[ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan]] · [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] · [[ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori]] · [[HRIS - Otomasi Skor KPI]]
+[[CORE - RBAC dan Permission Set]] · [[APP - Web ERP]] · [[Marketing - ICC Account Manager Mapping]] · [[ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan]] · [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] · [[ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori]] · [[HRIS - Otomasi Skor KPI]]

@@ -370,8 +370,8 @@ job_scheduler
 
 ## Dokumen Terkait
 
-- [[Sales - Big Pictures]] — peta domain Sales/Marketing
-- [[Sales - Marketplace Integration]] — integrasi marketplace (sumber data ads/order)
-- [[Sales - GMV Creative]] · [[Sales - TikTok Sentiment Pipeline]]
+- [[Marketing - Big Pictures]] — peta domain Marketing
+- [[Marketing - Marketplace Integration]] — integrasi marketplace (sumber data ads/order)
+- [[Marketing - GMV Creative]] · [[Marketing - TikTok Sentiment Pipeline]]
 - [[Microservices - Integration Service]] — backend data GMS/GMV/ads
 

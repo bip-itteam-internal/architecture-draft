@@ -10,7 +10,7 @@ saat ini kebutuhan konten iklan di adv sangat besar dan sangat mengandalkan edit
 
 ## Konsep: Ideamills — Pembuatan Video Manual
 
-*Konsep di atas diwujudkan oleh **Ideamills** — platform AI internal untuk membuat video iklan pendek (TikTok/Instagram) dari foto produk → ide kreatif → prompt → image → video. Dokumen ini mencakup alur **manual** (operator menyetir tiap langkah); alur otomatis ada di [[Sales - Veo (Gemini) Automation Layer]]. Implementasi teknis (stack, engine, mode, UI) ada di [[APP - Ideamills]].*
+*Konsep di atas diwujudkan oleh **Ideamills** — platform AI internal untuk membuat video iklan pendek (TikTok/Instagram) dari foto produk → ide kreatif → prompt → image → video. Dokumen ini mencakup alur **manual** (operator menyetir tiap langkah); alur otomatis ada di [[Marketing - Veo (Gemini) Automation Layer]]. Implementasi teknis (stack, engine, mode, UI) ada di [[APP - Ideamills]].*
 
 - **Status**: ✅ Implemented (matang)
 - **Nilai**: mempercepat produksi konten iklan & mengurangi beban editor; **AI membantu, ide kreatif tetap pokok** (AI disisipkan dalam konten, bukan pengganti konsep)
@@ -22,7 +22,7 @@ saat ini kebutuhan konten iklan di adv sangat besar dan sangat mengandalkan edit
 
 ## Dokumen Terkait
 - [[APP - Ideamills]] — implementasi (stack, engine, mode manual, UI)
-- [[Sales - Veo (Gemini) Automation Layer]] — alur otomatis (branch `automation-layer`)
-- [[Sales - GMV Creative]]
+- [[Marketing - Veo (Gemini) Automation Layer]] — alur otomatis (branch `automation-layer`)
+- [[Marketing - GMV Creative]]
 - [[CORE - SSO Flow]]
 - [[CORE - API Master Gateway]]

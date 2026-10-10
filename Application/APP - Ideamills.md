@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Implementasi teknis **Ideamills** — platform AI internal (satu app Next.js) untuk membuat video iklan pendek (TikTok/Instagram) dari foto produk → ide → prompt → image → video, dengan engine **Veo 3.1 (Google/Gemini)**. Satu repo, **dua alur**: **manual** (branch `main`, matang) dan **automation layer** (branch `automation-layer`, WIP). Konsep/bisnis tiap alur ada di [[Sales - Veo (Gemini) Implementation]] (manual) & [[Sales - Veo (Gemini) Automation Layer]] (automation).*
+*Implementasi teknis **Ideamills** — platform AI internal (satu app Next.js) untuk membuat video iklan pendek (TikTok/Instagram) dari foto produk → ide → prompt → image → video, dengan engine **Veo 3.1 (Google/Gemini)**. Satu repo, **dua alur**: **manual** (branch `main`, matang) dan **automation layer** (branch `automation-layer`, WIP). Konsep/bisnis tiap alur ada di [[Marketing - Veo (Gemini) Implementation]] (manual) & [[Marketing - Veo (Gemini) Automation Layer]] (automation).*
 
 - **Stack**: Next.js 15 (App Router) + TypeScript + Tailwind/shadcn; MongoDB (raw driver + GridFS); worker proses (tsx, polling MongoDB sebagai queue) untuk render Veo. Automation: **LangGraph.js** (`@langchain/langgraph` + checkpoint MongoDB).
 - **Path**: `ideamiils` (package `ideamills`)
@@ -63,8 +63,8 @@ Checkpoint state via LangGraph `MongoDBSaver`; `CampaignRuns` jadi proyeksi untu
 
 ## Dokumen Terkait
 
-- [[Sales - Veo (Gemini) Implementation]] — konsep/bisnis alur **manual**
-- [[Sales - Veo (Gemini) Automation Layer]] — konsep/bisnis alur **automation**
-- [[Sales - TikTok Sentiment Pipeline]] — sama-sama pakai Apify untuk discovery tren TikTok (terpisah)
-- [[Sales - GMV Creative]]
+- [[Marketing - Veo (Gemini) Implementation]] — konsep/bisnis alur **manual**
+- [[Marketing - Veo (Gemini) Automation Layer]] — konsep/bisnis alur **automation**
+- [[Marketing - TikTok Sentiment Pipeline]] — sama-sama pakai Apify untuk discovery tren TikTok (terpisah)
+- [[Marketing - GMV Creative]]
 - [[CORE - SSO Flow]] · [[CORE - API Master Gateway]]

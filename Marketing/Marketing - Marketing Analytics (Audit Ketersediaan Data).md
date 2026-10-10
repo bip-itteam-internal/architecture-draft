@@ -275,4 +275,4 @@ Diurut dari yang paling murah dan paling luas dampaknya.
 
 ## Dokumen Terkait
 
-[[Microservices - Marketing Analytics Service]] · [[API - Marketing Analytics Service]] · [[APP - Web ERP]] · [[DB - Data Dictionary]] · [[Sales - Marketing Dashboard (Index)]] · [[ADR - 0008 Profit Engine Join via item_group_id]] · [[Microservices - Inventory Service]] · [[HRIS - Otomasi Skor KPI]] (konsumen KPI dari cakupan di atas) · [[Finance - Incentive]] (SK yang menyebut CPA & konversi sebagai dasar penilaian Advertiser)
+[[Microservices - Marketing Analytics Service]] · [[API - Marketing Analytics Service]] · [[APP - Web ERP]] · [[DB - Data Dictionary]] · [[Marketing - Marketing Dashboard (Index)]] · [[ADR - 0008 Profit Engine Join via item_group_id]] · [[Microservices - Inventory Service]] · [[HRIS - Otomasi Skor KPI]] (konsumen KPI dari cakupan di atas) · [[Finance - Incentive]] (SK yang menyebut CPA & konversi sebagai dasar penilaian Advertiser)

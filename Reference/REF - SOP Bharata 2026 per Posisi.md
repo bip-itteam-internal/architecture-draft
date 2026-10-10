@@ -12,37 +12,37 @@
 
 | Posisi | Dok | Jumlah dokumen | Disusun oleh (jabatan) |
 |---|---|---|---|
-| Supervisor Beautyhacks | [[Sales - SOP Posisi Supervisor Beautyhacks]] | 4 |   |
-| Leader Beautyhacks | [[Sales - SOP Posisi Leader Beautyhacks]] | 2 | Supervisor, Supervisor Marketing |
-| Advertiser Meta Beautyhacks | [[Sales - SOP Posisi Advertiser Meta Beautyhacks]] | 2 | Supervisor Marketing |
-| Marketplace Beautyhacks | [[Sales - SOP Posisi Marketplace Beautyhacks]] | 2 | Supervisor Marketing |
-| Shopee Beautyhacks | [[Sales - SOP Posisi Shopee Beautyhacks]] | 2 | Supervisor Marketing |
-| Affiliate Beautyhacks | [[Sales - SOP Posisi Affiliate Beautyhacks]] | 2 | Supervisor Marketing |
-| Buzzer Beautyhacks | [[Sales - SOP Posisi Buzzer Beautyhacks]] | 5 | Supervisor, Supervisor Marketing |
-| CS Marketplace Support Beautyhacks | [[Sales - SOP Posisi CS Marketplace Support Beautyhacks]] | 3 | Supervisor Marketing |
-| CS Meta Beautyhacks | [[Sales - SOP Posisi CS Meta Beautyhacks]] | 3 | Supervisor Marketing |
-| Host Live Beautyhacks | [[Sales - SOP Posisi Host Live Beautyhacks]] | 12 | Supervisor Marketing |
-| Internal Content Creator Beautyhacks | [[Sales - SOP Posisi Internal Content Creator Beautyhacks]] | 1 | Supervisor Marketing |
+| Supervisor Beautyhacks | [[Marketing - SOP Posisi Supervisor Beautyhacks]] | 4 |   |
+| Leader Beautyhacks | [[Marketing - SOP Posisi Leader Beautyhacks]] | 2 | Supervisor, Supervisor Marketing |
+| Advertiser Meta Beautyhacks | [[Marketing - SOP Posisi Advertiser Meta Beautyhacks]] | 2 | Supervisor Marketing |
+| Marketplace Beautyhacks | [[Marketing - SOP Posisi Marketplace Beautyhacks]] | 2 | Supervisor Marketing |
+| Shopee Beautyhacks | [[Marketing - SOP Posisi Shopee Beautyhacks]] | 2 | Supervisor Marketing |
+| Affiliate Beautyhacks | [[Marketing - SOP Posisi Affiliate Beautyhacks]] | 2 | Supervisor Marketing |
+| Buzzer Beautyhacks | [[Marketing - SOP Posisi Buzzer Beautyhacks]] | 5 | Supervisor, Supervisor Marketing |
+| CS Marketplace Support Beautyhacks | [[Marketing - SOP Posisi CS Marketplace Support Beautyhacks]] | 3 | Supervisor Marketing |
+| CS Meta Beautyhacks | [[Marketing - SOP Posisi CS Meta Beautyhacks]] | 3 | Supervisor Marketing |
+| Host Live Beautyhacks | [[Marketing - SOP Posisi Host Live Beautyhacks]] | 12 | Supervisor Marketing |
+| Internal Content Creator Beautyhacks | [[Marketing - SOP Posisi Internal Content Creator Beautyhacks]] | 1 | Supervisor Marketing |
 
 ### Marketing Kyura
 
 | Posisi | Dok | Jumlah dokumen | Disusun oleh (jabatan) |
 |---|---|---|---|
-| Supervisor Kyura | [[Sales - SOP Posisi Supervisor Kyura]] | 3 | Supervisor Marketing, SupervisorMarketing |
-| Leader Advertiser TikTok Kyura | [[Sales - SOP Posisi Leader Advertiser TikTok Kyura]] | 3 | Supervisor Marketing |
-| Advertiser Meta Kyura | [[Sales - SOP Posisi Advertiser Meta Kyura]] | 4 | Supervisor Marketing |
-| Advertiser Shopee Kyura | [[Sales - SOP Posisi Advertiser Shopee Kyura]] | 4 | Supervisor Marketing |
-| Buzzer Kyura | [[Sales - SOP Posisi Buzzer Kyura]] | 5 | Supervisor Marketing |
-| CS Marketplace Kyura | [[Sales - SOP Posisi CS Marketplace Kyura]] | 5 | Supervisor Marketing |
-| Host Live Kyura | [[Sales - SOP Posisi Host Live Kyura]] | 12 | Supervisor Marketing |
-| Host Live Glowbooster | [[Sales - SOP Posisi Host Live Glowbooster]] | 12 | Supervisor Marketing |
-| Internal Content Creator Kyura | [[Sales - SOP Posisi Internal Content Creator Kyura]] | 1 | Supervisor Marketing |
+| Supervisor Kyura | [[Marketing - SOP Posisi Supervisor Kyura]] | 3 | Supervisor Marketing, SupervisorMarketing |
+| Leader Advertiser TikTok Kyura | [[Marketing - SOP Posisi Leader Advertiser TikTok Kyura]] | 3 | Supervisor Marketing |
+| Advertiser Meta Kyura | [[Marketing - SOP Posisi Advertiser Meta Kyura]] | 4 | Supervisor Marketing |
+| Advertiser Shopee Kyura | [[Marketing - SOP Posisi Advertiser Shopee Kyura]] | 4 | Supervisor Marketing |
+| Buzzer Kyura | [[Marketing - SOP Posisi Buzzer Kyura]] | 5 | Supervisor Marketing |
+| CS Marketplace Kyura | [[Marketing - SOP Posisi CS Marketplace Kyura]] | 5 | Supervisor Marketing |
+| Host Live Kyura | [[Marketing - SOP Posisi Host Live Kyura]] | 12 | Supervisor Marketing |
+| Host Live Glowbooster | [[Marketing - SOP Posisi Host Live Glowbooster]] | 12 | Supervisor Marketing |
+| Internal Content Creator Kyura | [[Marketing - SOP Posisi Internal Content Creator Kyura]] | 1 | Supervisor Marketing |
 
 ### CRM
 
 | Posisi | Dok | Jumlah dokumen | Disusun oleh (jabatan) |
 |---|---|---|---|
-| CRM | [[Sales - SOP Posisi CRM]] | 6 |   |
+| CRM | [[Marketing - SOP Posisi CRM]] | 6 |   |
 
 ### Finance
 

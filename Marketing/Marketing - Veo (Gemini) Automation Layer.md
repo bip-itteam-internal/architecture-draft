@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Konsep **Automation Layer** dari [[Sales - Veo (Gemini) Implementation|Ideamills]] — alih-alih operator menyetir tiap langkah (alur manual), pipeline **otomatis** membuat video iklan dari **penemuan tren TikTok** sampai **siap-kirim**, dengan satu titik **persetujuan manusia (HITL)**. Engine video tetap **Veo 3.1 (Google/Gemini)**. Implementasi teknis (pipeline LangGraph, fase, API/UI) ada di [[APP - Ideamills]].*
+*Konsep **Automation Layer** dari [[Marketing - Veo (Gemini) Implementation|Ideamills]] — alih-alih operator menyetir tiap langkah (alur manual), pipeline **otomatis** membuat video iklan dari **penemuan tren TikTok** sampai **siap-kirim**, dengan satu titik **persetujuan manusia (HITL)**. Engine video tetap **Veo 3.1 (Google/Gemini)**. Implementasi teknis (pipeline LangGraph, fase, API/UI) ada di [[APP - Ideamills]].*
 
 - **Status**: ⚠️ WIP — sebagian alur sudah jalan, sebagian belum (rincian fase di [[APP - Ideamills]])
 
@@ -14,7 +14,7 @@
 ## Dokumen Terkait
 
 - [[APP - Ideamills]] — implementasi (pipeline LangGraph, status fase, API/UI)
-- [[Sales - Veo (Gemini) Implementation]] — konsep alur manual (fondasi)
-- [[Sales - GMV Creative]]
-- [[Sales - TikTok Sentiment Pipeline]] — sama-sama discovery tren TikTok via Apify (terpisah)
+- [[Marketing - Veo (Gemini) Implementation]] — konsep alur manual (fondasi)
+- [[Marketing - GMV Creative]]
+- [[Marketing - TikTok Sentiment Pipeline]] — sama-sama discovery tren TikTok via Apify (terpisah)
 - [[CORE - SSO Flow]]

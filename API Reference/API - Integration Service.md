@@ -269,7 +269,7 @@ Daftar izin hidup di **satu tempat**, `finance_baca_gate.go`; tabel ini peta rin
 
 | Method | Path | Fungsi |
 |---|---|---|
-| GET | `/profit/incentive/summary?month=YYYY-MM&cutoff_day=25&shop_id=a,b&mode=bergeser` | Komponen profit per toko (uang cair, HPP, iklan, retur) + pemilik ICC tiap toko. Toko yang **terpetakan ke seorang ICC tetapi nol order** di periode itu ikut dikirim sebagai baris bernilai nol bertanda `tanpa_penjualan` (2026-08-26, PR #1455 — merged, belum diverifikasi di prod). Sebelumnya toko begitu lenyap dari jawaban, sehingga dashboard menyebut **9 toko** untuk tim yang di [[Sales - ICC Account Manager Mapping]] tercatat memegang **15** — selisih 6 toko yang belum pernah berjualan, tanpa satu pun keterangan. Saringan `shop_id` tetap dihormati (toko di luar saringan tidak ditambahkan) dan urutannya di-sort supaya jawaban ber-cache bisa dibandingkan. **`mode=bergeser`** (2026-08-27, PR #1503 — belum merge) menambahkan SUSULAN: order yang dikirim bulan-bulan sebelumnya tetapi uangnya baru cair di jendela cutoff periode ini. Dipakai KPI, TIDAK dipakai insentif — lihat catatan di bawah. Parameter `internal_affiliates` **DIHAPUS** (PR #1474). **`hpp_sampel`** (2026-09-29, #2333) = porsi HPP dari order sampel TikTok (6117 Beban Sampling); ⛔ **HIMPUNAN BAGIAN dari `hpp`, jangan dijumlah ke `hpp`** — `hpp` tetap total. **`sampel_tanpa_hpp[{sku, product_name, qty}]`** = qty sampel yang produknya belum ber-HPP ERP (nilai jual sampel 0, jadi `nilai_jual_tanpa_hpp` buta terhadapnya). Lihat [[Microservices - Insentive Service]] §Beban sampling |
+| GET | `/profit/incentive/summary?month=YYYY-MM&cutoff_day=25&shop_id=a,b&mode=bergeser` | Komponen profit per toko (uang cair, HPP, iklan, retur) + pemilik ICC tiap toko. Toko yang **terpetakan ke seorang ICC tetapi nol order** di periode itu ikut dikirim sebagai baris bernilai nol bertanda `tanpa_penjualan` (2026-08-26, PR #1455 — merged, belum diverifikasi di prod). Sebelumnya toko begitu lenyap dari jawaban, sehingga dashboard menyebut **9 toko** untuk tim yang di [[Marketing - ICC Account Manager Mapping]] tercatat memegang **15** — selisih 6 toko yang belum pernah berjualan, tanpa satu pun keterangan. Saringan `shop_id` tetap dihormati (toko di luar saringan tidak ditambahkan) dan urutannya di-sort supaya jawaban ber-cache bisa dibandingkan. **`mode=bergeser`** (2026-08-27, PR #1503 — belum merge) menambahkan SUSULAN: order yang dikirim bulan-bulan sebelumnya tetapi uangnya baru cair di jendela cutoff periode ini. Dipakai KPI, TIDAK dipakai insentif — lihat catatan di bawah. Parameter `internal_affiliates` **DIHAPUS** (PR #1474). **`hpp_sampel`** (2026-09-29, #2333) = porsi HPP dari order sampel TikTok (6117 Beban Sampling); ⛔ **HIMPUNAN BAGIAN dari `hpp`, jangan dijumlah ke `hpp`** — `hpp` tetap total. **`sampel_tanpa_hpp[{sku, product_name, qty}]`** = qty sampel yang produknya belum ber-HPP ERP (nilai jual sampel 0, jadi `nilai_jual_tanpa_hpp` buta terhadapnya). Lihat [[Microservices - Insentive Service]] §Beban sampling |
 | GET | `/profit/incentive/beban-marketing?month=YYYY-MM[&refresh=1]` | Beban marketing per orang dari salinan `beban_marketing_orang` (`refresh=1` tarik ulang dari Accurate lalu simpan). Tanpa `refresh` endpoint ini **tidak pernah menarik**; salinan kosong berarti periode itu belum pernah ditarik (`ringkasan.diperbarui_pada` null). Sejak 2026-10-09 (bip-erp #2873) salinan juga ditarik tiap malam oleh task `accurate-beban-marketing-refresh` (lihat [[IT - Background Jobs & Schedulers]]), dan `refresh=1` yang berhasil tapi **nol baris tidak menyimpan**: respons memuat salinan yang tersimpan dengan `diperbarui_pada` lama, atau `data` kosong bila belum ada salinan. Baris per orang membawa `total`, `rincian[{akun_no, akun_nama, nominal}]`, pajak, packing, dan **`footage_tanpa_hpp[{trans_number, item_no, qty}]`** (2026-09-29): item footage 611703 tanpa HPP ERP; orang yang hanya membawa ini tetap mendapat baris ber-`total` 0. `akun_dibebankan` = `AkunBebanMarketing` + 611703 (footage kini qty IA × HPP ERP, ditarik terpisah tapi masuk `total`). Penarikan gagal bila dokumen IA tak sepakat dengan jurnal 611703 — lihat [[Microservices - Insentive Service]] §Beban sampling |
 | GET | `/profit/incentive/panduan` | Kerangka rumus + penjelasan tiap baris untuk ditampilkan di UI (dihasilkan dari struct yang sama dengan yang menghitung) |
 | GET | `/profit/incentive/opex?month=YYYY-MM&projects=a,b,c[&refresh=1]` | Beban operasional **non-gaji** per proyek Accurate (akun `6000` − 14 akun yang sudah terhitung di tempat lain); membawa rincian akun yang dipotong + alasannya. `refresh=1` melewati salinan lokal 12 jam |
@@ -280,7 +280,7 @@ Daftar izin hidup di **satu tempat**, `finance_baca_gate.go`; tabel ini peta rin
 
 ## ICC Account Mapping
 
-> Auth: `RequireMarketingLeader` (kyura/beauty_hacks SPV · insentive `adv_leader` · integration SPV/admin) — kecuali `/me`. Lihat [[Sales - ICC Account Manager Mapping]].
+> Auth: `RequireMarketingLeader` (kyura/beauty_hacks SPV · insentive `adv_leader` · integration SPV/admin) — kecuali `/me`. Lihat [[Marketing - ICC Account Manager Mapping]].
 
 | Method | Path | Fungsi |
 |---|---|---|
@@ -294,7 +294,7 @@ Daftar izin hidup di **satu tempat**, `finance_baca_gate.go`; tabel ini peta rin
 
 ### Leader team ICC
 
-> Satu leader aktif per team. `POST /icc/mappings` **ditolak** bila team karyawan belum punya leader (leader-first). Lihat [[Sales - ICC Account Manager Mapping]].
+> Satu leader aktif per team. `POST /icc/mappings` **ditolak** bila team karyawan belum punya leader (leader-first). Lihat [[Marketing - ICC Account Manager Mapping]].
 
 > **Mutasi mapping & leader ICC membuang cache `/profit*`** (2026-08-26, PR #1448 — merged). `POST/PATCH/DELETE /icc/mappings` dan `POST/PATCH /icc/leaders` memanggil `InvalidatePrefix(ctx, "/profit")` sesudah berhasil. Tanpa itu mapping yang baru ditambahkan tidak terlihat di dashboard insentif sampai TTL rescache **10 menit** habis — dan bagi pemakainya itu terbaca sebagai "datanya tidak masuk", bukan sebagai cache. 🔑 `keyPrefix` rescache memuat **modtime binary** (`rescache:b<mtime>:`) sehingga berubah tiap deploy: jangan pernah di-hardcode, termasuk di test.
 
@@ -306,7 +306,7 @@ Daftar izin hidup di **satu tempat**, `finance_baca_gate.go`; tabel ini peta rin
 
 ### Akun affiliate ICC
 
-> Daftar akun affiliate TikTok **milik perusahaan**. `employee_id` **opsional** — kosong berarti belum ditugaskan, bukan akun luar. **Tanpa** guard leader-first: pendataan akun tak boleh tertahan urusan struktur tim. Lihat [[Sales - ICC Affiliate Mapping]].
+> Daftar akun affiliate TikTok **milik perusahaan**. `employee_id` **opsional** — kosong berarti belum ditugaskan, bukan akun luar. **Tanpa** guard leader-first: pendataan akun tak boleh tertahan urusan struktur tim. Lihat [[Marketing - ICC Affiliate Mapping]].
 
 | Method | Path | Fungsi |
 |---|---|---|
@@ -399,4 +399,4 @@ Daftar izin hidup di **satu tempat**, `finance_baca_gate.go`; tabel ini peta rin
 > Banyak job terjadwal (sync TikTok/Shopee + webhook consumer 5 detik) — lihat [[IT - Background Jobs & Schedulers]]. Jalur [[External - Desty]] soft-disabled per 2026-07-12 (route `/webhooks/services/desty` + `/webhooks/accounts/desty` dicabut → 404).
 
 ## Dokumen Terkait
-- [[Microservices - Integration Service]] · [[Sales - Marketplace Integration]] · [[External - Accurate]] · [[External - Desty]] · [[IT - Background Jobs & Schedulers]] · [[API - Index]]
+- [[Microservices - Integration Service]] · [[Marketing - Marketplace Integration]] · [[External - Accurate]] · [[External - Desty]] · [[IT - Background Jobs & Schedulers]] · [[API - Index]]

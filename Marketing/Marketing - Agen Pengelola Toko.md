@@ -1,4 +1,4 @@
-# Sales - Agen Pengelola Toko
+# Marketing - Agen Pengelola Toko
 
 ## Deskripsi
 
@@ -10,7 +10,7 @@
 ## Latar Belakang
 
 - Permintaan: agen AI yang menggantikan pemegang toko (konten, iklan, promo, CS, strategi), bertujuan laba maksimal dan belajar dari pengalaman.
-- "Pengelola toko" bukan satu jabatan. Pekerjaan satu toko dibagi ke banyak posisi (Account Specialist, Marketplace Advertiser, Host Live, Affiliate, Customer Support, Video Editor, Meta Advertiser, Buzzer), lihat [[Sales - Dashboard per Posisi (Beauty Hacks & Kyura)]]. Sasaran pertama: **Account Specialist**.
+- "Pengelola toko" bukan satu jabatan. Pekerjaan satu toko dibagi ke banyak posisi (Account Specialist, Marketplace Advertiser, Host Live, Affiliate, Customer Support, Video Editor, Meta Advertiser, Buzzer), lihat [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]]. Sasaran pertama: **Account Specialist**.
 - Pekerjaan Account Specialist menurut [[ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko]]: memantau performa toko, membaca ulasan, melaporkan masalah packing ke gudang, mengajukan boosting. Menurut wawancara 2026-09-30, juga membuat video AI dengan alat yang berbeda-beda per orang (tidak tercatat di satu tempat).
 - KPI Account Specialist (template prod, diukur 2026-09-12): profit dari `insentif_profit` bobot 0,6, ROAS dari `kinerja_toko` bobot 0,2, retur % bobot 0,2.
 - Masalah inti: tidak ada cara mengetahui apakah keputusan mesin untuk sebuah toko sama baiknya dengan keputusan manusia. Mesin keputusan yang ada mencatat jawaban orang, tetapi tidak menilai hasilnya.
@@ -91,5 +91,5 @@ Tujuh lapis fondasi agen dan posisinya hari ini:
 - [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]]
 - [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]]
 - [[CORE - Kapabilitas AI dan Machine Learning]]
-- [[Sales - Dashboard per Posisi (Beauty Hacks & Kyura)]]
+- [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]]
 - [[Microservices - Marketing Analytics Service]]

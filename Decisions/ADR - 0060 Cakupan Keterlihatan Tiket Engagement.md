@@ -2,7 +2,7 @@
 
 *Tiket Engagement disaring per **departemen requester**, bukan dibiarkan terbuka bagi seluruh pemakai ERP. Tiket menyimpan field baru `requester_department` yang distempel server saat tiket dibuat; keterlihatannya diputuskan dari **keterkaitan pemanggil dengan tiket** (pembuat / pengerja / anggota kolam pengerja / supervisor departemen / admin), bukan dari satu aturan tunggal. Keputusan ini juga mencabut `space_id` sebagai sumber keanggotaan tim.*
 
-- **Status**: ✅ **Berlaku, kodenya sudah di `main`** — commit `1cdd7fad` "model departemen requester + kolam pengerja lintas departemen" dan `742e0bfd` "perbaiki hasil review PR #1519 (kebocoran keterlihatan, filter mine, peta departemen)" (29 Agustus 2026), diverifikasi ulang ke kode 2026-09-09. **Belum diverifikasi lewat gateway** dev maupun prod. Keputusan diambil 2026-08-29 atas temuan audit T-10 ([[Sales - Engagement Team (Modul)]] cacat no. 4). Spesifikasi teknis lengkap ada di `Workspace/ANALISA - Model Departemen Engagement`. ⚠️ **§6 di bawah (pembersihan `space_id`/notifikasi mati) TERNYATA belum tuntas** — lihat catatan di situ dan di [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]].
+- **Status**: ✅ **Berlaku, kodenya sudah di `main`** — commit `1cdd7fad` "model departemen requester + kolam pengerja lintas departemen" dan `742e0bfd` "perbaiki hasil review PR #1519 (kebocoran keterlihatan, filter mine, peta departemen)" (29 Agustus 2026), diverifikasi ulang ke kode 2026-09-09. **Belum diverifikasi lewat gateway** dev maupun prod. Keputusan diambil 2026-08-29 atas temuan audit T-10 ([[Marketing - Engagement Team (Modul)]] cacat no. 4). Spesifikasi teknis lengkap ada di `Workspace/ANALISA - Model Departemen Engagement`. ⚠️ **§6 di bawah (pembersihan `space_id`/notifikasi mati) TERNYATA belum tuntas** — lihat catatan di situ dan di [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]].
 - **Path di repo (yang akan disentuh)**: `bip-erp/services/task-management/engagement_models.go` · `engagement_handlers.go` · `engagement_assign.go` · `engagement_repo.go` · `erp-frontend/src/features/marketing/engagement/**`
 - **Tanggal**: 2026-08-29
 
@@ -100,7 +100,7 @@ Yang tak berhasil di-resolve (requester sudah resign, `work_data` terhapus) **ti
 ## Terkait
 
 - [[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]] — memakai kolam pengerja ADR ini (§4) sebagai sumber kandidat, lalu menyempitkannya ke sedepartemen requester untuk alokasi OTOMATIS
-- [[Sales - Engagement Team (Modul)]] — konsep bisnis modul, daftar cacat termasuk T-10 yang jadi sebab ADR ini
+- [[Marketing - Engagement Team (Modul)]] — konsep bisnis modul, daftar cacat termasuk T-10 yang jadi sebab ADR ini
 - [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]] — butir 3-nya diubah oleh ADR ini
 - [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]]
 - [[Microservices - Task Management Service]] · [[API - Task Management Service]] · [[Microservices - Employee Service]] · [[APP - Web ERP]]

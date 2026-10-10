@@ -195,7 +195,7 @@ Alasan memilih Opsi A: konsisten dengan pola yang sudah ada di [[Microservices -
 
 ### Mengapa bukan Opsi A (Employee Service)
 
-Pemilik data ini **SPV/leader marketing, bukan HR**. ICC Management sudah memiliki persis perangkat yang dibutuhkan: RBAC `RequireMarketingLeader`, aturan leader-first, dan kartu per team (Fase 5–6 di [[Sales - ICC Account Manager Mapping]]). Menaruh input di HRIS berarti membangun UI dan izin baru untuk data yang bukan miliknya, lalu menambah panggilan HTTP + cache TTL lintas service untuk data yang jarang berubah. Opsi B dipilih, tetapi **tanpa sinkronisasi dari HRIS** — diisi langsung oleh yang memilikinya.
+Pemilik data ini **SPV/leader marketing, bukan HR**. ICC Management sudah memiliki persis perangkat yang dibutuhkan: RBAC `RequireMarketingLeader`, aturan leader-first, dan kartu per team (Fase 5–6 di [[Marketing - ICC Account Manager Mapping]]). Menaruh input di HRIS berarti membangun UI dan izin baru untuk data yang bukan miliknya, lalu menambah panggilan HTTP + cache TTL lintas service untuk data yang jarang berubah. Opsi B dipilih, tetapi **tanpa sinkronisasi dari HRIS** — diisi langsung oleh yang memilikinya.
 
 ### Koleksi terpisah, bukan field di `icc_account_mappings`
 
@@ -264,7 +264,7 @@ Rancangannya: diisi dari data order affiliate, yaitu kapan terakhir username itu
 
 ### Dampak ke tampilan ICC Management
 
-Kartu team (Fase 6 di [[Sales - ICC Account Manager Mapping]]) mendapat **sub-tab**: **Toko & Iklan** (isi sekarang) dan **Akun Affiliate** (daftar akun internal team itu). Sub-tab ditaruh **di dalam kartu**, bukan di tingkat halaman, supaya pemisahan per team tetap terjaga.
+Kartu team (Fase 6 di [[Marketing - ICC Account Manager Mapping]]) mendapat **sub-tab**: **Toko & Iklan** (isi sekarang) dan **Akun Affiliate** (daftar akun internal team itu). Sub-tab ditaruh **di dalam kartu**, bukan di tingkat halaman, supaya pemisahan per team tetap terjaga.
 
 Daftar akun menampilkan **semua akun internal team**, termasuk yang **belum ditugaskan** — justru itu antrean kerja SPV, bukan data yang boleh menguap. Baris karyawan di tab Toko & Iklan saat ini diturunkan hanya dari mapping toko (`kelompokkanMappingPerTeam`); karyawan yang cuma punya akun affiliate tanpa toko tidak akan muncul, sehingga sumber barisnya harus menjadi **gabungan mapping toko ∪ akun affiliate**.
 
@@ -399,9 +399,9 @@ Konsumen yang sudah terdampak hari ini ada di [[Microservices - Marketing Analyt
 
 - [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]] — sumber data affiliate TikTok
 - [[Microservices - Insentive Service]] — engine insentif ICC (pay-per-video, scoring)
-- [[Sales - Incentive]] — kriteria & aturan insentif ICC
+- [[Marketing - Incentive]] — kriteria & aturan insentif ICC
 - [[Microservices - Integration Service]] — service yang menyimpan `affiliate_orders`
 - [[Microservices - Employee Service]] — dipertimbangkan sebagai sumber (Opsi A), tidak jadi dipakai
 - [[Microservices - Marketing Analytics Service]] — konsumen daftar akun internal; sudah membaca `integration_db` baca-saja untuk penanggung jawab toko
-- [[Sales - ICC Account Manager Mapping]] — mapping toko/iklan & kartu per team tempat sub-tab Akun Affiliate akan ditaruh
+- [[Marketing - ICC Account Manager Mapping]] — mapping toko/iklan & kartu per team tempat sub-tab Akun Affiliate akan ditaruh
 - [[APP - Web ERP]] — frontend ERP (halaman ICC Management & Marketing Analytics → Affiliate)

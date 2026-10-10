@@ -40,8 +40,8 @@
 
 ### Lainnya
 - **task-management** FE & BE — GitHub Actions `local-deploy.yml` (deploy via self-hosted runner). Lihat [[APP - Dynamic Task Tracker]]
-- **scraping** (TikTok Sentiment) — GitHub Actions `auto-deploy.yml` + Docker (`Dockerfile.backend`, `docker-compose.yml`, `deploy.sh`); standalone lokal. Lihat [[Sales - TikTok Sentiment Pipeline]]
-- **ideamiils** (Veo) — `docker-compose.yml` + `deploy.sh` (deploy manual/Docker). Lihat [[Sales - Veo (Gemini) Implementation]]
+- **scraping** (TikTok Sentiment) — GitHub Actions `auto-deploy.yml` + Docker (`Dockerfile.backend`, `docker-compose.yml`, `deploy.sh`); standalone lokal. Lihat [[Marketing - TikTok Sentiment Pipeline]]
+- **ideamiils** (Veo) — `docker-compose.yml` + `deploy.sh` (deploy manual/Docker). Lihat [[Marketing - Veo (Gemini) Implementation]]
 
 ## Notifikasi
 - **bip-erp & erp-frontend**: WhatsApp grup **"BIP Notification Center"** via Bharata API (`scripts/notify.sh`) — start / success / completed-with-errors / rollback

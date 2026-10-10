@@ -1,4 +1,4 @@
-# Sales - Engagement Team (Modul)
+# Marketing - Engagement Team (Modul)
 
 ## Deskripsi
 
@@ -73,7 +73,7 @@ Tim ini **flat, tanpa lead** — tak ada satu orang pun yang bisa dijadikan tuju
 
 - **Pencarian mengenali kedua nama.** `cocokAliasEngagement` (`engagement_alias.go`) mencocokkan kata kunci `engagement` **dan** `buzzer` dengan `Contains`, satu arah, tanpa mengubah data apa pun. Kalau kata kunci pencarian menunjuk modul ini, ia **tidak** dipakai sebagai penyaring isi tiket — sebab ia menunjuk *modul*, bukan isi, sehingga memakainya sebagai kata kunci justru mengosongkan hasil dan pembacanya menyimpulkan datanya hilang.
 - Alias sengaja **tidak** memakai pencocokan awalan/kemiripan: `buzz` dan `engage` ditolak. Alias yang terlalu longgar membuat pencarian apa pun mengembalikan seluruh tiket engagement.
-- **Nama lama masih hidup di luar modul ini**, dan itu bukan bug modul: template KPI produksi `Beauty Hacks / Buzzer` (termasuk satu template uji cacat, lihat [[HRIS - Otomasi Skor KPI]]), baris jabatan `Buzzer` di [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]], dan peta kepemilikan di [[Sales - ICC Account Manager Mapping]]. Pencarian di vault maupun di data yang hanya memakai satu dari dua nama akan **melewatkan separuh kenyataan**.
+- **Nama lama masih hidup di luar modul ini**, dan itu bukan bug modul: template KPI produksi `Beauty Hacks / Buzzer` (termasuk satu template uji cacat, lihat [[HRIS - Otomasi Skor KPI]]), baris jabatan `Buzzer` di [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]], dan peta kepemilikan di [[Marketing - ICC Account Manager Mapping]]. Pencarian di vault maupun di data yang hanya memakai satu dari dua nama akan **melewatkan separuh kenyataan**.
 - ⚠️ **Penyaring kandidat penugasan TIDAK memakai nama jabatan** — dan sejak [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] §4 (29 Agustus 2026) juga **tidak lagi memakai departemen pemanggil**. `daftarKandidatPengerja` (`engagement_assign.go`) kini menyaring `position_key ∈ KunciJabatanPengerja` (data di `engagement_settings`, seed produksi cuma `'engagement_team'`) **lintas departemen** — versi lama dokumen ini pernah menyatakan penyaringannya `department == departemen pemanggil`, itu sudah tidak akurat. Alasan menghindari nama jabatan tetap sama: rename `Buzzer` → `Engagement Team` menerbitkan `position_key` baru dan mengosongkan daftar **tanpa satu pun galat** bila disaring by-nama. Konsekuensi yang diterima sadar sekarang bergeser: bukan lagi "AS ikut muncul di kandidat" (itu sudah tak terjadi karena position_key sudah spesifik), melainkan alokasi OTOMATIS (round-robin, [[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]]) yang menyempitkan kandidat ke sedepartemen requester secara default — dua sumbu (kolam vs giliran) yang gampang tertukar, lihat ADR-0060 TBD.
 
 ## Konsumen Data
@@ -146,5 +146,5 @@ Sisa keputusan lingkup yang menunggu SPV; sampai diputuskan, **jangan** menulisk
 - [[API - Task Management Service]] — daftar endpoint `/engagement/*` + `/kpi/engagement`
 - [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]] · [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] · [[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]]
 - [[Microservices - Employee Service]] — sumber KPI `kinerja_engagement` · [[HRIS - Otomasi Skor KPI]] · [[HRIS - Matriks KPI per Departemen]]
-- [[APP - Web ERP]] — layar Marketing › Engagement · [[Sales - Big Pictures]] · [[Sales - ICC Account Manager Mapping]]
+- [[APP - Web ERP]] — layar Marketing › Engagement · [[Marketing - Big Pictures]] · [[Marketing - ICC Account Manager Mapping]]
 - [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]] — jabatan `Buzzer` di peta peran sistem

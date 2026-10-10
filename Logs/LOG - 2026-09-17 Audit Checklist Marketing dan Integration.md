@@ -42,7 +42,7 @@ Hampir semua item masih tertulis "Belum Mulai", padahal sebagian besar sudah dib
 | 126 | Performa konten & produk | Belum Mulai → **Selesai** | Profit per Produk/SKU, Video, Live, Affiliate. Konten terbatas TikTok karena Shopee/Lazada tak menyediakan data video. |
 | 127 | Jadwal Host Live streaming | Belum Mulai → **Selesai** | Pola shift dan penugasan host bergerbang izin ([[ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan]]). Ceklis kesiapan siaran ([[ADR - 0101 Kesiapan Siaran Dicatat Host saat Mulai sebagai Dasar KPI Live Support]]) belum tuntas. Laporan Mingguan Live Support di-revert 2026-09-17 (erp-frontend #1623). |
 | 128 | Laba per level (reseller/affiliate tier) | Belum Mulai → **Tidak Relevan** | Salah tafsir. Menunya penelusuran laba toko → produk → SKU → kampanye → iklan → video → live → affiliate. Tier reseller tidak ada di kode ("reseller" nol hit). |
-| 129 | Engagement (interaksi customer/sosial media) | Belum Mulai → **Dalam Proses** | Isinya tiket boosting media sosial dari Account Specialist ke tim Engagement ([[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]], [[Sales - Engagement Team (Modul)]]), fase B masih dikerjakan. Membalas ulasan atau chat customer belum ada. |
+| 129 | Engagement (interaksi customer/sosial media) | Belum Mulai → **Dalam Proses** | Isinya tiket boosting media sosial dari Account Specialist ke tim Engagement ([[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]], [[Marketing - Engagement Team (Modul)]]), fase B masih dikerjakan. Membalas ulasan atau chat customer belum ada. |
 | 130 | ICC & Komplain ke QC | Belum Mulai → **Dalam Proses** | Usul dipecah: ICC Management = Selesai; Komplain ke QC = Revisi (daftar tak disaring per brand, putusan bisa ditimpa, hasil belum dipakai CAPA/KPI, teks belum dua bahasa). |
 | 131 | Kamus Metrik | Belum Mulai → **Revisi** | Teks statis 12 entri, terakhir diubah 2026-08-09. Definisi ROAS, Revenue, dan Laba kotor bertentangan dengan backend. Mengikuti Kamus berarti retur terhitung dua kali. |
 | 132 | PO Barang Jadi ke gudang/produksi | Belum Mulai → **Dalam Proses** | Kini "MO Barang Jadi", dari SPV Marketing ke PPIC, bukan ke gudang. Alurnya ada, tapi belum ada MO yang diajukan dari layar Marketing di PROD (per komentar kode 2026-09-16). |
@@ -114,6 +114,6 @@ Diperiksa ke kode 2026-09-17:
 ## Terkait
 
 - [[Microservices - Marketing Analytics Service]] · [[API - Marketing Analytics Service]]
-- [[Microservices - Integration Service]] · [[API - Integration Service]] · [[Sales - ICC Affiliate Mapping]]
+- [[Microservices - Integration Service]] · [[API - Integration Service]] · [[Marketing - ICC Affiliate Mapping]]
 - [[APP - Web ERP]] · [[IT - Security]] · [[CORE - API Master Gateway]]
 - [[LOG - 2026-07-30 Audit Otorisasi Employee Service]] (pola audit keamanan sebelumnya)

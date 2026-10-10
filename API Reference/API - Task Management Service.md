@@ -167,7 +167,7 @@ Seluruh aturan di atas berlaku **sama persis** untuk kedua rute, dan itu dijaga 
 
 ## Engagement Tim ⚠️
 
-> Status: kode di `main` (PR [#1504](https://github.com/bip-itteam-internal/bip-erp/pull/1504) + FE [#1287](https://github.com/bip-itteam-internal/erp-frontend/pull/1287)), **belum diverifikasi lewat gateway**. Tiga cacat penghalang alur semula sudah diperbaiki (rincian di [[Sales - Engagement Team (Modul)]] § Cacat yang Diketahui). Rute `PUT .../realisasi`, rincian per URL, dan perubahan `mine` di bawah berasal dari branch `feat/engagement-realisasi-per-jenis` (**belum merge, belum deploy**). Konsep & keputusannya: [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]].
+> Status: kode di `main` (PR [#1504](https://github.com/bip-itteam-internal/bip-erp/pull/1504) + FE [#1287](https://github.com/bip-itteam-internal/erp-frontend/pull/1287)), **belum diverifikasi lewat gateway**. Tiga cacat penghalang alur semula sudah diperbaiki (rincian di [[Marketing - Engagement Team (Modul)]] § Cacat yang Diketahui). Rute `PUT .../realisasi`, rincian per URL, dan perubahan `mine` di bawah berasal dari branch `feat/engagement-realisasi-per-jenis` (**belum merge, belum deploy**). Konsep & keputusannya: [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]].
 
 Modul boosting media sosial di service yang sama, memakai **koleksi Mongo sendiri** (`engagement_tickets`/`engagement_ticket_items`/`engagement_logs`), bukan `tasks`. Seluruh rutenya digerbang `requireRoles("staff","supervisor","admin")`; otorisasi sebenarnya diputuskan **di dalam handler** menurut hubungan pemanggil dengan tiket (pemohon? pengerja?), bukan di gerbang rute.
 
@@ -232,4 +232,4 @@ Aturan muatannya, semuanya supaya sumber tidak diam-diam menilai:
 
 ## Dokumen Terkait
 - [[Microservices - Task Management Service]] · [[APP - Dynamic Task Tracker]] · [[API - Index]] · [[ADR - 0038 Hak Per-Objek Admin Space Task Management]]
-- Modul Engagement Tim: [[Sales - Engagement Team (Modul)]] · [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]]
+- Modul Engagement Tim: [[Marketing - Engagement Team (Modul)]] · [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]]

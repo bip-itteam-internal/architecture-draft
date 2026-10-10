@@ -1,6 +1,6 @@
 # Marketing & Ads Command Center — MASTER Roadmap
 
-- **Status**: 🟡 **Arsip desain (30 Juni 2026) — sudah dieksekusi, peta service-nya usang.** Roadmap ini dijalankan, tetapi hasilnya jadi service tersendiri `marketing-analytics` (+ profit engine di `integration`), bukan seperti yang tertulis di sini. Keadaan sekarang: [[Microservices - Marketing Analytics Service]] · [[API - Marketing Analytics Service]]. Latar: [[Sales - Marketing Dashboard (Index)]].
+- **Status**: 🟡 **Arsip desain (30 Juni 2026) — sudah dieksekusi, peta service-nya usang.** Roadmap ini dijalankan, tetapi hasilnya jadi service tersendiri `marketing-analytics` (+ profit engine di `integration`), bukan seperti yang tertulis di sini. Keadaan sekarang: [[Microservices - Marketing Analytics Service]] · [[API - Marketing Analytics Service]]. Latar: [[Marketing - Marketing Dashboard (Index)]].
 
 > ⛔ **Angka "Progress ≈ 45–50%" di bawah adalah potret 30 Juni 2026, bukan status hari ini.** Per Agustus 2026 lapisan marketing & ads sudah live di PROD sebagai 40 route di service `marketing-analytics`. Jangan mengutip persentase ini sebagai status proyek — cek dok service-nya.
 >

@@ -26,7 +26,7 @@
 
 - **Path di repo**: `bip-erp/services/marketing-analytics/keputusan_dampak*.go` (baru) · `bip-erp/services/marketing-analytics/keputusan_pilot*.go` (baru) · `erp-frontend/src/features/marketing-analytics/` layar hasil keputusan (baru, lokasi persis diputuskan `/plan`)
 - **Tanggal**: 2026-10-01
-- **Dok domain**: [[Sales - Agen Pengelola Toko]] · daftar task: `Workspace/ANALISA - Agen Pengelola Toko`
+- **Dok domain**: [[Marketing - Agen Pengelola Toko]] · daftar task: `Workspace/ANALISA - Agen Pengelola Toko`
 
 ## Context
 
@@ -124,4 +124,4 @@ Selama tahap 1, pemetaan pemegang di `icc_account_mappings` **tidak diubah**; in
 
 ## Terkait
 
-[[Sales - Agen Pengelola Toko]] · [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] · [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] · [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] · [[ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai]] · [[ADR - 0138 Penugasan Toko Marketplace Bertanggal Berlaku untuk KPI dan Insentif]] · [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] · [[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]] · [[ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko]] · [[ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak]] · [[Microservices - Marketing Analytics Service]] · [[Finance - Incentive]] · [[APP - Ideamills]]
+[[Marketing - Agen Pengelola Toko]] · [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] · [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] · [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] · [[ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai]] · [[ADR - 0138 Penugasan Toko Marketplace Bertanggal Berlaku untuk KPI dan Insentif]] · [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] · [[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]] · [[ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko]] · [[ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak]] · [[Microservices - Marketing Analytics Service]] · [[Finance - Incentive]] · [[APP - Ideamills]]

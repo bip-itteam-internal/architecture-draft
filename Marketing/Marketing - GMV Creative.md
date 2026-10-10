@@ -67,6 +67,6 @@ repo: https://github.com/bip-itteam-internal/Bharata-Internal-tiktok
 
 ## Dokumen Terkait
 
-- [[Sales - Big Pictures]] — peta domain Sales/Marketing
-- [[Sales - Marketplace Integration]] · [[Sales - Dashboard]] (ads/omnichannel) · [[Sales - Veo (Gemini) Implementation]]
+- [[Marketing - Big Pictures]] — peta domain Marketing
+- [[Marketing - Marketplace Integration]] · [[Marketing - Dashboard]] (ads/omnichannel) · [[Marketing - Veo (Gemini) Implementation]]
 - [[Microservices - Integration Service]] — sumber data GMS/GMV

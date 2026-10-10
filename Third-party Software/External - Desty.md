@@ -35,5 +35,5 @@
 
 - [[Microservices - Integration Service]] — implementasi (webhook ingest, auto-approve, token rotation)
 - [[External - Accurate]] — bridging akuntansi hilir (sesama integrasi eksternal)
-- [[Finance - Bridging App]] · [[Sales - Marketplace Integration]] — konsumen/konsep sisi finance & marketing
+- [[Finance - Bridging App]] · [[Marketing - Marketplace Integration]] — konsumen/konsep sisi finance & marketing
 - [[DB - Overview and Notes]] — MongoDB & Redis (queue `srv:integration`)

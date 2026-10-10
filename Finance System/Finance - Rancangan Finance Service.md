@@ -71,7 +71,7 @@ Kontrak `SumberCuplikan` menyatakannya harfiah: *"Sumber tidak menghitung nilai 
 
 ### Metrik AR bersifat departemen, dan itu diterima
 
-Endpoint AR (`/orders/piutang/summary`, `/accounting/receivables`) tidak punya dimensi karyawan, sehingga AR Leader dan ketiga AR Staf menerima **angka yang sama**. Ini **bukan cacat**: seluruh toko dikelola bersama oleh tim AR Sales, jadi tidak ada pembagian per orang yang bisa diukur. Pemetaan karyawan→toko seperti `icc_account_mappings` di [[Sales - ICC Account Manager Mapping]] **tidak diperlukan di sini**.
+Endpoint AR (`/orders/piutang/summary`, `/accounting/receivables`) tidak punya dimensi karyawan, sehingga AR Leader dan ketiga AR Staf menerima **angka yang sama**. Ini **bukan cacat**: seluruh toko dikelola bersama oleh tim AR Sales, jadi tidak ada pembagian per orang yang bisa diukur. Pemetaan karyawan→toko seperti `icc_account_mappings` di [[Marketing - ICC Account Manager Mapping]] **tidak diperlukan di sini**.
 
 Konsekuensi yang diterima sadar: metrik AR menilai **kinerja tim**, bukan membedakan individu. Pembeda antar-orang harus datang dari metrik lain di templatnya. Bila kelak perlu dibedakan per orang, `TargetBerlaku` sudah mendukung `target_per_karyawan` — cukup lewat target, tanpa menyentuh metriknya.
 

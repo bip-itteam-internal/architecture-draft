@@ -80,7 +80,7 @@
 - [[Microservices - File Service]] — CV/berkas pelamar, report PDF psikotes, surat penawaran (MinIO)
 - [[Microservices - Notification Service]] — notifikasi internal (inbox/FCM) + **kandidat & pewawancara (interview User/Final) via Email/Resend** (`/email/send`, sudah dipakai) + WhatsApp (menyusul)
 - [[CORE - OCR Document Service]] — OCR CV hasil scan (untuk AI screening fase lanjut)
-- **LLM (OpenRouter)** — AI CV screening (fase lanjut); reuse infra Ideamills ([[Sales - Veo (Gemini) Implementation]])
+- **LLM (OpenRouter)** — AI CV screening (fase lanjut); reuse infra Ideamills ([[Marketing - Veo (Gemini) Implementation]])
 - **Glints (TapLoker)** — ATS/job-portal eksternal, sumber pelamar utama
 - [[CORE - API Master Gateway]] · [[CORE - SSO Flow]] — routing + auth
 - [[DB - Overview and Notes]] — pola database-per-service

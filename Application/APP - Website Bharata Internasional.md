@@ -60,5 +60,5 @@
 ## Dokumen Terkait
 
 - [[ADR - 0020 Tampilkan Harga dan Beli ke Marketplace]] — keputusan menampilkan harga + Beli ke marketplace.
-- [[Sales - Landing page]] — *konsep berbeda* (landing konversi penjualan ala Nike / WhatsApp-CS), **bukan** project website korporat ini.
-- [[Sales - Big Pictures]]
+- [[Marketing - Landing page]] — *konsep berbeda* (landing konversi penjualan ala Nike / WhatsApp-CS), **bukan** project website korporat ini.
+- [[Marketing - Big Pictures]]

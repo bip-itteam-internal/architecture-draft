@@ -2,7 +2,7 @@
 
 *Rancangan isi dashboard per posisi untuk dua divisi brand, **Beauty Hacks** (10 posisi) dan **Kyura** (9 posisi). Diturunkan mengikuti [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]]. Keduanya digabung dalam satu dokumen karena **berbagi delapan posisi dengan nama dan struktur metrik yang sama persis**; yang berbeda hanya angka targetnya.*
 
-- **Status**: 🟡 **Rancangan**. Tak satu pun posisi di sini punya lembar per posisi. Yang ada [[Sales - Marketing Dashboard (Index)|Marketing Analytics]], 16 halaman per TOPIK, bukan per orang.
+- **Status**: 🟡 **Rancangan**. Tak satu pun posisi di sini punya lembar per posisi. Yang ada [[Marketing - Marketing Dashboard (Index)|Marketing Analytics]], 16 halaman per TOPIK, bukan per orang.
 - **Tampilan bawaan SPV & Leader** (🔜 branch erp-frontend `feat/marketing-iklan-dashboard`, belum merge per 2026-09-15): `/dashboard` mereka membuka Ringkasan Marketing Analytics lewat peran (`isPemimpinBrand`: SPV/admin `kyura` atau `beauty_hacks`, atau `insentive: adv_leader`), berisi belanja iklan, ROAS vs target, ROI laba, dan anggaran iklan terpakai per brand dari Master Anggaran Finance ([[ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance]]). Itu layar per TOPIK yang sama bagi seluruh pembacanya, bukan lembar per posisi yang dirancang di bawah.
 - **Angka KPI diukur 2026-08-28** (sumber: [[HRIS - Matriks KPI per Departemen]]). **Ukur ulang sebelum dipakai mengambil keputusan.**
 - **Path di repo**: `erp-frontend/src/features/marketing-analytics/` · `erp-frontend/src/features/marketing-insight/`
@@ -83,7 +83,7 @@ Ada di kedua brand, 3 metrik. Beauty Hacks: Performance Monitoring (0,2), Conver
 
 Dua metrik di kedua brand, keduanya bersumber data GMV. BH: Conversion (0,7) + CPA (0,3). Kyura: Conversion (0,5) + ROI (0,5).
 
-**Bisa ditampilkan sekarang.** Tren CPA atau ROI per kampanye, plus kartu konversi terhadap target. Halaman [[Sales - Marketing Dashboard (Index)|GMV Max Monitoring]] sudah menggambar hampir persis ini, tinggal disaring per pengiklan.
+**Bisa ditampilkan sekarang.** Tren CPA atau ROI per kampanye, plus kartu konversi terhadap target. Halaman [[Marketing - Marketing Dashboard (Index)|GMV Max Monitoring]] sudah menggambar hampir persis ini, tinggal disaring per pengiklan.
 
 ### Affiliate
 
@@ -161,10 +161,10 @@ Ia tetap manual sampai maknanya diputuskan ulang, dan **tidak boleh digambar di 
 - [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]] — prinsip penurunannya
 - [[REF - Layout Dashboard erp-frontend]] — cara menyusunnya di layar
 - [[HRIS - Matriks KPI per Departemen]] — sumber angka di dokumen ini
-- [[Sales - ICC Account Manager Mapping]] — jembatan atribusi ke `employee_id`
-- [[Sales - ICC Affiliate Mapping]] — atribusi sisi afiliasi
-- [[Sales - Marketing Dashboard (Index)]] — layar yang sudah ada, per topik
-- [[Sales - Marketing Analytics (Audit Ketersediaan Data)]] — audit sumber angka divisi ini
+- [[Marketing - ICC Account Manager Mapping]] — jembatan atribusi ke `employee_id`
+- [[Marketing - ICC Affiliate Mapping]] — atribusi sisi afiliasi
+- [[Marketing - Marketing Dashboard (Index)]] — layar yang sudah ada, per topik
+- [[Marketing - Marketing Analytics (Audit Ketersediaan Data)]] — audit sumber angka divisi ini
 - [[Microservices - Marketing Analytics Service]] — pemilik `mart_profit_attribution`
 - [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] — kepemilikan toko dan tim
 - [[ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance]]: tampilan bawaan SPV/Leader dan anggaran iklan per brand

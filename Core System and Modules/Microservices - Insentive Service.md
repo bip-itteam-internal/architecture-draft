@@ -212,4 +212,4 @@ Hasil terhadap 183 karyawan aktif (prod 2026-08-26): 3 Leader (Ade 11, Satrio 10
 - [[Finance - Incentive]] — skema bisnis & isi SK
 - [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]] — keputusan sumber biaya operasional
 - [[API - Insentive Service]] — daftar rute
-- [[Sales - Incentive]] · [[HRIS - Key Performance Index]]
+- [[Marketing - Incentive]] · [[HRIS - Key Performance Index]]

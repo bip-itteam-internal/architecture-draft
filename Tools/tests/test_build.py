@@ -191,19 +191,19 @@ def vault_ringkasan(tmp_path: Path) -> Path:
     """Vault kecil untuk mode --daftar-tugas / --serap: dua dokumen normal,
     satu dokumen besar (>8192 byte, membuktikan `isi` dipotong), satu dokumen
     🔴 Stub (harus DIKECUALIKAN dari daftar tugas, ditangani lokal)."""
-    (tmp_path / "Sales").mkdir()
-    (tmp_path / "Sales" / "Sales - A.md").write_text(
+    (tmp_path / "Marketing").mkdir()
+    (tmp_path / "Marketing" / "Marketing - A.md").write_text(
         "- **Status**: ✅ Implemented\n\nIsi A singkat.\n", encoding="utf-8",
     )
-    (tmp_path / "Sales" / "Sales - C.md").write_text(
+    (tmp_path / "Marketing" / "Marketing - C.md").write_text(
         "- **Status**: ✅ Implemented\n\nIsi C singkat.\n", encoding="utf-8",
     )
     besar = (
         "- **Status**: ✅ Implemented\n\n## Bagian Panjang\n\n"
         + ("Kalimat isi berulang. " * 1000)
     )
-    (tmp_path / "Sales" / "Sales - Besar.md").write_text(besar, encoding="utf-8")
-    (tmp_path / "Sales" / "Sales - Stub.md").write_text(
+    (tmp_path / "Marketing" / "Marketing - Besar.md").write_text(besar, encoding="utf-8")
+    (tmp_path / "Marketing" / "Marketing - Stub.md").write_text(
         "- **Status**: 🔴 Stub\n", encoding="utf-8",
     )
     return tmp_path
@@ -218,7 +218,7 @@ def test_daftar_tugas_tulis_dokumen_yang_perlu_diringkas(vault_ringkasan):
     tugas = json.loads((vault_ringkasan / NAMA_TUGAS).read_text(encoding="utf-8"))
     paths = {t["path"] for t in tugas["tugas"]}
     assert paths == {
-        "Sales/Sales - A.md", "Sales/Sales - C.md", "Sales/Sales - Besar.md",
+        "Marketing/Marketing - A.md", "Marketing/Marketing - C.md", "Marketing/Marketing - Besar.md",
     }
     assert tugas["jumlah"] == 3
 
@@ -227,7 +227,7 @@ def test_daftar_tugas_kecualikan_stub(vault_ringkasan):
     build.main(["--root", str(vault_ringkasan), "--daftar-tugas"])
     tugas = json.loads((vault_ringkasan / NAMA_TUGAS).read_text(encoding="utf-8"))
     paths = {t["path"] for t in tugas["tugas"]}
-    assert "Sales/Sales - Stub.md" not in paths
+    assert "Marketing/Marketing - Stub.md" not in paths
 
 
 def test_daftar_tugas_field_lengkap_dan_isi_dipotong(vault_ringkasan):
@@ -235,15 +235,15 @@ def test_daftar_tugas_field_lengkap_dan_isi_dipotong(vault_ringkasan):
     tugas = json.loads((vault_ringkasan / NAMA_TUGAS).read_text(encoding="utf-8"))
     by_path = {t["path"]: t for t in tugas["tugas"]}
 
-    a = by_path["Sales/Sales - A.md"]
+    a = by_path["Marketing/Marketing - A.md"]
     assert {"path", "judul", "jenis", "hash", "isi"} <= set(a.keys())
-    assert a["judul"] == "Sales - A"
+    assert a["judul"] == "Marketing - A"
     assert a["jenis"] == "domain"
     assert len(a["hash"]) == 64
     assert a["isi"] == "- **Status**: ✅ Implemented\n\nIsi A singkat.\n"
 
-    besar_asli = (vault_ringkasan / "Sales" / "Sales - Besar.md").read_text(encoding="utf-8")
-    besar = by_path["Sales/Sales - Besar.md"]
+    besar_asli = (vault_ringkasan / "Marketing" / "Marketing - Besar.md").read_text(encoding="utf-8")
+    besar = by_path["Marketing/Marketing - Besar.md"]
     assert "[...dipotong...]" in besar["isi"]
     assert len(besar["isi"].encode("utf-8")) < len(besar_asli.encode("utf-8"))
 
@@ -311,7 +311,7 @@ def test_daftar_tugas_full_masukkan_semua_non_stub_walau_sudah_lengkap(vault_rin
     tugas = json.loads((vault_ringkasan / NAMA_TUGAS).read_text(encoding="utf-8"))
     paths = {t["path"] for t in tugas["tugas"]}
     assert paths == {
-        "Sales/Sales - A.md", "Sales/Sales - C.md", "Sales/Sales - Besar.md",
+        "Marketing/Marketing - A.md", "Marketing/Marketing - C.md", "Marketing/Marketing - Besar.md",
     }
 
 
@@ -330,13 +330,13 @@ def test_serap_menyerap_valid_dan_tulis_manifest(vault_ringkasan):
     entri = {e["path"]: e for e in scan_vault(vault_ringkasan)}
     hasil = {
         "hasil": {
-            "Sales/Sales - A.md": {
+            "Marketing/Marketing - A.md": {
                 "ringkasan": "Menjawab: apa isi A.", "kata_kunci": ["a"],
-                "hash": entri["Sales/Sales - A.md"]["hash"],
+                "hash": entri["Marketing/Marketing - A.md"]["hash"],
             },
-            "Sales/Sales - Besar.md": {
+            "Marketing/Marketing - Besar.md": {
                 "ringkasan": "Menjawab: apa isi Besar.", "kata_kunci": ["besar"],
-                "hash": entri["Sales/Sales - Besar.md"]["hash"],
+                "hash": entri["Marketing/Marketing - Besar.md"]["hash"],
             },
         }
     }
@@ -344,21 +344,21 @@ def test_serap_menyerap_valid_dan_tulis_manifest(vault_ringkasan):
 
     kode = build.main(["--root", str(vault_ringkasan), "--serap"])
 
-    assert kode != 0  # Sales - C.md tidak ada di hasil -> masih gagal
+    assert kode != 0  # Marketing - C.md tidak ada di hasil -> masih gagal
     index = json.loads((vault_ringkasan / NAMA_INDEX).read_text(encoding="utf-8"))
     ringkasan = {d["path"]: d["ringkasan"] for d in index["dokumen"]}
-    assert ringkasan["Sales/Sales - A.md"] == "Menjawab: apa isi A."
-    assert ringkasan["Sales/Sales - Besar.md"] == "Menjawab: apa isi Besar."
-    assert ringkasan["Sales/Sales - Stub.md"] is not None
-    assert index["gagal"] == ["Sales/Sales - C.md"]
+    assert ringkasan["Marketing/Marketing - A.md"] == "Menjawab: apa isi A."
+    assert ringkasan["Marketing/Marketing - Besar.md"] == "Menjawab: apa isi Besar."
+    assert ringkasan["Marketing/Marketing - Stub.md"] is not None
+    assert index["gagal"] == ["Marketing/Marketing - C.md"]
 
 
 def test_serap_tolak_entri_tipe_salah(vault_ringkasan, capsys):
     hasil = {
         "hasil": {
-            "Sales/Sales - A.md": {"ringkasan": 123, "kata_kunci": []},
-            "Sales/Sales - C.md": {"ringkasan": "", "kata_kunci": ["ok"]},
-            "Sales/Sales - Besar.md": {"ringkasan": "x", "kata_kunci": [1, 2]},
+            "Marketing/Marketing - A.md": {"ringkasan": 123, "kata_kunci": []},
+            "Marketing/Marketing - C.md": {"ringkasan": "", "kata_kunci": ["ok"]},
+            "Marketing/Marketing - Besar.md": {"ringkasan": "x", "kata_kunci": [1, 2]},
         }
     }
     (vault_ringkasan / NAMA_HASIL).write_text(json.dumps(hasil), encoding="utf-8")
@@ -368,7 +368,7 @@ def test_serap_tolak_entri_tipe_salah(vault_ringkasan, capsys):
     assert kode != 0
     index = json.loads((vault_ringkasan / NAMA_INDEX).read_text(encoding="utf-8"))
     assert set(index["gagal"]) == {
-        "Sales/Sales - A.md", "Sales/Sales - C.md", "Sales/Sales - Besar.md",
+        "Marketing/Marketing - A.md", "Marketing/Marketing - C.md", "Marketing/Marketing - Besar.md",
     }
     assert "DITOLAK" in capsys.readouterr().out
 
@@ -376,7 +376,7 @@ def test_serap_tolak_entri_tipe_salah(vault_ringkasan, capsys):
 def test_serap_tolak_hash_tidak_cocok_laporkan_basi(vault_ringkasan, capsys):
     hasil = {
         "hasil": {
-            "Sales/Sales - A.md": {
+            "Marketing/Marketing - A.md": {
                 "ringkasan": "Ringkasan A.", "kata_kunci": ["a"], "hash": "hash-salah",
             },
         }
@@ -387,14 +387,14 @@ def test_serap_tolak_hash_tidak_cocok_laporkan_basi(vault_ringkasan, capsys):
 
     assert kode != 0
     index = json.loads((vault_ringkasan / NAMA_INDEX).read_text(encoding="utf-8"))
-    assert "Sales/Sales - A.md" in index["gagal"]
+    assert "Marketing/Marketing - A.md" in index["gagal"]
     assert "basi" in capsys.readouterr().out.lower()
 
 
 def test_serap_terima_tanpa_hash_dengan_peringatan(vault_ringkasan, capsys):
     hasil = {
         "hasil": {
-            "Sales/Sales - A.md": {"ringkasan": "Ringkasan A.", "kata_kunci": ["a"]},
+            "Marketing/Marketing - A.md": {"ringkasan": "Ringkasan A.", "kata_kunci": ["a"]},
         }
     }
     (vault_ringkasan / NAMA_HASIL).write_text(json.dumps(hasil), encoding="utf-8")
@@ -403,14 +403,14 @@ def test_serap_terima_tanpa_hash_dengan_peringatan(vault_ringkasan, capsys):
 
     index = json.loads((vault_ringkasan / NAMA_INDEX).read_text(encoding="utf-8"))
     ringkasan = {d["path"]: d["ringkasan"] for d in index["dokumen"]}
-    assert ringkasan["Sales/Sales - A.md"] == "Ringkasan A."
+    assert ringkasan["Marketing/Marketing - A.md"] == "Ringkasan A."
     assert "tanpa" in capsys.readouterr().out.lower()
 
 
 def test_serap_laporkan_path_tidak_ada_di_vault_tanpa_crash(vault_ringkasan, capsys):
     hasil = {
         "hasil": {
-            "Sales/Sales - Tidak Ada.md": {"ringkasan": "x", "kata_kunci": []},
+            "Marketing/Marketing - Tidak Ada.md": {"ringkasan": "x", "kata_kunci": []},
         }
     }
     (vault_ringkasan / NAMA_HASIL).write_text(json.dumps(hasil), encoding="utf-8")
@@ -418,7 +418,7 @@ def test_serap_laporkan_path_tidak_ada_di_vault_tanpa_crash(vault_ringkasan, cap
     kode = build.main(["--root", str(vault_ringkasan), "--serap"])
 
     keluaran = capsys.readouterr().out
-    assert "Sales/Sales - Tidak Ada.md" in keluaran
+    assert "Marketing/Marketing - Tidak Ada.md" in keluaran
     assert kode != 0
     assert (vault_ringkasan / NAMA_INDEX).exists()  # tidak crash, manifest tetap ditulis
 
@@ -430,8 +430,8 @@ def test_serap_terapkan_stub(vault_ringkasan):
 
     index = json.loads((vault_ringkasan / NAMA_INDEX).read_text(encoding="utf-8"))
     dok = {d["path"]: d for d in index["dokumen"]}
-    assert dok["Sales/Sales - Stub.md"]["ringkasan"] is not None
-    assert "Sales/Sales - Stub.md" not in index["gagal"]
+    assert dok["Marketing/Marketing - Stub.md"]["ringkasan"] is not None
+    assert "Marketing/Marketing - Stub.md" not in index["gagal"]
 
 
 def test_serap_hapus_berkas_tugas_dan_hasil_setelah_manifest_ditulis(vault_ringkasan):
@@ -469,9 +469,9 @@ def test_serap_tanpa_pembungkus_hasil_gagal_tanpa_menulis_atau_menghapus(
     diperlakukan sebagai {} (nol diserap) dan berkas hasil tetap dihapus."""
     entri = {e["path"]: e for e in scan_vault(vault_ringkasan)}
     salah_bentuk = {
-        "Sales/Sales - A.md": {
+        "Marketing/Marketing - A.md": {
             "ringkasan": "Ringkasan A.", "kata_kunci": ["a"],
-            "hash": entri["Sales/Sales - A.md"]["hash"],
+            "hash": entri["Marketing/Marketing - A.md"]["hash"],
         },
     }
     (vault_ringkasan / NAMA_HASIL).write_text(json.dumps(salah_bentuk), encoding="utf-8")
@@ -509,7 +509,7 @@ def test_serap_sebagian_ditolak_artefak_dipertahankan(vault_ringkasan, capsys):
     (vault_ringkasan / NAMA_TUGAS).write_text("{}", encoding="utf-8")
     hasil = {
         "hasil": {
-            "Sales/Sales - A.md": {"ringkasan": 123, "kata_kunci": []},  # ditolak
+            "Marketing/Marketing - A.md": {"ringkasan": 123, "kata_kunci": []},  # ditolak
         }
     }
     (vault_ringkasan / NAMA_HASIL).write_text(json.dumps(hasil), encoding="utf-8")
@@ -525,7 +525,7 @@ def test_serap_sebagian_ditolak_artefak_dipertahankan(vault_ringkasan, capsys):
 def test_serap_hash_basi_artefak_dipertahankan(vault_ringkasan, capsys):
     hasil = {
         "hasil": {
-            "Sales/Sales - A.md": {
+            "Marketing/Marketing - A.md": {
                 "ringkasan": "x", "kata_kunci": [], "hash": "hash-salah",
             },
         }
@@ -539,7 +539,7 @@ def test_serap_hash_basi_artefak_dipertahankan(vault_ringkasan, capsys):
 
 
 def test_serap_path_tak_ditemukan_artefak_dipertahankan(vault_ringkasan, capsys):
-    hasil = {"hasil": {"Sales/Sales - Tidak Ada.md": {"ringkasan": "x", "kata_kunci": []}}}
+    hasil = {"hasil": {"Marketing/Marketing - Tidak Ada.md": {"ringkasan": "x", "kata_kunci": []}}}
     (vault_ringkasan / NAMA_HASIL).write_text(json.dumps(hasil), encoding="utf-8")
 
     build.main(["--root", str(vault_ringkasan), "--serap"])
@@ -554,17 +554,17 @@ def test_serap_sukses_penuh_artefak_tetap_terhapus(vault_ringkasan):
     entri = {e["path"]: e for e in scan_vault(vault_ringkasan)}
     hasil = {
         "hasil": {
-            "Sales/Sales - A.md": {
+            "Marketing/Marketing - A.md": {
                 "ringkasan": "a", "kata_kunci": [],
-                "hash": entri["Sales/Sales - A.md"]["hash"],
+                "hash": entri["Marketing/Marketing - A.md"]["hash"],
             },
-            "Sales/Sales - C.md": {
+            "Marketing/Marketing - C.md": {
                 "ringkasan": "c", "kata_kunci": [],
-                "hash": entri["Sales/Sales - C.md"]["hash"],
+                "hash": entri["Marketing/Marketing - C.md"]["hash"],
             },
-            "Sales/Sales - Besar.md": {
+            "Marketing/Marketing - Besar.md": {
                 "ringkasan": "b", "kata_kunci": [],
-                "hash": entri["Sales/Sales - Besar.md"]["hash"],
+                "hash": entri["Marketing/Marketing - Besar.md"]["hash"],
             },
         }
     }
@@ -611,9 +611,9 @@ def test_mode_tanpa_flag_ringkasan_null_untuk_yang_belum_ada_dan_exit_nonzero(
     assert kode != 0
     index = json.loads((vault_ringkasan / NAMA_INDEX).read_text(encoding="utf-8"))
     dok = {d["path"]: d for d in index["dokumen"]}
-    assert dok["Sales/Sales - A.md"]["ringkasan"] is None
-    assert dok["Sales/Sales - Stub.md"]["ringkasan"] is not None
-    assert "Sales/Sales - A.md" in index["gagal"]
+    assert dok["Marketing/Marketing - A.md"]["ringkasan"] is None
+    assert dok["Marketing/Marketing - Stub.md"]["ringkasan"] is not None
+    assert "Marketing/Marketing - A.md" in index["gagal"]
     assert "--daftar-tugas" in capsys.readouterr().out
 
 
@@ -637,7 +637,7 @@ def test_mode_tanpa_flag_carry_forward_ringkasan_yang_hash_nya_sama(vault_ringka
     assert kode == 0
     index = json.loads((vault_ringkasan / NAMA_INDEX).read_text(encoding="utf-8"))
     dok = {d["path"]: d for d in index["dokumen"]}
-    assert dok["Sales/Sales - A.md"]["ringkasan"] == "sudah ada"
+    assert dok["Marketing/Marketing - A.md"]["ringkasan"] == "sudah ada"
 
 
 # --- minor: mode CLI harus saling eksklusif, bukan diselesaikan senyap by
@@ -663,9 +663,9 @@ def test_dua_flag_mode_sekaligus_ditolak_argparse(vault_ringkasan, argv):
 @pytest.fixture
 def vault_pecah(tmp_path: Path) -> Path:
     """5 dokumen non-stub -- cukup untuk --pecah 2 menghasilkan potongan 2/2/1."""
-    (tmp_path / "Sales").mkdir()
+    (tmp_path / "Marketing").mkdir()
     for huruf in "ABCDE":
-        (tmp_path / "Sales" / f"Sales - {huruf}.md").write_text(
+        (tmp_path / "Marketing" / f"Marketing - {huruf}.md").write_text(
             f"- **Status**: ✅ Implemented\n\nIsi {huruf}.\n", encoding="utf-8",
         )
     return tmp_path
@@ -750,21 +750,21 @@ def test_serap_tanpa_path_gabung_beberapa_berkas_hasil_bernomor(vault_ringkasan)
     entri = {e["path"]: e for e in scan_vault(vault_ringkasan)}
     hasil_1 = {
         "hasil": {
-            "Sales/Sales - A.md": {
+            "Marketing/Marketing - A.md": {
                 "ringkasan": "Ringkasan A.", "kata_kunci": ["a"],
-                "hash": entri["Sales/Sales - A.md"]["hash"],
+                "hash": entri["Marketing/Marketing - A.md"]["hash"],
             },
-            "Sales/Sales - C.md": {
+            "Marketing/Marketing - C.md": {
                 "ringkasan": "Ringkasan C.", "kata_kunci": ["c"],
-                "hash": entri["Sales/Sales - C.md"]["hash"],
+                "hash": entri["Marketing/Marketing - C.md"]["hash"],
             },
         }
     }
     hasil_2 = {
         "hasil": {
-            "Sales/Sales - Besar.md": {
+            "Marketing/Marketing - Besar.md": {
                 "ringkasan": "Ringkasan Besar.", "kata_kunci": ["besar"],
-                "hash": entri["Sales/Sales - Besar.md"]["hash"],
+                "hash": entri["Marketing/Marketing - Besar.md"]["hash"],
             },
         }
     }
@@ -780,9 +780,9 @@ def test_serap_tanpa_path_gabung_beberapa_berkas_hasil_bernomor(vault_ringkasan)
     assert kode == 0  # A, C, Besar semua diserap; Stub ditangani lokal
     index = json.loads((vault_ringkasan / NAMA_INDEX).read_text(encoding="utf-8"))
     ringkasan = {d["path"]: d["ringkasan"] for d in index["dokumen"]}
-    assert ringkasan["Sales/Sales - A.md"] == "Ringkasan A."
-    assert ringkasan["Sales/Sales - C.md"] == "Ringkasan C."
-    assert ringkasan["Sales/Sales - Besar.md"] == "Ringkasan Besar."
+    assert ringkasan["Marketing/Marketing - A.md"] == "Ringkasan A."
+    assert ringkasan["Marketing/Marketing - C.md"] == "Ringkasan C."
+    assert ringkasan["Marketing/Marketing - Besar.md"] == "Ringkasan Besar."
     assert not (vault_ringkasan / "VAULT-INDEX.hasil.001.json").exists()
     assert not (vault_ringkasan / "VAULT-INDEX.hasil.002.json").exists()
 
@@ -794,9 +794,9 @@ def test_serap_satu_berkas_salah_bentuk_menolak_seluruh_operasi(vault_ringkasan,
     entri = {e["path"]: e for e in scan_vault(vault_ringkasan)}
     hasil_sah = {
         "hasil": {
-            "Sales/Sales - A.md": {
+            "Marketing/Marketing - A.md": {
                 "ringkasan": "Ringkasan A.", "kata_kunci": ["a"],
-                "hash": entri["Sales/Sales - A.md"]["hash"],
+                "hash": entri["Marketing/Marketing - A.md"]["hash"],
             },
         }
     }
@@ -805,7 +805,7 @@ def test_serap_satu_berkas_salah_bentuk_menolak_seluruh_operasi(vault_ringkasan,
     )
     # bentuk salah: tanpa pembungkus "hasil"
     (vault_ringkasan / "VAULT-INDEX.hasil.002.json").write_text(
-        json.dumps({"Sales/Sales - C.md": {"ringkasan": "x", "kata_kunci": []}}),
+        json.dumps({"Marketing/Marketing - C.md": {"ringkasan": "x", "kata_kunci": []}}),
         encoding="utf-8",
     )
 
@@ -822,15 +822,15 @@ def test_serap_satu_berkas_salah_bentuk_menolak_seluruh_operasi(vault_ringkasan,
 
 def test_serap_path_konflik_lintas_berkas_menolak_seluruh_operasi(vault_ringkasan, capsys):
     entri = {e["path"]: e for e in scan_vault(vault_ringkasan)}
-    hash_a = entri["Sales/Sales - A.md"]["hash"]
+    hash_a = entri["Marketing/Marketing - A.md"]["hash"]
     hasil_1 = {
         "hasil": {
-            "Sales/Sales - A.md": {"ringkasan": "Versi 1.", "kata_kunci": [], "hash": hash_a},
+            "Marketing/Marketing - A.md": {"ringkasan": "Versi 1.", "kata_kunci": [], "hash": hash_a},
         }
     }
     hasil_2 = {
         "hasil": {
-            "Sales/Sales - A.md": {"ringkasan": "Versi 2.", "kata_kunci": [], "hash": hash_a},
+            "Marketing/Marketing - A.md": {"ringkasan": "Versi 2.", "kata_kunci": [], "hash": hash_a},
         }
     }
     (vault_ringkasan / "VAULT-INDEX.hasil.001.json").write_text(
@@ -847,7 +847,7 @@ def test_serap_path_konflik_lintas_berkas_menolak_seluruh_operasi(vault_ringkasa
     assert (vault_ringkasan / "VAULT-INDEX.hasil.001.json").exists()
     assert (vault_ringkasan / "VAULT-INDEX.hasil.002.json").exists()
     keluaran = capsys.readouterr().out
-    assert "Sales/Sales - A.md" in keluaran
+    assert "Marketing/Marketing - A.md" in keluaran
     assert "VAULT-INDEX.hasil.001.json" in keluaran
     assert "VAULT-INDEX.hasil.002.json" in keluaran
 
@@ -866,9 +866,9 @@ def test_serap_pembersihan_mencakup_seluruh_potongan_tugas_dan_hasil(vault_ringk
     VAULT-INDEX.hasil.json)."""
     entri = {e["path"]: e for e in scan_vault(vault_ringkasan)}
     pasangan = [
-        ("001", "Sales/Sales - A.md"),
-        ("002", "Sales/Sales - C.md"),
-        ("003", "Sales/Sales - Besar.md"),
+        ("001", "Marketing/Marketing - A.md"),
+        ("002", "Marketing/Marketing - C.md"),
+        ("003", "Marketing/Marketing - Besar.md"),
     ]
     for n, path_dok in pasangan:
         (vault_ringkasan / f"VAULT-INDEX.tugas.{n}.json").write_text("{}", encoding="utf-8")
