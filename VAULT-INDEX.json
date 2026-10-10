@@ -1932,6 +1932,7 @@
         "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko",
         "ADR - 0072 Kewenangan Jadwal Host Live sebagai Izin yang Ditugaskan",
+        "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
         "Finance - Kas Kecil dan Pengajuan Budget",
         "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
         "ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen",
@@ -1967,20 +1968,23 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "74019e8fd66849b55c485a4868c2c122e89d9e309bfc83edfaefcf42bcda84e7",
-      "ukuran_kb": 140.5,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja (modul, tingkat aksi, cakupan data/reach), paket hak (permission set) apa saja yang ada dan menempel di posisi/jabatan, serta di mana izin ditegakkan (gateway, middleware service, sidebar frontend). Juga menjawab modul mana yang sudah berkatalog, apa itu fase dua (tier fallback off), dan di berkas mana katalog didaftarkan.",
+      "hash": "08c8030731d619b09106b5d39bae46fdbcb2895f2eefa265901e5087fc4e592d",
+      "ukuran_kb": 142.8,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja (tiga sumbu modul, tingkat aksi, cakupan data), bagaimana paket hak (permission set) menempel pada posisi/jabatan, dan bagaimana penegakannya di gateway, service, dan frontend. Juga menjawab modul mana yang sudah punya katalog izin dan penegakan per-aksi, bagaimana klaim JWT permissions dibentuk, serta apa status fase dua tier fallback dan arah satu pintu (ADR 0164).",
       "kata_kunci": [
         "RBAC",
-        "hak akses",
         "permission set",
         "paket hak",
+        "hak akses",
         "katalog izin",
         "reach",
-        "system_roles",
+        "JWT permissions",
         "tier fallback",
+        "system_roles",
+        "posisi",
+        "gate",
         "RequirePermission",
-        "Hak per Posisi"
+        "menu terbatas"
       ]
     },
     {
@@ -17111,20 +17115,23 @@
         "REF - Rantai Pengajuan Lintas Modul",
         "Microservices - Manufacture Service"
       ],
-      "hash": "65ef47b1c5a7bd1409ef50272f2d8bc927d9f722fb9a4d50931c14c0bb426cc3",
-      "ukuran_kb": 81.0,
-      "ringkasan": "Menjawab: service dan koleksi mana yang menjadi pemilik sebuah fakta bisnis (data karyawan, departemen, divisi, hak akses, kontrak, jadwal, produk/SKU, vendor, toko, gudang, dst), siapa yang boleh menulisnya, dan lewat jalan mana service lain boleh membacanya. Juga menjawab salinan data mana yang sah beserta arah dan penjaganya, pengecualian database-per-service yang masih hidup, duplikasi yang belum diputuskan, keadaan jejak audit, dan cara memakai peta ini sebelum membangun fitur atau penyimpanan baru.",
+      "hash": "d12705e791420e99341962330c60a1f20547bf46107b8e2f915a20ab511756f9",
+      "ukuran_kb": 81.8,
+      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki sebuah fakta bisnis, siapa yang boleh menulisnya, lewat jalan apa service lain boleh membacanya, dan salinan mana yang sah beserta penjaganya. Juga menjawab duplikasi data mana yang belum diputuskan, pengecualian aturan database-per-service yang masih hidup, dan cara memakai peta ini sebelum membangun fitur atau penyimpanan baru.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
         "pemilik fakta",
-        "satu fakta satu tempat",
-        "master data",
-        "salinan sah",
-        "SyncCollection",
-        "duplikasi data",
         "database-per-service",
-        "audit trail"
+        "salinan sah",
+        "duplikasi",
+        "sumber kebenaran",
+        "single source of truth",
+        "master data",
+        "jejak audit",
+        "audit trail",
+        "employee-service",
+        "SyncCollection"
       ]
     },
     {
@@ -20879,20 +20886,25 @@
         "APP - Web ERP",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "8ae97cd79872bd108a7a34187397021ddd55171915aa8740c5a930396926854a",
-      "ukuran_kb": 12.5,
-      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk mewujudkan sidebar satu daftar urusan, dalam urutan dan dependensi apa (penjaga gerbang per daun, urusan umum, penyatuan akhir), dan apa rincian task per departemen (Marketing, FAT, HRGA, Tech Development, Kesekretariatan, Manufaktur). Juga menjelaskan masalah sebenarnya di balik permintaan, asumsi yang disetujui, jenis task (S, G, B, D, X), dan cara verifikasinya.",
+      "hash": "a9c79a305292b007a9d80ae49b855d8d11ea3fb02ce5f84435ebd5b16a061393",
+      "ukuran_kb": 13.1,
+      "ringkasan": "Menjawab: kenapa sidebar ERP disusun ulang menjadi satu daftar menurut urusan (bukan departemen), masalah apa di baliknya (menu tanpa gerbang izin posisi, hak menumpuk di akun), dan asumsi yang disetujui. Juga menjawab daftar task per departemen (Marketing, FAT, HRGA, Tech Development, Kesekretariatan, Manufaktur), urutan dan dependensi U1-U4, serta cara verifikasinya.",
       "kata_kunci": [
-        "analisa kebutuhan",
         "sidebar",
-        "daftar task",
-        "gerbang menu",
-        "perbaikan data hak akses",
-        "ruang kerja Beranda",
+        "menu",
+        "Portal Saya",
+        "urusan",
+        "ADR 0149",
+        "gerbang izin",
+        "perm",
+        "FALLBACK",
+        "ruang kerja",
+        "Beranda",
+        "analisa kebutuhan",
         "Marketing",
         "FAT",
         "HRGA",
-        "Manufaktur"
+        "web ERP"
       ]
     },
     {
