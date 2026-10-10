@@ -103,9 +103,30 @@ const tableState = useTableState({ initialLimit: 20 });
   yang menjelaskan bedanya. Konsekuensinya `exportValue` per kolom jadi
   konfigurasi mati; jangan dipasang.
 
-- **Header bisa-urut tidak menuntut perubahan komponen bersama.**
-  `Column.header` menerima fungsi. Bungkus sebagai **komponen bernama**, bukan
-  arrow yang dikembalikan factory, atau `react/display-name` menggagalkan lint.
+- **Urut lewat kepala kolom SUDAH ADA di `MainTable`** (erp-frontend #2281):
+  `Column.sortable` (+ `sortDescFirst` untuk kolom "terbesar/terbaru dulu"),
+  lalu prop `sort` + `onSortChange`. Jangan merakit `HeaderUrut` sendiri lagi.
+  ⛔ `MainTable` **tidak mengurutkan** `data`; ia hanya melaporkan pilihan.
+  Daftar berpaginasi server WAJIB meneruskannya ke parameter sort endpoint:
+  mengurutkan `data` di layar hanya menyusun ulang SATU halaman, hasilnya
+  masuk akal dan salah. Kolom turunan yang tak dikenal server boleh diurutkan
+  lokal asal diakui begitu (acuan: `uang-gantung-table.tsx`, `terjemahkanUrut`).
+  Tombolnya tak dirender tanpa `onSortChange`, dan di ponsel muncul sebagai
+  pemilih "Urutkan".
+
+- **Pemilih kolom**: `enableColumnVisibility`, plus `Column.hideable: false`
+  untuk kolom penanda baris (nomor order, nama) dan kolom aksi. Pilihannya
+  diingat per peramban, dan export bawaan ikut kolom yang tampil. ⛔ **Mati
+  total bila `footer` diisi**: baris kaki dirakit dengan jumlah sel tetap, jadi
+  menyembunyikan kolom menggeser tiap total ke bawah label yang salah. Jangan
+  nyalakan di layar persetujuan yang sengaja menampilkan semua kolom sebelum
+  tombol setuju (mis. Payroll Run). Acuan: `piutang-channel-table.tsx`.
+
+- **Pilih baris**: `onSelectedKeysChange` (+ `selectedKeys`,
+  `selectionActions` untuk tombol aksi massal). Kunci = `_id` / `employee_id`
+  / `id`; pilihan dipegang pemanggil sehingga bertahan lintas halaman, dan
+  checkbox kepala hanya memilih baris HALAMAN INI. Jangan merakit kolom
+  `Checkbox` sendiri lewat `render`.
 
 - **Batas atas rentang tanggal**: periksa apakah param BE eksklusif (`*_lt`).
   Kalau ya, kirim tengah malam **hari berikutnya**, atau tanggal terakhir hilang
