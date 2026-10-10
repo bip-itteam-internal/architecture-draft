@@ -56,6 +56,18 @@ Keadaan per sensus produksi 2026-09-14:
 
 **Belum diputuskan (TBD), dan bukan keputusan dok ini:** nama mana yang dipakai. Menyamakan ke `Percetakan` berarti mengubah `DeptPrinting`, entri `deptKeyToNames`, uji attendance yang menolak `"Percetakan"`, dan `kpi_template.department`. Menyamakan ke `Printing` berarti mengganti nama di master dan `work_data` kembali. Keduanya menyentuh data produksi, jadi dijalankan manusia.
 
+## Rename Beauty Hacks menjadi Beautyhacks (direncanakan)
+
+🟡 **Diusulkan 2026-10-10, belum dikerjakan.** Departemen `beauty_hacks` akan berganti nama dari `Beauty Hacks` menjadi `Beautyhacks`, sesuai ejaan dokumen SOP perusahaan. Keputusan dan alasannya ada di [[ADR - 0168 Departemen Beauty Hacks Diganti Nama Jadi Beautyhacks Bertahap, Kedua Nama Diterima selama Transisi]], pecahan kerjanya di [[ANALISA - Ganti Nama Departemen Beauty Hacks Jadi Beautyhacks]].
+
+Cara kerjanya, supaya kelas kegagalan Printing/Percetakan di atas tidak terulang:
+
+1. **Expand**: backend menerima kedua nama untuk satu departemen. Kedua nama dipegang di satu tempat (`deptKeyToNames` dan konstanta transisi).
+2. **Migrate**: skrip dump → dry-run → apply mengganti nilai di seluruh koleksi yang menyimpan nama departemen. Dijalankan manusia di prod.
+3. **Contract**: nama lama dibuang sesudah dry-run ulang menunjukkan nol dokumen dan token lama sudah kedaluwarsa.
+
+Sampai Migrate selesai di prod, nama yang hidup tetap `Beauty Hacks`, dan tabel di atas sengaja belum diubah.
+
 ## Kunci yang terdengar seperti departemen, tapi bukan
 
 | Kunci / label | Apa sebenarnya | Sumber |
@@ -110,4 +122,5 @@ Begitu salah satu departemen di atas mendapat **kategori sidebar, modul, atau te
 - [[HRIS - Matriks KPI per Departemen]]: template KPI per departemen
 - [[CORE - RBAC dan Permission Set]]: peran, izin, dan peta departemen di RBAC
 - [[APP - Web ERP]]: kategori sidebar
+- [[ADR - 0168 Departemen Beauty Hacks Diganti Nama Jadi Beautyhacks Bertahap, Kedua Nama Diterima selama Transisi]]: rename departemen bertahap
 - [[HOMEPAGE]]
