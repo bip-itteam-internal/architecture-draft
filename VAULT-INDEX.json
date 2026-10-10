@@ -2650,22 +2650,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "f432b017185be2e8bab3e5be157f681b881277688686df5dd781436918317b45",
-      "ukuran_kb": 464.4,
-      "ringkasan": "Menjawab: apa saja yang dilakukan integration-service (webhook marketplace TikTok/Shopee/Lazada, laporan iklan TikTok Business/GMV Max, model transaksi terpadu, bridging Sales Invoice/Return ke Accurate), endpoint apa yang tersedia, dan bagaimana ketahanan sync, cron master data, serta ACL toko bekerja. Juga menjawab status tiap bagian (mana yang live, rencana, atau dicabut seperti Desty) dan service lain yang bergantung padanya.",
+      "hash": "63f396b45f2f1edaeabb7b1bfb39989da265647c7ad654796993bef653f0fd3e",
+      "ukuran_kb": 464.8,
+      "ringkasan": "Menjawab: bagaimana Integration Service menghubungkan ERP ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) lewat webhook realtime per platform, menormalkan order dan laporan iklan jadi model transaction terpadu, lalu menjembataninya ke Accurate Online (pembuatan invoice, push Sales Invoice/Sales Return). Juga menjawab: endpoint apa saja yang sudah tersedia per modul (webhooks, credentials & holidays, GMV Max monitoring/overview, ICC video metrics, shop ACL, department shops, review analytics marketplace), bagaimana automasi auto-ship/auto-approve yang sadar hari libur bekerja, serta status ketahanan/observability webhook Shopee dan performa MongoDB di jalur panas.",
       "kata_kunci": [
         "integration service",
         "marketplace",
         "webhook",
-        "TikTok Shop",
-        "Shopee",
-        "Lazada",
-        "Accurate",
+        "Accurate Online",
         "GMV Max",
-        "bridging akuntansi",
-        "Desty",
-        "shop ACL",
-        "sync worker"
+        "TikTok Business Ads",
+        "Shopee",
+        "OAuth kredensial",
+        "auto-ship auto-approve",
+        "ICC insentif"
       ]
     },
     {
