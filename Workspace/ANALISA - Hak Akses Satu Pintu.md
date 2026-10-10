@@ -1,7 +1,5 @@
 # ANALISA - Hak Akses Satu Pintu
 
-> **Menunggu [[ADR - 0164 Hak Akses Satu Pintu, Peran Dibawa Paket Hak dan Dirakit saat Token Terbit]] Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**
-
 - **Keputusan**: [[ADR - 0164 Hak Akses Satu Pintu, Peran Dibawa Paket Hak dan Dirakit saat Token Terbit]] (ðŸŸ¡ Diusulkan, 2026-10-10)
 - **Dok domain**: [[CORE - RBAC dan Permission Set]]
 - **Pemutus**: irfanarfianto

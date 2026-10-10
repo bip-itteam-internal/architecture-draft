@@ -1,6 +1,6 @@
 # ADR - 0167 Izin HRIS Dipecah per Fitur dengan Cadangan Peran per Fitur
 
-> **Status**: 🟡 **Diusulkan**, 2026-10-10. Arah dan empat pilihan bentuknya diputuskan pemilik produk (irfanarfianto) pada tanggal itu; kode belum ada. Persetujuan ADR ditulis di baris ini menurut [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]].
+> **Status**: 🟢 **Diterima**, 2026-10-10, oleh irfanarfianto (diusulkan 2026-10-10). Kode belum ada; pekerjaan di bip-erp#2941 dan sub-issue-nya. Aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]].
 
 ## Untuk Manajemen
 

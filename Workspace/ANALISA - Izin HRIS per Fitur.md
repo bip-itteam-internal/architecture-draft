@@ -1,7 +1,5 @@
 # ANALISA - Izin HRIS per Fitur
 
-> **Menunggu [[ADR - 0167 Izin HRIS Dipecah per Fitur dengan Cadangan Peran per Fitur]] Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**
-
 - **Keputusan**: [[ADR - 0167 Izin HRIS Dipecah per Fitur dengan Cadangan Peran per Fitur]] (ðŸŸ¡ Diusulkan, 2026-10-10)
 - **Dok domain**: [[CORE - RBAC dan Permission Set]]
 - **Pemutus**: irfanarfianto
