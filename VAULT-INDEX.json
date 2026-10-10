@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-10",
-  "jumlah_dokumen": 544,
+  "jumlah_dokumen": 609,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -3765,7 +3765,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "076b1a4fb212adebd3801ec7b3443d492438a6a76da2345516b17d06f0ada9bb",
-      "ukuran_kb": 4.8,
+      "ukuran_kb": 4.9,
       "ringkasan": "Menjawab sumber tanggal yang dipakai untuk membukukan retur TikTok ke Accurate: kenapa update_time menyesatkan (ikut mundur karena settle refund) dan kenapa order_update_date dipilih sebagai gantinya, serta perbaikan zona waktu WIB untuk penomoran dokumen retur (RTR).",
       "kata_kunci": [
         "tanggal retur",
@@ -4494,7 +4494,7 @@
         "RUN - Menambah Metrik KPI Otomatis"
       ],
       "hash": "ddca0201da7959b033620b4d876a8b18d58d146a1dd721bf9d3f6b75c917f3ec",
-      "ukuran_kb": 15.1,
+      "ukuran_kb": 15.2,
       "ringkasan": "Menjawab: bagaimana aset GA di ERP direkonsiliasi terhadap Aktiva Tetap di Accurate untuk menghasilkan skor KPI akurasi input aset staff GA, dan kenapa pencocokannya per-item lewat ceklis manual berbantuan (bukan agregat per-golongan) dengan `accurate_asset_no` disimpan agar periode berikutnya cocok otomatis. Menjelaskan pula kenapa aset yang belum ada di Accurate dihitung 100% (antrean tanggung jawab Finance, bukan GA) sementara Cakupan wajib tampil berdampingan dengan Akurasi, tiga tab modul Aset, penempatan yang menghormati batas service (inventory menyimpan nomor Accurate, feed KPI lewat employee-service), serta bagian mana yang di-supersede ADR-0049.",
       "kata_kunci": [
         "rekonsiliasi aset",
@@ -5661,7 +5661,7 @@
         "External - Accurate"
       ],
       "hash": "140f2789e531f6209bfdfc17bceca336e6f6048522951825a418bd4a22e2da22",
-      "ukuran_kb": 10.4,
+      "ukuran_kb": 10.5,
       "ringkasan": "Menjawab: mengapa opname perlengkapan GA dibuat sebagai perluasan tab Data Accurate (lewat pemilih tipe Aset Tetap/Perlengkapan) alih-alih modul baru, bagaimana perlengkapan dicocokkan per-KUANTITAS (hitung fisik GA vs qty Accurate) bukan per-unit, dan bagaimana skor akurasi opname dihitung untuk KPI staff GA. Menjelaskan juga koleksi ga_opname + endpoint /perlengkapan-opname, penangkapan kategori item Accurate saat sync, serta amandemen 2026-09-02 yang mengubah tab FE dari form opname jadi explorer padanan read-only (BE dibiarkan dormant).",
       "kata_kunci": [
         "opname perlengkapan",
@@ -7761,7 +7761,7 @@
         "APP - Web ERP"
       ],
       "hash": "4d7a4749403407de1c1518929ce4516203c1a8ce866baee74f53c3ffb05ebf09",
-      "ukuran_kb": 25.2,
+      "ukuran_kb": 25.3,
       "ringkasan": "Menjawab: mengapa beban ongkir Shopee di pembukuan bisa tercatat lebih besar daripada yang ditampilkan Shopee (rumus lama menghitung ongkir aktual dua kali lewat final_shipping_fee), dan bagaimana rumus yang benar dihitung — ongkir aktual dikurangi bagian pembeli, ditambah proteksi kirim dan ongkir retur, dengan subsidi Shopee sengaja tidak ikut dikurangkan di rumus ini karena sudah ditangani mekanisme lain. Menjawab juga sejarah penerapannya: tanggal cutover per-order, status deploy, amandemen backfill September yang belum merge, dan amandemen kedua (2026-10-06) untuk instance kedua dari kelas bug yang sama pada premi proteksi pengiriman seller dan order retur penuh.",
       "kata_kunci": [
         "ongkir Shopee",
@@ -8311,7 +8311,7 @@
         "Finance - Proses Retur dan Piutang Marketplace"
       ],
       "hash": "80e288d1aed5fd5b5df5d918351ef6e9f58b21bf3d759eb7df01614f615cf120",
-      "ukuran_kb": 14.1,
+      "ukuran_kb": 14.4,
       "ringkasan": "Menjawab: bagaimana kompensasi logistik TikTok yang turun SETELAH retur pesanan sudah dibukukan di Accurate harus diperlakukan tergantung kondisi fisik barang hasil scan gudang (reject vs reuse/rework), dan kenapa aturannya dijalankan manual dulu (SOP) bukan langsung diotomasi. Menjelaskan populasi terukur (16 dari 458 kompensasi logistik, 8.647 total retur) yang jadi alasan otomasi ditunda, serta bagaimana keputusan ini mengamandemen ADR-0119 (pemisahan kompensasi ke Pendapatan Lain-lain) dan keputusan lama soal retur reject tetap menambah stok WMS, khusus untuk sub-populasi sempit ini.",
       "kata_kunci": [
         "kompensasi logistik",
@@ -8701,7 +8701,7 @@
         "ANALISA - Retur Dibukukan Manual oleh Finance"
       ],
       "hash": "fce74b366cc9ad169118e0b39006fec4011fd11d59108b3457c54d14a763a751",
-      "ukuran_kb": 15.2,
+      "ukuran_kb": 15.3,
       "ringkasan": "Menjawab: bagaimana finance menandai sebuah order bahwa Retur Penjualannya sudah dibukukan manual di Accurate agar Auto-Sync Retur berhenti menyentuhnya, dan mengapa baris SKIPPED lama bisa hidup lagi dan berisiko membukukan retur ganda. Menjelaskan keputusan penanda per order di transaction_orders (terpisah dari invoice_excluded) yang dibaca satu fungsi keputusan returTakDibukukan oleh semua jalur, siapa yang boleh menandai dan mencabut (izin returselisih.tandai), kewajiban alasan dan nomor Retur Penjualan, penolakan bila sistem sudah lebih dulu membukukan, serta konsekuensi dan hal yang sengaja tidak dilakukan.",
       "kata_kunci": [
         "retur",
@@ -8993,7 +8993,7 @@
         "ADR - 0077 Koreksi Faktur via Impor Rekap Lengkap Mengalir ke Master-Data, Bukan Override per Baris"
       ],
       "hash": "f1a8461e95d154a3d4d0d687cadc5c40710b468af65db0a936dbc1a554aad522",
-      "ukuran_kb": 11.9,
+      "ukuran_kb": 12.0,
       "ringkasan": "Menjawab: apa yang harus terjadi pada INC (penerimaan) dan faktur penjualan bila sebuah order ditandai FO (fake order) sesudah uangnya cair, siapa yang menghapus INC yang menjadi kosong, siapa melapor FO, dan keadaan akhir catatan sistem untuk INC yang sudah dihapus finance (ID Accurate dipertahankan, penahan BOOKED_EXTERNALLY). Memuat urutan koreksi INC dulu baru faktur, aturan hasil kaskade yang jujur, dan butir yang masih TBD seperti FO di periode yang sudah ditutup.",
       "kata_kunci": [
         "FO",
@@ -9197,7 +9197,7 @@
         "ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync"
       ],
       "hash": "1db073080ec5afe94a911c1b3e30ac27f163cf761e291c7233401c1784d5baa1",
-      "ukuran_kb": 18.6,
+      "ukuran_kb": 18.8,
       "ringkasan": "Menjawab: mengapa retur bisa tercatat dua kali di gudang dan membuat stok WMS berbeda dari pembukuan Accurate, berdasarkan insiden 2026-10-07 dan pengukuran produksi (simpan ganda, jumlah kurang, komponen paket tak discan, SKU di luar klaim). Juga menjawab apa saja pagar yang diputuskan (D1-D5: kunci Simpan dan idempotensi, konfirmasi saat kurang, batas kumulatif per order-SKU di server, jumlah kumulatif ke pembukuan, form hanya menawarkan sisa), mengapa jalur koreksi (D6) lewat Proposal ditunda, dan apa yang belum diputuskan.",
       "kata_kunci": [
         "ADR 0158",
@@ -9328,7 +9328,7 @@
         "IT - Background Jobs & Schedulers"
       ],
       "hash": "8f5a1affcd7d37866001c651e7495d96b69751b424269d87b3f7896cacf438ef",
-      "ukuran_kb": 10.0,
+      "ukuran_kb": 10.1,
       "ringkasan": "Menjawab: kenapa receipt Lazada di Accurate kini memakai payout (uang yang benar-benar cair) dan bukan hitungan per-order, bagaimana selisih ditandai di layar INC, dan ke akun mana selisih yang jenis biayanya belum terbaca dibukukan sementara. Juga menjawab ambang tanda selisih (Rp0,5), perlakuan receipt lama yang sudah terkirim, dan pemetaan akun COA per jenis biaya Lazada.",
       "kata_kunci": [
         "receipt Lazada",
@@ -9537,7 +9537,7 @@
         "Sales - Marketplace Integration"
       ],
       "hash": "ee317d4d8664cf3c5227bcf8d3d018f9648ff0b9fdc9228e35cc31d4144a5c89",
-      "ukuran_kb": 15.9,
+      "ukuran_kb": 16.3,
       "ringkasan": "Menjawab endpoint dan alur kerja Finance Bridging versi Golang (penulisan ulang dari sistem Java): bagaimana membuat dan mengirim ringkasan transaksi Sales/Income/Return ke Accurate, halaman FE terkait per channel, status ringkasan, serta setting toko dan mapping produk.",
       "kata_kunci": [
         "Finance Bridging Golang",
@@ -9564,7 +9564,7 @@
         "Finance - Incentive"
       ],
       "hash": "8a3dba53269a5104fd1106064d8ed8159f96a7207b2c5a97ffc4a66f7a399504",
-      "ukuran_kb": 19.5,
+      "ukuran_kb": 19.6,
       "ringkasan": "Menjawab fitur dan struktur sistem Finance lama (Java/PostgreSQL/ReactJS) sebagai jembatan antara Accurate dan marketplace: master data, upload Excel per platform (TikTok/Shopee/Lazada/Tokopedia/KiriminAja), sinkronisasi ke Accurate, dan lokasi repositori kodenya.",
       "kata_kunci": [
         "Finance Bridging lama",
@@ -10614,6 +10614,276 @@
       ]
     },
     {
+      "path": "Finance System/Finance - SOP Posisi Accounting Staf.md",
+      "judul": "Finance - SOP Posisi Accounting Staf",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "c69878aa3a82de9659b753acf788ac70ea0ba75fda6f39520cc12b075659716b",
+      "ukuran_kb": 4.5,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Accounting Staf (unit Finance) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 1 dokumen: Input Transaksi Operasional di Sistem Keuangan. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Accounting Staf",
+        "Accounting Staf",
+        "prosedur kerja",
+        "finance",
+        "keuangan",
+        "input",
+        "operasional",
+        "sistem",
+        "transaksi"
+      ]
+    },
+    {
+      "path": "Finance System/Finance - SOP Posisi Admin Sales.md",
+      "judul": "Finance - SOP Posisi Admin Sales",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "4f1b646cdb8b23551736beae037cc2495c62baf9f034b28d78b903dc1df58190",
+      "ukuran_kb": 5.3,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Admin Sales (unit Finance) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 1 dokumen: Input Data Penjualan di Sistem. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Admin Sales",
+        "Admin Sales",
+        "prosedur kerja",
+        "finance",
+        "keuangan",
+        "data",
+        "input",
+        "penjualan",
+        "sistem"
+      ]
+    },
+    {
+      "path": "Finance System/Finance - SOP Posisi AR Leader.md",
+      "judul": "Finance - SOP Posisi AR Leader",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "edcd889c5c588ed399b492882e332595c4fc6c8b66e8189ae4108319daf5de5f",
+      "ukuran_kb": 6.1,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi AR Leader (unit Finance) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 2 dokumen: Rekonsiliasi Piutang; Penagihan & Penerimaan Pembayaran. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP AR Leader",
+        "AR Leader",
+        "prosedur kerja",
+        "finance",
+        "keuangan",
+        "pembayaran",
+        "penagihan",
+        "penerimaan",
+        "piutang"
+      ]
+    },
+    {
+      "path": "Finance System/Finance - SOP Posisi AR Staf.md",
+      "judul": "Finance - SOP Posisi AR Staf",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "6822f9230dbf5f48e78a1dd60cef75fbb11e5d602a40737e273ef83309a545f3",
+      "ukuran_kb": 7.9,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi AR Staf (unit Finance) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 3 dokumen: Rekonsiliasi Piutang; Penagihan & Penerimaan Pembayaran; Penagihan & Penerimaan Retur. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP AR Staf",
+        "AR Staf",
+        "prosedur kerja",
+        "finance",
+        "keuangan",
+        "penagihan",
+        "penerimaan",
+        "pembayaran",
+        "piutang"
+      ]
+    },
+    {
+      "path": "Finance System/Finance - SOP Posisi Cost Control.md",
+      "judul": "Finance - SOP Posisi Cost Control",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "63c1e71ce93cf6eed2622996caba3e63bd5984d6171096def2701127b7de40cd",
+      "ukuran_kb": 19.6,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Cost Control (unit Finance) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 5 dokumen: Pengendalian & Pemantauan Biaya; Penyusunan & Evaluasi Anggaran; Verifikasi & Persetujuan Pengeluaran; Kontrol Anggaran; Top Up Kas Iklan Marketing. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Cost Control",
+        "Cost Control",
+        "prosedur kerja",
+        "finance",
+        "keuangan",
+        "anggaran",
+        "biaya",
+        "evaluasi",
+        "iklan"
+      ]
+    },
+    {
+      "path": "Finance System/Finance - SOP Posisi Finance AP.md",
+      "judul": "Finance - SOP Posisi Finance AP",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "50c9d91ef7fcb97651bed37a13adafdc5837b51234453b7b835297a0628ee014",
+      "ukuran_kb": 25.6,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Finance AP (unit Finance) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 7 dokumen: Pengelolaan Kas & Bank; Pengelolaan Bukti Transaksi & Arsip Keuangan; Verifikasi Dokumen Pembayaran; Pembayaran Utang Usaha; Rekonsiliasi Utang Dagang & Laporan Keuangan; Pengelolaan Arsip & Dokumentasi Pembayaran; Input Transaksi Account Payable di Sistem Keuangan. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Finance AP",
+        "Finance AP",
+        "prosedur kerja",
+        "finance",
+        "keuangan",
+        "pembayaran",
+        "pengelolaan",
+        "arsip",
+        "transaksi"
+      ]
+    },
+    {
+      "path": "Finance System/Finance - SOP Posisi Junior Accounting.md",
+      "judul": "Finance - SOP Posisi Junior Accounting",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "2f929ff007b480ea67a8c06b3359cb7a1f17da0773709354923d4edf69cba782",
+      "ukuran_kb": 17.1,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Junior Accounting (unit Finance) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 5 dokumen: Proses Verifikasi Dokumen Keuangan; Input Transaksi Keuangan; Input Transaksi Kas Keluar; Input Transaksi Kas Masuk; Input Transaksi Material Non Keuangan. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Junior Accounting",
+        "Junior Accounting",
+        "prosedur kerja",
+        "finance",
+        "keuangan",
+        "input",
+        "transaksi",
+        "kas",
+        "dokumen"
+      ]
+    },
+    {
+      "path": "Finance System/Finance - SOP Posisi Senior Accounting.md",
+      "judul": "Finance - SOP Posisi Senior Accounting",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "3c08f6ea9e791b602ae783a90a9111cb6962891b9519c8780a8fd8492ce903cc",
+      "ukuran_kb": 13.5,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Senior Accounting (unit Finance) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 4 dokumen: Rekonsiliasi Kas Bank; Inventarisasi Aset Tetap; Memproses Akhir Bulan pada Sistem Akuntansi; Membuat Laporan Keuangan & Analisis. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Senior Accounting",
+        "Senior Accounting",
+        "prosedur kerja",
+        "finance",
+        "keuangan",
+        "akhir",
+        "akuntansi",
+        "analisis",
+        "aset"
+      ]
+    },
+    {
+      "path": "Finance System/Finance - SOP Posisi Supervisor FAT.md",
+      "judul": "Finance - SOP Posisi Supervisor FAT",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "b95c56d023fe7253e0f384d708bcfd5f30b2b162644f3a2e83e27a8373d952c9",
+      "ukuran_kb": 22.5,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Supervisor FAT (unit Finance) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 6 dokumen: Pengendalian Internal & Audit; Perencanaan Umum Keuangan; Pembuatan & Pelaporan Keuangan; Pengelolaan Kas, Utang & Piutang; Audit Internal Keuangan; Audit Internal & Tindak Lanjut Temuan Audit. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Supervisor FAT",
+        "Supervisor FAT",
+        "prosedur kerja",
+        "finance",
+        "keuangan",
+        "audit",
+        "internal",
+        "kas",
+        "lanjut"
+      ]
+    },
+    {
+      "path": "Finance System/Finance - SOP Posisi Tax Officer.md",
+      "judul": "Finance - SOP Posisi Tax Officer",
+      "area": "Finance System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "d7c6653e3321dab5012b54b4292c0cad9b066e1e1ed198c3ed168fa7d20acd90",
+      "ukuran_kb": 81.2,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Tax Officer (unit Finance) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 24 dokumen: Pajak & Kepatuhan; Pengelolaan Dokumen & Arsip Pajak; Perhitungan,Pembayaran & Pelaporan Pajak; Perencanaan Pajak; Audit Pajak Internal; Perhitungan PPh; Perhitungan PPN; Perhitungan PPN Masa; Perhitungan Pajak Penghasilan(PPh) 21; Perhitungan Pajak Penghasilan(PPh) 23; Perhitungan Pajak Penghasilan(PPh) Pasal 4 Ayat 2; Pembuatan Kode Billing PPN Kurang Bayar; Pembuatan Kode Billing PPh 21; Pembuatan Kode Billing PPh 23; Pembuatan Kode Billing PPh Pasal 4 Ayat 2; Pelaporan PPN Masa; Pelaporan PPh Pasal 21; Pelaporan PPh Pasal 23; Pelaporan PPh Pasal 4 Ayat 2; PPh Final UMKM; Pembuatan Kode Billing PPh Final UMKM; SPT Tahunan Badan (Formulir 1771); Pembuatan Kode Billing PPh Unifikasi; Pelaporan PPh Unifikasi. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Tax Officer",
+        "Tax Officer",
+        "prosedur kerja",
+        "finance",
+        "keuangan",
+        "pph",
+        "pajak",
+        "perhitungan",
+        "billing"
+      ]
+    },
+    {
       "path": "General Affairs/GA - Accident Prevention.md",
       "judul": "GA - Accident Prevention",
       "area": "General Affairs",
@@ -11120,6 +11390,169 @@
         "shift",
         "jobdesk",
         "KPI Security"
+      ]
+    },
+    {
+      "path": "General Affairs/GA - SOP Posisi Admin General Service.md",
+      "judul": "GA - SOP Posisi Admin General Service",
+      "area": "General Affairs",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "3b13f51cb1abc3a54d59cc9ea3dc46e29aaeba1b900d9035da4282ce7ea37879",
+      "ukuran_kb": 25.7,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Admin General Service (unit HRGA, GA) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 6 dokumen: Pengadaan Barang & Jasa; Pembayaran; Pengadaan ATK & Kebutuhan Operasional; Pengelolaan Pengeluaran Operasional GA; Penggunaan Ruang Meeting & Training; Perjalanan Dinas & Akomodasi. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Admin General Service",
+        "Admin General Service",
+        "prosedur kerja",
+        "general affair",
+        "GA",
+        "operasional",
+        "pengadaan",
+        "akomodasi",
+        "atk"
+      ]
+    },
+    {
+      "path": "General Affairs/GA - SOP Posisi Building & Maintenance.md",
+      "judul": "GA - SOP Posisi Building & Maintenance",
+      "area": "General Affairs",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "426a9430a056842e5a07986773f25541d56bf81f77307738ef763b1b16ca3c21",
+      "ukuran_kb": 14.1,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Building & Maintenance (unit HRGA, GA) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 3 dokumen: Preventive Maintenance; Corrective Maintenance; Perawatan AC & Ventilasi. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Building & Maintenance",
+        "Building & Maintenance",
+        "prosedur kerja",
+        "general affair",
+        "GA",
+        "corrective",
+        "perawatan",
+        "preventive",
+        "ventilasi"
+      ]
+    },
+    {
+      "path": "General Affairs/GA - SOP Posisi General Affair.md",
+      "judul": "GA - SOP Posisi General Affair",
+      "area": "General Affairs",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "64b941d127567cfa97b382792b605db53bd46f10f0bfc3aadc318795c1d373e3",
+      "ukuran_kb": 14.4,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi General Affair (unit HRGA, GA) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 4 dokumen: Pemeliharaan Aset; Pemeliharaan Aset Office; Pemeliharaan Aset Manufaktur; Pemeliharaan Aset Gudang. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP General Affair",
+        "General Affair",
+        "prosedur kerja",
+        "GA",
+        "aset",
+        "pemeliharaan",
+        "gudang",
+        "manufaktur",
+        "office"
+      ]
+    },
+    {
+      "path": "General Affairs/GA - SOP Posisi OB-OG.md",
+      "judul": "GA - SOP Posisi OB-OG",
+      "area": "General Affairs",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "4afbaf100cb0a8b4e30340748b5a02a93dd7710affecd91d4b31c2ed10f5bd1e",
+      "ukuran_kb": 18.5,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi OB-OG (unit HRGA, GA) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 5 dokumen: Pemeliharaan & Kebersihan Kantor; Pelayanan Tamu & Rapat; Pengelolaan Sampah & Kebersihan Lingkungan; Pengiriman Paket & Dokumen; Membersihkan Kaca Ruangan. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP OB-OG",
+        "OB-OG",
+        "prosedur kerja",
+        "general affair",
+        "GA",
+        "kebersihan",
+        "dokumen",
+        "kaca",
+        "kantor"
+      ]
+    },
+    {
+      "path": "General Affairs/GA - SOP Posisi Procurement.md",
+      "judul": "GA - SOP Posisi Procurement",
+      "area": "General Affairs",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi",
+        "GA - SOP Procurement"
+      ],
+      "hash": "75e4b3c6110e8441e50ea7b2826862d2c8bd098d463368559fe0da1918f81d1d",
+      "ukuran_kb": 64.8,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Procurement (unit Procurement) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 11 dokumen: Perencanaan Kebutuhan Pengadaan; Permintaan Pembelian(Purchase Requisition); Seleksi & Registrasi Vendor; Permintaan Penawaran Harga; Penerbitan Purchase Order(PO); Monitoring Pengiriman Barang; Evaluasi Kinerja Vendor; Cost Saving Procurement; Penyusunan Laporan Procurement; ALUR BISNIS PROSES PROCUREMENT; PROSES PROCUREMENT. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Procurement",
+        "Procurement",
+        "prosedur kerja",
+        "general affair",
+        "GA",
+        "permintaan",
+        "purchase",
+        "vendor",
+        "alur"
+      ]
+    },
+    {
+      "path": "General Affairs/GA - SOP Posisi Security.md",
+      "judul": "GA - SOP Posisi Security",
+      "area": "General Affairs",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "93dc01ad3b01e58bd836a8b6523f6d267dcbeee0f42030c0f9d00391e7c7caa0",
+      "ukuran_kb": 26.4,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Security (unit HRGA, GA) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 7 dokumen: Patroli Keamanan & Pengawasan Aset; Pemeriksaan Barang Masuk & Keluar; Keamanan & Ketertiban Kendaraan; Kontrol Akses & Pengawasan Karyawan Tamu; Penanganan Pelanggaran & Keamanan; Pengelolaan Sistem Keamanan; Tindakan Preventif Keamanan. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Security",
+        "Security",
+        "prosedur kerja",
+        "general affair",
+        "GA",
+        "keamanan",
+        "pengawasan",
+        "akses",
+        "aset"
       ]
     },
     {
@@ -12897,6 +13330,141 @@
       ]
     },
     {
+      "path": "Human Resource Information System/HRIS - SOP Posisi Organizational Development.md",
+      "judul": "HRIS - SOP Posisi Organizational Development",
+      "area": "Human Resource Information System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "4fd519e740f3dbee11628bb13a176b672d52a3bf1cdc537f8a1ba30500cddac0",
+      "ukuran_kb": 30.7,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Organizational Development (unit HRGA, HRD) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 6 dokumen: Struktur Organisasi; KPI Management; Perfomance Management; Culture Development; Employee Engagement; Continous Improvement. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Organizational Development",
+        "Organizational Development",
+        "prosedur kerja",
+        "HR",
+        "SDM",
+        "management",
+        "continous",
+        "culture",
+        "employee"
+      ]
+    },
+    {
+      "path": "Human Resource Information System/HRIS - SOP Posisi Personalia.md",
+      "judul": "HRIS - SOP Posisi Personalia",
+      "area": "Human Resource Information System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "b7b628e87be16aba95fb602729d0169028bae3796c32e638a6a3165ecc753f52",
+      "ukuran_kb": 34.8,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Personalia (unit HRGA, HRD) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 7 dokumen: Administrasi Data Karyawan; Absensi dan Cuti; Kontrak Kerja; Payroll; BPJS & Benefit; Disiplin Kerja; Perjalanan Dinas & Akomodasi. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Personalia",
+        "Personalia",
+        "prosedur kerja",
+        "HR",
+        "SDM",
+        "kerja",
+        "absensi",
+        "administrasi",
+        "akomodasi"
+      ]
+    },
+    {
+      "path": "Human Resource Information System/HRIS - SOP Posisi Recruitment.md",
+      "judul": "HRIS - SOP Posisi Recruitment",
+      "area": "Human Resource Information System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "d435699e14f33543a84c9934dcbf333b25660868dc34a315b5ec782a79200538",
+      "ukuran_kb": 27.3,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Recruitment (unit HRGA, HRD) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 6 dokumen: Permintaan Karyawan Baru; Publikasi Lowongan Kerja; Screening Kandidat; Interview dan Test; Offering dan Hiring; Onboarding Karyawan Baru. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Recruitment",
+        "Recruitment",
+        "prosedur kerja",
+        "HR",
+        "SDM",
+        "baru",
+        "karyawan",
+        "hiring",
+        "interview"
+      ]
+    },
+    {
+      "path": "Human Resource Information System/HRIS - SOP Posisi Supervisor HRGA.md",
+      "judul": "HRIS - SOP Posisi Supervisor HRGA",
+      "area": "Human Resource Information System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "f9c0b1fa584e182099ba7eb93bd598575f91f9c2740f32c5bd760cb043ccd067",
+      "ukuran_kb": 39.3,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Supervisor HRGA (unit HRGA) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 10 dokumen: Penyusunan Rencana Kerja dan Anggaran Tahunan HRGA; Mengontrol Pencapaian KPI Staf HRGA; Career Planning & Pengembangan Karyawan; Memastikan Ketepatan Administrasi HR; Disiplin Kerja & Pemberian Sanksi; Evaluasi Kinerja Tim HRGA; Analisa Biaya Penyediaan dan Perawatan Fasilitas Kantor; Membuat Rencana dan Mengawasi Pelaksanaan Pembangunan Gedung; Koodinasi, Pengawasan dan Evaluasi Tim Security; Koordinasi, Pengawasan & Evaluasi Tim Kebersihan. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Supervisor HRGA",
+        "Supervisor HRGA",
+        "prosedur kerja",
+        "HR",
+        "SDM",
+        "evaluasi",
+        "tim",
+        "kerja",
+        "pengawasan"
+      ]
+    },
+    {
+      "path": "Human Resource Information System/HRIS - SOP Posisi Training Development.md",
+      "judul": "HRIS - SOP Posisi Training Development",
+      "area": "Human Resource Information System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "ee28289a6c24b83683a3844e3ff562d15d682dc240edfb7501cd10920c1e0a16",
+      "ukuran_kb": 25.1,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Training Development (unit HRGA, HRD) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 5 dokumen: Training Need Analysis; Annual Training Plan; Pelaksanaan Training; Evaluasi Training; Development Program. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Training Development",
+        "Training Development",
+        "prosedur kerja",
+        "HR",
+        "SDM",
+        "analysis",
+        "annual",
+        "evaluasi",
+        "need"
+      ]
+    },
+    {
       "path": "Human Resource Information System/HRIS - Training Program.md",
       "judul": "HRIS - Training Program",
       "area": "Human Resource Information System",
@@ -13723,6 +14291,33 @@
       ]
     },
     {
+      "path": "IT/IT - SOP Posisi Tech Development.md",
+      "judul": "IT - SOP Posisi Tech Development",
+      "area": "IT",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": false,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "a29af4b9632dc31076f6a6fc2dadd21512eda879836754bf11bdac33a40b412c",
+      "ukuran_kb": 60.7,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Tech Development (unit Tech Development) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 16 dokumen: Development Modul ERP; Testing Modul ERP; Deployment Modul ERP; Delivery Modul ERP; Bug Fixing; Perbaikan Laptop; Perbaikan Printer; Troubleshooting Jaringan Internet; Sistem Down; Server Down; E-Ticket Permintaan Pengembangan Software; Pemberian Akses Saat Onboarding Karyawan; Pencabutan Akses Saat Resign Karyawan; Berita Acara Pemberian Akses Karyawan Baru; Berita Acara Pencabutan Akses Karyawan; Template Blueprint Flowchart. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Tech Development",
+        "Tech Development",
+        "prosedur kerja",
+        "IT",
+        "akses",
+        "erp",
+        "karyawan",
+        "modul",
+        "acara"
+      ]
+    },
+    {
       "path": "Logs/LOG - 2026-07-30 Audit Otorisasi Employee Service.md",
       "judul": "LOG - 2026-07-30 Audit Otorisasi Employee Service",
       "area": "Logs",
@@ -14211,6 +14806,114 @@
       ]
     },
     {
+      "path": "Manufacture/Manufacture - SOP Posisi Admin Produksi.md",
+      "judul": "Manufacture - SOP Posisi Admin Produksi",
+      "area": "Manufacture",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "8ea8dca4e3f94cc221bf28ab8ea3b35dd242ced6997c72e5c1fe6c1215b6cf79",
+      "ukuran_kb": 10.1,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Admin Produksi (unit Manufacture, Produksi) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 2 dokumen: Input & Verifikasi Data Produksi; Pelaporan Produksi. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Admin Produksi",
+        "Admin Produksi",
+        "prosedur kerja",
+        "manufacture",
+        "produksi",
+        "data",
+        "input",
+        "pelaporan",
+        "verifikasi"
+      ]
+    },
+    {
+      "path": "Manufacture/Manufacture - SOP Posisi Leader Produksi.md",
+      "judul": "Manufacture - SOP Posisi Leader Produksi",
+      "area": "Manufacture",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "0f76f4efd37f6e9597903b8985d50b7a62682e05dfc9d10533f13aa1db342f9e",
+      "ukuran_kb": 11.1,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Leader Produksi (unit Manufacture, Produksi) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 3 dokumen: Membuat Laporan Hasil Inspeksi & Rekomendasi Perbaikan; Perawatan & Perbaikan Mesin Produksi; Mengidentifikasi & Menangani Kerusakan Pada Mesin. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Leader Produksi",
+        "Leader Produksi",
+        "prosedur kerja",
+        "manufacture",
+        "produksi",
+        "mesin",
+        "perbaikan",
+        "hasil",
+        "inspeksi"
+      ]
+    },
+    {
+      "path": "Manufacture/Manufacture - SOP Posisi Operator Produksi.md",
+      "judul": "Manufacture - SOP Posisi Operator Produksi",
+      "area": "Manufacture",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "5b85bd99a4738b29a22e7abffd98280dd8d026396a3a95ec23a3936e0c505212",
+      "ukuran_kb": 8.2,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Operator Produksi (unit Manufacture, Produksi) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 2 dokumen: Memastikan Mesin Beroperasi Dengan Optimal & Aman; Melaporkan Kondisi Mesin Kepada Leader Produksi. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Operator Produksi",
+        "Operator Produksi",
+        "prosedur kerja",
+        "manufacture",
+        "produksi",
+        "mesin",
+        "aman",
+        "beroperasi",
+        "kondisi"
+      ]
+    },
+    {
+      "path": "Manufacture/Manufacture - SOP Posisi PPIC.md",
+      "judul": "Manufacture - SOP Posisi PPIC",
+      "area": "Manufacture",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "a50f9f09017ad5edc357813f1a163feba14952be1bd946c94a23c86be3435442",
+      "ukuran_kb": 45.0,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi PPIC (unit Manufacture) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 7 dokumen: Perencanaan Produksi; Material Requirement Planning(MRP); Pengendalian Persediaan Fifo & Fefo; Capacity Planning Produksi; Monitoring & Pengendalian Produksi; Pelaporan Produksi dan Persediaan; Pengendalian Dokumen PPIC. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP PPIC",
+        "PPIC",
+        "prosedur kerja",
+        "manufacture",
+        "produksi",
+        "pengendalian",
+        "persediaan",
+        "planning",
+        "capacity"
+      ]
+    },
+    {
       "path": "Manufacture/Manufacture - Stock & Material Management.md",
       "judul": "Manufacture - Stock & Material Management",
       "area": "Manufacture",
@@ -14595,6 +15298,112 @@
         "dispute",
         "advis hukum",
         "kedaluwarsa izin"
+      ]
+    },
+    {
+      "path": "Quality & Regulatory/QA - SOP Posisi Quality Control.md",
+      "judul": "QA - SOP Posisi Quality Control",
+      "area": "Quality & Regulatory",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "fd9442c447879c051f01b720d13e41c3a99b502d3650920815fb4812d2e56fe6",
+      "ukuran_kb": 23.3,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Quality Control (unit Quality) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 4 dokumen: PENGAMBILAN SAMPEL; PENGAWASAN dan PENGUJIAN PRODUKSI; PENGUJIAN BAHAN BAKU DAN BAHAN KEMAS; SAMPEL PERTINGGAL. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Quality Control",
+        "Quality Control",
+        "prosedur kerja",
+        "quality",
+        "mutu",
+        "pengujian",
+        "sampel",
+        "bahan",
+        "baku"
+      ]
+    },
+    {
+      "path": "Quality & Regulatory/QA - SOP Posisi Quality Teknologi Pangan.md",
+      "judul": "QA - SOP Posisi Quality Teknologi Pangan",
+      "area": "Quality & Regulatory",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "48507dea0414e985dfc15b2f27e48e65874c8834e8e09a4b9fb5e8e72ffc2737",
+      "ukuran_kb": 25.5,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Quality Teknologi Pangan (unit Quality) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 3 dokumen: INSPEKSI DIRI; LAMPIRAN INSPEKSI DIRI; LAMPIRAN PENGENDALIAN PERUBAHAN. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Quality Teknologi Pangan",
+        "Quality Teknologi Pangan",
+        "prosedur kerja",
+        "quality",
+        "mutu",
+        "diri",
+        "inspeksi",
+        "lampiran",
+        "pengendalian"
+      ]
+    },
+    {
+      "path": "Quality & Regulatory/QA - SOP Posisi R&D Apoteker.md",
+      "judul": "QA - SOP Posisi R&D Apoteker",
+      "area": "Quality & Regulatory",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "bc665d335a8e4f3a756590ad069f05a31e1fa871064dae29b0906846d1bf0b08",
+      "ukuran_kb": 21.3,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi R&D Apoteker (unit Kesekretariatan) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 3 dokumen: REGISTRASI PRODUK; PENGEMBANGAN PRODUK; EVALUASI PERUBAHAN BAHAN BAKU, SUPPLIER DAN FORMULA PRODUK. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP R&D Apoteker",
+        "R&D Apoteker",
+        "prosedur kerja",
+        "quality",
+        "mutu",
+        "produk",
+        "bahan",
+        "baku",
+        "evaluasi"
+      ]
+    },
+    {
+      "path": "Quality & Regulatory/QA - SOP Posisi Supervisor Quality.md",
+      "judul": "QA - SOP Posisi Supervisor Quality",
+      "area": "Quality & Regulatory",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "71d57d14d626cc6d0066f79275d0e83c020ffa2239b878fe80d18b49004951b5",
+      "ukuran_kb": 6.7,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Supervisor Quality (unit Quality) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 1 dokumen: Pembuatan Protap. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Supervisor Quality",
+        "Supervisor Quality",
+        "prosedur kerja",
+        "quality",
+        "mutu",
+        "pembuatan",
+        "protap"
       ]
     },
     {
@@ -15281,6 +16090,100 @@
       ]
     },
     {
+      "path": "Reference/REF - SOP Bharata 2026 per Posisi.md",
+      "judul": "REF - SOP Bharata 2026 per Posisi",
+      "area": "Reference",
+      "jenis": "reference",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap tiap SOP belum dipetakan (TBD), kecuali Procurement di [[GA - SOP Procurement]].",
+      "publik": true,
+      "tautan": [
+        "GA - SOP Procurement",
+        "Sales - SOP Posisi Supervisor Beautyhacks",
+        "Sales - SOP Posisi Leader Beautyhacks",
+        "Sales - SOP Posisi Advertiser Meta Beautyhacks",
+        "Sales - SOP Posisi Marketplace Beautyhacks",
+        "Sales - SOP Posisi Shopee Beautyhacks",
+        "Sales - SOP Posisi Affiliate Beautyhacks",
+        "Sales - SOP Posisi Buzzer Beautyhacks",
+        "Sales - SOP Posisi CS Marketplace Support Beautyhacks",
+        "Sales - SOP Posisi CS Meta Beautyhacks",
+        "Sales - SOP Posisi Host Live Beautyhacks",
+        "Sales - SOP Posisi Internal Content Creator Beautyhacks",
+        "Sales - SOP Posisi Supervisor Kyura",
+        "Sales - SOP Posisi Leader Advertiser TikTok Kyura",
+        "Sales - SOP Posisi Advertiser Meta Kyura",
+        "Sales - SOP Posisi Advertiser Shopee Kyura",
+        "Sales - SOP Posisi Buzzer Kyura",
+        "Sales - SOP Posisi CS Marketplace Kyura",
+        "Sales - SOP Posisi Host Live Kyura",
+        "Sales - SOP Posisi Host Live Glowbooster",
+        "Sales - SOP Posisi Internal Content Creator Kyura",
+        "Sales - SOP Posisi CRM",
+        "Finance - SOP Posisi Supervisor FAT",
+        "Finance - SOP Posisi Senior Accounting",
+        "Finance - SOP Posisi Junior Accounting",
+        "Finance - SOP Posisi Accounting Staf",
+        "Finance - SOP Posisi Finance AP",
+        "Finance - SOP Posisi AR Leader",
+        "Finance - SOP Posisi AR Staf",
+        "Finance - SOP Posisi Admin Sales",
+        "Finance - SOP Posisi Cost Control",
+        "Finance - SOP Posisi Tax Officer",
+        "HRIS - SOP Posisi Supervisor HRGA",
+        "HRIS - SOP Posisi Recruitment",
+        "HRIS - SOP Posisi Personalia",
+        "HRIS - SOP Posisi Training Development",
+        "HRIS - SOP Posisi Organizational Development",
+        "GA - SOP Posisi General Affair",
+        "GA - SOP Posisi Admin General Service",
+        "GA - SOP Posisi Building & Maintenance",
+        "GA - SOP Posisi Security",
+        "GA - SOP Posisi OB-OG",
+        "GA - SOP Posisi Procurement",
+        "Unlisted - SOP Posisi Asisten Eksekutif Internal",
+        "Unlisted - SOP Posisi Internal Control",
+        "Unlisted - SOP Posisi Legal",
+        "Unlisted - SOP Posisi Company Branding",
+        "Unlisted - SOP Posisi Graphic Designer",
+        "Unlisted - SOP Posisi Video Editor",
+        "Unlisted - SOP Posisi Videographer",
+        "QA - SOP Posisi R&D Apoteker",
+        "QA - SOP Posisi Supervisor Quality",
+        "QA - SOP Posisi Quality Control",
+        "QA - SOP Posisi Quality Teknologi Pangan",
+        "Manufacture - SOP Posisi PPIC",
+        "Manufacture - SOP Posisi Leader Produksi",
+        "Manufacture - SOP Posisi Admin Produksi",
+        "Manufacture - SOP Posisi Operator Produksi",
+        "WH - SOP Posisi Leader Warehouse",
+        "WH - SOP Posisi Admin Warehouse",
+        "WH - SOP Posisi Staf Warehouse",
+        "WH - SOP Posisi Leader Warehouse Packing",
+        "WH - SOP Posisi Admin Warehouse Packing",
+        "WH - SOP Posisi Helper Packing",
+        "IT - SOP Posisi Tech Development",
+        "HRIS - Kepatuhan Peraturan Perusahaan",
+        "REF - PRD ERP",
+        "REF - Kepemilikan Data"
+      ],
+      "hash": "145988d20bd2378cf41eb4a215d4ae63801886a6b181555767a3c2eddc7a1c56",
+      "ukuran_kb": 14.5,
+      "ringkasan": "Menjawab: posisi mana saja yang punya SOP resmi di kumpulan SOP BHARATA 2026, dok vault mana yang memuat salinannya, berapa dokumen per posisi, dan siapa (jabatan) penyusunnya. Menjelaskan juga apa yang sengaja tidak disalin (kontrak kerja per karyawan, templat slip gaji, gambar flowchart) dan memuat Form Inspeksi Implementasi SOP lintas departemen. Pintu masuk sebelum merancang fitur ERP yang menyentuh pekerjaan suatu posisi.",
+      "kata_kunci": [
+        "SOP",
+        "standar operasional prosedur",
+        "SOP per posisi",
+        "peta SOP",
+        "SOP BHARATA 2026",
+        "inspeksi implementasi SOP",
+        "jobdesk",
+        "prosedur kerja",
+        "posisi",
+        "jabatan"
+      ]
+    },
+    {
       "path": "ROADMAP.md",
       "judul": "ROADMAP",
       "area": "root",
@@ -15754,7 +16657,7 @@
         "APP - Web ERP"
       ],
       "hash": "0115ceffe21b522769faac6e9286fe16c1737ff46d15d0f58ff2e9333c9cd7f0",
-      "ukuran_kb": 14.0,
+      "ukuran_kb": 14.2,
       "ringkasan": "Menjawab: bagaimana menerbitkan akun ERP untuk vendor, mitra, atau kontraktor tanpa menjadikannya karyawan, lalu memberinya akses ke modul tertentu. Menjelaskan cara memilih antara dua sumbu hak akses yang paling sering tertukar (Paket Hak vs Role Modul), cara memperpanjang dan menutup akses beserta batasnya, serta gejala umum saat vendor sudah dibuat tapi tetap tak bisa masuk.",
       "kata_kunci": [
         "akun eksternal",
@@ -16689,6 +17592,569 @@
       ]
     },
     {
+      "path": "Sales/Sales - SOP Posisi Advertiser Meta Beautyhacks.md",
+      "judul": "Sales - SOP Posisi Advertiser Meta Beautyhacks",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "dfecb63d40c2d96d642a2a9c0d24429ba11f3ac0dd271fa85c5759f6d2cc3650",
+      "ukuran_kb": 6.1,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Advertiser Meta Beautyhacks (unit Marketing Beautyhacks) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 2 dokumen: Perencanaan & Pelaksanaan Iklan; Monitoring & Optimasi Iklan. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Advertiser Meta Beautyhacks",
+        "Advertiser Meta Beautyhacks",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "iklan",
+        "monitoring",
+        "optimasi",
+        "pelaksanaan"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi Advertiser Meta Kyura.md",
+      "judul": "Sales - SOP Posisi Advertiser Meta Kyura",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "3b59cd8eea375c80c302343b9e9cb49c5fc478809067d0b17c7d06225ac8c45a",
+      "ukuran_kb": 11.5,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Advertiser Meta Kyura (unit Marketing Kyura) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 4 dokumen: Alur Kerja Internal Content Creator; Analisis Pasar & Trend; Perencanaan & Pelaksanaan Iklan; Monitoring & Optimasi Iklan. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Advertiser Meta Kyura",
+        "Advertiser Meta Kyura",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "iklan",
+        "alur",
+        "analisis",
+        "content"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi Advertiser Shopee Kyura.md",
+      "judul": "Sales - SOP Posisi Advertiser Shopee Kyura",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "36a9c1f0a1b285bb47efe234c3edfeb7b0df1e8294579d49f3bc881ea901213c",
+      "ukuran_kb": 11.4,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Advertiser Shopee Kyura (unit Marketing Kyura) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 4 dokumen: Alur Kerja Internal Content Creator; Analisis Pasar & Trend; Perencanaan & Pelaksanaan Iklan; Monitoring & Optimasi Iklan. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Advertiser Shopee Kyura",
+        "Advertiser Shopee Kyura",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "iklan",
+        "alur",
+        "analisis",
+        "content"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi Affiliate Beautyhacks.md",
+      "judul": "Sales - SOP Posisi Affiliate Beautyhacks",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "7b2a76080aa19e995e4c5d7b2d8056780101c3d646ac28be528097e1e6508ed3",
+      "ukuran_kb": 7.4,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Affiliate Beautyhacks (unit Marketing Beautyhacks) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 2 dokumen: Affiliator Baru; Menagih Video ke Affiliator. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Affiliate Beautyhacks",
+        "Affiliate Beautyhacks",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "affiliator",
+        "baru",
+        "menagih",
+        "video"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi Buzzer Beautyhacks.md",
+      "judul": "Sales - SOP Posisi Buzzer Beautyhacks",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "63ca3ec52872d088d71247721eda5ca8ee93ae59408e159280ec702dc02e1365",
+      "ukuran_kb": 22.5,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Buzzer Beautyhacks (unit Marketing Beautyhacks) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 5 dokumen: Pembuatan & Distribusi Komentar Engagement; Kontrol Kualitas & Etika Komentar; Dokumentasi & Arsip Komentar; Monitoring Engagement Komentar; Pelaporan Aktivitas Buzzer. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Buzzer Beautyhacks",
+        "Buzzer Beautyhacks",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "komentar",
+        "engagement",
+        "aktivitas",
+        "arsip"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi Buzzer Kyura.md",
+      "judul": "Sales - SOP Posisi Buzzer Kyura",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "da736ac69e6226583f4eee5d1a03ea2e8a93b3a92d9b043ac8d89351f9a681a3",
+      "ukuran_kb": 22.5,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Buzzer Kyura (unit Marketing Kyura) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 5 dokumen: Pembuatan & Distribusi Komentar Engagement; Kontrol Kualitas & Etika Komentar; Dokumentasi & Arsip Komentar; Monitoring Engagement Komentar; Pelaporan Aktivitas Buzzer. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Buzzer Kyura",
+        "Buzzer Kyura",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "komentar",
+        "engagement",
+        "aktivitas",
+        "arsip"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi CRM.md",
+      "judul": "Sales - SOP Posisi CRM",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "90dce54985ddcbf933e85e55144802c0f9df1c6667935a074719d95d7a305a2f",
+      "ukuran_kb": 22.5,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi CRM (unit CRM) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 6 dokumen: Pengelolaan Sistem CRM; Strategi Retensi & Loyalitas Customer; Monitoring & Evaluasi Kinerja CRM; Peningkatan Pengalaman Customer; Analisis Data Customer CRM; Pelaporan & Dokumentasi CRM. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP CRM",
+        "CRM",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "customer",
+        "analisis",
+        "data",
+        "dokumentasi"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi CS Marketplace Kyura.md",
+      "judul": "Sales - SOP Posisi CS Marketplace Kyura",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "a5725ae67a48cb598ad2bbb122bc9541d0a5e08c28c2d8db90ca812011429d25",
+      "ukuran_kb": 16.8,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi CS Marketplace Kyura (unit Marketing Kyura) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 5 dokumen: Penanganan Keluhan & Masalah Customer; Follow Up Kepada Customer; Pengelolaan Data & Dokumentasi Customer; Pengelolaan Hubungan Customer; Standar Layanan Customer. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP CS Marketplace Kyura",
+        "CS Marketplace Kyura",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "customer",
+        "pengelolaan",
+        "data",
+        "dokumentasi"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi CS Marketplace Support Beautyhacks.md",
+      "judul": "Sales - SOP Posisi CS Marketplace Support Beautyhacks",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "01533518e95ee6f0be8ca6f7c9093fcb1dc84614820e3d4e5ac14d6561eaa798",
+      "ukuran_kb": 10.4,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi CS Marketplace Support Beautyhacks (unit Marketing Beautyhacks) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 3 dokumen: Penanganan Keluhan & Masalah Customer; Pengelolaan Data & Dokumentasi Customer; Standar Layanan Customer. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP CS Marketplace Support Beautyhacks",
+        "CS Marketplace Support Beautyhacks",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "customer",
+        "data",
+        "dokumentasi",
+        "keluhan"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi CS Meta Beautyhacks.md",
+      "judul": "Sales - SOP Posisi CS Meta Beautyhacks",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "d74a0e87eb9187497c88826956d3b1054400831d75ff8a7b99cca5dbc520fea0",
+      "ukuran_kb": 9.0,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi CS Meta Beautyhacks (unit Marketing Beautyhacks) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 3 dokumen: Pengelolaan Data & Dokumentasi Customer; Pengelolaan Hubungan Customer; Standar Layanan Customer. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP CS Meta Beautyhacks",
+        "CS Meta Beautyhacks",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "customer",
+        "pengelolaan",
+        "data",
+        "dokumentasi"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi Host Live Beautyhacks.md",
+      "judul": "Sales - SOP Posisi Host Live Beautyhacks",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "92d8c5e3befc88bb84bbaa8610cb53739504b7a8d3c93591b8362e382b7a62e0",
+      "ukuran_kb": 38.4,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Host Live Beautyhacks (unit Marketing Beautyhacks) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 12 dokumen: Berpenampilan Sesuai Brand Image; Membangun Interaksi Baik & Pendekatan Persuasif kepada Viewers; Menjelaskan Produk dengan Lengkap; Membuat Laporan Live Host Streaming; Menjawab Pertanyaan Terkait Produk; Meningkatkan Brand Awareness & Selling Produk; Mempersiapkan Properti, Materi & Menjadi Live Host Streaming; Menciptakan Suasana Menyenangkan untuk Menarik Customer; Hard Selling & Soft Selling Live Host Streaming; Persiapan Live Streaming; Penataan Display Produk Live Host Streaming; Sikap Ketika Viewer Turun atau Tidak Ada Viewer atau Komentar. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Host Live Beautyhacks",
+        "Host Live Beautyhacks",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "streaming",
+        "produk",
+        "brand",
+        "selling"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi Host Live Glowbooster.md",
+      "judul": "Sales - SOP Posisi Host Live Glowbooster",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "87d42dd8610e569b599104d9426c56bf45bb89e858f50624bc6896395626433a",
+      "ukuran_kb": 37.9,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Host Live Glowbooster (unit Marketing Kyura) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 12 dokumen: Berpenampilan Sesuai Brand Image; Membangun Interaksi Baik & Pendekatan Persuasif kepada Viewers; Menjelaskan Produk dengan Lengkap; Membuat Laporan Live Host Streaming; Menjawab Pertanyaan Terkait Produk; Meningkatkan Brand Awareness & Selling Produk; Mempersiapkan Properti, Materi & Menjadi Live Host Streaming; Menciptakan Suasana Menyenangkan untuk Menarik Customer; Hard Selling & Soft Selling Live Host Streaming; Persiapan Live Streaming; Penataan Display Produk Live Host Streaming; Sikap Ketika Viewer Turun atau Tidak Ada Viewer atau Komentar. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Host Live Glowbooster",
+        "Host Live Glowbooster",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "streaming",
+        "produk",
+        "brand",
+        "selling"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi Host Live Kyura.md",
+      "judul": "Sales - SOP Posisi Host Live Kyura",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "820d1a2065228a136b754c5e472a53875c9f73f32cabdaf4401b5407558918b9",
+      "ukuran_kb": 38.4,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Host Live Kyura (unit Marketing Kyura) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 12 dokumen: Berpenampilan Sesuai Brand Image; Membangun Interaksi Baik & Pendekatan Persuasif kepada Viewers; Menjelaskan Produk dengan Lengkap; Membuat Laporan Live Host Streaming; Menjawab Pertanyaan Terkait Produk; Meningkatkan Brand Awareness & Selling Produk; Mempersiapkan Properti, Materi & Menjadi Live Host Streaming; Menciptakan Suasana Menyenangkan untuk Menarik Customer; Hard Selling & Soft Selling Live Host Streaming; Persiapan Live Streaming; Penataan Display Produk Live Host Streaming; Sikap Ketika Viewer Turun atau Tidak Ada Viewer atau Komentar. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Host Live Kyura",
+        "Host Live Kyura",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "streaming",
+        "produk",
+        "brand",
+        "selling"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi Internal Content Creator Beautyhacks.md",
+      "judul": "Sales - SOP Posisi Internal Content Creator Beautyhacks",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "a534d3abd7c47601acfa4b9a0484358e116aead69d37ebd20e9fc2edc145e947",
+      "ukuran_kb": 4.2,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Internal Content Creator Beautyhacks (unit Marketing Beautyhacks) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 1 dokumen: Alur Kerja Internal Content Creator. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Internal Content Creator Beautyhacks",
+        "Internal Content Creator Beautyhacks",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "alur",
+        "kerja"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi Internal Content Creator Kyura.md",
+      "judul": "Sales - SOP Posisi Internal Content Creator Kyura",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "95b00a08f8f7b40be7e5d0ed48b1e39b70f8cf568302173ae0eb0c74a8dad472",
+      "ukuran_kb": 4.2,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Internal Content Creator Kyura (unit Marketing Kyura) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 1 dokumen: Alur Kerja Internal Content Creator. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Internal Content Creator Kyura",
+        "Internal Content Creator Kyura",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "alur",
+        "kerja"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi Leader Advertiser TikTok Kyura.md",
+      "judul": "Sales - SOP Posisi Leader Advertiser TikTok Kyura",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "998dc0034577f8328effdd64b751eddb7f739546bf9fdf83c9afd4fa6e150d19",
+      "ukuran_kb": 8.7,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Leader Advertiser TikTok Kyura (unit Marketing Kyura) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 3 dokumen: Analisis Pasar & Trend; Perencanaan & Pelaksanaan Iklan; Monitoring & Optimasi Iklan. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Leader Advertiser TikTok Kyura",
+        "Leader Advertiser TikTok Kyura",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "iklan",
+        "analisis",
+        "monitoring",
+        "optimasi"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi Leader Beautyhacks.md",
+      "judul": "Sales - SOP Posisi Leader Beautyhacks",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "71443d23e2dfbb9d70310d84b0eadcbcff9ba54e683bc8e9872b17eab48a7c1d",
+      "ukuran_kb": 6.3,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Leader Beautyhacks (unit Marketing Beautyhacks) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 2 dokumen: Perencanaan & Pelaksanaan Iklan; Monitoring & Optimasi Iklan. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Leader Beautyhacks",
+        "Leader Beautyhacks",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "iklan",
+        "monitoring",
+        "optimasi",
+        "pelaksanaan"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi Marketplace Beautyhacks.md",
+      "judul": "Sales - SOP Posisi Marketplace Beautyhacks",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "1a122eb0d0cfbc4c3f44455a6ba98b8978d44565c5859f9906633f439d20356c",
+      "ukuran_kb": 6.3,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Marketplace Beautyhacks (unit Marketing Beautyhacks) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 2 dokumen: Perencanaan & Pelaksanaan Iklan; Monitoring & Optimasi Iklan. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Marketplace Beautyhacks",
+        "Marketplace Beautyhacks",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "iklan",
+        "monitoring",
+        "optimasi",
+        "pelaksanaan"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi Shopee Beautyhacks.md",
+      "judul": "Sales - SOP Posisi Shopee Beautyhacks",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "93c7178c653b502e18f22b3304b3538897df7efcb2b09836f94702bca062867b",
+      "ukuran_kb": 5.8,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Shopee Beautyhacks (unit Marketing Beautyhacks) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 2 dokumen: Perencanaan & Pelaksanaan Iklan; Monitoring & Optimasi Iklan. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Shopee Beautyhacks",
+        "Shopee Beautyhacks",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "iklan",
+        "monitoring",
+        "optimasi",
+        "pelaksanaan"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi Supervisor Beautyhacks.md",
+      "judul": "Sales - SOP Posisi Supervisor Beautyhacks",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "c43e0caa14fdaad4e079ac700deb346db8a43293026219d2717fc685979fdf0e",
+      "ukuran_kb": 12.2,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Supervisor Beautyhacks (unit Marketing Beautyhacks) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 4 dokumen: Perencanaan Strategi Pemasaran; Perencanaan & Pelaksanaan Strategi Pemasaran; Analisis Pasar & Trend; Evaluasi & Pelaporan Kinerja. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Supervisor Beautyhacks",
+        "Supervisor Beautyhacks",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "perencanaan",
+        "strategi",
+        "analisis",
+        "evaluasi"
+      ]
+    },
+    {
+      "path": "Sales/Sales - SOP Posisi Supervisor Kyura.md",
+      "judul": "Sales - SOP Posisi Supervisor Kyura",
+      "area": "Sales",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "724f34df4f1a95fb0d803ad5629eed074fdd389191f2964632be326afe9aa62e",
+      "ukuran_kb": 10.2,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Supervisor Kyura (unit Marketing Kyura) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 3 dokumen: Perencanaan Strategi Pemasaran; Perencanaan & Pelaksanaan Strategi Pemasaran; Evaluasi & Pelaporan Kinerja. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Supervisor Kyura",
+        "Supervisor Kyura",
+        "prosedur kerja",
+        "marketing",
+        "pemasaran",
+        "perencanaan",
+        "strategi",
+        "evaluasi",
+        "kinerja"
+      ]
+    },
+    {
       "path": "Sales/Sales - TikTok Affiliate Rules (Docs).md",
       "judul": "Sales - TikTok Affiliate Rules (Docs)",
       "area": "Sales",
@@ -17240,6 +18706,193 @@
       "kata_kunci": []
     },
     {
+      "path": "Unknown or not listed/Unlisted - SOP Posisi Asisten Eksekutif Internal.md",
+      "judul": "Unlisted - SOP Posisi Asisten Eksekutif Internal",
+      "area": "Unknown or not listed",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "d9a3fab9ecb72252ac37f9a82d4432d4147022cca68bd216e237a88cfcb414a5",
+      "ukuran_kb": 48.2,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Asisten Eksekutif Internal (unit Kesekretariatan) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 11 dokumen: Pembuatan Jadwal atau Agenda Kegiatan Direktur; Perjalanan Dinas Direktur; Itinerary Perjalanan Dinas Direktur; Pemenuhan Kebutuhan Direktur; Pembuatan Janji Temu Dengan Direktur; Menemui Tamu Direktur; Menjawab Panggilan Untuk Direktur; Pembuatan Dokumen Penting Untuk Pertemuan Direktur; Pembuatan Presentasi; Pengarsipan Dokumen; Penyampaian Informasi Dari Direktur Kepada Divisi Terkait. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Asisten Eksekutif Internal",
+        "Asisten Eksekutif Internal",
+        "prosedur kerja",
+        "kesekretariatan",
+        "direktur",
+        "pembuatan",
+        "dinas",
+        "dokumen",
+        "perjalanan"
+      ]
+    },
+    {
+      "path": "Unknown or not listed/Unlisted - SOP Posisi Company Branding.md",
+      "judul": "Unlisted - SOP Posisi Company Branding",
+      "area": "Unknown or not listed",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "9243a463a7d2959b1ee0b1b5e792b5f129fdf1db23ad6ff68416159ee36d427a",
+      "ukuran_kb": 14.6,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Company Branding (unit Kesekretariatan) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 5 dokumen: Strategi Pengelolaan & Produksi Konten; Standar & Pedoman Gaya Konten; Proses Analisis Performa Konten; Kolaborasi Tim Marketing & Sosial Media; Pengelolaan Kalender Editorial. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Company Branding",
+        "Company Branding",
+        "prosedur kerja",
+        "kesekretariatan",
+        "konten",
+        "pengelolaan",
+        "analisis",
+        "editorial",
+        "gaya"
+      ]
+    },
+    {
+      "path": "Unknown or not listed/Unlisted - SOP Posisi Graphic Designer.md",
+      "judul": "Unlisted - SOP Posisi Graphic Designer",
+      "area": "Unknown or not listed",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "a8afb97c5a9dce168e7f754f467ef950d6b4e57050c30e169085b7729d46df6f",
+      "ukuran_kb": 22.3,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Graphic Designer (unit Kesekretariatan) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 5 dokumen: Brief & Konsep Design; Produksi Design Marketing; Design Kemasan & Label; Approval & Revisi; Standarisasi Brand Visual. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Graphic Designer",
+        "Graphic Designer",
+        "prosedur kerja",
+        "kesekretariatan",
+        "design",
+        "approval",
+        "brand",
+        "brief",
+        "kemasan"
+      ]
+    },
+    {
+      "path": "Unknown or not listed/Unlisted - SOP Posisi Internal Control.md",
+      "judul": "Unlisted - SOP Posisi Internal Control",
+      "area": "Unknown or not listed",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "c9e8c3167540a848f8e37f73d43dec76e2872a213e3f299a57b5fbf78bb75ac5",
+      "ukuran_kb": 15.1,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Internal Control (unit Kesekretariatan) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 3 dokumen: Komunikasi Kebijakan Direksi; Monitoring Implementasi Kebijakan; Konsolidasi Laporan Divisi. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Internal Control",
+        "Internal Control",
+        "prosedur kerja",
+        "kesekretariatan",
+        "kebijakan",
+        "direksi",
+        "divisi",
+        "implementasi",
+        "komunikasi"
+      ]
+    },
+    {
+      "path": "Unknown or not listed/Unlisted - SOP Posisi Legal.md",
+      "judul": "Unlisted - SOP Posisi Legal",
+      "area": "Unknown or not listed",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "e4fe46328893a6752df1b149cc33462889eaec3c536e535972c5feb66ecbee9d",
+      "ukuran_kb": 5.0,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Legal (unit Kesekretariatan) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 1 dokumen: Pengurusan Perizinan Perusahaan. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Legal",
+        "Legal",
+        "prosedur kerja",
+        "kesekretariatan",
+        "pengurusan",
+        "perizinan",
+        "perusahaan"
+      ]
+    },
+    {
+      "path": "Unknown or not listed/Unlisted - SOP Posisi Video Editor.md",
+      "judul": "Unlisted - SOP Posisi Video Editor",
+      "area": "Unknown or not listed",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "84b735d39584365b0dc7f1089b724d25f31381945551d3a2b91a1fbd68b0be77",
+      "ukuran_kb": 15.9,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Video Editor (unit Kesekretariatan) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 6 dokumen: Proses Editing Video; Standar Kualitas Video; Pengelolaan File & Arsip Video; Proses Revisi & Approval Video; Riset & Penerapan Trend Video; Penerapan Trend Editing Video. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Video Editor",
+        "Video Editor",
+        "prosedur kerja",
+        "kesekretariatan",
+        "editing",
+        "penerapan",
+        "trend",
+        "approval",
+        "arsip"
+      ]
+    },
+    {
+      "path": "Unknown or not listed/Unlisted - SOP Posisi Videographer.md",
+      "judul": "Unlisted - SOP Posisi Videographer",
+      "area": "Unknown or not listed",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "92136ecf86198de28a2439adc2dad95631ec2d2c6d579c1058165c8f12c67732",
+      "ukuran_kb": 18.2,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Videographer (unit Kesekretariatan) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 6 dokumen: Pengambilan Gambar Dengan Kualitas Visual Yang Baik; Proses Produksi Video; Standar Kualitas Video; Pengelolaan Arsip & Footage Video; Riset & Penerapan Trend Video; Pengelolaan & Penyimpanan Alat. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Videographer",
+        "Videographer",
+        "prosedur kerja",
+        "kesekretariatan",
+        "video",
+        "kualitas",
+        "pengelolaan",
+        "alat",
+        "arsip"
+      ]
+    },
+    {
       "path": "Warehouse/WH - Fulfillment Flow & WMS Tinggarjaya.md",
       "judul": "WH - Fulfillment Flow & WMS Tinggarjaya",
       "area": "Warehouse",
@@ -17356,7 +19009,7 @@
         "APP - Web ERP"
       ],
       "hash": "c4637f8509f5c1a5a4144b1a335e575e34704efa5110b9829b98aa991eb3b130",
-      "ukuran_kb": 8.4,
+      "ukuran_kb": 8.5,
       "ringkasan": "Menjawab: apa rencana penyatuan menu-menu gudang yang kini terpecah per-tahap (Perlu Diproses, Antrian Pesanan, Pengambilan, Pengemasan, Riwayat Cetak Resi, Serah Terima) menjadi satu layar omnichannel \"Kelola Pesanan\" ala Desty tanpa mengubah backend, dan apa beda pratinjau Beta FE-only (data dummy, aksi mati) dengan menu produksi yang sudah wired ke endpoint nyata. Juga menjelaskan pemetaan tiap tab/sub-tab \"Siap Dikirim\" ke endpoint warehouse/integration, rencana mutasi bertahap fase 0-5 sampai cutover, gerbang dan nuansa yang wajib dipertahankan saat \"cuma ganti UI\" (gerbang rekon `exported_at`, kode packer T1/T2, guard TikTok `package_id` kosong, batch cap 100), persona pengguna dan RBAC-nya, serta hal yang belum diputuskan (tab Belum Dibayar, cakupan Sadewa, nasib menu lama).",
       "kata_kunci": [
         "Kelola Pesanan",
@@ -17416,6 +19069,168 @@
         "logging barang keluar",
         "dashboard shipping",
         "WMS konsep"
+      ]
+    },
+    {
+      "path": "Warehouse/WH - SOP Posisi Admin Warehouse Packing.md",
+      "judul": "WH - SOP Posisi Admin Warehouse Packing",
+      "area": "Warehouse",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "c65be90cc611543f756b647a515f2ec6576248ce03e0eafbb60d2d4e1933881a",
+      "ukuran_kb": 38.5,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Admin Warehouse Packing (unit Manufacture, Warehouse Packing) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 11 dokumen: Penyusunan dan Pembuatan Laporan Stok Harian; Pembuatan Laporan Penerimaan dan Pengeluaran Barang Gudang; Pelaporan Hasil Pekerjaan & Stok Harian; Pencetakan & Penyortiran Resi Penjualan; Penyerahan Produk dari Gudang Tinggarjaya ke Ekspedisi; Pengecekan Resi; Penerimaan Produk Retur; Penanganan & Pengiriman Produk Reject; Penumpukan Produk; Alur Penerimaan & Pengeluaran Barang; Kebersihan Area Kerja Gudang Tinggarjaya. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Admin Warehouse Packing",
+        "Admin Warehouse Packing",
+        "prosedur kerja",
+        "warehouse",
+        "gudang",
+        "produk",
+        "penerimaan",
+        "barang",
+        "harian"
+      ]
+    },
+    {
+      "path": "Warehouse/WH - SOP Posisi Admin Warehouse.md",
+      "judul": "WH - SOP Posisi Admin Warehouse",
+      "area": "Warehouse",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "28b6a46c316cfc56e609eb90efbe15ea33fd391992684af530d22071988c1cff",
+      "ukuran_kb": 17.4,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Admin Warehouse (unit Manufacture, Warehouse) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 4 dokumen: Update Stok Harian; Barang Masuk & Keluar; Verifikasi Dokumen Gudang; Stock Opname. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Admin Warehouse",
+        "Admin Warehouse",
+        "prosedur kerja",
+        "warehouse",
+        "gudang",
+        "barang",
+        "dokumen",
+        "harian",
+        "keluar"
+      ]
+    },
+    {
+      "path": "Warehouse/WH - SOP Posisi Helper Packing.md",
+      "judul": "WH - SOP Posisi Helper Packing",
+      "area": "Warehouse",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "d9fc03a2b4d5e98a2236c350e22f5c28f61751d5fccf81f77a3f8c85b7d1fadb",
+      "ukuran_kb": 23.1,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Helper Packing (unit Manufacture, Warehouse Packing) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 4 dokumen: Verifikasi & Pemeriksaan Kesesuaian Barang (Pre-Packing Inspection); Pengemasan & Proteksi Produk (Packaging & Wrapping Standard); Penanganan Produk Reject & Pelaporan Defect; Pelabelan & Identifikasi Paket Pengiriman. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Helper Packing",
+        "Helper Packing",
+        "prosedur kerja",
+        "warehouse",
+        "gudang",
+        "produk",
+        "barang",
+        "defect",
+        "identifikasi"
+      ]
+    },
+    {
+      "path": "Warehouse/WH - SOP Posisi Leader Warehouse Packing.md",
+      "judul": "WH - SOP Posisi Leader Warehouse Packing",
+      "area": "Warehouse",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "1d203f70d99588e8e8a48a9da6e4236a25937514dae77a52e9ad4d1f4a09ac36",
+      "ukuran_kb": 30.3,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Leader Warehouse Packing (unit Manufacture, Warehouse Packing) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 6 dokumen: Memproses Pesananan Toko; Quality Control Pesanan; Pencocokan Data Pesanan; Monitoring Pesanan Tertinggal; Controlling Tim Warehouse Packing; Penempatan Produk & Kartu Stok. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Leader Warehouse Packing",
+        "Leader Warehouse Packing",
+        "prosedur kerja",
+        "warehouse",
+        "gudang",
+        "pesanan",
+        "control",
+        "controlling",
+        "data"
+      ]
+    },
+    {
+      "path": "Warehouse/WH - SOP Posisi Leader Warehouse.md",
+      "judul": "WH - SOP Posisi Leader Warehouse",
+      "area": "Warehouse",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "3dd2b44b7a8918041de71120c45ddb8d520809aaa106cc4681f9421386b11823",
+      "ukuran_kb": 4.7,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Leader Warehouse (unit Manufacture, Warehouse) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 1 dokumen: Stok Opname,Inventarisasi Berkala. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Leader Warehouse",
+        "Leader Warehouse",
+        "prosedur kerja",
+        "warehouse",
+        "gudang",
+        "berkala",
+        "inventarisasi",
+        "opname",
+        "stok"
+      ]
+    },
+    {
+      "path": "Warehouse/WH - SOP Posisi Staf Warehouse.md",
+      "judul": "WH - SOP Posisi Staf Warehouse",
+      "area": "Warehouse",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "**Rekaman SOP (proses bisnis, non-kode).** Kepatuhan sistem ERP terhadap SOP ini belum dipetakan (TBD).",
+      "publik": true,
+      "tautan": [
+        "REF - SOP Bharata 2026 per Posisi"
+      ],
+      "hash": "a715a03ed5bcd3071bda6aef2b5be3a20af1fad881313fedeba510f4ffd49197",
+      "ukuran_kb": 11.9,
+      "ringkasan": "Menjawab: apa saja SOP resmi posisi Staf Warehouse (unit Manufacture, Warehouse) dan bagaimana langkah kerjanya menurut dokumen SOP BHARATA 2026. Memuat salinan apa adanya 4 dokumen: Penerimaan Barang; Pengiriman Produk; Penyimpanan & Penataan Barang; Proses Produksi. Tiap SOP berisi tujuan, ruang lingkup, penanggung jawab, rincian prosedur, dokumen pendukung, dan distribusinya; berguna untuk mengecek alur kerja posisi ini sebelum merancang fitur ERP yang menyentuhnya.",
+      "kata_kunci": [
+        "SOP",
+        "SOP Staf Warehouse",
+        "Staf Warehouse",
+        "prosedur kerja",
+        "warehouse",
+        "gudang",
+        "barang",
+        "penataan",
+        "penerimaan",
+        "pengiriman"
       ]
     },
     {
@@ -18242,7 +20057,7 @@
         "Finance - Proses Retur dan Piutang Marketplace"
       ],
       "hash": "e2d143889408149960b09d92d58880acfbe2c83c31ea38eff0341e09067932aa",
-      "ukuran_kb": 3.2,
+      "ukuran_kb": 3.3,
       "ringkasan": "Menjawab: apa saja task tindak lanjut dari ADR-0133 soal kompensasi logistik TikTok pasca-retur — menyebarkan SOP ke tim finance/accounting, pertanyaan terbuka yang masih perlu dikonfirmasi (dokumen retur campuran kondisi barang), cara mengukur ulang populasi secara berkala, dan daftar task kode yang TERTUNDA sampai pemicu otomasi (Opsi A) terpenuhi.",
       "kata_kunci": [
         "kompensasi logistik",
@@ -18493,7 +20308,7 @@
         "ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync"
       ],
       "hash": "055761dd2a4bdd0d80f24139bfc1f9f275619df80f07309476c8586211a25943",
-      "ukuran_kb": 6.1,
+      "ukuran_kb": 6.2,
       "ringkasan": "Menjawab: task apa saja (T0-T9) yang diturunkan dari ADR 0158 tentang pengaman scan retur gudang, mana yang termasuk tahap pagar dan mana tahap koreksi, serta apa dependensi dan urutan antar task. Juga menjawab keputusan apa yang menjadi gerbang (T5: tanggal dokumen koreksi, aturan koreksi ke nol) sebelum koreksi boleh dibangun, pembagian kerja BE/FE per repo, hasil pengukuran frekuensi jumlah kurang pada paket, dan pekerjaan dokumentasi/prosedur manusia yang tersisa.",
       "kata_kunci": [
         "ANALISA",
@@ -18721,7 +20536,7 @@
         "API - Integration Service"
       ],
       "hash": "15311d96ce19afd582bf5609ce8312b1a5433f1db782391b9b5f1d1bfe023c1f",
-      "ukuran_kb": 15.8,
+      "ukuran_kb": 15.9,
       "ringkasan": "Menjawab: bagaimana mekanisme ACL yang membatasi daftar toko marketplace yang boleh dilihat staf marketing (AllowedShops di endpoint GET /transactions/master/shops, integration-service) bekerja, kenapa sumber datanya bisa dipindah dari team_members/team_shops ke department_shops + work_data.department, dan bug apa yang sempat membuat staf non-marketing menerima daftar toko kosong. Mencatat status FINAL: redesign merge+deploy+live (PR #1727, 2026-09-05) DAN Fase Contract-nya SENDIRI SUDAH SELESAI (2026-09-15, bip-erp PR #1888 + erp-frontend PR #1579) — team_shops/team_members/menu Teams/CRUD-nya sudah dicabut fisik dari kode. Juga mencatat batas lingkup keputusan yang sengaja tidak diubah (gate rute RequireIntegrationStaff, exemption admin/supervisor integration).",
       "kata_kunci": [
         "AllowedShops",
@@ -18782,7 +20597,7 @@
         "ADR - 0104 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres"
       ],
       "hash": "bfda69cf856a2964ef3a3f887533e9cead707f3aba5224af9de2d32bcc36e66d",
-      "ukuran_kb": 7.8,
+      "ukuran_kb": 7.9,
       "ringkasan": "Menjawab: apa saja task yang perlu dikerjakan (T1 sampai T6) untuk mewujudkan ADR 0144, urutan dependensinya, di repo mana, apa kriteria selesainya, dan perintah /start-task untuk tiap task. Mencakup penanda per order dan penjagaan, endpoint tandai/cabut, aksi di layar Auto-Sync Retur, perkakas menandai ulang order yang sudah ditutup lewat skrip, daftar dan ekspor order bertanda, verifikasi prod lewat gateway, serta titik yang belum tertutup dan tahap 2 yang belum diputuskan.",
       "kata_kunci": [
         "analisa kebutuhan",
@@ -18815,7 +20630,7 @@
         "ADR - 0116 Setelan Akun Marketplace Bergerbang dan Berjejak, Komponen Tak Dikenal Wajib Terlihat"
       ],
       "hash": "502459db9078ed7439df8748be1bfdda0af7c4bf4e9fbcd046d5f84fcb04c1cf",
-      "ukuran_kb": 7.9,
+      "ukuran_kb": 8.0,
       "ringkasan": "Menjawab: seberapa besar dampak dua masalah yang dilaporkan tiket finance \"Revisi Sistem Income\" (ongkir Shopee salah pos 3.870 pesanan senilai Rp96.826.227 dan masih bertambah sekitar Rp16 juta per bulan, versus kompensasi TikTok atas pesanan yang sudah cair 14 pesanan senilai Rp1.610.697, dengan 360 pesanan kompensasi yang sudah benar sebagai kontrol), kenapa Shopee didahulukan, dan apa urutan kerja T1 sampai T5 beserta mana yang eksekusi prod-nya dijalankan manusia. Juga memuat 10 pertanyaan terbuka untuk Finance/FAT yang menahan penerapan (akun tersendiri untuk baris Penyesuaian yang kini berbagi akun dengan Beban Admin E-Commerce 6112, pos yang benar untuk ongkir pengembalian barang, proteksi pengiriman Rp7,4 juta di 21.148 pesanan, 208 dokumen retur menggantung, 54 penyesuaian TikTok tanpa pesanan padanan) serta daftar utang di luar lingkup tiket. Menjelaskan pula cara mengukur ulang angkanya secara read-only di VPS Biznet lewat `docker exec Integration-MongoDB mongosh` dan kenapa `10.10.10.120` tidak boleh dipakai sebagai pembanding.",
       "kata_kunci": [
         "Revisi Sistem Income",
@@ -19441,7 +21256,7 @@
         "WH - Warehouse Sadewa"
       ],
       "hash": "256b39d712a784b9ff443d528747ca065ab9eb8bbe91a08ffc13607cc07cb67a",
-      "ukuran_kb": 17.7,
+      "ukuran_kb": 17.9,
       "ringkasan": "Menjawab kenapa sidebar erp-frontend memicu request polling 30 detik ke endpoint warehouse/sadewa/accurate untuk semua karyawan tanpa peduli role atau halaman yang dibuka, dan rencana perbaikannya lewat gerbang enabled yang diturunkan dari menu yang benar-benar tampil. Memuat dua pembaruan 2026-08-29 yang menandai sebagian rencana ini usang lalu sebagian lagi sudah dikerjakan lewat jalan lain: branch fix/badge-sidebar-per-halaman memilih gerbang HALAMAN, sehingga Task 4 (kuartet refetch) gugur karena keduanya alternatif bukan pelengkap, Task 1 dan 3 turun prioritas, dan Task 5 tetap berdiri sendiri.",
       "kata_kunci": [
         "sidebar",
