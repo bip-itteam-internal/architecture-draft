@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan** (2026-10-02). Arah dan rancangan per departemen disetujui user; kode belum ada.
+> **Status**: 🟢 **Diterima**, 2026-10-10, oleh irfanarfianto (diusulkan 2026-10-02). HRGA sudah berjalan (bip-erp#2488); Marketing sedang dikerjakan (bip-erp#2924); departemen lain dan penyatuan akhir belum.
 
 ## Untuk Manajemen
 
@@ -19,7 +19,7 @@
 
 *Sidebar web ERP menjadi satu daftar urusan tanpa kategori departemen dan tanpa "Portal Saya". Menu sama untuk semua; yang tampil ditentukan izin posisi per menu, bukan keberadaan kategori `system_roles`; data dan aksi di dalamnya disaring server menurut cakupan posisi. Beranda (`/dashboard`) adalah tempat kerja posisi, dan ringkasan divisi pindah ke zona D [[ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi]]. Pembatas kategori baru boleh dihapus setelah setiap menu punya gerbang izin sendiri.*
 
-- **Status**: 🟡 **Diusulkan**. Arah dan rancangan per departemen disetujui user 2026-10-02; kode belum ada.
+- **Status**: 🟢 **Diterima**, 2026-10-10, oleh irfanarfianto. Kode HRGA sudah ada; Marketing sedang dikerjakan; sisanya belum.
 - **Path di repo** (akan disentuh): `erp-frontend/src/components/layout/sidebar-menus.tsx` · `erp-frontend/src/components/layout/sidebar.tsx` · `erp-frontend/src/components/layout/sidebar-kategori.ts` · `erp-frontend/src/components/layout/portal-menu.ts` · `erp-frontend/src/components/layout/pengajuan-menu.ts` · `erp-frontend/src/utils/menu-permission.ts` · `erp-frontend/src/utils/akses-penuh.ts` · `erp-frontend/src/proxy.ts` · `erp-frontend/src/components/layout/sidebar-gerbang.test.ts` (baru) · `erp-frontend/src/features/erp/portal/lib/dashboard-posisi.ts` · `erp-frontend/src/features/erp/portal/lib/gerbang-departemen.ts` · `bip-erp/services/employee/peran_dari_jabatan.go`
 - **Tanggal**: 2026-10-02
 

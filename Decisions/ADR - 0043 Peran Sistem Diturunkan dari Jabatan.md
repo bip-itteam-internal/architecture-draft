@@ -1,5 +1,7 @@
 **Status**: ✅ Implemented (dev, 2026-08-09). Tabel `services/employee/peran_dari_jabatan.go` mengisi `system_roles` yang kosong dari (departemen, jabatan) di keempat jalur penerbitan token. Menyentuh 13 akun Manufaktur/Quality, 11 akun Beauty Hacks/Kyura, 1 akun General Affair, dan 1 akun Kesekretariatan. Sakelar `ROLE_FROM_POSITION=off`. **Jembatan sementara**, bukan pengganti [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]]. ⚠️ Pembongkaran dimulai 2026-09-05: `manufacture` sudah berkatalog, barisnya masih hidup sampai fase dua (lihat catatan di §Decision).
 
+> **Arah (2026-10-10)**: tabel peran di ADR ini dijadwalkan dipindah menjadi data paket peran yang terpasang di jabatan oleh [[ADR - 0164 Hak Akses Satu Pintu, Peran Dibawa Paket Hak dan Dirakit saat Token Terbit]] (🟡 Diusulkan, kode belum ada). Sampai keputusan itu dijalankan, isi ADR ini tetap berlaku apa adanya.
+
 ## Context
 
 [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]] menetapkan hak menempel pada posisi lewat permission-set. Jalan itu benar, tapi menuntut modulnya berkatalog lebih dulu — dan dua modul yang paling banyak dikeluhkan justru **sudah punya pembedaan per pekerjaan yang halus dan sudah ditegakkan**, hanya saja bukan lewat katalog:
