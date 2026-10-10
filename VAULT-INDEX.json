@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-10",
-  "jumlah_dokumen": 615,
+  "jumlah_dokumen": 617,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -9391,8 +9391,8 @@
       "judul": "ADR - 0164 Hak Akses Satu Pintu, Peran Dibawa Paket Hak dan Dirakit saat Token Terbit",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-10. Arah dan tiga pilihan bentuknya diputuskan pemilik produk (irfanarfianto) pada tanggal itu; kode belum ada. Persetujuan ADR ditulis di baris ini menurut [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]].",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-10, oleh irfanarfianto (diusulkan 2026-10-10). Kode belum ada; pekerjaan di bip-erp#2933 dan sub-issue-nya. Aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]].",
       "publik": true,
       "tautan": [
         "ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia",
@@ -9410,20 +9410,20 @@
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "RUN - Onboarding Akun Eksternal (Vendor & Mitra)"
       ],
-      "hash": "a199a70709aba9c6b2575ed333612e1da0f35ffc61e19ba8be0e8cfab2eda5f7",
+      "hash": "736f3af3464708eab79ff125ca0a2bcc33a10249091e1376662a995e3653e7e9",
       "ukuran_kb": 14.5,
-      "ringkasan": "Menjawab: bagaimana pengaturan hak akses disatukan di menu Hak Akses, dengan peran per modul (system_roles) dibawa paket berjenis peran yang dipasang ke jabatan dan dirakit saat token terbit. Juga menjawab kenapa bentuk keluaran token tidak berubah (gerbang, sidebar, MyBharata aman), bagaimana kesamaan hak tiap akun dibuktikan, dan data sensus akun/jabatan yang mendasarinya.",
+      "ringkasan": "Menjawab: kenapa pengaturan hak akses ERP disatukan ke menu Hak Akses, bagaimana peran per modul (system_roles) dipindah ke paket hak berjenis peran yang dipasang ke jabatan dengan pengecualian per akun lalu dirakit saat token terbit, dan apa yang dihapus dari menu Akun Karyawan. Juga menjelaskan kenapa bentuk klaim token sengaja tidak berubah (gerbang backend, sidebar, proxy.ts, MyBharata tetap jalan) dan bagaimana kesamaan hak dibuktikan dengan alat banding isi token per akun.",
       "kata_kunci": [
-        "ADR 0164",
         "hak akses satu pintu",
-        "paket peran",
-        "role package",
         "system_roles",
         "permission set",
-        "Akun Karyawan",
-        "Hak Akses",
-        "token",
-        "pengecualian akun"
+        "paket hak",
+        "paket peran",
+        "RBAC",
+        "token JWT",
+        "peran dari jabatan",
+        "alat banding token",
+        "Akun Karyawan"
       ]
     },
     {
@@ -9489,8 +9489,8 @@
       "judul": "ADR - 0167 Izin HRIS Dipecah per Fitur dengan Cadangan Peran per Fitur",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-10. Arah dan empat pilihan bentuknya diputuskan pemilik produk (irfanarfianto) pada tanggal itu; kode belum ada. Persetujuan ADR ditulis di baris ini menurut [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]].",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-10, oleh irfanarfianto (diusulkan 2026-10-10). Kode belum ada; pekerjaan di bip-erp#2941 dan sub-issue-nya. Aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]].",
       "publik": true,
       "tautan": [
         "ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia",
@@ -9502,20 +9502,51 @@
         "Microservices - Attendance Service",
         "APP - Web ERP"
       ],
-      "hash": "914788199c12e2937e4555bd4a518caed6d17ad3b946e9f9845f68d00d8a10bf",
-      "ukuran_kb": 13.0,
-      "ringkasan": "Menjawab: kenapa izin modul HRIS (`hris.view`/`work`/`manage`) dipecah menjadi pasangan lihat/kelola per fitur (karyawan, kontrak, mutasi, resign, SP, presensi, cuti), bagaimana rute backend dan menu web dipetakan ke izin baru, dan kenapa cadangan peran dinilai per fitur alih-alih per modul. Juga menjelaskan langkah netral (hak setiap akun tidak berubah, dibuktikan alat banding) sebelum penyempitan per jabatan.",
+      "hash": "e2baf1c9378296503b499454836d69299eb96b45aa0f150c822df1ab14dd7e86",
+      "ukuran_kb": 12.9,
+      "ringkasan": "Menjawab: kenapa staf HR bisa membuka fitur yang bukan tugasnya, bagaimana izin hris.view/hris.work/hris.manage dipecah jadi pasangan lihat dan kelola per fitur (karyawan, kontrak, mutasi, resign, SP, presensi, cuti), dan bagaimana cadangan peran hris dinilai per fitur supaya paket sempit tidak mencabut hak. Juga menjelaskan pemetaan rute backend dan menu web ke izin baru, pemetaan paket bawaan yang setara, serta urutan penyempitan hak per jabatan.",
       "kata_kunci": [
-        "izin HRIS",
-        "HRIS permission",
-        "per fitur",
+        "izin HRIS per fitur",
+        "permission",
+        "hris.manage",
+        "hris.work",
+        "hris.view",
         "cadangan peran",
         "tier fallback",
-        "hris.manage",
-        "gateHris",
-        "paket hak",
-        "RBAC",
-        "ADR 0167"
+        "HRIS_TIER_FALLBACK",
+        "katalog izin",
+        "gateHris"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0168 Departemen Beauty Hacks Diganti Nama Jadi Beautyhacks Bertahap, Kedua Nama Diterima selama Transisi.md",
+      "judul": "ADR - 0168 Departemen Beauty Hacks Diganti Nama Jadi Beautyhacks Bertahap, Kedua Nama Diterima selama Transisi",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-10-10, kode belum ada. Pemutus: irfanarfianto. Pekerjaan di bip-erp#2944 dan sub-issue-nya; blueprint [[ANALISA - Ganti Nama Departemen Beauty Hacks Jadi Beautyhacks]].",
+      "publik": true,
+      "tautan": [
+        "ANALISA - Ganti Nama Departemen Beauty Hacks Jadi Beautyhacks",
+        "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
+        "REF - Peta Departemen",
+        "REF - Kepemilikan Data",
+        "Microservices - Employee Service"
+      ],
+      "hash": "286fcf2f680fcb7014bb299b16ad64b94989f9f2fff7a3cc98b02d3efbd4d065",
+      "ukuran_kb": 11.2,
+      "ringkasan": "Menjawab: kenapa nama departemen Beauty Hacks diganti jadi Beautyhacks, kenapa rename tidak bisa lewat layar Master Data (ditolak 409, nama tersalin sebagai teks di sekitar 40 koleksi, terbawa di klaim JWT, dan dicocokkan persis di BE, FE, mobile), dan bagaimana tiga fase expand, migrate, contract menjaga staf tidak kehilangan menu, KPI, atau insentif. Juga menyebut apa yang tidak diubah: key modul beauty_hacks, rute /icc/kpi/beauty-hacks, nama Accurate MARKETING - BEAUTYHACKS, nama jabatan, dan nama toko.",
+      "kata_kunci": [
+        "Beautyhacks",
+        "Beauty Hacks",
+        "ganti nama departemen",
+        "rename department",
+        "beauty_hacks",
+        "deptKeyToNames",
+        "expand migrate contract",
+        "migrasi data",
+        "department_key",
+        "DeptBeautyHacks"
       ]
     },
     {
@@ -17398,6 +17429,8 @@
         "GA - Form Pengadaan dan Pengajuan Dana",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "Microservices - Attendance Service",
+        "ADR - 0168 Departemen Beauty Hacks Diganti Nama Jadi Beautyhacks Bertahap, Kedua Nama Diterima selama Transisi",
+        "ANALISA - Ganti Nama Departemen Beauty Hacks Jadi Beautyhacks",
         "APP - Audit Internal",
         "GA - Procurement System",
         "REF - Kepemilikan Data",
@@ -17407,20 +17440,20 @@
         "APP - Web ERP",
         "HOMEPAGE"
       ],
-      "hash": "827b74dcde292eb9798a254ded013b46519d2560ae55bba9a7e117bf56ae1a74",
-      "ukuran_kb": 14.5,
-      "ringkasan": "Menjawab: departemen X didokumentasikan di dok vault mana, apa kunci modul (deptKeyToNames) dan kategori sidebar-nya, berapa karyawan dan template KPI-nya menurut sensus produksi, dan departemen mana yang belum punya dok induk beserta alasannya. Juga menjawab selisih nama Printing vs Percetakan dan akibatnya pada picker jadwal kerja serta pratinjau template KPI, dan kunci mana yang terdengar seperti departemen padahal bukan (kategori marketing, label HRGA).",
+      "hash": "6990b0ebda2c48b726f65daae027578350649ff7cfd0a6b007b1a939859e7249",
+      "ukuran_kb": 15.7,
+      "ringkasan": "Menjawab: departemen X didokumentasikan di dok vault mana, apa key modul dan kategori sidebar-nya, berapa karyawan dan template KPI per departemen (sensus bertanggal), dan departemen mana yang belum punya dok induk. Juga menjelaskan selisih nama Printing vs Percetakan beserta akibatnya (picker jadwal 400, template KPI tak terpakai), rencana rename Beauty Hacks jadi Beautyhacks, dan key yang terdengar seperti departemen tapi bukan.",
       "kata_kunci": [
         "peta departemen",
         "department map",
         "deptKeyToNames",
-        "kategori sidebar",
         "master_department",
         "Printing",
         "Percetakan",
+        "kategori sidebar",
         "HRGA",
-        "dok induk departemen",
-        "Marketing Offline Distribution"
+        "Beauty Hacks",
+        "Kyura"
       ]
     },
     {
@@ -19806,6 +19839,34 @@
       ]
     },
     {
+      "path": "Workspace/ANALISA - Ganti Nama Departemen Beauty Hacks Jadi Beautyhacks.md",
+      "judul": "ANALISA - Ganti Nama Departemen Beauty Hacks Jadi Beautyhacks",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": "🟡",
+      "status_teks": "Belum dikerjakan (2026-10-10).",
+      "publik": false,
+      "tautan": [
+        "ADR - 0168 Departemen Beauty Hacks Diganti Nama Jadi Beautyhacks Bertahap, Kedua Nama Diterima selama Transisi",
+        "REF - Peta Departemen",
+        "IT - Server, VMs and Databases"
+      ],
+      "hash": "1d95e411622fda1b1cc3998679b40effbe4035acb81a4f49f61ad0b9b29a45f6",
+      "ukuran_kb": 14.5,
+      "ringkasan": "Menjawab: issue apa saja yang dibutuhkan untuk rename Beauty Hacks jadi Beautyhacks di bip-erp, erp-frontend, dan MyBharata, urutan deploy-nya (Expand BE, skrip Migrate, FE, Mobile, Contract), dan kriteria benar tiap issue. Juga memuat kueri mongosh baca-saja untuk mengukur dokumen prod bernilai Beauty Hacks per database, koleksi, dan field.",
+      "kata_kunci": [
+        "Beautyhacks",
+        "Beauty Hacks",
+        "blueprint rename",
+        "draf issue",
+        "Siap Agent",
+        "skrip migrasi",
+        "expand contract",
+        "mongosh kueri ukur",
+        "department_color_utils"
+      ]
+    },
+    {
       "path": "Workspace/ANALISA - Gap Jadwal Program Culture vs Sistem ERP.md",
       "judul": "ANALISA - Gap Jadwal Program Culture vs Sistem ERP",
       "area": "Workspace",
@@ -19878,20 +19939,19 @@
         "ADR - 0164 Hak Akses Satu Pintu, Peran Dibawa Paket Hak dan Dirakit saat Token Terbit",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "f89d48cdd6fc73c3f56cfb58d1e75d41f3189b42453fc2af8f7d94a6a58457f0",
-      "ukuran_kb": 20.8,
-      "ringkasan": "Menjawab: bagaimana pekerjaan Hak Akses Satu Pintu dipecah jadi issue (induk bip-erp#2933 dan sub-issue BE/FE), urutan pengerjaan dan deploy-nya, serta langkah manusia di antaranya (alat banding token, pemindahan data, penyalaan sakelar). Juga memuat draf issue lengkap dengan kriteria Yang harus benar, cakupan, dan data sensus produksi.",
+      "hash": "5c68d183f7174702a815d6aedf40d598cf0a505c161ea9a69d765d11dd8d9dd9",
+      "ukuran_kb": 20.6,
+      "ringkasan": "Menjawab: pekerjaan apa saja (issue induk dan enam sub-issue BE dan FE) untuk menyatukan hak akses ke paket hak sesuai ADR 0164, urutan deploy-nya, dan langkah manusia di antaranya (alat banding di prod, pembekuan perubahan hak, skrip pemindahan data, penyalaan sakelar). Juga memuat kriteria benar tiap issue dan sensus prod akun, peran, dan paket.",
       "kata_kunci": [
-        "analisa hak akses",
         "hak akses satu pintu",
         "draf issue",
-        "sub-issue",
-        "alat banding token",
+        "system_roles",
         "paket peran",
+        "alat banding token",
+        "permission set",
         "migrasi peran",
-        "bip-erp#2933",
-        "urutan deploy",
-        "system_roles"
+        "sakelar perakitan",
+        "RBAC"
       ]
     },
     {
@@ -20081,20 +20141,19 @@
         "ADR - 0167 Izin HRIS Dipecah per Fitur dengan Cadangan Peran per Fitur",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "560535a374ad4c6c5e284acae0b8a6ed017c93ae7379fdaeaee4b8f7a8162079",
-      "ukuran_kb": 13.6,
-      "ringkasan": "Menjawab: bagaimana pekerjaan pemecahan izin HRIS per fitur dipecah jadi issue induk dan sub-issue BE/FE beserta urutan deploy-nya, apa kriteria 'yang harus benar' tiap issue, dan langkah manusia apa yang dibutuhkan (alat banding, perapian paket sempit, menyalakan HRIS_TIER_FALLBACK=off). Juga memuat data pendukung produksi tentang siapa memegang peran dan paket hris.",
+      "hash": "1fe4f7cd0dc6e3fd7881cc5f761c959c86662397e5290d6779c808a97f5c1ab3",
+      "ukuran_kb": 13.4,
+      "ringkasan": "Menjawab: issue apa saja untuk memecah izin HRIS per fitur sesuai ADR 0167 (katalog dan gerbang BE, menu dan tombol cuti FE, paket setara dan lompatan ke attendance), urutan deploy-nya, dan langkah manusia sebelum mematikan cadangan peran (HRIS_TIER_FALLBACK=off). Juga memuat kriteria benar seperti izin payung, cadangan per fitur, pemetaan paket bawaan, dan data prod pemegang hak HRIS.",
       "kata_kunci": [
-        "analisa kebutuhan",
-        "izin HRIS",
-        "HRIS permission",
+        "izin HRIS per fitur",
         "draf issue",
-        "sub-issue",
-        "fase dua",
+        "hris_lihat",
+        "hris_pelaksana",
+        "hris_admin",
         "HRIS_TIER_FALLBACK",
-        "paket setara",
-        "alat banding",
-        "bip-erp#2941"
+        "cadangan peran",
+        "permission",
+        "katalog izin hris"
       ]
     },
     {
