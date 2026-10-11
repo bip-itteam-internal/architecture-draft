@@ -15,17 +15,17 @@
 
 | # | Issue | Repo | Bentuk | Urutan |
 |---|---|---|---|---|
-| 0 | To-do harian pribadi dengan pantauan atasan efektif | bip-erp | induk, tanpa PR | - |
-| 1 | [BE] Endpoint internal atasan dan bawahan efektif (bagian 1/2) | bip-erp | sub-issue | pertama |
-| 2 | [BE] Koleksi to-do, daftar hari ini, dan pantauan bawahan (bagian 2/2) | bip-erp | sub-issue | sesudah #1 merged |
-| 3 | [Mobile] To-do hari ini di Beranda dan tab Hari Ini (bagian 1/2) | my-bharata | sub-issue | deploy sesudah #2 |
-| 4 | [Mobile] Tampilan to-do bawahan untuk atasan efektif (bagian 2/2) | my-bharata | sub-issue | sesudah #3 merged |
+| 0 ([bip-erp#2967](https://github.com/bip-itteam-internal/bip-erp/issues/2967)) | To-do harian pribadi dengan pantauan atasan efektif | bip-erp | induk, tanpa PR | - |
+| 1 ([bip-erp#2968](https://github.com/bip-itteam-internal/bip-erp/issues/2968)) | [BE] Endpoint internal atasan dan bawahan efektif (bagian 1/2) | bip-erp | sub-issue | pertama |
+| 2 ([bip-erp#2969](https://github.com/bip-itteam-internal/bip-erp/issues/2969)) | [BE] Koleksi to-do, daftar hari ini, dan pantauan bawahan (bagian 2/2) | bip-erp | sub-issue | sesudah #1 merged |
+| 3 ([my-bharata#205](https://github.com/bip-itteam-internal/my-bharata/issues/205)) | [Mobile] To-do hari ini di Beranda dan tab Hari Ini (bagian 1/2) | my-bharata | sub-issue | deploy sesudah #2 |
+| 4 ([my-bharata#206](https://github.com/bip-itteam-internal/my-bharata/issues/206)) | [Mobile] Tampilan to-do bawahan untuk atasan efektif (bagian 2/2) | my-bharata | sub-issue | sesudah #3 merged |
 
 ---
 
 ## 0. To-do harian pribadi dengan pantauan atasan efektif
 
-- **Repo**: bip-erp · **Bentuk**: induk (tanpa PR) · **Issue**: (diisi saat dibuat)
+- **Repo**: bip-erp · **Bentuk**: induk (tanpa PR) · **Issue**: [bip-erp#2967](https://github.com/bip-itteam-internal/bip-erp/issues/2967)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -58,7 +58,7 @@ Tidak ada.
 
 ## 1. [BE] Endpoint internal atasan dan bawahan efektif (bagian 1/2)
 
-- **Repo**: bip-erp (`services/employee`) · **Bentuk**: sub-issue induk #0 · **Issue**: (diisi saat dibuat)
+- **Repo**: bip-erp (`services/employee`) · **Bentuk**: sub-issue induk #0 · **Issue**: [bip-erp#2968](https://github.com/bip-itteam-internal/bip-erp/issues/2968)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -98,7 +98,7 @@ Tidak ada.
 
 ## 2. [BE] Koleksi to-do, daftar hari ini, dan pantauan bawahan (bagian 2/2)
 
-- **Repo**: bip-erp (`services/task-management`, `docker-compose.yml`) · **Bentuk**: sub-issue induk #0 · **Issue**: (diisi saat dibuat)
+- **Repo**: bip-erp (`services/task-management`, `docker-compose.yml`) · **Bentuk**: sub-issue induk #0 · **Issue**: [bip-erp#2969](https://github.com/bip-itteam-internal/bip-erp/issues/2969)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -144,7 +144,7 @@ Prod 2026-10-11 `task_management_db.tasks`: 427 tiket; status Done 289, Request 
 
 ## 3. [Mobile] To-do hari ini di Beranda dan tab Hari Ini (bagian 1/2)
 
-- **Repo**: my-bharata (folder lokal `mybharata-app`, branch `dev`) · **Bentuk**: sub-issue induk #0 · **Issue**: (diisi saat dibuat)
+- **Repo**: my-bharata (folder lokal `mybharata-app`, branch `dev`) · **Bentuk**: sub-issue induk #0 · **Issue**: [my-bharata#205](https://github.com/bip-itteam-internal/my-bharata/issues/205)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -186,7 +186,7 @@ Tidak perlu data prod tambahan.
 
 ## 4. [Mobile] Tampilan to-do bawahan untuk atasan efektif (bagian 2/2)
 
-- **Repo**: my-bharata (folder lokal `mybharata-app`, branch `dev`) · **Bentuk**: sub-issue induk #0 · **Issue**: (diisi saat dibuat)
+- **Repo**: my-bharata (folder lokal `mybharata-app`, branch `dev`) · **Bentuk**: sub-issue induk #0 · **Issue**: [my-bharata#206](https://github.com/bip-itteam-internal/my-bharata/issues/206)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @

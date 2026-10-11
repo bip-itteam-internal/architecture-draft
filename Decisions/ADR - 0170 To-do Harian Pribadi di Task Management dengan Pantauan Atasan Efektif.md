@@ -2,19 +2,10 @@
 
 ## Untuk Manajemen
 
-**Apa yang berubah di layar.** Karyawan dapat mencatat pekerjaan hariannya sendiri di MyBharata. Ada kartu "To-do hari ini" di Beranda dengan tombol tambah, dan tab baru **Hari Ini** di menu Tugas. Isi tab Hari Ini adalah catatan pribadi itu ditambah tiket yang ditugaskan ke orang tersebut dan jatuh tempo hari ini atau sudah lewat, sehingga tidak ada yang perlu diketik dua kali. Pekerjaan yang belum selesai otomatis terbawa ke hari berikutnya dengan label "tertunda N hari". Atasan dapat melihat daftar hari ini setiap bawahannya. Layar atasan dibuka dengan ringkasan siapa yang punya pekerjaan tertunda tiga hari atau lebih, supaya atasan bisa menegur, membantu, atau membagi ulang pekerjaan.
-
-**Siapa yang terdampak.** Seluruh karyawan aktif (181 orang per 2026-10-11) sebagai pengisi. Sebagai pemantau: 8 atasan langsung yang sudah tercatat, ditambah 11 supervisor departemen yang memantau 97 karyawan yang atasan langsungnya belum diisi HR.
-
-**Apa yang TIDAK dijanjikan.**
-- Belum masuk KPI atau penilaian kinerja. Itu diputuskan terpisah sesudah ada data satu sampai dua bulan.
-- Belum ada di Web ERP. Staf kantor yang seharian di depan komputer tetap mengisi lewat ponsel.
-- Belum ada pengingat atau notifikasi pagi.
-- Lampiran bukti sudah bisa diunggah, tetapi belum bisa diwajibkan. Mewajibkan bukti diputuskan di tahap berikutnya.
-- Laporan harian berbasis Excel yang diminta SOP beberapa posisi tidak otomatis tergantikan. Menggantinya adalah keputusan pemilik SOP masing-masing.
-- Angka "tertunda" dihitung dalam hari kalender, jadi akhir pekan dan hari libur ikut terhitung.
-
-**Perkiraan besaran kerja.** Besar: dua PR backend (dua service) dan dua PR aplikasi MyBharata, dikerjakan berurutan.
+- **Yang berubah di layar**: karyawan mencatat pekerjaan hariannya di MyBharata (kartu "To-do hari ini" di Beranda dan tab **Hari Ini** di menu Tugas), digabung dengan tiket yang ditugaskan kepadanya sehingga tak ada yang diketik dua kali. Yang belum selesai terbawa ke hari berikutnya berlabel "tertunda N hari". Atasan melihat daftar bawahannya, dibuka dengan ringkasan siapa yang tertunda tiga hari atau lebih, untuk menegur, membantu, atau membagi ulang pekerjaan.
+- **Siapa terdampak**: seluruh 181 karyawan aktif sebagai pengisi (2026-10-11). Pemantau: 8 atasan langsung tercatat, plus 11 supervisor departemen yang memantau 97 karyawan yang atasan langsungnya belum diisi HR.
+- **Tidak dijanjikan**: belum masuk KPI atau penilaian kinerja (diputuskan sesudah ada data satu sampai dua bulan); belum ada di Web ERP; belum ada pengingat pagi; bukti bisa dilampirkan tetapi belum bisa diwajibkan; laporan harian Excel milik SOP tidak otomatis tergantikan; "tertunda" dihitung hari kalender sehingga akhir pekan dan libur ikut terhitung.
+- **Besaran kerja**: besar, yaitu dua PR backend (dua service) dan dua PR aplikasi MyBharata, berurutan.
 
 ## Deskripsi
 
