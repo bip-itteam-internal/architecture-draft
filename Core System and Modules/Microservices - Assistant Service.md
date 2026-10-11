@@ -32,6 +32,14 @@
   **di dalam service pemilik data lewat klien tipis `shared-library/ai`**, bukan sebagai service
   tersendiri. ⚠️ **Klien `shared-library/ai` yang disebut di sana TERNYATA BELUM ADA sama sekali
   di kode** — diverifikasi `git grep` menyeluruh 2026-09-28, nol hasil di luar false-positive.
+  ⛔ **ADR 0120 itu sendiri DICABUT 2026-10-11** oleh
+  [[ADR - 0169 Asisten Analisa Marketing Dihapus, Copilot Jadi Pintu Tunggal, Mesin Keputusan Dipertahankan]]:
+  fitur Asisten Analisa (laporan marketing terjadwal) dihapus dari marketing-analytics dan erp-frontend
+  (bip-erp [#2964](https://github.com/bip-itteam-internal/bip-erp/pull/2964), erp-frontend
+  [#2297](https://github.com/bip-itteam-internal/erp-frontend/pull/2297), live di prod 2026-10-11), sehingga
+  **Copilot kini pintu tunggal analisa percakapan marketing**. Pengingat rutin tetap lewat Jadwal Tugas
+  Copilot apa adanya (pengingat, bukan laporan utuh tanpa kehadiran pemakai); keputusan jalankan/tolak
+  **tidak** dipindahkan ke Copilot. Laporan laba kini hanya punya satu pembuat, yaitu milik Copilot.
   Ketegangan dengan ADR 0058 §2 yang dicatat dokumen ini (§ Dua ketegangan terbuka) **sudah
   dijawab** di sana, tapi HANYA untuk kasus satu domain (Marketing) — untuk kasus tanya-jawab
   bebas **lintas modul**, ketegangan itu **dijawab beda** oleh
