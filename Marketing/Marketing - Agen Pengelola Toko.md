@@ -2,7 +2,7 @@
 
 ## Deskripsi
 
-*Konsep agen AI yang secara bertahap mengambil alih pekerjaan pemegang toko marketplace (posisi Account Specialist) di divisi Beauty Hacks dan Kyura. Agen ini bukan service baru: ia adalah mesin keputusan Asisten Analisa Marketing yang diperluas dengan toko pilot, penyetuju Leader/SPV, dan penilaian dampak tiap keputusan terhadap laba matang. Keputusan arsitekturnya di [[ADR - 0145 Agen Pengelola Toko Tumbuh dari Mesin Keputusan yang Ada, Dampak Diukur Sebelum Eksekusi]]; dok ini menyimpan cara kerjanya.*
+*Konsep agen AI yang secara bertahap mengambil alih pekerjaan pemegang toko marketplace (posisi Account Specialist) di divisi Beautyhacks dan Kyura. Agen ini bukan service baru: ia adalah mesin keputusan Asisten Analisa Marketing yang diperluas dengan toko pilot, penyetuju Leader/SPV, dan penilaian dampak tiap keputusan terhadap laba matang. Keputusan arsitekturnya di [[ADR - 0145 Agen Pengelola Toko Tumbuh dari Mesin Keputusan yang Ada, Dampak Diukur Sebelum Eksekusi]]; dok ini menyimpan cara kerjanya.*
 
 - **Status**: 🟡 **Konsep**, 2026-10-01. Kode tahap 1 belum ada. Mesin keputusan yang menjadi dasarnya sudah ⚠️ implemented di prod (mode bayangan, [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]]).
 - **Implementasi**: [[Microservices - Marketing Analytics Service]] (mesin keputusan, koleksi `keputusan_kiriman`)
@@ -53,7 +53,7 @@ Tujuh lapis fondasi agen dan posisinya hari ini:
 
 | Persona | Peran & Divisi | Akses / RBAC | Device |
 |---|---|---|---|
-| Penyetuju toko pilot | Leader / SPV Beauty Hacks atau Kyura | ditulis eksplisit per toko pilot (bukan `RequireMarketingLeader`) | Web ERP |
+| Penyetuju toko pilot | Leader / SPV Beautyhacks atau Kyura | ditulis eksplisit per toko pilot (bukan `RequireMarketingLeader`) | Web ERP |
 | Pemegang toko pilot | Account Specialist | tetap tercatat di `icc_account_mappings` selama tahap 1 | Web ERP |
 | Pembaca hasil | Direktur, pemilik produk | daftar penerima eksplisit (pola [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]]) | Web ERP |
 

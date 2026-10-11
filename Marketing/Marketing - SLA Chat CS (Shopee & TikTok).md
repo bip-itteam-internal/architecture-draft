@@ -144,7 +144,7 @@ adalah vonis terburuk untuk toko yang sebenarnya tidak diukur.
 (`cs_shop_mappings`, banyak-ke-banyak) — `icc_account_mappings` adalah
 kepemilikan toko, bukan tanggung jawab chat. ICC yang merangkap CS cukup
 terdaftar di keduanya. CS terdaftar lewat `system_roles.insentive = "crm"` dan
-berada di departemen yang sama dengan ICC (Kyura, Beauty Hacks).
+berada di departemen yang sama dengan ICC (Kyura, Beautyhacks).
 
 ## Dokumen Terkait
 

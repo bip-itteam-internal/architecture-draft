@@ -161,7 +161,7 @@ Ketujuh baris plafon punya **tiga bentuk yang berbeda**, dan hanya lima di antar
 
 | Blueprint | Induk di ERP | Bentuk | Karyawan induk |
 |---|---|---|---:|
-| BH Beautyhacks | `Beauty Hacks` (ejaan berbeda) | departemen utuh | 48 |
+| BH Beautyhacks | `Beautyhacks` (sebelum 2026-10-11 bernama `Beauty Hacks`, ejaan berbeda; sejak itu sama dengan blueprint) | departemen utuh | 48 |
 | KY Kyura | `Kyura` | departemen utuh | 31 |
 | GA General Affair | `General Affair` | departemen utuh | 21 |
 | SK Sekretariat | `Kesekretariatan` (nama berbeda) | departemen utuh | 11 |

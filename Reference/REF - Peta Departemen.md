@@ -2,7 +2,7 @@
 
 *Peta dari tiap departemen yang tercatat di sistem ke kunci modulnya, kategori sidebar-nya, dan dok vault yang menjadi titik masuknya. Menjawab dua pertanyaan: "departemen X didokumentasikan di mana" dan "departemen mana yang belum punya rumah di vault". Dok ini BUKAN daftar departemen yang hidup; ia pintu ke dok lain.*
 
-- **Status**: ⚠️ Implemented (ada catatan). Kolom kode diverifikasi ke `origin/main` bip-erp `72183415` dan erp-frontend `bd7320d3`. Daftar departemen, jumlah karyawan, dan jumlah template diukur dari sensus produksi baca-saja `employee_db` pada **2026-09-14**. ⚠️ **Ukur ulang sebelum dipakai mengambil keputusan.** Temuan terpenting sensus itu: departemen ber-key `printing` bernama `Percetakan` di data, tetapi `Printing` di kode dan di template KPI; lihat bab "Selisih nama Printing dan Percetakan".
+- **Status**: ⚠️ Implemented (ada catatan). Kolom kode diverifikasi ke `origin/main` bip-erp `72183415` dan erp-frontend `bd7320d3`. Daftar departemen, jumlah karyawan, dan jumlah template diukur dari sensus produksi baca-saja `employee_db` pada **2026-09-14**. ⚠️ **Ukur ulang sebelum dipakai mengambil keputusan.** Sejak 2026-10-11 departemen `beauty_hacks` bernama `Beautyhacks` (bab "Rename Beauty Hacks menjadi Beautyhacks"). Temuan terpenting sensus itu: departemen ber-key `printing` bernama `Percetakan` di data, tetapi `Printing` di kode dan di template KPI; lihat bab "Selisih nama Printing dan Percetakan".
 - **Daftar hidupnya** ada di `GET /master/departments` ([[Microservices - Employee Service]]) dan tab **Peta Struktur** di `/pengaturan/organisasi?tab=peta-struktur`. Tab itu sengaja menarik isinya hidup; menurut komentarnya, menuliskan daftar departemen sebagai gambar tetap "akan melahirkan sumber kebenaran kedua yang membusuk diam-diam". Tabel di bawah karena itu bertanggal, dan fungsinya memetakan ke dok, bukan menggantikan layar itu.
 
 ## Peta departemen
@@ -16,7 +16,7 @@ Kunci modul dari `deptKeyToNames` (`shared-library/common/roles.go`). Kategori s
 | Tech Development | `it` | 11 / 6 | 3 / 4 | `it` | [[IT - Big Pictures]] | [[IT - Dashboard per Posisi]] |
 | Kesekretariatan | `secretary` | 11 / 8 | 7 / 1 | `secretary` (label SEKRETARIAT) | [[Unlisted - Kesekretariatan (Big Pictures)]] | [[QA - Register Perizinan & Sertifikasi]] · [[QA - R&D Regulatory (Registrasi & Pipeline Produk)]] · [[Unlisted - Dashboard per Posisi (Kesekretariatan)]] |
 | Finance | `finance` | 19 / 16 | 12 / 2 | `finance` (label FAT) | [[Finance - Big Pictures]] | [[Finance - Dashboard per Posisi (FAT)]] · [[Finance - Rancangan Finance Service]] |
-| Beauty Hacks | `beauty_hacks` | 54 / 47 | 12 / 7 | `marketing` | [[Marketing - Big Pictures]] | [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]] |
+| Beautyhacks (sebelum 2026-10-11: Beauty Hacks) | `beauty_hacks` | 54 / 47 | 12 / 7 | `marketing` | [[Marketing - Big Pictures]] | [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]] |
 | Kyura | `kyura` | 38 / 32 | 12 / 5 | `marketing` | [[Marketing - Big Pictures]] | [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]] |
 | Manufaktur | `manufacture` | 34 / 33 | 11 / 10 | `manufacture` (label WMS ERP OPERATIONAL), juga memegang `warehouse` | tidak ada dok induk tunggal | [[Manufacture - Dashboard per Posisi]] · [[WH - Management System]] · [[Microservices - Manufacture Service]] · [[Microservices - Warehouse Service]] |
 | Quality | `quality` | 6 / 6 | 4 / 0 | `quality` | [[QA - Big Pictures]] | [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]] · [[QA - Dashboard per Posisi]] |
@@ -29,7 +29,7 @@ Catatan tabel:
 
 - **Nama master dan data selaras, kecuali satu.** Kedua belas nama departemen BIP di `master_department` muncul persis sebagai nilai `work_data.department`, dan setiap nilai `kpi_template.department` cocok dengan nama master **kecuali `Printing`**.
 - **General Affair tidak punya kategori sidebar utama sendiri.** Menu GA tinggal di kategori `hris`, dan blok `ga` digabung ke blok HRGA oleh `gabungBlokHrga` setelah penyaringan izin. `HRGA` adalah `supervision_label`, bukan nama departemen siapa pun.
-- **Beauty Hacks dan Kyura berbagi kategori `marketing`.** Kategori itu tidak ada hubungannya dengan departemen ber-key `marketing` (Marketing Offline Distribution); lihat bab berikut.
+- **Beautyhacks dan Kyura berbagi kategori `marketing`.** Kategori itu tidak ada hubungannya dengan departemen ber-key `marketing` (Marketing Offline Distribution); lihat bab berikut.
 - **`deptKeyToNames.finance` memetakan ke Finance DAN Procurement.** Gerbang yang membaca peta ini (mis. akses KPI per departemen bagi peran bernilai `supervisor`/`admin`) karena itu meloloskan pemegang peran `finance` ke departemen Procurement.
 - **Jumlah akun.** `system_authentication` berisi 216 akun (186 aktif), sedangkan `work_data` berjumlah 214 (184 dengan akun aktif). Dua akun tanpa `work_data` belum diperiksa apakah keduanya akun pihak luar.
 
@@ -56,17 +56,17 @@ Keadaan per sensus produksi 2026-09-14:
 
 **Belum diputuskan (TBD), dan bukan keputusan dok ini:** nama mana yang dipakai. Menyamakan ke `Percetakan` berarti mengubah `DeptPrinting`, entri `deptKeyToNames`, uji attendance yang menolak `"Percetakan"`, dan `kpi_template.department`. Menyamakan ke `Printing` berarti mengganti nama di master dan `work_data` kembali. Keduanya menyentuh data produksi, jadi dijalankan manusia.
 
-## Rename Beauty Hacks menjadi Beautyhacks (direncanakan)
+## Rename Beauty Hacks menjadi Beautyhacks
 
-🟡 **Diusulkan 2026-10-10, belum dikerjakan.** Departemen `beauty_hacks` akan berganti nama dari `Beauty Hacks` menjadi `Beautyhacks`, sesuai ejaan dokumen SOP perusahaan. Keputusan dan alasannya ada di [[ADR - 0168 Departemen Beauty Hacks Diganti Nama Jadi Beautyhacks Bertahap, Kedua Nama Diterima selama Transisi]], pecahan kerjanya di [[ANALISA - Ganti Nama Departemen Beauty Hacks Jadi Beautyhacks]].
+⚠️ **Live di produksi 2026-10-11, fase Contract belum.** Departemen `beauty_hacks` bernama `Beautyhacks` (sebelumnya `Beauty Hacks`), sesuai ejaan dokumen SOP perusahaan. Keputusan dan alasannya ada di [[ADR - 0168 Departemen Beauty Hacks Diganti Nama Jadi Beautyhacks Bertahap, Kedua Nama Diterima selama Transisi]], pecahan kerjanya di [[ANALISA - Ganti Nama Departemen Beauty Hacks Jadi Beautyhacks]]. Key `beauty_hacks`, nama jabatan (`BeautyHacks Supervisor`), nama departemen Accurate `MARKETING - BEAUTYHACKS`, dan nama toko tidak berubah.
 
-Cara kerjanya, supaya kelas kegagalan Printing/Percetakan di atas tidak terulang:
+Tiga fase, supaya kelas kegagalan Printing/Percetakan di atas tidak terulang:
 
-1. **Expand**: backend menerima kedua nama untuk satu departemen. Kedua nama dipegang di satu tempat (`deptKeyToNames` dan konstanta transisi).
-2. **Migrate**: skrip dump → dry-run → apply mengganti nilai di seluruh koleksi yang menyimpan nama departemen. Dijalankan manusia di prod.
-3. **Contract**: nama lama dibuang sesudah dry-run ulang menunjukkan nol dokumen dan token lama sudah kedaluwarsa.
+1. **Expand** ✅ (bip-erp #2957, erp-frontend #2293, deploy prod 2026-10-11 ±10:00 WIB): backend dan web memperlakukan kedua ejaan sebagai satu departemen. Satu sumber di backend: `shared-library/common/departemen_nama.go` (`DeptNameBeautyhacks`, konstanta transisi `DeptNameBeautyHacksLama`, `DepartemenSama`, `NilaiFilterDepartemen`), dijaga test pemindai sumber yang menolak literal ejaan lama. Di web: `kanonDepartemen`/`samaDepartemen` di `src/features/hris/kpi/lib/departemen-marketing.ts`. MyBharata (`department_color_utils.dart`, my-bharata #203) merged ke `dev`, menunggu rilis store.
+2. **Migrate** ✅ (skrip `scripts/ganti-nama-beautyhacks/`, bip-erp #2956, dijalankan 2026-10-11 10:55 WIB): 2.963 dokumen diganti di 9 container Mongo, cek ulang sisa 0 di 10 container. **Sengaja tetap berkunci lama** ("beauty hacks"): `recruitment_db.manpower_plan.dept_key` dan `task_management_db.engagement_giliran` (`_id`, `departemen`), karena kode Expand memetakan kedua ejaan ke kunci lama itu. Riwayat Copilot (`assistant_db.percakapan`) dan rincian KPI historis tidak dimigrasi.
+3. **Contract** 🟡 (bip-erp #2947, belum): buang nama lama dari kode sesudah token yang terbit sebelum migrasi kedaluwarsa, dan putuskan kunci akhir dua koleksi di atas. Selama belum dikerjakan, ejaan lama tetap diterima di mana pun nama departemen dibandingkan.
 
-Sampai Migrate selesai di prod, nama yang hidup tetap `Beauty Hacks`, dan tabel di atas sengaja belum diubah.
+⚠️ **Pembanding departemen yang belum menyamakan kedua ejaan:** `departemenSama` di `erp-frontend/src/features/integration/icc/lib/hierarki-leader.ts` (kartu leader ICC). Sesudah migrasi data aman karena `team` ICC dan `work_data` sama-sama sudah "Beautyhacks"; baru berisiko bila salah satunya ditulis ulang dengan ejaan lama.
 
 ## Kunci yang terdengar seperti departemen, tapi bukan
 

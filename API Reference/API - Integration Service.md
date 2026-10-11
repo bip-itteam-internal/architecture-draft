@@ -380,7 +380,7 @@ Daftar izin hidup di **satu tempat**, `finance_baca_gate.go`; tabel ini peta rin
 | POST | `/department-shops` | Body `{department, channel, shop_id, shop_name, pindah}`. Non-IT: `department` HARUS sama (kanonik) dengan departemen pemanggil → **403** bila beda. Toko yang **sudah** dimiliki departemen lain → **409**, kecuali `pindah:true` dikirim eksplisit — memindahkan kepemilikan diam-diam berarti memindahkan omzet + skor dua supervisor sekaligus, sengaja tidak implisit |
 | DELETE | `/department-shops?channel=&shop_id=` | Lepas kepemilikan (query param, **bukan** path — tak ada `:id` publik). Tidak ditemukan → **404**. Tetap `RequireIntegrationAdmin`, tidak ikut dibuka untuk marketing leader |
 
-⚠️ **Laporan `yatim` belum mencakup Lazada** — sumbernya cuma menyatukan `shopee_shop_infos` + `tt_shop_authorized_shops`. Toko Lazada karena itu tak akan pernah dilaporkan yatim walau belum dipetakan — gap senyap (hari ini Kyura/Beauty Hacks nol toko Lazada, tapi begitu ada, omzetnya hilang dari laporan kesehatan tanpa peringatan).
+⚠️ **Laporan `yatim` belum mencakup Lazada** — sumbernya cuma menyatukan `shopee_shop_infos` + `tt_shop_authorized_shops`. Toko Lazada karena itu tak akan pernah dilaporkan yatim walau belum dipetakan — gap senyap (hari ini Kyura/Beautyhacks nol toko Lazada, tapi begitu ada, omzetnya hilang dari laporan kesehatan tanpa peringatan).
 
 `shop_name` **tidak pernah dipakai mencocokkan** (cuma tampilan) — nama toko produksi ada yang berspasi di ujung atau beda kapitalisasi saja; identitas sejati selalu `(channel, shop_id)`.
 

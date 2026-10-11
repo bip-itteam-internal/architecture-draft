@@ -1519,7 +1519,7 @@ JWT penanya berikutnya (ditemukan di bip-erp #2382).
     `katalog-pertanyaan.test.ts`: tiap kartu dan templat hanya menanyakan periode dalam bentuk yang diterima alatnya, dan
     tak menjanjikan hal di luar isi alat. ⚠️ Ini cermin lintas repo: argumen periode yang berubah di backend wajib
     disunting di sini juga.
-  - **Pilihan divisi marketing** Kyura dan Beauty Hacks (nama dari `hris/kpi/lib/departemen-marketing.ts`), bawaannya divisi
+  - **Pilihan divisi marketing** Kyura dan Beautyhacks (nama dari `hris/kpi/lib/departemen-marketing.ts`), bawaannya divisi
     pemakai (`divisiPemakai`), selain itu "Semua divisi". Daftar hidup `GET /divisi` sengaja tidak dipakai karena digerbang
     modul marketing dan akan gagal bagi pemakai departemen lain. Kartu perbandingan dua divisi meminta tiap divisi diambil
     terpisah (backend menolak dua divisi dalam satu panggilan), jadi hasilnya dua blok, bukan satu grafik banding.

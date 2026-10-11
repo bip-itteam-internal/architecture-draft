@@ -184,7 +184,7 @@ Tingkat SENGAJA least-privilege: **`quality: supervisor` hanya untuk jabatan Sup
 
 Kebalikan Quality: tak ada yang terkunci, justru berpotensi terlalu terbuka — dan itu **diterima sadar**. Jabatan dev (`Frontend Developer`, `Backend Developer`, dst.) membawa paket `hris_admin` + `recruitment_penyetuju` di tingkat POSISI, sehingga dev baru non-admin otomatis mendapat HR admin. Diminta **dibiarkan** (tim ini membangun & mengoperasikan ERP, akses luas disengaja). Departemennya punya atasan (`is_supervisor: true` pada dua Tech Development Supervisor), jadi bug "tak punya atasan" ala Procurement tak ada. Jabatan `IT Infrastructure` tanpa paket & tanpa pemegang — dorman, tak berbahaya.
 
-Dengan ini **sepuluh departemen tuntas** diaudit: HR · Finance · Manufaktur · Quality · Beauty Hacks · Kyura · General Affair · Kesekretariatan · Procurement · Tech Development.
+Dengan ini **sepuluh departemen tuntas** diaudit: HR · Finance · Manufaktur · Quality · Beauty Hacks (kini Beautyhacks) · Kyura · General Affair · Kesekretariatan · Procurement · Tech Development.
 
 🔴 **Direktur = akses penuh seluruh sistem (2026-08-11). Corporate Secretary TIDAK.** Keputusan pemilik produk, dengan **hak tulis diterima eksplisit**. Ini titik di mana kesetaraan Direktur–Corporate Secretary **berhenti**: keduanya tetap setara dalam MEMUTUS (lihat paragraf berikutnya), tapi tidak dalam mengakses.
 
@@ -601,7 +601,7 @@ Sebabnya gateway **tak bisa dibangun ulang**: ia memanggil `ValidateInternalURL`
 
 **Aturan kerja**: satu PR sama dengan satu modul, memuat katalog + paket bawaan, gerbang BE + kill-switch env, dan penyaringan FE sekaligus. Urutan: payroll, recruitment, hris, wms, integration (integration terakhir karena terbesar dan paling banyak celah).
 
-**Yang berubah dari urutan itu (2026-08-09):** `wms` **tidak** dikatalogkan. Pengukuran ke data menunjukkan masalah nyatanya bukan ketiadaan aturan melainkan ketiadaan data peran, dan matriks WMS yang sudah ada terlalu mahal untuk disalin ke bentuk kedua — lihat [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]]. Urutan sisanya juga diturunkan dari data, bukan dari ukuran service: **56 dari 63 jabatan** berbagi tanda tangan `system_roles` yang identik dengan jabatan lain di departemennya, artinya RBAC hari ini tak bisa membedakan mereka sama sekali. Terparah Finance (8 jabatan → 3 pola) dan Beauty Hacks (10 → 11 pola tapi lima jabatan menyatu jadi satu).
+**Yang berubah dari urutan itu (2026-08-09):** `wms` **tidak** dikatalogkan. Pengukuran ke data menunjukkan masalah nyatanya bukan ketiadaan aturan melainkan ketiadaan data peran, dan matriks WMS yang sudah ada terlalu mahal untuk disalin ke bentuk kedua — lihat [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]]. Urutan sisanya juga diturunkan dari data, bukan dari ukuran service: **56 dari 63 jabatan** berbagi tanda tangan `system_roles` yang identik dengan jabatan lain di departemennya, artinya RBAC hari ini tak bisa membedakan mereka sama sekali. Terparah Finance (8 jabatan → 3 pola) dan Beauty Hacks (kini Beautyhacks) (10 → 11 pola tapi lima jabatan menyatu jadi satu).
 
 Akar teknisnya satu angka: penanda izin di menu. Angka itu **bergerak, tapi bentuk masalahnya tidak**. Menu tanpa penanda selalu tampil, tak peduli paketnya — jadi memasang paket ke jabatan di modul yang menunya belum ditandai tidak mengubah apa pun di layar.
 

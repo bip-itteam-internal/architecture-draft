@@ -9,7 +9,7 @@
 |---|---|---|
 | [[HRIS - Alur KPI Otomatis.excalidraw]] | SPV, Leader, HR, direksi | Kenapa skornya belum terisi sendiri padahal matriknya sudah lengkap |
 | [[HRIS - Alur KPI Otomatis Rinci.excalidraw]] | Dev departemen | Sembilan langkah yang benar-benar dijalankan employee-service, beserta katalog rumus, arah target, dan jalur kegagalan |
-| [[HRIS - Alur KPI Otomatis Marketing.excalidraw]] | SPV & Leader Beauty Hacks/Kyura, dev marketing | Lima tahap yang benar-benar jalan untuk marketing, dan **di tahap mana** yang belum jalan itu tersendat |
+| [[HRIS - Alur KPI Otomatis Marketing.excalidraw]] | SPV & Leader Beautyhacks/Kyura, dev marketing | Lima tahap yang benar-benar jalan untuk marketing, dan **di tahap mana** yang belum jalan itu tersendat |
 
 ### Versi gambaran besar
 
@@ -19,7 +19,7 @@
 
 ![[HRIS - Alur KPI Otomatis Rinci.excalidraw]]
 
-### Versi marketing (Beauty Hacks · Kyura)
+### Versi marketing (Beautyhacks · Kyura)
 
 ![[HRIS - Alur KPI Otomatis Marketing.excalidraw]]
 
@@ -27,7 +27,7 @@ Dua diagram di atas menjelaskan mesinnya secara umum. Yang ini menjawab pertanya
 
 Perlu diketahui sebelum membacanya:
 
-- **"Marketing" bukan nama departemen di sistem ini.** Yang ada `Beauty Hacks` dan `Kyura`; identitas tim tunggalnya diputuskan di [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]]. Daftar eksplisitnya (`departemenMarketingTarget` di `kpi_target_marketing.go`) ikut hilang bersama alur target-marketing (PR C ADR 0079); keanggotaan divisi kini dari `work_data` lewat employee-service, seperti pada `/profit-dashboard`.
+- **"Marketing" bukan nama departemen di sistem ini.** Yang ada `Beautyhacks` dan `Kyura`; identitas tim tunggalnya diputuskan di [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]]. Daftar eksplisitnya (`departemenMarketingTarget` di `kpi_target_marketing.go`) ikut hilang bersama alur target-marketing (PR C ADR 0079); keanggotaan divisi kini dari `work_data` lewat employee-service, seperti pada `/profit-dashboard`.
 - **Seluruh angkanya diukur langsung ke produksi 26 Agustus 2026**, bukan disalin dari dokumen lain: cakupan dari `GET /kpi/auto-scores`, katalog dari `GET /kpi/sumber-katalog`, dan alasan kegagalan dari `auto_basis` di `GET /kpi/auto-values`. Angka di [[HRIS - Matriks KPI per Departemen]] masih potret 1 Agustus 2026 dan sudah bergeser jauh sejak itu.
 - **Alur target berjenjang** (Finance → SPV → Direktur, lewat `/kpi/target-marketing`) sengaja digambar terpisah dengan garis putus-putus: rutenya ada di biner produksi dan halaman `/finance/target-marketing` sudah ter-build, tetapi koleksi `kpi_target_marketing` masih kosong dan antrean persetujuan Direktur belum ter-deploy. Ia belum jadi bagian alur yang berjalan. 🗑️ **Dipensiunkan** ([[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] §6): sisi frontend (halaman, menu, antrean Direktur) dicabut di erp-frontend PR [#1484](https://github.com/bip-itteam-internal/erp-frontend/pull/1484) (merged 2026-09-08), sisi backend (rute `/kpi/target-marketing*`, `departemenMarketingTarget`, koleksi, dan `POST /kpi/auto-values/pratinjau`) di bip-erp PR C [#1788](https://github.com/bip-itteam-internal/bip-erp/pull/1788) (merged 2026-09-08); keduanya live prod 2026-09-08 11:29 WIB (rute membalas 404, terverifikasi). Target profit ditulis satu kali di insentif dan dibaca KPI; alur ini tak pernah terisi, mengecualikan Advertiser, dan bertentangan dengan keputusan SPV menulis langsung.
 

@@ -72,7 +72,7 @@ Ini bukan kelalaian dokumentasi. Pekerjaan divisi ini sebagian besar **tidak mel
 
 Perlu ditegaskan karena godaannya besar: metrik kedua posisi ini menilai **mutu dan ketepatan garapan**, bukan performa hasilnya di marketplace. Targetnya berbunyi "disetujui pengaju dan diserahkan 1 hari setelah form pengajuan ditandatangani". Yang dibutuhkan alur pengajuan bertenggat, bukan angka tayangan.
 
-⚠️ Posisi Video Editor ada **dua kali di perusahaan** dengan template berbeda: `VIDEOGRAPHER & EDITOR COMPANY` di sini dan `VIDEO EDITOR` di Beauty Hacks. Keduanya terkunci pada tracker yang sama, jadi satu modul melayani keduanya.
+⚠️ Posisi Video Editor ada **dua kali di perusahaan** dengan template berbeda: `VIDEOGRAPHER & EDITOR COMPANY` di sini dan `VIDEO EDITOR` di Beautyhacks. Keduanya terkunci pada tracker yang sama, jadi satu modul melayani keduanya.
 
 ### Corporate Secretary dan Personal Assistant
 
@@ -86,7 +86,7 @@ Kenapa tetap tidak direkomendasikan sekarang: matriks KPI menyatakan kedelapan m
 
 ## Kebutuhan backend, terurut
 
-1. **Tracker garapan desain dan video** (pengajuan, persetujuan, tenggat). Membuka 7 metrik di 2 posisi di divisi ini, plus 3 metrik Video Editor Beauty Hacks. Total 10 metrik lintas divisi, daya ungkit tertinggi di dokumen ini.
+1. **Tracker garapan desain dan video** (pengajuan, persetujuan, tenggat). Membuka 7 metrik di 2 posisi di divisi ini, plus 3 metrik Video Editor Beautyhacks. Total 10 metrik lintas divisi, daya ungkit tertinggi di dokumen ini.
 2. **Selesaikan modul Audit Internal** yang sudah diputuskan dua ADR. Memberi Internal Audit metrik terbesarnya tanpa pekerjaan tambahan.
 3. **Periksa kelayakan Calendar Service dan Task Management** sebagai sumber untuk Corporate Secretary dan Personal Assistant. Pemeriksaan dulu, bukan implementasi: yang harus dijawab apakah agenda dan instruksi Direktur benar-benar tercatat di sana.
 4. **Tracker izin BPOM & Halal** untuk QA RND, dipakai bersama [[QA - Dashboard per Posisi]].

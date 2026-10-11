@@ -1,6 +1,6 @@
 # ADR - 0168 Departemen Beauty Hacks Diganti Nama Jadi Beautyhacks Bertahap, Kedua Nama Diterima selama Transisi
 
-> **Status**: 🟢 **Diterima**, 2026-10-10, oleh irfanarfianto (diusulkan 2026-10-10). Kode belum ada. Pemutus: irfanarfianto. Pekerjaan di bip-erp#2944 dan sub-issue-nya; blueprint [[ANALISA - Ganti Nama Departemen Beauty Hacks Jadi Beautyhacks]].
+> **Status**: 🟢 **Diterima**, 2026-10-10, oleh irfanarfianto (diusulkan 2026-10-10). ⚠️ **Implementasi**: Expand dan Migrate live di produksi 2026-10-11 (bip-erp #2957 + #2956, erp-frontend #2293; migrasi 2.963 dokumen, cek ulang sisa 0); MyBharata #203 merged ke `dev`, menunggu rilis store; Contract (bip-erp#2947) belum. Pemutus: irfanarfianto. Pekerjaan di bip-erp#2944 dan sub-issue-nya; blueprint [[ANALISA - Ganti Nama Departemen Beauty Hacks Jadi Beautyhacks]].
 
 ## Untuk Manajemen
 

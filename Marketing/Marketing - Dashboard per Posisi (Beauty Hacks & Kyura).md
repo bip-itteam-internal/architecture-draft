@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Rancangan isi dashboard per posisi untuk dua divisi brand, **Beauty Hacks** (10 posisi) dan **Kyura** (9 posisi). Diturunkan mengikuti [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]]. Keduanya digabung dalam satu dokumen karena **berbagi delapan posisi dengan nama dan struktur metrik yang sama persis**; yang berbeda hanya angka targetnya.*
+*Rancangan isi dashboard per posisi untuk dua divisi brand, **Beautyhacks** (10 posisi) dan **Kyura** (9 posisi). Diturunkan mengikuti [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]]. Keduanya digabung dalam satu dokumen karena **berbagi delapan posisi dengan nama dan struktur metrik yang sama persis**; yang berbeda hanya angka targetnya.*
 
 - **Status**: 🟡 **Rancangan**. Tak satu pun posisi di sini punya lembar per posisi. Yang ada [[Marketing - Marketing Dashboard (Index)|Marketing Analytics]], 16 halaman per TOPIK, bukan per orang.
 - **Tampilan bawaan SPV & Leader** (🔜 branch erp-frontend `feat/marketing-iklan-dashboard`, belum merge per 2026-09-15): `/dashboard` mereka membuka Ringkasan Marketing Analytics lewat peran (`isPemimpinBrand`: SPV/admin `kyura` atau `beauty_hacks`, atau `insentive: adv_leader`), berisi belanja iklan, ROAS vs target, ROI laba, dan anggaran iklan terpakai per brand dari Master Anggaran Finance ([[ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance]]). Itu layar per TOPIK yang sama bagi seluruh pembacanya, bukan lembar per posisi yang dirancang di bawah.
@@ -9,7 +9,7 @@
 
 ## Kenapa dua brand satu dokumen
 
-Delapan posisi ini ada di **kedua** divisi dengan struktur metrik yang sama: Affiliate, Buzzer, Customer Support, Host Live, ICC, Leader, Marketplace Advertiser, Meta Advertiser. Yang berbeda cuma nama supervisornya, angka targetnya, dan Video Editor yang hanya ada di Beauty Hacks.
+Delapan posisi ini ada di **kedua** divisi dengan struktur metrik yang sama: Affiliate, Buzzer, Customer Support, Host Live, ICC, Leader, Marketplace Advertiser, Meta Advertiser. Yang berbeda cuma nama supervisornya, angka targetnya, dan Video Editor yang hanya ada di Beautyhacks.
 
 Menulis dua dokumen berarti dua tempat yang harus dijaga sama, dan yang ketinggalan tidak akan berbunyi. Perbedaan antar-brand ditulis di tempatnya masing-masing di bawah.
 
@@ -30,7 +30,7 @@ Layarnya pun sudah ada, 16 halaman Marketing Analytics lengkap dengan saringan, 
 
 ⚠️ **RALAT 2026-09-04.** Dokumen ini semula menyatakan atribusi ke orang adalah gerbang tunggal divisi ini, dan bahwa jembatannya `icc_account_mappings`. **Keduanya tidak akurat**, dan koreksinya mengubah rekomendasi di bawah. Diukur langsung ke `integration_db` produksi hari itu:
 
-**a. `icc_account_mappings` TERISI dan sehat.** 61 dokumen, 55 aktif, dan **seluruh 55 baris aktif punya `employee_id`** (100%), mencakup **32 orang unik** di tim Beauty Hacks dan Kyura. Dari 44 baris ber-`tiktok_shop_id`, **tak satu toko pun dibagi dua orang** (maksimum satu orang per toko), jadi atribusi lewat toko memang membedakan orang. Yang tipis justru kanal lain: hanya 2 baris punya `tiktok_advertiser_id` dan 8 punya `shopee_shop_id`.
+**a. `icc_account_mappings` TERISI dan sehat.** 61 dokumen, 55 aktif, dan **seluruh 55 baris aktif punya `employee_id`** (100%), mencakup **32 orang unik** di tim Beautyhacks dan Kyura. Dari 44 baris ber-`tiktok_shop_id`, **tak satu toko pun dibagi dua orang** (maksimum satu orang per toko), jadi atribusi lewat toko memang membedakan orang. Yang tipis justru kanal lain: hanya 2 baris punya `tiktok_advertiser_id` dan 8 punya `shopee_shop_id`.
 
 **b. Atribusi VIDEO tidak lewat pemetaan itu sama sekali.** `ICCVideoMetric` (`services/integration/internal/domain/entity/icc_video_metric.go`) beratribut **`creator_username`**, dijoin lewat `tt_business_campaign_items` dan tanggal tayangnya dari snapshot `tt_shop_video_performances`. Jadi metrik per-video ICC punya jalur atribusinya sendiri, dan `icc_account_mappings` bukan prasyaratnya.
 
@@ -46,7 +46,7 @@ Pola "yang mau dibangun ternyata sudah ada di modul lain" kini sudah berulang **
 
 ### ICC (Internal Content Creator)
 
-⚠️ **Diukur ulang PROD 2026-09-12: tabel dan rancangan video di bawah milik template KPI lama berposisi "ICC"** (metrik video, dinilai manual), yang masih ada di `kpi_template`. Template posisi **Account Specialist** (Beauty Hacks dan Kyura) menilai hal lain: ROAS dari sumber `kinerja_toko` target 4,5 (bobot 0,2), profit dari `insentif_profit` 50 jt (bobot 0,6), dan `retur_persen` dari `insentif_profit` 7 (bobot 0,2). Layar perbandingan per orangnya kini halaman **Analisis Account Specialist** ([[APP - Web ERP]], [[Microservices - Marketing Analytics Service]]), yang sengaja tak memuat metrik video: 97% video 30 hari di toko berpemegang dibuat kreator yang tak terpetakan ke Account Specialist (terukur 2026-09-12). Target dan capaian profit tetap di Dashboard Insentif. Skema insentif per-video yang dulu memakai metrik ini sudah dicabut 2026-07-30 (lihat ralat c di atas), jadi rancangan di bawah dipertahankan hanya sebagai catatan template lama.
+⚠️ **Diukur ulang PROD 2026-09-12: tabel dan rancangan video di bawah milik template KPI lama berposisi "ICC"** (metrik video, dinilai manual), yang masih ada di `kpi_template`. Template posisi **Account Specialist** (Beautyhacks dan Kyura) menilai hal lain: ROAS dari sumber `kinerja_toko` target 4,5 (bobot 0,2), profit dari `insentif_profit` 50 jt (bobot 0,6), dan `retur_persen` dari `insentif_profit` 7 (bobot 0,2). Layar perbandingan per orangnya kini halaman **Analisis Account Specialist** ([[APP - Web ERP]], [[Microservices - Marketing Analytics Service]]), yang sengaja tak memuat metrik video: 97% video 30 hari di toko berpemegang dibuat kreator yang tak terpetakan ke Account Specialist (terukur 2026-09-12). Target dan capaian profit tetap di Dashboard Insentif. Skema insentif per-video yang dulu memakai metrik ini sudah dicabut 2026-07-30 (lihat ralat c di atas), jadi rancangan di bawah dipertahankan hanya sebagai catatan template lama.
 
 Ada di kedua brand, 3 metrik, struktur sama.
 
@@ -67,7 +67,7 @@ Sumber ketiganya sama: `tt_shop_video_performances`, yang punya `published_at` d
 
 ### Leader
 
-Ada di kedua brand, 3 metrik. Beauty Hacks: Performance Monitoring (0,2), Conversion (0,4), ROI (0,4). Kyura: ROI (0,4), Conversion (0,4), Performance Monitoring (0,2).
+Ada di kedua brand, 3 metrik. Beautyhacks: Performance Monitoring (0,2), Conversion (0,4), ROI (0,4). Kyura: ROI (0,4), Conversion (0,4), Performance Monitoring (0,2).
 
 **Bisa ditampilkan sekarang.** Conversion dan ROI keduanya bersumber data GMV yang tebal.
 
@@ -77,7 +77,7 @@ Ada di kedua brand, 3 metrik. Beauty Hacks: Performance Monitoring (0,2), Conver
 
 ⚠️ **Yang tampil hari ini untuk Leader dan SPV bukan bagan di atas** (🔜 branch erp-frontend `feat/marketing-iklan-dashboard`, belum merge per 2026-09-15). Ringkasan Marketing menilai ROAS vs target terhadap `roas_min` modul Marketing Analytics (PROD 4,5 berlaku 2026-08-01), **bukan** ambang "ROI" KPI Leader 3,2, dan kartu ROI di sana adalah ROI laba (laba ÷ biaya iklan) yang definisinya berbeda. Tren ROI bulanan terhadap ambang KPI belum dibangun; menyamakan kedua ambang keputusan pemilik KPI ([[ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance]]).
 
-⚠️ Metrik Performance Monitoring Beauty Hacks memakai `skor_tim` dengan reduksi `rasio_ambang`, dan **cakupan tim menuntut `work_data.supervisor_id` terisi**. Bila belum, angkanya bukan salah melainkan tak keluar sama sekali.
+⚠️ Metrik Performance Monitoring Beautyhacks memakai `skor_tim` dengan reduksi `rasio_ambang`, dan **cakupan tim menuntut `work_data.supervisor_id` terisi**. Bila belum, angkanya bukan salah melainkan tak keluar sama sekali.
 
 ### Marketplace Advertiser
 
@@ -99,11 +99,11 @@ BH 3 metrik (Conversion 0,6, ROI 0,3, Performance Monitoring 0,1); Kyura 2 (Conv
 
 **Bisa ditampilkan sekarang** untuk Kyura: konversi dan ROI keduanya bersumber. Halaman Live dan Live Shift di Marketing Analytics sudah menggambar deretnya.
 
-⛔ Metrik ROI Beauty Hacks dipetakan ke *"TIDAK ADA tracker pajak/audit internal/CAPA/izin BPOM"*, yang **tidak berhubungan sama sekali** dengan ROI live. Salah petak, sekelas dengan temuan di [[GA - Dashboard per Posisi]]. Perbaiki pemetaannya sebelum merancang kartunya.
+⛔ Metrik ROI Beautyhacks dipetakan ke *"TIDAK ADA tracker pajak/audit internal/CAPA/izin BPOM"*, yang **tidak berhubungan sama sekali** dengan ROI live. Salah petak, sekelas dengan temuan di [[GA - Dashboard per Posisi]]. Perbaiki pemetaannya sebelum merancang kartunya.
 
 ### Customer Support
 
-**Kyura bisa, Beauty Hacks belum.** Kyura metrik Perfoma (0,4, rating toko) bersumber `GET /integration/reviews/summary` dengan 6.314 ulasan. Beauty Hacks metrik terbesarnya Konversi (0,6) bersumber data GMV, tetapi Closing Rate (0,3) menunggu data percakapan CS yang tidak ada di sistem mana pun.
+**Kyura bisa, Beautyhacks belum.** Kyura metrik Perfoma (0,4, rating toko) bersumber `GET /integration/reviews/summary` dengan 6.314 ulasan. Beautyhacks metrik terbesarnya Konversi (0,6) bersumber data GMV, tetapi Closing Rate (0,3) menunggu data percakapan CS yang tidak ada di sistem mana pun.
 
 ### Supervisor (BeautyHacks & Kyura)
 
@@ -130,9 +130,9 @@ Ini bukan metrik yang belum dipetakan melainkan platform yang belum ada di siste
 
 Metriknya menuntut kecepatan boosting, kuantitas engagement, dan kualitas komentar, ketiganya hanya terbaca dari akun yang tidak dikendalikan perusahaan. Menyambungkannya bukan pekerjaan backend melainkan keputusan tentang bagaimana buzzer bekerja.
 
-⚠️ Template `Buzzer` Beauty Hacks berisi **satu metrik bernama `contoh` berbobot 1,0**. Itu template yang belum diisi, bukan penilaian. Jangan merancang apa pun di atasnya, dan sebaiknya dibersihkan di master data.
+⚠️ Template `Buzzer` Beautyhacks berisi **satu metrik bernama `contoh` berbobot 1,0**. Itu template yang belum diisi, bukan penilaian. Jangan merancang apa pun di atasnya, dan sebaiknya dibersihkan di master data.
 
-### Video Editor (hanya Beauty Hacks)
+### Video Editor (hanya Beautyhacks)
 
 ⛔ **Nol dari tiga metrik punya sumber.** Ketiganya menunggu tracker garapan desain dan video (pengajuan, persetujuan, tenggat) yang tidak ada di sistem.
 
@@ -140,7 +140,7 @@ Metriknya menuntut kecepatan boosting, kuantitas engagement, dan kualitas koment
 
 ## Metrik sirkular: berlaku lintas posisi
 
-⚠️ Metrik bernama **`Perfomance Monitoring`** di Affiliate Kyura (0,2), Host Live Beauty Hacks (0,1), dan Leader Kyura (0,2) **merujuk skor KPI final pemegangnya sendiri**, sehingga metrik itu ikut menentukan dirinya.
+⚠️ Metrik bernama **`Perfomance Monitoring`** di Affiliate Kyura (0,2), Host Live Beautyhacks (0,1), dan Leader Kyura (0,2) **merujuk skor KPI final pemegangnya sendiri**, sehingga metrik itu ikut menentukan dirinya.
 
 Ia tetap manual sampai maknanya diputuskan ulang, dan **tidak boleh digambar di dashboard dalam bentuk apa pun**. Kartu yang menampilkan skor sendiri sebagai komponen skor sendiri akan membingungkan pembacanya tanpa ada yang bisa menjelaskan angkanya.
 
@@ -148,11 +148,11 @@ Ia tetap manual sampai maknanya diputuskan ulang, dan **tidak boleh digambar di 
 
 1. ~~**Isi dan verifikasi `icc_account_mappings`.**~~ **SELESAI 2026-09-04, dan ternyata bukan prasyarat.** Pemetaannya sehat (55 dari 55 baris aktif terisi, 32 orang, satu toko satu orang), dan atribusi video memang tidak lewat situ. Yang menggantikannya sebagai langkah pertama: **periksa cakupan `finance/incentive`** sebelum merancang layar ICC apa pun, karena metriknya sudah dihitung dan sudah dikonsumsi modul insentif.
 2. **Tetapkan definisi "affiliator baru bergabung".** Keputusan pemilik KPI, bukan kode. Mengunci bobot 0,3 sampai 0,4 di dua posisi.
-3. **Perbaiki pemetaan ROI Host Live Beauty Hacks** yang menunjuk tracker pajak/BPOM.
-4. **Bersihkan template `Buzzer` Beauty Hacks** yang berisi metrik `contoh`.
+3. **Perbaiki pemetaan ROI Host Live Beautyhacks** yang menunjuk tracker pajak/BPOM.
+4. **Bersihkan template `Buzzer` Beautyhacks** yang berisi metrik `contoh`.
 5. **Isi `work_data.supervisor_id`** supaya cakupan tim Leader bisa dihitung.
 6. **Integrasi Meta Ads.** Membuka 4 metrik di 2 posisi, tetapi pekerjaan terbesar di daftar ini.
-7. **Data percakapan CS** untuk Closing Rate Customer Support Beauty Hacks.
+7. **Data percakapan CS** untuk Closing Rate Customer Support Beautyhacks.
 
 ⚠️ **Yang TIDAK masuk daftar**: tracker garapan video dan integrasi akun buzzer. Keduanya menuntut keputusan tentang cara kerja orangnya lebih dulu, bukan endpoint baru.
 

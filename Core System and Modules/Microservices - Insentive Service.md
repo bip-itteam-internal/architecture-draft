@@ -81,7 +81,7 @@ Catatan Finance 2026-09-29: kedua beban marketing ini dihitung dari **qty × HPP
 1. Riwayat akun 611703 memberi nomor IA, proyek, dan keterangan per baris jurnal; detail tiap IA (`item-adjustment/detail.do?number=`) memberi item, qty, `unitCost`, arah (`ADJUSTMENT_IN`/`OUT`), dan proyek per baris.
 2. **Penjaga:** Σ qty × `unitCost` dokumen per (IA, proyek) harus sama dengan nominal jurnal 611703. Selisih (dokumen memuat baris akun lain, proyek tak sepakat, atau field salah terbaca) menjadi **galat** yang menggagalkan penarikan beban marketing periode itu, bukan angka. Baris `ADJUSTMENT_IN` (barang footage kembali ke stok) mengurangi beban, sama seperti jurnalnya yang kredit.
 3. Nilai ulang dengan HPP ERP yang berlaku di akhir periode (HPP yang sama dengan profit), lalu dialokasikan dengan **aturan umum** penerima manfaat (nama di keterangan → orangnya; tak bernama > Rp500 rb → leader + ICC; sisanya → SPV).
-4. Proyek `BIP - BH Host Live` → Beauty Hacks dan `BIP - KY+GB Host Live` → Kyura dibaca sebagai proyek divisi **khusus footage**. Akun lain di proyek Host Live tetap diabaikan seperti sebelumnya.
+4. Proyek `BIP - BH Host Live` → Beautyhacks dan `BIP - KY+GB Host Live` → Kyura dibaca sebagai proyek divisi **khusus footage**. Akun lain di proyek Host Live tetap diabaikan seperti sebelumnya.
 
 **Produk tanpa HPP ERP tidak dihitung nol.** Sampel maupun footage yang produknya belum punya HPP ERP dilaporkan sebagai **qty per SKU** (`sampel_tanpa_hpp`, `footage_tanpa_hpp`) dan menjadi **peringatan baris yang menahan `layak_dibayar`** (keputusan user 2026-09-29), sekelas HPP penjualan yang belum ada. Untuk KPI keduanya **diloloskan** (sekelas "HPP baru mencakup"), jadi skor tak ikut mati. Prefiksnya kontrak antar-service di `shared-library/models/insentive/peringatan.go`; ⚠️ **employee-service wajib naik bersama/sebelum insentive-service**, lihat [[RUN - Deploy Microservices bip-erp]] §3a. Agustus 2026: PJG-010 Serum GB PDRN (footage Kyura, 8 pcs) belum punya HPP ERP.
 
@@ -147,7 +147,7 @@ Sebelumnya level Leader dibangun dari koleksi `icc_leaders` dan level Supervisor
 `incentive_org`. Keduanya gagal, dengan cara yang berbeda:
 
 - `icc_leaders` punya indeks **UNIQUE pada `team`**, sehingga departemen ber-DUA leader —
-  keadaan Beauty Hacks sejak SK-nya keluar — **ditolak database**. Ade Jaenul Farhi memimpin
+  keadaan Beautyhacks sejak SK-nya keluar — **ditolak database**. Ade Jaenul Farhi memimpin
   11 orang dan 3 toko di prod, dan tak akan pernah bisa masuk koleksi itu selama Satrio ada
   di tim yang sama.
 - `incentive_org` level supervisor **tak pernah terisi** (0 baris) dan tak punya satu pun

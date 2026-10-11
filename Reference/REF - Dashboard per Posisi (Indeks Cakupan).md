@@ -30,12 +30,12 @@
 | General Affair | 4 | 24 | [[GA - Dashboard per Posisi]] | 3 posisi bertab, hidup |
 | Procurement | 2 | 10 | [[GA - Dashboard per Posisi]] | belum ada |
 | Manufaktur | 8 | 52 | [[Manufacture - Dashboard per Posisi]] | belum ada |
-| Beauty Hacks | 10 | 30 | [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]] | per topik, bukan per posisi |
+| Beautyhacks | 10 | 30 | [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]] | per topik, bukan per posisi |
 | Kyura | 9 | 27 | [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]] | per topik, bukan per posisi |
 | Kesekretariatan | 7 | 28 | [[Unlisted - Dashboard per Posisi (Kesekretariatan)]] | belum ada |
 | Quality | 4 | 18 | [[QA - Dashboard per Posisi]] | belum ada |
 
-⚠️ Beauty Hacks dan Kyura **berbagi delapan posisi** dengan struktur metrik yang sama, sehingga jumlah posisi unik lintas perusahaan 54, bukan 64.
+⚠️ Beautyhacks dan Kyura **berbagi delapan posisi** dengan struktur metrik yang sama, sehingga jumlah posisi unik lintas perusahaan 54, bukan 64.
 
 ## Penghambat lintas divisi, diurutkan daya ungkit
 
@@ -83,7 +83,7 @@ Metrik yang **punya** sumber tetapi sumbernya menjawab pertanyaan lain. Ini kela
 | Personal Assistant | responsivitas ke Direktur (0,15) | chat marketplace | respons asisten |
 | Senior Accountant | pengelolaan aset tetap (0,15) | resi & fulfillment gudang | aset tetap akuntansi |
 | Junior Accountant | pengelolaan aset (0,15) | resi & fulfillment gudang | aset akuntansi |
-| Host Live (Beauty Hacks) | ROI (0,3) | tracker pajak & BPOM | ROI live |
+| Host Live (Beautyhacks) | ROI (0,3) | tracker pajak & BPOM | ROI live |
 | Recruitment & Onboarding | turnover probation (0,1) | resign sukarela **seluruh perusahaan** | probation saja |
 
 **Dua belas metrik, sembilan posisi, tujuh divisi.** Tiga di antaranya menunjuk data iklan TikTok yang berisi ratusan ribu baris, sehingga akan menghasilkan angka yang mulus dan stabil.
@@ -102,9 +102,9 @@ Sesuai [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Amban
 | PPIC | Manufaktur | 5 pemetaan bermasalah | tinjau ulang pemetaannya |
 | QA Leader | Quality | 0 dari 4 bersumber | Batch Record terisi |
 | QC Production | Quality | praktis nol | Batch Record terisi |
-| Meta Advertiser | Beauty Hacks & Kyura | Meta Ads tak terintegrasi | integrasi Meta Ads |
-| Buzzer | Beauty Hacks & Kyura | akun personal, tanpa API | keputusan cara kerja buzzer |
-| Video Editor | Beauty Hacks & Kesekretariatan | tak ada tracker garapan | tracker garapan berdiri |
+| Meta Advertiser | Beautyhacks & Kyura | Meta Ads tak terintegrasi | integrasi Meta Ads |
+| Buzzer | Beautyhacks & Kyura | akun personal, tanpa API | keputusan cara kerja buzzer |
+| Video Editor | Beautyhacks & Kesekretariatan | tak ada tracker garapan | tracker garapan berdiri |
 | Company Branding | Kesekretariatan | akun organik tak terintegrasi | integrasi akun korporat |
 | Corporate Secretary | Kesekretariatan | 0 dari 4 bersumber | periksa Calendar & Task Management |
 | Graphic Design | Kesekretariatan | tak ada tracker garapan | tracker garapan berdiri |
@@ -138,7 +138,7 @@ Diurutkan menurut porsi bobot yang sudah punya sumber.
 | Warehouse Leader | Manufaktur | 5 dari 8, bobot 0,7 | [[Manufacture - Dashboard per Posisi]] |
 | AR Staff (Piutang) | Finance | bobot 0,9 bersumber | [[Finance - Dashboard per Posisi (FAT)]] |
 | Supervisor (BH & Kyura) | Sales | bobot 0,9, menunggu atribusi | [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]] |
-| ICC | Beauty Hacks & Kyura | 3 dari 3, menunggu atribusi | [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]] |
+| ICC | Beautyhacks & Kyura | 3 dari 3, menunggu atribusi | [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]] |
 | Personalia | Human Resource | 3 dari 5 | [[HRIS - Dashboard per Posisi]] |
 
 ⚠️ **Ralat 2026-09-04**: baris ini semula menyatakan kesiapan Sales seluruhnya bergantung `icc_account_mappings`. **Tidak benar.** Pemetaan itu diukur ke prod dan sehat (55 dari 55 baris aktif terisi, 32 orang, satu toko satu orang), dan atribusi video ternyata lewat `creator_username`, bukan lewat pemetaan itu. Metrik per-video ICC bahkan **sudah dihitung backend** dan sudah dikonsumsi modul insentif. Yang menggantikannya sebagai langkah pertama Sales: periksa cakupan [[Finance - Incentive]] lebih dulu. Rinciannya di [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]] § Ralat 2026-09-04.

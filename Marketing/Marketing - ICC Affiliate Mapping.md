@@ -189,7 +189,7 @@ Alasan memilih Opsi A: konsisten dengan pola yang sudah ada di [[Microservices -
 
 ## Keputusan Desain 2026-08-06 — Dikelola lewat ICC Management
 
-*Permintaan: username akun affiliate bisa diinput di ICC Management, lalu dipakai memetakan data affiliate di [[APP - Web ERP]] menu Marketing Analytics → Affiliate. Sumber data awal: `z-file-hasil/DATA NAMA AKUN TIKTOK ICC BEAUTYHACKS.xlsx` tab **AKUN TIKTOK ICC** — 36 staff, 49 username (Beauty Hacks saja; Kyura belum ada).*
+*Permintaan: username akun affiliate bisa diinput di ICC Management, lalu dipakai memetakan data affiliate di [[APP - Web ERP]] menu Marketing Analytics → Affiliate. Sumber data awal: `z-file-hasil/DATA NAMA AKUN TIKTOK ICC BEAUTYHACKS.xlsx` tab **AKUN TIKTOK ICC** — 36 staff, 49 username (Beauty Hacks (kini Beautyhacks) saja; Kyura belum ada).*
 
 - **Status**: ⚠️ Sebagian terimplementasi (2026-08-07) — **Fase A–C selesai**: koleksi `icc_affiliate_accounts` + endpoint, sub-tab Akun Affiliate di ICC Management, dan alat impor `cmd/iccaffiliateimport`. **Fase D ditahan sampai E**; datanya belum diimpor ke produksi. Rinciannya di [[#Rencana Implementasi (Revisi 2026-08-06)]].
 
@@ -206,7 +206,7 @@ Koleksi baru `icc_affiliate_accounts` (Integration Service) — **daftar akun in
 ```json
 {
   "_id": "UUID",
-  "team":          "Beauty Hacks",
+  "team":          "Beautyhacks",
   "username":      "glowinajah",
   "alias":         ["glowinajah_lama"],
   "employee_id":   "BIP-0114",
@@ -320,7 +320,7 @@ Justru karena keduanya independen, **persilangannya** yang bernilai:
 
 - **Atribusi order akun bersama** — `@efcare` dipakai FIRA & IPUL, `@auraliaa__` dipakai BELIA & FADLY. Saat insentif dihitung, order dari akun itu masuk ke siapa: dibagi rata, salah satu ditandai pemilik utama, atau dihitung penuh ke keduanya? **Harus diputuskan sebelum fase insentif**, tetapi tidak menghalangi pengumpulan datanya.
 - **Akun internal tanpa pemegang** — nilainya ikut akumulasi insentif **leader/tim** (karena milik team) atau tidak dihitung sama sekali? Condong ke "masuk laporan tim, tidak masuk insentif individu", tetapi ini keputusan bisnis.
-- **Data Kyura** — belum ada file setara Beauty Hacks.
+- **Data Kyura** — belum ada file setara Beautyhacks.
 
 ### Rencana Implementasi (Revisi 2026-08-06)
 

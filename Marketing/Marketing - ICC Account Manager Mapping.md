@@ -345,7 +345,7 @@ bersifat global. Pipeline: `$unwind → $group by advertiser_id` untuk deduplika
 
 - **`icc_leaders` tidak lagi dibaca FE sama sekali.** Fitur "kartu-per-leader-icc" (merged ke `main`) **menghapus** `LeaderBar`, tombol **Set Leader**, `set-leader-dialog.tsx`, `use-set-leader.ts`, dan `use-fetch-leaders.ts`. Tidak ada satu pun jalur UI lagi untuk mengisi atau mengganti baris `icc_leaders` — koleksi itu **beku** sejak migrasi ini, isinya sisa dari sebelum rewrite.
 - **Leader kini diturunkan dari HRIS**, bukan dipilih manual: `hierarki-leader.ts` (`susunTimLeader`) mengelompokkan karyawan ber-`position`/`position_key` **ICC** menurut atasan langsungnya (`work_data.supervisor_id`) — leader = siapa pun yang punya bawahan langsung berposisi ICC, bukan orang yang menyandang label jabatan "leader". Aturan ini sengaja mengikuti kenyataan organisasi, bukan label jabatan, supaya SPV yang kebetulan langsung membawahi satu staf ICC tetap dapat kartu.
-- **Departemen tetap unit pengelompokan tertinggi** di layar (`kartu-leader.ts`, `blokDepartemen`); di dalamnya bisa ada **lebih dari satu kartu leader** — kasus nyata: Beauty Hacks kini punya dua leader paralel (Ade Jaenul Farhi, Satrio), masing-masing dapat kartunya sendiri. Dua kartu tambahan yang tak berbasis leader: **"Langsung di bawah SPV"** (`tanpa-leader` — karyawan ICC tanpa atasan berposisi leader di atasnya) dan **"Belum ditugaskan"** (akun affiliate tanpa pemegang).
+- **Departemen tetap unit pengelompokan tertinggi** di layar (`kartu-leader.ts`, `blokDepartemen`); di dalamnya bisa ada **lebih dari satu kartu leader** — kasus nyata: Beautyhacks kini punya dua leader paralel (Ade Jaenul Farhi, Satrio), masing-masing dapat kartunya sendiri. Dua kartu tambahan yang tak berbasis leader: **"Langsung di bawah SPV"** (`tanpa-leader` — karyawan ICC tanpa atasan berposisi leader di atasnya) dan **"Belum ditugaskan"** (akun affiliate tanpa pemegang).
 - **Gerbang assign di FE** (`leader-gate.ts`, `nilaiLeaderGate`) memblokir submit bila karyawan yang dipilih **tidak punya `supervisor_id`** sama sekali di HRIS (`kodePesan: "tanpaAtasan"`). Ini **BUKAN pengganti** guard backend — komentar di file itu eksplisit: gate ini menggantikan UX lama, backend tetap penjaga sebenarnya.
 
 ### ⛔ Gap nyata: dua model bisa saling bertentangan
@@ -353,7 +353,7 @@ bersifat global. Pipeline: `$unwind → $group by advertiser_id` untuk deduplika
 **Backend dan frontend memvalidasi hal yang berbeda, dan tak ada yang menjaga keduanya tetap sinkron:**
 
 - FE menilai "team boleh di-assign" dari HRIS (karyawan itu punya atasan); BE menilai dari **baris aktif di `icc_leaders`** untuk team itu — dua sumber yang independen sejak FE berhenti membaca/menulis `icc_leaders`.
-- **`icc_leaders` unique index per-team secara struktural tidak bisa merepresentasikan Beauty Hacks** yang kini punya dua leader (Ade + Satrio) — hanya satu baris yang boleh aktif. Guard BE tidak peduli baris itu milik leader yang MANA (cuma cek "ada baris aktif untuk team ini"), jadi assign untuk anggota Ade maupun Satrio tetap lolos selama team-nya punya *satu* baris aktif apa pun — tapi begitu baris itu dinonaktifkan/basi (mis. data lama sebelum rewrite dan tak ada yang tahu harus menjaganya), **seluruh assign untuk team itu gagal 400 di backend, padahal FE terlihat sudah mengizinkan** (kartu leader tampil, karyawan punya atasan lengkap).
+- **`icc_leaders` unique index per-team secara struktural tidak bisa merepresentasikan Beautyhacks** yang kini punya dua leader (Ade + Satrio) — hanya satu baris yang boleh aktif. Guard BE tidak peduli baris itu milik leader yang MANA (cuma cek "ada baris aktif untuk team ini"), jadi assign untuk anggota Ade maupun Satrio tetap lolos selama team-nya punya *satu* baris aktif apa pun — tapi begitu baris itu dinonaktifkan/basi (mis. data lama sebelum rewrite dan tak ada yang tahu harus menjaganya), **seluruh assign untuk team itu gagal 400 di backend, padahal FE terlihat sudah mengizinkan** (kartu leader tampil, karyawan punya atasan lengkap).
 - **Tak terverifikasi**: apakah baris `icc_leaders` untuk `kyura` dan `beautyhacks` saat ini masih aktif di produksi. Sebelum menyalahkan kode manapun bila assign tiba-tiba 400 di produksi untuk team yang kartunya tampil normal di FE, **cek dulu isi `icc_leaders` untuk team itu** — kelas gejala yang sama dengan "biner basi": layar terlihat benar, backend menolak untuk alasan yang FE tidak tampilkan.
 - ~~**Belum diputuskan**: apakah `icc_leaders`/guard-nya akan dihapus menyusul, atau backend ditulis ulang membaca hierarki HRIS langsung.~~ **TERJAWAB 2026-08-26**: [[Microservices - Insentive Service]] kini menurunkan Leader & Supervisor dari `work_data.supervisor_id`, memakai aturan yang sama persis dengan FE. `icc_leaders` **tidak dihapus** — ia turun pangkat jadi *fallback* bila hierarki gagal ditarik. Guard-nya di Integration belum disentuh, jadi jebakan 400 yang dicatat di atas **masih berlaku untuk alur assign**.
 
@@ -384,18 +384,18 @@ flowchart TD
 
 ## Tampilan ICC Management — kartu per leader (menggantikan kartu per team)
 
-*Permintaan (2026-08-05): tampilan ICC Management harus terpisah antara department **Kyura** dan **Beauty Hacks**, tidak lagi satu tabel campuran. Diselesaikan dulu (2026-08-06) sebagai kartu per TEAM; direvisi lagi (Fase A, sesi ini) jadi kartu per LEADER di dalam tiap departemen begitu hierarki HRIS-nya lengkap dan Beauty Hacks ternyata punya dua leader paralel.*
+*Permintaan (2026-08-05): tampilan ICC Management harus terpisah antara department **Kyura** dan **Beauty Hacks (kini Beautyhacks)**, tidak lagi satu tabel campuran. Diselesaikan dulu (2026-08-06) sebagai kartu per TEAM; direvisi lagi (Fase A, sesi ini) jadi kartu per LEADER di dalam tiap departemen begitu hierarki HRIS-nya lengkap dan Beauty Hacks ternyata punya dua leader paralel.*
 
 - **Status**: ✅ Implemented — sudah ter-merge ke `main` ("kartu-per-leader-icc"). File: `components/team-card.tsx` (rewrite total — kini kartu per leader, dulu kartu per team), `components/leader-card-khusus.tsx` (baru — kartu "Langsung di bawah SPV" + "Belum ditugaskan"), `lib/hierarki-leader.ts` (`susunTimLeader`), `lib/kartu-leader.ts` (`blokDepartemen`, menggantikan `kelompokkanMappingPerTeam`), `lib/leader-gate.ts` (`nilaiLeaderGate`), `app/(main)/icc/management/page.tsx`. **Dihapus**: `set-leader-dialog.tsx`, `use-set-leader.ts`, `use-fetch-leaders.ts` — lihat [[#Relasi Leader & Akumulasi Insentif]] untuk konsekuensinya ke backend.
 
 ### Kenapa direvisi lagi
 
-Kartu-per-team (Fase 6) menaruh SATU leader per kartu team, sesuai model `icc_leaders` (unique per team) saat itu. Begitu hierarki `work_data.supervisor_id` terisi penuh (sensus 2026-08-06), ketahuan Beauty Hacks punya **dua** orang yang masing-masing punya bawahan ICC langsung (Ade, Satrio) — sesuatu yang model lama secara struktural tak bisa tampilkan (satu leader per team). Kartu-per-team juga mewajibkan "Set Leader" manual sebelum assign bisa jalan, padahal HRIS sudah tahu siapa atasan siapa — jadi ganda-input.
+Kartu-per-team (Fase 6) menaruh SATU leader per kartu team, sesuai model `icc_leaders` (unique per team) saat itu. Begitu hierarki `work_data.supervisor_id` terisi penuh (sensus 2026-08-06), ketahuan Beauty Hacks (kini Beautyhacks) punya **dua** orang yang masing-masing punya bawahan ICC langsung (Ade, Satrio) — sesuatu yang model lama secara struktural tak bisa tampilkan (satu leader per team). Kartu-per-team juga mewajibkan "Set Leader" manual sebelum assign bisa jalan, padahal HRIS sudah tahu siapa atasan siapa — jadi ganda-input.
 
 ### Bentuk saat ini: kartu per leader di dalam tiap departemen
 
 ```text
-ICC Management (departemen = Kyura, Beauty Hacks, ...)
+ICC Management (departemen = Kyura, Beautyhacks, ...)
 
 ┌─ Kyura — Ridho (BIP-00xx) ──────────────────────── [+ Assign] [▾] ─┐
 │ 11 anggota · N toko                                                │
@@ -404,15 +404,15 @@ ICC Management (departemen = Kyura, Beauty Hacks, ...)
 │ ...      │ ...         │ ...        │ ...    │ ...    │ ✎  ⏻     │
 └────────────────────────────────────────────────────────────────────┘
 
-┌─ Beauty Hacks — Ade Jaenul Farhi ────────────────  [+ Assign] [▾] ─┐
+┌─ Beautyhacks — Ade Jaenul Farhi ────────────────  [+ Assign] [▾] ─┐
 │ 12 anggota                                                          │
 └──────────────────────────────────────────────────────────────────┘
 
-┌─ Beauty Hacks — Satrio ──────────────────────────  [+ Assign] [▾] ─┐
+┌─ Beautyhacks — Satrio ──────────────────────────  [+ Assign] [▾] ─┐
 │ 11 anggota                                                          │
 └──────────────────────────────────────────────────────────────────┘
 
-┌─ ⚠ Langsung di bawah SPV (Beauty Hacks) ────────── [+ Assign] [▾] ─┐
+┌─ ⚠ Langsung di bawah SPV (Beautyhacks) ────────── [+ Assign] [▾] ─┐
 │ Karyawan APA PUN posisinya yang lapor langsung ke SPV departemen   │
 │ (bukan cuma ICC lagi — lihat "Kenapa direvisi lagi" & Fase 11)     │
 └──────────────────────────────────────────────────────────────────┘
@@ -485,7 +485,7 @@ Marketplace Advertiser **tidak** difilter oleh `useFetchIccEmployees` (yang memb
 posisi `icc`/`leader`/`supervisor` lewat `position_key`) — mereka masuk daftar karyawan
 ICC Management lewat jalur lain sama sekali: `use-fetch-staf-langsung-spv.ts`
 (`useFetchStafLangsungSpv`), hook yang dibuat khusus untuk kasus nyata **Yudi Kurniawan**
-(Marketplace Advertiser, toko Shopee Beauty Hacks) — mengambil SEMUA karyawan satu
+(Marketplace Advertiser, toko Shopee Beautyhacks) — mengambil SEMUA karyawan satu
 departemen (posisi apa pun) yang lapor **langsung ke SPV**. Karena tidak berposisi ICC,
 mereka jatuh sebagai residual ke kartu "Langsung di bawah SPV", tercampur satu tabel
 dengan Account Specialist yang juga ada di sana.

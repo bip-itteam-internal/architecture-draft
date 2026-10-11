@@ -55,7 +55,7 @@ Tim ini **flat, tanpa lead** — tak ada satu orang pun yang bisa dijadikan tuju
 
 | Persona | Peran & Divisi | Akses / RBAC | Device |
 |---|---|---|---|
-| Account Specialist | staf marketing (Kyura / Beauty Hacks), pemohon boosting | tier `staff`; menu digerbang `IZIN_MARKETING.po` | Web ERP |
+| Account Specialist | staf marketing (Kyura / Beautyhacks), pemohon boosting | tier `staff`; menu digerbang `IZIN_MARKETING.po` | Web ERP |
 | Anggota tim Engagement (dulu *Buzzer*) | staf marketing, pengerja boosting | tier `staff`; menu digerbang `IZIN_MARKETING.po` | Web ERP |
 | Supervisor / Admin marketing | atasan divisi | tier `supervisor`/`admin`; boleh menugaskan ulang & membatalkan tiket **siapa pun** | Web ERP |
 
@@ -73,12 +73,12 @@ Tim ini **flat, tanpa lead** — tak ada satu orang pun yang bisa dijadikan tuju
 
 - **Pencarian mengenali kedua nama.** `cocokAliasEngagement` (`engagement_alias.go`) mencocokkan kata kunci `engagement` **dan** `buzzer` dengan `Contains`, satu arah, tanpa mengubah data apa pun. Kalau kata kunci pencarian menunjuk modul ini, ia **tidak** dipakai sebagai penyaring isi tiket — sebab ia menunjuk *modul*, bukan isi, sehingga memakainya sebagai kata kunci justru mengosongkan hasil dan pembacanya menyimpulkan datanya hilang.
 - Alias sengaja **tidak** memakai pencocokan awalan/kemiripan: `buzz` dan `engage` ditolak. Alias yang terlalu longgar membuat pencarian apa pun mengembalikan seluruh tiket engagement.
-- **Nama lama masih hidup di luar modul ini**, dan itu bukan bug modul: template KPI produksi `Beauty Hacks / Buzzer` (termasuk satu template uji cacat, lihat [[HRIS - Otomasi Skor KPI]]), baris jabatan `Buzzer` di [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]], dan peta kepemilikan di [[Marketing - ICC Account Manager Mapping]]. Pencarian di vault maupun di data yang hanya memakai satu dari dua nama akan **melewatkan separuh kenyataan**.
+- **Nama lama masih hidup di luar modul ini**, dan itu bukan bug modul: template KPI produksi `Beautyhacks / Buzzer` (termasuk satu template uji cacat, lihat [[HRIS - Otomasi Skor KPI]]), baris jabatan `Buzzer` di [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]], dan peta kepemilikan di [[Marketing - ICC Account Manager Mapping]]. Pencarian di vault maupun di data yang hanya memakai satu dari dua nama akan **melewatkan separuh kenyataan**.
 - ⚠️ **Penyaring kandidat penugasan TIDAK memakai nama jabatan** — dan sejak [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] §4 (29 Agustus 2026) juga **tidak lagi memakai departemen pemanggil**. `daftarKandidatPengerja` (`engagement_assign.go`) kini menyaring `position_key ∈ KunciJabatanPengerja` (data di `engagement_settings`, seed produksi cuma `'engagement_team'`) **lintas departemen** — versi lama dokumen ini pernah menyatakan penyaringannya `department == departemen pemanggil`, itu sudah tidak akurat. Alasan menghindari nama jabatan tetap sama: rename `Buzzer` → `Engagement Team` menerbitkan `position_key` baru dan mengosongkan daftar **tanpa satu pun galat** bila disaring by-nama. Konsekuensi yang diterima sadar sekarang bergeser: bukan lagi "AS ikut muncul di kandidat" (itu sudah tak terjadi karena position_key sudah spesifik), melainkan alokasi OTOMATIS (round-robin, [[ADR - 0083 Alokasi Otomatis Round-Robin Menggantikan Penunjukan Manual AS]]) yang menyempitkan kandidat ke sedepartemen requester secara default — dua sumbu (kolam vs giliran) yang gampang tertukar, lihat ADR-0060 TBD.
 
 ## Konsumen Data
 
-- [[Microservices - Employee Service]] — sumber KPI **`kinerja_engagement`** (`kpi_sumber_engagement.go`, grup `marketing`), menarik `GET /kpi/engagement` dari task-management. **Tiga** metrik dari satu agregat, dipilih lewat `KPIAutoConfig.Metrik` (metrik `quality` **dicabut** 2026-09 mengikuti revisi template KPI Marketing Beauty Hacks tab Engagement Team, yang tak lagi memuat baris kualitas terpisah):
+- [[Microservices - Employee Service]] — sumber KPI **`kinerja_engagement`** (`kpi_sumber_engagement.go`, grup `marketing`), menarik `GET /kpi/engagement` dari task-management. **Tiga** metrik dari satu agregat, dipilih lewat `KPIAutoConfig.Metrik` (metrik `quality` **dicabut** 2026-09 mengikuti revisi template KPI Marketing Beautyhacks tab Engagement Team, yang tak lagi memuat baris kualitas terpisah):
 
 | Metrik | Menjawab | Bentuk nilai | Formula | Penyebut |
 |---|---|---|---|---|

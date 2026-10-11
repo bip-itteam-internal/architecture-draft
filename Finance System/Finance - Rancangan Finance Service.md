@@ -833,7 +833,7 @@ berbeda, dikonfirmasi satu-satu via tanya-jawab sebelum diimplementasi.
 
 **Budget adalah sumbu TERPISAH dari Aktual, dan itu yang membuat pola 1–3 di atas aman.**
 Budget tiap kartu (6 dari 7 — semua kecuali Laptop/PC) berasal dari **Master Anggaran yang
-sudah ada** (`anggaran_opex`), difilter akun × departemen Marketing (Beauty Hacks + Kyura,
+sudah ada** (`anggaran_opex`), difilter akun × departemen Marketing (Beautyhacks + Kyura,
 dijumlah client-side dari `GET /accounting/anggaran?akun_no=`). Ini murni input manusia
 (form/Excel), sama sekali tidak bergantung pada bagaimana Accurate mencatat departemen
 untuk akun Aktual-nya — sehingga aman dipasang bahkan untuk Internet & Iklan yang sisi
@@ -885,7 +885,7 @@ yang sama di kedua tab.
   sempit (`sm:max-w-lg`) membuat grid horizontal melipat label dan mengecilkan field.
   Berlaku ke SEMUA kategori manual sekaligus karena satu komponen `FormTambahBeban`
   dipakai ulang oleh kelimanya.
-- **Kartu Laptop/PC kini punya "Daftar Pemegang (Beauty Hacks/Kyura)"** — daftar
+- **Kartu Laptop/PC kini punya "Daftar Pemegang (Beautyhacks/Kyura)"** — daftar
   Laptop/PC yang dipegang staff Marketing, ditarik dari **`services/inventory`**
   (field `held_by`), BUKAN `aset_tetap` (salinan Accurate tanpa data pemegang, sempat
   keliru disebut sebagai solusi di draf awal) dan BUKAN entri manual. Reuse penuh —
@@ -910,7 +910,7 @@ yang sama di kedua tab.
   - **Form manual TETAP ADA** — daftar pemegang melengkapi, bukan menggantikan;
     Finance masih mengetik nominal beban penyusutan sendiri. Draf sempat
     mempertimbangkan filter berdasar posisi HRIS "ICC" (sesuai kata user), diputuskan
-    memakai departemen (Beauty Hacks/Kyura) supaya KONSISTEN dengan 6 kategori lain
+    memakai departemen (Beautyhacks/Kyura) supaya KONSISTEN dengan 6 kategori lain
     di grid yang semuanya berbasis departemen, bukan posisi.
 
 ### Registry catatan beban manual (dasar untuk 5 dari 7 kategori)
@@ -947,7 +947,7 @@ AI, dst) sebaliknya sengaja bebas-ketik: daftar vendor/item memang terus bertamb
 tergantung pengajuan tim marketing, dan menguncinya ke daftar tetap berarti deploy tiap
 kali ada tool baru.
 
-**PIC dipilih dari karyawan Beauty Hacks/Kyura, tidak diketik bebas.** "Staff marketing"
+**PIC dipilih dari karyawan Beautyhacks/Kyura, tidak diketik bebas.** "Staff marketing"
 di organisasi ini secara struktural berarti kedua departemen itu — tidak ada departemen
 bernama "Marketing" (lihat [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]]).
 Nama yang diketik manual tidak bisa diatribusikan balik ke `employee_id`, jadi breakdown
