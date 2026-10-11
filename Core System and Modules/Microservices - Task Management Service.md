@@ -144,7 +144,7 @@ Rute ini sengaja **terpisah dari `/report/*`** walau angkanya bertetangga: rute 
 
 ### Modul Rencana Kerja Harian 🟡
 
-> Status: **konsep, kode belum ada.** Keputusan [[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]] (🟡 Diusulkan), konsep bisnis [[HRIS - Rencana Kerja Harian (Modul)]], blueprint [[ANALISA - Rencana Kerja Harian]].
+> Status: **konsep, kode belum ada.** Keputusan [[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]] (🟢 Diterima 2026-10-12), konsep bisnis [[HRIS - Rencana Kerja Harian (Modul)]], blueprint [[ANALISA - Rencana Kerja Harian]].
 
 Modul ketiga yang direncanakan di service ini: rencana kerja karyawan, digabung dengan tiket `assign_to` miliknya menjadi satu daftar "hari ini" di MyBharata. Bentuk yang sudah diputuskan:
 

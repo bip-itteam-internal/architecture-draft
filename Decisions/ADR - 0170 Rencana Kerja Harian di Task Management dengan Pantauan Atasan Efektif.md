@@ -11,7 +11,7 @@
 
 *Karyawan mencatat rencana kerja hariannya di MyBharata, bergabung dengan tiket yang ditugaskan kepadanya. Item yang belum selesai terbawa otomatis dengan hitungan tertunda yang diturunkan dari tanggal rencana awal yang tak bisa diubah. Atasan efektif (atasan langsung, atau supervisor departemen bila atasan langsung kosong) dapat melihatnya. Rencana kerja disimpan di koleksi baru di Task Management Service, terpisah dari tiket, tanpa triase dan tanpa SLA. Pondasi lampiran bukti ikut dibangun sejak tahap pertama, tetapi belum ditegakkan.*
 
-- **Status**: 🟡 **Diusulkan**, 2026-10-11, kode belum ada. Analisa: [[ANALISA - Rencana Kerja Harian]]
+- **Status**: 🟢 **Diterima**, 2026-10-12, oleh irfanarfianto (Pemutus; perintah "kerjakan sekarang"). Kode belum ada. Analisa: [[ANALISA - Rencana Kerja Harian]]
 - **Path di repo**: `bip-erp/services/employee/atasan_efektif.go` (baru) · `bip-erp/services/task-management/rencana_kerja_*.go` (baru) · `bip-erp/docker-compose.yml` (env `EMPLOYEE_MODULE_URL` untuk task-management) · `mybharata-app/lib/src/features/task/` (tab Hari Ini, tampilan bawahan; baru) · `erp-frontend/src/features/task-management/components/my-tasks-view.tsx` (tab baru) · `erp-frontend/src/features/task-management/components/rencana-kerja/` (baru)
 - **Tanggal**: 2026-10-11
 

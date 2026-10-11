@@ -1,7 +1,5 @@
 # ANALISA - Rencana Kerja Harian
 
-> ⛔ **Menunggu ADR [[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]] Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**
-
 - **Keputusan**: [[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]]
 - **Konsep domain**: [[HRIS - Rencana Kerja Harian (Modul)]]
 - **Pemutus**: irfanarfianto

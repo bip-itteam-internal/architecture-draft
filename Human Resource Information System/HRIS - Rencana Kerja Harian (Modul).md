@@ -4,7 +4,7 @@
 
 *Karyawan mencatat pekerjaan hariannya sendiri di MyBharata. Catatan itu bergabung dengan tiket yang ditugaskan kepadanya menjadi satu daftar "hari ini". Item yang belum selesai terbawa ke hari berikutnya dengan hitungan tertunda, dan atasan efektifnya dapat melihat daftar itu untuk menegur, membantu, atau membagi ulang pekerjaan. Datanya disimpan di [[Microservices - Task Management Service]], terpisah dari tiket.*
 
-- **Status**: 🟡 Konsep, kode belum ada. Keputusan [[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]] masih 🟡 Diusulkan.
+- **Status**: 🟡 Konsep, kode belum ada. Keputusan [[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]] 🟢 Diterima 2026-10-12.
 - **Implementasi**: [[Microservices - Task Management Service]] (bagian *Modul Rencana Kerja Harian*) · atasan efektif dari [[Microservices - Employee Service]]
 - **Layar**: [[APP - MyBharata]]: tab **Hari Ini** di menu Tugas saja, tidak tampil di Beranda. [[APP - Web ERP]]: tab **Hari Ini** dan **Rencana Tim** di Task Management › Daftar Tugas.
 - **Blueprint**: [[ANALISA - Rencana Kerja Harian]]

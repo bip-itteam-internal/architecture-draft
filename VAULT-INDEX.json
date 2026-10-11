@@ -3185,20 +3185,20 @@
         "APP - Dynamic Task Tracker",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "f41b9034fca22f8fe35fc05b11bb0a50a671d8d8655307c71f0479586dc8d5b9",
+      "hash": "0a55531e7e842710b1e083ccfa10448afc9da1bb374b283d0827c43c448aa671",
       "ukuran_kb": 47.7,
-      "ringkasan": "Menjawab: bagaimana IT Helpdesk / ticketing ERP bekerja (board Kanban per space, tipe permintaan dan pertanyaan per tipe, approval, SLA dua dimensi, CSAT, auto-assign/auto-close), siapa boleh mengelola space (admin space, cakupan divisi supervisor, visibility restricted), dan endpoint apa yang tersedia termasuk WebSocket, KPI, dan laporan. Juga menjelaskan modul yang menumpang di service ini: Engagement Tim dan Rencana Kerja Harian.",
+      "ringkasan": "Menjawab: bagaimana IT Helpdesk/ticketing dan board Kanban bekerja (stage Request sampai Done, approval, hold/reopen, CSAT), siapa boleh melihat dan menindak tiket (cakupan divisi supervisor, admin space, visibility space restricted), serta bagaimana SLA dua dimensi, automation auto-assign/auto-close, WebSocket, dan attachment diatur. Juga menjelaskan tipe permintaan dan pertanyaan per tipe, kelompok KPI space, serta modul tambahan Engagement Tim dan Rencana Kerja Harian yang menumpang di service ini.",
       "kata_kunci": [
         "task management",
-        "tiket",
         "helpdesk",
+        "tiket",
         "ticketing",
-        "Kanban",
+        "kanban",
         "SLA",
         "admin space",
         "approval",
-        "Engagement Tim",
-        "Rencana Kerja Harian"
+        "WebSocket",
+        "Engagement Tim"
       ]
     },
     {
@@ -9603,8 +9603,8 @@
       "judul": "ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-11, kode belum ada. Analisa: [[ANALISA - Rencana Kerja Harian]]",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-12, oleh irfanarfianto (Pemutus; perintah \"kerjakan sekarang\"). Kode belum ada. Analisa: [[ANALISA - Rencana Kerja Harian]]",
       "publik": true,
       "tautan": [
         "ANALISA - Rencana Kerja Harian",
@@ -9618,20 +9618,20 @@
         "HRIS - Rencana Kerja Harian (Modul)",
         "APP - MyBharata"
       ],
-      "hash": "4a82a3c794c58008a5d637a1fef02cddc8ec87032c566d903d03dabc3d39f109",
-      "ukuran_kb": 17.2,
-      "ringkasan": "Menjawab: kenapa rencana kerja harian disimpan sebagai koleksi baru di Task Management Service dan bukan sebagai tiket, bagaimana hitungan \"tertunda N hari\" diturunkan dari tanggal rencana awal tanpa job pemindah, dan siapa atasan efektif yang boleh memantau (atasan langsung, atau supervisor departemen bila kosong). Juga menjawab siapa boleh membuat/mengubah/membatalkan item, kenapa batal tidak menghapus, bagaimana daftar \"Hari Ini\" menggabungkan rencana kerja dan tiket saya, serta apa yang sengaja belum dijanjikan (KPI, pengingat, wajib bukti).",
+      "hash": "dc14316af1957f0b4588dc4c08e5145035be6e6c962e7651ad4c6414ba28622f",
+      "ukuran_kb": 17.3,
+      "ringkasan": "Menjawab: kenapa rencana kerja harian disimpan sebagai entitas baru di Task Management dan bukan sebagai tiket, bagaimana hitungan \"tertunda N hari\" diturunkan dari tanggal rencana awal tanpa job pemindah, dan siapa yang boleh menulis atau hanya membaca. Juga menjelaskan definisi atasan efektif (atasan langsung atau fallback supervisor departemen), daftar \"hari ini\" yang menggabungkan rencana kerja dan tiket, pondasi lampiran bukti, alasan belum masuk KPI, serta alternatif yang ditolak.",
       "kata_kunci": [
         "rencana kerja harian",
         "daily work plan",
-        "to-do list",
+        "to-do",
         "tertunda",
         "carry over",
         "atasan efektif",
         "supervisor",
+        "ADR 0170",
         "task management",
-        "tab Hari Ini",
-        "pantauan atasan"
+        "laporan harian"
       ]
     },
     {
@@ -13507,7 +13507,7 @@
       "area": "Human Resource Information System",
       "jenis": "domain",
       "status_emoji": "🟡",
-      "status_teks": "Konsep, kode belum ada. Keputusan [[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]] masih 🟡 Diusulkan.",
+      "status_teks": "Konsep, kode belum ada. Keputusan [[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]] 🟢 Diterima 2026-10-12.",
       "publik": true,
       "tautan": [
         "Microservices - Task Management Service",
@@ -13519,20 +13519,20 @@
         "HRIS - Organization Structure",
         "HRIS - Matriks KPI per Departemen"
       ],
-      "hash": "851ef25b77b1b6d7a636f8c6156ca0f996968e8658948fba22791bef5754db15",
+      "hash": "ec73d3789c31317a695441c079d63befeb5b3767edf8be619deb365d69054825",
       "ukuran_kb": 6.9,
-      "ringkasan": "Menjawab: bagaimana karyawan mencatat pekerjaan hariannya di tab Hari Ini (MyBharata dan Web ERP), item apa saja yang muncul di daftar hari ini termasuk tiket yang ditugaskan, dan bagaimana label \"tertunda N hari\" serta pembatalan bekerja. Juga menjawab siapa persona pengisi dan pemantau, bagaimana atasan efektif ditentukan bila atasan langsung kosong, kendala data atasan langsung yang baru terisi 46%, dan hal yang masih TBD (wajib bukti, KPI, pilot, pengingat).",
+      "ringkasan": "Menjawab: bagaimana karyawan mencatat pekerjaan hariannya di tab Hari Ini (MyBharata dan Web ERP), bagaimana item tertunda terbawa ke hari berikutnya, dan bagaimana atasan efektif memantau bawahan lewat ringkasan. Juga menjelaskan persona pengguna dengan angka prod, kendala atasan langsung yang baru terisi 46%, hal yang di luar cakupan tahap 1 (KPI, pengingat, wajib bukti), serta hal yang belum diputuskan.",
       "kata_kunci": [
         "rencana kerja harian",
         "daily work plan",
-        "laporan harian",
-        "daily report",
-        "to-do",
+        "tab Hari Ini",
+        "Rencana Tim",
         "tertunda",
+        "atasan efektif",
         "atasan langsung",
-        "supervisor departemen",
+        "laporan harian",
         "MyBharata",
-        "Rencana Tim"
+        "bukti"
       ]
     },
     {
@@ -20965,19 +20965,19 @@
         "ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif",
         "HRIS - Rencana Kerja Harian (Modul)"
       ],
-      "hash": "44bb4ef1f278922f92fedbc67d748b3b17c35f8d956211c48c6bdc0dc1f5ee61",
-      "ukuran_kb": 21.8,
-      "ringkasan": "Menjawab: bagaimana pekerjaan rencana kerja harian dipecah jadi issue induk dan enam sub-issue lintas bip-erp, my-bharata, dan erp-frontend, beserta urutan merge dan deploy (employee-service lalu task-management lalu Mobile/Web). Untuk tiap sub-issue menjawab masalahnya, keputusan yang dirujuk, kriteria \"yang harus benar\" yang bisa diuji (mis. endpoint internal atasan/bawahan efektif, koleksi rencana kerja, tab Hari Ini, tab Rencana Tim), di luar cakupan, dan data prod pendukung.",
+      "hash": "0440a9a7b0d78f5333317403ea27cbe7a82273f649332fffea40e37d4ec13c15",
+      "ukuran_kb": 21.6,
+      "ringkasan": "Menjawab: bagaimana fitur Rencana Kerja Harian dipecah jadi issue induk dan enam sub-issue lintas bip-erp, my-bharata, dan erp-frontend, dalam urutan apa dikerjakan dan di-deploy, serta kriteria \"yang harus benar\" tiap issue. Juga memuat data prod sebaran supervisor_id per departemen dan rincian endpoint internal atasan/bawahan efektif di employee-service serta koleksi rencana kerja di task-management.",
       "kata_kunci": [
         "analisa rencana kerja harian",
-        "breakdown issue",
         "sub-issue",
-        "atasan efektif",
-        "endpoint internal",
-        "task-management",
-        "tab Hari Ini",
-        "Rencana Tim",
+        "issue induk",
         "urutan deploy",
+        "atasan efektif",
+        "bawahan efektif",
+        "endpoint internal",
+        "employee-service",
+        "task-management",
         "Siap Agent"
       ]
     },
