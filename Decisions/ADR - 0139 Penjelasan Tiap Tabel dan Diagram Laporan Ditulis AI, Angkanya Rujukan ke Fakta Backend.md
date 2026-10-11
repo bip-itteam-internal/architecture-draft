@@ -1,12 +1,14 @@
 ---
 tags: [adr, marketing-analytics, ai, frontend]
-status: Accepted
+status: Superseded
 tanggal: 2026-09-29
 ---
 
 # ADR - 0139 Penjelasan Tiap Tabel dan Diagram Laporan Ditulis AI, Angkanya Rujukan ke Fakta Backend
 
 > **Status**: ⚠️ **Implemented (ada catatan)** — diputuskan dan di-merge 2026-09-29 (bip-erp [#2329](https://github.com/bip-itteam-internal/bip-erp/pull/2329), erp-frontend [#1838](https://github.com/bip-itteam-internal/erp-frontend/pull/1838)); status deploy prod diukur ulang sebelum dipakai (lihat § Realisasi). Mengubah sebagian [[ADR - 0134 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend]] § Realisasi butir g (model tidak menulis teks apa pun untuk blok non-teks): larangan itu diganti mekanisme di bawah **khusus untuk penjelasan per blok**. Judul blok dan blok Ringkasan tetap dari aturan seperti sebelumnya.
+>
+> ⛔ **Dicabut** oleh [[ADR - 0169 Asisten Analisa Marketing Dihapus, Copilot Jadi Pintu Tunggal, Mesin Keputusan Dipertahankan]] (2026-10-11): penjelasan AI per tabel/diagram laporan ikut dihapus bersama Asisten Analisa. Isi di bawah dipertahankan sebagai riwayat.
 
 ## Context
 

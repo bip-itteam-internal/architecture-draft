@@ -1,6 +1,8 @@
 # ADR - 0145 Agen Pengelola Toko Tumbuh dari Mesin Keputusan yang Ada, Dampak Diukur Sebelum Eksekusi
 
 > **Status**: 🟡 **Diusulkan**, 2026-10-01, kode belum ada. Disetujui pemohon lewat `/analisa-kebutuhan` (opsi C dari tiga). Diusulkan dari Tech Development; **belum ada konfirmasi bahwa manajemen marketing, Finance, atau Direktur sudah membahasnya**. Berdiri di atas grounding vault + kode `origin/main` + pengukuran prod read-only pada 2026-09-30.
+>
+> ⚠️ **Landasan berubah** oleh [[ADR - 0169 Asisten Analisa Marketing Dihapus, Copilot Jadi Pintu Tunggal, Mesin Keputusan Dipertahankan]] (2026-10-11): mesin keputusan (katalog, kelayakan, jendela matang, orkestrator) dipertahankan, tetapi laporan terjadwal, kiriman keputusan, dan jawaban setuju/tolak yang dirancang dipakai ADR ini **dihapus**. Bila ADR ini dilanjutkan, lapisan pengiriman ke Leader/SPV dan persetujuannya harus dirancang ulang (kandidat: di atas Copilot).
 
 %% Status ditulis di blockquote atas, alasan sama dengan ADR 0120/0127/0132/0135:
 ## Untuk Manajemen mendorong Deskripsi melewati baris ke-15 sehingga status tak terbaca VAULT-INDEX.json. %%
