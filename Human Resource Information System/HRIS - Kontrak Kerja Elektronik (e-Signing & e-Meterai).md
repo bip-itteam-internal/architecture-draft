@@ -1,17 +1,17 @@
 ## Deskripsi
 
-*Digitalisasi kontrak kerja karyawan (PKWT/PKWTT): dokumen dibuat dari template berbasis data HRIS, ditandatangani secara elektronik **tidak tersertifikasi** **tatap muka di kantor dan didampingi HRD** (karyawan menggores tanda tangan di perangkat HR, direktur mengonfirmasi dari Ruang Direktur), dibubuhi **e-Meterai** oleh HR, lalu salinannya dikirim ke karyawan. Ditambah pengingat otomatis sebelum kontrak berakhir. Keputusannya di [[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]], yang menggantikan rancangan tersertifikasi [[ADR - 0019 Kontrak Kerja Elektronik via Service Internal + Lapisan Tersertifikasi]]. Dibangun di atas modul riwayat kontrak yang **sudah live** di [[Microservices - Employee Service]] (koleksi `employee_contract`).*
+*Digitalisasi kontrak kerja karyawan (PKWT/PKWTT): dokumen dibuat dari template berbasis data HRIS, ditandatangani secara elektronik **tidak tersertifikasi** **tatap muka di kantor dan didampingi HRD** (setelah HRD mencocokkan KTP dan membuka akses 15 menit, karyawan menggores tanda tangan di HP-nya sendiri lewat MyBharata atau halaman web bertoken; revisi 2026-10-11 ADR 0089 §12, menunggu pemilik proses; direktur mengonfirmasi dari Ruang Direktur), dibubuhi **e-Meterai** oleh HR, lalu salinannya dikirim ke karyawan. Ditambah pengingat otomatis sebelum kontrak berakhir. Keputusannya di [[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]], yang menggantikan rancangan tersertifikasi [[ADR - 0019 Kontrak Kerja Elektronik via Service Internal + Lapisan Tersertifikasi]]. Dibangun di atas modul riwayat kontrak yang **sudah live** di [[Microservices - Employee Service]] (koleksi `employee_contract`).*
 
 - **Status**: 🟡 **Konsep / Direncanakan** untuk tanda tangan dan e-Meterai; belum ada di kode. ✅ **Pengingat kontrak habis: merged 2026-09-11 (bip-erp PR #1851), naik di DEV 2026-09-11 dan PROD 2026-09-12**; jalan cron DEV sudah terverifikasi, jalan PROD pertama (2026-09-13 07:00 WIB) belum dibaca (§Pengingat Kontrak Habis). ⚠️ **Dokumen PKWT masa transisi (T18): selesai di branch 2026-09-12** (bip-erp `feat/employee-dokumen-pkwt`, erp-frontend `feat/hris-dokumen-pkwt`), PR dibuka 2026-09-12 (bip-erp #1864, erp-frontend #1552), belum merged, belum di DEV (§Masa transisi). Pondasinya (riwayat kontrak + lampiran PDF) sudah ✅ live, diverifikasi ke `bip-erp` `origin/main` `915ca2f8` pada 2026-09-11; rinciannya di §Pondasi yang Sudah Ada.
-- **Ruang lingkup implementasi**: modul kontrak employee-service (status tanda tangan, sesi tanda tangan tatap muka, catatan tanda tangan, pengingat), prefix arsip MinIO baru, Web ERP (layar tanda tangan di perangkat HR, status di halaman Kontrak, antrean Ruang Direktur), salinan lewat email, dan MyBharata ("Kontrak Saya", baca-saja). Tanpa vendor PSrE, tanpa integrasi API meterai, tanpa tanda tangan jarak jauh.
+- **Ruang lingkup implementasi**: modul kontrak employee-service (status tanda tangan, sesi tanda tangan tatap muka, catatan tanda tangan, pengingat), prefix arsip MinIO baru, Web ERP (panel sesi tanda tangan HRD: cocokkan NIK, buka akses, QR; status di halaman Kontrak; antrean Ruang Direktur; halaman web publik bertoken untuk karyawan yang belum registrasi MyBharata), salinan lewat email, dan MyBharata ("Kontrak Saya": riwayat, detail, PDF, dan pintu tanda tangan bagi yang sudah registrasi). Tanpa vendor PSrE, tanpa integrasi API meterai, tanpa tanda tangan jarak jauh.
 - **Endpoint yang sudah ada**: [[API - Employee Service]] §Kontrak Kerja. Layar HR: [[APP - Web ERP]] `/hris/contract`.
 
 ## Persona / Pengguna
 
 | Persona | Peran & Divisi | Akses/RBAC | Device |
 |---|---|---|---|
-| Staf HR / HRD (Personalia) | menyiapkan kontrak, mendampingi penandatanganan dan mencocokkan KTP, membubuhkan e-Meterai di portal distributor lalu mengunggah, memantau status | `gateHris` + `RequireHRISStaff` (baca `PermHrisView`, tulis `PermHrisWork`) | Web ERP, `/hris/contract`, perangkat HR |
-| Karyawan (Pihak Kedua) | membaca dan menggores tanda tangan di kantor, didampingi HRD; menerima salinan | tidak login saat menandatangani; salinan lewat email (karyawan baru) atau "Kontrak Saya" (karyawan aktif, belum ada) | perangkat HR; email; [[APP - MyBharata]] |
+| Staf HR / HRD (Personalia) | menyiapkan kontrak, mendampingi penandatanganan, mencocokkan KTP lalu membuka akses tanda tangan 15 menit, membubuhkan e-Meterai di portal distributor lalu mengunggah, memantau status | `gateHris` + `RequireHRISStaff` (baca `PermHrisView`, tulis `PermHrisWork`) | Web ERP, `/hris/contract` |
+| Karyawan (Pihak Kedua) | membaca dan menggores tanda tangan di HP sendiri, di kantor, didampingi HRD; melihat riwayat dan dokumen kontraknya; menerima salinan | sudah registrasi MyBharata: menu "Kontrak Saya" di balik PIN; belum registrasi: halaman web bertoken dari QR, tanpa login (ADR 0089 §12); salinan lewat email (karyawan baru) atau "Kontrak Saya" | HP sendiri; email; [[APP - MyBharata]] |
 | Direktur (Pihak Pertama) | menandatangani banyak kontrak sekaligus | akun dipakai bersama Sekretariat (lihat §Keamanan Akun) | Web ERP, Ruang Direktur |
 | Atasan langsung | menerima pengingat penilaian kinerja sebelum kontrak berakhir | tidak membuka PDF kontrak, karena memuat gaji | MyBharata / Web ERP |
 
@@ -55,7 +55,7 @@ Diverifikasi ke `bip-erp` `origin/main` `915ca2f8`, `erp-frontend` `origin/main`
 
 ## Keamanan Akun
 
-Tanda tangan dilakukan tatap muka dan **tidak memakai akun maupun PIN karyawan** ([[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]] §6-§7), jadi lubang di bawah **tidak menahan** fitur ini. Tetap dicatat karena nyata dan menjadi task keamanan akun terpisah. Dicek ke `origin/main` 2026-09-11.
+Tanda tangan dilakukan tatap muka dan identitasnya ditetapkan lewat NIK yang dicocokkan HRD ([[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]] §6-§7). Dicek ke `origin/main` 2026-09-11. ⚠️ **Revisi 2026-10-11 (ADR 0089 §12)**: pintu MyBharata memakai akun karyawan yang sudah registrasi, jadi lubang "PIN tanpa batas" dan "ambil alih sesudah reset IT" kembali relevan dalam jendela 15 menit saat akses terbuka; pintu web tidak memakai akun. Lubang password awal = `employee_id` tidak berlaku di pintu MyBharata karena registrasi memaksa password baru. Lubang lain tetap task keamanan akun terpisah.
 
 | Lubang | Bukti | Relevansi ke kontrak |
 |---|---|---|
@@ -105,16 +105,17 @@ Mengikuti [[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi 
 |---|---|---|
 | Record kontrak + salinan `work_data` | employee `employee_contract` (pemilik) | reuse, sudah live |
 | Status tanda tangan | field baru pada `employee_contract` | baru |
-| Sesi tanda tangan tatap muka | modul kontrak: dibuka HRD (izin kerja HRIS), pencocokan NIK, goresan, pernyataan setuju | baru |
+| Sesi tanda tangan tatap muka | modul kontrak: dibuka HRD (izin kerja HRIS), pencocokan NIK, akses 15 menit sekali pakai, goresan, pernyataan setuju | baru |
+| Pintu tanda tangan karyawan (ADR 0089 §12) | MyBharata "Kontrak Saya" bila `has_registered = true`; selain itu halaman web publik bertoken (QR di layar HRD, email cadangan) dengan rute publik tanpa JWT yang divalidasi employee-service | baru |
 | Catatan tanda tangan | koleksi baru, hanya-tambah, **tanpa TTL** | baru |
 | Template, PDF draft, lembar bukti | modul kontrak; preseden `go-pdf/fpdf` slip gaji | baru |
 | Dokumen masa transisi (T18) | `contract_pkwt*.go`: PDF isian dibuat saat diminta (`go-pdf/fpdf`), daftar kekurangan, kirim opsional; jejak di `employee_contract_dokumen_kirim` | ⚠️ di branch, belum merged (2026-09-12) |
 | Arsip PDF final, goresan, lembar bukti | prefix MinIO baru tanpa kunci baca di browser, dibaca lewat proxy employee-service | baru |
 | Pengingat | `contract_pengingat.go` + cron 07:00 WIB, `kirimInboxKategoriGalat`, kategori `reminder`, koleksi `employee_contract_pengingat` | ✅ DEV + PROD (2026-09-12) |
 | Salinan untuk karyawan baru | notification-service `POST /email/send` (lampiran PDF) | reuse |
-| Layar HR | halaman Kontrak + panel riwayat + layar tanda tangan di perangkat HR | perluasan |
+| Layar HR | halaman Kontrak + panel riwayat + panel sesi tanda tangan (NIK, buka/tutup akses, QR, status langsung) | perluasan |
 | Layar direktur | antrean Ruang Direktur + tanda tangan massal | perluasan |
-| Layar karyawan aktif | MyBharata "Kontrak Saya", baca-saja, di balik gerbang PIN | baru |
+| Layar karyawan | MyBharata "Kontrak Saya" di balik gerbang PIN (riwayat, detail, PDF, jejak tanda tangan, pintu tanda tangan); halaman web bertoken untuk yang belum registrasi | baru |
 | e-Meterai | portal distributor resmi Peruri, dikerjakan HR | di luar sistem |
 
 **Tidak dipakai**: [[Microservices - HRD Document Service]]. Acknowledgment-nya menyimpan Markdown, tanpa konfirmasi identitas, dan milik service lain.
@@ -134,8 +135,8 @@ jalur samping: KOREKSI_DIMINTA (kembali ke DRAFT) · DIBATALKAN (sebelum SELESAI
 ```
 
 1. **Draft**: HR membuat kontrak baru atau perpanjangan; sistem mengisi template dan menerbitkan PDF draft. Draf **tidak dikirim ke karyawan lebih dulu** (keputusan pemilik proses 2026-09-12): karyawan menerima dokumennya saat bertemu HR di sesi tatap muka.
-2. **Sesi tatap muka**: karyawan datang ke kantor. HRD membuka sesi untuk kontrak itu di perangkat HR dan mengetik NIK dari KTP fisik; yang tidak cocok dengan `personal_data.nik_number` ditolak.
-3. **TTD karyawan**: karyawan membaca kontrak di layar, menggores tanda tangan, dan menyatakan setuju; atau minta koreksi (kembali ke HR).
+2. **Sesi tatap muka**: karyawan datang ke kantor. HRD membuka sesi untuk kontrak itu di Web ERP dan mengetik NIK dari KTP fisik; yang tidak cocok dengan `personal_data.nik_number` ditolak (tiga kali salah mengunci sesi 15 menit). Bila cocok, HRD membuka akses 15 menit sekali pakai; sistem memilih pintunya dari status registrasi MyBharata (ADR 0089 §12).
+3. **TTD karyawan**: di HP sendiri, lewat kartu "menunggu tanda tangan" di MyBharata atau halaman web dari QR, karyawan membaca kontrak, menggores tanda tangan, dan menyatakan setuju; atau minta koreksi (kembali ke HR). Akses tertutup begitu tanda tangan tersimpan atau waktunya habis; panel HRD menampilkan statusnya langsung.
 4. **TTD direktur**: kontrak masuk antrean Ruang Direktur; direktur menandatangani satu atau banyak sekaligus.
 5. **Meterai + kunci**: HR membubuhkan e-Meterai di portal distributor lalu mengunggahnya. Sistem menyimpan PDF di prefix arsip, menghitung hash SHA-256, dan mengunci lampiran. Pada urutan A, sistem memeriksa bahwa PDF bermeterai memuat PDF yang ditandatangani tanpa perubahan.
 6. **Selesai**: sistem menerbitkan lembar bukti tanda tangan (PDF terpisah), mengirim salinan (email untuk karyawan baru, "Kontrak Saya" untuk karyawan aktif), dan status di halaman Kontrak HR menjadi selesai.
@@ -174,6 +175,7 @@ Ada dua kelompok penanda tangan. **Usulan (2026-09-11, belum diputuskan)**: cara
 | Durasi dan tanggal berakhir | `masa_evaluasi` di offer, teks bebas (DEV: `"2"`, `"3 bulan"`); jenis kontrak dan tanggal berakhir diketik manual saat Tambah Karyawan (`erp-frontend` `create-employee/index.tsx:219`) | dipilih HR saat Perpanjang |
 | Gaji Lampiran 1 | `gaji_evaluasi` / `gaji_kontrak` di offer, satu angka tanpa rincian (`services/recruitment/models_offer.go:39-40`) | `employee_salary` payroll |
 | Penilaian sebelum kontrak berikutnya | Performance Review Onboarding (peserta `PKWT (Evaluasi)`) | pesan atasan H-14 dari pengingat; penilaiannya di luar sistem |
+| Pintu tanda tangan (ADR 0089 §12) | halaman web bertoken dari QR, bila belum registrasi MyBharata (lazimnya) | MyBharata "Kontrak Saya", bila sudah registrasi |
 | Salinan final | email | "Kontrak Saya" di MyBharata |
 
 Bila NIK yang diketik HRD saat sesi tidak cocok, sesi ditolak dan HR harus memperbaiki data karyawan di layar lain; layar penolakannya perlu menautkan ke sana. Hal yang belum diputuskan untuk dua kelompok ini ada di §Belum Diputuskan.
@@ -263,7 +265,7 @@ Komponen pendapatan lain yang punya nilai tidak dicetak dan tidak ikut total; na
 | Target | Yang ditulis | Catatan |
 |---|---|---|
 | `employee_contract` (pemilik) | status tanda tangan, rujukan PDF final, goresan, dan lembar bukti, hash | modul kontrak employee-service |
-| Koleksi catatan tanda tangan (baru) | satu dokumen per tindakan: sesi dibuka, tanda tangan karyawan (hasil pencocokan NIK, HRD pendamping, perangkat, waktu), tanda tangan direktur, unggah meterai, pembatalan | hanya-tambah, tanpa TTL; NIK yang diketik tidak disimpan |
+| Koleksi catatan tanda tangan (baru) | satu dokumen per tindakan: sesi dibuka, pencocokan NIK, akses dibuka/ditutup/kedaluwarsa, tanda tangan karyawan (hasil pencocokan NIK, HRD pendamping, pintu MyBharata/web, perangkat, waktu), tanda tangan direktur, unggah meterai, pembatalan | hanya-tambah, tanpa TTL; NIK yang diketik tidak disimpan |
 | `employee_contract_pengingat` (PR #1851) | satu dokumen per (kontrak, tahap, penerima) yang berhasil terkirim: `contract_id`, `employee_id`, `company_id`, `tahap`, `penerima_id`, `peran` (`hr`/`atasan`), `dikirim_pada` | penjaga idempotensi pengingat; index unik `contract_id + tahap + penerima_id`. Koleksi sendiri karena `PATCH /contract/:id` menimpa dokumen kontrak utuh lewat `ReplaceOne`, dan jejak kiriman bukan fakta kontrak |
 | `employee_contract_dokumen_kirim` (T18, di branch 2026-09-12) | satu dokumen per kiriman dokumen masa transisi yang **berhasil** keluar: `contract_id`, `employee_id`, `company_id`, `ke`, `dikirim_oleh` (`employee_id` HR pengirim), `dikirim_pada` | index `contract_id` + `dikirim_pada` menurun, dibuat saat boot; dibaca untuk "kiriman terakhir" di dialog dan untuk membentuk kunci idempoten email. Koleksi sendiri dengan alasan yang sama dengan pengingat |
 | Salinan `work_data` (`employment_type`, `contract_ending`) | tidak ditulis modul tanda tangan. Modul kontrak menyegarkannya sendiri lewat `segarkanSalinan` | pintu tulis lain membuang kedua field itu |
@@ -273,6 +275,8 @@ Komponen pendapatan lain yang punya nilai tidak dicetak dan tidak ikut total; na
 ## Belum Diputuskan (TBD)
 
 - **Konfirmasi legal** keabsahan tanda tangan tidak tersertifikasi untuk PKWT. Rilis tanda tangan menunggu ini; pengingat tidak.
+- **Persetujuan pemilik proses atas revisi ADR 0089 §12** (goresan di HP karyawan, dua pintu). Sampai disetujui, yang berlaku tetap perangkat HR.
+- **Rute dan path pintu web bertoken** (rute publik gateway, halaman di erp-frontend), dan apakah tombol tanda tangan menunggu PDF dibuka sampai halaman terakhir. Ditetapkan saat `/plan`.
 - **Hasil uji S1** (urutan A atau B): HR memeteraikan satu PDF contoh lewat portal distributor yang dipakai.
 - **Format dan keunikan nomor kontrak**: format HR (`…/HRD/PKWT/…/…`) vs kode sekarang, urutan per perusahaan dan periode, dan perlakuan nomor kontrak lama (celah 1).
 - **Letak data penandatangan per perusahaan** (nama, jabatan, alamat direktur).
@@ -303,7 +307,7 @@ Komponen pendapatan lain yang punya nilai tidak dicetak dan tidak ikut total; na
 - [[Microservices - Calendar Service]]: feed `contract_end` (kontrak milik pemanggil).
 - [[CORE - HRIS Orchestrator]]: rantai hire (create-employee).
 - [[CORE - API Master Gateway]]: routing + auth SSO.
-- [[APP - Web ERP]] (`/hris/contract` beserta dialog Dokumen PKWT masa transisi, layar tanda tangan di perangkat HR, Ruang Direktur) dan [[APP - MyBharata]] ("Kontrak Saya").
+- [[APP - Web ERP]] (`/hris/contract` beserta dialog Dokumen PKWT masa transisi, panel sesi tanda tangan HRD, halaman web publik bertoken, Ruang Direktur) dan [[APP - MyBharata]] ("Kontrak Saya", termasuk pintu tanda tangan).
 
 ## Dokumen Terkait
 
