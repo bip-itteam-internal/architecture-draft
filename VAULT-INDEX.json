@@ -3169,9 +3169,9 @@
         "Microservices - Form Builder Service",
         "CORE - API Master Gateway",
         "Microservices - Employee Service",
-        "ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif",
-        "HRIS - To-do Harian Pribadi (Modul)",
-        "ANALISA - To-do Harian Pribadi",
+        "ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif",
+        "HRIS - Rencana Kerja Harian (Modul)",
+        "ANALISA - Rencana Kerja Harian",
         "Marketing - Engagement Team (Modul)",
         "ADR - 0117 Realisasi Engagement Dilaporkan Pengerja per URL per Jenis Pekerjaan sampai Akhir Bulan KPI",
         "ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri",
@@ -3185,20 +3185,20 @@
         "APP - Dynamic Task Tracker",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "e842f39a7742692fb64bc6d55606b789eb8618372f81fd5a47e5af28ef873238",
+      "hash": "f41b9034fca22f8fe35fc05b11bb0a50a671d8d8655307c71f0479586dc8d5b9",
       "ukuran_kb": 47.7,
-      "ringkasan": "Menjawab: bagaimana IT Helpdesk / ticketing internal bekerja (workflow Kanban Request sampai Done, approval, SLA response dan resolution beserta eskalasi), siapa boleh melihat dan menindak tiket (cakupan divisi supervisor, admin space per objek, visibility space restricted), dan endpoint apa saja yang tersedia. Juga menjelaskan tipe permintaan dengan pertanyaan per tipe, CSAT, automation auto-assign/auto-close, WebSocket realtime, KPI group space, serta modul tambahan Engagement Tim dan To-do Harian Pribadi.",
+      "ringkasan": "Menjawab: bagaimana IT Helpdesk / ticketing ERP bekerja (board Kanban per space, tipe permintaan dan pertanyaan per tipe, approval, SLA dua dimensi, CSAT, auto-assign/auto-close), siapa boleh mengelola space (admin space, cakupan divisi supervisor, visibility restricted), dan endpoint apa yang tersedia termasuk WebSocket, KPI, dan laporan. Juga menjelaskan modul yang menumpang di service ini: Engagement Tim dan Rencana Kerja Harian.",
       "kata_kunci": [
         "task management",
-        "helpdesk",
         "tiket",
+        "helpdesk",
         "ticketing",
         "Kanban",
         "SLA",
         "admin space",
-        "space",
         "approval",
-        "Engagement Tim"
+        "Engagement Tim",
+        "Rencana Kerja Harian"
       ]
     },
     {
@@ -9597,15 +9597,15 @@
       ]
     },
     {
-      "path": "Decisions/ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif.md",
-      "judul": "ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif",
+      "path": "Decisions/ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif.md",
+      "judul": "ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif",
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-11, kode belum ada. Analisa: [[ANALISA - To-do Harian Pribadi]]",
+      "status_teks": "**Diusulkan**, 2026-10-11, kode belum ada. Analisa: [[ANALISA - Rencana Kerja Harian]]",
       "publik": true,
       "tautan": [
-        "ANALISA - To-do Harian Pribadi",
+        "ANALISA - Rencana Kerja Harian",
         "HRIS - Matriks KPI per Departemen",
         "HRIS - Organization Structure",
         "Microservices - Task Management Service",
@@ -9613,23 +9613,23 @@
         "Marketing - Engagement Team (Modul)",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
         "Microservices - Calendar Service",
-        "HRIS - To-do Harian Pribadi (Modul)",
+        "HRIS - Rencana Kerja Harian (Modul)",
         "APP - MyBharata"
       ],
-      "hash": "32e2874988718b5db894666ffa86cc349d6cfc9867137b6c79101accf819532f",
-      "ukuran_kb": 13.7,
-      "ringkasan": "Menjawab: di mana karyawan mencatat to-do harian pribadi di MyBharata, kenapa to-do disimpan sebagai entitas baru di Task Management Service dan bukan tiket, dan bagaimana item yang belum selesai terbawa ke hari berikutnya dengan hitungan \"tertunda N hari\" yang diturunkan dari tanggal rencana awal. Juga menjawab siapa atasan efektif yang boleh memantau (atasan langsung atau supervisor departemen bila supervisor_id kosong), siapa boleh membuat/mengubah/membatalkan item, bagaimana lampiran bukti disiapkan, dan apa yang belum dijanjikan (KPI, Web ERP, pengingat pagi).",
+      "hash": "40c2211de9df82b26d2db837aa1c73f6ae1c90625106e6c9e686d0d6543f5699",
+      "ukuran_kb": 15.8,
+      "ringkasan": "Menjawab: kenapa rencana kerja harian disimpan sebagai koleksi baru di Task Management (bukan tiket, tanpa triase dan SLA), bagaimana hitungan tertunda diturunkan saat dibaca dari tanggal rencana awal yang tak bisa diubah, dan siapa atasan efektif yang boleh memantau (atasan langsung, fallback supervisor departemen). Juga menjelaskan kenapa namanya \"Rencana Kerja\" bukan to-do, kenapa hanya tampil di tab Hari Ini menu Tugas MyBharata, pondasi lampiran bukti, dan alasan belum masuk KPI.",
       "kata_kunci": [
-        "to-do harian",
-        "daily todo",
-        "tugas tertunda",
-        "carry over",
+        "Rencana Kerja Harian",
+        "rencana kerja",
+        "daily work plan",
+        "tertunda",
         "atasan efektif",
         "supervisor_id",
         "Task Management",
-        "tab Hari Ini",
-        "laporan harian",
-        "MyBharata"
+        "MyBharata",
+        "Hari Ini",
+        "ADR 0170"
       ]
     },
     {
@@ -13498,6 +13498,39 @@
       ]
     },
     {
+      "path": "Human Resource Information System/HRIS - Rencana Kerja Harian (Modul).md",
+      "judul": "HRIS - Rencana Kerja Harian (Modul)",
+      "area": "Human Resource Information System",
+      "jenis": "domain",
+      "status_emoji": "🟡",
+      "status_teks": "Konsep, kode belum ada. Keputusan [[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]] masih 🟡 Diusulkan.",
+      "publik": true,
+      "tautan": [
+        "Microservices - Task Management Service",
+        "ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif",
+        "Microservices - Employee Service",
+        "APP - MyBharata",
+        "ANALISA - Rencana Kerja Harian",
+        "HRIS - Organization Structure",
+        "HRIS - Matriks KPI per Departemen"
+      ],
+      "hash": "1007bc7ebe0c21b35c9f1acf4531bb81be07a91a01e4d79be881d0893f87c04c",
+      "ukuran_kb": 6.9,
+      "ringkasan": "Menjawab: bagaimana karyawan mencatat rencana kerja harian di tab Hari Ini menu Tugas MyBharata, apa isi daftar hari ini (rencana kerja plus tiket yang ditugaskan, tiket tanpa ceklis dan dibuka ke halaman tiket), dan bagaimana label \"tertunda N hari\" serta pembatalan tanpa hapus bekerja. Juga menjawab siapa atasan efektif yang memantau, persona pengguna beserta angka prod, kendala data atasan langsung, dan hal yang belum diputuskan (kewajiban bukti, KPI, Web ERP, pengingat).",
+      "kata_kunci": [
+        "Rencana Kerja Harian",
+        "rencana kerja",
+        "daily work plan",
+        "tertunda",
+        "carry over",
+        "atasan efektif",
+        "laporan harian",
+        "MyBharata",
+        "menu Tugas",
+        "Hari Ini"
+      ]
+    },
+    {
       "path": "Human Resource Information System/HRIS - Retention.md",
       "judul": "HRIS - Retention",
       "area": "Human Resource Information System",
@@ -13708,39 +13741,6 @@
         "annual",
         "evaluasi",
         "need"
-      ]
-    },
-    {
-      "path": "Human Resource Information System/HRIS - To-do Harian Pribadi (Modul).md",
-      "judul": "HRIS - To-do Harian Pribadi (Modul)",
-      "area": "Human Resource Information System",
-      "jenis": "domain",
-      "status_emoji": "🟡",
-      "status_teks": "Konsep, kode belum ada. Keputusan [[ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif]] masih 🟡 Diusulkan.",
-      "publik": true,
-      "tautan": [
-        "Microservices - Task Management Service",
-        "ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif",
-        "Microservices - Employee Service",
-        "APP - MyBharata",
-        "ANALISA - To-do Harian Pribadi",
-        "HRIS - Organization Structure",
-        "HRIS - Matriks KPI per Departemen"
-      ],
-      "hash": "ae1b12aeef9d3f9ef789de9db5a9ae6744a86ea2c65d7be3dc4d0fa3abe7e5e8",
-      "ukuran_kb": 6.6,
-      "ringkasan": "Menjawab: bagaimana karyawan mencatat to-do harian di MyBharata, apa isi daftar hari ini (to-do pribadi plus tiket yang ditugaskan), bagaimana label tertunda dan pembatalan bekerja, serta bagaimana atasan efektif memantau bawahannya. Juga memuat persona pengguna, kendala (baru 46% karyawan punya atasan langsung, hari kalender), cakupan tahap 1, dan hal yang belum diputuskan seperti KPI dan wajib bukti.",
-      "kata_kunci": [
-        "to-do harian",
-        "daily to-do",
-        "Hari Ini",
-        "MyBharata",
-        "tertunda",
-        "atasan efektif",
-        "pantauan atasan",
-        "laporan harian",
-        "daily report",
-        "bukti"
       ]
     },
     {
@@ -20949,6 +20949,34 @@
       ]
     },
     {
+      "path": "Workspace/ANALISA - Rencana Kerja Harian.md",
+      "judul": "ANALISA - Rencana Kerja Harian",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif",
+        "HRIS - Rencana Kerja Harian (Modul)"
+      ],
+      "hash": "aa89a37ddb73b067d44f40fe607c7dff336079e2d04c9a4f33867f798a0bfb98",
+      "ukuran_kb": 14.8,
+      "ringkasan": "Menjawab: bagaimana pekerjaan Rencana Kerja Harian dipecah jadi issue induk dan empat sub-issue (endpoint internal atasan/bawahan efektif di employee-service, koleksi dan daftar hari ini di task-management, tab Hari Ini dan tampilan bawahan di MyBharata), urutan merge dan deploy-nya, serta kriteria \"yang harus benar\" tiap issue. Juga memuat data prod sebaran supervisor_id per departemen dan menegaskan analisa ini baru bisa dipakai /brief setelah ADR 0170 Diterima.",
+      "kata_kunci": [
+        "ANALISA",
+        "Rencana Kerja Harian",
+        "sub-issue",
+        "atasan efektif",
+        "atasanPengingat",
+        "task-management",
+        "employee-service",
+        "MyBharata",
+        "urutan deploy",
+        "Siap Agent"
+      ]
+    },
+    {
       "path": "Workspace/ANALISA - Retur Dibukukan Manual oleh Finance.md",
       "judul": "ANALISA - Retur Dibukukan Manual oleh Finance",
       "area": "Workspace",
@@ -21378,34 +21406,6 @@
         "deploy",
         "verifikasi",
         "KPI"
-      ]
-    },
-    {
-      "path": "Workspace/ANALISA - To-do Harian Pribadi.md",
-      "judul": "ANALISA - To-do Harian Pribadi",
-      "area": "Workspace",
-      "jenis": "workspace",
-      "status_emoji": null,
-      "status_teks": null,
-      "publik": false,
-      "tautan": [
-        "ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif",
-        "HRIS - To-do Harian Pribadi (Modul)"
-      ],
-      "hash": "10bc151546ddff1909cccafa1143c13441367c8f7ad445d9890d874b9cf4bf16",
-      "ukuran_kb": 14.2,
-      "ringkasan": "Menjawab: bagaimana fitur to-do harian pribadi dipecah jadi issue induk dan sub-issue per repo (bip-erp employee-service, task-management, my-bharata), urutan pengerjaan dan deploy-nya, serta kriteria \"yang harus benar\" tiap bagian. Berguna untuk mengetahui endpoint internal atasan/bawahan efektif, aturan daftar hari ini, dan data prod pendukung per departemen sebelum menulis brief.",
-      "kata_kunci": [
-        "ANALISA to-do",
-        "to-do harian",
-        "sub-issue",
-        "bip-erp#2967",
-        "atasan efektif",
-        "bawahan efektif",
-        "atasanPengingat",
-        "my-bharata",
-        "Siap Agent",
-        "brief"
       ]
     },
     {

@@ -1,29 +1,29 @@
-# ANALISA - To-do Harian Pribadi
+# ANALISA - Rencana Kerja Harian
 
-> ⛔ **Menunggu ADR [[ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif]] Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**
+> ⛔ **Menunggu ADR [[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]] Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**
 
-- **Keputusan**: [[ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif]]
-- **Konsep domain**: [[HRIS - To-do Harian Pribadi (Modul)]]
+- **Keputusan**: [[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]]
+- **Konsep domain**: [[HRIS - Rencana Kerja Harian (Modul)]]
 - **Pemutus**: irfanarfianto
 - **Tanggal analisa**: 2026-10-11
 - **Ukuran**: **Besar**. Dua repo harus berubah, dan masing-masing butuh dua PR:
-  - `bip-erp`: endpoint internal atasan efektif di employee-service, lalu koleksi dan rute to-do di task-management. Dua service, dan konvensi tim satu branch per service.
-  - `my-bharata`: tab Hari Ini + kartu Beranda, lalu tampilan bawahan. Tidak ada layar to-do yang sudah merender bentuk ini secara generik (`git grep` atas `origin/dev`: nol entitas to-do; `getTasks` hanya punya param scope + status, `task_remote_datasource.dart:87-105`).
+  - `bip-erp`: endpoint internal atasan efektif di employee-service, lalu koleksi dan rute rencana kerja di task-management. Dua service, dan konvensi tim satu branch per service.
+  - `my-bharata`: tab Hari Ini di menu Tugas, lalu tampilan bawahan. Tidak ada layar rencana kerja yang sudah merender bentuk ini secara generik (`git grep` atas `origin/dev`: nol entitas rencana kerja; `getTasks` hanya punya param scope + status, `task_remote_datasource.dart:87-105`).
   - `erp-frontend` **tidak berubah**: tahap 1 hanya MyBharata (ADR §9).
 
 ## Urutan
 
 | # | Issue | Repo | Bentuk | Urutan |
 |---|---|---|---|---|
-| 0 ([bip-erp#2967](https://github.com/bip-itteam-internal/bip-erp/issues/2967)) | To-do harian pribadi dengan pantauan atasan efektif | bip-erp | induk, tanpa PR | - |
+| 0 ([bip-erp#2967](https://github.com/bip-itteam-internal/bip-erp/issues/2967)) | Rencana kerja harian pribadi dengan pantauan atasan efektif | bip-erp | induk, tanpa PR | - |
 | 1 ([bip-erp#2968](https://github.com/bip-itteam-internal/bip-erp/issues/2968)) | [BE] Endpoint internal atasan dan bawahan efektif (bagian 1/2) | bip-erp | sub-issue | pertama |
-| 2 ([bip-erp#2969](https://github.com/bip-itteam-internal/bip-erp/issues/2969)) | [BE] Koleksi to-do, daftar hari ini, dan pantauan bawahan (bagian 2/2) | bip-erp | sub-issue | sesudah #1 merged |
-| 3 ([my-bharata#205](https://github.com/bip-itteam-internal/my-bharata/issues/205)) | [Mobile] To-do hari ini di Beranda dan tab Hari Ini (bagian 1/2) | my-bharata | sub-issue | deploy sesudah #2 |
-| 4 ([my-bharata#206](https://github.com/bip-itteam-internal/my-bharata/issues/206)) | [Mobile] Tampilan to-do bawahan untuk atasan efektif (bagian 2/2) | my-bharata | sub-issue | sesudah #3 merged |
+| 2 ([bip-erp#2969](https://github.com/bip-itteam-internal/bip-erp/issues/2969)) | [BE] Koleksi rencana kerja, daftar hari ini, dan pantauan bawahan (bagian 2/2) | bip-erp | sub-issue | sesudah #1 merged |
+| 3 ([my-bharata#205](https://github.com/bip-itteam-internal/my-bharata/issues/205)) | [Mobile] Tab Hari Ini untuk rencana kerja di menu Tugas (bagian 1/2) | my-bharata | sub-issue | deploy sesudah #2 |
+| 4 ([my-bharata#206](https://github.com/bip-itteam-internal/my-bharata/issues/206)) | [Mobile] Tampilan rencana kerja bawahan untuk atasan efektif (bagian 2/2) | my-bharata | sub-issue | sesudah #3 merged |
 
 ---
 
-## 0. To-do harian pribadi dengan pantauan atasan efektif
+## 0. Rencana kerja harian pribadi dengan pantauan atasan efektif
 
 - **Repo**: bip-erp · **Bentuk**: induk (tanpa PR) · **Issue**: [bip-erp#2967](https://github.com/bip-itteam-internal/bip-erp/issues/2967)
 
@@ -36,7 +36,7 @@ Atasan baru tahu pekerjaan bawahan macet setelah terlambat. Pekerjaan harian yan
 
 ### Keputusan
 
-[[ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif]]. Layak `Siap Agent` sesudah ADR berstatus Diterima.
+[[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]]. Layak `Siap Agent` sesudah ADR berstatus Diterima.
 
 ### Yang harus benar
 
@@ -69,7 +69,7 @@ Task-management perlu tahu siapa atasan efektif seseorang (atasan langsung, atau
 
 ### Keputusan
 
-[[ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif]] §5. Layak `Siap Agent` sesudah ADR berstatus Diterima.
+[[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]] §5. Layak `Siap Agent` sesudah ADR berstatus Diterima.
 - Atasan efektif = `supervisor_id` bila sah, bila kosong rantai penyetuju cuti, persis `atasanPengingat`. Rantai yang menunjuk orang itu sendiri = tanpa atasan.
 - Dua rute internal berkunci layanan: atasan efektif satu karyawan, dan daftar bawahan efektif satu atasan. Satu perusahaan saja.
 
@@ -96,7 +96,7 @@ Tidak ada.
 
 ---
 
-## 2. [BE] Koleksi to-do, daftar hari ini, dan pantauan bawahan (bagian 2/2)
+## 2. [BE] Koleksi rencana kerja, daftar hari ini, dan pantauan bawahan (bagian 2/2)
 
 - **Repo**: bip-erp (`services/task-management`, `docker-compose.yml`) · **Bentuk**: sub-issue induk #0 · **Issue**: [bip-erp#2969](https://github.com/bip-itteam-internal/bip-erp/issues/2969)
 
@@ -105,11 +105,11 @@ Tidak ada.
 
 ### Masalah
 
-Belum ada tempat menyimpan to-do pribadi. Tabel tiket tidak cocok: setiap tiket lahir `Request`, ber-SLA 24 jam, dan memberi notifikasi supervisor space (`services/task-management/task_handlers.go:126-160`). Tidak ada endpoint yang menggabungkan pekerjaan pribadi dan tiket saya untuk satu hari (`GET /tasks/filter` tak punya param tanggal, `task_filter.go:232-240`).
+Belum ada tempat menyimpan rencana kerja. Tabel tiket tidak cocok: setiap tiket lahir `Request`, ber-SLA 24 jam, dan memberi notifikasi supervisor space (`services/task-management/task_handlers.go:126-160`). Tidak ada endpoint yang menggabungkan pekerjaan pribadi dan tiket saya untuk satu hari (`GET /tasks/filter` tak punya param tanggal, `task_filter.go:232-240`).
 
 ### Keputusan
 
-[[ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif]] §1-§7. Layak `Siap Agent` sesudah ADR berstatus Diterima.
+[[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]] §1-§7. Layak `Siap Agent` sesudah ADR berstatus Diterima.
 - Koleksi baru; field inti `employee_id`, judul, catatan, `tanggal_rencana_awal` (immutable), `tanggal_rencana`, status `terbuka|selesai|dibatalkan`, `selesai_at`, `dibatalkan_at`, `bukti[]`, `wajib_bukti` (bawaan false, tanpa penulis).
 - Tertunda dihitung saat dibaca (hari kalender WIB dari `tanggal_rencana_awal`); tidak ada job pemindah. Hanya pemilik menulis; batal tidak menghapus; tidak ada rute hapus.
 - Atasan efektif dari rute internal #1; task-management tidak menghitung ulangnya.
@@ -118,11 +118,11 @@ Belum ada tempat menyimpan to-do pribadi. Tabel tiket tidak cocok: setiap tiket 
 
 - [ ] Pemilik bisa membuat, mengubah judul/catatan, mengubah `tanggal_rencana`, menyelesaikan, dan membatalkan item miliknya. Permintaan yang sama atas item milik orang lain ditolak 403, termasuk dari atasannya.
 - [ ] `tanggal_rencana_awal` tidak berubah oleh rute apa pun sesudah dibuat (uji: ubah `tanggal_rencana` lalu baca ulang).
-- [ ] Tidak ada rute DELETE untuk item to-do. Item dibatalkan tetap terbaca oleh pemilik dan atasan efektif.
-- [ ] Daftar hari ini pemilik berisi: to-do `terbuka` dengan `tanggal_rencana` ≤ hari ini WIB, to-do `selesai` dengan `selesai_at` hari ini WIB, dan tiket dengan `assign_to` memuat pemanggil, `completed_at` nil, `is_archived` bukan true, status bukan Ditolak, `due_date` ≤ akhir hari ini WIB. Tiap baris membawa `jenis: todo|tiket`.
-- [ ] Baris to-do membawa `tertunda_hari` = selisih hari kalender WIB antara hari ini dan `tanggal_rencana_awal` (0 bila belum lewat). Uji batas hari pada 23:30 dan 00:30 WIB.
-- [ ] Tidak ada scheduler atau goroutine baru yang menulis ke koleksi to-do.
-- [ ] Rute ringkasan bawahan untuk atasan efektif: per bawahan, jumlah to-do terbuka hari ini, jumlah tertunda ≥ 3 hari, dan jumlah dibatalkan 7 hari terakhir. Pemanggil yang bukan atasan efektif orang itu menerima 403 untuk rincian bawahan tersebut.
+- [ ] Tidak ada rute DELETE untuk item rencana kerja. Item dibatalkan tetap terbaca oleh pemilik dan atasan efektif.
+- [ ] Daftar hari ini pemilik berisi: rencana kerja `terbuka` dengan `tanggal_rencana` ≤ hari ini WIB, rencana kerja `selesai` dengan `selesai_at` hari ini WIB, dan tiket dengan `assign_to` memuat pemanggil, `completed_at` nil, `is_archived` bukan true, status bukan Ditolak, `due_date` ≤ akhir hari ini WIB, ditambah tiket ber-`assign_to` pemanggil yang `completed_at`-nya hari ini WIB. Tiap baris membawa `jenis: rencana|tiket`; baris tiket membawa nama status aslinya (stage space, tanpa dipetakan ulang), `due_date`, dan penanda lewat tenggat.
+- [ ] Baris rencana kerja membawa `tertunda_hari` = selisih hari kalender WIB antara hari ini dan `tanggal_rencana_awal` (0 bila belum lewat). Uji batas hari pada 23:30 dan 00:30 WIB.
+- [ ] Tidak ada scheduler atau goroutine baru yang menulis ke koleksi rencana kerja. Endpoint daftar hari ini tidak pernah menulis ke koleksi `tasks`.
+- [ ] Rute ringkasan bawahan untuk atasan efektif: per bawahan, jumlah rencana kerja terbuka hari ini, jumlah tertunda ≥ 3 hari, dan jumlah dibatalkan 7 hari terakhir. Tiket tidak ikut dihitung di ringkasan ini. Pemanggil yang bukan atasan efektif orang itu menerima 403 untuk rincian bawahan tersebut.
 - [ ] Rincian daftar hari ini seorang bawahan bisa dibaca atasan efektifnya. Baris tiket dari space `restricted` yang tak bisa diakses atasan itu tidak memuat judul, keluhan, atau deskripsi.
 - [ ] Rute unggah, pratinjau, dan lepas bukti per item memakai file-service dengan pola `uploadTaskAttachment`; hanya pemilik yang boleh mengunggah atau melepas; atasan efektif boleh pratinjau. Ada uji `app.Test` untuk jalur galat tiap rute baru.
 - [ ] Env `EMPLOYEE_MODULE_URL` (dan kunci layanan #1) ditambahkan ke blok task-management di compose tanpa kunci YAML ganda, terisi di `.env` dev sebelum merge; badan PR menyebut `--force-recreate`.
@@ -142,7 +142,7 @@ Prod 2026-10-11 `task_management_db.tasks`: 427 tiket; status Done 289, Request 
 
 ---
 
-## 3. [Mobile] To-do hari ini di Beranda dan tab Hari Ini (bagian 1/2)
+## 3. [Mobile] Tab Hari Ini untuk rencana kerja di menu Tugas (bagian 1/2)
 
 - **Repo**: my-bharata (folder lokal `mybharata-app`, branch `dev`) · **Bentuk**: sub-issue induk #0 · **Issue**: [my-bharata#205](https://github.com/bip-itteam-internal/my-bharata/issues/205)
 
@@ -155,18 +155,19 @@ MyBharata tidak punya tempat mencatat pekerjaan harian pribadi. Menu Tugas hanya
 
 ### Keputusan
 
-[[ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif]] §2-§4, §7, §9. Layak `Siap Agent` sesudah ADR berstatus Diterima.
-- Kartu "To-do hari ini" di Beranda tepat di bawah `AttendanceActivityCard` (`home_page.dart:262`), dengan tombol tambah.
-- Tab **Hari Ini** paling depan di menu Tugas: to-do + tiket saya; tiket membuka detail tiket yang ada.
+[[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]] §2-§4, §7, §9. Layak `Siap Agent` sesudah ADR berstatus Diterima.
+- **Tidak ada kartu di Beranda** (ADR §9): rencana kerja hanya ada di menu Tugas.
+- Tab **Hari Ini** paling depan di menu Tugas: rencana kerja + tiket saya; tiket membuka detail tiket yang ada.
 
 ### Yang harus benar
 
 - [ ] Menambah item cukup judul; tanggal rencana bawaan hari ini dan bisa diganti lewat pemilih tanggal. Tanpa field prioritas.
-- [ ] Tab Hari Ini menampilkan baris to-do dan tiket dari endpoint #2, tiket ditandai berbeda dan mengetuknya membuka detail tiket.
-- [ ] Baris to-do yang tertunda menampilkan label "tertunda N hari" dari `tertunda_hari` backend, bukan dihitung di aplikasi.
+- [ ] Tab Hari Ini menampilkan baris rencana kerja dan tiket dari endpoint #2. **Baris tiket tanpa ceklis**: label "Tiket", chip berisi nama status dari backend apa adanya (Testing diberi keterangan "menunggu tinjauan"), tenggat dan tanda lewat tenggat; mengetuknya membuka detail tiket yang sudah ada. Tidak ada aksi ubah status tiket dari tab ini.
+- [ ] Baris rencana kerja yang tertunda menampilkan label "tertunda N hari" dari `tertunda_hari` backend, bukan dihitung di aplikasi.
 - [ ] Centang selesai, ubah tanggal, dan batalkan bekerja dengan umpan balik; batalkan meminta konfirmasi dan menyebut bahwa item tetap terlihat oleh atasan.
 - [ ] Lampirkan bukti (foto/berkas) dari detail item, dan bukti yang ada bisa dipratinjau dan dilepas.
-- [ ] Kartu Beranda menampilkan sampai 3 item teratas + jumlah total + "Lihat semua" ke tab Hari Ini; menyembunyikan diri saat endpoint membalas 404 (rute belum rilis), meniru `task_remote_datasource.dart:152-154`, dan ikut `refreshKey` tarik-menyegarkan.
+- [ ] Tidak ada widget rencana kerja yang ditambahkan ke `home_page.dart`.
+- [ ] Tab Hari Ini menampilkan keadaan kosong yang jelas saat endpoint membalas 404 karena rute belum rilis, meniru `task_remote_datasource.dart:152-154`; mendukung tarik-menyegarkan.
 - [ ] Loading memakai `ShimmerBox`, padding memakai `AppDimens`; lima keadaan layar (memuat, kosong, galat, berisi, sebagian) tertangani.
 - [ ] Teks baru lewat l10n `app_id.arb` dan `app_en.arb`.
 
@@ -184,7 +185,7 @@ Tidak perlu data prod tambahan.
 
 ---
 
-## 4. [Mobile] Tampilan to-do bawahan untuk atasan efektif (bagian 2/2)
+## 4. [Mobile] Tampilan rencana kerja bawahan untuk atasan efektif (bagian 2/2)
 
 - **Repo**: my-bharata (folder lokal `mybharata-app`, branch `dev`) · **Bentuk**: sub-issue induk #0 · **Issue**: [my-bharata#206](https://github.com/bip-itteam-internal/my-bharata/issues/206)
 
@@ -197,14 +198,14 @@ Atasan tidak punya layar untuk melihat pekerjaan harian bawahan. Tab Tim yang ad
 
 ### Keputusan
 
-[[ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif]] §5, §6, §9. Layak `Siap Agent` sesudah ADR berstatus Diterima.
+[[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]] §5, §6, §9. Layak `Siap Agent` sesudah ADR berstatus Diterima.
 - Tampilan muncul untuk siapa pun yang punya bawahan efektif (dari endpoint #2), tidak menumpang syarat tab Tim.
 - Dibuka dengan ringkasan; rincian per orang dari ringkasan; atasan hanya membaca.
 
 ### Yang harus benar
 
 - [ ] Pintu masuk tampilan bawahan hanya muncul bila daftar bawahan efektif tidak kosong; karyawan tanpa bawahan tidak melihatnya.
-- [ ] Ringkasan per bawahan menampilkan jumlah to-do terbuka hari ini, tertunda ≥ 3 hari, dan dibatalkan 7 hari terakhir; tidak diurutkan sebagai peringkat berdasarkan angka tertunda (urutan nama).
+- [ ] Ringkasan per bawahan menampilkan jumlah rencana kerja terbuka hari ini, tertunda ≥ 3 hari, dan dibatalkan 7 hari terakhir; tidak diurutkan sebagai peringkat berdasarkan angka tertunda (urutan nama).
 - [ ] Mengetuk seorang bawahan membuka daftar hari ininya; tidak ada tombol ubah, selesai, batal, atau unggah.
 - [ ] Baris tiket dari space terbatas tampil sebagai "1 tiket di space terbatas" tanpa judul, sesuai balasan backend.
 - [ ] Galat memuat daftar bawahan tampil sebagai galat, bukan sebagai "tidak punya bawahan".

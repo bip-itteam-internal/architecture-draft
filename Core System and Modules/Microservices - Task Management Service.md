@@ -142,13 +142,13 @@ Rute ini sengaja **terpisah dari `/report/*`** walau angkanya bertetangga: rute 
 - **Selesai bukan berarti `status == "Done"`.** `isTerminalStatus` mengenali `Done`, `Selesai`, dan `Archive`, dan tiga space Tech Development (Infrastructure, MyBharata/HRIS, System Marketing) memakai `Archive` sesudah Done. Menghitung `Done` saja membuang **18 tiket ber-assignee**, 13 di antaranya ber-`completed_at` dan **5 membawa rating CSAT** alias 29% dari seluruh rating yang pernah masuk. Tak satu pun galat muncul; gejalanya cuma angka yang tampak wajar.
 - **Tiket `Ditolak` tidak boleh masuk penyebut.** Itu permintaan yang batal dikerjakan, bukan pekerjaan yang gagal diselesaikan.
 
-### Modul To-do Harian Pribadi 🟡
+### Modul Rencana Kerja Harian 🟡
 
-> Status: **konsep, kode belum ada.** Keputusan [[ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif]] (🟡 Diusulkan), konsep bisnis [[HRIS - To-do Harian Pribadi (Modul)]], blueprint [[ANALISA - To-do Harian Pribadi]].
+> Status: **konsep, kode belum ada.** Keputusan [[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]] (🟡 Diusulkan), konsep bisnis [[HRIS - Rencana Kerja Harian (Modul)]], blueprint [[ANALISA - Rencana Kerja Harian]].
 
-Modul ketiga yang direncanakan di service ini: to-do pribadi karyawan, digabung dengan tiket `assign_to` miliknya menjadi satu daftar "hari ini" di MyBharata. Bentuk yang sudah diputuskan:
+Modul ketiga yang direncanakan di service ini: rencana kerja karyawan, digabung dengan tiket `assign_to` miliknya menjadi satu daftar "hari ini" di MyBharata. Bentuk yang sudah diputuskan:
 
-- **Koleksi baru, terpisah dari `tasks`.** Tanpa status `Request`, tanpa triase, SLA, prioritas, atau notifikasi supervisor space. To-do yang lewat jalur tiket akan membanjiri antrean triase.
+- **Koleksi baru, terpisah dari `tasks`.** Tanpa status `Request`, tanpa triase, SLA, prioritas, atau notifikasi supervisor space. Rencana kerja yang lewat jalur tiket akan membanjiri antrean triase.
 - **Tertunda dihitung saat dibaca** dari `tanggal_rencana_awal` (tak bisa diubah) terhadap hari ini WIB, dalam hari kalender. **Tidak ada job pemindah**: ticker `sla_scheduler.go` tidak sadar zona waktu, dan counter yang ditulis job bisa melenceng tanpa galat.
 - **Batal tidak menghapus**, dan tidak ada rute hapus. Hanya pemilik yang menulis; atasan hanya membaca.
 - **Baris tiket** di daftar hari ini memakai aturan "belum selesai" yang sama dengan feed kalender (`completed_at`/`is_archived`, bukan nama status) dan tidak diubah dari sana.
@@ -259,4 +259,4 @@ Semua reuse `reportBaseFilter` + `parseReportRange` (default 30 hari; `start_dat
 - [[ADR - 0038 Hak Per-Objek Admin Space Task Management]] — keputusan admin per space (menyimpang dari [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]])
 - [[Marketing - Engagement Team (Modul)]] — konsep bisnis modul Engagement Tim yang ditampung service ini
 - [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]]
-- [[HRIS - To-do Harian Pribadi (Modul)]] · [[ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif]] — modul to-do pribadi yang direncanakan
+- [[HRIS - Rencana Kerja Harian (Modul)]] · [[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]] — modul rencana kerja yang direncanakan

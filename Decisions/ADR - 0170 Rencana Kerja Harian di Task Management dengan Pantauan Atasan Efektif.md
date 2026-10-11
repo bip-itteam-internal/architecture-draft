@@ -1,18 +1,18 @@
-# ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif
+# ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif
 
 ## Untuk Manajemen
 
-- **Yang berubah di layar**: karyawan mencatat pekerjaan hariannya di MyBharata (kartu "To-do hari ini" di Beranda dan tab **Hari Ini** di menu Tugas), digabung dengan tiket yang ditugaskan kepadanya sehingga tak ada yang diketik dua kali. Yang belum selesai terbawa ke hari berikutnya berlabel "tertunda N hari". Atasan melihat daftar bawahannya, dibuka dengan ringkasan siapa yang tertunda tiga hari atau lebih, untuk menegur, membantu, atau membagi ulang pekerjaan.
+- **Yang berubah di layar**: karyawan mencatat pekerjaan hariannya di MyBharata lewat tab baru **Hari Ini** di menu Tugas (tidak tampil di Beranda), digabung dengan tiket yang ditugaskan kepadanya sehingga tak ada yang diketik dua kali. Yang belum selesai terbawa ke hari berikutnya berlabel "tertunda N hari". Atasan melihat daftar bawahannya, dibuka dengan ringkasan siapa yang tertunda tiga hari atau lebih, untuk menegur, membantu, atau membagi ulang pekerjaan.
 - **Siapa terdampak**: seluruh 181 karyawan aktif sebagai pengisi (2026-10-11). Pemantau: 8 atasan langsung tercatat, plus 11 supervisor departemen yang memantau 97 karyawan yang atasan langsungnya belum diisi HR.
 - **Tidak dijanjikan**: belum masuk KPI atau penilaian kinerja (diputuskan sesudah ada data satu sampai dua bulan); belum ada di Web ERP; belum ada pengingat pagi; bukti bisa dilampirkan tetapi belum bisa diwajibkan; laporan harian Excel milik SOP tidak otomatis tergantikan; "tertunda" dihitung hari kalender sehingga akhir pekan dan libur ikut terhitung.
 - **Besaran kerja**: besar, yaitu dua PR backend (dua service) dan dua PR aplikasi MyBharata, berurutan.
 
 ## Deskripsi
 
-*Karyawan mencatat to-do pribadi hariannya di MyBharata, bergabung dengan tiket yang ditugaskan kepadanya. Item yang belum selesai terbawa otomatis dengan hitungan tertunda yang diturunkan dari tanggal rencana awal yang tak bisa diubah. Atasan efektif (atasan langsung, atau supervisor departemen bila atasan langsung kosong) dapat melihatnya. To-do disimpan di koleksi baru di Task Management Service, terpisah dari tiket, tanpa triase dan tanpa SLA. Pondasi lampiran bukti ikut dibangun sejak tahap pertama, tetapi belum ditegakkan.*
+*Karyawan mencatat rencana kerja hariannya di MyBharata, bergabung dengan tiket yang ditugaskan kepadanya. Item yang belum selesai terbawa otomatis dengan hitungan tertunda yang diturunkan dari tanggal rencana awal yang tak bisa diubah. Atasan efektif (atasan langsung, atau supervisor departemen bila atasan langsung kosong) dapat melihatnya. Rencana kerja disimpan di koleksi baru di Task Management Service, terpisah dari tiket, tanpa triase dan tanpa SLA. Pondasi lampiran bukti ikut dibangun sejak tahap pertama, tetapi belum ditegakkan.*
 
-- **Status**: 🟡 **Diusulkan**, 2026-10-11, kode belum ada. Analisa: [[ANALISA - To-do Harian Pribadi]]
-- **Path di repo**: `bip-erp/services/employee/atasan_efektif.go` (baru) · `bip-erp/services/task-management/todo_*.go` (baru) · `bip-erp/docker-compose.yml` (env `EMPLOYEE_MODULE_URL` untuk task-management) · `mybharata-app/lib/src/features/task/` (tab Hari Ini, kartu Beranda, tampilan bawahan; baru)
+- **Status**: 🟡 **Diusulkan**, 2026-10-11, kode belum ada. Analisa: [[ANALISA - Rencana Kerja Harian]]
+- **Path di repo**: `bip-erp/services/employee/atasan_efektif.go` (baru) · `bip-erp/services/task-management/rencana_kerja_*.go` (baru) · `bip-erp/docker-compose.yml` (env `EMPLOYEE_MODULE_URL` untuk task-management) · `mybharata-app/lib/src/features/task/` (tab Hari Ini, tampilan bawahan; baru)
 - **Tanggal**: 2026-10-11
 
 ## Context
@@ -39,19 +39,19 @@ Yang diukur di prod (2026-10-11, baca saja):
 | Tiket total / pemegang tiket aktif | 427 / 14 orang (61 penugasan aktif) |
 | Tiket dibuat untuk diri sendiri | 155, **seluruhnya Tech Development** (12 orang) sebagai backlog pengembangan; **0 dalam 30 hari terakhir** |
 
-Angka terakhir membantah dugaan bahwa orang sudah memakai Task Management sebagai to-do pribadi.
+Angka terakhir membantah dugaan bahwa orang sudah memakai Task Management sebagai rencana kerja.
 
-Pemeriksaan negatif (`git grep`, termasuk berkas biner) di `bip-erp` `origin/main`, `mybharata-app` `origin/dev`, dan vault: tidak ada entitas to-do, log kerja harian, mekanisme pindah ke besok, atau hitungan tertunda.
+Pemeriksaan negatif (`git grep`, termasuk berkas biner) di `bip-erp` `origin/main`, `mybharata-app` `origin/dev`, dan vault: tidak ada entitas rencana kerja, log kerja harian, mekanisme pindah ke besok, atau hitungan tertunda.
 
 Dok yang menjadi dasar: [[Microservices - Task Management Service]] (⚠️ Implemented) dan [[HRIS - Organization Structure]] (⚠️ Implemented). Keduanya mencerminkan kode yang hidup, bukan rencana.
 
 ## Decision
 
-### 1. To-do adalah entitas baru di Task Management Service, bukan tiket
+### 1. Rencana kerja adalah entitas baru di Task Management Service, bukan tiket
 
-Koleksi baru di `task_management_db`, terpisah dari `tasks`. **Tidak memakai tabel tiket**, karena setiap tiket lahir sebagai `Request` dengan SLA respons 24 jam dan memberi notifikasi ke supervisor space (`services/task-management/task_handlers.go:126-160`). To-do pribadi lewat jalur itu akan membanjiri antrean triase. To-do tidak punya prioritas, triase, persetujuan, maupun SLA.
+Koleksi baru di `task_management_db`, terpisah dari `tasks`. **Tidak memakai tabel tiket**, karena setiap tiket lahir sebagai `Request` dengan SLA respons 24 jam dan memberi notifikasi ke supervisor space (`services/task-management/task_handlers.go:126-160`). Rencana kerja lewat jalur itu akan membanjiri antrean triase. Rencana kerja tidak punya prioritas, triase, persetujuan, maupun SLA.
 
-Tempatnya Task Management, bukan service baru: daftar "hari ini" menggabungkan to-do dan tiket, dan service ini sudah memiliki tiketnya. Service baru menambah container dan rute gateway untuk pemakai pertama (ditolak, lihat Alternatif).
+Tempatnya Task Management, bukan service baru: daftar "hari ini" menggabungkan rencana kerja dan tiket, dan service ini sudah memiliki tiketnya. Service baru menambah container dan rute gateway untuk pemakai pertama (ditolak, lihat Alternatif).
 
 ### 2. Isi item dan siapa boleh apa
 
@@ -65,13 +65,17 @@ Item terbuka yang `tanggal_rencana`-nya sudah lewat **tampil di daftar hari ini*
 
 Memindahkan `tanggal_rencana` ke depan tidak mengubah `tanggal_rencana_awal`, jadi menjadwal ulang tidak menghapus riwayat keterlambatan. Batas hari memakai WIB, sama dengan `feedWIB` di `calendar_feed.go:22-28`.
 
-### 4. Daftar "hari ini" = to-do pribadi + tiket saya
+### 4. Daftar "hari ini" = rencana kerja + tiket saya
 
-Satu endpoint di task-management mengembalikan dua jenis baris yang dibedakan eksplisit (`jenis: todo | tiket`): to-do terbuka dengan `tanggal_rencana` ≤ hari ini ditambah to-do yang selesai hari ini, serta tiket yang `assign_to` memuat pemanggil, belum selesai menurut aturan `calendar_feed.go:90-104`, dan `due_date` ≤ akhir hari ini. Tiket tetap diubah di halaman tiket; daftar ini hanya membaca dan menautkannya.
+Satu endpoint di task-management mengembalikan dua jenis baris yang dibedakan eksplisit (`jenis: rencana | tiket`): rencana kerja terbuka dengan `tanggal_rencana` ≤ hari ini ditambah rencana kerja yang selesai hari ini, serta tiket yang `assign_to` memuat pemanggil, belum selesai menurut aturan `calendar_feed.go:90-104`, dan `due_date` ≤ akhir hari ini, ditambah tiket saya yang `completed_at`-nya hari ini (bagian "selesai hari ini"). Tiket `Request` otomatis tidak ikut karena `due_date` baru diisi saat disetujui.
+
+**Baris tiket tidak punya ceklis** (keputusan user 2026-10-11). Status tiket ditentukan stage space masing-masing (bawaan `Request → Todo → On Going → Testing → Done`, tetapi space bisa menambah stage, dan beberapa space memakai `Archive`), dan `Testing → Done` menuntut tinjauan supervisor atau admin space. Satu centang tidak bisa dipetakan ke satu status tanpa melompati tinjauan atau menyalin urutan stage. Karena itu baris tiket menampilkan **chip berisi nama status aslinya apa adanya** (Testing diberi keterangan "menunggu tinjauan"), tenggatnya (dengan tanda "lewat tenggat" bila `due_date` sudah lewat), dan mengetuknya membuka detail tiket. Status diubah di sana lewat alur yang sudah ada. Daftar ini hanya membaca tiket, tidak pernah menulisnya.
+
+Hitungan "tertunda" (§3) dan ringkasan atasan (§6) **hanya untuk rencana kerja**. Keterlambatan tiket sudah punya ukurannya sendiri (SLA, `/report/sla-breaches`), dan menjumlahkan keduanya menghitung satu pekerjaan dengan dua aturan berbeda.
 
 ### 5. Atasan efektif, dan resolusinya tidak disalin
 
-**Atasan efektif** seseorang = `supervisor_id` bila sah, bila kosong supervisor departemennya, persis aturan `atasanPengingat`. Supervisor departemen yang rantainya menunjuk dirinya sendiri tidak punya atasan efektif, dan to-do-nya hanya terlihat oleh dirinya.
+**Atasan efektif** seseorang = `supervisor_id` bila sah, bila kosong supervisor departemennya, persis aturan `atasanPengingat`. Supervisor departemen yang rantainya menunjuk dirinya sendiri tidak punya atasan efektif, dan rencana kerjanya hanya terlihat oleh dirinya.
 
 Employee-service membuka **endpoint internal** yang memanggil resolver itu (atasan efektif seseorang, dan daftar bawahan efektif seseorang). Task-management **memanggilnya**, tidak menulis ulang resolusinya, walau task-management punya koneksi baca ke `employee_db`. Menyalin rantai berlapis itu melahirkan sumber kebenaran kedua (team-memory "Jangan menulis ulang resolusi milik modul lain"). Endpoint internal wajib memeriksa identitas pemanggil (kunci layanan), karena gateway tetap meneruskan `/internal/` dari internet.
 
@@ -79,7 +83,7 @@ Isolasi tenant mengikuti `validasiAtasan` (`subordinate.go`): atasan dan bawahan
 
 ### 6. Tampilan atasan dimulai dari ringkasan
 
-Layar atasan dibuka dengan ringkasan per bawahan: jumlah to-do terbuka hari ini, jumlah yang **tertunda ≥ 3 hari**, dan jumlah yang dibatalkan dalam 7 hari terakhir. Rincian per orang dibuka dari ringkasan. Atasan dengan 22 bawahan, atau supervisor fallback dengan sekitar 32 orang, tidak akan membuka daftar satu per satu.
+Layar atasan dibuka dengan ringkasan per bawahan: jumlah rencana kerja terbuka hari ini, jumlah yang **tertunda ≥ 3 hari**, dan jumlah yang dibatalkan dalam 7 hari terakhir. Rincian per orang dibuka dari ringkasan. Atasan dengan 22 bawahan, atau supervisor fallback dengan sekitar 32 orang, tidak akan membuka daftar satu per satu.
 
 Tiket bawahan yang berasal dari space `Visibility: restricted` yang tidak bisa diakses atasan itu ditampilkan sebagai "1 tiket di space terbatas" tanpa judul. Pantauan atasan tidak boleh menjadi jalan pintas membaca tiket yang RBAC tiket tidak buka.
 
@@ -95,11 +99,15 @@ Pondasi wajib menyertakan **rute pengisinya**, bukan field saja. Preseden: metri
 
 ### 8. Tidak masuk KPI di tahap 1
 
-To-do ditulis sendiri, jadi bila langsung dinilai orang akan menulis item yang mudah diselesaikan. Sumber KPI (`DaftarkanSumberBermetrik`, `services/employee/kpi_sumber.go:186`; draft yang diverifikasi supervisor menurut [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]) diputuskan dengan ADR terpisah sesudah ada data satu sampai dua bulan.
+Rencana kerja ditulis sendiri, jadi bila langsung dinilai orang akan menulis item yang mudah diselesaikan. Sumber KPI (`DaftarkanSumberBermetrik`, `services/employee/kpi_sumber.go:186`; draft yang diverifikasi supervisor menurut [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]) diputuskan dengan ADR terpisah sesudah ada data satu sampai dua bulan.
 
 ### 9. Platform
 
-Tahap 1 hanya MyBharata: kartu "To-do hari ini" di Beranda (di bawah kartu presensi) dengan tombol tambah, dan tab **Hari Ini** paling depan di menu Tugas. Tampilan bawahan muncul untuk siapa pun yang **punya bawahan efektif**, tidak menumpang syarat tab Tim yang ada (`task_page.dart:101-104`, yang mensyaratkan supervisor tiket atau role supervisor/admin dan tidak dipenuhi semua atasan langsung).
+Tahap 1 hanya MyBharata, dan **hanya di dalam menu Tugas**: tab **Hari Ini** paling depan, dengan tombol tambah. **Tidak ada kartu atau ringkasan di Beranda** (keputusan user 2026-10-11): rencana kerja baru terlihat saat orang membuka halaman manajemen tugas. Konsekuensinya diterima sadar: tanpa pengingat di Beranda, orang yang jarang membuka menu Tugas bisa lupa mengisi. Tampilan bawahan muncul untuk siapa pun yang **punya bawahan efektif**, tidak menumpang syarat tab Tim yang ada (`task_page.dart:101-104`, yang mensyaratkan supervisor tiket atau role supervisor/admin dan tidak dipenuhi semua atasan langsung).
+
+### 10. Nama: "Rencana Kerja", bukan "To-do"
+
+Fitur ini bernama **Rencana Kerja** di layar ("Rencana kerja hari ini"), dan di kode `rencana_kerja` (koleksi, berkas, rute, kunci l10n). Kata **"to-do" / "todo" dilarang** untuk fitur ini, karena di modul yang sama `Todo` sudah berarti **status tiket** (`Request → Todo → On Going → Testing → Done`, 35 tiket berstatus itu di prod 2026-10-11) dan `todo_approval` adalah field tiket (`mybharata-app` `task_model.dart`, `approval_rules.dart`). Dua arti untuk satu kata di menu yang sama membuat pemakai mengira daftar ini berisi tiket berstatus Todo, dan membuat pencarian kode ambigu. Status tiket tidak diganti namanya: nilainya sudah tersimpan di data produksi. Diputuskan user 2026-10-11.
 
 ### Asumsi eksplisit
 
@@ -113,20 +121,20 @@ Tahap 1 hanya MyBharata: kartu "To-do hari ini" di Beranda (di bawah kartu prese
 
 - **Deploy**: task-management butuh env baru `EMPLOYEE_MODULE_URL` (hari ini ia hanya membaca `employee_db` langsung). Naik dengan `docker compose up -d --force-recreate`, bukan `restart`. Isi `.env` dev sebelum merge. Urutan: employee-service → task-management → MyBharata. Tidak ada kategori inbox baru.
 - **Beban supervisor fallback**: supervisor Manufaktur praktis memantau sekitar 32 orang. Bila itu terlalu berat, obatnya melengkapi `supervisor_id`, bukan mengubah aturan ini.
-- **Data pribadi**: isi to-do bisa memuat hal pribadi. Atasan efektif melihatnya. Ini keputusan sadar (pilihan user 2026-10-11) dan perlu disampaikan ke karyawan saat rilis.
-- **Kalender**: to-do **tidak** masuk feed kalender di tahap 1. Bila kelak masuk, hanya sebagai milik pemiliknya: prinsip tiga lapis melarang to-do bawahan tampil di kalender atasan ([[Microservices - Calendar Service]]).
+- **Data pribadi**: isi rencana kerja bisa memuat hal pribadi. Atasan efektif melihatnya. Ini keputusan sadar (pilihan user 2026-10-11) dan perlu disampaikan ke karyawan saat rilis.
+- **Kalender**: rencana kerja **tidak** masuk feed kalender di tahap 1. Bila kelak masuk, hanya sebagai milik pemiliknya: prinsip tiga lapis melarang rencana kerja bawahan tampil di kalender atasan ([[Microservices - Calendar Service]]).
 - **Laporan harian SOP**: fitur ini dapat menggantikan laporan Excel, tetapi tidak otomatis. Bila pemilik SOP tetap meminta Excel, karyawan mengisi dua kali dan fitur ditinggalkan.
 
 ### Alternatif yang ditolak
 
-- **To-do sebagai tiket di "space pribadi"**: ditolak, lihat §1.
+- **Rencana kerja sebagai tiket di "space pribadi"**: ditolak, lihat §1.
 - **Job per jam yang memindahkan item dan menaikkan counter**: ditolak, lihat §3.
-- **Service to-do tersendiri**: menambah container, compose, dan rute gateway, sementara tetap harus memanggil task-management untuk tiket. Satu pemakai belum membenarkan batas service baru.
+- **Service rencana kerja tersendiri**: menambah container, compose, dan rute gateway, sementara tetap harus memanggil task-management untuk tiket. Satu pemakai belum membenarkan batas service baru.
 - **Atasan hanya dari `supervisor_id`**: ditolak, 54% karyawan tidak akan terlihat siapa pun.
 - **Langsung jadi sumber KPI**: ditunda, lihat §8.
 
 ## Dokumen Terkait
 
-- [[HRIS - To-do Harian Pribadi (Modul)]] · [[ANALISA - To-do Harian Pribadi]]
+- [[HRIS - Rencana Kerja Harian (Modul)]] · [[ANALISA - Rencana Kerja Harian]]
 - [[Microservices - Task Management Service]] · [[HRIS - Organization Structure]] · [[APP - MyBharata]]
 - [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]] · [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]]
