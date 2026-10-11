@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-12",
-  "jumlah_dokumen": 621,
+  "jumlah_dokumen": 622,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -9632,6 +9632,33 @@
         "ADR 0170",
         "task management",
         "laporan harian"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0171 Izin per Jam Dihitung Ulang dari Semua Pengajuan dan Dipotong per Subtipe.md",
+      "judul": "ADR - 0171 Izin per Jam Dihitung Ulang dari Semua Pengajuan dan Dipotong per Subtipe",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-12, oleh irfanarfianto (perintah \"kerjakan sekarang\" atas bip-erp#2977; empat keputusan dipilih lewat pertanyaan pilihan ganda di sesi). Koreksi slip lampau **didelegasikan ke HR/Finance**, tidak diputuskan di sini.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan"
+      ],
+      "hash": "980d1c6493d1baefb1d67be82cb37afe519486d42edee07fbbb111bf2b31e005",
+      "ukuran_kb": 9.2,
+      "ringkasan": "Menjawab: kenapa izin per jam (keluar sementara, pulang cepat) bisa dipotong payroll sehari penuh atau jamnya hilang bila ada beberapa izin di hari yang sama, dan bagaimana aturannya sekarang. Memutuskan entri presensi dihitung ulang dari semua pengajuan disetujui, hari yang sudah tap tetap hadir, potongan per subtipe (urusan kantor dibayar), koreksi manual HR dikunci, serta urutan PR-A/PR-B dan data prod run payroll 2026-08 draft.",
+      "kata_kunci": [
+        "izin per jam",
+        "leave_hour",
+        "leave_subtype",
+        "leave_parts",
+        "potongan tunjangan kehadiran",
+        "payroll izin",
+        "urusan kantor",
+        "pulang cepat",
+        "hitung ulang presensi",
+        "computePayoutBreakdown"
       ]
     },
     {
