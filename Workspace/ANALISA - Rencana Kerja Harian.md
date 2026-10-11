@@ -6,10 +6,10 @@
 - **Konsep domain**: [[HRIS - Rencana Kerja Harian (Modul)]]
 - **Pemutus**: irfanarfianto
 - **Tanggal analisa**: 2026-10-11
-- **Ukuran**: **Besar**. Dua repo harus berubah, dan masing-masing butuh dua PR:
+- **Ukuran**: **Besar**. Tiga repo harus berubah, dan masing-masing butuh dua PR:
   - `bip-erp`: endpoint internal atasan efektif di employee-service, lalu koleksi dan rute rencana kerja di task-management. Dua service, dan konvensi tim satu branch per service.
   - `my-bharata`: tab Hari Ini di menu Tugas, lalu tampilan bawahan. Tidak ada layar rencana kerja yang sudah merender bentuk ini secara generik (`git grep` atas `origin/dev`: nol entitas rencana kerja; `getTasks` hanya punya param scope + status, `task_remote_datasource.dart:87-105`).
-  - `erp-frontend` **tidak berubah**: tahap 1 hanya MyBharata (ADR §9).
+  - `erp-frontend`: tab Hari Ini di Daftar Tugas, lalu tab Rencana Tim. Halaman itu merender tiket lewat `MainTable` + `CustomTabs` (`my-tasks-view.tsx:321`) tanpa konsep rencana kerja (`git grep -i "rencana.?kerja" origin/main -- src`: hanya modul manufacture), jadi butuh dua PR. Ditambahkan atas permintaan user 2026-10-11.
 
 ## Urutan
 
@@ -20,6 +20,8 @@
 | 2 ([bip-erp#2969](https://github.com/bip-itteam-internal/bip-erp/issues/2969)) | [BE] Koleksi rencana kerja, daftar hari ini, dan pantauan bawahan (bagian 2/2) | bip-erp | sub-issue | sesudah #1 merged |
 | 3 ([my-bharata#205](https://github.com/bip-itteam-internal/my-bharata/issues/205)) | [Mobile] Tab Hari Ini untuk rencana kerja di menu Tugas (bagian 1/2) | my-bharata | sub-issue | deploy sesudah #2 |
 | 4 ([my-bharata#206](https://github.com/bip-itteam-internal/my-bharata/issues/206)) | [Mobile] Tampilan rencana kerja bawahan untuk atasan efektif (bagian 2/2) | my-bharata | sub-issue | sesudah #3 merged |
+| 5 ([erp-frontend#2306](https://github.com/bip-itteam-internal/erp-frontend/issues/2306)) | [FE] Tab Hari Ini rencana kerja di Daftar Tugas Web ERP (bagian 1/2) | erp-frontend | sub-issue | deploy sesudah #2 |
+| 6 ([erp-frontend#2307](https://github.com/bip-itteam-internal/erp-frontend/issues/2307)) | [FE] Tab Rencana Tim untuk atasan efektif di Web ERP (bagian 2/2) | erp-frontend | sub-issue | sesudah #5 merged |
 
 ---
 
@@ -40,11 +42,11 @@ Atasan baru tahu pekerjaan bawahan macet setelah terlambat. Pekerjaan harian yan
 
 ### Yang harus benar
 
-- [ ] Keempat sub-issue merged, dan urutan deploy employee-service → task-management → MyBharata diikuti.
+- [ ] Keenam sub-issue merged, dan urutan deploy employee-service → task-management → (MyBharata, Web ERP) diikuti.
 
 ### Di luar cakupan
 
-KPI, Web ERP, notifikasi/pengingat, kewajiban bukti, feed kalender.
+KPI, notifikasi/pengingat, kewajiban bukti, feed kalender.
 
 ### Data / bukti pendukung
 
@@ -173,7 +175,7 @@ MyBharata tidak punya tempat mencatat pekerjaan harian pribadi. Menu Tugas hanya
 
 ### Di luar cakupan
 
-Tampilan atasan (#4); notifikasi; Web ERP.
+Tampilan atasan (#4); notifikasi; Web ERP (#5, #6).
 
 ### Data / bukti pendukung
 
@@ -222,3 +224,90 @@ Prod 2026-10-11: bawahan per atasan langsung 22, 15, 12, 12, 11, 6, 4, 2; superv
 ### Prasyarat
 
 #3 merged. #2 ter-deploy.
+
+---
+
+## 5. [FE] Tab Hari Ini rencana kerja di Daftar Tugas Web ERP (bagian 1/2)
+
+- **Repo**: erp-frontend (`src/features/task-management`) · **Bentuk**: sub-issue induk #0 · **Issue**: [erp-frontend#2306](https://github.com/bip-itteam-internal/erp-frontend/issues/2306)
+
+**Pemutus:** @irfanarfianto
+**PIC:** @
+
+### Masalah
+
+Staf yang seharian di depan komputer tidak bisa mencatat rencana kerja dari Web ERP. Halaman Task Management › Daftar Tugas (`/task-management/my-tickets`) hanya punya tab tiket: `created` "Tugas Saya", `assigned`, `team` (`src/features/task-management/components/my-tasks-view.tsx:79-101`), dengan state tab `useState` lokal (`:66`). Label tab pertama juga berbeda dari MyBharata ("Tugas Saya" di Web, "Diajukan" di MyBharata, `taskScopeMine`).
+
+### Keputusan
+
+"ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif" §2-§4, §7, §9, §10. Layak `Siap Agent` sesudah ADR berstatus Diterima.
+- Tab **Hari Ini** paling depan dan jadi tab bawaan di `CustomTabs` halaman Daftar Tugas; bukan menu sidebar baru, tidak menuntut panduan. State tab di query string `?tab=`.
+- Rencana kerja ber-ceklis; baris tiket tanpa ceklis dengan `StatusBadge` (`task-ui.tsx:62`). Detail rencana dalam `Sheet` berangka tiga.
+- Label tab `created` diganti jadi **"Diajukan" / "Submitted"**, sama dengan MyBharata (keputusan user 2026-10-12).
+
+### Yang harus benar
+
+- [ ] Tab Hari Ini tampil paling depan dan terbuka secara bawaan saat membuka `/task-management/my-tickets`; `?tab=` mengikuti tab aktif dan membuka tab yang benar saat URL dibagikan atau di-refresh; `?create=1` yang sudah ada tetap bekerja. `useSearchParams` tetap di dalam `Suspense` (`my-tickets/page.tsx:7-9`) dan `pnpm build` lolos.
+- [ ] Isi tab dari endpoint daftar hari ini milik `bip-erp` sub-issue #2, dikelompokkan Tertunda / Hari ini / Selesai hari ini.
+- [ ] Baris rencana kerja: ceklis selesai, label "tertunda N hari" dari `tertunda_hari` backend (bukan dihitung di FE), jumlah bukti; klik judul membuka `Sheet` detail.
+- [ ] Baris tiket: tanpa ceklis, nama space, `StatusBadge` dengan warna stage space bila ada, tenggat atau "lewat tenggat", keterangan "menunggu tinjauan" untuk Testing; klik membuka `/task-management/<id>` lewat konstanta rute yang ada (`routes.ts`), bukan string rute baru.
+- [ ] Tambah cepat di atas daftar: kolom judul (Enter menyimpan) + pemilih tanggal (bawaan hari ini) + tombol Tambah.
+- [ ] `Sheet` detail: header tetap (judul + chip tertunda), badan menggulir (`flex-1 min-h-0 overflow-y-auto px-*`) berisi tanggal rencana awal (baca saja) dan tanggal rencana (bisa diubah), catatan, daftar bukti dengan lihat/lepas dan unggah (maks 4 MB per berkas, multipart field `file`, pola `createTaskThenUpload` `api.ts:575-598`); `SheetFooter` berisi Batalkan rencana (konfirmasi, menyebut tetap terlihat atasan), Simpan, Tandai selesai.
+- [ ] Panel ringkasan di samping daftar (rencana selesai x/y, tertunda, tiket aktif hari ini) dan kalimat "terlihat oleh <atasan efektif>"; tersusun di bawah daftar pada lebar ponsel.
+- [ ] `taskManagement.tabCreated` bernilai "Diajukan" di `id.ts` dan "Submitted" di `en.ts`; kunci tidak diganti.
+- [ ] Semua teks baru lewat `t("taskManagement.…")` di `id.ts` **dan** `en.ts`; tanggal lewat `intlLocale(lang)` di render, bukan di lapisan fetch.
+- [ ] Loading memakai `Skeleton`; lima keadaan layar (memuat, kosong, galat, berisi, sebagian) tertangani; endpoint 404 (rute belum rilis) tampil sebagai keadaan kosong yang jelas, bukan galat merah.
+- [ ] Verifikasi lokal: `pnpm tsc --noEmit`, `pnpm lint`, `pnpm build`, dan `pnpm test` dibandingkan dengan baseline `origin/main`.
+
+### Di luar cakupan
+
+Tab Rencana Tim (#6); perubahan label tab lain; Beranda/dashboard; notifikasi.
+
+### Data / bukti pendukung
+
+Tidak perlu data prod tambahan.
+
+### Prasyarat
+
+`bip-erp` sub-issue #2 merged **dan ter-deploy** sebelum rilis (deploy BE sebelum FE). Merge lebih dulu boleh.
+
+---
+
+## 6. [FE] Tab Rencana Tim untuk atasan efektif di Web ERP (bagian 2/2)
+
+- **Repo**: erp-frontend (`src/features/task-management`) · **Bentuk**: sub-issue induk #0 · **Issue**: [erp-frontend#2307](https://github.com/bip-itteam-internal/erp-frontend/issues/2307)
+
+**Pemutus:** @irfanarfianto
+**PIC:** @
+
+### Masalah
+
+Atasan yang bekerja di Web tidak bisa melihat rencana kerja bawahannya. Tab Tugas Tim yang ada digerbang supervisor/admin atau pemegang space (`my-tasks-view.tsx:54-64`), dan satu-satunya sumber bawahan di FE, `useSubordinates` (`src/features/hris/employee/hooks/use-subordinates.ts:16-28`), hanya mengenal bawahan langsung tanpa fallback ke supervisor departemen.
+
+### Keputusan
+
+"ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif" §5, §6, §9. Layak `Siap Agent` sesudah ADR berstatus Diterima.
+- Tab **Rencana Tim** terpisah dari Tugas Tim; muncul untuk siapa pun yang punya bawahan efektif (dari endpoint `bip-erp` sub-issue #2), bukan dari `useSubordinates`.
+- Tabel `MainTable` urut nama; klik baris membuka `Sheet` baca-saja berisi hari ini bawahan itu.
+
+### Yang harus benar
+
+- [ ] Tab Rencana Tim hanya muncul bila daftar bawahan efektif tidak kosong; tidak memakai `useSubordinates` maupun gerbang tab Tugas Tim.
+- [ ] Tabel `MainTable` + `Banner bare` di prop `toolbar` (struktur tabel HRIS, skill `/migrasi-tabel-hris`) dengan kolom Nama, Jabatan, Terbuka hari ini, Tertunda ≥ 3 hari, Dibatalkan 7 hari; bawaan urut nama, tidak diurutkan sebagai peringkat; pencarian nama.
+- [ ] Badge jumlah di tab = jumlah bawahan yang punya rencana tertunda ≥ 3 hari.
+- [ ] Klik baris membuka `Sheet` baca-saja (header tetap, badan menggulir) dengan Tertunda / Hari ini / Selesai-Dibatalkan milik bawahan itu; tidak ada tombol ubah, selesai, batal, atau unggah.
+- [ ] Baris tiket dari space terbatas tampil sebagai "1 tiket di space terbatas" tanpa judul, sesuai balasan backend.
+- [ ] Galat memuat bawahan tampil sebagai galat, bukan sebagai tab yang hilang atau tabel kosong.
+- [ ] i18n dua bahasa, `Skeleton`, lima keadaan layar; verifikasi lokal seperti #5.
+
+### Di luar cakupan
+
+Menegur atau membagi ulang dari layar ini; ekspor; KPI.
+
+### Data / bukti pendukung
+
+Prod 2026-10-11: bawahan per atasan langsung 22, 15, 12, 12, 11, 6, 4, 2; supervisor departemen fallback bisa memantau sekitar 32 orang. Tabel wajib berpaginasi atau nyaman untuk 30+ baris.
+
+### Prasyarat
+
+#5 merged. `bip-erp` sub-issue #2 ter-deploy.

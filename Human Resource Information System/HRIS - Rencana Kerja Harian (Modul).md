@@ -6,7 +6,7 @@
 
 - **Status**: 🟡 Konsep, kode belum ada. Keputusan [[ADR - 0170 Rencana Kerja Harian di Task Management dengan Pantauan Atasan Efektif]] masih 🟡 Diusulkan.
 - **Implementasi**: [[Microservices - Task Management Service]] (bagian *Modul Rencana Kerja Harian*) · atasan efektif dari [[Microservices - Employee Service]]
-- **Layar**: [[APP - MyBharata]]: tab **Hari Ini** di menu Tugas saja; tidak tampil di Beranda. Web ERP belum.
+- **Layar**: [[APP - MyBharata]]: tab **Hari Ini** di menu Tugas saja, tidak tampil di Beranda. [[APP - Web ERP]]: tab **Hari Ini** dan **Rencana Tim** di Task Management › Daftar Tugas.
 - **Blueprint**: [[ANALISA - Rencana Kerja Harian]]
 
 ## Latar Belakang
@@ -28,7 +28,7 @@
 
 **Atasan efektif** = atasan langsung (HRIS › Personalia › Atasan Langsung). Bila kosong, supervisor departemennya, dengan aturan yang sama seperti penerima pengingat kontrak (General Affair lewat HR). Supervisor departemen tanpa atasan: rencana kerjanya hanya terlihat oleh dirinya sendiri.
 
-**Di luar cakupan tahap 1**: KPI dan penilaian kinerja, Web ERP, pengingat atau notifikasi, kewajiban bukti, feed kalender, dan penggantian otomatis laporan Excel milik SOP.
+**Di luar cakupan tahap 1**: KPI dan penilaian kinerja, pengingat atau notifikasi, kewajiban bukti, feed kalender, dan penggantian otomatis laporan Excel milik SOP.
 
 ## Persona / Pengguna
 
@@ -38,7 +38,7 @@ Angka diukur di prod 2026-10-11 (baca saja). Bagian bertanda *(asumsi)* belum te
 |---|---|---|---|
 | Staf operasional ber-SOP laporan harian | Admin/Leader Warehouse Packing, PPIC, Operator Produksi, Security | Pemilik rencana kerja sendiri | MyBharata |
 | Tim marketing | Host Live, Buzzer, Account Specialist di Beautyhacks (45 orang, 40 ber-atasan langsung) dan Kyura (30, 16 ber-atasan langsung) | Pemilik rencana kerja sendiri | MyBharata |
-| Staf kantor | Finance (16), Percetakan (13), Quality (6), Procurement (3); nol ber-atasan langsung | Pemilik rencana kerja sendiri | MyBharata (tahap 1); sehari-hari di Web *(asumsi)* |
+| Staf kantor | Finance (16), Percetakan (13), Quality (6), Procurement (3); nol ber-atasan langsung | Pemilik rencana kerja sendiri | Web ERP (sehari-hari di depan komputer *(asumsi)*) dan MyBharata |
 | Penerima tiket | 14 orang yang memegang tiket aktif, kebanyakan Tech Development dan GA | Pemilik rencana kerja + tiket `assign_to` | MyBharata |
 | Atasan langsung | 8 orang ber-bawahan langsung (22, 15, 12, 12, 11, 6, 4, 2 bawahan) | Baca rencana kerja bawahan efektif | MyBharata |
 | Supervisor departemen (fallback) | 11 orang `is_supervisor`; mewarisi 97 karyawan tanpa atasan langsung | Baca rencana kerja bawahan efektif | MyBharata |
@@ -67,7 +67,6 @@ Angka diukur di prod 2026-10-11 (baca saja). Bagian bertanda *(asumsi)* belum te
 - Siapa boleh mewajibkan bukti, dan apakah item wajib bukti ditolak saat diselesaikan tanpa bukti.
 - Metrik KPI (bila ada) dan bobotnya, sesudah ada data satu sampai dua bulan.
 - Pilot terbatas (misalnya marketing) atau langsung semua karyawan. Asumsi ADR: semua karyawan.
-- Web ERP untuk staf kantor.
 - Pengingat pagi atau notifikasi tertunda.
 
 ## Dokumen Terkait
