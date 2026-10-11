@@ -129,9 +129,9 @@ Konfigurasi **per-space** (`Space.auto_assign` bool, `auto_close_days` int `0`=n
 - Default: response **24 jam** (diset saat create), resolution **72 jam** (referensi resolution: `start_date`/`responded_at`/`created_at` → `due_date`). **Override resolution per-priority ✅**: tiap `Priority` punya `resolution_hours` (per-space, satuan jam) → dipakai `resolutionHoursOf(space, priority_id)` saat approve (default `due_date`) & reopen; fallback 72 jam bila `resolution_hours ≤ 0` / prioritas tak ada. (Response tetap 24 jam, bukan per-priority.)
 - Scheduler eskalasi (`sla_scheduler.go`): goroutine per jam, mengirim notifikasi **breach sekali** per task (ditandai array `sla_notified`): response breach → **supervisor divisi**; resolution breach → **assignee + supervisor**. (Warning hanya untuk badge, belum dieskalasi via notifikasi.)
 
-### KPI (panggilan mesin) 🟡
+### KPI (panggilan mesin) ✅
 
-> Status: **branch `feat/kpi-sumber-tiket`, belum merge dan belum deploy** (2026-08-06).
+> Status: **live di prod sejak 6 Agustus 2026** ([#1055](https://github.com/bip-itteam-internal/bip-erp/pull/1055)), sesuai [[API - Task Management Service]]. Penanda lama "branch `feat/kpi-sumber-tiket`, belum merge" sudah usang (dikoreksi 2026-10-11).
 
 `GET /kpi/ticket?employee_id=&periode=YYYY-MM&key=` — agregat tiket satu orang satu periode, dipakai sumber `kinerja_tiket` di [[Microservices - Employee Service]] saat menghitung skor KPI. Kontrak lengkap di [[API - Task Management Service]].
 
@@ -141,6 +141,20 @@ Rute ini sengaja **terpisah dari `/report/*`** walau angkanya bertetangga: rute 
 
 - **Selesai bukan berarti `status == "Done"`.** `isTerminalStatus` mengenali `Done`, `Selesai`, dan `Archive`, dan tiga space Tech Development (Infrastructure, MyBharata/HRIS, System Marketing) memakai `Archive` sesudah Done. Menghitung `Done` saja membuang **18 tiket ber-assignee**, 13 di antaranya ber-`completed_at` dan **5 membawa rating CSAT** alias 29% dari seluruh rating yang pernah masuk. Tak satu pun galat muncul; gejalanya cuma angka yang tampak wajar.
 - **Tiket `Ditolak` tidak boleh masuk penyebut.** Itu permintaan yang batal dikerjakan, bukan pekerjaan yang gagal diselesaikan.
+
+### Modul To-do Harian Pribadi 🟡
+
+> Status: **konsep, kode belum ada.** Keputusan [[ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif]] (🟡 Diusulkan), konsep bisnis [[HRIS - To-do Harian Pribadi (Modul)]], blueprint [[ANALISA - To-do Harian Pribadi]].
+
+Modul ketiga yang direncanakan di service ini: to-do pribadi karyawan, digabung dengan tiket `assign_to` miliknya menjadi satu daftar "hari ini" di MyBharata. Bentuk yang sudah diputuskan:
+
+- **Koleksi baru, terpisah dari `tasks`.** Tanpa status `Request`, tanpa triase, SLA, prioritas, atau notifikasi supervisor space. To-do yang lewat jalur tiket akan membanjiri antrean triase.
+- **Tertunda dihitung saat dibaca** dari `tanggal_rencana_awal` (tak bisa diubah) terhadap hari ini WIB, dalam hari kalender. **Tidak ada job pemindah**: ticker `sla_scheduler.go` tidak sadar zona waktu, dan counter yang ditulis job bisa melenceng tanpa galat.
+- **Batal tidak menghapus**, dan tidak ada rute hapus. Hanya pemilik yang menulis; atasan hanya membaca.
+- **Baris tiket** di daftar hari ini memakai aturan "belum selesai" yang sama dengan feed kalender (`completed_at`/`is_archived`, bukan nama status) dan tidak diubah dari sana.
+- **Atasan efektif** diambil dari endpoint internal [[Microservices - Employee Service]] yang memanggil `atasanPengingat`, **bukan** dihitung ulang dari koneksi `employee_db` service ini. Menuntut env baru `EMPLOYEE_MODULE_URL` (naik dengan `--force-recreate`).
+- **Bukti**: rute unggah/pratinjau/lepas bukti per item memakai pola file-service lampiran tiket. Field `wajib_bukti` disimpan tetapi belum punya penulis dan belum ditegakkan.
+- Tiket bawahan dari space `restricted` yang tak bisa diakses atasan tampil tanpa judul.
 
 ### Modul Engagement Tim ⚠️
 
@@ -245,3 +259,4 @@ Semua reuse `reportBaseFilter` + `parseReportRange` (default 30 hari; `start_dat
 - [[ADR - 0038 Hak Per-Objek Admin Space Task Management]] — keputusan admin per space (menyimpang dari [[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]])
 - [[Marketing - Engagement Team (Modul)]] — konsep bisnis modul Engagement Tim yang ditampung service ini
 - [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]]
+- [[HRIS - To-do Harian Pribadi (Modul)]] · [[ADR - 0170 To-do Harian Pribadi di Task Management dengan Pantauan Atasan Efektif]] — modul to-do pribadi yang direncanakan
