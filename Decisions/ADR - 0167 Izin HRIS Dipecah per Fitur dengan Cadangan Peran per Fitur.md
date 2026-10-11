@@ -6,7 +6,7 @@
 
 **Apa yang berubah di layar.** Hak akses HRIS bisa diberikan per fitur (data karyawan, kontrak, mutasi, resign, surat peringatan, presensi, cuti), tidak lagi satu paket untuk semuanya. Setelah semua tahap selesai, IT bisa memasang ke tiap jabatan HR hanya fitur yang dikerjakannya, sehingga misalnya staf rekrutmen tidak lagi membuka presensi atau pengaturan organisasi.
 
-**Siapa yang terdampak.** Pada tahap pertama tidak ada yang merasakan perubahan hak: hak setiap akun sesudah pemecahan harus sama persis dengan sebelumnya. Satu perubahan yang terlihat: dua orang HR (Culture & Industrial dan Recruitment & Onboarding) akan melihat menu kontrak, mutasi, resign, dan presensi yang hari ini sudah bisa mereka akses lewat sistem tetapi tidak tampil di menu. Penyempitan hak per jabatan baru dilakukan di tahap terakhir, jabatan demi jabatan, dan setiap penyempitan itu disengaja serta dicatat.
+**Siapa yang terdampak.** Pada tahap pertama tidak ada yang merasakan perubahan apa pun: hak dan menu setiap akun sesudah pemecahan sama persis dengan sebelumnya (amandemen 2026-10-11). Penyempitan hak per jabatan baru dilakukan di tahap terakhir, jabatan demi jabatan, dan setiap penyempitan itu disengaja serta dicatat.
 
 **Apa yang tidak dijanjikan.**
 
@@ -64,12 +64,12 @@ Izin pengajuan dan `hris.divisi.view` tidak berubah. Fitur yang hari ini digerba
 
 **2. Pemetaan dari gerbang backend yang berlaku.** Tiap rute yang hari ini memakai `hris.view` beralih ke izin lihat fiturnya; yang memakai `hris.work` ke izin kelola fiturnya; `POST`/`DELETE /holiday` (`hris.manage`) ke `hris.presensi.manage`. Dua `GET` PKWT yang hari ini memakai `hris.work` beralih ke `hris.kontrak.manage`. Empat pembaca di dalam handler ikut beralih ke izin lihat fiturnya.
 
-**3. Menu mengikuti backend.** Menu sebuah fitur tampil bagi pemegang izin lihat fitur itu; tombol ubah kuota cuti bagi pemegang `hris.cuti.manage`. Karena `hris.work` hari ini membuka tulis kontrak, mutasi, resign, dan surat peringatan, izin kelola keempat fitur itu dipegang paket Pelaksana, bukan hanya Admin.
+**3. Menu tidak berubah bagi siapa pun (amandemen 2026-10-11, irfanarfianto).** Menu sebuah fitur digerbang izin lihat fitur itu, dan tombol ubah kuota cuti digerbang `hris.cuti.manage`. Di web, izin lama dibaca sebagai payung menurut **gerbang menu lama**, bukan gerbang API: `hris.manage` membuka menu kontrak, mutasi, resign, kehadiran, laporan kehadiran, dan cuti; `hris.work` membuka menu surat peringatan dan tombol ubah kuota cuti; `hris.view` hanya membuka daftar karyawan dan bagan organisasi. Payung API di backend tetap seperti butir 5. Akibatnya menu setiap orang sama dengan hari ini; menu fitur baru bertambah bila jabatannya diberi paket fitur. Karena `hris.work` hari ini membuka tulis kontrak, mutasi, resign, dan surat peringatan lewat API, izin kelola keempat fitur itu dipegang paket Pelaksana, bukan hanya Admin. *Versi awal butir ini membuka menu fitur bagi pemegang paket Lihat dan Pelaksana; diubah karena bertentangan dengan perapian data HRGA ([[ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi]]) yang sengaja menyisakan paket Lihat bagi jabatan yang hanya perlu direktori.*
 
 **4. Pemetaan paket yang ada, setara.**
 
-- `hris_lihat`: semua izin lihat.
-- `hris_pelaksana`: semua izin lihat, ditambah izin kelola untuk semua fitur kecuali `hris.presensi.manage` (hari ini paket ini tidak memegang `hris.manage`, satu-satunya pemakai `hris.manage` di backend adalah hari libur). Koreksi presensi (`PATCH /:id/update`, hari ini `hris.work`) memakai izin tersendiri `hris.presensi.koreksi` supaya pemetaan ini tetap setara; izin itu ikut dipegang Pelaksana dan Admin.
+- `hris_lihat`: hanya `hris.view` dan `hris.karyawan.view`. Izin lihat fitur lain sengaja tidak dimuat eksplisit (amandemen 2026-10-11): hak API-nya tetap utuh lewat payung `hris.view`, sedangkan bila dimuat eksplisit, token pemegangnya akan membuka menu fitur yang hari ini tidak mereka lihat.
+- `hris_pelaksana`: `hris.view`, `hris.work`, `hris.karyawan.view`, dan izin kelola untuk semua fitur kecuali `hris.presensi.manage`; izin lihat fitur lain tidak dimuat eksplisit dengan alasan yang sama dengan `hris_lihat` (hari ini paket ini tidak memegang `hris.manage`, satu-satunya pemakai `hris.manage` di backend adalah hari libur). Koreksi presensi (`PATCH /:id/update`, hari ini `hris.work`) memakai izin tersendiri `hris.presensi.koreksi` supaya pemetaan ini tetap setara; izin itu ikut dipegang Pelaksana dan Admin.
 - `hris_admin` dan paket buatan tangan `personalia`: semua izin baru.
 - Peran `hris` tingkat apa pun (cadangan): semua izin baru, sama seperti hari ini mendapat ketiga izin umum.
 
@@ -97,7 +97,7 @@ Setiap penyempitan per jabatan adalah perubahan hak yang disengaja dan dicatat d
 - ➕ Paket fitur yang dipasang sebelum fase dua tidak lagi mencabut hak HRIS lain.
 - ➖ Izin bertambah dari 6 menjadi 18 di modul `hris`, ditambah tiga izin payung yang ditahan sementara.
 - ➖ Dua tahap tambahan (paket setara dan fase dua) harus selesai sebelum manfaat utamanya, penyempitan, bisa dirasakan.
-- ⚠️ **Dua akun melihat menu lebih banyak** (Culture & Industrial, Recruitment & Onboarding). Keduanya kasus paket sempit yang perlu dirapikan sebelum fase dua.
+- ⚠️ **Payung web dan payung backend sengaja berbeda** (butir 3 vs butir 5): payung web mengikuti gerbang menu lama, payung backend mengikuti gerbang API lama. Keduanya didokumentasikan di kode masing-masing; menyamakannya akan mengubah menu atau hak API seseorang.
 - ⚠️ **Lompatan internal dari orchestrator HRIS ke attendance tidak membawa izin.** Setelah fase dua, rute attendance yang dicapai lewat lompatan itu (koreksi presensi, hari libur) akan menolak semua orang kecuali lompatannya membawa izin. Ini harus dibereskan sebelum fase dua.
 - ⚠️ **Paket ber-key bawaan diselaraskan ulang tiap service menyala.** Izin baru otomatis masuk ke paket bawaan yang tersimpan; paket buatan tangan (`personalia`) harus dipetakan oleh skrip.
 - ⚠️ **Urutan deploy**: backend sebelum web. Menyalakan fase dua menuntut container employee dan attendance dibuat ulang, dan nilainya diperiksa di container.
