@@ -180,6 +180,35 @@ Ada dua kelompok penanda tangan. **Usulan (2026-09-11, belum diputuskan)**: cara
 
 Bila NIK yang diketik HRD saat sesi tidak cocok, sesi ditolak dan HR harus memperbaiki data karyawan di layar lain; layar penolakannya perlu menautkan ke sana. Hal yang belum diputuskan untuk dua kelompok ini ada di §Belum Diputuskan.
 
+## Desain Layar (mockup)
+
+- **Status**: 🟡 **Desain**, bukan bukti implementasi. Kanvas **"MyBharata Kontrak Saya"** dibuat 2026-10-11, disimpan sebagai Artifact desain **privat** (minta akses ke pembuatnya): https://claude.ai/artifact/DpkwRWLkknp8YAga1mnuAT. Isi kanvas memakai placeholder (`[NAMA KARYAWAN]`, `[NOMOR KONTRAK]`, `[NAMA HRD]`, `[NAMA PERUSAHAAN]`, `[JABATAN]`), tanpa data orang sungguhan. Berkas HTML kanvasnya **sengaja tidak disalin** ke vault (repo publik); yang dicatat di sini isi dan perilaku tiap layar.
+
+Tujuh layar, dua alur:
+
+**MyBharata · Kontrak Saya** (karyawan yang sudah registrasi)
+
+| # | Layar | Isi dan perilaku menurut desain |
+|---|---|---|
+| 1 | Gerbang PIN | PIN 6 digit sebelum Kontrak Saya terbuka ("Kontrak berisi data pribadi dan gajimu"), tautan Lupa PIN |
+| 2 | Kontrak Saya | Kartu oranye **"Kontrak baru menunggu tanda tanganmu"** (jenis, periode, nama HRD yang membuka sesi, batas jam berlaku) di puncak; seksi **Kontrak berjalan**: jenis, "No. …", badge Aktif, **Mulai / Berakhir sejajar** (bulan singkat), **progress bar** masa kontrak, "Berakhir dalam N hari", tombol **"Lihat detail & dokumen"**; seksi **Riwayat kontrak** dalam **satu kartu**: baris per kontrak berisi titik status, jenis, rentang tanggal, catatan kuning (mis. "Tanggal mulai perkiraan · tanpa dokumen"), status teks Aktif/Selesai di kanan |
+| 3 | Detail kontrak + dokumen | Kartu data (jenis, mulai, berakhir, perusahaan, catatan) ber-badge status; **Dokumen kontrak**: pratinjau halaman, nama berkas PDF "final, terkunci", tombol Buka dan Bagikan/Simpan; **Jejak tanda tangan** per pihak (karyawan, Direktur, e-Meterai dibubuhkan HR) dengan waktunya. Kontrak lama bertanda tangan kertas hanya menampilkan pindaian, tanpa jejak |
+| 4 | Tanda tangan kontrak baru | Langkah 1 Baca · 2 Tanda tangan · 3 Direktur; tombol "Baca dokumen kontrak" yang mencatat "sudah dibuka sampai halaman terakhir", centang persetujuan, kanvas goresan dengan Ulangi, kotak info (sesi dibuka HR setelah NIK KTP dicocokkan, berlaku sampai jam tertentu, tak bisa diubah sesudah ditandatangani), tombol **"Tanda tangani kontrak"** dan **"Minta koreksi ke HR"** |
+
+**Web · Sesi tanda tangan tatap muka** (HRD, dan karyawan yang belum registrasi MyBharata)
+
+| # | Layar | Isi dan perilaku menurut desain |
+|---|---|---|
+| 5 | ERP web: HR buka akses | Menu Kontrak › Sesi tanda tangan per karyawan dan kontrak. **1. Cocokkan NIK dari KTP fisik** (salah 3 kali = sesi dikunci 15 menit, tercatat siapa dan jam berapa). **2. Akses terbuka**: hitung mundur, **QR** untuk dipindai kamera HP karyawan, berlaku 15 menit dan sekali pakai, tombol Kirim link ke email dan Tutup akses. **3. Status** yang berubah sendiri saat karyawan membuka halaman dan saat selesai |
+| 6 | Halaman web tanda tangan (lewat QR) | Kepala halaman nama perusahaan + sisa waktu; ringkasan kontrak (jenis, periode, jabatan); baca dokumen (jumlah halaman, tanda sudah dibuka sampai akhir); centang persetujuan; kanvas goresan; info sekali pakai dan salinan final dikirim ke email sesudah Direktur menandatangani |
+| 7 | Halaman web: selesai / kedaluwarsa | Berhasil: "Tanda tanganmu tersimpan", kontrak menunggu Direktur, halaman tak aktif lagi. Gagal: "Link sudah tidak berlaku" (kedaluwarsa atau dipakai ulang), minta HR membuka sesi lagi |
+
+**Yang sudah ada di kode** (dicocokkan ke my-bharata `dev` 2026-10-12; layar 5 sampai 7 **belum diperiksa** ke kode):
+
+- **Layar 2**: diterapkan my-bharata [#215](https://github.com/bip-itteam-internal/my-bharata/pull/215) (merged ke `dev` 2026-10-12, `1.27.1+178`), memakai komponen bersama (`SectionHeader`, `StatusBadge` di `Stack`, `CustomButton`), bukan salinan gaya mockup. Kartu tanda tangan di puncak sudah ada sebelumnya (`ContractSignCard`, hitung mundur dan hilang sendiri saat sesi lewat). Badge status di kode menempel tepi kanan kartu, berbeda dari pil di dalam kartu pada mockup (diminta saat implementasi 2026-10-12, menyamakan dengan kartu pengajuan). Detail tampilan aplikasi: [[APP - MyBharata]] §Struktur menu beranda.
+- **Layar 1**: halaman Kontrak Saya memang berada di balik gerbang PIN (`ContractPages`).
+- **Layar 3 dan 4**: ada padanannya (`ContractDetailBody`: data, jejak tanda tangan berisi waktu dan pintu, tombol Buka/Bagikan; `ContractSignPage`: goresan dan kirim), tetapi **belum dicocokkan butir per butir** dengan mockup. Yang jelas berbeda: jejak di kode satu baris (waktu + pintu), bukan per pihak karyawan/Direktur/e-Meterai.
+
 ## Pengingat Kontrak Habis
 
 > ✅ **Merged 2026-09-11 (bip-erp PR #1851).** **DEV**: deploy manual 2026-09-11 22:01 WIB karena pipeline dev melewatkannya; jalan cron 2026-09-12 07:00 WIB terverifikasi: 133 kontrak jatuh jadwal, 7 pesan terkirim (1 ringkasan HR, 6 atasan) dan ketujuhnya ada di inbox, 0 gagal, 151 catatan tanpa duplikat. **PROD**: image employee-service dibangun 2026-09-12 07:32 WIB dari `198ff789` bersama beberapa service lain; gerbang biner dan index unik terverifikasi, koleksinya masih kosong; jalan pertama 2026-09-13 07:00 WIB **belum dibaca**. Ukur ulang sebelum mengandalkan status ini: baris log `[Pengingat Kontrak]` di container employee-service dan isi koleksi `employee_contract_pengingat`. Rencana dan langkah verifikasinya: `.task-plans/2026-09-11-pengingat-kontrak-habis.md`.
