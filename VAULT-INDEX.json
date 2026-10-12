@@ -21482,19 +21482,19 @@
         "APP - Web ERP",
         "CORE - SSO Flow"
       ],
-      "hash": "45a2d394fcb52df476feb66977463192992bbbc2aab739a1cf49dbfde5d504d0",
+      "hash": "b5deecb3755920fcfd8b8ef0c61293f8d4373d445100c1921d03ee810db0f676",
       "ukuran_kb": 5.9,
-      "ringkasan": "Menjawab: task apa saja yang harus dikerjakan untuk memindahkan token login Web ERP ke localStorage dan menambah paket Semua Izin (T0 ukur ukuran token, T1 FE sesi-token, T2 BE employee-service, T3 layar Hak Akses, T4 sinkron dok). Juga menjawab urutan deploy yang mengikat (T1 live sebelum T2/T3, BE sebelum FE), test dan verifikasi yang dituntut tiap task, serta rencana issue GitHub induk dan sub-issue.",
+      "ringkasan": "Menjawab: kenapa akun dengan banyak paket hak terpental ke halaman login Web ERP (JWT di cookie melewati batas ±4 KB), dan task apa saja untuk memindahkan token ke localStorage serta menambah paket bawaan Semua Izin. Juga menjawab urutan deploy yang mengikat (token keluar cookie dulu, baru paket Semua Izin, BE sebelum FE), larangan memasang paket ke diri sendiri, dan nomor issue GitHub tiap task.",
       "kata_kunci": [
-        "analisa kebutuhan",
         "token login",
+        "JWT",
+        "cookie 4 KB",
         "localStorage",
         "Semua Izin",
-        "daftar task",
-        "urutan deploy",
-        "sesi-token",
-        "hak akses",
-        "sub-issue",
+        "super admin",
+        "permission set",
+        "paket hak",
+        "RBAC",
         "ADR 0172"
       ]
     },

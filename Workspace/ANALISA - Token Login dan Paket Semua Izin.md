@@ -74,12 +74,11 @@ Urutan T2 dan T3: BE (employee-service) sebelum FE. Tidak ada env baru. Prod dij
   - ukuran token pemegang Semua Izin di [[CORE - RBAC dan Permission Set]];
   - catatan penyimpanan token di [[APP - Web ERP]] dan [[CORE - SSO Flow]].
 
-## Issue GitHub (belum dibuat)
+## Issue GitHub (dibuat 2026-10-12, Project #15, Backlog)
 
-Lintas repo, jadi bentuknya induk + sub-issue per repo (aturan tim):
-- induk di `bip-erp`;
-- `[FE]` T1 di `erp-frontend`;
-- `[BE]` T2 di `bip-erp`;
-- `[FE]` T3 di `erp-frontend`.
+- Induk: bip-erp#2981 (memuat T0 sebagai checklist)
+- T1 `[FE]`: erp-frontend#2315
+- T2 `[BE]`: bip-erp#2982
+- T3 `[FE]`: erp-frontend#2316
 
-Label `Siap Agent` dipasang manusia **setelah** ADR 0172 berstatus Diterima.
+Label `Siap Agent` dipasang manusia **setelah** ADR 0172 berstatus Diterima. `**Pemutus:**` di induk masih TBD.
