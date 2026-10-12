@@ -2,6 +2,8 @@
 
 > **Status**: ⚠️ **Sebagian diterapkan** (diverifikasi 2026-09-29): fondasi merged dan `Assistant-Service` jalan di prod sejak 2026-09-29, baru satu modul (rekap telat, attendance); sisa di § Yang kurang pada issue. Awalnya Diusulkan 2026-09-28. Diusulkan tim IT/Tech Development — **belum ada konfirmasi eksplisit ini sudah dibicarakan ke Direktur**. Berdiri di atas grounding vault + kode langsung pada tanggal yang sama (lihat § Context untuk koreksi atas klaim vault yang ternyata tidak cocok dengan kode).
 >
+> ⚠️ **Diusulkan diubah sebagian (2026-10-12)** oleh [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja atas Data Bisnis Berdaftar-Izin, Dijalankan Service Pemilik]] (🟡 Diusulkan): §4 dan butir 1-2 "Yang sengaja tidak dilakukan". **Sampai ADR 0173 berstatus Diterima, seluruh ADR ini berlaku apa adanya.**
+>
 > **Issue GitHub**: [bip-erp#2353](https://github.com/bip-itteam-internal/bip-erp/issues/2353) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 
 %% Status ditulis di blockquote atas, bukan bullet di ## Deskripsi, alasan sama dengan ADR 0120/0127:
@@ -228,6 +230,8 @@ data dan status kesegarannya (beberapa mart, mis. marketing-analytics, hanya sin
 menjawab kombinasi yang ditanya, asisten menjawab **tidak tahu** dan menunjuk layar yang ada,
 bukan menaksir atau turun membaca database mentah.
 
+⚠️ *Diusulkan diubah (2026-10-12)*: [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja atas Data Bisnis Berdaftar-Izin, Dijalankan Service Pemilik]] mengusulkan pengecualian berpagar untuk data bisnis agregat (tool `kueri`, eksekutor di service pemilik, hasil berlabel eksploratif). Belum berlaku sampai ADR itu Diterima.
+
 ### §5 Korelasi lintas modul lewat banyak pemanggilan tool dalam satu giliran, bukan join database
 
 Pertanyaan yang butuh lebih dari satu modul (mis. KPI + presensi) dijawab dengan memanggil
@@ -326,6 +330,7 @@ bip-erp#2389). Belum ada uji end-to-end lewat gateway per alat.
 
 - **Tidak ada akses database langsung atau lintas-database** untuk fitur ini.
 - **Tidak ada tool query bebas** (SQL/Mongo) yang bisa ditulis model sendiri.
+  ⚠️ *Dua butir di atas diusulkan diubah* oleh [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja atas Data Bisnis Berdaftar-Izin, Dijalankan Service Pemilik]] (🟡 Diusulkan, 2026-10-12) menjadi izin berpagar untuk data bisnis agregat. Data karyawan, gaji, pribadi, dan kredensial tetap terlarang di versi mana pun.
 - **Tidak streaming** di iterasi pertama; tidak memperbaiki infrastruktur gateway bersama sebagai
   bagian dari fitur ini.
 - **Tidak eksekusi apa pun** — murni baca, sama seperti batas [[ADR - 0058]] §5 yang tetap berlaku
