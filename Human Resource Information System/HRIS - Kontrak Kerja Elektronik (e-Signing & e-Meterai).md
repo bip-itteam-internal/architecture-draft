@@ -2,7 +2,7 @@
 
 *Digitalisasi kontrak kerja karyawan (PKWT/PKWTT): dokumen dibuat dari template berbasis data HRIS, ditandatangani secara elektronik **tidak tersertifikasi** **tatap muka di kantor dan didampingi HRD** (setelah HRD mencocokkan KTP dan membuka akses 15 menit, karyawan menggores tanda tangan di HP-nya sendiri lewat MyBharata atau halaman web bertoken; revisi 2026-10-11 ADR 0089 §12, menunggu pemilik proses; direktur mengonfirmasi dari Ruang Direktur), dibubuhi **e-Meterai** oleh HR, lalu salinannya dikirim ke karyawan. Ditambah pengingat otomatis sebelum kontrak berakhir. Keputusannya di [[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]], yang menggantikan rancangan tersertifikasi [[ADR - 0019 Kontrak Kerja Elektronik via Service Internal + Lapisan Tersertifikasi]]. Dibangun di atas modul riwayat kontrak yang **sudah live** di [[Microservices - Employee Service]] (koleksi `employee_contract`).*
 
-- **Status**: 🟡 **Konsep / Direncanakan** untuk tanda tangan dan e-Meterai; belum ada di kode. ✅ **Pengingat kontrak habis: merged 2026-09-11 (bip-erp PR #1851), naik di DEV 2026-09-11 dan PROD 2026-09-12**; jalan cron DEV sudah terverifikasi, jalan PROD pertama (2026-09-13 07:00 WIB) belum dibaca (§Pengingat Kontrak Habis). ⚠️ **Dokumen PKWT masa transisi (T18): selesai di branch 2026-09-12** (bip-erp `feat/employee-dokumen-pkwt`, erp-frontend `feat/hris-dokumen-pkwt`), PR dibuka 2026-09-12 (bip-erp #1864, erp-frontend #1552), belum merged, belum di DEV (§Masa transisi). Pondasinya (riwayat kontrak + lampiran PDF) sudah ✅ live, diverifikasi ke `bip-erp` `origin/main` `915ca2f8` pada 2026-09-11; rinciannya di §Pondasi yang Sudah Ada.
+- **Status**: 🟡 **Konsep / Direncanakan** untuk sisa alur tanda tangan; ⚠️ **pondasi sesi HRD + goresan karyawan sudah merged** (bip-erp#2976, erp-frontend panel HRD + halaman web bertoken, MyBharata pintu tanda tangan), semuanya di balik flag yang mati. Langkah Direktur, lembar bukti, dan status selesai belum ada. **Tahap pertama tanpa e-Meterai** ([[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]] §13, diusulkan 2026-10-12; §Alur Tanda Tangan). ✅ **Pengingat kontrak habis: merged 2026-09-11 (bip-erp PR #1851), naik di DEV 2026-09-11 dan PROD 2026-09-12**; jalan cron DEV sudah terverifikasi, jalan PROD pertama (2026-09-13 07:00 WIB) belum dibaca (§Pengingat Kontrak Habis). ⚠️ **Dokumen PKWT masa transisi (T18): selesai di branch 2026-09-12** (bip-erp `feat/employee-dokumen-pkwt`, erp-frontend `feat/hris-dokumen-pkwt`), PR dibuka 2026-09-12 (bip-erp #1864, erp-frontend #1552), belum merged, belum di DEV (§Masa transisi). Pondasinya (riwayat kontrak + lampiran PDF) sudah ✅ live, diverifikasi ke `bip-erp` `origin/main` `915ca2f8` pada 2026-09-11; rinciannya di §Pondasi yang Sudah Ada.
 - **Ruang lingkup implementasi**: modul kontrak employee-service (status tanda tangan, sesi tanda tangan tatap muka, catatan tanda tangan, pengingat), prefix arsip MinIO baru, Web ERP (panel sesi tanda tangan HRD: cocokkan NIK, buka akses, QR; status di halaman Kontrak; antrean Ruang Direktur; halaman web publik bertoken untuk karyawan yang belum registrasi MyBharata), salinan lewat email, dan MyBharata ("Kontrak Saya": riwayat, detail, PDF, dan pintu tanda tangan bagi yang sudah registrasi). Tanpa vendor PSrE, tanpa integrasi API meterai, tanpa tanda tangan jarak jauh.
 - **Endpoint yang sudah ada**: [[API - Employee Service]] §Kontrak Kerja. Layar HR: [[APP - Web ERP]] `/hris/contract`.
 
@@ -122,6 +122,21 @@ Mengikuti [[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi 
 
 ## Alur Tanda Tangan
 
+> 🟡 **Tahap pertama tanpa e-Meterai** ([[ADR - 0089 Tanda Tangan Kontrak Kerja di Sistem Sendiri, Didampingi HRD, e-Meterai Dibubuhkan HR]] §13, diusulkan 2026-10-12, menunggu pemilik proses). Yang dibangun sekarang:
+>
+> ```
+> DRAFT ──▶ MENUNGGU_TTD_KARYAWAN ──▶ MENUNGGU_TTD_DIREKTUR ──▶ SELESAI
+> jalur samping: KOREKSI_DIMINTA (kembali ke DRAFT) · DIBATALKAN (sebelum SELESAI)
+> ```
+>
+> - Langkah 5 di bawah (**Meterai + kunci**) **ditunda**; uji S1 tidak menahan tahap ini.
+> - **Tidak ada keterangan e-Meterai di layar mana pun** (MyBharata, web bertoken, Web ERP, lembar bukti): tanpa baris jejak, status, langkah, maupun placeholder "menunggu meterai".
+> - **Dokumen final = PDF kontrak dari HR yang tidak diubah + lembar bukti tanda tangan terpisah** (goresan karyawan dan Direktur, waktu server, HRD pendamping, hasil cocok NIK tanpa NIK-nya, pintu dan perangkat, hash PDF, "atas nama Direktur" + akun). Goresan tidak dicetak ke PDF.
+> - **Direktur menggores per kontrak** (langkah 4 di bawah: bukan "banyak sekaligus").
+> - Yang sudah ada di kode per 2026-10-12: sesi HRD + goresan karyawan (bip-erp#2976, flag `KONTRAK_TTD_AKTIF` mati; status diturunkan dari sesi + jejak, belum ada field status). Status alur, langkah Direktur, lembar bukti, dan salinan final **belum dibangun**.
+>
+> Diagram urutan A/B di bawah adalah rancangan dengan meterai, berlaku bila e-Meterai dipasang kembali.
+
 Nama status di bawah usulan; ditetapkan saat `/plan`. Posisi `MENUNGGU_METERAI` bergantung hasil uji S1.
 
 ```
@@ -208,6 +223,7 @@ Tujuh layar, dua alur:
 - **Layar 2**: diterapkan my-bharata [#215](https://github.com/bip-itteam-internal/my-bharata/pull/215) (merged ke `dev` 2026-10-12, `1.27.1+178`), memakai komponen bersama (`SectionHeader`, `StatusBadge` di `Stack`, `CustomButton`), bukan salinan gaya mockup. Kartu tanda tangan di puncak sudah ada sebelumnya (`ContractSignCard`, hitung mundur dan hilang sendiri saat sesi lewat). Badge status di kode menempel tepi kanan kartu, berbeda dari pil di dalam kartu pada mockup (diminta saat implementasi 2026-10-12, menyamakan dengan kartu pengajuan). Detail tampilan aplikasi: [[APP - MyBharata]] §Struktur menu beranda.
 - **Layar 1**: halaman Kontrak Saya memang berada di balik gerbang PIN (`ContractPages`).
 - **Layar 3 dan 4**: ada padanannya (`ContractDetailBody`: data, jejak tanda tangan berisi waktu dan pintu, tombol Buka/Bagikan; `ContractSignPage`: goresan dan kirim), tetapi **belum dicocokkan butir per butir** dengan mockup. Yang jelas berbeda: jejak di kode satu baris (waktu + pintu), bukan per pihak karyawan/Direktur/e-Meterai.
+- ⛔ **Baris jejak "e-Meterai · Dibubuhkan HR" di layar 3 TIDAK dibangun**: tahap pertama tanpa e-Meterai dan tanpa keterangan meterai di layar (ADR 0089 §13). Jejak per pihak berhenti di karyawan dan Direktur.
 
 ## Pengingat Kontrak Habis
 
@@ -306,7 +322,11 @@ Komponen pendapatan lain yang punya nilai tidak dicetak dan tidak ikut total; na
 - **Konfirmasi legal** keabsahan tanda tangan tidak tersertifikasi untuk PKWT. Rilis tanda tangan menunggu ini; pengingat tidak.
 - **Persetujuan pemilik proses atas revisi ADR 0089 §12** (goresan di HP karyawan, dua pintu). Sampai disetujui, yang berlaku tetap perangkat HR.
 - **Rute dan path pintu web bertoken** (rute publik gateway, halaman di erp-frontend), dan apakah tombol tanda tangan menunggu PDF dibuka sampai halaman terakhir. Ditetapkan saat `/plan`.
-- **Hasil uji S1** (urutan A atau B): HR memeteraikan satu PDF contoh lewat portal distributor yang dipakai.
+- **Hasil uji S1** (urutan A atau B): HR memeteraikan satu PDF contoh lewat portal distributor yang dipakai. *(Sejak ADR 0089 §13, 2026-10-12: tidak menahan tahap pertama tanpa e-Meterai; baru relevan bila meterai dipasang kembali.)*
+- **Persetujuan pemilik proses atas revisi ADR 0089 §13** (tanpa e-Meterai, lembar bukti terpisah, Direktur menggores per kontrak).
+- **Data penandatangan per perusahaan** (ADR 0089 §8, T6): tempat dicatat dan siapa pengisinya. Prasyarat langkah Direktur.
+- **Status alur kontrak**: bentuknya harus aman terhadap `ReplaceOne` di `PATCH /contract/:id`; apakah Direktur boleh menolak/mengembalikan; letak permintaan koreksi karyawan.
+- **Pemeteraian susulan** untuk kontrak yang selesai tanpa meterai, diputuskan bersama konfirmasi legal.
 - **Format dan keunikan nomor kontrak**: format HR (`…/HRD/PKWT/…/…`) vs kode sekarang, urutan per perusahaan dan periode, dan perlakuan nomor kontrak lama (celah 1).
 - **Letak data penandatangan per perusahaan** (nama, jabatan, alamat direktur).
 - **Field tempat lahir** di `personal_data`, termasuk siapa yang mengisinya. Data kandidat sudah punya `tempat_lahir`, jadi calon karyawan bisa terisi otomatis saat Tambah Karyawan dari kandidat; karyawan lama tetap perlu diisi.
