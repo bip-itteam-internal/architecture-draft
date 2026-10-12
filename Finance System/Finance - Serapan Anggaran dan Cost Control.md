@@ -69,7 +69,7 @@ Tambahan di luar halaman ini: kotak **sisa pos** di bawah tiap baris form pencat
 
 ### Dari mana angka "dari pengajuan" dan "menunggu dicatat"
 
-- **`tercatat` bukan realisasi Accurate.** Ia dibangun dari baris Accounting dokumen pengajuan yang **sudah berjurnal** (`jurnal_nomor` terisi), per (akun COA, departemen Accurate) (`pengajuan_barang_serapan.go:24-28`). Realisasi baru menyusul pada sinkron berikutnya; antara pencatatan dan sinkron itu keduanya boleh berbeda. Bila dari pengajuan lebih besar dari Terpakai, layar menampilkannya **apa adanya** dengan keterangan "menunggu sinkron", tidak dipotong dan tidak ditambahkan (`serapan.ts:104-108`).
+- **`tercatat` bukan realisasi Accurate.** Ia dibangun dari baris Accounting dokumen pengajuan yang **sudah berjurnal** (`jurnal_nomor` terisi), per (akun COA, departemen Accurate) (`pengajuan_barang_serapan.go:24-28`). Realisasi baru menyusul pada sinkron berikutnya; antara pencatatan dan sinkron itu keduanya boleh berbeda. Bila dari pengajuan lebih besar dari Terpakai, layar menampilkannya **apa adanya** dengan keterangan "menunggu sinkron", tidak dipotong dan tidak ditambahkan (`serapan.ts:104-108`). Keterangan itu hanya muncul bila realisasinya **tersedia** (`status_realisasi === "ada"`). Selama realisasi belum ada, sel Terpakai berisi penanda kosong dan keterangan ini tidak tampil, karena sebabnya memang realisasi yang belum ada, bukan pengajuan yang mendahului Accurate. Syarat ini ditentukan di **satu** tempat, `gabungSerapan` (`serapan.ts:142`), dan dipakai bersama oleh tabel Serapan dan sheet rincian (erp-frontend #2358, merged 2026-10-12).
 - **Periode `tercatat`** = bulan **WIB** dari **tanggal jurnal di Accurate**, bukan tanggal Accounting menekan tombol. Tanggal jurnal = tanggal transfer, dengan waktu pencatatan sebagai cadangan (`tanggalJurnalPengajuan`, `pengajuan_barang_jurnal_kirim.go:23-28`), fungsi yang **sama** dengan pembangun jurnal. Dua salinan aturan tanggal berarti serapan Oktober bisa memuat jurnal yang di Accurate jatuh di September.
 - **Penanda pencatatan** di riwayat pengajuan berbunyi `dicatat`, **bukan** `disetujui` (`waktuDicatatPengajuan`, `pengajuan_barang_serapan.go:149-157`). Pembaca yang mencari `disetujui` di tahap itu mendapat serapan kosong yang terbaca "belum ada yang tercatat".
 - **Syarat masuk antrean Menunggu dicatat** (`menungguDicatat`, `pengajuan_barang_serapan.go:262-278`): tipe berjurnal dan bukan dokumen pembelian, status berjalan, pernah dituntaskan tahap Finance setujui-bayar, `jurnal_nomor` kosong, belum pernah dicatat, jurnal tidak gagal terbit.
@@ -110,7 +110,18 @@ Dilacak di bip-erp#2814 (Pemutus: wirkancil):
 - **Sisa sesudah dicatat**: dijumlahkan per pos, atau cukup diberi keterangan.
 - **Template unggah bergantung pada Accurate**: daftar akun OPEX diambil langsung dari Accurate, jadi Accurate mati → 502.
 - **Konfirmasi paket izin** `finance_anggaran` oleh Pemutus (K9).
-- Sisa teknis yang tercatat di issue yang sama: aturan "supervisor/admin finance" untuk izin kelola tertulis di dua tempat di FE; `GET /katalog/departemen` terdaftar dua kali di procurement (yang terpakai mengirim nama; bila urutan berubah, kotak sisa pos salah tanpa galat).
+- Sisa teknis dari issue yang sama sudah dipecah per issue dan dikerjakan 2026-10-12:
+  - **Merged**:
+    - bip-erp #2992: rute ganda `/katalog/departemen` dan `/katalog/satuan` dihapus, dijaga `TestRuteTidakTerdaftarGanda`.
+    - bip-erp #2996: penjaga tabrakan judul template RAPB, `daftarkanJudulKanonik`.
+    - erp-frontend #2338: aturan tier izin kelola kini satu tempat, `tierKelolaAnggaran` di `anggaran/lib/izin.ts`.
+    - erp-frontend #2343: test pesan galat unduh template berbadan Blob.
+    - erp-frontend #2352: keterangan "Terisi dari" di form Rekomendasi hilang begitu akun diganti.
+    - erp-frontend #2355: sheet rincian tidak lagi terbuka sendiri saat posnya muncul lagi.
+    - erp-frontend #2358: menunggu sinkron (lihat §Aturan Membaca Angka).
+  - **Belum merged**: erp-frontend #2350, yang menghapus `sebabTakTerdefinisi` yang tak terpakai sehingga urutan sebab hanya tersisa di `sebabBaris`.
+
+  Deploy prod untuk semuanya TBD.
 - **Verifikasi**: belum ada layar yang dilihat di browser dan belum ada endpoint yang dicoba lewat gateway.
 
 Untuk proyeksi mingguan yang diatur (ADR 0161, Diterima 2026-10-09): yang tersisa hanya asal nama pengubah di riwayat (diserahkan ke pelaksana). Sudah diputuskan di ADR-nya: unggah ulang RAPB menerapkan porsi ke anggaran baru untuk semua minggu, bulan mendatang boleh diatur, dan tidak ada tombol kembalikan ke bawaan.
