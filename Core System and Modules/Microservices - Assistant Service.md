@@ -171,7 +171,7 @@ Angka hanya boleh berasal dari yang sudah dihitung endpoint. Aturan pemakaian ko
 
 Alasannya spesifik dan sudah terdokumentasi di [[CORE - Kapabilitas AI dan Machine Learning]] § Aturan pemakaian kolom: `iklan_sia_sia` adalah himpunan bagian dari `ads_cost` dan tidak boleh dijumlahkan ke laba, `spend_vsa` dan `spend_gmv_max` dua basis atribusi berbeda yang tidak boleh digabung, dan pendapatan nol di tingkat video bisa berarti tidak ada datanya. Model bahasa yang diberi angka mentah akan menjumlahkannya dengan percaya diri, kegagalannya bukan galat melainkan **angka salah yang masuk akal**, dan tak ada test yang menangkapnya.
 
-⚠️ **Pengecualian yang diusulkan (2026-10-12, belum berlaku)**: [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja atas Data Bisnis Berdaftar-Izin, Dijalankan Service Pemilik]] (🟡 Diusulkan) mengizinkan model menulis pipeline agregasi untuk tool `kueri`. Hitungannya tetap dikerjakan database, bukan model, tetapi **rumusnya** ditulis model, sehingga risiko di paragraf atas berpindah ke dalam kueri. Karena itu hasilnya wajib berlabel eksploratif dan dilarang dipakai untuk KPI, insentif, payroll, atau komisi. Rancangannya di § Tool kueri eksploratif.
+⚠️ **Pengecualian yang diusulkan (2026-10-12, belum berlaku)**: [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] (🟡 Diusulkan) mengizinkan model menulis pipeline agregasi untuk tool `kueri`. Hitungannya tetap dikerjakan database, bukan model, tetapi **rumusnya** ditulis model, sehingga risiko di paragraf atas berpindah ke dalam kueri. Karena itu hasilnya wajib berlabel eksploratif dan dilarang dipakai untuk KPI, insentif, payroll, atau komisi. Rancangannya di § Tool kueri eksploratif.
 
 ### 4. Jawaban adalah pintu, bukan tujuan
 
@@ -1172,22 +1172,30 @@ sumber) ada di [[REF - Penyajian Laporan Copilot]].
 
 ### Tool kueri eksploratif (🟡 Diusulkan 2026-10-12, kode belum ada)
 
-Keputusannya [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja atas Data Bisnis Berdaftar-Izin, Dijalankan Service Pemilik]]; blueprint
+Keputusannya [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]]; blueprint
 [[ANALISA - Copilot Kueri Eksploratif]]. Ringkasan cara kerja yang direncanakan:
 
-- **Tool `kueri`** (assistant-service) menerima `sumber`, `koleksi`, `pipeline` (tahap agregasi MongoDB dalam JSON), dan
-  `tujuan`, lalu memanggil `POST /kueri-eksploratif` milik marketing-analytics **lewat gateway dengan JWT penanya**, sama
+- **Tool `kueri`** (assistant-service) menerima `service`, `koleksi`, `pipeline` (tahap agregasi MongoDB dalam JSON), dan
+  `tujuan`, lalu memanggil `POST /kueri-eksploratif` milik service yang dituju **lewat gateway dengan JWT penanya**, sama
   seperti tool lain. Dipakai hanya bila tak ada tool khusus yang menjawab.
-- **Eksekutor di service pemilik** menegakkan seluruh pagar: daftar-izin koleksi **dan field** (satu tempat di kode), tahap
-  yang diizinkan (`$lookup`, `$unionWith`, `$out`, `$merge`, `$function`, `$where` ditolak), wajib `$group`/`$count`,
-  `maxTimeMS` 15 detik, maksimal 200 baris, gerbang `RequireAnalitikMarketing`, dan user Mongo **read-only** baru.
-- **Keluaran** membawa penanda `kueri_eksploratif` (teks pipeline + `tujuan`), sumber, dan umur data. Penjaga
+- **Eksekutor bersama** (`shared-library/kueri`) dipasang di 19 service pemilik data. Tiap service hanya mendaftarkan
+  koleksinya, fungsi cakupan per koleksi, dan kamus kolomnya. Pagar yang ditegakkan:
+  - kredensial dan token ditolak (koleksi kredensial utuh + field berpola rahasia), dijaga test pemindai entity;
+  - tahap `$lookup`, `$unionWith`, `$out`, `$merge`, `$function`, `$where` ditolak;
+  - `maxTimeMS` 15 detik, maksimal 500 baris, user Mongo **read-only** baru per container.
+- **Cakupan disisipkan server**: Direktur, setara Direktur, Supervisor HRD, dan IT melihat semua (termasuk daftar gaji per
+  orang, mengubah batas [[ADR - 0165 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang]] untuk jalur ini);
+  supervisor lain hanya departemennya, diturunkan lewat `ExpandToDepartmentGroup(ResolveDepartmentFilter(...))` (jebakan
+  label `HRGA`). Gerbang modul pemilik tetap berlaku di atasnya.
+- **Samaran tidak berubah**: kiriman berisi NIK, NPWP, rekening, BPJS, telepon, email, alamat, atau tanggal lahir tetap
+  ditahan sampai ada persetujuan tertulis Direksi.
+- **Keluaran** membawa penanda `kueri_eksploratif` (teks pipeline + `tujuan`), kamus kolom, sumber, dan umur data. Penjaga
   `hitungan_model` tetap berlaku atas jawaban.
-- **Tak terjangkau**: DB employee, payroll, recruitment, attendance, insentive, kredensial, field identitas pembeli
-  (`transaction_orders.buyer` dan sejenisnya), `live_shifts.employee_id`.
+- **Kueri terverifikasi**: kueri yang ditandai anggota IT disimpan di `assistant_db` dan dipakai ulang untuk pertanyaan
+  yang cocok, tanpa label eksploratif. Kueri yang belum diverifikasi tidak pernah dipakai ulang otomatis.
 - **Dasar ukur** (prod `assistant_db.percakapan`, 30 Sep - 12 Okt 2026, 158 giliran, 10 penanya): ±10 jawaban "data belum
-  tersedia di Copilot", sebagian besar HR/procurement; 7 penolakan yang benar (4 data pribadi, 3 tak berhak) yang **tetap
-  harus ditolak** di bawah pagar ini.
+  tersedia di Copilot", sebagian besar HR/procurement; 3 penolakan tak berhak tetap ditolak lewat cakupan; 4 pertanyaan
+  data pribadi tetap tertahan samaran.
 
 ### Sumber yang sengaja dilewati (jangan dicoba ulang tanpa membaca alasannya)
 
@@ -1595,7 +1603,7 @@ Yang sengaja **TIDAK** ada, dan alasannya bukan kehati-hatian umum:
 | Tidak dibuat | Alasan |
 |---|---|
 | Tool bash atau perintah bebas | Harness hanya menerima string buram, sehingga tak bisa menggerbang, mengaudit, atau merender per aksi |
-| Tool query bebas ke MongoDB | Membuka jalan bagi asisten menghitung sendiri, yang justru dilarang Keputusan 3. ⚠️ Diusulkan diganti versi berpagar oleh [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja atas Data Bisnis Berdaftar-Izin, Dijalankan Service Pemilik]] (🟡 Diusulkan 2026-10-12); larangan ini berlaku sampai ADR itu Diterima |
+| Tool query bebas ke MongoDB | Membuka jalan bagi asisten menghitung sendiri, yang justru dilarang Keputusan 3. ⚠️ Diusulkan diganti versi berpagar oleh [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] (🟡 Diusulkan 2026-10-12); larangan ini berlaku sampai ADR itu Diterima |
 | Tool tulis apa pun | Irisan pertama baca-saja. Aksi menulis menuntut gerbang konfirmasi tersendiri yang belum dirancang |
 
 ## Penjaga supaya tidak lahir angka karangan
