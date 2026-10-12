@@ -24,7 +24,7 @@ Diverifikasi ke `bip-erp` dan `erp-frontend` `origin/main` 2026-10-12. Tahapnya 
 
 **Belum selesai (TBD)**
 - Katalog izin `kaskecil` dan seed paket `kaskecil_*` MASIH terdaftar; pencabutannya BE-3 (PR bip-erp#3004, **draft, belum merged**), menunggu BE-0 (cabut paket `kaskecil_*` dari data dulu). Alasan urutan di [[CORE - RBAC dan Permission Set]].
-- Izin `budget.*` lama (`budget.pengajuan.save`, `budget.approve.aset`, `budget.master.save`) belum dipangkas; butuh pembersihan data paket.
+- Izin `budget.*` lama (`budget.pengajuan.save`, `budget.approve.aset`, `budget.master.save`) masih di katalog `origin/main`; pencabutannya diajukan di PR bip-erp#3014 (**open, belum merged**, issue bip-erp#3009). Sesudah deploy, perapian paket wajib dijalankan di prod karena seed tak menimpa paket yang ada. Rincian di [[CORE - RBAC dan Permission Set]].
 - Dok proses bisnis dan blueprint di bawah (aturan plafon, matriks approval) belum ditandai satu per satu mana yang diwarisi Pengajuan Dana; sebelum itu diukur, anggap aturan plafon per divisi TIDAK berlaku (modul penggantinya memakai ambang nominal, bukan plafon per divisi, lihat riwayat status di atas).
 
 ## Tujuan
