@@ -439,6 +439,13 @@ perubahan X, kenapa ia bilang tidak ada?").
   adalah temuan. Keadaan yang hilang sampai membuat pengguna salah paham (kosong terbaca
   "tidak ada", 403 terbaca rusak) naik ke kritis, sekelas §F.
 - Error validasi form tidak lewat `showFormErrorsToast`.
+- **`<input type="date">` bawaan browser BARU di erp-frontend** (juga `<Input type="date">`).
+  Wajib `DateStringPicker` / `DatePicker` / `DatePickerWithRange` / `FilterTable` tipe `date`
+  (`ui-checklist.md` §2d). Yang dihitung hanya baris yang **ditambahkan diff**, bukan yang
+  sudah ada di berkas yang kebetulan tersentuh; migrasi yang lama milik erp-frontend#2333.
+  `type="month"`, `type="time"`, `type="datetime-local"` belum punya komponen bersama, jadi
+  bukan temuan selama rencananya menyebutnya. ⚠️ Mencarinya dari PowerShell dengan pola
+  berkutip ganda membalas nol palsu (kutipnya dibuang); pakai pola di `ui-checklist.md` §2d.
 
 ### K. Celah test
 
