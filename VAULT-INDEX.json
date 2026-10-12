@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-12",
-  "jumlah_dokumen": 624,
+  "jumlah_dokumen": 626,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -2151,6 +2151,7 @@
         "Microservices - Vault MCP Service",
         "Marketing - Veo (Gemini) Automation Layer",
         "Microservices - Calendar Service",
+        "ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja atas Data Bisnis Berdaftar-Izin, Dijalankan Service Pemilik",
         "API - Attendance Service",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "API - Payroll Service",
@@ -2160,6 +2161,7 @@
         "ADR - 0165 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang",
         "Microservices - Payroll Service",
         "Microservices - Inventory Service",
+        "ANALISA - Copilot Kueri Eksploratif",
         "ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai",
         "Microservices - Notification Service",
         "CORE - SSO Flow",
@@ -2180,20 +2182,20 @@
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "b098587b9b223bb60d9ef6547546d215e209f478282d89c5bccae7e1196fb9c6",
-      "ukuran_kb": 178.1,
-      "ringkasan": "Menjawab: bagaimana asisten AI Copilot di Web ERP menjawab pertanyaan angka bisnis dengan merutekan ke endpoint lewat gateway memakai JWT penanya, tool apa saja yang tersedia per modul (marketing, HRGA, dll), dan penjaga apa yang mencegah angka karangan. Juga menjelaskan keputusan rancangan (Tool Runner bukan LangGraph, asisten dilarang berhitung), riwayat percakapan, umpan balik, Jadwal Tugas, persona, dan keterbatasan yang diketahui.",
+      "hash": "cb2d63e6d66b39657965c2a6e35417370cdddbde0102eedbbae944bdec71e8ff",
+      "ukuran_kb": 180.5,
+      "ringkasan": "Menjawab: bagaimana Copilot (asisten AI tanya-jawab di Web ERP) bekerja, yaitu merutekan pertanyaan ke endpoint lewat gateway dengan JWT penanya tanpa menghitung sendiri, tool apa saja yang tersedia per modul (HRGA, marketing, finance, gudang, dll), dan sumber mana yang sengaja dilewati. Juga menjelaskan penjaga anti angka karangan, samaran identitas sebelum ke relay AI, riwayat percakapan, Jadwal Tugas, batas gateway 30 detik, dan siapa yang boleh memakainya.",
       "kata_kunci": [
-        "assistant service",
         "Copilot",
+        "assistant-service",
         "asisten AI",
         "AI assistant",
         "tool runner",
         "chatbot",
-        "tanya jawab",
+        "penjaga jawaban",
         "Jadwal Tugas",
-        "LLM",
-        "penjaga jawaban"
+        "gateway JWT",
+        "tanya-jawab"
       ]
     },
     {
@@ -8273,6 +8275,7 @@
       "status_teks": "**Sebagian diterapkan** (diverifikasi 2026-09-29): fondasi merged dan `Assistant-Service` jalan di prod sejak 2026-09-29, baru satu modul (rekap telat, attendance); sisa di § Yang kurang pada issue. Awalnya Diusulkan 2026-09-28. Diusulkan tim IT/Tech Development — **belum ada konfirmasi eksplisit ini sudah dibicarakan ke Direktur**. Berdiri di atas grounding vault + kode langsung pada tanggal yang sama (lihat § Context untuk koreksi atas klaim vault yang ternyata tidak cocok dengan kode).",
       "publik": true,
       "tautan": [
+        "ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja atas Data Bisnis Berdaftar-Izin, Dijalankan Service Pemilik",
         "Microservices - Assistant Service",
         "Microservices - Assistant\nService",
         "ADR - 0082\nIntegrasi AI lewat Klien Tipis di Shared-Library",
@@ -8299,17 +8302,20 @@
         "ADR - 0165 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang",
         "ADR - 0166 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Satu Sumber, Cek Silang Dikerjakan Sistem dengan Tiga Keadaan"
       ],
-      "hash": "d2f4be5db0d8e12c3bfd9c2689cf7c154889c1a7957bbb0ae2fd4c273754034c",
-      "ukuran_kb": 25.2,
-      "ringkasan": "Menjawab: mengapa asisten AI lintas modul dibangun sebagai lapisan data bisnis per service dan bukan terpusat, siapa yang boleh memakai Copilot, dan batas yang diputuskan (angka tak dihitung dari data mentah, keluaran terstruktur). Menautkan keputusan lanjutan tentang gerbang data upah dan cek silang.",
+      "hash": "5bcdef888b2f5469e8ab696e7c0722a34675864cb58f2c0bd0083e6cba5247e5",
+      "ukuran_kb": 26.2,
+      "ringkasan": "Menjawab: kenapa asisten AI lintas modul berdiri sebagai service terpisah sementara lapisan data bisnisnya dibangun di dalam tiap service pemilik data (bukan terpusat), siapa yang boleh memakainya (Supervisor, Direktur, IT), dan kenapa asisten dilarang menghitung dari data mentah. Juga menjelaskan batas gateway 30 detik tanpa SSE, klien AI OpenAI-compatible, keluaran teks/tabel/chart, serta syarat persetujuan Direksi untuk data asli lewat relay AI.",
       "kata_kunci": [
-        "asisten AI",
-        "Copilot",
-        "lintas modul",
         "ADR 0132",
-        "gerbang akses",
-        "assistant-service",
-        "tanya jawab"
+        "Copilot",
+        "asisten AI lintas modul",
+        "cross-module AI",
+        "lapisan data bisnis",
+        "RBAC Supervisor Direktur IT",
+        "relay AI",
+        "klien AI",
+        "ADR 0058",
+        "gateway timeout"
       ]
     },
     {
@@ -9487,20 +9493,23 @@
         "ADR - 0139 Penjelasan Tiap Tabel dan Diagram Laporan Ditulis AI, Angkanya Rujukan ke Fakta Backend",
         "Microservices - Assistant Service",
         "REF - Penyajian Laporan Copilot",
+        "ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja atas Data Bisnis Berdaftar-Izin, Dijalankan Service Pemilik",
         "buka:<nama_alat>"
       ],
-      "hash": "dae16599a99bdc62c9141bf70255f393603c5f4a289510eb57bc098a4ffe2398",
-      "ukuran_kb": 8.3,
-      "ringkasan": "Menjawab: mengapa Copilot tidak boleh menyimpulkan ketiadaan atau sebab dari satu sumber, bagaimana cek silang dikerjakan sistem dengan tiga keadaan (ada, tidak ada tercatat, tidak diperiksa), bagaimana angka tak pernah dihitung model, dan pasangan cek silang mana yang masih pekerjaan terbuka. Status Diusulkan.",
+      "hash": "aa1c727f15e45414f357a21649c6630bb5358f6ff3729381c2b73224db49e678",
+      "ukuran_kb": 8.7,
+      "ringkasan": "Menjawab: bagaimana Copilot menyikapi angka nol, turun, atau rendah tanpa menebak sebab dari satu sumber, yaitu cek silang oleh sistem dengan tiga keadaan (ada, tidak ada tercatat, tidak diperiksa). Juga menjelaskan pasangan cek silang yang berjalan (live vs kalender libur dan shift host, laba toko vs penanggung jawab), penanganan laba belum final, penjaga hitungan_model, dan token tautan halaman yang divalidasi server.",
       "kata_kunci": [
-        "cek silang",
+        "ADR 0166",
         "Copilot",
-        "belum final",
-        "hitungan_model",
-        "token tautan",
+        "cek silang",
+        "cross-check",
+        "tiga keadaan",
         "tidak diperiksa",
+        "hitungan_model",
+        "laba belum final",
         "kalender libur",
-        "ADR 0166"
+        "token tautan"
       ]
     },
     {
@@ -9694,6 +9703,40 @@
         "JWT",
         "sesi_aktif",
         "permission set"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja atas Data Bisnis Berdaftar-Izin, Dijalankan Service Pemilik.md",
+      "judul": "ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja atas Data Bisnis Berdaftar-Izin, Dijalankan Service Pemilik",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-10-12, oleh panpan (Tech Development), lewat sesi `/analisa-kebutuhan`. Pemutus: **irfanarfianto**. Kode belum ada. Mengubah sebagian [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] (§4 dan butir 1-2 \"Yang sengaja tidak dilakukan\") dan Keputusan 3 [[Microservices - Assistant Service]]. ⛔ **Deploy PROD juga menunggu persetujuan tertulis Direksi** untuk data asli lewat relay AI (syarat ADR 0132 yang tidak diubah ADR ini).",
+      "publik": true,
+      "tautan": [
+        "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
+        "Microservices - Assistant Service",
+        "ANALISA - Copilot Kueri Eksploratif",
+        "REF - Kepemilikan Data",
+        "Microservices - Marketing Analytics Service",
+        "ADR - 0166 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Satu Sumber, Cek Silang Dikerjakan Sistem dengan Tiga Keadaan",
+        "ADR - 0165 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang",
+        "REF - Penyajian Laporan Copilot"
+      ],
+      "hash": "8591a5c98a23a3fb5b59819437d6be2e318fdf2ce26a6011336736839ce24e6c",
+      "ukuran_kb": 12.3,
+      "ringkasan": "Menjawab: apakah Copilot boleh menyusun kueri agregasi MongoDB sendiri untuk pertanyaan marketing yang belum punya endpoint, dan pagar apa yang berlaku (daftar-izin koleksi dan field, wajib agregat, user Mongo read-only, gerbang analitik marketing, batas waktu dan baris). Juga menjelaskan kenapa eksekutornya di marketing-analytics, label hasil eksploratif yang bukan angka resmi, dan bagian ADR 0132 yang diubah.",
+      "kata_kunci": [
+        "ADR 0173",
+        "Copilot",
+        "kueri eksploratif",
+        "exploratory query",
+        "tool kueri",
+        "aggregation pipeline",
+        "read-only Mongo",
+        "daftar-izin",
+        "allowlist",
+        "marketing-analytics"
       ]
     },
     {
@@ -17537,6 +17580,7 @@
         "REF - Layout Dashboard erp-frontend",
         "Microservices - Assistant Service",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja atas Data Bisnis Berdaftar-Izin, Dijalankan Service Pemilik",
         "buka:<nama_alat>",
         "ADR - 0166 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Satu Sumber, Cek Silang Dikerjakan Sistem dengan Tiga Keadaan",
         "ADR - 0165 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang",
@@ -17546,20 +17590,20 @@
         "Microservices - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "73835de5cd300fe650ef19cb25bc169feae83c02125a7fb6a1d26dae10d45c4d",
-      "ukuran_kb": 52.4,
-      "ringkasan": "Menjawab: bagaimana Copilot menyajikan jawaban berangka sebagai laporan (angka utama dan perubahannya, judul grafik berupa kesimpulan, paragraf per grafik, tabel lengkap, data belum final, kepala kelompok per divisi atau periode, tautan halaman, label cek silang, unduhan PDF/Excel). Juga menjawab apa yang harus disiapkan saat menambah alat atau endpoint GET baru sebagai sumber data Copilot: daftar periksa 19 butir, termasuk gerbang endpoint sumber, data upah, batas baris, resolver bulan, cek silang, dan peta halaman.",
+      "hash": "ad1a06cd0e2d0eb4ca8dacae10f754d970b88232e3f2b4daf9a410898492b18a",
+      "ukuran_kb": 52.8,
+      "ringkasan": "Menjawab: bagaimana jawaban berangka Copilot disajikan sebagai laporan (angka utama dengan perubahan periode, judul grafik berupa kesimpulan, satu paragraf per grafik, tabel lengkap, unduhan PDF/Excel) dan siapa yang memilih bentuk grafiknya. Juga berisi aturan warna, data tak dipotong, urutan baca 3-30-3, label cek silang, tautan halaman, serta daftar periksa saat menambah alat baru ke Copilot.",
       "kata_kunci": [
         "Copilot",
-        "laporan",
-        "assistant service",
-        "menambah alat",
-        "sumber data Copilot",
-        "endpoint GET baru",
-        "daftar periksa",
+        "penyajian laporan",
+        "report presentation",
         "grafik",
+        "chart",
+        "temuan",
         "PDF Excel export",
-        "cek silang"
+        "bentuk_bawaan",
+        "laba_produk",
+        "tambah alat Copilot"
       ]
     },
     {
@@ -19935,6 +19979,34 @@
         "paket izin audit",
         "audit-bharata",
         "fase implementasi"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Copilot Kueri Eksploratif.md",
+      "judul": "ANALISA - Copilot Kueri Eksploratif",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": "🟡",
+      "status_teks": "Blueprint dari `/analisa-kebutuhan` 2026-10-12. Keputusannya di [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja atas Data Bisnis Berdaftar-Izin, Dijalankan Service Pemilik]]; dok domain [[Microservices - Assistant Service]] § Tool kueri eksploratif. Dok ini papan kerja, bukan arsitektur.",
+      "publik": false,
+      "tautan": [
+        "ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja atas Data Bisnis Berdaftar-Izin, Dijalankan Service Pemilik",
+        "Microservices - Assistant Service"
+      ],
+      "hash": "38e92d6436ea38406012e86ee8049edd50cf55d11d949779c6fb62115fb20722",
+      "ukuran_kb": 9.5,
+      "ringkasan": "Menjawab: bagaimana pekerjaan tool kueri eksploratif Copilot dipecah jadi issue (induk dan tiga sub-issue: eksekutor BE, tool BE, label FE), apa kriteria yang harus benar di tiap bagian, dan urutan deploy-nya. Juga mencatat syarat PROD (persetujuan Direksi, user Mongo read-only dibuat manusia) dan data pendukung dari pengukuran percakapan Copilot di prod.",
+      "kata_kunci": [
+        "ANALISA",
+        "Copilot",
+        "kueri eksploratif",
+        "exploratory query",
+        "sub-issue",
+        "eksekutor",
+        "bip-erp#3023",
+        "label eksploratif",
+        "read-only user",
+        "blueprint"
       ]
     },
     {

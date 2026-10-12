@@ -26,7 +26,7 @@ Deploy: user read-only (manusia), env URI baru + `--force-recreate` marketing-an
 ### Induk: Copilot: tool kueri eksploratif baca-saja (ADR 0173)
 
 - **Repo**: bip-erp
-- **Issue**: bip-erp#(diisi saat dibuat)
+- **Issue**: [bip-erp#3023](https://github.com/bip-itteam-internal/bip-erp/issues/3023)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -62,7 +62,7 @@ Tidak ada.
 ### 1/3 [BE] Eksekutor kueri eksploratif baca-saja di marketing-analytics
 
 - **Repo**: bip-erp (sub-issue induk)
-- **Issue**: bip-erp#(diisi saat dibuat)
+- **Issue**: [bip-erp#3024](https://github.com/bip-itteam-internal/bip-erp/issues/3024)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -105,7 +105,7 @@ ADR 0173 Diterima.
 ### 2/3 [BE] Tool `kueri` di assistant-service
 
 - **Repo**: bip-erp (sub-issue induk)
-- **Issue**: bip-erp#(diisi saat dibuat)
+- **Issue**: [bip-erp#3025](https://github.com/bip-itteam-internal/bip-erp/issues/3025)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -144,7 +144,7 @@ Ukur prod `assistant_db.percakapan` 2026-10-12: 158 giliran, 10 penanya; jawaban
 ### 3/3 [FE] Label eksploratif dan teks kueri di layar Copilot
 
 - **Repo**: erp-frontend (sub-issue induk)
-- **Issue**: erp-frontend#(diisi saat dibuat)
+- **Issue**: [erp-frontend#2366](https://github.com/bip-itteam-internal/erp-frontend/issues/2366)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
