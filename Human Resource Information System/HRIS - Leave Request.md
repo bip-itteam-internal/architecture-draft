@@ -102,7 +102,17 @@ Rantai **2 tingkat**: **Supervisor departemen → HR**. Supervisor dideteksi via
 
 - Jenis & subtipe harus valid (`IsLeaveRequestTypeValid` / `IsLeaveRequestSubtypeValid`)
 - Durasi dibatasi `max_range` per subtipe (mis. Melahirkan/keguguran 90 hari, Izin "Tidak masuk kerja" maks 2 hari, "Pulang cepat" hari yang sama)
-- **Cuti tahunan**: cek & **decrement kuota** lewat [[Microservices - Employee Service]] (`/vacation/decrement`)
+- **Cuti tahunan**: cek & **decrement kuota** lewat [[Microservices - Employee Service]] (`/vacation/decrement`), dihitung **hari kerja** (§Durasi = hari kerja)
+
+### Durasi = hari kerja
+
+Durasi pengajuan izin/cuti adalah **hari kerja pemohon** di rentang `from_date..to_date` (hari WIB, inklusif): hari libur menurut jadwal orang itu **tidak dihitung**. Izin Sabtu sampai Senin untuk orang yang Minggu-nya libur = **2 hari**, bukan 3 (bip-erp [#2983](https://github.com/bip-itteam-internal/bip-erp/pull/2983), my-bharata [#215](https://github.com/bip-itteam-internal/my-bharata/pull/215), 2026-10-12).
+
+- **Jadwal orangnya** diresolusi dengan resolver yang sama dengan kalender presensi (`getEmployeeScheduleDateRange`: event perusahaan > roster > libur nasional/perusahaan > jadwal dasar statis/rotasi, plus tukar shift yang disetujui). Jadi "hari libur" berbeda per orang: shift, roster, dan pola rotasi ikut, bukan "Minggu tetap".
+- **Penentu libur = `isHolidaySchedule`** (`services/attendance/func.go`): `OFF-DUTY`, `NATIONAL_HOLIDAY`, `COMPANY_HOLIDAY`, `REPLACEMENT_DAY_OFF`. ⚠️ **`COMPANY_EVENT` dihitung HARI KERJA** (tidak ada di daftar itu), sehingga cuti di hari event perusahaan ikut memotong kuota. Mengubahnya cukup satu baris di `isHolidaySchedule`, dan perubahan itu sekaligus menggeser angka tampilan, cek kuota, dan pemotongan.
+- **Ditampilkan** lewat field opsional `hari_kerja` di `GET /requests/mine`, `GET /hr/requests`, dan `GET /request/view` (riwayat, detail `?id=`, daftar penyetuju). Hanya diisi untuk izin/cuti yang melintasi **lebih dari satu hari**; field hilang = klien memakai hitungannya sendiri. Dihitung sesudah potong halaman, jadi hanya baris yang dikirim yang diresolusi.
+- **Form pengajuan di MyBharata** menghitung durasinya sendiri dari jadwal pemakai, memakai flag `is_off_day` di tiap baris `GET /schedule` (penentu yang sama). Daftar jenis libur salinan app (`ScheduleTypes.holidays`: memuat `COMPANY_EVENT` dan `LIBUR`, tak mengenal `REPLACEMENT_DAY_OFF`) **tidak lagi dipakai untuk durasi**, hanya untuk tampilan kalender.
+- **Dinas tetap hari kalender** (tidak memakai `hari_kerja`).
 - Dokumen pendukung di-upload via [[Microservices - File Service]]. **Opsional untuk semua jenis KECUALI Sakit**, yang ditolak 400 bila berkasnya kosong (lihat §Sakit WAJIB berlampiran)
 
 ## Kuota Cuti Tahunan
@@ -120,7 +130,8 @@ Vacation { available bool; quota int; used int; history []time.Time }
 - **Tidak ada penerbit hak sama sekali.** Satu-satunya penulis `quota` adalah `POST /vacation/quota`, dipanggil hanya dari modal edit per baris di layar Kelola Cuti ([[APP - Web ERP]]).
 - `cronResetAnnualLeave` (1 Januari 00:05 WIB, [[IT - Background Jobs & Schedulers]]) **bukan** pemberi jatah: filternya `vacation.quota > 0` dan isinya hanya menyetel `used=0, available=true, history=[]`. Karyawan berkuota 0 dilewati selamanya, dan sisa cuti hangus **satu tahun lebih cepat** dari yang diatur.
 - Gerbang di attendance menolak `Cuti tahunan` dengan **400 `Annual leave (vacation) quota has not been set, contact HR`** (kode `VACATION_QUOTA_UNSET`) begitu kuotanya 0.
-- Pemotongan menghitung **hari kalender**, bukan hari kerja, sehingga cuti Jumat sampai Senin memotong 4 hari padahal jatahnya dinyatakan dalam hari kerja.
+- ✅ **Pemotongan dan cek sisa kuota menghitung HARI KERJA pemohon** sejak bip-erp [#2983](https://github.com/bip-itteam-internal/bip-erp/pull/2983) (merged + PROD 2026-10-12). Sebelumnya hari kalender, sehingga cuti Jumat sampai Senin memotong 4 hari. Satu sumber hitungan: `services/attendance/hari_kerja_pengajuan.go` (`tanggalKerjaPengajuan`), dipakai cek kuota saat `POST /request/create` **dan** `decrementVacationQuota` saat HR menyetujui, jadi angka yang dicek sama dengan yang dipotong. Rincian penentu libur di §Durasi = hari kerja.
+	- ⚠️ **Jadwal tak terbaca → kembali ke hari kalender** (perilaku lama, dicatat di log `[Hari Kerja]`), bukan nol. Lebih baik terpotong seperti dulu daripada tidak terpotong sama sekali.
 - **Cuti Bersama tidak menyentuh saldo.** Pemotongan hanya terjadi untuk `LeaveType = Cuti` dengan subtipe persis `Cuti tahunan`.
 
 ### ⛔ `vacation.quota` BUKAN jatah tahunan

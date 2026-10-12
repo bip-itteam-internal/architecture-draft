@@ -65,7 +65,7 @@
 **Views Karyawan & HRIS**
 - `GET /entries` — daftar entry absensi (RequireHRISStaff).
 - `GET /history` — riwayat bulanan per karyawan.
-- `GET /schedule` — jadwal kerja karyawan.
+- `GET /schedule` — jadwal kerja karyawan. Tiap baris membawa **`is_off_day`** (= `isHolidaySchedule(schedule)`, sejak bip-erp #2983, 2026-10-12): penentu hari libur yang sama dengan hitungan hari kerja pengajuan dan kuota cuti, dipakai form pengajuan MyBharata untuk menghitung durasi.
 - `GET /today?view=resolve|team` — kehadiran hari ini (mode resolve atau team).
 - `PATCH /mood` + `GET /mood` — set & ambil mood karyawan.
 
@@ -93,6 +93,7 @@
 - `POST /request/create` — buat request (multipart + upload via file service, rantai review supervisor→HR, cek kuota cuti). **Idempoten** (guard `duplicateLeaveRequestFilter`, `request_dedup.go`): sebelum `InsertOne`, cek duplikat **berbasis konten** — `employee_id` + `leave_type` + `leave_subtype` + `from_date` + `to_date` yang masih **aktif** (status `Waiting`/`Approved`). Bila ada, kembalikan sukses **tanpa insert baru** (mencegah data ganda dari retry saat jaringan tak stabil — respons hilang padahal data sudah tersimpan). Status terminal (`Rejected`/`Canceled`/`Ignored`) tetap boleh diajukan ulang. Catatan: `reason` & lampiran **tidak** masuk identitas dedup — pengajuan kedua dengan alasan beda tapi tipe/subtipe/tanggal sama tetap dianggap duplikat.
 - `GET /request/view?as=reviewer|reviewed` — lihat request sebagai reviewer atau yang direview.
 - `PATCH /request/review` — approval SPV/HR + notif + auto-apply cuti + decrement kuota.
+- **Hari kerja pengajuan** (`hari_kerja_pengajuan.go`, bip-erp [#2983](https://github.com/bip-itteam-internal/bip-erp/pull/2983), PROD 2026-10-12): `tanggalKerjaPengajuan` = tanggal di rentang izin/cuti yang bukan hari libur menurut jadwal pemohon (resolver `getEmployeeScheduleDateRange` + `isHolidaySchedule`). Satu sumber untuk tiga pemakai: field opsional **`hari_kerja`** di `GET /requests/mine`, `GET /hr/requests` (diisi sesudah potong halaman) dan `GET /request/view`; **cek sisa kuota** Cuti tahunan di `POST /request/create`; dan **`decrementVacationQuota`** saat HR menyetujui. Jadwal tak terbaca → kembali ke hari kalender. Hanya izin/cuti lintas hari yang diresolusi (beberapa query per hari per pengajuan), rentang maks 200 hari. ⚠️ `COMPANY_EVENT` dihitung hari kerja. Aturannya: [[HRIS - Leave Request]] §Durasi = hari kerja.
 - `PATCH /request/cancel` — pembatalan request.
 - `GET /request/security-lookup` — lookup oleh security (RequireSecurity).
 - `PATCH /request/security-verify` — verifikasi oleh security.

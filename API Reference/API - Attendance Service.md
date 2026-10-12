@@ -35,7 +35,7 @@
 | Method | Path | Fungsi | Auth |
 |---|---|---|---|
 | POST | `/request/create` | Ajukan cuti (multipart + dokumen). **Idempoten**: dedup berbasis konten (`employee_id`+`leave_type`+`leave_subtype`+`from_date`+`to_date` yang masih `Waiting`/`Approved`) → pengajuan identik dianggap sukses tanpa duplikat | header |
-| GET | `/request/view` | Lihat pengajuan (`?as=reviewer|reviewed`) | header |
+| GET | `/request/view` | Lihat pengajuan (`?as=reviewer|reviewed`). Tiap dokumen membawa field opsional **`hari_kerja`** (lihat catatan di bawah tabel `/requests/mine`) | header |
 | PATCH | `/request/review` · `/request/cancel` | Approve/reject / batal | header |
 | GET/PATCH | `/request/security-lookup` · `/request/security-verify` | Verifikasi security cuti per-jam | Security |
 
@@ -111,6 +111,8 @@ Ringkasan/detail **lintas jenis** (Izin/Cuti/Sakit/Dinas/Koreksi/Tukar, plus **B
 | GET | `/requests/mine` | Ringkasan pengajuan **milik pemanggil** ("Aktivitas Saya", Riwayat); `?filter=ongoing/past`, `?type=`, `?page=`/`?limit=` (bawaan 20, maks 100), `?include=booking`. Bentuk `HRRequestSummary` (header + `steps` timeline review + tanggal per jenis) | header |
 | GET | `/hr/requests` | Daftar ringkas untuk **peninjau / admin HR**. `?as=reviewer` (antrian) / `reviewed` (sudah) = difilter per peran **rekan / atasan(SPV) / HRD** (rekan hanya untuk Tukar); tanpa `as` = mode admin HR (hanya yang sudah sampai HRD). Filter `?type=`, `?status=`, `?department=`, `?search=`, `?from=`/`?to=` (yyyy-MM-dd, atas `metadata.created_at`), `?page=`/`?limit=` (bawaan 20, maks 100), `?include=booking` (hanya berlaku `as=reviewer`). Guard: pemohon tak muncul atas pengajuan sendiri | header; mode admin: `hris.pengajuan.view` (fallback dept HR / posisi Cost Control) |
 | GET | `/hr/requests/detail` | Dokumen penuh satu pengajuan by `?type=` & `?id=`; `?as=self` (pemilik) / `reviewer\|reviewed` (peninjau, filter per jenis; item tab "sudah" hanya cocok `as=reviewed`) / tanpa = admin HR. Body = doc per jenis (sama dengan `/*/view`) | header; mode admin: `hris.pengajuan.view` (fallback sama) |
+
+> **`hari_kerja`** (opsional, `int`, bip-erp [#2983](https://github.com/bip-itteam-internal/bip-erp/pull/2983), PROD 2026-10-12) di `/requests/mine`, `/hr/requests`, dan `/request/view`: jumlah **hari kerja pemohon** di rentang izin/cuti, melewati hari liburnya (izin Sabtu sampai Senin dengan Minggu libur = `2`). Hanya untuk izin/cuti yang melintasi **lebih dari satu hari** WIB; **kunci hilang** (`omitempty`) untuk pengajuan satu hari, jenis lain, atau jadwal pemohon tak terbaca, dan klien memakai hitungannya sendiri. Jangan dibaca sebagai `0`. Angka yang sama dipakai cek dan pemotongan kuota Cuti tahunan; aturannya di [[HRIS - Leave Request]] §Durasi = hari kerja. Pasangannya: tiap baris `GET /schedule` membawa **`is_off_day`** (`bool`) dari penentu libur yang sama.
 
 > FE mybharata: "Aktivitas Saya" pakai `/requests/mine`; "Review Submission" + kartu beranda pending pakai `/hr/requests` (+ `/hr/requests/detail` fetch-on-tap). Detail: [[APP - MyBharata]]. Aplikasi **selalu** mengirim `as`, jadi ia tak pernah menyentuh mode admin dan tak terpengaruh gerbang izinnya. Versi dengan Booking Ruang (my-bharata `1.18.3+165`, #149 merged ke `dev` 2026-09-15) juga selalu mengirim `page`/`limit` dan `include=booking`.
 
