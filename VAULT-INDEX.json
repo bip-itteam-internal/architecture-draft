@@ -17537,23 +17537,24 @@
         "ADR - 0165 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang",
         "ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai",
         "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
+        "buka:<alat>",
         "Microservices - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "db92aed53b6a70041952bad3c848939f249e16a610e6d6eb9ac119694b014385",
-      "ukuran_kb": 49.9,
-      "ringkasan": "Menjawab: bagaimana Copilot menyajikan jawaban berangka sebagai laporan (kartu angka utama dengan perubahan periode, judul grafik berupa kesimpulan, paragraf per grafik, tabel lengkap, unduhan PDF/Excel) dan siapa yang memilih bentuk grafiknya. Menjelaskan aturan pembanding periode, disiplin warna, data tidak dipotong, cakupan alat laba_produk/laba_toko vs jalur umum, serta daftar periksa saat menambah alat baru ke Copilot.",
+      "hash": "73835de5cd300fe650ef19cb25bc169feae83c02125a7fb6a1d26dae10d45c4d",
+      "ukuran_kb": 52.4,
+      "ringkasan": "Menjawab: bagaimana Copilot menyajikan jawaban berangka sebagai laporan (angka utama dan perubahannya, judul grafik berupa kesimpulan, paragraf per grafik, tabel lengkap, data belum final, kepala kelompok per divisi atau periode, tautan halaman, label cek silang, unduhan PDF/Excel). Juga menjawab apa yang harus disiapkan saat menambah alat atau endpoint GET baru sebagai sumber data Copilot: daftar periksa 19 butir, termasuk gerbang endpoint sumber, data upah, batas baris, resolver bulan, cek silang, dan peta halaman.",
       "kata_kunci": [
         "Copilot",
         "laporan",
         "assistant service",
+        "menambah alat",
+        "sumber data Copilot",
+        "endpoint GET baru",
+        "daftar periksa",
         "grafik",
-        "chart",
         "PDF Excel export",
-        "PutuskanBentuk",
-        "laba_produk",
-        "temuan",
-        "angka utama"
+        "cek silang"
       ]
     },
     {
