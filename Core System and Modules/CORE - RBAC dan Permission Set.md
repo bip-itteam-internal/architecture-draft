@@ -10,6 +10,7 @@
 - **Pendaftaran katalog employee-service PINDAH berkas.** Ketiga belas `common.RegisterCatalog` tak lagi berdesakan di `services/employee/main.go` melainkan tinggal di `services/employee/permission_catalogs.go`. Rujukan lama ke `main.go:<baris>` karena itu tak akan ketemu; berkas inilah satu-satunya tempat employee-service mendaftarkan katalog, dan ia yang harus disunting saat modul berikutnya berkatalog.
 - **Arah satu pintu (2026-10-10, belum ada kodenya)**: [[ADR - 0164 Hak Akses Satu Pintu, Peran Dibawa Paket Hak dan Dirakit saat Token Terbit]] (🟡 Diusulkan) memutuskan peran per modul tidak lagi diketik per akun, melainkan dibawa paket berjenis peran di jabatan dan dirakit saat token terbit, dengan bentuk keluaran yang tidak berubah. Sampai keputusan itu dijalankan, seluruh isi dok ini tetap menggambarkan keadaan yang berlaku.
 - **Arah izin HRIS per fitur (2026-10-10, belum ada kodenya)**: [[ADR - 0167 Izin HRIS Dipecah per Fitur dengan Cadangan Peran per Fitur]] (🟡 Diusulkan) memecah `hris.view`/`work`/`manage` menjadi pasangan lihat/kelola per fitur dengan cadangan peran per fitur. ⚠️ Bagian modul `hris` di dok ini (katalog "hanya `hris.view`", 12 rute baca) sudah basi: per 2026-10-10 katalognya 6 izin dan `gateHris` menggerbangi 37 rute baca dan tulis.
+- **Arah paket Semua Izin (2026-10-12, belum ada kodenya)**: [[ADR - 0172 Token Login Keluar dari Cookie dan Paket Semua Izin Dimekarkan saat Token Terbit]] (🟡 Diusulkan). Token Web ERP keluar dari cookie (batas 4 KB browser), dan paket bawaan yang dimekarkan jadi seluruh izin saat token terbit. Rincian di §Belum Diimplementasikan.
 
 ## Persona / Pengguna
 
@@ -397,6 +398,20 @@ Paket WMS adalah terjemahan langsung matriks tab yang sudah berjalan di `erp-fro
 > ⚠️ **MyBharata tidak menerima klaim izin sama sekali (diperiksa ke kode 2026-09-11).** Body login dari gateway hanya membawa `system_roles`, `department`, dan `position` (`api-gateway/main.go:316-325`), dan aplikasi menggerbang menunya dari `system_roles` yang di-cache lokal, yang meloloskan semua menu bila peran belum termuat. Paket izin karena itu tak bisa memunculkan atau menyembunyikan menu MyBharata apa pun; gerbang yang sungguhan harus ditanyakan ke server. Rencana pertama menu MyBharata yang digerbang izin (modul tersendiri, tertutup sejak awal, supaya tak mencabut fallback tier `hris`/`formbuilder` pemegangnya): [[ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir]]. Menu Satgas di branch T6 (PR draft my-bharata [#144](https://github.com/bip-itteam-internal/my-bharata/pull/144), 2026-09-12) menjadi yang pertama: izinnya ditanyakan ke `GET /me/satgas`, dan barisnya di `home_quick_access.dart` dievaluasi sebelum jalan pintas `roles == null`.
 
 ## Belum Diimplementasikan / Catatan
+
+### 🟡 Paket bawaan "Semua Izin" dan batas cookie 4 KB (2026-10-12, belum ada kodenya)
+
+Keputusannya di [[ADR - 0172 Token Login Keluar dari Cookie dan Paket Semua Izin Dimekarkan saat Token Terbit]]. Ringkas cara kerjanya:
+
+- **Masalah yang dijawab.** Klaim `permissions` tumbuh mengikuti jumlah paket. Web ERP menyimpan JWT di cookie `token`, dan browser membuang diam-diam cookie di atas ±4 KB, sehingga akun berhak banyak terpental ke `/login`. Buffer server 32 KB ([[CORE - API Master Gateway]]) tidak menolong batas browser ini. ⚠️ Perkiraan ±11,4 KB di [[ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya]] hanya dinilai terhadap buffer server.
+- **Penyimpanan token** pindah ke `localStorage`, dengan cookie penanda kecil untuk `proxy.ts` ([[APP - Web ERP]]). Ini menghapus batas 4 KB bagi semua akun, bukan hanya pemegang Semua Izin.
+- **Paket bawaan Semua Izin** dimekarkan di perakit izin (`hitungIzinEfektif`, dipanggil `rakitHakToken`) menjadi:
+  - seluruh izin setiap katalog terdaftar, **kecuali modul `menu`** ([[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]]);
+  - penanda `<modul>.$reach.all` per modul.
+- **Bentuk klaim tidak berubah.** Pemegangnya diperlakukan setiap konsumen persis seperti orang yang memegang seluruh izin itu satu per satu, termasuk logika yang **membatasi** karena memegang izin (staf AP procurement, antrean asli vs efektif).
+- **Yang tidak dibawa:** paket ini tidak menyentuh `system_roles`. Rute `proxy.ts` dan menu MyBharata yang digerbang peran tetap butuh perannya.
+- **Penetapan** mengikuti gerbang yang ada (`RequireITStaff` untuk akun, gerbang interim untuk posisi), **ditambah larangan memasang ke akun sendiri atau ke posisi yang sedang dipegang pemanggil**. Tanpa larangan itu, `PATCH /account/permission-sets` menerima `employee_id` pemanggil sendiri, sehingga staf IT mana pun bisa memberi dirinya akses penuh.
+- **Plafon baru = 32 KB buffer server.** Pemegang Semua Izin adalah kasus terburuk mutlak. Ukurannya wajib dicatat di sini saat kode naik (TBD).
 
 **Status penegakan per service** (scan 950 rute, 2026-07-29). "Telanjang" = rute user-facing tanpa middleware apa pun; rute sistem (`/internal`, `/public`, `/health`, `/webhook`) tidak dihitung.
 
