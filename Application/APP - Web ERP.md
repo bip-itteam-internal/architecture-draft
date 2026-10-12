@@ -10,7 +10,14 @@
 ## Autentikasi & Role
 
 - Login `employee_id` + password → `POST /auth/login` (gateway); `token`, `system_roles`, dll disimpan sebagai cookie. Bearer token auto-attach; proactive refresh via `/auth/refresh` (<60 detik sebelum expiry); interceptor 401 retry sekali lalu redirect `/login`.
-	- ⚠️ **Cookie `token` dibuang diam-diam oleh browser bila melewati ±4 KB**, dan akun berhak banyak lalu terpental ke `/login` sesaat setelah login berhasil (tanpa token → 401 → `redirectToLogin`). Pembacanya tersebar di tujuh berkas `getCookie("token")` ditambah `proxy.ts:164` (hanya memeriksa keberadaan). 🟡 Diputuskan pindah ke `localStorage` lewat satu modul, dengan cookie penanda kecil untuk `proxy.ts`; kode belum ada → [[ADR - 0172 Token Login Keluar dari Cookie dan Paket Semua Izin Dimekarkan saat Token Terbit]].
+	- ⚠️ **Sejak erp-frontend PR #2329 (merged 2026-10-12, `a93e46296`) JWT TIDAK lagi di cookie.** Ia ada di `localStorage["erp_web_token"]`, dan satu-satunya penulis, pembaca, dan penghapusnya adalah `src/lib/sesi-token.ts` (`simpanToken`/`bacaToken`/`hapusToken`).
+		- `proxy.ts` menggerbang sesi lewat cookie penanda `sesi_aktif` berisi `"1"` (`src/lib/sesi-penanda.ts`), berumur sama dengan token.
+		- Token yang lewat `exp` dianggap tidak ada, lalu dibersihkan bersama penandanya.
+		- Cookie `system_roles` dan cookie lain tetap.
+		- `sesi-token.pemindai.test.ts` menggagalkan test bila ada kode yang membaca atau menulis cookie `"token"` lagi.
+		- Alasannya: browser membuang diam-diam cookie di atas ±4 KB, sehingga akun berhak banyak terpental ke `/login`.
+		- Deploy dan perjalanan browser dengan token > 4 KB belum terverifikasi. Pengguna yang sedang login saat rilis keluar sekali.
+		- Keputusan → [[ADR - 0172 Token Login Keluar dari Cookie dan Paket Semua Izin Dimekarkan saat Token Terbit]].
 - **SSO Identity Provider** (mint one-time code via `POST /auth/sso/ticket`):
 	- *Inbound handoff*: jika login dengan query `?redirect_url=...`, setelah login di-redirect balik ke app tujuan dengan `?code=...`
 	- *Outbound launch*: ⚠️ **tak ada lagi tombol/menu peluncur** di sidebar. Yang tersisa di kode hanya penanganan `redirect_url` di `app/login/page.tsx` (allowlist: `NEXT_PUBLIC_SSO_ALLOWED_ORIGINS`, subdomain `bharatainternasional.com`, localhost, dan `NEXT_PUBLIC_TASK_MANAGER_APP_URL`), jadi app tujuan yang harus mengarahkan user ke ERP lebih dulu

@@ -25,6 +25,11 @@ Urutan T2 dan T3: BE (employee-service) sebelum FE. Tidak ada env baru. Prod dij
 - **Dependensi**: tidak ada.
 
 ### T1. Token Web ERP disimpan di `localStorage` lewat satu modul
+- **Status 2026-10-12**:
+  - ✅ PR erp-frontend#2329 **merged** 2026-10-12 03:42 UTC (`a93e46296`), dan issue #2315 tertutup. Judge lolos di percobaan 2/3; percobaan 1 ditolak karena `proxy-roles.test.ts` masih memasang cookie `token`.
+  - Sisa: deploy prod (manusia), dan pengumuman "keluar sekali".
+  - Hanya test tertarget yang dijalankan (56 test), atas permintaan user. tsc/lint/build lolos di pre-push.
+  - **Perjalanan browser dengan token > 4 KB dan SSO belum dijalankan.**
 - **Repo**: erp-frontend.
 - **Isi**:
   - Satu modul sesi-token, satu-satunya penulis, pembaca, dan penghapus JWT.
@@ -41,6 +46,11 @@ Urutan T2 dan T3: BE (employee-service) sebelum FE. Tidak ada env baru. Prod dij
 - **Konsekuensi**: pengguna yang sedang login saat rilis keluar sekali. Umumkan sebelum deploy prod.
 
 ### T2. Paket bawaan Semua Izin di employee-service
+- **Status 2026-10-12**:
+  - `/kerjakan` berhenti GAGAL setelah 3 percobaan. Worktree lokal `be-2982-paket-semua-izin` belum commit, belum PR.
+  - Yang sudah benar menurut judge: pemekaran, pengecualian `menu`, daftar pemegang tidak memekarkan (keputusan user: Semua Izin hanya di token), dan perlindungan paket bawaan.
+  - Sisa temuan kritis: larangan memasang ke diri sendiri masih bisa dilewati di satu jalur penulisan akun. Rinciannya hanya di issue privat bip-erp#2982, **sengaja tidak ditulis di vault publik**.
+  - Menunggu keputusan user: satu percobaan tambahan, lanjut manual, atau penjaga diganti daftar-izin kunci.
 - **Repo**: bip-erp.
 - **Isi**:
   - Kunci paket bawaan baru, disinkron tiap start seperti paket bawaan lain (ADR 0164), tidak bisa disunting isinya.

@@ -11,7 +11,7 @@
 
 *Token login Web ERP berpindah dari cookie `token` ke `localStorage`, dengan cookie kecil penanda sesi untuk `proxy.ts`. Akibatnya ukuran token tak lagi dibatasi ±4 KB per cookie milik browser. Di atasnya ditambahkan paket bawaan "Semua Izin" yang dimekarkan perakit token menjadi seluruh izin katalog berjangkauan `all`. Bentuk klaim `permissions` tidak berubah, jadi tak satu pun dari ±120 konsumen izin perlu diajari penanda baru. Usulan awal "satu penanda super admin di token" ditolak.*
 
-- **Status**: 🟡 **Diusulkan**, opsi dipilih user 2026-10-12 lewat `/analisa-kebutuhan` (A lalu C; gerbang penetapan **tidak** dinaikkan ke Supervisor IT). Kode belum ada.
+- **Status**: 🟡 **Diusulkan**, opsi dipilih user 2026-10-12 lewat `/analisa-kebutuhan` (A lalu C; gerbang penetapan **tidak** dinaikkan ke Supervisor IT). Per 2026-10-12: §A **merged** ke erp-frontend `main` (PR #2329, `a93e46296`; deploy dan perjalanan browser token > 4 KB belum terverifikasi); §C belum ada PR.
 - **Path di repo**:
   - Opsi A (FE):
     - `erp-frontend/src/lib/sesi-token.ts` (baru)

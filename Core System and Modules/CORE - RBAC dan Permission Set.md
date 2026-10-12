@@ -404,14 +404,14 @@ Paket WMS adalah terjemahan langsung matriks tab yang sudah berjalan di `erp-fro
 Keputusannya di [[ADR - 0172 Token Login Keluar dari Cookie dan Paket Semua Izin Dimekarkan saat Token Terbit]]. Ringkas cara kerjanya:
 
 - **Masalah yang dijawab.** Klaim `permissions` tumbuh mengikuti jumlah paket. Web ERP menyimpan JWT di cookie `token`, dan browser membuang diam-diam cookie di atas ±4 KB, sehingga akun berhak banyak terpental ke `/login`. Buffer server 32 KB ([[CORE - API Master Gateway]]) tidak menolong batas browser ini. ⚠️ Perkiraan ±11,4 KB di [[ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya]] hanya dinilai terhadap buffer server.
-- **Penyimpanan token** pindah ke `localStorage`, dengan cookie penanda kecil untuk `proxy.ts` ([[APP - Web ERP]]). Ini menghapus batas 4 KB bagi semua akun, bukan hanya pemegang Semua Izin.
+- ✅ **Penyimpanan token** pindah ke `localStorage`, dengan cookie penanda kecil untuk `proxy.ts` ([[APP - Web ERP]]); merged ke erp-frontend `main` 2026-10-12, deploy belum terverifikasi. Ini menghapus batas 4 KB bagi semua akun, bukan hanya pemegang Semua Izin.
 - **Paket bawaan Semua Izin** dimekarkan di perakit izin (`hitungIzinEfektif`, dipanggil `rakitHakToken`) menjadi:
   - seluruh izin setiap katalog terdaftar, **kecuali modul `menu`** ([[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]]);
   - penanda `<modul>.$reach.all` per modul.
 - **Bentuk klaim tidak berubah.** Pemegangnya diperlakukan setiap konsumen persis seperti orang yang memegang seluruh izin itu satu per satu, termasuk logika yang **membatasi** karena memegang izin (staf AP procurement, antrean asli vs efektif).
 - **Yang tidak dibawa:** paket ini tidak menyentuh `system_roles`. Rute `proxy.ts` dan menu MyBharata yang digerbang peran tetap butuh perannya.
 - **Penetapan** mengikuti gerbang yang ada (`RequireITStaff` untuk akun, gerbang interim untuk posisi), **ditambah larangan memasang ke akun sendiri atau ke posisi yang sedang dipegang pemanggil**. Tanpa larangan itu, `PATCH /account/permission-sets` menerima `employee_id` pemanggil sendiri, sehingga staf IT mana pun bisa memberi dirinya akses penuh.
-- **Plafon baru = 32 KB buffer server.** Pemegang Semua Izin adalah kasus terburuk mutlak. Ukurannya wajib dicatat di sini saat kode naik (TBD).
+- **Plafon baru = 32 KB buffer server.** Pemegang Semua Izin adalah kasus terburuk mutlak. Perkiraan offline 2026-10-12 dari implementasi yang belum merge: klaim `permissions` pemegangnya ±235 entri (izin + penanda reach), ±5,4 KB JSON, belum termasuk klaim lain. Angka dari login nyata lewat gateway: TBD, dicatat di sini saat kode naik.
 
 **Status penegakan per service** (scan 950 rute, 2026-07-29). "Telanjang" = rute user-facing tanpa middleware apa pun; rute sistem (`/internal`, `/public`, `/health`, `/webhook`) tidak dihitung.
 
