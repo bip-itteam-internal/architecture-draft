@@ -4,13 +4,8 @@
 
 - **Yang berubah di layar**: karyawan yang memegang banyak hak akses tidak lagi "terpental" kembali ke halaman login di Web ERP. Di halaman Hak Akses ada satu paket baru, **Semua Izin**, yang memberi seluruh izin di semua modul tanpa harus mencentangnya satu per satu.
 - **Siapa terdampak**: semua pengguna Web ERP. Yang paling merasakan adalah akun berhak banyak (Direktur, tim IT, staf lintas modul) yang hari ini sudah atau akan segera melewati batas. Staf IT yang mengelola hak akses mendapat satu paket baru untuk dipasang.
-- **Yang tidak dijanjikan**:
-  - Paket Semua Izin membuka **izin**, bukan **peran modul**. Halaman yang masih digerbang peran modul, termasuk menu MyBharata seperti Buku Tamu atau Live Shift, tetap butuh peran modulnya dipasang terpisah.
-  - Aturan "tidak boleh menyetujui pengajuan sendiri" tetap berlaku bagi pemegang paket ini.
-  - Menu terbatas (izin `menu.*`) tidak ikut terbuka.
-  - Paket ini tidak bisa dipasang ke akun milik sendiri.
-  - Ukuran token **tidak mengecil**. Yang diperbaiki adalah tempat menyimpannya.
-- **Besaran kerja**: dua PR. Satu PR Web ERP untuk tempat penyimpanan token (kecil, ±7 berkas), dan satu PR backend employee-service plus satu PR Web ERP untuk paket Semua Izin (sedang). Penyimpanan token dikerjakan lebih dulu karena itu yang menghentikan login terpental.
+- **Yang tidak dijanjikan**: paket ini membuka **izin**, bukan **peran modul** (halaman dan menu MyBharata yang digerbang peran, seperti Buku Tamu atau Live Shift, tetap butuh perannya). Larangan menyetujui pengajuan sendiri tetap berlaku. Menu terbatas tidak ikut terbuka. Paket ini tidak bisa dipasang ke akun sendiri. Ukuran token **tidak mengecil**; yang diperbaiki tempat menyimpannya.
+- **Besaran kerja**: tiga PR. Satu PR Web ERP untuk penyimpanan token (kecil, ±7 berkas) dikerjakan lebih dulu karena itu yang menghentikan login terpental. Paket Semua Izin butuh satu PR backend employee-service dan satu PR Web ERP (sedang).
 
 ## Deskripsi
 
