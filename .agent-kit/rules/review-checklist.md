@@ -94,6 +94,13 @@ Kelas bug paling mahal di bip-erp: kodenya benar, tapi tak pernah terpanggil.
   supervisor. (PR #1047)
 - **Fallback yang meloloskan semua orang.** Bila resolver hak akses gagal/kosong lalu
   jatuh ke "izinkan", itu bug keamanan, bukan ketahanan. Cek arah fallback-nya.
+- **Alat Copilot baru memanggil endpoint yang hanya butuh login.** Copilot meneruskan JWT
+  penanya, jadi hak aksesnya persis sekuat gerbang endpoint sumber (ADR 0132). Endpoint tanpa
+  gerbang peran di pendaftaran rute, middleware grup, atau filter dokumen (cari berurutan,
+  `team-memory.md` § Gotchas backend Go) berarti siapa pun pemakai Copilot bisa membaca
+  datanya lewat pertanyaan. Data upah dan nominal per orang juga wajib masuk keluarga alat
+  bergerbang Copilot (ADR 0165). Rincian celah yang ditemukan ditulis di issue PRIVAT, bukan
+  di vault.
 
 ### C. Kelengkapan enum & nilai baru
 
@@ -394,6 +401,11 @@ perubahan X, kenapa ia bilang tidak ada?").
   lama yang masih beredar. **Deploy BE sebelum FE** untuk perubahan kontrak (FE fallback
   aman bila field baru belum ada).
 - Dok `API - <Service>.md` di vault tidak ikut diperbarui saat rute berubah.
+- **Endpoint GET baru berisi data bisnis tanpa keputusan Copilot.** Rencana (`/plan` §1)
+  atau badan PR wajib memuat satu baris `Copilot: ya / tidak, karena ... / nanti (<issue>)`.
+  Tanpa baris itu, endpoint lahir tanpa ada yang memutuskan apakah manajemen bisa
+  menanyakannya, dan alat Copilot yang menyusul kemudian sering ditulis tanpa membaca
+  gerbang dan bentuk sumbernya. Laporkan sebagai pertanyaan, bukan temuan kritis.
 
 ### J. Frontend (erp-frontend / mybharata)
 

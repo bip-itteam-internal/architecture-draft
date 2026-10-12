@@ -58,6 +58,14 @@ Yang wajib dicek di sini:
   menangnya sering berlapis, dan salinan itu pasti menyimpang.
 - **Kalender terpusat.** Fitur bertanggal WAJIB mendaftarkan feed ke `calendar-service`;
   dilarang bikin halaman kalender sendiri.
+- **Endpoint baca baru dan Copilot.** Rencana yang menambah endpoint GET berisi data bisnis
+  (ringkasan, rekap, peringkat, daftar yang wajar ditanyakan manajemen) WAJIB menulis satu
+  baris keputusan di artefak: `Copilot: ya (alat <nama>) / tidak, karena <alasan> / nanti
+  (<issue>)`. Tidak semua endpoint perlu jadi alat: yang hanya melayani satu layar (isian
+  dropdown, detail satu dokumen, daftar mentah tanpa arti bisnis) cukup "tidak". Bila "ya",
+  ikuti daftar periksa menambah alat di [[REF - Penyajian Laporan Copilot]], dan endpoint
+  sumbernya harus bergerbang peran, bukan sekadar butuh login (ADR 0132: Copilot mewarisi
+  lubang gerbang endpoint yang diteruskannya).
 - **Dok arsitektur di vault.** Apakah sudah ada dok/ADR yang mengatur ini? Rencana yang
   menyimpang wajib menyebut dok mana dan apakah penyimpangannya disengaja.
 
