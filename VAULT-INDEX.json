@@ -746,20 +746,20 @@
         "ADR - 0001 Akuntansi via Accurate",
         "CORE - API Master Gateway"
       ],
-      "hash": "2112a450200abbf942c68b731f0fb919761cb6c1a0bbcc4076a6a483ddc8a9a8",
-      "ukuran_kb": 55.4,
-      "ringkasan": "Menjawab: endpoint apa saja milik procurement-service di /api/procurement untuk master Pemasok dan Barang & Jasa (CRUD, usul nomor/kode, katalog dari Accurate, import awal, status sync), cermin baca-saja Pembelian, Permintaan/Pesanan/Penerimaan Barang ERP, Pengajuan Barang lima tipe, Tagihan Pemasok, Pembayaran, Aging Utang, Bukti Transfer, KPI Account Payable, dan Kas Kecil. Juga menjawab bentuk request/response, kode galat, dan cara autentikasinya (gateway key, permission-set dengan fallback tier).",
+      "hash": "ad3f0277707953e1eafa1c6517e7eda84056fc289b51b6ccedad8f4a284ad024",
+      "ukuran_kb": 53.5,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan procurement-service (master pemasok dan barang, cermin pembelian Accurate, permintaan/pesanan/penerimaan barang ERP, Pengajuan Barang lima tipe, tagihan pemasok, pembayaran vendor, aging utang, KPI Account Payable), bentuk request/response-nya, serta kode galatnya. Juga menjelaskan bagaimana akses digerbang lewat permission-set dengan fallback tier, dan bahwa rute Kas Kecil/Pengajuan Budget sudah dihapus.",
       "kata_kunci": [
-        "procurement-service",
-        "API pengadaan",
+        "procurement",
+        "pengadaan",
         "pemasok",
         "vendor",
         "barang dan jasa",
-        "pesanan pembelian",
-        "purchase order",
+        "Accurate sync",
         "pengajuan barang",
         "tagihan pemasok",
-        "aging utang"
+        "aging utang",
+        "account payable"
       ]
     },
     {
@@ -1494,6 +1494,7 @@
         "ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web",
         "API - Employee Service",
         "ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget",
+        "Finance - Kas Kecil dan Pengajuan Budget",
         "API - Learning Service",
         "ADR - 0102 Kesesuaian Materi Dinilai Peserta dan Dampak Pelatihan dari Kenaikan Skor KPI",
         "ADR - 0109 Penyelenggara Pelatihan Internal atau Eksternal dengan Master Vendor Milik HR dan Bank Sertifikat Dua Sumber",
@@ -1590,20 +1591,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "060650a8f792200a93e0fa416b95be8a292e0763f6b98e092595e824f729f5f3",
-      "ukuran_kb": 589.9,
-      "ringkasan": "Menjawab: apa saja stack, modul, dan fitur portal web ERP/HRIS (One Bharata), bagaimana login, penyimpanan token (localStorage + cookie penanda sesi), refresh token, dan peran SSO Identity Provider bekerja, serta bagaimana sidebar dan menu digerbang lewat system_roles dan izin. Juga menjelaskan dukungan multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan) dan konvensi data-fetching TanStack Query serta bagan Recharts.",
+      "hash": "236915b2260d18c14051e9f069d9384cc0c338025447aa630af4356cd192c8d9",
+      "ukuran_kb": 591.3,
+      "ringkasan": "Menjawab: apa itu portal web ERP One Bharata (erp-frontend), stack-nya, cara login dan penyimpanan token, bagaimana sidebar dan menu digerbang oleh system_roles dan izin, serta fitur multi-perusahaan dan SSO Identity Provider. Juga menjawab konvensi data-fetching TanStack Query, konvensi bagan Recharts, dan daftar modul/fitur yang sudah ada di layar.",
       "kata_kunci": [
         "Web ERP",
         "erp-frontend",
         "One Bharata",
         "hris-dashboard",
-        "login",
-        "token localStorage",
-        "SSO Identity Provider",
-        "system_roles",
-        "sidebar menu",
-        "multi-tenant"
+        "sidebar",
+        "SSO",
+        "login token",
+        "multi-perusahaan",
+        "TanStack Query",
+        "Recharts"
       ]
     },
     {
@@ -1911,7 +1912,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, **training**, **kpi**, **kaskecil**, **ga**, **formbuilder**, serta **secretary** (Kesekretariatan, peleburan `legal` + `rnd` sejak 2026-08-13 — `legal` sebagai modul tersendiri sudah dipensiunkan). **finance** punya katalog + 5 paket (`finance_view`, `finance_pelaksana`, `finance_admin`, `finance_ar`, `finance_ap`) dan menunya sudah bertanda izin, tetapi **belum ada endpoint yang memeriksanya**. 🟡 [[ADR - 0104 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres]] memutuskan dua izin baru untuk tab Selisih Retur di Auto Sync Retur, dan prefiksnya SENGAJA bukan `finance`: `returselisih.view` dan `returselisih.tandai` (alasan sama dengan `akuntansicv` — klaim izin modul menang atas cadangan tier modul itu). Ditegakkan di integration-service lewat `RequireReturSelisih`, dengan cadangan `common.ReturSelisihTierDefault` (finance/integration/integration_accurate/IT boleh melihat; hanya finance boleh menandai) yang dicerminkan tabel `FALLBACK` frontend. Menu Auto Sync Retur muncul bagi pemegang izin walau tanpa peran finance/integration, dan bagi mereka kategori Accurate disaring jadi menu itu saja. Modul **`menu`** (menu terbatas) **sudah merge** namun **belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
+      "status_teks": "Implemented (ada catatan). Lapisan **posisi-memegang-hak sudah live** (migrasi + resolver + layar Hak per Posisi & Siapa Boleh Apa), dan penegakan per-aksi jalan di **ticket**, **payroll**, **procurement**, **monitoring**, **hris**, **recruitment**, **training**, **kpi**, ~~**kaskecil**~~ (penegakannya dicabut 2026-10-12, lihat catatan modul `kaskecil` di bawah), **ga**, **formbuilder**, serta **secretary** (Kesekretariatan, peleburan `legal` + `rnd` sejak 2026-08-13 — `legal` sebagai modul tersendiri sudah dipensiunkan). **finance** punya katalog + 5 paket (`finance_view`, `finance_pelaksana`, `finance_admin`, `finance_ar`, `finance_ap`) dan menunya sudah bertanda izin, tetapi **belum ada endpoint yang memeriksanya**. 🟡 [[ADR - 0104 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres]] memutuskan dua izin baru untuk tab Selisih Retur di Auto Sync Retur, dan prefiksnya SENGAJA bukan `finance`: `returselisih.view` dan `returselisih.tandai` (alasan sama dengan `akuntansicv` — klaim izin modul menang atas cadangan tier modul itu). Ditegakkan di integration-service lewat `RequireReturSelisih`, dengan cadangan `common.ReturSelisihTierDefault` (finance/integration/integration_accurate/IT boleh melihat; hanya finance boleh menandai) yang dicerminkan tabel `FALLBACK` frontend. Menu Auto Sync Retur muncul bagi pemegang izin walau tanpa peran finance/integration, dan bagi mereka kategori Accurate disaring jadi menu itu saja. Modul **`menu`** (menu terbatas) **sudah merge** namun **belum berfungsi penuh** (celah akun-tanpa-paket, lihat §Belum Diimplementasikan). Modul lain masih bertumpu pada `system_roles` tier.",
       "publik": true,
       "tautan": [
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
@@ -1973,20 +1974,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "671b133a062fcd8bf538c508a22d7c7db108ea0fd11dae600cf8cf8d863056f3",
-      "ukuran_kb": 146.3,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja (tiga sumbu modul, tingkat aksi, cakupan/reach), apa itu paket hak (permission set) yang menempel di posisi, katalog izin modul mana saja yang terdaftar, dan bagaimana izin di-resolve saat login lalu ditegakkan di gateway, service, dan frontend. Juga mencatat fase dua (tier fallback), modul yang belum menegakkan izin, serta arah perubahan seperti paket Semua Izin dan izin HRIS per fitur.",
+      "hash": "a07f0a0c157d59a42499654afd3a0a0af3d34b494afbc93cb6a3ce8629ae94e9",
+      "ukuran_kb": 148.1,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja dalam tiga sumbu (modul, aksi, cakupan data), bagaimana paket izin menempel pada posisi/jabatan dan diresolusi saat login, serta di mana gerbangnya ditegakkan (gateway, service, frontend). Juga memuat katalog izin per modul yang terdaftar, fallback tier system_roles, fase dua, dan rencana paket Semua Izin serta batas cookie 4 KB.",
       "kata_kunci": [
         "RBAC",
-        "hak akses",
         "permission set",
-        "paket hak",
-        "katalog izin",
-        "reach",
-        "cakupan data",
+        "paket izin",
+        "hak akses",
         "system_roles",
+        "fallback tier",
         "posisi jabatan",
-        "JWT permissions"
+        "reach cakupan",
+        "katalog izin",
+        "Siapa Boleh Apa"
       ]
     },
     {
@@ -2177,22 +2178,20 @@
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "74ca3a97b66f2cef4d559b71983d23d9de443beb2b0b8e4009d43539ff10918a",
-      "ukuran_kb": 177.8,
-      "ringkasan": "Menjawab: bagaimana Copilot/asisten tanya-jawab lintas modul bekerja (tool memanggil endpoint lewat gateway dengan JWT pemakai, dilarang berhitung sendiri), tool apa saja yang ditawarkan per modul, dan penjaga anti angka karangan. Juga menjawab riwayat percakapan, Jadwal Tugas, umpan balik, status per gelombang, dan keputusan ADR terkait.",
+      "hash": "b098587b9b223bb60d9ef6547546d215e209f478282d89c5bccae7e1196fb9c6",
+      "ukuran_kb": 178.1,
+      "ringkasan": "Menjawab: bagaimana asisten AI Copilot di Web ERP menjawab pertanyaan angka bisnis dengan merutekan ke endpoint lewat gateway memakai JWT penanya, tool apa saja yang tersedia per modul (marketing, HRGA, dll), dan penjaga apa yang mencegah angka karangan. Juga menjelaskan keputusan rancangan (Tool Runner bukan LangGraph, asisten dilarang berhitung), riwayat percakapan, umpan balik, Jadwal Tugas, persona, dan keterbatasan yang diketahui.",
       "kata_kunci": [
-        "Copilot",
         "assistant service",
+        "Copilot",
         "asisten AI",
-        "tool",
-        "tanya-jawab",
-        "lintas modul",
+        "AI assistant",
+        "tool runner",
+        "chatbot",
+        "tanya jawab",
         "Jadwal Tugas",
-        "penjaga jawaban",
-        "ADR 0132",
-        "gateway",
         "LLM",
-        "rekap telat"
+        "penjaga jawaban"
       ]
     },
     {
@@ -2427,20 +2426,19 @@
         "Microservices - Notification Service",
         "APP - MyBharata"
       ],
-      "hash": "4aeebaf057ebbb23a9e0d7e14423cbfae4d198dd7cc30d1ab9950f85932dd46e",
-      "ukuran_kb": 12.2,
-      "ringkasan": "Menjawab: bagaimana berkas disimpan dan diberi izin di ERP, sepuluh prefix apa saja yang terdaftar dan mana yang punya kunci baca, serta kenapa berkas berizin dibaca lewat proxy sisi server alih-alih presigned URL. Menjelaskan perakitan peta access key yang melewati env kosong dan membuang kedua entri saat kunci bertabrakan, beserta alasan keduanya bukan panic. Memuat pula kelas kegagalan yang sudah tiga kali terjadi tanpa dilaporkan siapa pun: prefix yang terdaftar di kode tetapi env-nya lupa diisi, sehingga modulnya mati senyap berbulan-bulan, lengkap dengan daftar periksa dan cara membuktikannya dari hitungan prefix di log boot.",
+      "hash": "6a44c7669bcff441c8a7e4a28d5261bdca4097050db2e58fefeea4f23bf1fbe1",
+      "ukuran_kb": 12.4,
+      "ringkasan": "Menjawab: bagaimana file service di atas MinIO menyimpan, membaca, menyalin, memindah, dan menghapus berkas, serta bagaimana akses diotorisasi per prefix lewat access-key tulis dan baca. Juga menjelaskan cara menambah prefix baru (dan kenapa menambah di kode saja tidak cukup), presigned URL, dan pola proxy sisi server untuk berkas berizin.",
       "kata_kunci": [
-        "file-service",
+        "file service",
         "MinIO",
-        "access key",
+        "object storage",
+        "upload berkas",
+        "presigned URL",
         "prefix",
-        "upload",
-        "preview",
-        "proxy",
-        "env kosong",
-        "invalid access key",
-        "deploy"
+        "access key",
+        "download",
+        "file server"
       ]
     },
     {
@@ -2659,20 +2657,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "07469cf5e336cba0d1df41304c0342ee0c419d3bbb8cf43ec6ca6b9e94a888e1",
-      "ukuran_kb": 464.9,
-      "ringkasan": "Menjawab: apa tugas integration-service (integrasi marketplace TikTok Shop, TikTok Business/Ads, Shopee, Lazada dan bridging finansial ke Accurate), bagaimana order masuk lewat webhook dan diproses, serta endpoint apa saja yang tersedia untuk webhook, kredensial, hari libur, GMV Max, ICC, dan Accurate. Juga menjawab job sync apa yang berjalan dan bagian mana yang dicabut atau masih berupa rencana, seperti Meta Ads dan Desty.",
+      "hash": "b626dd08ce61309c2acd49f6f2101a81acc64eb187a7183eaeb02b70684ec554",
+      "ukuran_kb": 465.7,
+      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace (TikTok Shop, Shopee, Lazada, TikTok/Meta Ads) lewat webhook dan job sync, bagaimana order dinormalkan ke model transaction, dan bagaimana invoice serta retur di-push ke Accurate. Juga mencakup ICC mapping, shop ACL, affiliate, fulfillment WMS bridge, gross profit per produk, ulasan marketplace, worker cron, dan status sinkron per toko.",
       "kata_kunci": [
-        "integration-service",
+        "integration service",
         "marketplace",
         "TikTok Shop",
         "Shopee",
         "Lazada",
-        "webhook order",
-        "bridging Accurate",
-        "GMV Max",
-        "auto-ship",
-        "credential OAuth"
+        "Accurate",
+        "webhook",
+        "sinkron order",
+        "ICC",
+        "affiliate"
       ]
     },
     {
@@ -3050,7 +3048,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan), **sudah deploy dan terisi di produksi**. Sensus langsung `procurement_db` produksi **diukur prod 2026-09-12** (24 koleksi total): `pemasok` 139, `barang` 955, `pesanan_pembelian` 1.087, `penerimaan` 1.926, `faktur_pembelian` 2.055 (terakhir 2026-07-30), `permintaan_barang` 257, `katalog` 757, `kas_transaksi` 69, `pengajuan_budget` 1, `pengajuan_pembelian` 3 (modul LAMA, terakhir 2026-08-26, lihat bab Pengajuan Barang di bawah), `pengajuan_barang` 1 (modul BARU, 2026-09-02), `pembayaran` 0, `pengaturan_penyetuju_pembelian` 0. **Diukur ulang 2026-09-17**: `pesanan_pembelian` 1.093 dan `penerimaan` 1.936 (keduanya terbaru 2026-09-16), `katalog` 773, sedangkan `faktur_pembelian` (2.055, terbaru 2026-07-30), `kas_transaksi` (69, terbaru 2026-08-26), `pengajuan_barang` (1), dan `pembayaran` (0) tidak berubah. `pemasok` dan `barang` TIDAK berubah dari sensus 4 Agustus 2026 (masih 139/955; lihat catatan di §Belum Diimplementasikan). Frontend Master Pemasok, Barang & Jasa, dan ketiga tab Pembelian ada di `erp-frontend` (`src/features/procurement/`), lihat [[APP - Web ERP]].",
+      "status_teks": "Implemented (ada catatan), **sudah deploy dan terisi di produksi**. Sensus langsung `procurement_db` produksi **diukur prod 2026-09-12** (24 koleksi total): `pemasok` 139, `barang` 955, `pesanan_pembelian` 1.087, `penerimaan` 1.926, `faktur_pembelian` 2.055 (terakhir 2026-07-30), `permintaan_barang` 257, `katalog` 757, `kas_transaksi` 69, `pengajuan_budget` 1, `pengajuan_pembelian` 3 (modul LAMA, terakhir 2026-08-26, lihat bab Pengajuan Barang di bawah), `pengajuan_barang` 1 (modul BARU, 2026-09-02), `pembayaran` 0, `pengaturan_penyetuju_pembelian` 0. **Diukur ulang 2026-09-17**: `pesanan_pembelian` 1.093 dan `penerimaan` 1.936 (keduanya terbaru 2026-09-16), `katalog` 773, sedangkan `faktur_pembelian` (2.055, terbaru 2026-07-30), `kas_transaksi` (69, terbaru 2026-08-26), `pengajuan_barang` (1), dan `pembayaran` (0) tidak berubah. `pemasok` dan `barang` TIDAK berubah dari sensus 4 Agustus 2026 (masih 139/955; lihat catatan di §Belum Diimplementasikan). **Catatan 2026-10-12**: koleksi `kas_transaksi`, `kas_plafon`, `kas_parameter`, `kas_unit`, `kas_kategori`, `pengajuan_budget` di atas adalah data modul yang sudah DIHAPUS dari kode; **datanya TIDAK dihapus** (bip-erp#2997), hanya tak ada lagi yang membaca/menulisnya. `kas_jurnal_outbox` tetap dipakai Pengajuan Dana. Frontend Master Pemasok, Barang & Jasa, dan ketiga tab Pembelian ada di `erp-frontend` (`src/features/procurement/`), lihat [[APP - Web ERP]].",
       "publik": true,
       "tautan": [
         "CORE - API Master Gateway",
@@ -3075,20 +3073,20 @@
         "Microservices - Integration Service",
         "Finance - FAT Persona"
       ],
-      "hash": "1adcdb92ab8cc33c49f1a5f5acf925ea746c5e7a6761c42b5f31579828bc8429",
-      "ukuran_kb": 87.2,
-      "ringkasan": "Menjawab: apa tugas procurement-service, arah sinkron data dengan Accurate (master Pemasok/Barang dari ERP ke Accurate, Pembelian ditarik dari Accurate), struktur berkas, port, database, env kunci, dan sensus isi koleksi di produksi. Juga menjawab cara kerja Pengajuan Barang lima tipe (jenjang, antrean, notifikasi, jurnal, bukti transfer, serapan anggaran), tagihan dan pembayaran vendor, KPI Account Payable, penomoran, worker sync, import awal, model data, dan jebakan integrasi Accurate.",
+      "hash": "8239a9cdd9fee961359a0b8fc5b1610dccf960a5f1edf13d6a3485f348c3f7c7",
+      "ukuran_kb": 89.2,
+      "ringkasan": "Menjawab: bagaimana procurement-service mengelola master pemasok dan barang yang disinkronkan ke Accurate, menarik cermin pembelian dari Accurate, serta menjalankan permintaan/pesanan/penerimaan barang ERP dan Pengajuan Barang lima tipe beserta persetujuan, serapan anggaran, dan pembayaran vendor. Juga menjelaskan penomoran, worker sync, import awal, KPI Account Payable, model data, dan jebakan integrasi Accurate.",
       "kata_kunci": [
-        "procurement-service",
+        "procurement service",
         "pengadaan",
+        "purchasing",
         "pemasok",
-        "vendor",
-        "barang dan jasa",
-        "pembelian",
-        "purchase",
         "pengajuan barang",
-        "faktur pemasok",
-        "pembayaran vendor"
+        "pengajuan dana",
+        "purchase order",
+        "penerimaan barang",
+        "Accurate",
+        "serapan anggaran"
       ]
     },
     {
@@ -9907,9 +9905,9 @@
         "API - Finance Service",
         "APP - Web ERP",
         "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
+        "Finance - Kas Kecil dan Pengajuan Budget",
         "REF - Kepemilikan Data",
         "Microservices - Procurement Service",
-        "Finance - Kas Kecil dan Pengajuan Budget",
         "Microservices - Payroll Service",
         "Microservices - Integration Service",
         "Finance - Dashboard per Posisi (FAT)",
@@ -9923,17 +9921,20 @@
         "CORE - RBAC dan Permission Set",
         "API - Payroll Service"
       ],
-      "hash": "3ee713f82e11da5025f43bff355dfeb020c7cbffb921044b64f12fae40b0ff5b",
-      "ukuran_kb": 17.7,
-      "ringkasan": "Menjawab: bagaimana rancangan buku besar CV di dalam ERP (bukan CV FINCON eksternal) seharusnya bekerja — model data, gerbang kolom, tutup buku, dan siapa konsumen datanya (KPI Accounting CV, Tax Officer) — termasuk catatan 2026-09-26 bahwa bekas kartu dashboard posisi yang dirujuknya sudah dilebur/dihapus.",
+      "hash": "64ea7ec56eded7c0e0cb31d27cf80d5c4ac52944f917a2022b29ab37d79ace8b",
+      "ukuran_kb": 17.8,
+      "ringkasan": "Menjawab: bagaimana rencana membangun buku besar dan konsolidasi 40 CV grup di dalam ERP (bagan akun, jurnal, laporan keuangan per CV, konsolidasi, tutup buku) menggantikan FINCON, dan sumber jurnal otomatis apa yang direncanakan. Juga menjelaskan master entitas CV dan penugasan pemegang yang sudah ada, persona, kendala, dan hal yang belum diputuskan.",
       "kata_kunci": [
         "buku besar CV",
-        "rekonsiliasi kas CV",
-        "tutup buku CV",
-        "CV Ditugaskan",
-        "Accounting CV",
-        "PPh final PP 55",
-        "gerbang kolom"
+        "general ledger",
+        "konsolidasi",
+        "FINCON",
+        "entitas CV",
+        "bagan akun",
+        "chart of accounts",
+        "jurnal",
+        "tutup buku",
+        "laporan keuangan"
       ]
     },
     {
@@ -9966,20 +9967,19 @@
         "Finance - Big Pictures",
         "Finance - Incentive"
       ],
-      "hash": "576115524cd086a25898b2600492ca91a36820771577a4da4967529a162c0385",
-      "ukuran_kb": 22.0,
-      "ringkasan": "Menjawab: apa isi dashboard `/finance` sekarang, ke halaman mana isi tiap bekas tab posisi FAT pindah, di berkas mana kodenya (`features/finance/posisi/`), dan grafik atau indikator mana bersumber dari hook apa. Juga menjawab isi layar Tim Accounting (`/finance/tim-accounting`) beserta izin yang menentukan apa yang terlihat, keadaan tab Kas dan Bank, kebutuhan yang belum terpenuhi, prinsip \"tidak ada angka palsu\", dan rancangan isi menurut ADR 0076 beserta kebutuhan backend-nya.",
+      "hash": "4e812872e4cf54ce14aa6fa11e952221bd088fa97b10957b5041d6f19c19a4fd",
+      "ukuran_kb": 22.5,
+      "ringkasan": "Menjawab: apa isi dashboard Finance di /finance sesudah diringkas jadi Ringkasan Divisi dan Kamus & Catatan, ke modul mana isi tab per posisi lama (AR, accounting, supervisor) dipindahkan, dan apa yang tampil di layar Tim Accounting beserta izinnya. Juga menjawab grafik dan indikator yang sudah hidup, kebutuhan backend yang belum terpenuhi, dan rancangan isi menurut ADR 0076.",
       "kata_kunci": [
-        "dashboard per posisi",
+        "dashboard finance",
         "FAT",
-        "Finance Accounting Tax",
+        "dashboard per posisi",
         "Tim Accounting",
         "Ringkasan Divisi",
+        "AR",
         "piutang",
-        "aging",
-        "indikator target",
-        "kas dan bank",
-        "ruang kerja posisi"
+        "Kas dan Bank",
+        "KPI finance"
       ]
     },
     {
@@ -10044,21 +10044,20 @@
         "CORE - RBAC dan Permission Set",
         "HRIS - Payroll Persona"
       ],
-      "hash": "1e2e3459d8ea2d4ca4b5115cd54d2a1af69008b9975dd6a32046cfdd6a8d3bfd",
-      "ukuran_kb": 33.5,
-      "ringkasan": "Menjawab: siapa saja yang bekerja di divisi Finance, Accounting, dan Tax (Supervisor, Senior/Junior Accountant, AR, Account Payable, Cost Control, Tax Officer), tujuan tiap posisi, dan bagaimana pekerjaan mengalir antar posisi (uang keluar, uang masuk marketplace, tutup buku, kas kecil, pajak, insentif). Juga skenario gagal dan selisih akses nyata di produksi.",
+      "hash": "0c01bc38430d9ab886263669f64a5b4a2b37ba600a7e8939bbc9940b794b5fa1",
+      "ukuran_kb": 33.6,
+      "ringkasan": "Menjawab: siapa saja yang bekerja di divisi Finance, Accounting, dan Tax (Supervisor, Senior/Junior Accountant, AR Leader/Staff, Account Payable, Cost Control, Tax Officer), apa tujuan dan aksesnya, serta bagaimana pekerjaan mengalir antar posisi untuk uang keluar, uang masuk marketplace, tutup buku, kas kecil, pajak, dan insentif. Juga memuat skenario gagal dan selisih akses produksi dengan rancangan.",
       "kata_kunci": [
-        "FAT",
         "persona finance",
-        "finance accounting tax",
-        "account payable",
-        "AR",
-        "piutang",
-        "senior accountant",
+        "FAT",
+        "accounting",
         "tax officer",
+        "account payable",
+        "AR staff",
         "cost control",
         "alur kerja finance",
-        "akses posisi"
+        "peran",
+        "finance workflow"
       ]
     },
     {
@@ -10155,39 +10154,42 @@
       "area": "Finance System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Digantikan sebagian; kode kas kecil TETAP hidup dan dipakai, koreksi 2026-09-12.** Jalur **pengajuan budget** diganti [[ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget]] (dan modul pengganti itu sendiri sudah digantikan lagi, lihat catatan di bagian Tabrakan dengan Arsitektur); **kas kecil dipensiunkan bertahap** oleh ADR yang sama. Delapan PR kas kecil merge 5 Agustus 2026. **Koreksi**: versi dok sebelumnya menulis modul ini \"belum deploy, dan kini tidak akan dilanjutkan\"; itu usang. Diukur prod 2026-09-12: `kas_transaksi` **69** dokumen (terakhir 2026-08-26, 0 dalam 7 hari terakhir), `kas_plafon` **6**, `kas_parameter` **6**, `kas_unit` **1**, `kas_kategori` **1**, `kas_jurnal_outbox` **1**, `pengajuan_budget` **1** (2026-08-19). Modul ini SUDAH deploy dan datanya terus bertambah sesudah 5 Agustus, bukan berhenti di merge. Dokumen ini dipertahankan sebagai catatan aturan bisnis dan lubang data yang ditemukan; aturan yang masih berlaku bagi modul penggantinya adalah ambang nominal, bukan plafon per divisi.",
+      "status_teks": "**DIHAPUS dari kode 2026-10-12, diganti Pengajuan Dana** (bip-erp#2717; BE-1 PR #2990, BE-2 PR #2997, FE erp-frontend #2334/#2335/#2341, semua merged; diukur atas `origin/main` 2026-10-12). Rute `/kas/*` dan `/budget/*` tidak ada lagi; dok ini tinggal **catatan historis** aturan bisnis dan lubang data, BUKAN deskripsi sistem yang berjalan. Pengganti: Pengajuan Dana (koleksi `pengajuan_barang_*`, rute `/pengajuan-barang/*`), lihat bab Pengajuan Barang di [[Microservices - Procurement Service]] dan alur per peran di [[Finance - Proses Pengajuan Pengeluaran dan Persetujuan]]; keputusan penggantian awalnya [[ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget]]. Bagian \"Sudah Ada di Kode\" dan \"Endpoint\" di bawah menggambarkan kode SEBELUM penghapusan. Ringkasan apa yang tetap dan apa yang hilang ada di bagian **Setelah Penghapusan** persis di bawah. *Riwayat status sebelumnya (2026-09-12):* \"Digantikan sebagian; kode kas kecil TETAP hidup dan dipakai\"; angka prod saat itu (`kas_transaksi` 69, `kas_plafon` 6, `kas_parameter` 6, `kas_unit` 1, `kas_kategori` 1, `kas_jurnal_outbox` 1, `pengajuan_budget` 1) tetap valid sebagai ukuran historis dan datanya tidak dihapus.",
       "publik": true,
       "tautan": [
+        "Microservices - Procurement Service",
+        "Finance - Proses Pengajuan Pengeluaran dan Persetujuan",
         "ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget",
         "GA - Form Pengadaan dan Pengajuan Dana",
+        "Microservices - Assistant Service",
         "APP - Web ERP",
+        "API - Procurement Service",
+        "Microservices - File Service",
+        "CORE - RBAC dan Permission Set",
         "HRIS - Organization Structure",
         "ADR - 0001 Akuntansi via Accurate",
         "Microservices - Integration Service",
-        "Microservices - Procurement Service",
         "ADR - 0002 Database-per-Service",
         "GA - Inventory Management",
         "Finance - FAT Persona",
-        "Microservices - File Service",
         "Microservices - Employee Service",
-        "CORE - RBAC dan Permission Set",
         "External - Accurate",
         "GA - Procurement System",
         "Finance - Big Pictures"
       ],
-      "hash": "959206e4fd1f1259d359d38d007a6ef66ed4af4e78675ec2bb302c69d8c050f7",
-      "ukuran_kb": 33.4,
-      "ringkasan": "Menjawab: bagaimana aturan kas kecil per divisi dan pengajuan budget (plafon bulanan, sembilan aturan, matriks approval, alur status), apa yang sudah ada di kode procurement-service, lubang data apa yang ditemukan di produksi, dan bagaimana modul ini digantikan sebagian oleh pengajuan pembelian empat tipe. Juga mencatat tabrakan dengan ADR akuntansi via Accurate dan pertanyaan terbuka.",
+      "hash": "3387751e751c95019310c324000f4dbab9777fa4b901901a7088248c57ddba21",
+      "ukuran_kb": 36.5,
+      "ringkasan": "Menjawab: apa aturan bisnis kas kecil per divisi dan pengajuan budget menurut blueprint Finance (plafon, matriks approval, alur status), apa yang dulu ada di kode, dan kenapa modul ini dihapus 2026-10-12 lalu diganti Pengajuan Dana. Juga mencatat lubang data produksi, tabrakan dengan arsitektur (buku besar vs Accurate), dan pertanyaan terbuka sebagai catatan historis.",
       "kata_kunci": [
         "kas kecil",
         "petty cash",
         "pengajuan budget",
+        "budget request",
         "plafon",
+        "Pengajuan Dana",
         "approval",
-        "Finance",
-        "procurement",
-        "ADR 0055",
-        "kas_transaksi"
+        "blueprint finance",
+        "kaskecil"
       ]
     },
     {
@@ -10233,7 +10235,7 @@
       "area": "Finance System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)**. Master anggaran, varians, dan kas kecil ada; kas kecil pernah dipakai satu unit tetapi tidak ada transaksi baru sejak 2026-08-26 (diukur 2026-09-17); varians belum bisa ditelusuri ke transaksi dan pertanggungjawaban dana kegiatan belum ada.",
+      "status_teks": "**Implemented (ada catatan)**. Master anggaran dan varians ada; **modul kas kecil di ERP sudah DIHAPUS 2026-10-12** (bip-erp#2717, diganti Pengajuan Dana; pernah dipakai satu unit, tidak ada transaksi baru sejak 2026-08-26, diukur 2026-09-17); varians belum bisa ditelusuri ke transaksi dan pertanggungjawaban dana kegiatan belum ada.",
       "publik": true,
       "tautan": [
         "Finance - Proses Bisnis dan Kebutuhan Sistem",
@@ -10244,20 +10246,19 @@
         "Finance - Sambungan dan Permintaan Data Lintas Departemen",
         "Finance - FAT Persona"
       ],
-      "hash": "0f9230f0560bcc29301d10c122e333d255032d358c730c0252a41d6ed6ee981e",
-      "ukuran_kb": 5.0,
-      "ringkasan": "Menjawab: bagaimana Finance mengerjakan proses anggaran, kas kecil, dan dana kegiatan hari ini, fitur ERP apa yang sudah menopangnya (master anggaran OPEX, kartu Varians OPEX, breakdown mingguan, forecast kas mingguan, kas kecil), dan seperti apa alur target di sistem. Juga menjelaskan celah yang harus ditutup (varians belum tertelusur ke transaksi, pengajuan belum membawa pos anggaran, pertanggungjawaban dana kegiatan, cakupan forecast kas), kontrol pemisahan tugas yang wajib dijaga, dan ukuran efisiensinya.",
+      "hash": "3d27a8dffd745fca0029d8e670ae74c1e9293e1733914f54b2acb261be73babb",
+      "ukuran_kb": 5.3,
+      "ringkasan": "Menjawab: bagaimana proses anggaran, kas kecil, dan dana kegiatan (P9) Finance dikerjakan hari ini, apa yang sudah ada di ERP (master anggaran, varians) dan apa yang sudah dihapus, serta alur target dan celah yang harus ditutup. Juga menjawab kontrol yang wajib dijaga dan ukuran efisiensi, seperti pertanggungjawaban dana kegiatan dan penelusuran varians ke transaksi.",
       "kata_kunci": [
         "anggaran",
         "budget",
-        "kas kecil",
-        "petty cash",
-        "dana kegiatan",
-        "varians OPEX",
-        "forecast kas",
         "RAPB",
-        "Cost Control",
-        "P9"
+        "varians",
+        "kas kecil",
+        "dana kegiatan",
+        "pertanggungjawaban",
+        "reimburse",
+        "proses finance P9"
       ]
     },
     {
@@ -10340,20 +10341,19 @@
         "Finance - Big Pictures",
         "Finance - Dashboard per Posisi (FAT)"
       ],
-      "hash": "54a3b7ae2a17bf7d08632b89f9f7a901cb0a6d37521aba70dabc9d49aabe3b7b",
+      "hash": "43f51f1611fef3f48fbb1cf880c6646c46c0ef5fcea842290bcb788f1c13f9a6",
       "ukuran_kb": 19.4,
-      "ringkasan": "Menjawab: apa saja empat belas proses bisnis Finance (P1 sampai P14), posisi Finance mana yang mengerjakan proses apa, dan seberapa jauh ERP mencakup serta sesuai dengan kebutuhan tiap proses. Juga menjawab prinsip rancangan sistem Finance, pengelompokan celah A/B/C, urutan pengerjaan beserta ketergantungannya, pertanyaan wajib sebelum membangun, dan keputusan yang masih dibutuhkan dari manajemen.",
+      "ringkasan": "Menjawab: apa saja empat belas proses bisnis Finance, posisi mana mengerjakan proses apa, dan seberapa jauh ERP sudah mencakup tiap proses. Juga menjawab prinsip rancangan, kelompok kebutuhan A/B/C, urutan pengerjaan, pertanyaan wajib sebelum membangun, keputusan yang dibutuhkan, dan hal yang sengaja tidak dibangun.",
       "kata_kunci": [
-        "proses bisnis Finance",
-        "peta proses",
-        "FAT",
+        "proses bisnis finance",
+        "business process",
         "kebutuhan sistem",
+        "peta proses",
         "cakupan ERP",
         "gap analysis",
-        "posisi Finance",
-        "Accurate",
-        "FINCON",
-        "prioritas pengerjaan"
+        "finance requirements",
+        "urutan pengerjaan",
+        "FAT"
       ]
     },
     {

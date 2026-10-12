@@ -34,7 +34,7 @@ Diverifikasi ke `services/file/main.go` 2026-09-03.
 | `task/` | `MINIO_TASK_KEY` | ✅ | task-management |
 | `notification/` | `MINIO_NOTIFICATION_KEY` | ✅ | notification-service |
 | `form/` | `MINIO_FORM_KEY` | ✅ `MINIO_FORM_READ_KEY` | [[Microservices - Form Builder Service]] |
-| `kas-kecil/` | `MINIO_PROCUREMENT_KEY` | ❌ | procurement-service |
+| `kas-kecil/` | `MINIO_PROCUREMENT_KEY` | ❌ | procurement-service (modul Kas Kecil sudah dihapus 2026-10-12; grant **dipertahankan** supaya objek lama tetap bisa diaudit, `services/file/main.go:67-73`) |
 | `pengajuan-barang/` | `MINIO_PENGAJUAN_KEY` | ❌ | procurement-service. ⚠️ Env-nya kosong sampai 2026-09-04 |
 | `pembayaran/` | `MINIO_PEMBAYARAN_KEY` | ❌ | bukti transfer AP. ⚠️ Env-nya kosong sampai 2026-09-04 |
 | `pajak/` | `MINIO_PAJAK_KEY` | ❌ | arsip pajak finance-service. ⚠️ Env-nya KOSONG di prod dan dev sampai 2026-09-04 — fiturnya live tapi tak pernah bisa mengunggah |
@@ -115,7 +115,7 @@ Yang paling mahal `pembayaran/`: ia diberi prefix sendiri justru dengan alasan *
 
 `TestTakAdaPrefixYangBeririsan` memeriksa **seluruh pasangan** di `writeAccessEnv`: tak satu pun prefix boleh berada di dalam prefix lain, dan tak satu pun boleh kosong (prefix kosong memberi akses tulis ke seluruh bucket). Sebelumnya pemeriksaan itu hanya berjalan untuk `pengajuan-barang/`; digeneralisasi PR [#1699](https://github.com/bip-itteam-internal/bip-erp/pull/1699) karena menyalinnya tiap ada prefix baru berarti satu aturan hidup di banyak tempat.
 
-⚠️ Nested **object path** tidak terpengaruh: lampiran pengajuan budget disimpan di `kas-kecil/pengajuan-budget/…`, tapi itu letak objek di bawah satu prefix, bukan entri prefix kedua.
+⚠️ Nested **object path** tidak terpengaruh: lampiran pengajuan budget lama (modul dihapus 2026-10-12, objeknya tidak dihapus) disimpan di `kas-kecil/pengajuan-budget/…`, tapi itu letak objek di bawah satu prefix, bukan entri prefix kedua.
 
 ## Belum Diimplementasikan / Catatan
 

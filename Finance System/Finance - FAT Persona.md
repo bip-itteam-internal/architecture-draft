@@ -113,7 +113,7 @@
   - Angka varians di ERP sulit dipertanggungjawabkan saat ditanya lanjut karena **transaksi pembentuk realisasinya tidak terlihat**. Dicocokkan ke kode: kartu Varians OPEX hanya menyajikan total dan cacah pos lewat anggaran, tanpa daftar baris (`erp-frontend/src/features/finance/anggaran/components/kartu-varians-opex.tsx:65-94`); realisasi per akun memang tampil di breakdown mingguan (`types-mingguan.ts`), tetapi komponen anggaran tidak menaut ke transaksi Accurate mana pun (tautannya hanya ke `/finance/cost-control` dan `/finance/kpi`). Jalan menelusuri realisasi sampai transaksinya belum ada.
   - Memeriksa rekap gaji dari HRD per orang terhadap lampiran izin, SKS, dan jam absen, mulai sekitar tanggal 26. Rekap yang sama diperiksa lagi Senior Accountant dari sisi rekening dan PPh. Pemisahan tugas yang disengaja atau pemeriksaan ganda: **TBD** konfirmasi Supervisor FAT.
   - Memakai aplikasi buku besar CV [[APP - Buku Besar Konsolidasi CV FINCON]] sebagai alat kerja.
-  - Meminta proses pengajuan diotomasi. Pengajuan Barang dan kas kecil sudah ada di kode (Alur 1 dan 4), jadi yang kurang adopsinya.
+  - Meminta proses pengajuan diotomasi. Pengajuan Barang sudah ada di kode (Alur 1 dan 4; modul kas kecil di Alur 4 dihapus 2026-10-12, diganti Pengajuan Dana), jadi yang kurang adopsinya.
 
 ### Tax Officer: penjaga kepatuhan pajak
 - **Peran & Divisi**: Tax Officer (posisi prod "Tax Staff"), melapor ke Supervisor FAT (`erp-frontend/src/features/finance/posisi/data/tax.ts:20-26`).

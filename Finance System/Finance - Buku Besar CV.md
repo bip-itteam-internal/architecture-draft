@@ -11,7 +11,7 @@
 
 - **Buku CV di luar pagar.** FINCON membukukan 40 CV sejak 2026-08-05 dari repo pribadi dan database Supabase, dengan otorisasi hanya di peramban ([[ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate]]).
 - **Satu pembayaran dicatat berkali-kali.** Survei alur kerja Finance (2026-09-14) memperlihatkan pembayaran CV dicatat di voucher BKK FINCON, AppSheet, Kopra, jurnal, dan arsip kertas, oleh Junior Accountant yang masing-masing memegang sekelompok CV.
-- **ERP punya potongan-potongannya tanpa buku untuk dituju.** Pengajuan Barang, alokasi kas kecil per CV, payroll per badan usaha, dan data marketplace per toko sudah ada, tetapi seluruh jurnalnya menuju Accurate PT; tak ada buku per CV di ERP.
+- **ERP punya potongan-potongannya tanpa buku untuk dituju.** Pengajuan Barang, alokasi kas kecil per CV (modul kas kecil dihapus dari kode 2026-10-12, lihat [[Finance - Kas Kecil dan Pengajuan Budget]]), payroll per badan usaha, dan data marketplace per toko sudah ada, tetapi seluruh jurnalnya menuju Accurate PT; tak ada buku per CV di ERP.
 - **Identitas CV terpecah** di payroll, rekening Accurate, FINCON, dan katalog procurement, tanpa kunci bersama ([[REF - Kepemilikan Data]] §Duplikasi).
 
 ## Ruang Lingkup / Cakupan (business view)
