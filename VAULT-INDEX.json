@@ -93,6 +93,7 @@
       "tautan": [
         "Microservices - Employee Service",
         "API - Index",
+        "ADR - 0172 Token Login Keluar dari Cookie dan Paket Semua Izin Dimekarkan saat Token Terbit",
         "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
         "ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
@@ -132,20 +133,20 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "0534b0627cfe6dcc06ce7e492f3c2628f433f1b9f4c6d45f18eec7dac5f72c1c",
-      "ukuran_kb": 87.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service di balik `/api/employee/*` dan gerbang RBAC-nya, mulai dari auth/login/onboarding, CRUD personal & work data, dokumen, system-auth dan kelola akun, sampai master data (departemen, divisi, perusahaan/tenant, system role, jenjang jabatan, penyetuju departemen, menu-hidden). Juga menjawab kontrak rute KPI, vacation, kontrak kerja, resign/non-aktif, promosi & mutasi, Surat Peringatan, akun pihak luar, ringkasan pengajuan, listing/me, dan komplain QC, termasuk cara kerja `data-type` ber-`grouped` untuk label grup seperti HRGA.",
+      "hash": "896665f69e6085b820d3fe9181d90a75fd6604f646cebba5a575d10a011e8bac",
+      "ukuran_kb": 88.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki employee-service (login/auth, personal & work data, system-auth akun, master departemen/divisi/system role/perusahaan, jenjang jabatan, kontrak, resign, promosi/mutasi, surat peringatan, KPI) beserta gerbang RBAC tiap rute. Juga menjawab kunci apa yang boleh dikirim ke system-auth, cara menonaktifkan akun lewat active-status, dan cara memakai filter department grouped/all di data-type.",
       "kata_kunci": [
-        "API employee",
+        "employee-service",
         "endpoint karyawan",
-        "auth login",
-        "master data departemen",
-        "master divisi",
-        "system roles",
+        "system-auth",
+        "master department",
         "data-type grouped",
-        "account active-status",
-        "resign",
-        "KPI"
+        "active-status",
+        "nonaktif akun",
+        "jenjang jabatan",
+        "job level",
+        "permission-sets"
       ]
     },
     {
@@ -1591,20 +1592,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "236915b2260d18c14051e9f069d9384cc0c338025447aa630af4356cd192c8d9",
-      "ukuran_kb": 591.3,
-      "ringkasan": "Menjawab: apa itu portal web ERP One Bharata (erp-frontend), stack-nya, cara login dan penyimpanan token, bagaimana sidebar dan menu digerbang oleh system_roles dan izin, serta fitur multi-perusahaan dan SSO Identity Provider. Juga menjawab konvensi data-fetching TanStack Query, konvensi bagan Recharts, dan daftar modul/fitur yang sudah ada di layar.",
+      "hash": "0d68f6eb8809d370cb71eebc11e137bd67dea3a868dde309a3e7c082b8814667",
+      "ukuran_kb": 592.0,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS \"One Bharata\" (erp-frontend), stack-nya, cara login dan di mana token disimpan (localStorage + cookie penanda sesi), cara kerja SSO Identity Provider, serta bagaimana sidebar dan menu digerbang lewat system_roles dan izin. Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts, multi-perusahaan, dan daftar modul yang sudah atau belum diimplementasikan.",
       "kata_kunci": [
         "Web ERP",
         "erp-frontend",
         "One Bharata",
-        "hris-dashboard",
-        "sidebar",
+        "sidebar menu",
+        "system_roles",
         "SSO",
-        "login token",
-        "multi-perusahaan",
+        "token localStorage",
+        "multi-tenant",
         "TanStack Query",
-        "Recharts"
+        "Hak Akses"
       ]
     },
     {
@@ -1950,6 +1951,7 @@
         "APP - Web ERP",
         "ADR - 0090 Inspeksi Satgas 5R dan K3 di Form Builder dengan Nilai dari Cek Ulang Terakhir",
         "CORE - API Master Gateway",
+        "API - Employee Service",
         "LOG - 2026-07-30 Audit Otorisasi Employee Service",
         "ADR - 0038 Hak Per-Objek Admin Space Task Management",
         "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya",
@@ -1974,20 +1976,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "a07f0a0c157d59a42499654afd3a0a0af3d34b494afbc93cb6a3ce8629ae94e9",
-      "ukuran_kb": 148.1,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja dalam tiga sumbu (modul, aksi, cakupan data), bagaimana paket izin menempel pada posisi/jabatan dan diresolusi saat login, serta di mana gerbangnya ditegakkan (gateway, service, frontend). Juga memuat katalog izin per modul yang terdaftar, fallback tier system_roles, fase dua, dan rencana paket Semua Izin serta batas cookie 4 KB.",
+      "hash": "60e82e64dd07bf35ebc7e82e6bfc6c1cb654cae3d0fbd1b734ab73e034ebedcc",
+      "ukuran_kb": 149.7,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja (tiga sumbu modul, tingkat aksi, cakupan/reach), apa itu paket hak (permission set) yang menempel di posisi, modul mana yang sudah ditegakkan per-izin, katalog izin apa saja yang terdaftar, dan bagaimana izin dirakit ke JWT saat login. Juga menjelaskan cadangan tier (fallback), fase dua, paket Semua Izin, dan gerbang di layar frontend.",
       "kata_kunci": [
         "RBAC",
         "permission set",
-        "paket izin",
+        "paket hak",
         "hak akses",
-        "system_roles",
-        "fallback tier",
-        "posisi jabatan",
-        "reach cakupan",
         "katalog izin",
-        "Siapa Boleh Apa"
+        "reach",
+        "cakupan data",
+        "tier fallback",
+        "Semua Izin",
+        "posisi jabatan"
       ]
     },
     {
@@ -9662,8 +9664,8 @@
       "judul": "ADR - 0172 Token Login Keluar dari Cookie dan Paket Semua Izin Dimekarkan saat Token Terbit",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, opsi dipilih user 2026-10-12 lewat `/analisa-kebutuhan` (A lalu C; gerbang penetapan **tidak** dinaikkan ke Supervisor IT). Per 2026-10-12: §A **merged** ke erp-frontend `main` (PR #2329, `a93e46296`; deploy dan perjalanan browser token > 4 KB belum terverifikasi); §C belum ada PR.",
+      "status_emoji": "⚠️",
+      "status_teks": "**Implemented (ada catatan)**. Opsi dipilih user 2026-10-12 lewat `/analisa-kebutuhan` (A lalu C; gerbang penetapan **tidak** dinaikkan ke Supervisor IT); pengerjaannya diperintahkan user di sesi yang sama, dan baris \"Diterima\" formal belum ditulis siapa pun. Kode merged 2026-10-12: §A erp-frontend#2329, §C bip-erp#3002 + erp-frontend#2345. Deploy prod dan perjalanan browser belum terverifikasi.",
       "publik": true,
       "tautan": [
         "CORE - API Master Gateway",
@@ -9675,9 +9677,9 @@
         "ADR - 0137 Model Persetujuan Tunggal dan Pemisahan Tugas Lintas Modul",
         "APP - Web ERP"
       ],
-      "hash": "5ff7bdefeca54c58a203277701e33589818926afbaa98c41581b4d2cff1f0f66",
-      "ukuran_kb": 13.3,
-      "ringkasan": "Menjawab: kenapa akun berhak banyak terpental ke halaman login Web ERP (batas cookie ±4 KB browser), kenapa token dipindah ke localStorage dengan cookie penanda sesi, dan kenapa paket bawaan Semua Izin dimekarkan saat token terbit alih-alih penanda super admin di token. Juga menjelaskan batasan paket itu (bukan peran modul, menu terbatas dikecualikan, tidak bisa dipasang ke diri sendiri) dan konsekuensinya.",
+      "hash": "1a19940c01a5ea1b9201a67f07f17aa7cc7dabbed5e51b8201e3797e2eeb6e25",
+      "ukuran_kb": 13.4,
+      "ringkasan": "Menjawab: kenapa akun berhak banyak terpental ke halaman login Web ERP (cookie token melewati batas ±4 KB browser), kenapa token dipindah ke localStorage dengan cookie penanda sesi, dan kenapa usulan penanda super admin di token ditolak. Juga menjelaskan paket bawaan Semua Izin yang dimekarkan saat token terbit, batasannya (tak berlaku untuk peran modul, menu terbatas, dan akun sendiri), serta konsekuensinya.",
       "kata_kunci": [
         "ADR 0172",
         "token login",
@@ -9686,7 +9688,7 @@
         "terpental login",
         "Semua Izin",
         "super admin",
-        "rakitHakToken",
+        "JWT",
         "sesi_aktif",
         "permission set"
       ]
@@ -21481,20 +21483,20 @@
         "APP - Web ERP",
         "CORE - SSO Flow"
       ],
-      "hash": "be5125362e700e25274ff4b1e6a9aab6eee3feaa32b4840486b8e5cc04c1454d",
+      "hash": "65f048665617ba7bb1f1770d115b1d8ac58eacc0926285e64e14b42d8ab79803",
       "ukuran_kb": 7.0,
-      "ringkasan": "Menjawab: task apa saja yang diturunkan dari ADR 0172 (ukur ukuran token, pindah token ke localStorage, paket Semua Izin di employee-service, layar Hak Akses, sinkron dok), urutan deploy yang mengikat, serta issue GitHub dan progres tiap task. Berguna untuk mengetahui test dan verifikasi yang diminta per task dan apa yang masih tersisa.",
+      "ringkasan": "Menjawab: task apa saja yang diturunkan dari ADR 0172 (ukur ukuran token, pindah token ke localStorage, paket Semua Izin di employee-service, tampilan di layar Hak Akses, sinkron dok), PR dan issue GitHub mana yang terkait, serta urutan deploy yang wajib (FE token dulu, lalu BE sebelum FE). Juga memuat test dan langkah verifikasi tiap task.",
       "kata_kunci": [
         "analisa kebutuhan",
         "token login",
         "Semua Izin",
-        "localStorage",
-        "cookie 4 KB",
-        "hak akses",
         "urutan deploy",
+        "localStorage",
         "banding_token",
+        "Hak Akses",
         "daftar task",
-        "ADR 0172"
+        "super admin",
+        "JWT"
       ]
     },
     {

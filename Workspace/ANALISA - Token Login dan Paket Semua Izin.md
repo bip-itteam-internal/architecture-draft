@@ -47,10 +47,9 @@ Urutan T2 dan T3: BE (employee-service) sebelum FE. Tidak ada env baru. Prod dij
 
 ### T2. Paket bawaan Semua Izin di employee-service
 - **Status 2026-10-12**:
-  - `/kerjakan` berhenti GAGAL setelah 3 percobaan. Worktree lokal `be-2982-paket-semua-izin` belum commit, belum PR.
-  - Yang sudah benar menurut judge: pemekaran, pengecualian `menu`, daftar pemegang tidak memekarkan (keputusan user: Semua Izin hanya di token), dan perlindungan paket bawaan.
-  - Sisa temuan kritis: larangan memasang ke diri sendiri masih bisa dilewati di satu jalur penulisan akun. Rinciannya hanya di issue privat bip-erp#2982, **sengaja tidak ditulis di vault publik**.
-  - Menunggu keputusan user: satu percobaan tambahan, lanjut manual, atau penjaga diganti daftar-izin kunci.
+  - ✅ PR bip-erp#3002 **merged** 2026-10-12 04:36 UTC.
+  - Judge lolos pada percobaan 4, yaitu 3 percobaan + 1 tambahan yang disetujui user. Pada percobaan tambahan itu penjaga system-auth umum diganti daftar-izin kunci.
+  - Sisa: deploy employee-service, verifikasi lewat gateway (klaim + panjang token), dan prod **sesudah** T1 live.
 - **Repo**: bip-erp.
 - **Isi**:
   - Kunci paket bawaan baru, disinkron tiap start seperti paket bawaan lain (ADR 0164), tidak bisa disunting isinya.
@@ -69,6 +68,10 @@ Urutan T2 dan T3: BE (employee-service) sebelum FE. Tidak ada env baru. Prod dij
 - **Dependensi**: tidak ada di kode. **Deploy prod setelah T1 live.**
 
 ### T3. Layar Hak Akses menampilkan paket Semua Izin
+- **Status 2026-10-12**:
+  - ✅ PR erp-frontend#2345 **merged** 2026-10-12 05:12 UTC. Judge lolos percobaan 2/3.
+  - Sisa: deploy sesudah employee-service, dan perjalanan staf IT di browser.
+  - Issue lanjutan: dialog akses akun luar masih menawarkan paket ini.
 - **Repo**: erp-frontend, `src/app/(main)/it/hak-akses/page.tsx` dan modal permission set.
 - **Isi**:
   - Paket tampil di pemilih paket akun dan posisi, dengan keterangan bahwa isinya seluruh katalog kecuali menu terbatas.

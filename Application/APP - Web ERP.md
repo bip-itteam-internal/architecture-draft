@@ -18,6 +18,12 @@
 		- Alasannya: browser membuang diam-diam cookie di atas ±4 KB, sehingga akun berhak banyak terpental ke `/login`.
 		- Deploy dan perjalanan browser dengan token > 4 KB belum terverifikasi. Pengguna yang sedang login saat rilis keluar sekali.
 		- Keputusan → [[ADR - 0172 Token Login Keluar dari Cookie dan Paket Semua Izin Dimekarkan saat Token Terbit]].
+	- **Layar Hak Akses (`/it/hak-akses`) mengenali paket bawaan Semua Izin** sejak erp-frontend#2345 (merged 2026-10-12).
+		- Pengenalnya satu: `adalahPaketSemuaIzin` + `KUNCI_PAKET_SEMUA_IZIN` di `src/features/hris/master-data/lib/paket-peran.ts`.
+		- Barisnya tampil "Semua Izin" / "Semua modul" / "Bawaan sistem", tanpa aksi sunting/hapus, dan tidak muncul sebagai opsi modul `*` di filter.
+		- Di pemilih paket akun dan posisi ia bisa dipilih, dengan keterangan.
+		- Penolakan server (mis. memasang ke akun sendiri) tampil apa adanya.
+		- ⚠️ Dialog akses akun pihak luar (`features/hris/external-accounts/components/access-dialog.tsx`) belum memakai pengenal ini: paket tetap ditawarkan di sana walau backend selalu menolaknya.
 - **SSO Identity Provider** (mint one-time code via `POST /auth/sso/ticket`):
 	- *Inbound handoff*: jika login dengan query `?redirect_url=...`, setelah login di-redirect balik ke app tujuan dengan `?code=...`
 	- *Outbound launch*: ⚠️ **tak ada lagi tombol/menu peluncur** di sidebar. Yang tersisa di kode hanya penanganan `redirect_url` di `app/login/page.tsx` (allowlist: `NEXT_PUBLIC_SSO_ALLOWED_ORIGINS`, subdomain `bharatainternasional.com`, localhost, dan `NEXT_PUBLIC_TASK_MANAGER_APP_URL`), jadi app tujuan yang harus mengarahkan user ke ERP lebih dulu

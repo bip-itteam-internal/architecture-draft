@@ -10,7 +10,7 @@
 - **Pendaftaran katalog employee-service PINDAH berkas.** Ketiga belas `common.RegisterCatalog` tak lagi berdesakan di `services/employee/main.go` melainkan tinggal di `services/employee/permission_catalogs.go`. Rujukan lama ke `main.go:<baris>` karena itu tak akan ketemu; berkas inilah satu-satunya tempat employee-service mendaftarkan katalog, dan ia yang harus disunting saat modul berikutnya berkatalog.
 - **Arah satu pintu (2026-10-10, belum ada kodenya)**: [[ADR - 0164 Hak Akses Satu Pintu, Peran Dibawa Paket Hak dan Dirakit saat Token Terbit]] (🟡 Diusulkan) memutuskan peran per modul tidak lagi diketik per akun, melainkan dibawa paket berjenis peran di jabatan dan dirakit saat token terbit, dengan bentuk keluaran yang tidak berubah. Sampai keputusan itu dijalankan, seluruh isi dok ini tetap menggambarkan keadaan yang berlaku.
 - **Arah izin HRIS per fitur (2026-10-10, belum ada kodenya)**: [[ADR - 0167 Izin HRIS Dipecah per Fitur dengan Cadangan Peran per Fitur]] (🟡 Diusulkan) memecah `hris.view`/`work`/`manage` menjadi pasangan lihat/kelola per fitur dengan cadangan peran per fitur. ⚠️ Bagian modul `hris` di dok ini (katalog "hanya `hris.view`", 12 rute baca) sudah basi: per 2026-10-10 katalognya 6 izin dan `gateHris` menggerbangi 37 rute baca dan tulis.
-- **Arah paket Semua Izin (2026-10-12, belum ada kodenya)**: [[ADR - 0172 Token Login Keluar dari Cookie dan Paket Semua Izin Dimekarkan saat Token Terbit]] (🟡 Diusulkan). Token Web ERP keluar dari cookie (batas 4 KB browser), dan paket bawaan yang dimekarkan jadi seluruh izin saat token terbit. Rincian di §Belum Diimplementasikan.
+- **Paket Semua Izin (kode merged 2026-10-12, deploy belum terverifikasi)**: [[ADR - 0172 Token Login Keluar dari Cookie dan Paket Semua Izin Dimekarkan saat Token Terbit]]. Token Web ERP keluar dari cookie (batas 4 KB browser), dan paket bawaan dimekarkan jadi seluruh izin saat token terbit. Rincian di §Belum Diimplementasikan / Catatan.
 
 ## Persona / Pengguna
 
@@ -401,19 +401,31 @@ Paket WMS adalah terjemahan langsung matriks tab yang sudah berjalan di `erp-fro
 
 ## Belum Diimplementasikan / Catatan
 
-### 🟡 Paket bawaan "Semua Izin" dan batas cookie 4 KB (2026-10-12, belum ada kodenya)
+### ⚠️ Paket bawaan "Semua Izin" dan batas cookie 4 KB (kode merged 2026-10-12, deploy belum terverifikasi)
 
-Keputusannya di [[ADR - 0172 Token Login Keluar dari Cookie dan Paket Semua Izin Dimekarkan saat Token Terbit]]. Ringkas cara kerjanya:
+Keputusannya di [[ADR - 0172 Token Login Keluar dari Cookie dan Paket Semua Izin Dimekarkan saat Token Terbit]]. Kodenya merged 2026-10-12: bip-erp#3002 (backend), erp-frontend#2329 (penyimpanan token), dan erp-frontend#2345 (layar Hak Akses). Cara kerjanya:
 
 - **Masalah yang dijawab.** Klaim `permissions` tumbuh mengikuti jumlah paket. Web ERP menyimpan JWT di cookie `token`, dan browser membuang diam-diam cookie di atas ±4 KB, sehingga akun berhak banyak terpental ke `/login`. Buffer server 32 KB ([[CORE - API Master Gateway]]) tidak menolong batas browser ini. ⚠️ Perkiraan ±11,4 KB di [[ADR - 0078 Fase Satu WMS Menggabungkan Matriks dan Paket Hak, Bukan Menggantikannya]] hanya dinilai terhadap buffer server.
 - ✅ **Penyimpanan token** pindah ke `localStorage`, dengan cookie penanda kecil untuk `proxy.ts` ([[APP - Web ERP]]); merged ke erp-frontend `main` 2026-10-12, deploy belum terverifikasi. Ini menghapus batas 4 KB bagi semua akun, bukan hanya pemegang Semua Izin.
-- **Paket bawaan Semua Izin** dimekarkan di perakit izin (`hitungIzinEfektif`, dipanggil `rakitHakToken`) menjadi:
-  - seluruh izin setiap katalog terdaftar, **kecuali modul `menu`** ([[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]]);
-  - penanda `<modul>.$reach.all` per modul.
+- ✅ **Paket bawaan Semua Izin.**
+  - Bentuknya `key`/`jenis` = `semua_izin`, `module: "*"`, `permissions: []`, `reach: "all"`. Kunci tunggalnya konstanta `employee.KunciPaketSemuaIzin` (`shared-library/models/employee/paket_semua_izin.go`).
+  - Ikut `DefaultPermissionSets`, jadi tersinkron lewat seed/migrasi saat employee-service start.
+  - Paket ini tidak menyimpan daftar izin. Saat token terbit, `hitungIzinEfektif` (dipanggil `rakitHakToken`) memekarkannya lewat `MekarkanSemuaIzin()` menjadi:
+    - seluruh izin setiap katalog terdaftar, **kecuali modul `menu`** ([[ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign]]);
+    - penanda `<modul>.$reach.all` per modul.
+  - Izin katalog yang baru didaftarkan otomatis ikut terbawa.
 - **Bentuk klaim tidak berubah.** Pemegangnya diperlakukan setiap konsumen persis seperti orang yang memegang seluruh izin itu satu per satu, termasuk logika yang **membatasi** karena memegang izin (staf AP procurement, antrean asli vs efektif).
+- **Tidak dimekarkan di daftar pemegang izin** (keputusan user 2026-10-12). `permission_holders.go` memakai `izinKaryawanNyata`, sehingga pemegang Semua Izin bukan calon penyetuju dan bukan penerima notifikasi otomatis di tiap modul. ⚠️ Konsekuensinya, "boleh melakukan" dan "ditunjuk mengerjakan" sengaja berbeda untuk paket ini.
 - **Yang tidak dibawa:** paket ini tidak menyentuh `system_roles`. Rute `proxy.ts` dan menu MyBharata yang digerbang peran tetap butuh perannya.
-- **Penetapan** mengikuti gerbang yang ada (`RequireITStaff` untuk akun, gerbang interim untuk posisi), **ditambah larangan memasang ke akun sendiri atau ke posisi yang sedang dipegang pemanggil**. Tanpa larangan itu, `PATCH /account/permission-sets` menerima `employee_id` pemanggil sendiri, sehingga staf IT mana pun bisa memberi dirinya akses penuh.
-- **Plafon baru = 32 KB buffer server.** Pemegang Semua Izin adalah kasus terburuk mutlak. Perkiraan offline 2026-10-12 dari implementasi yang belum merge: klaim `permissions` pemegangnya ±235 entri (izin + penanda reach), ±5,4 KB JSON, belum termasuk klaim lain. Angka dari login nyata lewat gateway: TBD, dicatat di sini saat kode naik.
+- **Penetapan** mengikuti gerbang yang ada (`RequireITStaff` untuk akun, gerbang interim untuk posisi), karena per 2026-10-12 perusahaan belum punya Supervisor IT. Pengamannya ada di `services/employee/semua_izin_guard.go`, dan paket **ditolak** bila:
+  - dipasang ke akun sendiri (`PATCH /account/permission-sets`, 403);
+  - dipasang ke posisi yang sedang dipegang pemanggil (`PUT .../positions/:positionKey/permission-sets`, 403);
+  - ditambahkan, atau posisi pemegangnya diganti nama/key, lewat `PUT`/`POST /master/departments` (403);
+  - dipasang ke akun pihak luar (403);
+  - disunting atau dihapus (`PUT`/`DELETE /master/permission-sets/semua_izin`, 403).
+  Endpoint system-auth umum memakai daftar-izin kunci (lihat [[API - Employee Service]]), jadi `permission_sets` hanya bisa ditulis lewat jalur penetapan di atas.
+- ✅ **Layar Hak Akses** mengenali paket ini lewat satu pengenal (`adalahPaketSemuaIzin`, `features/hris/master-data/lib/paket-peran.ts`). Ia tampil dengan badge "Semua Izin" dan "Semua modul", tanpa aksi sunting/hapus, dan berlabel sendiri di Hak Efektif ([[APP - Web ERP]]).
+- **Plafon baru = 32 KB buffer server.** Pemegang Semua Izin adalah kasus terburuk mutlak. Perkiraan offline 2026-10-12: klaim `permissions` pemegangnya ±235 entri (izin + penanda reach), ±5,4 KB JSON, belum termasuk klaim lain. Angka dari login nyata lewat gateway: TBD.
 
 **Status penegakan per service** (scan 950 rute, 2026-07-29). "Telanjang" = rute user-facing tanpa middleware apa pun; rute sistem (`/internal`, `/public`, `/health`, `/webhook`) tidak dihitung.
 
