@@ -23,7 +23,7 @@
 *Mengubah dasar `chequeAmount` receipt Lazada dari jumlah hitungan per-order menjadi payout (uang cair), menandai selisih payout terhadap hitungan, dan membukukan selisihnya ke akun yang harus diputuskan Finance.*
 
 - **Tanggal**: 2026-10-09
-- **Hubungan**: audit BHA-297 (GitHub bip-erp#2199, butir C7). Berkaitan dengan [[ADR - 0119 Kompensasi TikTok Dipisah Menurut Sudah atau Belum Ada Uang Masuk]] (prinsip serumpun: uang yang benar-benar masuk menjadi dasar). Dokumentasi layanan: [[Microservices - Integration Service]].
+- **Hubungan**: audit BHA-297 (GitHub bip-erp#2199, butir C7). Berkaitan dengan [[ADR - 0119 Kompensasi TikTok Dipisah Menurut Sudah atau Belum Ada Uang Masuk]] (prinsip serumpun: uang yang benar-benar masuk menjadi dasar). Dokumentasi layanan: [[Microservices - Integration Service]]. **Penerapan** (diukur 2026-10-12, baca-saja): kode live di prod dan terbukti pada dua receipt, `INC/2026/10/10/011-BH` (selisih +Rp6.271) dan `INC/2026/10/11/010-BH` (selisih −Rp7.692), keduanya bertanda `selisih_payout`; butir 7 dan 8 masih menunggu konfirmasi Finance.
 
 ## Context
 
