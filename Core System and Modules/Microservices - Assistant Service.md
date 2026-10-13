@@ -171,7 +171,7 @@ Angka hanya boleh berasal dari yang sudah dihitung endpoint. Aturan pemakaian ko
 
 Alasannya spesifik dan sudah terdokumentasi di [[CORE - Kapabilitas AI dan Machine Learning]] § Aturan pemakaian kolom: `iklan_sia_sia` adalah himpunan bagian dari `ads_cost` dan tidak boleh dijumlahkan ke laba, `spend_vsa` dan `spend_gmv_max` dua basis atribusi berbeda yang tidak boleh digabung, dan pendapatan nol di tingkat video bisa berarti tidak ada datanya. Model bahasa yang diberi angka mentah akan menjumlahkannya dengan percaya diri, kegagalannya bukan galat melainkan **angka salah yang masuk akal**, dan tak ada test yang menangkapnya.
 
-⚠️ **Pengecualian yang diusulkan (2026-10-12, belum berlaku)**: [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] (🟡 Diusulkan) mengizinkan model menulis pipeline agregasi untuk tool `kueri`. Hitungannya tetap dikerjakan database, bukan model, tetapi **rumusnya** ditulis model, sehingga risiko di paragraf atas berpindah ke dalam kueri. Karena itu hasilnya wajib berlabel eksploratif dan dilarang dipakai untuk KPI, insentif, payroll, atau komisi. Rancangannya di § Tool kueri eksploratif.
+⚠️ **Pengecualian (diterima 2026-10-13, kode belum ada)**: [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] (🟢 Diterima 2026-10-13) mengizinkan model menulis pipeline agregasi untuk tool `kueri`. Hitungannya tetap dikerjakan database, bukan model, tetapi **rumusnya** ditulis model, sehingga risiko di paragraf atas berpindah ke dalam kueri. Karena itu hasilnya wajib berlabel eksploratif dan dilarang dipakai untuk KPI, insentif, payroll, atau komisi. Rancangannya di § Tool kueri eksploratif.
 
 ### 4. Jawaban adalah pintu, bukan tujuan
 
@@ -1170,7 +1170,7 @@ publik; tempatnya issue privat repo kode).
 Aturan yang lahir dari kelas-kelas ini (model tidak menyaring, menghitung, atau mengetik tabel; angka turunan diambil dari
 sumber) ada di [[REF - Penyajian Laporan Copilot]].
 
-### Tool kueri eksploratif (🟡 Diusulkan 2026-10-12, kode belum ada)
+### Tool kueri eksploratif (🔜 Diterima 2026-10-13, kode belum ada)
 
 Keputusannya [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]]; blueprint
 [[ANALISA - Copilot Kueri Eksploratif]]. Ringkasan cara kerja yang direncanakan:
@@ -1603,7 +1603,7 @@ Yang sengaja **TIDAK** ada, dan alasannya bukan kehati-hatian umum:
 | Tidak dibuat | Alasan |
 |---|---|
 | Tool bash atau perintah bebas | Harness hanya menerima string buram, sehingga tak bisa menggerbang, mengaudit, atau merender per aksi |
-| Tool query bebas ke MongoDB | Membuka jalan bagi asisten menghitung sendiri, yang justru dilarang Keputusan 3. ⚠️ Diusulkan diganti versi berpagar oleh [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] (🟡 Diusulkan 2026-10-12); larangan ini berlaku sampai ADR itu Diterima |
+| Tool query bebas ke MongoDB | Membuka jalan bagi asisten menghitung sendiri, yang justru dilarang Keputusan 3. ⚠️ Diusulkan diganti versi berpagar oleh [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] (🟢 Diterima 2026-10-13); larangan mutlak ini digantikan versi berpagar. Kode belum ada |
 | Tool tulis apa pun | Irisan pertama baca-saja. Aksi menulis menuntut gerbang konfirmasi tersendiri yang belum dirancang |
 
 ## Penjaga supaya tidak lahir angka karangan

@@ -9,7 +9,7 @@
 Aturan yang dijaga sistem:
 
 - Copilot **tidak menampilkan daftar gaji seluruh karyawan**. Peringkat per orang paling banyak 20 baris; untuk daftar lengkap, penanya diarahkan ke halaman Payroll.
-  ⚠️ *Diusulkan diubah (2026-10-12)* oleh [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] (🟡 Diusulkan): lewat tool kueri eksploratif, Direktur, Supervisor HRD, dan IT boleh melihat daftar gaji penuh per orang. Kelompok yang boleh melihat tidak berubah, dan tool payroll khusus tetap memakai batas di atas. Belum berlaku sampai ADR 0173 Diterima.
+  ⚠️ *Diubah (diterima 2026-10-13)* oleh [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] (🟢 Diterima 2026-10-13): lewat tool kueri eksploratif, Direktur, Supervisor HRD, dan IT boleh melihat daftar gaji penuh per orang. Kelompok yang boleh melihat tidak berubah, dan tool payroll khusus tetap memakai batas di atas. ADR 0173 Diterima 2026-10-13; kode belum ada.
 - Rekap per departemen (jumlah karyawan, total gross, total net) menggabungkan departemen yang berisi **kurang dari 3 orang** ke satu baris, supaya nominal satu atau dua orang tidak bisa dibaca dari total.
 - Departemen dalam rekap itu adalah **departemen saat gaji dihitung** bila tercatat; bila tidak tercatat, yang dipakai departemen karyawan hari ini dan layar menyebutnya.
 - **Bulan gaji ditentukan sistem dari tanggal awal dan akhir run**, bukan dari label bulan yang diketik atau disimpan. Gaji yang masih draf diberi tanda draf.

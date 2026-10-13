@@ -2,7 +2,7 @@
 
 > **Status**: ⚠️ **Sebagian diterapkan** (diverifikasi 2026-09-29): fondasi merged dan `Assistant-Service` jalan di prod sejak 2026-09-29, baru satu modul (rekap telat, attendance); sisa di § Yang kurang pada issue. Awalnya Diusulkan 2026-09-28. Diusulkan tim IT/Tech Development — **belum ada konfirmasi eksplisit ini sudah dibicarakan ke Direktur**. Berdiri di atas grounding vault + kode langsung pada tanggal yang sama (lihat § Context untuk koreksi atas klaim vault yang ternyata tidak cocok dengan kode).
 >
-> ⚠️ **Diusulkan diubah sebagian (2026-10-12)** oleh [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] (🟡 Diusulkan): §4 dan butir 1-2 "Yang sengaja tidak dilakukan". **Sampai ADR 0173 berstatus Diterima, seluruh ADR ini berlaku apa adanya.**
+> ⚠️ **Diubah sebagian (diterima 2026-10-13)** oleh [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] (🟢 Diterima 2026-10-13): §4 dan butir 1-2 "Yang sengaja tidak dilakukan". **Bagian lain ADR ini tetap berlaku.** Kode ADR 0173 belum ada, jadi perilaku sistem hari ini masih mengikuti ADR ini.
 >
 > **Issue GitHub**: [bip-erp#2353](https://github.com/bip-itteam-internal/bip-erp/issues/2353) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 
@@ -230,7 +230,7 @@ data dan status kesegarannya (beberapa mart, mis. marketing-analytics, hanya sin
 menjawab kombinasi yang ditanya, asisten menjawab **tidak tahu** dan menunjuk layar yang ada,
 bukan menaksir atau turun membaca database mentah.
 
-⚠️ *Diusulkan diubah (2026-10-12)*: [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] mengusulkan pengecualian berpagar untuk data semua service (tool `kueri`, eksekutor bersama di service pemilik, cakupan departemen disisipkan server, kredensial dikecualikan, hasil berlabel eksploratif kecuali kueri terverifikasi). Belum berlaku sampai ADR itu Diterima.
+⚠️ *Diubah (diterima 2026-10-13)*: [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] menetapkan pengecualian berpagar untuk data semua service (tool `kueri`, eksekutor bersama di service pemilik, cakupan departemen disisipkan server, kredensial dikecualikan, hasil berlabel eksploratif kecuali kueri terverifikasi). Diterima 2026-10-13; kode belum ada.
 
 ### §5 Korelasi lintas modul lewat banyak pemanggilan tool dalam satu giliran, bukan join database
 
@@ -330,7 +330,7 @@ bip-erp#2389). Belum ada uji end-to-end lewat gateway per alat.
 
 - **Tidak ada akses database langsung atau lintas-database** untuk fitur ini.
 - **Tidak ada tool query bebas** (SQL/Mongo) yang bisa ditulis model sendiri.
-  ⚠️ *Dua butir di atas diusulkan diubah* oleh [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] (🟡 Diusulkan, 2026-10-12) menjadi izin berpagar untuk data semua service. Kredensial dan token tetap terlarang. Data identitas pribadi tetap tertahan samaran sampai ada persetujuan tertulis Direksi.
+  ⚠️ *Dua butir di atas diubah* oleh [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] (🟢 Diterima 2026-10-13) menjadi izin berpagar untuk data semua service. Kredensial dan token tetap terlarang. Data identitas pribadi tetap tertahan samaran sampai ada persetujuan tertulis Direksi.
 - **Tidak streaming** di iterasi pertama; tidak memperbaiki infrastruktur gateway bersama sebagai
   bagian dari fitur ini.
 - **Tidak eksekusi apa pun** — murni baca, sama seperti batas [[ADR - 0058]] §5 yang tetap berlaku

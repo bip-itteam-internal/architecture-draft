@@ -1,6 +1,6 @@
 **Status**: 🟡 Blueprint dari `/analisa-kebutuhan` 2026-10-12 (diperluas ke semua service pada hari yang sama). Keputusannya di [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]]; dok domain [[Microservices - Assistant Service]] § Tool kueri eksploratif. Dok ini papan kerja, bukan arsitektur.
 
-⛔ **Menunggu ADR 0173 "Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan" Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**
+✅ ADR 0173 **Diterima** 2026-10-13 oleh irfanarfianto. Urutan pengerjaan yang diputuskan: #3024 dulu sampai merged, lalu sisanya.
 
 - **Pemutus**: irfanarfianto
 - **Ukuran**: **Besar**. Dua repo, dan `bip-erp` butuh enam PR (eksekutor bersama, tool + kueri terverifikasi, empat pemasangan per area). FE harus berubah karena kode penanda yang tak dikenal tampil sebagai label umum tanpa teks kuerinya (`erp-frontend/src/features/copilot/lib/penanda.ts:7-9`), dan karena tombol verifikasi untuk IT belum ada. Bentuknya induk + tujuh sub-issue saudara.

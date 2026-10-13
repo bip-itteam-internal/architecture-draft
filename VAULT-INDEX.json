@@ -2182,20 +2182,20 @@
         "API - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "a616fdfde05187411b5e9e39d6f6846c4d1a812ee4655ed43bf10158e8a1fca3",
+      "hash": "3e17ad55c0b51c7d56a1ed63c3ac191c2befb9a7857d8d1df55c54e024835664",
       "ukuran_kb": 181.4,
-      "ringkasan": "Menjawab: bagaimana Copilot (asisten AI tanya-jawab di Web ERP) bekerja, kenapa ia merutekan pertanyaan ke endpoint lewat gateway dengan JWT penanya dan dilarang berhitung sendiri, tool apa saja yang tersedia per modul (HRGA, marketing, finance, gudang, dll), serta penjaga anti angka karangan, samaran identitas, riwayat percakapan, umpan balik, dan Jadwal Tugas. Juga mencatat sumber yang sengaja dilewati, batas timeout 30 detik gateway, dan siapa yang boleh memakai Copilot.",
+      "ringkasan": "Menjawab: bagaimana Copilot (asisten tanya-jawab AI di Web ERP) bekerja, yaitu merutekan pertanyaan ke endpoint yang sudah menghitung lewat gateway dengan JWT penanya dan dilarang berhitung sendiri, serta tool apa saja yang ditawarkan per area (HRGA, marketing, finance, gudang, procurement, dll). Juga menjawab penjaga anti angka karangan, samaran identitas sebelum ke relay AI, riwayat percakapan, umpan balik jempol, Jadwal Tugas, batas timeout gateway 30 detik, dan sumber data yang sengaja dilewati.",
       "kata_kunci": [
         "Copilot",
-        "assistant-service",
+        "assistant service",
         "asisten AI",
         "tool runner",
         "tanya-jawab",
-        "JWT penanya",
+        "JWT gateway",
         "penjaga jawaban",
-        "samaran identitas",
         "Jadwal Tugas",
-        "LLM"
+        "relay AI",
+        "chatbot"
       ]
     },
     {
@@ -3031,19 +3031,19 @@
         "ADR - 0002 Database-per-Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "6e44489006a8bfe7282a6002a77b5d85e109eb43a693ea2458fc27e9a47bfda8",
+      "hash": "ff82e068dc2bf8e2f46f90873dabe5c0efe1074291a98064dc18c40e8a08ee86",
       "ukuran_kb": 68.0,
-      "ringkasan": "Menjawab: endpoint apa yang dimiliki payroll-service untuk setup komponen gaji, konfigurasi BPJS dan PPh21 TER, gaji per karyawan, badan usaha penggaji (kop slip), payroll run (hitung, approve, publish slip), THR, dan PDF slip. Juga menjelaskan potongan kehadiran, periode kehadiran, lingkup run, impor run dari spreadsheet HRD, pembulatan BPJS, keterbatasan multi-perusahaan, serta di mana aturan bisnis Peraturan Perusahaan yang menjadi acuan.",
+      "ringkasan": "Menjawab: endpoint dan fitur payroll service (config BPJS, pajak PPh21 TER, master badan usaha untuk kop slip, komponen gaji, gaji per karyawan, payroll run sampai publish slip, THR, PDF slip, impor run dari spreadsheet HRD) serta bagaimana potongan kehadiran, periode kehadiran, dan lingkup run dihitung. Juga menjawab di mana aturan bisnis gaji bersumber (Peraturan Perusahaan di repo mobile), keterbatasan multi-perusahaan, dan kondisi pemakaian payroll di produksi.",
       "kata_kunci": [
         "payroll",
         "penggajian",
-        "gaji",
         "slip gaji",
-        "payroll run",
+        "payslip",
         "BPJS",
         "PPh21 TER",
         "THR",
         "potongan kehadiran",
+        "payroll run",
         "badan usaha"
       ]
     },
@@ -8303,20 +8303,20 @@
         "ADR - 0165 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang",
         "ADR - 0166 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Satu Sumber, Cek Silang Dikerjakan Sistem dengan Tiga Keadaan"
       ],
-      "hash": "618cd5edb8b650a5249a8246f37a77f24ac563bbcad19396e192c9fd78236d49",
+      "hash": "740274c8adbd7716ac39aa0c1799746843b075d8962edbb82235edb27e8597ab",
       "ukuran_kb": 26.4,
-      "ringkasan": "Menjawab: kenapa asisten AI lintas modul dibangun sebagai service terpisah yang memanggil endpoint baca baru di tiap service pemilik data, bukan lapisan data terpusat, siapa yang boleh memakainya (Supervisor, Direktur, IT), dan mengapa ia tidak boleh menghitung dari data mentah. Juga menjelaskan klien AI OpenAI-compatible, batas modul per pertanyaan akibat timeout gateway, bentuk keluaran teks/tabel/chart, syarat persetujuan Direksi untuk data asli, dan pewarisan gerbang endpoint.",
+      "ringkasan": "Menjawab: kenapa asisten AI ERP mencakup lintas modul sejak awal, kenapa lapisan data bisnisnya berupa endpoint baca baru di tiap service pemilik data dan bukan lapisan terpusat, serta siapa yang boleh memakainya (Supervisor, Direktur, IT). Juga menjawab batasannya: tidak menghitung dari data mentah, korelasi lewat banyak tool per giliran, batas gateway 30 detik tanpa SSE, klien AI OpenAI-compatible, syarat persetujuan Direksi untuk data asli, dan pewarisan gerbang endpoint.",
       "kata_kunci": [
         "ADR 0132",
         "asisten AI",
         "Copilot",
         "lintas modul",
         "cross-module",
-        "RBAC Copilot",
-        "klien AI",
-        "gateway timeout",
+        "RBAC Supervisor Direktur IT",
         "lapisan data bisnis",
-        "relay AI"
+        "gateway timeout",
+        "ADR 0058",
+        "klien AI"
       ]
     },
     {
@@ -9467,20 +9467,20 @@
         "Microservices - Payroll Service",
         "REF - Kepemilikan Data"
       ],
-      "hash": "d010cbf41b9b51e5a4d240022b58281fdb110dfb41a37176d75e8448f5b1e92c",
+      "hash": "3e21b6e2fb186ddb9a635374aaa27fddf54f2a8dafbc3df8ba24e8642a0d4df4",
       "ukuran_kb": 8.6,
-      "ringkasan": "Menjawab: siapa yang boleh menanyakan data gaji atau upah lewat Copilot (Direktur, Supervisor HRD, IT), bagaimana tiga lapis penegakannya, kenapa Copilot tidak menampilkan daftar gaji per orang (peringkat maksimal 20 baris), dan bagaimana rekap per departemen digabung bila kurang dari 3 orang. Juga menjelaskan cara sistem menentukan bulan gaji dari jendela run dan asal departemen rekap dari snapshot run.",
+      "ringkasan": "Menjawab: siapa yang boleh menanyakan data gaji dan biaya karyawan di Copilot (Direktur, Supervisor HRD, IT), kenapa Copilot tidak menampilkan daftar gaji per orang (peringkat maksimal 20 baris), dan bagaimana rekap per departemen menggabungkan departemen kurang dari 3 orang. Juga menjawab bagaimana bulan gaji ditentukan dari jendela run dan departemen mana yang dipakai dalam rekap.",
       "kata_kunci": [
         "ADR 0165",
         "data upah",
         "gaji",
-        "payroll Copilot",
-        "BolehPayrollCopilot",
+        "salary",
+        "Copilot payroll",
         "Supervisor HRD",
         "rekap departemen",
         "bulan gaji",
         "privasi gaji",
-        "salary"
+        "BolehPayrollCopilot"
       ]
     },
     {
@@ -9499,20 +9499,20 @@
         "ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan",
         "buka:<nama_alat>"
       ],
-      "hash": "76df10ef8f38aa1f22e54eeded4cd26a1a74e731b2177ec4993fa734798b3f5b",
+      "hash": "576961c8a021c62ecc86bfe675035d49cce35fa27ae7594cddf47da5944c20d1",
       "ukuran_kb": 8.7,
-      "ringkasan": "Menjawab: bagaimana Copilot menjelaskan angka nol, turun, atau rendah tanpa menebak sebab dari satu sumber, yaitu cek silang oleh sistem dengan tiga keadaan (ada, tidak ada tercatat, tidak diperiksa), pasangan cek silang apa saja yang sudah berjalan (live dengan kalender libur dan shift, laba toko dengan penanggung jawab), dan kenapa laba belum final tidak dibaca sebagai kerugian. Juga menjelaskan penjaga hitungan_model yang membuang hitungan buatan model dan token rujukan halaman yang divalidasi.",
+      "ringkasan": "Menjawab: bagaimana Copilot menjelaskan angka nol, turun, atau rendah tanpa menebak sebab dari satu sumber, yaitu lewat cek silang sistem dengan tiga keadaan (ada, tidak ada tercatat, tidak diperiksa beserta alasan). Juga menjawab larangan model menghitung angka sendiri, perlakuan laba yang belum final, rujukan halaman lewat token tervalidasi, dan pasangan cek silang yang belum dikerjakan.",
       "kata_kunci": [
         "ADR 0166",
-        "Copilot",
         "cek silang",
         "cross-check",
         "tiga keadaan",
-        "tidak diperiksa",
-        "hitungan_model",
+        "Copilot",
+        "penjaga hitungan",
         "laba belum final",
         "token tautan",
-        "halusinasi"
+        "hari libur",
+        "anti halusinasi"
       ]
     },
     {
@@ -9713,8 +9713,8 @@
       "judul": "ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-12, oleh panpan (Tech Development), lewat sesi `/analisa-kebutuhan`. Pemutus: **irfanarfianto**. Kode belum ada. Diperluas dari \"data marketing saja\" ke semua service pada hari yang sama. Bila diterima, ADR ini mengubah sebagian [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] (§4 dan butir 1-2 \"Yang sengaja tidak dilakukan\"), [[ADR - 0165 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang]] (batas 20 baris dan larangan daftar gaji per orang), serta Keputusan 3 [[Microservices - Assistant Service]]. Di ADR 0165, \"siapa boleh melihat\" berasal dari pemilik produk dan **tidak** diubah; batas 20 baris dipilih pelaksana (ADR 0165 baris status), dan itulah yang diubah di sini. ⛔ **Deploy PROD menunggu persetujuan tertulis Direksi** untuk data asli lewat relay AI (syarat ADR 0132 yang tidak diubah ADR ini).",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-13, oleh irfanarfianto (ditegaskan di sesi Claude Code 2026-10-13). Diusulkan 2026-10-12 lewat sesi `/analisa-kebutuhan`. Pemutus: **irfanarfianto**. Kode belum ada. Diperluas dari \"data marketing saja\" ke semua service pada hari yang sama. Bila diterima, ADR ini mengubah sebagian [[ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat]] (§4 dan butir 1-2 \"Yang sengaja tidak dilakukan\"), [[ADR - 0165 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang]] (batas 20 baris dan larangan daftar gaji per orang), serta Keputusan 3 [[Microservices - Assistant Service]]. Di ADR 0165, \"siapa boleh melihat\" berasal dari pemilik produk dan **tidak** diubah; batas 20 baris dipilih pelaksana (ADR 0165 baris status), dan itulah yang diubah di sini. ⛔ **Deploy PROD menunggu persetujuan tertulis Direksi** untuk data asli lewat relay AI (syarat ADR 0132 yang tidak diubah ADR ini).",
       "publik": true,
       "tautan": [
         "ADR - 0132 Asisten AI Tanya-Jawab Lintas Modul, Lapisan Data Bisnis per Service Bukan Terpusat",
@@ -9727,20 +9727,20 @@
         "REF - Penyajian Laporan Copilot",
         "Microservices - Payroll Service"
       ],
-      "hash": "85bfc3b3acbe4c89decc45841575b6224dfc05bd08019dc6bc2f2f146cac83e8",
-      "ukuran_kb": 16.0,
-      "ringkasan": "Menjawab: bagaimana Copilot bisa menjawab pertanyaan data yang belum punya endpoint lewat tool kueri agregasi MongoDB baca-saja yang dijalankan eksekutor bersama di tiap service pemilik, pagar apa yang berlaku (daftar-tolak kredensial, cakupan departemen, tahap agregasi berdaftar-izin, user Mongo read-only, batas waktu dan baris), dan siapa melihat data apa. Juga menjelaskan label eksploratif, kueri terverifikasi IT yang dipakai ulang, perubahan terhadap ADR 0132 dan 0165, serta syarat persetujuan Direksi sebelum PROD.",
+      "hash": "6dfbf9466de7703a0958a9eafcf4917c7f0f78cc3619f558db04bd1789f287b6",
+      "ukuran_kb": 16.1,
+      "ringkasan": "Menjawab: bagaimana Copilot boleh menjawab pertanyaan data yang belum punya endpoint lewat tool kueri eksploratif (pipeline agregasi MongoDB buatan model) yang dijalankan eksekutor bersama di service pemilik, serta pagar apa yang berlaku (daftar-tolak kredensial, cakupan departemen, tahap berdaftar-izin, user Mongo read-only, batas waktu dan baris). Juga menjawab siapa melihat apa, label eksploratif, kueri terverifikasi IT yang dipakai ulang, bagian ADR 0132 dan 0165 yang diubah, dan syarat persetujuan Direksi sebelum PROD.",
       "kata_kunci": [
         "ADR 0173",
         "kueri eksploratif",
         "exploratory query",
         "Copilot",
-        "MongoDB aggregation",
+        "aggregation pipeline",
         "read-only",
-        "kredensial",
         "kueri terverifikasi",
+        "kredensial",
         "cakupan departemen",
-        "pipeline"
+        "shared-library eksekutor"
       ]
     },
     {
@@ -17594,20 +17594,20 @@
         "Microservices - Marketing Analytics Service",
         "APP - Web ERP"
       ],
-      "hash": "72d2a25372a0282aeb9ed178b4bd520f3602bdc1d30db1202813f69513bc0f76",
+      "hash": "44803c94d5ad3bb873e02eef2df9fa48cb18f2f04e1f766f17132aa48e24d610",
       "ukuran_kb": 52.8,
-      "ringkasan": "Menjawab: bagaimana Copilot menyajikan jawaban berangka sebagai laporan (kartu angka utama dengan perubahan periode, judul grafik berupa kesimpulan, satu paragraf penjelasan per grafik, tabel lengkap, unduhan PDF dan Excel), siapa yang memilih bentuk grafik, dan aturan warna, data tidak dipotong, pita belum final, serta label cek silang. Juga memuat daftar periksa saat menambah alat baru ke Copilot dan penjaga di kode yang menegakkannya.",
+      "ringkasan": "Menjawab: bagaimana jawaban berangka Copilot harus disajikan sebagai laporan (angka utama, judul grafik berupa kesimpulan, satu paragraf per grafik, tabel lengkap tanpa dipotong, unduhan PDF/Excel) dan siapa yang memilih bentuk grafik. Juga menjawab aturan warna, urutan baca 3-30-3, pita belum final, tautan halaman, label cek silang, jebakan area gulir, serta daftar periksa saat menambah alat baru ke Copilot.",
       "kata_kunci": [
-        "Copilot",
         "penyajian laporan",
+        "Copilot",
         "report",
         "grafik",
         "chart",
-        "kartu angka utama",
+        "tabel",
         "PDF",
         "Excel",
-        "bentuk_bawaan",
-        "temuan"
+        "daftar periksa alat baru",
+        "bentuk_bawaan"
       ]
     },
     {
@@ -19999,20 +19999,20 @@
         "Microservices - Marketing Analytics Service",
         "Microservices - Payroll Service"
       ],
-      "hash": "057470d641c7d5eef4d57f7df189313c6b1506fd4c48ca461477aa108e6f7ea8",
-      "ukuran_kb": 14.6,
-      "ringkasan": "Menjawab: bagaimana pekerjaan tool kueri eksploratif Copilot dipecah jadi issue induk dan tujuh sub-issue (eksekutor bersama di shared-library, tool dan kueri terverifikasi di assistant-service, pemasangan per area service, dan layar FE), apa kriteria \"yang harus benar\" tiap bagian, dan bagaimana urutan kerja serta deploy-nya. Juga mencatat syarat PROD (persetujuan Direksi, user Mongo read-only) dan bahwa papan ini menunggu ADR 0173 Diterima.",
+      "hash": "24ee47045834d20c8c2d286ecb70e67b05d668862935bccd30c7f36b14fe9dae",
+      "ukuran_kb": 14.5,
+      "ringkasan": "Menjawab: bagaimana pekerjaan tool kueri eksploratif Copilot (ADR 0173) dipecah jadi issue induk dan tujuh sub-issue (eksekutor bersama, tool dan kueri terverifikasi, pemasangan per area marketing/HR/finance/tiket, serta FE label dan tombol verifikasi), urutan pengerjaan, dan urutan deploy. Juga menjawab kriteria yang harus benar per issue, syarat PROD (persetujuan Direksi, user Mongo read-only), dan data pendukung kebutuhannya.",
       "kata_kunci": [
-        "ANALISA",
+        "analisa kebutuhan",
         "kueri eksploratif",
         "Copilot",
         "sub-issue",
+        "Siap Agent",
         "eksekutor kueri",
-        "shared-library/kueri",
-        "kueri terverifikasi",
-        "Mongo read-only",
-        "blueprint",
-        "bip-erp#3023"
+        "urutan deploy",
+        "bip-erp#3023",
+        "read-only Mongo",
+        "papan kerja"
       ]
     },
     {
