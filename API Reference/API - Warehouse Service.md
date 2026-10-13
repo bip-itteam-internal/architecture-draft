@@ -253,6 +253,23 @@ Assignment toko marketplace → Warehouse Sadewa (men-scope antrian/feed menu Sa
 | POST | `/wms/sadewa-shops` | Assign toko — upsert `{shop_id, channel, shop_name}` by `shop_id`+`channel` |
 | DELETE | `/wms/sadewa-shops/:shopId?channel=` | Lepas assignment toko |
 
+## Laporan Produk Terkirim per Gudang (✅ Diimplementasikan, live PROD sejak 2026-10-12)
+
+Laporan harian produk terkirim, dibatalkan, dan diretur per produk master untuk gudang **Sadewa** dan **Tinggarjaya**. Aturan hitung, format, dan penjadwal: [[WH - Laporan Produk Terkirim per Gudang]]. Path group `/wms/`, lewat gateway `/api/warehouse/wms/...`.
+
+**Gerbang** (`gerbangLaporanTerkirim`, dipasang di pendaftaran rute): 401 tanpa identitas; **`admin_gudang_sadewa` ditolak 403 lebih dulu tanpa syarat**, termasuk bila ia juga memegang peran IT atau PPIC (mitra Sadewa tak boleh menarik laporan lewat API, walau boleh membaca pesan WhatsApp-nya); lalu IT supervisor/admin; lalu `admin_gudang`/`leader`/`spv` (PPIC dan supervisor manufaktur ikut lewat seperti pengelola Tinggar lain). Tanpa izin RBAC baru.
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/wms/laporan/produk-terkirim?tanggal=YYYY-MM-DD` | Unduh **xlsx** dua sheet (Sadewa, Tinggarjaya) untuk satu hari WIB; `tanggal` bawaan **kemarin WIB**. Berkas `produk-terkirim-<tanggal>.xlsx` (`Content-Type` spreadsheetml). |
+| POST | `/wms/laporan/produk-terkirim/wa` | Kirim laporan sebagai **teks WhatsApp** (dua pesan, satu per gudang) untuk uji dan kirim ulang; kode pengirim sama dengan jadwal otomatis. Body JSON opsional: `{"tanggal":"YYYY-MM-DD" (bawaan kemarin WIB), "paksa":bool, "alias":"stock"\|"it"}`. |
+
+**Respons `GET`**: 200 xlsx · 400 tanggal salah format atau masa depan · **404 JSON `{ada_data:false, tanggal, error}`** untuk hari yang dilewati (Terkirim, Cancel, dan Retur semuanya nol; bukan berkas kosong, bukan 500) · 502 sumber (integration) gagal, bersebab, tanpa membocorkan `?key=`.
+
+**Respons `POST`**: 400 (tanggal salah/masa depan, badan bukan JSON, alias di luar daftar-izin: hanya alias terjadwal, `stock`, dan `it`; `sales` dan `it-alert` **ditolak**) · **409** `{"sudah_terkirim":true,…}` bila semua gudang sudah tercatat untuk (tanggal, alias) dan tanpa `paksa`; 409 juga bila kunci Redis dipegang instance lain · 502 bila ada masalah (kirim gagal, alias tak terisi, sumber gagal) · 200 dengan `hasil` per gudang · 200 `ada_data:false` untuk hari sepi. Konteks pemanggilan memakai `context.WithoutCancel` + timeout 4 menit supaya gateway yang memutus di 30 detik tak meninggalkan satu gudang terkirim tanpa catatan. ⚠️ `paksa:true` mengirim lagi walau sudah tercatat: pesannya **menggandakan** pesan di grup.
+
+⚠️ Berkas Excel adalah biner: simpan sebagai byte (mis. PowerShell `Invoke-WebRequest -OutFile`), jangan lewat tombol unduh klien yang menampilkannya sebagai teks (rusak, Excel menawarkan "recover").
+
 ## Komplain Gudang (✅ Diimplementasikan)
 
 Keluhan **marketing atas pekerjaan gudang packing**, sekaligus sumber KPI baris 1 gudang packing. Path group `/wms/`. ⚠️ Gerbangnya **berbeda per method**, dan bedanya disengaja: yang dinilai tidak mengisi nilainya sendiri.
@@ -319,6 +336,6 @@ Dibaca employee-service (`services/employee/kpi_sumber_warehouse_packing.go`) un
 
 ## Dokumen Terkait
 
-- [[Microservices - Warehouse Service]] · [[WH - Fulfillment Flow & WMS Tinggarjaya]] · [[API - Integration Service]] · [[API - Index]]
+- [[Microservices - Warehouse Service]] · [[WH - Fulfillment Flow & WMS Tinggarjaya]] · [[WH - Laporan Produk Terkirim per Gudang]] · [[API - Integration Service]] · [[API - Index]]
 - [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] — alasan rute baca dibuka ke marketing
 - [[ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori]]: alasan daftar kategori diterbitkan

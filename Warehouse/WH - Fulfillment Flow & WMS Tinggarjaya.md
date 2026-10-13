@@ -399,7 +399,7 @@ warehouse_db (MongoDB, pola standar bip-erp)
 | Return Reuse/Rework/Reject | ❌ Belum ada | Fase berikut (bukan MVP) |
 | Dashboard gudang | ✅ Sudah ada | `/fulfillment/dashboard` |
 | Master SKU + lokasi rak | ✅ Sudah ada | `warehouse_products` + import xlsx; ⚠️ barcode/nama sebagian SKU masih kosong |
-| Report internal gudang | ❌ Belum ada | Fase berikut |
+| Report internal gudang | ⚠️ Sebagian | ✅ Laporan harian produk terkirim/cancel/retur per gudang (Excel + WhatsApp terjadwal, live PROD sejak 2026-10-12): [[WH - Laporan Produk Terkirim per Gudang]]. Report lain (SLA, produktivitas packer) belum ada |
 
 ---
 
@@ -460,6 +460,7 @@ bukan body request).
 
 ## Dokumen Terkait
 
+- [[WH - Laporan Produk Terkirim per Gudang]] — laporan harian per gudang (Excel + WhatsApp)
 - [[Marketing - Marketplace Integration]] — konsep bisnis integrasi marketplace
 - [[Microservices - Integration Service]] — implementasi backend + proxy API marketplace
 - [[DB - Overview and Notes]] — MongoDB & Redis
