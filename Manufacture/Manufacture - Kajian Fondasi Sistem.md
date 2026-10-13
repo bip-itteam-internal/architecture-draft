@@ -157,6 +157,7 @@ Dibandingkan dua Batch Record lengkap (Oktober 2026), satu diputuskan LULUS dan 
 
 ## Dokumen Terkait
 
+- Persona dan alur (diagram): [[Manufacture - Fondasi Manufaktur Persona]] · rancangan menu dan halaman per jabatan: [[Manufacture - Rancangan Menu per Posisi]]
 - [[Manufacture - Kesiapan Otomasi KPI (menunggu WMS)]] · [[Manufacture - Dashboard per Posisi]] · [[Manufacture - Dokumen Produksi Batch]] · [[Manufacture - Stock & Material Management]] · [[Manufacture - Material Order (SPK)]]
 - [[Microservices - Manufacture Service]] · [[API - Manufacture Service]] · [[Microservices - Procurement Service]]
 - SOP: [[Manufacture - SOP Posisi PPIC]] · [[Manufacture - SOP Posisi Admin Produksi]] · [[WH - SOP Posisi Staf Warehouse]] · [[WH - SOP Posisi Admin Warehouse]] · [[QA - SOP Posisi Quality Control]] · [[GA - SOP Posisi Procurement]] · [[GA - SOP Procurement]] · [[Finance - SOP Posisi Cost Control]] · [[REF - SOP Bharata 2026 per Posisi]]
