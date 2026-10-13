@@ -343,7 +343,7 @@ Daftar izin hidup di **satu tempat**, `finance_baca_gate.go`; tabel ini peta rin
 
 ## Reviews (Ulasan Marketplace)
 
-**Cakupan (sejak 2026-09-23)**: kelima rute di bawah dibatasi ke toko yang DIPEGANG pemanggil (`icc_account_mappings`, `is_active: true`), bukan ke daftar peran. Leader/SPV marketing dan tim Integration tanpa batas; yang tak memetakan toko mendapat **nol baris**, bukan semua. `shop_id` dari query tidak bisa melangkahinya. Identitas wajib (`BIP-Employee-ID`), dan mapping yang gagal dibaca menghasilkan **500**, bukan daftar kosong.
+**Cakupan (sejak 2026-09-23)**: kelima rute baca di bawah dibatasi ke toko yang DIPEGANG pemanggil: `icc_account_mappings` aktif, ditambah `cs_shop_mappings` aktif sejak bip-erp#2837 ([[ADR - 0160 Cakupan Baca Ulasan Mencakup Toko Pegangan CS, Menu Dibuka lewat Paket Izin yang Ada]]), bukan ke daftar peran. Leader/SPV marketing dan tim Integration tanpa batas; yang tak memetakan toko mendapat **nol baris**, bukan semua. `shop_id` dari query tidak bisa melangkahinya. Identitas wajib (`BIP-Employee-ID`), dan mapping yang gagal dibaca menghasilkan **500**, bukan daftar kosong.
 
 | Method | Path | Fungsi |
 |---|---|---|
@@ -352,6 +352,7 @@ Daftar izin hidup di **satu tempat**, `finance_baca_gate.go`; tabel ini peta rin
 | GET | `/reviews/products/:productId/trend` | Deret snapshot harian per produk (tren; TikTok = kumulatif, delta dihitung FE) |
 | GET | `/reviews/comments` | Komentar Shopee (teks, baca-saja); `shop_id` **opsional** = feed lintas toko DI DALAM cakupan pemanggil (PR #568) · filter `item_id`/`rating`/`channel`/`has_text`/`has_media`/`unreplied` · paginated + join `product_name`/`shop_name` · 🟡 `rating_max` (bip-erp branch `feat/integration-reviews-rating-max`, belum merge 2026-09-25): bintang **1..N** (`rating_star {$gte:1,$lte:N}`), rentang 0..5; dikirim **bersama `rating` → 400** supaya satu filter tak diam-diam kalah. Bawaan "Bintang rendah" tab Ulasan FE mengirim `rating_max=3`. ⚠️ Backend lama **mengabaikan** param ini tanpa galat (semua bintang terkirim), jadi deploy BE **sebelum** FE |
 | GET | `/reviews/sync-status` | State sync per toko (`last_synced_at`, `last_error`, `backfill_truncated` cap-500 Shopee) |
+| POST | `/reviews/comments/:commentId/reply` *(🟡 rencana, path final di `/plan`)* | Balas satu ulasan Shopee lewat `reply_comment`, teks 1-500 karakter. Hanya pemegang toko (`icc_account_mappings` atau `cs_shop_mappings` aktif), BUKAN pembaca tanpa batas; `GET /reviews/comments` membawa `boleh_balas` per baris dari fungsi yang sama. Tiap percobaan dicatat di koleksi jejak terpisah. Keputusan: [[ADR - 0176 Ulasan Shopee Dibalas dari ERP oleh Pemegang Toko, Otomatisasi Menyusul]] |
 
 > Worker `sync-reviews` harian 06:45 WIB. TikTok TIDAK punya API teks ulasan (hanya distribusi bintang kumulatif) — detail keterbatasan & desain: [[Microservices - Integration Service]] §Ulasan Marketplace.
 

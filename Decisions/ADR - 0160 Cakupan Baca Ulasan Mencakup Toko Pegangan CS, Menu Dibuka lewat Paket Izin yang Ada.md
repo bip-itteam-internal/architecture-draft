@@ -10,7 +10,7 @@
 
 - **Ulasan TikTok per pembeli tidak ada.** TikTok tidak memberikan isi ulasan lewat jalur yang dipakai ERP, hanya sebaran bintang per produk. Untuk toko TikTok, ulasan tetap dibaca di Seller Center.
 - **Ulasan Lazada belum ada sama sekali** di ERP.
-- **Membalas ulasan dari ERP belum dibangun.** Balasan tetap dilakukan di Seller Center. Itu keputusan terpisah yang menunggu kepastian izin dari marketplace.
+- **Membalas ulasan dari ERP belum dibangun.** Balasan tetap dilakukan di Seller Center. Itu keputusan terpisah yang menunggu kepastian izin dari marketplace. *(Diperbarui 2026-10-13: izin Shopee sudah dicek dan keputusan terpisahnya diusulkan di [[ADR - 0176 Ulasan Shopee Dibalas dari ERP oleh Pemegang Toko, Otomatisasi Menyusul]]. Sampai ADR itu diterima dan kodenya jalan, kalimat ini tetap berlaku.)*
 - **Mengajukan komplain dari ulasan tetap hak pemegang akun toko.** Shop Quality membaca ulasan, tetapi tidak mengajukan komplain dan tidak melihat penanda ulasan mana yang sudah dikomplainkan.
 - **Data diperbarui sekali sehari, pagi hari.** Ulasan yang masuk siang ini terlihat besok pagi.
 
@@ -78,6 +78,8 @@ Tidak ada perubahan jadwal dan tidak ada tombol sinkron manual. Ulasan kemarin t
 ### 5. Balas ulasan tidak diputuskan di sini
 
 Tetap di Seller Center. Jalur menuju balas ulasan Shopee tetap seperti yang ditulis ADR Agen Pengelola Toko: cek izin scope API lebih dulu, lalu ADR tersendiri.
+
+> Diperbarui 2026-10-13: izin scope sudah dicek (app ERP System "One Bharata" termasuk tipe yang boleh memanggil `reply_comment`), dan ADR tersendirinya [[ADR - 0176 Ulasan Shopee Dibalas dari ERP oleh Pemegang Toko, Otomatisasi Menyusul]] (🟡 Diusulkan). Ia mengikuti cakupan baca di sini, tetapi hak **mengirim** balasan lebih sempit: hanya pemegang toko, bukan pembaca semua toko.
 
 ### 6. Urutan pemasangan
 

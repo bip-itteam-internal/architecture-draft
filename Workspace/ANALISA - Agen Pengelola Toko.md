@@ -98,6 +98,7 @@ kebenaran final; verifikasi ulang ke `origin/main`), dan **Kriteria selesai** (b
 - [ ] **T9. Cek izin scope API tulis TikTok Shop dan Shopee.** Tujuan: lead time izin marketplace tidak
   menahan tahap 2. Kriteria: daftar scope yang dibutuhkan per tindakan (balas ulasan, promo, budget iklan),
   status aplikasi kita, dan perkiraan waktu persetujuan, bertanggal.
+  - Sebagian, 2026-10-13: **Shopee balas ulasan** sudah boleh. Dokumentasi `v2.product.reply_comment` menyebut tipe app ERP System, dan app ERP_SYSTEM kita ("One Bharata", Live Partner_id 2032314) berkategori itu. Balas ulasan **oleh orang** diputuskan terpisah di [[ADR - 0176 Ulasan Shopee Dibalas dari ERP oleh Pemegang Toko, Otomatisasi Menyusul]]. Belum dicek: TikTok, promo Shopee, budget iklan Shopee.
 - [ ] **T10. Ukur pekerjaan Account Specialist.** Tujuan: tahu apa yang sebenarnya akan diganti. Kriteria:
   survei atau wawancara minimal 5 orang, porsi waktu per jenis pekerjaan termasuk pembuatan video AI.
 
@@ -105,6 +106,9 @@ kebenaran final; verifikasi ulang ke `origin/main`), dan **Kriteria selesai** (b
 
 - [ ] **T11. ADR eksekusi tindakan pertama** (usulan: balas ulasan), menggantikan ADR 0127 §2 khusus
   tindakan itu, dengan eksekusi saat disetujui memakai identitas penyetuju. Bergantung: T6 (gerbang), T9.
+  - Catatan 2026-10-13: klien `reply_comment`, jejak pengirim, dan aturan siapa boleh membalas akan lahir dari
+    [[ADR - 0176 Ulasan Shopee Dibalas dari ERP oleh Pemegang Toko, Otomatisasi Menyusul]] (balasan ditulis orang, bukan
+    usulan agent). T11 tetap terbuka untuk balasan yang **diusulkan agent lalu disetujui**, dan cukup memakai ulang bagian itu.
 
 ## Terpisah, diputuskan saat dibutuhkan
 
