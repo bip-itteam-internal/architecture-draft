@@ -166,7 +166,7 @@ flowchart LR
   COA --> FG(["Gudang FG<br/>Surat Jalan + COA"])
 ```
 
-- Bagian spesifikasi produk belum ada di model Batch Record (Temuan 6) dan menjadi isi utama COA keluar.
+- Bagian spesifikasi produk (Temuan 6) dikerjakan M-03: master per produk ditulis QA/PJT, disalin ke Batch Record, hasil diisi QC (PR bip-erp#3084, belum merged + erp-frontend#2417). Ia menjadi isi utama COA keluar (M-21).
 
 ### PJT dan Supervisor Quality
 

@@ -594,25 +594,26 @@
         "IT - Background Jobs & Schedulers",
         "APP - Web ERP",
         "ADR - 0002 Database-per-Service",
+        "Manufacture - Dokumen Produksi Batch",
         "Manufacture - Stock & Material Management",
         "GA - Procurement System",
         "API - Integration Service",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line"
       ],
-      "hash": "edf3dbd3cbce239802d86148f39301918c4b67e8e59df9309780ef2e11e1d5c1",
-      "ukuran_kb": 22.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan manufacture-service (WMS manufaktur) di bawah /api/manufacture, mulai dari master bahan/produk, stok, saldo awal, transaksi, formula, produksi, resi retur ekspedisi, feed retur marketplace, PO, proposal, sampai mutasi gudang dan konsinyasi. Juga menjawab bagaimana sync dan align master/stok dengan Accurate dan data HPP bekerja (konversi satuan, dry_run, push penyesuaian persediaan), cara import hasil Stock Opname ke saldo akhir, serta isi laporan Tarikan Mutasi dan Transparansi Substitusi RM.",
+      "hash": "1e94af90850052bedd69801c032c997ec7b7f1cce04103c81040ed5af2568f46",
+      "ukuran_kb": 24.6,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan manufacture-service (WMS) lewat gateway `/api/manufacture/*`, mulai dari master bahan/produk, stok, saldo awal, transaksi, formula, produksi, Dokumen Produksi Batch, PO, resi retur, sampai feed retur marketplace. Juga menjelaskan cara sync master dan stok dari Accurate (read-only, konversi satuan), migrasi kode lama ke kode Accurate/HPP (align), push pergerakan WMS ke Accurate, import hasil Stock Opname, serta laporan Tarikan Mutasi dan Transparansi Substitusi RM.",
       "kata_kunci": [
         "manufacture-service",
         "WMS",
-        "API manufacture",
         "master bahan",
+        "raw material",
         "stok",
+        "stock",
         "sync Accurate",
-        "saldo awal",
         "stock opname",
-        "mutasi",
-        "substitusi RM"
+        "saldo awal",
+        "endpoint"
       ]
     },
     {
@@ -2681,7 +2682,7 @@
       ],
       "hash": "b591fe63ce631d54ad70285a40472f68761fde387a7e3ec49be45046a8532839",
       "ukuran_kb": 471.8,
-      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace (TikTok Shop, TikTok Ads/GMV Max, Shopee, Lazada) lewat webhook dan sync terjadwal, bagaimana order dinormalkan jadi model transaction lalu di-push ke Accurate sebagai Sales Invoice/Return, dan endpoint apa saja yang tersedia per modul. Juga menjawab soal Shop ACL dan kepemilikan toko per departemen, mapping akun ICC, ulasan marketplace, fulfillment ke WMS, cron worker, serta catatan ketahanan Shopee dan performa MongoDB.",
+      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) lewat webhook dan sync terjadwal, bagaimana order dan laporan iklan dinormalkan jadi transaction lalu di-push ke Accurate (Sales Invoice/Return), dan endpoint apa yang tersedia untuk GMV Max, ICC, ulasan marketplace, Shop ACL, fulfillment WMS, serta worker cron. Juga menjelaskan gotcha operasional seperti rate limit TikTok, bypass signature webhook Shopee, status sinkron per toko, dan rencana Meta Ads.",
       "kata_kunci": [
         "integration-service",
         "marketplace",
@@ -2691,8 +2692,8 @@
         "Shopee",
         "GMV Max",
         "ulasan marketplace",
-        "Shop ACL",
-        "ICC"
+        "sync cron",
+        "transaction"
       ]
     },
     {
@@ -4745,20 +4746,20 @@
         "HRIS - Organization Structure",
         "APP - Web ERP"
       ],
-      "hash": "1fd3e3329c505387a60e36e969c9b136389d200a704a4e24ee4e7290c33440aa",
-      "ukuran_kb": 14.4,
-      "ringkasan": "Menjawab: bagaimana system_roles yang kosong diisi otomatis dari departemen dan jabatan saat token terbit (peran_dari_jabatan.go), aturan tak-pernah-menimpa per modul, dan sakelar ROLE_FROM_POSITION. Juga menjawab jabatan mana yang sengaja tidak dipetakan beserta alasannya (WMS/manufacture, insentive, GA security, Kesekretariatan).",
+      "hash": "6c8d400677c29bb663e5e96b5e432575fa4e624480362d4315c56da8ff8f78dc",
+      "ukuran_kb": 14.5,
+      "ringkasan": "Menjawab: mengapa dan bagaimana `system_roles` yang kosong diisi otomatis dari departemen dan jabatan saat token diterbitkan (login, PIN, biometrik, refresh), serta aturan pengikatnya: tak pernah menimpa per modul, hanya untuk peran akses, jabatan ambigu tidak ditebak, dan kanon `KanonPosisi`. Juga menjawab jabatan mana yang sengaja tidak dipetakan (mis. Quality Supervisor, Personal Assistant, Admin Warehouse), tambahan Kesekretariatan (Legal, QA RND), sakelar `ROLE_FROM_POSITION`, dan hubungannya dengan ADR 0030 dan rencana ADR 0164.",
       "kata_kunci": [
-        "ADR 0043",
         "peran dari jabatan",
-        "system_roles",
         "role from position",
-        "ROLE_FROM_POSITION",
+        "system_roles",
+        "RBAC",
         "peran_dari_jabatan.go",
-        "WMS",
-        "insentive",
+        "ROLE_FROM_POSITION",
         "jabatan",
-        "token login"
+        "position",
+        "penerbitan token",
+        "QA RND"
       ]
     },
     {
@@ -9847,7 +9848,7 @@
       ],
       "hash": "2ee2ea045a6f0f3608726e448a45d92137c77f703ff435486d42910b77132e1f",
       "ukuran_kb": 11.1,
-      "ringkasan": "Menjawab: apakah ulasan Shopee bisa dibalas langsung dari ERP, siapa yang boleh mengirim balasan (pemegang toko lewat icc_account_mappings atau cs_shop_mappings, bukan pembaca semua toko), dan bagaimana balasan dikirim lewat API reply_comment serta dicatat di koleksi jejak terpisah. Juga menjelaskan apa yang sengaja ditunda (balasan otomatis, template, kirim massal, draf AI, TikTok) dan kenapa data lokal diperbarui dengan $set, bukan ReplaceOne.",
+      "ringkasan": "Menjawab: kenapa ulasan Shopee kini bisa dibalas langsung dari ERP lewat API reply_comment, siapa yang boleh membalas (pemegang toko lewat icc_account_mappings atau cs_shop_mappings, bukan leader/pembaca semua toko), dan bagaimana tiap percobaan balasan dicatat serta galat Shopee dibaca. Juga menjelaskan apa yang sengaja tidak dijanjikan: balasan otomatis, template, kirim massal, draf AI, dan ulasan TikTok.",
       "kata_kunci": [
         "balas ulasan",
         "review reply",
@@ -9856,8 +9857,9 @@
         "pemegang toko",
         "boleh_balas",
         "Seller Center",
-        "ulasan belum dibalas",
-        "ADR 0176"
+        "CS",
+        "ADR 0176",
+        "otomatisasi balasan"
       ]
     },
     {
@@ -15137,6 +15139,8 @@
       "status_teks": "Implemented",
       "publik": true,
       "tautan": [
+        "Manufacture - Kajian Fondasi Sistem",
+        "ADR - 0136 Pemilik Master Barang dan Master Gudang",
         "Manufacture - Material Order (SPK)",
         "Microservices - Manufacture Service",
         "API - Manufacture Service",
@@ -15149,22 +15153,20 @@
         "QA - CPOB (GMP)",
         "Manufacture - Order Production Workflow (Flow Source)"
       ],
-      "hash": "d4f997013835e282e40df9a28906dee69a25d17259da5be164efa1298af7ae7f",
-      "ukuran_kb": 15.9,
-      "ringkasan": "Menjawab: bagaimana dokumen batch produksi (batch release dossier 7 lembar) yang dulu manual dikerjakan di WMS, siapa mengisi bagian mana (admin RM, admin produksi, QC/RnD, PPIC/SPV), dan bagaimana alur DRAFT ke DIAJUKAN ke LULUS atau DITOLAK dijaga di server. Menjelaskan mode pengecekan QC (field milik QC dikunci di form admin dan hanya bisa diisi di layar review), paraf by jabatan lewat roster, serta paraf digital berjenjang per baris yang mengunci approval sampai semua slot terparaf. Berguna untuk memahami isi tiap lembar, penimbangan dan rekonsiliasi, cetak PDF, serta rantai nomor batch dari Material Order ke dossier lalu ke Laporan Produksi, termasuk menu terpisah Rekonsiliasi MO.",
+      "hash": "ab1b307f41b8acc2b496bdd900d5c80c5a1ccb48a7b286263de87645f15ce127",
+      "ukuran_kb": 19.0,
+      "ringkasan": "Menjawab: bagaimana dokumen batch produksi kertas 7 lembar (batch release dossier) didigitalisasi di menu WMS Dokumen Produksi Batch, siapa mengisi apa (Admin RM, Admin Produksi, QC/RnD, PPIC/SPV), dan bagaimana alur status DRAFT, DIAJUKAN, LULUS/DITOLAK beserta mode pengecekan QC. Juga menjelaskan paraf berbasis jabatan dan paraf digital berjenjang, Spesifikasi Produk sebagai dasar COA, penimbangan dan rekonsiliasi, cetak PDF, rantai No. Batch dari MO ke Laporan Produksi, serta model data dan endpoint-nya.",
       "kata_kunci": [
-        "dokumen produksi batch",
+        "Dokumen Produksi Batch",
         "batch record",
-        "batch release",
-        "dossier",
-        "QC",
+        "batch release dossier",
+        "release for sale",
         "paraf digital",
-        "approval produksi",
-        "penimbangan",
+        "spesifikasi produk",
+        "COA",
         "rekonsiliasi MO",
-        "no batch",
-        "material order",
-        "manufacture"
+        "QC approval",
+        "PJT"
       ]
     },
     {
@@ -15190,20 +15192,20 @@
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
         "Finance - FAT Persona"
       ],
-      "hash": "6f948e0799e6414b77162f8b46a739b515d35fac578c7d8e183838b6f15ec9c4",
-      "ukuran_kb": 14.4,
-      "ringkasan": "Menjawab: siapa saja jabatan yang terlibat di alur manufaktur (PPIC, gudang, produksi, QC, PJT, procurement, finance, marketing) dan bagaimana pekerjaan mengalir dari Production Order sampai bahan lulus QC, lalu produksi batch, rilis PJT, COA, dan pengiriman. Berisi diagram Mermaid alur proses, arsitektur service manufaktur ke Accurate, alur per jabatan, dan skenario gagal (di bawah MOQ, bahan ditolak, bahan kurang, batch ditolak).",
+      "hash": "db20ca7701ae48641d79ccb2b3050262cd614473d4de346864736f29984b479e",
+      "ukuran_kb": 14.5,
+      "ringkasan": "Menjawab: siapa saja persona yang bekerja di alur manufaktur (SPV Brand, PPIC, SPV Manufacture, Procurement, Gudang, QC, Admin/Leader/Operator Produksi, PJT, Finance, Admin Return) dan bagaimana pekerjaan mengalir antar jabatan dan antar service dalam rancangan target. Memuat alur rencana sampai bahan lulus QC, alur produksi sampai rilis dan pengiriman, arsitektur service, alur per jabatan, dan skenario gagal, dengan langkah yang masih menunggu keputusan ditandai TBD.",
       "kata_kunci": [
-        "alur manufaktur",
-        "persona",
-        "flow produksi",
-        "Batch Record",
-        "rilis batch",
-        "PJT",
+        "persona manufaktur",
+        "alur produksi",
+        "production workflow",
+        "PPIC",
         "karantina",
-        "WIP",
-        "COA",
-        "Mermaid"
+        "quarantine",
+        "rilis batch",
+        "batch release",
+        "FEFO",
+        "Production Order"
       ]
     },
     {
@@ -15305,9 +15307,9 @@
         "Microservices - Procurement Service",
         "Microservices - Manufacture Service",
         "API - Manufacture Service",
+        "Manufacture - Dokumen Produksi Batch",
         "Manufacture - Fondasi Manufaktur Persona",
         "Manufacture - Rancangan Menu per Posisi",
-        "Manufacture - Dokumen Produksi Batch",
         "Manufacture - Stock & Material Management",
         "Manufacture - Material Order (SPK)",
         "Manufacture - SOP Posisi PPIC",
@@ -15323,19 +15325,19 @@
         "REF - Kepemilikan Data",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)"
       ],
-      "hash": "00e441420d1e13cd5cc44f8279566f0f7916069ea243e74c559b748df782fd83",
-      "ukuran_kb": 15.9,
-      "ringkasan": "Menjawab: seberapa jauh ERP mendukung manufaktur hari ini, fitur mana yang sudah dipakai di prod, tumpang tindih apa di fondasi kode (Batch Record ganda, rilis ganda, jalur stok berbeda), apa kata pemakai dari kuesioner, dan keputusan apa yang masih terbuka (pemilik angka stok, zona WIP, status bahan masuk, COA keluar, gerbang ketersediaan bahan).",
+      "hash": "28c5a65ed4c8f65d58e4ff27309d4b7a7b9e9902d7ed7fe6c7e7ecb7bd34ea2c",
+      "ukuran_kb": 16.2,
+      "ringkasan": "Menjawab: fitur manufaktur mana di ERP yang benar-benar dipakai di prod dan mana yang belum pernah dipakai beserta penyebabnya, tumpang tindih apa yang ada di fondasi kode (catatan produksi, rilis batch, QC bahan masuk, PO bahan, jalur penyesuaian stok, pemilik angka stok), dan apa kata kuesioner pemakai. Juga menjelaskan spreadsheet PPIC sebagai sistem yang berjalan nyata, kebutuhan COA keluar, perbandingan Batch Record kertas dengan model ERP, serta daftar keputusan yang belum diambil.",
       "kata_kunci": [
-        "kajian manufaktur",
-        "fondasi",
-        "pemakaian ERP",
-        "stok pabrik",
-        "Accurate",
-        "kuesioner",
+        "kajian fondasi manufaktur",
+        "adopsi ERP",
         "spreadsheet PPIC",
+        "kuesioner pemakai",
+        "batch record",
+        "karantina",
         "COA",
-        "Certificate of Analysis",
+        "stock opname",
+        "pemilik stok",
         "TBD"
       ]
     },
@@ -17333,21 +17335,20 @@
         "APP - Web ERP",
         "Unlisted - Kesekretariatan (Big Pictures)"
       ],
-      "hash": "71e44709a1705f67628e386785adad1958fe5b98b9cfe2ab44bce1365c17925c",
-      "ukuran_kb": 11.0,
-      "ringkasan": "Menjawab: apa fitur workspace R&D Regulatory (Register NIE/BPOM/Halal dengan alert target, dan Papan Pengembangan Produk Baru dari ide sampai siap launching), siapa penggunanya, dan gerbang izinnya. Juga menjelaskan koleksi, kode backend di employee-service, dan yang belum termasuk seperti simulasi HPP.",
+      "hash": "7617c916ac1d8263118829c1f47f4d0472e4ec1283f60b1d197dff42eaa0c9d5",
+      "ukuran_kb": 11.1,
+      "ringkasan": "Menjawab: bagaimana posisi R&D Regulatory memantau registrasi izin edar NIE/BPOM/Halal sampai terbit beserta alert lewat target, dan bagaimana Papan Pengembangan Produk Baru melacak tahap ide sampai siap launching termasuk riwayat tahap milik server. Juga menjelaskan endpoint `/rnd/*`, model data, unggah PDF, dan perubahan izin sejak modul `rnd` dilebur ke `secretary` (izin `secretary.rnd.*`, paket, gerbang `gateSecretary`), serta pemetaan jabatan QA RND.",
       "kata_kunci": [
-        "R&D",
-        "regulatory",
-        "NIE",
+        "R&D Regulatory",
+        "registrasi NIE",
         "BPOM",
-        "halal",
-        "izin edar",
-        "registrasi produk",
-        "pengembangan produk baru",
-        "pipeline produk",
-        "rnd_registration",
-        "workspace posisi"
+        "Halal",
+        "pengembangan produk",
+        "product pipeline",
+        "riwayat tahap",
+        "secretary",
+        "QA RND",
+        "izin edar"
       ]
     },
     {
@@ -17737,9 +17738,10 @@
         "Microservices - Recruitment Service",
         "HRIS - Kepatuhan Peraturan Perusahaan",
         "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan",
+        "ADR - 0136 Pemilik Master Barang dan Master Gudang",
+        "Manufacture - Dokumen Produksi Batch",
         "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
         "RUN - Deploy Microservices bip-erp",
-        "ADR - 0136 Pemilik Master Barang dan Master Gudang",
         "REF - PRD ERP",
         "DB - Data Dictionary",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin",
@@ -17747,23 +17749,20 @@
         "REF - Rantai Pengajuan Lintas Modul",
         "Microservices - Manufacture Service"
       ],
-      "hash": "d12705e791420e99341962330c60a1f20547bf46107b8e2f915a20ab511756f9",
-      "ukuran_kb": 81.8,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki sebuah fakta bisnis, siapa yang boleh menulisnya, lewat jalan apa service lain boleh membacanya, dan salinan mana yang sah beserta penjaganya. Juga menjawab duplikasi data mana yang belum diputuskan, pengecualian aturan database-per-service yang masih hidup, dan cara memakai peta ini sebelum membangun fitur atau penyimpanan baru.",
+      "hash": "5960f383914afe13cbe3bede9be8d2678365d1c71e903aa52f0ad1a946bb3b9b",
+      "ukuran_kb": 83.4,
+      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis (karyawan, departemen, divisi, headcount, hak akses, kontrak, jadwal, master produk/SKU, vendor, gudang, dll.), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga menjawab salinan mana yang sah beserta arah dan penjaganya, pengecualian ADR 0002 yang masih hidup (mis. task-management membaca DB lain langsung), duplikasi yang belum diputuskan, jejak audit, dan cara memakai peta ini sebelum membangun penyimpanan baru.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "pemilik fakta",
-        "database-per-service",
-        "salinan sah",
-        "duplikasi",
-        "sumber kebenaran",
+        "satu fakta satu tempat",
         "single source of truth",
+        "database-per-service",
+        "salinan data",
+        "duplikasi",
+        "SyncCollection",
         "master data",
-        "jejak audit",
-        "audit trail",
-        "employee-service",
-        "SyncCollection"
+        "audit trail"
       ]
     },
     {
@@ -19343,19 +19342,19 @@
         "Finance - Audit Internal",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi"
       ],
-      "hash": "77e58b13332f4bfc463e5e177a75d82e5baafcd267f4343c5beb771e59659e80",
-      "ukuran_kb": 12.4,
-      "ringkasan": "Menjawab: jabatan apa saja di departemen Kesekretariatan (key secretary), modul sistem yang dipakai tiap jabatan (Legal, R&D Regulatory, Internal Audit, Ruang Direktur), dan dok detail mana yang memilikinya. Juga menjawab bagaimana katalog izin secretary.legal dan secretary.rnd, peran turunan dari jabatan, sidebar SEKRETARIAT, dan kesetaraan Corporate Secretary dengan Direktur dalam persetujuan bekerja, kenapa system_roles.secretary tidak membuka Legal maupun R&D, dan kenapa Legal serta R&D dilebur ke modul secretary.",
+      "hash": "7e8e1167053710425f3ea49df4bc9b1e8dd4aca80c9699f029a8a11289cb24ab",
+      "ukuran_kb": 12.6,
+      "ringkasan": "Menjawab: apa saja jabatan di departemen Kesekretariatan (Direktur, Corporate Secretary, Legal, QA RND, Internal Audit, Personal Assistant, kreatif) dan modul sistem apa yang dipakai tiap jabatan, termasuk peran yang diturunkan dari jabatan dan template KPI-nya. Juga menjelaskan modul `secretary` (area Legal dan R&D, katalog izin, 25 rute, isi sidebar), mengapa `system_roles.secretary` sengaja tidak membuka Legal/R&D, Ruang Direktur, dan siapa yang setara Direktur dalam memutus persetujuan.",
       "kata_kunci": [
         "Kesekretariatan",
         "secretary",
-        "sekretariat",
         "Corporate Secretary",
-        "Legal",
-        "R&D Regulatory",
+        "Direktur",
         "Ruang Direktur",
+        "Legal",
+        "R&D",
         "Internal Audit",
-        "peran dari jabatan",
+        "sidebar SEKRETARIAT",
         "SetaraDirektur"
       ]
     },
@@ -20306,17 +20305,18 @@
       ],
       "hash": "b8717b94042cad0697a7798ca5bc505d7f1ac3c3e012d2b236713c6b3e6d35bc",
       "ukuran_kb": 10.8,
-      "ringkasan": "Menjawab: bagaimana pekerjaan balas ulasan Shopee dari ERP dipecah jadi issue induk dan sub-issue BE/FE, apa kriteria 'yang harus benar' untuk tiap bagian, PR mana yang terkait, dan langkah manusia apa yang tersisa (status ADR, urutan deploy integration-service lalu frontend, uji kirim balasan sungguhan). Juga memuat angka cakupan dan jeda balasan ulasan Shopee 90 hari sebagai latar masalah.",
+      "ringkasan": "Menjawab: bagaimana pekerjaan balas ulasan Shopee dari ERP dipecah jadi issue induk dan sub-issue BE/FE, PR mana yang sudah merged, urutan deploy (integration-service sebelum frontend), dan langkah manusia apa yang tersisa sebelum fitur dianggap dipakai. Memuat kriteria 'yang harus benar' per bagian serta data prod pendukung tentang cakupan dan jeda balasan ulasan.",
       "kata_kunci": [
-        "ANALISA",
-        "balas ulasan Shopee",
+        "analisa balas ulasan",
         "review reply",
+        "Shopee",
         "sub-issue",
         "bip-erp#3050",
-        "urutan deploy",
-        "Komplain Belum Dibalas",
+        "erp-frontend",
+        "deploy urutan",
+        "review_reply_attempts",
         "halaman Rating",
-        "cakupan balasan"
+        "papan kerja"
       ]
     },
     {
@@ -20439,20 +20439,20 @@
         "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "0983b76e2d10211d7dc9f7e2fd65049bc3fb0dd0f9928ff0a566fa781e89c5ab",
-      "ukuran_kb": 6.7,
-      "ringkasan": "Menjawab: butir apa saja (kode M-nn) dalam penataan fondasi Manufaktur, PPIC, gudang, dan Quality, issue mana yang sudah menampung tiap butir, dan butir mana yang siap dikerjakan versus menunggu keputusan. Juga menjawab keputusan terbuka K-1 sampai K-11 (pemilik stok pabrik, zona WIP, rilis batch, karantina bahan masuk, COA, HPP per batch, master barang dan gudang) beserta siapa pemutusnya, serta aturan sebelum membuat issue atau kode baru di area ini.",
+      "hash": "ccc0e5015f46dbbb92cc2655a604fe3482996c2815bcf5a1f87248ea0dd558ab",
+      "ukuran_kb": 6.9,
+      "ringkasan": "Menjawab: butir kerja apa saja (kode M-nn) dalam penataan fondasi Manufaktur per fase, issue GitHub mana yang terkait, dan butir mana yang siap dikerjakan atau masih menunggu keputusan. Juga menjawab keputusan apa yang ditunggu (K-1 sampai K-11, mis. pemilik angka stok, zona WIP, keputusan rilis, status bahan masuk, format BPOM, COA) beserta pemutusnya, aturan pakai papan, dan apa yang sengaja di luar cakupan.",
       "kata_kunci": [
         "fondasi manufaktur",
-        "manufacture",
-        "PPIC",
-        "Batch Record",
-        "Quality Control",
-        "karantina",
+        "papan kerja",
+        "backlog manufaktur",
+        "keputusan tertunda",
+        "M-03",
+        "issue induk bip-erp#3068",
+        "batch record",
+        "pemilik stok",
         "COA",
-        "HPP per batch",
-        "stok opname",
-        "Production Order"
+        "PPIC"
       ]
     },
     {

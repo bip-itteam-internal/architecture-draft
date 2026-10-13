@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Endpoint **manufacture-service** (WMS manufaktur: master bahan/produk, stok, transaksi, formula, produksi, PO, proposal, resi retur ekspedisi, feed retur marketplace). Gateway: `/api/manufacture/*`. Grounded ke `services/manufacture/main.go`.*
+*Endpoint **manufacture-service** (WMS manufaktur: master bahan/produk, stok, transaksi, formula, produksi, dokumen produksi batch + spesifikasi produk, PO, proposal, resi retur ekspedisi, feed retur marketplace). Gateway: `/api/manufacture/*`. Grounded ke `services/manufacture/main.go`.*
 
 - **Implementasi**: [[Microservices - Manufacture Service]] · **Status**: ✅ (di kode)
 - **Indeks**: [[API - Index]] · RBAC: di-handle di gateway (tak eksplisit di rute).
@@ -73,6 +73,19 @@
 > **Gagal-aman:** integration tak terjangkau → **502 eksplisit**, bukan daftar kosong; "tak ada retur" dan "gagal menghubungi" wajib bisa dibedakan, karena Finance memakai halaman ini untuk memastikan tak ada retur tertunggak. Paginasi dihabiskan (batas 10 × 200); bila batas tersentuh `meta.truncated=true` + dicatat ke log — pemotongan dilaporkan, tidak dipendam.
 >
 > Retur yang dicatat lewat feed ini tetap membawa penanda `namaMarket`, sehingga tetap **di-SKIP** dari push Penyesuaian Persediaan sesuai [[ADR - 0015 Push Pergerakan WMS ke Accurate]] (tercakup Sales Return).
+
+## Dokumen Produksi Batch & Spesifikasi Produk
+*Rincian alur dan field: [[Manufacture - Dokumen Produksi Batch]]. Gerbang ditulis di pendaftaran rute: `requireTabRead("batch_record")` (pembuka menu), `requireBatchCreate` (admin produksi/RM + super-akses), `requireBatchApprove` (QC/RnD + izin `manufacture.batch.approve` + super-akses PPIC/SPV/IT).*
+
+| Method | Path | Fungsi |
+|---|---|---|
+| GET | `/batch-record` · `/batch-record/:id` | List/detail dossier |
+| POST/PUT | `/batch-record` · `/batch-record/:id` | Buat draft / edit saat DRAFT atau DITOLAK. Field `spesifikasi` **disalin server** dari master spesifikasi produk (kiriman klien diabaikan); Update menyalin ulang bila salinan masih kosong atau kode produk berganti |
+| POST | `/batch-record/:id/ajukan` · `/approve` · `/tolak` · `/paraf` | Ajukan · setujui (body opsional `reviewed:true` + isian QC, termasuk `spesifikasi[].hasil/kesimpulan`; 400 bila kesimpulan bukan `SESUAI`/`TIDAK_SESUAI`/kosong) · tolak · paraf jabatan |
+| PUT/POST | `/batch-record/:id/rekon-mo` · `/rekon-mo/approve` | Rekonsiliasi Pemakaian vs MO |
+| GET | `/spesifikasi-produk-pilihan` | Produk yang bisa diberi spesifikasi: `product_sku` di formula + produk yang sudah berspesifikasi → `[{kode, nama_produk, jumlah_parameter}]`. Disusun server karena `GET /formula` digerbang tab `production` yang tak terbuka bagi QC/PJT. Prefiks sengaja beda agar tak tertelan `/:kode` |
+| GET | `/spesifikasi-produk` · `/spesifikasi-produk/:kode` | List master spesifikasi · detail satu produk (**404** bila belum ada) |
+| PUT | `/spesifikasi-produk/:kode` | Tulis ulang seluruh parameter satu produk (upsert, `requireBatchApprove`). Body `{nama_produk, lini, parameter:[{nama, syarat, metode}]}`; nama wajib, unik (beda kapital/spasi dianggap sama), maks 30 parameter, else 400. Audit `SIMPAN_SPESIFIKASI_PRODUK` |
 
 ## PO · Proposal · Audit
 | Method | Path | Fungsi |
