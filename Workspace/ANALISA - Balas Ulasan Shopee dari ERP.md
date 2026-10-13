@@ -25,7 +25,7 @@ Merge [FE] lebih dulu boleh (tanpa `boleh_balas` tombol tak tampil); deploy [FE]
 ## Induk: Balas ulasan Shopee dari ERP
 
 - **Repo**: `bip-erp` (tanpa PR sendiri)
-- **Issue**: TBD
+- **Issue**: [bip-erp#3050](https://github.com/bip-itteam-internal/bip-erp/issues/3050)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -59,7 +59,7 @@ ADR 0176 Diterima.
 
 - **Repo**: `bip-erp`, sub-issue induk
 - **Urutan**: 1
-- **Issue**: TBD
+- **Issue**: [bip-erp#3051](https://github.com/bip-itteam-internal/bip-erp/issues/3051)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -102,7 +102,7 @@ ADR 0176 Diterima. Tidak ada issue lain.
 
 - **Repo**: `erp-frontend`, sub-issue induk
 - **Urutan**: 2, deploy sesudah [BE]
-- **Issue**: TBD
+- **Issue**: [erp-frontend#2380](https://github.com/bip-itteam-internal/erp-frontend/issues/2380)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
