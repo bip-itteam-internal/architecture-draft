@@ -250,4 +250,4 @@ Seluruh TBD yang dirujuk di sini tercatat di [[Manufacture - Kajian Fondasi Sist
 
 - [[Manufacture - Kajian Fondasi Sistem]] · [[Manufacture - Fondasi Manufaktur Persona]] · [[Manufacture - Dashboard per Posisi]] · [[Manufacture - Dokumen Produksi Batch]]
 - [[Microservices - Manufacture Service]] · [[API - Manufacture Service]] · [[Microservices - Procurement Service]]
-- [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]] · [[ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi]]
+- [[QA - Rancangan Menu per Posisi]] (rancangan menu Quality per posisi; letak CAPA = keputusan Q1 di sana) · [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]] · [[ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi]]
