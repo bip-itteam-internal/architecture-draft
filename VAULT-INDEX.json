@@ -15240,20 +15240,20 @@
         "REF - Kepemilikan Data",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)"
       ],
-      "hash": "a6deb5b66e86968182457d7863e3df933dbb855ebd7a0e06b5f4725d98a9dc9e",
-      "ukuran_kb": 11.7,
-      "ringkasan": "Menjawab: fitur manufaktur ERP mana yang sudah atau belum dipakai di prod, kenapa pabrik masih memakai kertas dan Google Sheet PPIC, dan di mana kode manufaktur saling tumpang tindih (Batch Record, rilis batch, karantina QC, PO bahan, penyesuaian stok, lot/ED). Juga merangkum hasil kuesioner pemakai (karantina, stock opname, rilis oleh APJ, kapan bahan terpakai), struktur spreadsheet PPIC sebagai cetak biru ERP, kebutuhan COA, dan keputusan yang masih TBD.",
+      "hash": "1ff54463cc9a154aff8785a988b367428eef47678e2f1b84a6f850d100559e98",
+      "ukuran_kb": 13.8,
+      "ringkasan": "Menjawab: kenapa modul manufaktur di ERP (Batch Record, Material Order, QC, cycle count, lot) belum dipakai di prod, di mana kode manufaktur tumpang tindih (catatan produksi, rilis batch, karantina QC, PO bahan, sembilan jalur penyesuaian stok, pemilik angka stok vs Accurate), dan apa kata kuesioner pemakai soal karantina, opname, rilis APJ, serta kertas wajib BPOM. Juga menjelaskan bagaimana Google Sheet PPIC yang benar-benar berjalan bisa menjadi cetak biru ERP, celah COA, perbandingan Batch Record kertas vs model ERP, dan keputusan yang masih terbuka.",
       "kata_kunci": [
         "manufaktur",
         "manufacture",
         "PPIC",
         "Batch Record",
-        "rilis batch",
-        "karantina QC",
         "stock opname",
-        "Google Sheet PPIC",
+        "karantina QC",
+        "rilis batch APJ",
+        "spreadsheet PPIC",
         "MRP",
-        "Accurate"
+        "COA"
       ]
     },
     {

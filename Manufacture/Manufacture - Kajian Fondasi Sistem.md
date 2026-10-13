@@ -16,7 +16,7 @@
 | Leader / Operator Produksi | mengisi Batch Record kertas di lantai produksi | tidak perlu input ERP (hasil kuesioner) | kertas |
 | Leader / Admin / Staf Warehouse | penerimaan, karantina, keluar ke produksi, opname mingguan | modul manufacture (WMS) | desktop |
 | QC Assistant / QC Production / QA | QC bahan masuk, pengujian IPC, rilis | modul quality | desktop |
-| APJ / PJT | memutuskan rilis batch (OT dan kosmetik) | TBD, orangnya belum dipastikan | TBD |
+| APJ / PJT (Penanggung Jawab Teknis, posisi QA RND) | memutuskan rilis batch di Lembar Keputusan | modul quality (TBD) | kertas |
 | Finance (Supervisor FAT, Accounting, Cost Control) | validasi opname, persediaan di Accurate, HPP | modul finance | desktop |
 
 - **Tujuan**: satu batch bisa ditelusuri dari rencana PPIC sampai FG masuk gudang, setiap data diketik sekali.
@@ -109,6 +109,28 @@ Obat Tradisional, Kosmetik**.
 - **Lini Pangan belum terwakili** di ERP (yang dibedakan baru OT dan kosmetik) maupun di kajian ini.
 - Istilah: di modul Finance, "COA" berarti **Chart of Accounts**. Tulis lengkap "COA (Certificate of Analysis)" supaya tak tertukar.
 
+## Temuan 6: Batch Record kertas vs model ERP
+
+Dibandingkan satu Batch Record kertas lengkap (produk serum, ukuran batch 120 kg, Oktober 2026) dengan model `BatchRecord` di `shared-library/models/manufacture/models.go`:
+
+| Bagian kertas | No. dokumen | Di ERP |
+|---|---|---|
+| Kepala batch (kode, nama, no. batch, ukuran, tanggal olah, bentuk sediaan, kemasan, masa simpan) | PR/SOP/007/01/F/02 | ✅ |
+| Penimbangan per bahan: no. batch bahan, teoritis, ditimbang, batas R < 2% | | ✅ `penimbangan` (`no_batch_bahan`, `di_luar_batas`) |
+| Daftar Kesiapan Ruang Pengolahan / Pengemasan | PR/04/PD/011/03, /04 | ✅ `kesiapan_olah`, `kesiapan_kemas` |
+| Prosedur pengolahan per fase + Hasil QC | | ✅ `fase` (`hasil_qc`) |
+| Rekonsiliasi mixing / filling / produk jadi, penyimpangan | | ✅ |
+| Catatan Pengemasan: komposisi & foto bahan kemas, prosedur kemas sekunder | PR/SOP/007/01/F/01 | ✅ `komposisi_kemasan`, `foto_kemasan`, `prosedur_kemas` |
+| Ceklis Kelengkapan Dokumen Produksi | | ✅ `checklist_qa` |
+| Lembar Keputusan "Release for Sale" (Penanggung Jawab Teknis) | | ✅ `keputusan_rilis` + penyetuju |
+| **Spesifikasi produk** (pemerian, warna, bau, pH, netto, penandaan, ED) | | ❌ belum ada |
+| **Peralatan** (alat timbang, mesin mixing, mesin coding) | | ❌ belum ada |
+
+- **Batch Record ERP tak perlu dirancang ulang**: bentuknya sudah mengikuti kertas. Yang kurang: pelatihan, hak akses, dan bagian **spesifikasi produk**, yang sekaligus menjadi isi utama COA keluar (Temuan 5).
+- **Pemutus rilis = Penanggung Jawab Teknis** (APJ/PJT), penanda tangan Lembar Keputusan. Pengujian QC adalah dokumen terpisah (Catatan Pengujian Produksi/Pengemasan) yang menjadi syarat keputusan, bukan keputusan rilis kedua.
+- Kesalahan khas kertas yang dicegah sistem: hitungan rekonsiliasi tulis tangan keliru, sisa nama bahan dari template produk lain, identitas tak konsisten antarhalaman (bentuk sediaan, netto).
+- Format nomor batch: kode produk + tanggal `ddmmyy` + urutan (dapat dibangkitkan sistem).
+
 ## Belum Diputuskan (TBD)
 
 1. **Pemilik angka stok pabrik**: ERP (push ke Accurate) atau Accurate. Jawaban pemakai bertentangan (Accurate vs stok fisik). Pemutus: Finance Supervisor. Syarat Finance: ERP mengikuti aturan pencatatan masuk/keluar (penjualan, retur, pembelian, pemakaian produksi); penyesuaian opname dibukukan setelah validasi Finance.
@@ -118,7 +140,7 @@ Obat Tradisional, Kosmetik**.
 5. **Cetak dokumen format BPOM** (kartu stok, Batch Record) sebagai syarat meninggalkan kertas.
 6. **Pemilik HPP per batch**: PPIC vs Cost Accounting.
 7. **Arah pembangunan** (usulan): dashboard dari spreadsheet sebagai jembatan, lalu pindahkan tab demi tab ke ERP mulai penerimaan bahan, hasil produksi, FG keluar, dengan form meniru kolom spreadsheet.
-8. **Pihak belum terpetakan**: siapa APJ/PJT; SPV Manufacture tak punya SOP; departemen teknisi mesin.
+8. **Pihak belum terpetakan**: SPV Manufacture tak punya SOP; departemen teknisi mesin. (APJ/PJT sudah teridentifikasi dari Lembar Keputusan, Temuan 6.)
 9. **COA (Certificate of Analysis) keluar**: format per lini (Pangan, OT, Kosmetik), per batch atau per Surat Jalan, dan penanda tangan (APJ dan/atau Supervisor Quality). Pemutus: Supervisor Quality + APJ.
 
 ## Dokumen Terkait
