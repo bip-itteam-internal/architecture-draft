@@ -457,24 +457,20 @@
         "Marketing - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "25f57423bbb91917a002dffc014aabeb71adb415703f5f9fb5e3b14f1ce622a4",
-      "ukuran_kb": 117.6,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di integration-service (webhook, transactions/orders, TikTok Shop/Business, Shopee, Accurate, /accounting dashboard FAT, profit insentif, ICC mapping, kas toko/wallet, reviews, status sinkron toko, worker/jobs), apa method, path, parameter, dan fungsinya. Juga menjawab filter apa yang didukung order list/export/summary (mis. shopee_attribution, order_ids, updated_since), bagaimana packet tracking, aging piutang, feed retur, dan laporan produk terkirim dipanggil, serta rute mana yang publik atau butuh gateway key.",
+      "hash": "3ab6eb80e214157c5ecec70aef7e6789f24649979e4fdc901fb6ae539b92a5c2",
+      "ukuran_kb": 118.4,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service (order terpadu, export order, aging piutang, feed retur untuk WMS, packet tracking, TikTok Shop/Business, Shopee, Accurate, dashboard FAT /accounting, ICC mapping, kas toko, ulasan, status sinkron toko, worker), parameter dan bentuk responsnya, serta gerbang aksesnya. Juga menjelaskan filter atribusi afiliasi Shopee, webhook publik /ext/webhook, dan siapa konsumen tiap endpoint.",
       "kata_kunci": [
-        "integration service",
-        "endpoint",
-        "API",
-        "webhook",
-        "transactions orders",
-        "packet tracking",
+        "integration-service",
+        "endpoint marketplace",
+        "transaction orders",
         "piutang aging",
-        "feed retur",
-        "shopee_attribution",
-        "accounting FAT",
-        "Accurate",
-        "TikTok Shop",
+        "packet tracking",
+        "retur",
         "Shopee",
-        "gateway key"
+        "TikTok Shop",
+        "Accurate",
+        "webhook"
       ]
     },
     {
@@ -2684,25 +2680,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "f11f650e00f19e891a1501986607dc9122bf5f989ae49f17c9a10374c58db7eb",
-      "ukuran_kb": 467.6,
-      "ringkasan": "Menjawab: apa yang dilakukan integration-service (bridge marketplace TikTok Shop/Business, Shopee, Lazada ke Accurate), bagaimana webhook marketplace diproses, bagaimana order dinormalkan ke model transaksi terpadu, dan bagaimana invoice, sales return, auto-ship, serta worker/cron bekerja. Juga mencakup fitur GMV Max monitoring/overview, ICC mapping, kepemilikan toko per departemen, status sinkron toko, profit per produk, ulasan marketplace, observability Shopee, serta apa yang belum diimplementasikan dan dependensinya.",
+      "hash": "3f43af3af83876087b80fa12390e297824d87e92e4f3712d52f6a2f4e223f9bb",
+      "ukuran_kb": 471.5,
+      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace (TikTok Shop, TikTok Ads, Shopee, Lazada) lewat webhook dan sync, bagaimana order dinormalkan jadi transaksi terpadu lalu di-bridge ke Accurate (invoice, sales return), dan cron/worker apa yang berjalan. Juga menjelaskan GMV Max monitoring, ICC account mapping, Shop ACL dan kepemilikan toko per departemen, ulasan marketplace, gross profit per produk, status sinkron toko, serta rencana Meta Ads.",
       "kata_kunci": [
         "integration service",
         "marketplace",
-        "Accurate",
-        "webhook",
-        "TikTok Shop",
-        "Shopee",
-        "Lazada",
+        "Accurate bridging",
+        "webhook Shopee",
+        "TikTok Business",
         "GMV Max",
-        "ICC",
-        "auto-ship",
-        "worker cron",
-        "transaksi terpadu",
-        "sales invoice",
-        "Desty",
-        "Meta Ads"
+        "ICC mapping",
+        "Shop ACL",
+        "cron sync",
+        "ulasan marketplace"
       ]
     },
     {
@@ -9841,7 +9832,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-13, kode belum ada. Disetujui pemohon lewat `/analisa-kebutuhan` (opsi A dari tiga). Pemutus: irfanarfianto. Berdiri di atas grounding vault + kode `origin/main` + pengukuran prod read-only 2026-10-13. Papan kerja: [[ANALISA - Balas Ulasan Shopee dari ERP]].",
+      "status_teks": "**Diusulkan**, 2026-10-13. Kode: BE bip-erp#3054 dan FE erp-frontend#2393 merged 2026-10-13 atas perintah langsung Pemutus, halaman Rating erp-frontend#2416 belum merged, deploy prod belum diverifikasi (per 2026-10-14). Disetujui pemohon lewat `/analisa-kebutuhan` (opsi A dari tiga). Pemutus: irfanarfianto. Berdiri di atas grounding vault + kode `origin/main` + pengukuran prod read-only 2026-10-13. Papan kerja: [[ANALISA - Balas Ulasan Shopee dari ERP]].",
       "publik": true,
       "tautan": [
         "ANALISA - Balas Ulasan Shopee dari ERP",
@@ -9855,19 +9846,19 @@
         "ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai",
         "API - Integration Service"
       ],
-      "hash": "bd209ea96eaf0382f836844401edd1a991ba8c9b1432d39cd43f6cee131ee1cf",
-      "ukuran_kb": 11.1,
-      "ringkasan": "Menjawab: bagaimana ulasan Shopee dibalas langsung dari ERP lewat API reply_comment, siapa yang boleh membalas (pemegang toko via ICC atau CS, bukan leader yang membaca semua toko), dan bagaimana setiap percobaan dicatat serta galat Shopee ditangani. Juga menjelaskan kenapa balasan otomatis, template, kirim massal, dan draf AI ditunda.",
+      "hash": "7fd6f4c3ba9154b4d4b3f65f585da74d095c8790c37fed3b5017265b9b5189bd",
+      "ukuran_kb": 11.2,
+      "ringkasan": "Menjawab: apakah ulasan Shopee bisa dibalas langsung dari ERP, siapa yang boleh membalas (pemegang toko lewat icc_account_mappings atau cs_shop_mappings, bukan pembaca semua toko), dan bagaimana balasan dikirim lewat reply_comment, dicatat di koleksi jejak terpisah, serta galat Shopee ditangani. Juga menjelaskan apa yang sengaja ditunda: balasan otomatis, template, kirim massal, draf AI, dan TikTok.",
       "kata_kunci": [
         "balas ulasan",
-        "reply review",
+        "review reply",
         "reply_comment",
         "Shopee",
-        "boleh_balas",
         "pemegang toko",
+        "boleh_balas",
         "CS",
         "Seller Center",
-        "jejak balasan"
+        "ADR 0176"
       ]
     },
     {
@@ -20335,19 +20326,19 @@
         "ADR - 0160 Cakupan Baca Ulasan Mencakup Toko Pegangan CS, Menu Dibuka lewat Paket Izin yang Ada",
         "ANALISA - Shop Quality Membaca Ulasan Toko Pegangan CS"
       ],
-      "hash": "685d635e1bbefc470176bdb2b5cc733790e893f32ae65d1c9e4c352bb7902c48",
-      "ukuran_kb": 9.2,
-      "ringkasan": "Menjawab: bagaimana pekerjaan balas ulasan Shopee dari ERP dipecah jadi issue induk serta sub-issue BE (bip-erp) dan FE (erp-frontend), apa kriteria \"yang harus benar\" tiap bagian, urutan deploy, dan data prod yang melatarinya. Juga menyebut prasyarat ADR 0176 Diterima dan langkah yang hanya bisa dikerjakan manusia.",
+      "hash": "8f73bd5d0184a68d43197fe6f578a3c850d3d2f4d8ba792be40934c248418d65",
+      "ukuran_kb": 10.9,
+      "ringkasan": "Menjawab: bagaimana fitur balas ulasan Shopee dari ERP dipecah jadi issue induk dan sub-issue BE/FE, apa kriteria 'yang harus benar' tiap bagian, urutan deploy, PR mana yang terkait, dan langkah manusia apa yang tersisa. Juga memuat data pendukung tingkat balasan ulasan Shopee 90 hari per toko.",
       "kata_kunci": [
-        "balas ulasan Shopee",
-        "reply_comment",
-        "sub-issue",
-        "bip-erp#3050",
-        "erp-frontend#2380",
-        "boleh_balas",
-        "kotak balasan",
+        "analisa balas ulasan",
         "review reply",
-        "Komplain Belum Dibalas"
+        "Shopee",
+        "sub-issue BE FE",
+        "reply_comment",
+        "review_reply_attempts",
+        "halaman Rating",
+        "Komplain Belum Dibalas",
+        "papan kerja"
       ]
     },
     {

@@ -14,6 +14,23 @@ Diukur prod 2026-10-13, ulasan Shopee 90 hari (angka bergerak, ukur ulang sebelu
 - Empat toko Kyura: 9.609 ulasan, 58 dibalas. Toko Beautyhacks: 50% sampai 75% dibalas.
 - 98,5% balasan memakai empat teks yang sama; hanya 61 teks balasan berbeda. Ini bahan langkah otomatisasi, bukan cakupan task di sini.
 
+## Status PR (per 2026-10-14; ukur ulang sebelum dipakai)
+
+Dikerjakan lewat `/kerjakan` 2026-10-13 atas perintah langsung Pemutus, sebelum baris status ADR ditulis Diterima. Mockup yang disetujui: https://claude.ai/artifact/4U8xfyMWymakLGiDUeUGnv (Seller Center tetap tampil, konfirmasi dua langkah, keterangan "dikirim dari ERP oleh"; halaman Rating dipisah dengan tab Per Toko dan Per Produk).
+
+| Bagian | Issue | PR | Keadaan saat ditulis |
+|---|---|---|---|
+| [BE] kirim balasan, jejak, `boleh_balas`, `balasan_erp`, `belum_dibalas` | bip-erp#3051 | [bip-erp#3054](https://github.com/bip-itteam-internal/bip-erp/pull/3054) | merged 2026-10-13; judge lolos percobaan 2 |
+| [FE] aksi Balas + kartu seragam | erp-frontend#2380 | [erp-frontend#2393](https://github.com/bip-itteam-internal/erp-frontend/pull/2393) | merged 2026-10-13; judge lolos percobaan 1 |
+| [FE] halaman Rating terpisah | erp-frontend#2382 (sub-issue saudara, dibuat sesudah mockup) | [erp-frontend#2416](https://github.com/bip-itteam-internal/erp-frontend/pull/2416) | terbuka; judge + gerbang penuh lolos atas baseline @ 0e9fb1b34 |
+
+Sisa langkah manusia:
+
+- Tulis baris status ADR 0176 jadi Diterima (Pemutus), lalu hapus baris ⛔ di atas.
+- Deploy prod `integration-service` lebih dulu, baru `frontend-hris`; tanpa env baru atau paket izin baru. Koleksi `review_reply_attempts` + indeks dibuat `EnsureAllIndexes` saat start.
+- Kirim satu balasan sungguhan dari akun pemegang toko Shopee lalu cocokkan di Seller Center (balasan tak bisa ditarik), dan pastikan "dikirim dari ERP oleh" tampil di kartu.
+- Issue erp-frontend#2382 di Project #15 belum dipindah ke In Review (GraphQL GitHub putus saat dibuat).
+
 ## Urutan dan ketergantungan
 
 ```
