@@ -250,7 +250,7 @@ Yang dilonggarkan **menu, bukan data**. Angka labanya dijaga dua lapis yang tak 
 
 | Modul | view | work | approve | manage | Pengecualian | Reach |
 |---|---|---|---|---|---|---|
-| `hris` | ✅ | ✅ | | ✅ | `hris.pengajuan.view`, `hris.pengajuan.approve`, `hris.divisi.view` | own/div/all |
+| `hris` | ✅ | ✅ | | ✅ | `hris.pengajuan.view`, `hris.pengajuan.approve`, `hris.divisi.view`, `hris.direktori.view` (izin tampilan menu direktori; menunggu merge PR https://github.com/bip-itteam-internal/bip-erp/pull/3070) | own/div/all |
 | `payroll` | ✅ | ✅ | ✅ | ✅ | | all |
 | `recruitment` | ✅ | ✅ | ✅ | ✅ | `recruitment.requisition_cross_dept`, `recruitment.cross_company`, `recruitment.manpower_plan_manage` (merged 2026-09-17, deploy belum diverifikasi) (ADITIF, di luar tangga, lihat catatan di bawah) | div/all |
 | `kpi` | ✅ | ✅ | | ✅ | | own/div/all |
@@ -266,7 +266,7 @@ Yang dilonggarkan **menu, bukan data**. Angka labanya dijaga dua lapis yang tak 
 | `admin` | ✅ | | | ✅ | `admin.permissionset.manage`, `admin.assignment.manage` | all |
 | `secretary` | ✅ | ✅ | | ✅ | tangganya DIPECAH PER AREA: `secretary.legal.*` dan `secretary.rnd.*` | all |
 | ~~`legal`~~ | | | | | dipensiunkan 2026-08-13, dilebur ke `secretary` | |
-| `formbuilder` | ✅ | ✅ | | | `formbuilder.rules.manage` | all |
+| `formbuilder` | ✅ | ✅ | | | `formbuilder.rules.manage`, `formbuilder.tanpa_akses` (penanda, bukan hak; menunggu merge PR https://github.com/bip-itteam-internal/bip-erp/pull/3069) | all |
 | `ticket` | 15 permission granular (sudah live, tidak diubah) | | | | | own/div/all |
 | `finance` | (live, TIDAK memakai tangga — lihat catatan di bawah) | | | | | all |
 | `kaskecil` | (live & ditegakkan; 8 izin, `approve` DIPECAH EMPAT — lihat catatan di bawah) | | | | | own/div/all |
