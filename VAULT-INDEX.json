@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-13",
-  "jumlah_dokumen": 632,
+  "jumlah_dokumen": 633,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -20264,6 +20264,40 @@
         "Batch Record",
         "master anggaran",
         "backlog KPI"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Fondasi Manufaktur.md",
+      "judul": "ANALISA - Fondasi Manufaktur",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": null,
+      "status_teks": null,
+      "publik": false,
+      "tautan": [
+        "Manufacture - Kajian Fondasi Sistem",
+        "REF - Rantai Pengajuan Lintas Modul",
+        "ADR - 0136 Pemilik Master Barang dan Master Gudang",
+        "ADR - 0175 Stok GA di ERP Jadi Stok Operasional, Barang Keluar dan Penyesuaian Dikirim ke Accurate",
+        "Microservices - Manufacture Service",
+        "API - Manufacture Service",
+        "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
+        "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
+      ],
+      "hash": "c6810043cea7c5b813a1dbe429e87d95d9de32f174f0b6725a7bbfe78065904c",
+      "ukuran_kb": 6.3,
+      "ringkasan": "Menjawab: butir kerja apa saja (kode M-nn) untuk menata fondasi Manufaktur, PPIC, gudang bahan/barang jadi, dan Quality, beserta issue GitHub BE/FE yang sudah ada dan urutan fasenya. Juga menjawab keputusan mana (K-1 sampai K-11) yang masih ditunggu, siapa pemutusnya, dan butir mana yang sudah boleh dikerjakan atau harus menunggu ADR diterima. Memuat aturan pakai papan: cek butir sebelum membuat issue atau master data baru, serta apa yang di luar cakupan (scan retur marketplace, stok gudang packing).",
+      "kata_kunci": [
+        "manufaktur",
+        "manufacture",
+        "PPIC",
+        "Batch Record",
+        "Quality Control",
+        "karantina",
+        "stok opname",
+        "rilis produk",
+        "COA",
+        "HPP per batch"
       ]
     },
     {
