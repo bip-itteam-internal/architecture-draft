@@ -15240,9 +15240,9 @@
         "REF - Kepemilikan Data",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)"
       ],
-      "hash": "82b43fd82f64b58f0b1afdb8df19ac435f76b45b2e6861063ffaa3247f7668e7",
-      "ukuran_kb": 10.5,
-      "ringkasan": "Menjawab: kenapa modul manufaktur/pabrik di ERP belum dipakai (sosialisasi dan hak akses, bukan fitur), fitur mana yang sudah dan belum pernah dipakai di prod, serta di mana fondasi kodenya tumpang tindih (Batch Record vs production_log, rilis batch, karantina QC, PO bahan, sembilan jalur penyesuaian stok, pemilik angka stok vs Accurate, lot/ED). Juga merangkum hasil kuesioner pemakai (karantina, opname mingguan, rilis oleh APJ, kertas wajib untuk BPOM) dan bagaimana Google Sheet PPIC yang benar-benar berjalan bisa menjadi cetak biru ERP, beserta keputusan yang masih TBD.",
+      "hash": "a6deb5b66e86968182457d7863e3df933dbb855ebd7a0e06b5f4725d98a9dc9e",
+      "ukuran_kb": 11.7,
+      "ringkasan": "Menjawab: fitur manufaktur ERP mana yang sudah atau belum dipakai di prod, kenapa pabrik masih memakai kertas dan Google Sheet PPIC, dan di mana kode manufaktur saling tumpang tindih (Batch Record, rilis batch, karantina QC, PO bahan, penyesuaian stok, lot/ED). Juga merangkum hasil kuesioner pemakai (karantina, stock opname, rilis oleh APJ, kapan bahan terpakai), struktur spreadsheet PPIC sebagai cetak biru ERP, kebutuhan COA, dan keputusan yang masih TBD.",
       "kata_kunci": [
         "manufaktur",
         "manufacture",
