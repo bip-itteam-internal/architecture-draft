@@ -93,6 +93,22 @@ Satu Google Sheet (±40 tab, data Jan-Okt 2026, dipelihara tim PPIC/gudang) menc
 
 Kualitas data spreadsheet perlu dibereskan sebelum dijadikan sumber: banyak `#N/A`/`#REF!`, tab duplikat, satuan KG dan gram bercampur, formula di dua tab.
 
+## Temuan 5: COA (Certificate of Analysis) keluar belum ada
+
+Masukan SPV Manufacture (2026-10-13): barang jadi yang dikirim perlu **COA (Certificate of Analysis)** sebagai bukti
+lulus QC/QA, biasanya satu lampiran dengan Surat Jalan. Perusahaan menjalankan **tiga lini manufaktur: Pangan,
+Obat Tradisional, Kosmetik**.
+
+| Hal | Di ERP | Bukti |
+|---|---|---|
+| COA **masuk** (dari pemasok) | ✅ ada | lampiran wajib `SURAT_JALAN`/`FOTO`/`COA` saat penerimaan pengajuan barang (procurement) |
+| Surat Jalan FG | ✅ ada | `CetakSuratJalanView`, `KirimFgPanel` (erp-frontend, manufacture) |
+| COA **keluar** per batch FG | ❌ tidak ada | tak ada di kode mana pun |
+
+- COA keluar pada dasarnya ringkasan uji QC + keputusan rilis satu batch, jadi sumbernya Batch Record yang sudah dirilis APJ. Ini menguatkan TBD nomor 3 (satu Batch Record + rilis APJ).
+- **Lini Pangan belum terwakili** di ERP (yang dibedakan baru OT dan kosmetik) maupun di kajian ini.
+- Istilah: di modul Finance, "COA" berarti **Chart of Accounts**. Tulis lengkap "COA (Certificate of Analysis)" supaya tak tertukar.
+
 ## Belum Diputuskan (TBD)
 
 1. **Pemilik angka stok pabrik**: ERP (push ke Accurate) atau Accurate. Jawaban pemakai bertentangan (Accurate vs stok fisik). Pemutus: Finance Supervisor. Syarat Finance: ERP mengikuti aturan pencatatan masuk/keluar (penjualan, retur, pembelian, pemakaian produksi); penyesuaian opname dibukukan setelah validasi Finance.
@@ -103,6 +119,7 @@ Kualitas data spreadsheet perlu dibereskan sebelum dijadikan sumber: banyak `#N/
 6. **Pemilik HPP per batch**: PPIC vs Cost Accounting.
 7. **Arah pembangunan** (usulan): dashboard dari spreadsheet sebagai jembatan, lalu pindahkan tab demi tab ke ERP mulai penerimaan bahan, hasil produksi, FG keluar, dengan form meniru kolom spreadsheet.
 8. **Pihak belum terpetakan**: siapa APJ/PJT; SPV Manufacture tak punya SOP; departemen teknisi mesin.
+9. **COA (Certificate of Analysis) keluar**: format per lini (Pangan, OT, Kosmetik), per batch atau per Surat Jalan, dan penanda tangan (APJ dan/atau Supervisor Quality). Pemutus: Supervisor Quality + APJ.
 
 ## Dokumen Terkait
 

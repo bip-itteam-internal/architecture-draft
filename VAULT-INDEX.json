@@ -1984,19 +1984,22 @@
       ],
       "hash": "9d2e6604a13315a087746c5729769caaa3fe5d73b77faa5a5071dedff3a75727",
       "ukuran_kb": 151.6,
-      "ringkasan": "Menjawab: bagaimana RBAC tiga sumbu (modul, tingkat aksi, cakupan data) bekerja di bip-erp, bagaimana paket hak (permission set) menempel pada posisi/jabatan dan diresolusi saat login, serta modul mana yang sudah punya katalog izin dan penegakan per-aksi. Juga menjawab bagaimana gerbang backend, JWT, dan frontend menegakkan izin, apa itu fase dua tier fallback, dan paket bawaan Semua Izin beserta batas cookie 4 KB.",
+      "ringkasan": "Menjawab: bagaimana RBAC tiga sumbu (modul, tingkat aksi, cakupan data) bekerja di seluruh bip-erp, apa itu paket hak (permission set) yang menempel pada posisi/jabatan, dan katalog izin apa saja yang terdaftar per modul. Juga menjelaskan bagaimana izin ditegakkan di gateway, service, dan frontend, cadangan tier lama `system_roles`, serta batas cookie 4 KB dan paket Semua Izin.",
       "kata_kunci": [
         "RBAC",
         "permission set",
         "paket hak",
         "hak akses",
+        "izin",
         "katalog izin",
         "reach",
-        "tier fallback",
+        "cakupan data",
+        "posisi",
+        "jabatan",
         "system_roles",
-        "JWT",
-        "posisi jabatan",
-        "Semua Izin"
+        "tier fallback",
+        "token JWT",
+        "Siapa Boleh Apa"
       ]
     },
     {
@@ -3091,22 +3094,23 @@
       ],
       "hash": "8aac848f174140d8b88f4a7c2d79468d70f4f33c64dc266d074950711050b0eb",
       "ukuran_kb": 90.4,
-      "ringkasan": "Menjawab: apa saja yang dilakukan procurement-service (master Pemasok, Barang & Jasa, Tagihan Pemasok, cermin baca-saja Pembelian dari Accurate), bagaimana sinkronisasi ke Accurate berjalan, dan bagaimana alur Pengajuan Barang lima tipe (Pengajuan Dana) bekerja dari jenjang approval sampai bukti transfer dan jurnal. Juga menjawab dampak penghapusan Kas Kecil dan Budget lama, KPI Account Payable, model data, serta jebakan integrasi Accurate.",
+      "ringkasan": "Menjawab: apa saja yang dikerjakan procurement-service (master Pemasok, Barang & Jasa, Tagihan/Faktur Pemasok, cermin baca-saja Pembelian dari Accurate), bagaimana sinkronisasi ke Accurate berjalan, dan bagaimana alur Pengajuan Barang lima tipe (jenjang persetujuan, bukti transfer, jurnal, serapan anggaran). Juga memuat jebakan integrasi Accurate, KPI Account Payable, model data, dan dampak penghapusan modul Kas Kecil/Pengajuan Budget lama.",
       "kata_kunci": [
         "procurement",
         "pengadaan",
         "pemasok",
         "vendor",
         "barang dan jasa",
-        "Pengajuan Barang",
-        "Pengajuan Dana",
-        "faktur pembelian",
         "Accurate",
-        "purchase order",
-        "penerimaan",
-        "tagihan",
+        "pengajuan barang",
+        "pengajuan dana",
+        "faktur pembelian",
+        "tagihan pemasok",
+        "pembayaran vendor",
         "KPI Account Payable",
-        "AP"
+        "AP",
+        "bukti transfer",
+        "sync"
       ]
     },
     {
@@ -10363,7 +10367,7 @@
       ],
       "hash": "20468e7ca78004a2bae3819d2bbaa81260c504a19ae9f65b4acb8d9c1813b945",
       "ukuran_kb": 37.0,
-      "ringkasan": "Menjawab: apa aturan bisnis kas kecil per divisi (plafon, ambang Rp 500.000, sembilan aturan R-01 sampai R-09, matriks approval), apa yang dihapus dari kode pada 2026-10-12 dan apa yang tetap dipakai Pengajuan Dana. Juga menjawab lubang data hasil sensus prod, tabrakan dengan arsitektur Accurate, dan hal yang masih TBD.",
+      "ringkasan": "Menjawab: aturan bisnis kas kecil per divisi (plafon, sembilan aturan R-01 sampai R-09, matriks approval), apa yang dihapus dari kode pada 2026-10-12 dan apa yang tetap dipakai Pengajuan Dana. Juga mencatat lubang data hasil pengukuran prod, tabrakan dengan arsitektur Accurate, dan item TBD pencabutan katalog izin `kaskecil`.",
       "kata_kunci": [
         "kas kecil",
         "petty cash",
@@ -10371,11 +10375,13 @@
         "plafon",
         "divisi",
         "approval",
-        "Pengajuan Dana",
-        "penghapusan modul",
-        "kas_jurnal_outbox",
+        "pengajuan dana",
+        "dihapus",
+        "kaskecil",
+        "budget",
+        "Finance",
+        "outbox jurnal",
         "ACCURATE_KAS_PUSH",
-        "finance",
         "top-up"
       ]
     },
@@ -15244,9 +15250,9 @@
         "REF - Kepemilikan Data",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)"
       ],
-      "hash": "82b43fd82f64b58f0b1afdb8df19ac435f76b45b2e6861063ffaa3247f7668e7",
-      "ukuran_kb": 10.6,
-      "ringkasan": "Menjawab: kenapa modul manufaktur/pabrik di ERP belum dipakai (sosialisasi dan hak akses, bukan fitur), fitur mana yang sudah dan belum pernah dipakai di prod, serta di mana fondasi kodenya tumpang tindih (Batch Record vs production_log, rilis batch, karantina QC, PO bahan, sembilan jalur penyesuaian stok, pemilik angka stok vs Accurate, lot/ED). Juga merangkum hasil kuesioner pemakai (karantina, opname mingguan, rilis oleh APJ, kertas wajib untuk BPOM) dan bagaimana Google Sheet PPIC yang benar-benar berjalan bisa menjadi cetak biru ERP, beserta keputusan yang masih TBD.",
+      "hash": "a6deb5b66e86968182457d7863e3df933dbb855ebd7a0e06b5f4725d98a9dc9e",
+      "ukuran_kb": 11.8,
+      "ringkasan": "Menjawab: fitur manufaktur ERP mana yang sudah atau belum dipakai di prod, kenapa pabrik masih memakai kertas dan Google Sheet PPIC, dan di mana kode manufaktur saling tumpang tindih (Batch Record, rilis batch, karantina QC, PO bahan, penyesuaian stok, lot/ED). Juga merangkum hasil kuesioner pemakai (karantina, stock opname, rilis oleh APJ, kapan bahan terpakai), struktur spreadsheet PPIC sebagai cetak biru ERP, kebutuhan COA, dan keputusan yang masih TBD.",
       "kata_kunci": [
         "manufaktur",
         "manufacture",
