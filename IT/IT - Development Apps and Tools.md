@@ -22,8 +22,12 @@
 - Dibuka lewat tautan tanpa login; potongan URL rahasianya ada di rahasia Worker
 - Rincian dan batasan pemakaian angkanya: [[IT - Papan Aktivitas Developer]]
 
+**QA Device Lab** (🟡 direncanakan) — alat QA untuk menguji aplikasi Android di banyak HP sekaligus, pengganti aman untuk Panda
+- Panda tidak dipasang di PC kantor atau HP kerja; alasan dan rancangan penggantinya: [[IT - QA Device Lab]]
+
 ## Dokumen Terkait
 
 - [[IT - Big Pictures]] — peta domain IT
 - [[IT - Server, VMs and Databases]] — VM tempat tool ini di-host
 - [[IT - Papan Aktivitas Developer]] — papan aktivitas developer (di-host di luar VM internal)
+- [[IT - QA Device Lab]] — alat QA banyak HP Android (direncanakan)
