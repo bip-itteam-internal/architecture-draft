@@ -879,6 +879,26 @@ dari 7 kategori grid (bukan panggil `/anggaran/varians`), label & pola SAMA deng
 `KartuVariansOpex` di tab "Master Anggaran" sebelahnya, supaya "varians OPEX" berarti hal
 yang sama di kedua tab.
 
+**Galat akses dibedakan dari galat Accurate (2026-10-13, erp-frontend #2377, merged; deploy
+prod TBD).** Tiga sumber otomatis tab ini, `GET /profit/incentive/beban-marketing`,
+`/summary`, dan `/biaya-engine`, digerbang `RequireMenu("finance.insentif")` di
+integration-service. Akun yang tokennya membawa kunci menu Insentif tanpa izinnya mendapat
+**403**.
+
+Sebelum perbaikan, layar menampilkan 403 itu secara keliru:
+- kartu kategori menulis "Gagal memuat data Accurate.", sehingga Accurate yang tertuduh;
+- kartu Biaya Engine merender **Rp 0** palsu karena tidak punya keadaan galat;
+- kartu Beban Iklan menyembunyikan galatnya.
+
+Kini 403 dikenali lewat `galatTakBerhak` (`src/lib/pesan-galat.ts`) dan tampil sebagai "tidak
+punya akses Insentif" (`finance.opexManual.hintTakBerhak`). Galat lain tetap memakai
+`hintGagalMuat`, dan Biaya Engine menampilkan penanda kosong + pesan, bukan nol.
+
+⚠️ Yang menentukan siapa boleh melihat angka di tab ini adalah izin menu **Insentif**, bukan
+izin Anggaran. Apakah tab ini seharusnya terbuka bagi non-pemegang menu Insentif belum
+diputuskan (TBD); gerbangnya sengaja dipertahankan karena isinya beban per karyawan yang
+menentukan insentif.
+
 **Revisi lanjutan 2026-08-20 (form vertikal + Daftar Pemegang Laptop/PC):**
 
 - **Form "Tambah catatan" jadi vertikal**, bukan grid 2/4 kolom — drawer sisi kanan

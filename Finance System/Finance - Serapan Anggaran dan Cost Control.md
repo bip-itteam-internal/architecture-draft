@@ -119,7 +119,7 @@ Dilacak di bip-erp#2814 (Pemutus: wirkancil):
     - erp-frontend #2352: keterangan "Terisi dari" di form Rekomendasi hilang begitu akun diganti.
     - erp-frontend #2355: sheet rincian tidak lagi terbuka sendiri saat posnya muncul lagi.
     - erp-frontend #2358: menunggu sinkron (lihat §Aturan Membaca Angka).
-  - **Belum merged**: erp-frontend #2350, yang menghapus `sebabTakTerdefinisi` yang tak terpakai sehingga urutan sebab hanya tersisa di `sebabBaris`.
+    - erp-frontend #2350: `sebabTakTerdefinisi` yang tak terpakai dihapus, sehingga urutan sebab hanya tersisa di `sebabBaris` (merged 2026-10-12).
 
   Deploy prod untuk semuanya TBD.
 - **Verifikasi**: belum ada layar yang dilihat di browser dan belum ada endpoint yang dicoba lewat gateway.
