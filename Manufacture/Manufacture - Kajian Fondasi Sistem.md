@@ -128,20 +128,32 @@ Dibandingkan satu Batch Record kertas lengkap (produk serum, ukuran batch 120 kg
 
 - **Batch Record ERP tak perlu dirancang ulang**: bentuknya sudah mengikuti kertas. Yang kurang: pelatihan, hak akses, dan bagian **spesifikasi produk**, yang sekaligus menjadi isi utama COA keluar (Temuan 5).
 - **Pemutus rilis = Penanggung Jawab Teknis** (APJ/PJT), penanda tangan Lembar Keputusan. Pengujian QC adalah dokumen terpisah (Catatan Pengujian Produksi/Pengemasan) yang menjadi syarat keputusan, bukan keputusan rilis kedua.
-- Kesalahan khas kertas yang dicegah sistem: hitungan rekonsiliasi tulis tangan keliru, sisa nama bahan dari template produk lain, identitas tak konsisten antarhalaman (bentuk sediaan, netto).
+- Kesalahan khas kertas yang dicegah sistem: hitungan rekonsiliasi tulis tangan keliru, identitas tak konsisten antarhalaman (bentuk sediaan, netto), dan bahan pengganti yang tidak tercatat sebagai penyimpangan (lihat Temuan 7).
 - Format nomor batch: kode produk + tanggal `ddmmyy` + urutan (dapat dibangkitkan sistem).
+
+## Temuan 7: Batch Record lulus vs ditolak
+
+Dibandingkan dua Batch Record lengkap (Oktober 2026), satu diputuskan LULUS dan satu DITOLAK oleh Penanggung Jawab Teknis.
+
+- **Penolakan berakar pada ketersediaan bahan, bukan hasil uji QC.** Bahan baku habis sehingga diganti bahan lain; komposisi tak lagi sesuai pendaftaran. Hasil uji QC pada kedua batch tertulis lulus. Karena itu **pemeriksaan "semua bahan formula tersedia" sebelum produksi dimulai** menjadi kebutuhan utama, tersambung ke MRP, safety stock, dan akurasi stok.
+- **Barang jadi sudah dikemas penuh, berlabel, dan ber-ED sebelum keputusan rilis.** Stok FG butuh status **"karantina menunggu rilis"**; FG tak boleh dianggap tersedia sebelum diputuskan.
+- **Nasib barang yang ditolak tidak tercatat di dokumen mana pun.** Lembar Keputusan hanya stempel, tanpa alasan dan tanpa pilihan tindak lanjut. Model ERP sudah mewajibkan `alasan_tolak` (lebih baik dari kertas), tetapi belum punya field **nasib barang** (karantina / musnah / rework / lainnya) sebagai keputusan tersendiri.
+- **Kolom Penyimpangan tulis tangan tak dapat diandalkan** (bisa tertulis nihil padahal ada bahan pengganti dan rekonsiliasi di luar batas). Penyimpangan sebaiknya **dihitung sistem** dari selisih formula, penggantian bahan, dan rekonsiliasi.
+- **Satu nomor lot tercatat untuk dua bahan berbeda.** Sistem perlu menegakkan satu lot = satu bahan.
+- **Data uji QC tipis**: parameter spesifikasi seperti pH tidak diukur. COA (Temuan 5) yang dirakit dari Batch Record akan kosong di parameter itu; praktik pengujian perlu dibenahi lebih dulu (di luar sistem).
 
 ## Belum Diputuskan (TBD)
 
 1. **Pemilik angka stok pabrik**: ERP (push ke Accurate) atau Accurate. Jawaban pemakai bertentangan (Accurate vs stok fisik). Pemutus: Finance Supervisor. Syarat Finance: ERP mengikuti aturan pencatatan masuk/keluar (penjualan, retur, pembelian, pemakaian produksi); penyesuaian opname dibukukan setelah validasi Finance.
 2. **Model zona WIP** dan kapan bahan dianggap terpakai. Pemutus: SPV Manufacture + Supervisor Quality.
-3. **Satu Batch Record + keputusan rilis APJ**, dan **perlakuan batch berstatus Ditolak** (boleh masuk stok FG dengan catatan penyimpangan, atau ditahan). Pemutus: Supervisor Quality + APJ.
+3. **Satu Batch Record + keputusan rilis APJ**, dan **perlakuan batch berstatus Ditolak**: daftar pilihan nasib barang (karantina, musnah, rework, dan apakah ada pilihan lain) dicatat sebagai keputusan tersendiri. Pemutus: Supervisor Quality + APJ.
 4. **Status bahan masuk** di sistem: karantina, Lulus, Reject, Ditolak.
 5. **Cetak dokumen format BPOM** (kartu stok, Batch Record) sebagai syarat meninggalkan kertas.
 6. **Pemilik HPP per batch**: PPIC vs Cost Accounting.
 7. **Arah pembangunan** (usulan): dashboard dari spreadsheet sebagai jembatan, lalu pindahkan tab demi tab ke ERP mulai penerimaan bahan, hasil produksi, FG keluar, dengan form meniru kolom spreadsheet.
 8. **Pihak belum terpetakan**: SPV Manufacture tak punya SOP; departemen teknisi mesin. (APJ/PJT sudah teridentifikasi dari Lembar Keputusan, Temuan 6.)
 9. **COA (Certificate of Analysis) keluar**: format per lini (Pangan, OT, Kosmetik), per batch atau per Surat Jalan, dan penanda tangan (APJ dan/atau Supervisor Quality). Pemutus: Supervisor Quality + APJ.
+10. **Gerbang ketersediaan bahan sebelum produksi**: apakah batch boleh dimulai bila ada bahan formula yang kurang, dan siapa yang menyetujui penggantian bahan. Pemutus: SPV Manufacture + APJ.
 
 ## Dokumen Terkait
 

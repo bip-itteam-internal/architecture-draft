@@ -15249,20 +15249,20 @@
         "REF - Kepemilikan Data",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)"
       ],
-      "hash": "1ff54463cc9a154aff8785a988b367428eef47678e2f1b84a6f850d100559e98",
-      "ukuran_kb": 13.8,
-      "ringkasan": "Menjawab: kenapa modul manufaktur (produksi, PPIC, gudang bahan baku/FG, QC) di ERP belum dipakai, fitur mana yang benar-benar berjalan di prod, dan di mana kode manufaktur tumpang tindih (Batch Record, rilis batch, karantina QC, PO bahan, jalur penyesuaian stok, pemilik angka stok vs Accurate). Juga menjawab apa kata pemakai lewat kuesioner (karantina, stock opname mingguan, bahan keluar ke produksi, rilis oleh APJ, dokumen kertas untuk BPOM), bagaimana Google Sheet PPIC bisa jadi cetak biru ERP, dan keputusan apa yang masih terbuka.",
+      "hash": "f45828acf1ed92336554d3587f2960003ea3cab3190936e6c2414402a46d807e",
+      "ukuran_kb": 15.6,
+      "ringkasan": "Menjawab: fitur manufaktur ERP mana yang sudah dipakai di prod dan mana yang belum pernah dipakai, kenapa pabrik belum memakai ERP (sosialisasi dan hak akses), serta di mana fondasi kode manufaktur tumpang tindih (Batch Record, rilis batch, QC bahan masuk, PO bahan, penyesuaian stok, sinkron Accurate, lot/ED). Juga menjawab apa kata kuesioner pemakai (karantina, stock opname mingguan, rilis oleh APJ, kertas wajib untuk audit BPOM), bagaimana Google Sheet PPIC bisa jadi cetak biru ERP, dan keputusan apa yang masih TBD.",
       "kata_kunci": [
         "manufaktur",
         "manufacture",
         "PPIC",
-        "Batch Record",
+        "batch record",
         "rilis batch",
         "karantina QC",
         "stock opname",
-        "Google Sheet PPIC",
-        "MRP",
-        "BPOM"
+        "spreadsheet PPIC",
+        "BPOM",
+        "MRP"
       ]
     },
     {
