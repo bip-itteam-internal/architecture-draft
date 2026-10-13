@@ -36,7 +36,7 @@
 
 | Persona | Peran & Divisi | Akses/RBAC | Device |
 |---|---|---|---|
-| R&D Regulatory | jabatan **`QA RND`** di department **`secretary`** (Kesekretariatan) | peran `rnd:staff` diturunkan dari jabatan, atau paket **Sekretariat: R&D Pelaksana** — kelola registrasi & pipeline | Web ERP |
+| R&D Regulatory | jabatan **`QA RND`** di department **`secretary`** (Kesekretariatan) | peran `rnd:staff` (+ `manufacture: rnd` sebagai PJT di Dokumen Produksi Batch, PR bip-erp#3084, belum merged) diturunkan dari jabatan, atau paket **Sekretariat: R&D Pelaksana** — kelola registrasi & pipeline | Web ERP |
 | R&D Regulatory Supervisor | department `secretary` | peran `rnd:supervisor` atau paket **Sekretariat: R&D Admin** — termasuk hapus | Web ERP |
 | Supervisor / admin IT | Tech Development | super-akses, bertahan juga di fase dua | Web ERP |
 
@@ -81,7 +81,7 @@ pribadi atau angka uang) dan pencabutannya satu baris di `peran_dari_jabatan.go`
 - [[Microservices - Employee Service]] — host endpoint `/rnd/*`, Mongo, seed department.
 - [[CORE - API Master Gateway]] — meneruskan `/api/employee/rnd/*` + header `BIP-*`.
 - [[CORE - RBAC dan Permission Set]] — modul `secretary`, izin `secretary.rnd.*`, dan tier lama `system_roles.rnd`.
-- [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]] — jabatan `QA RND` di Kesekretariatan menurunkan peran `rnd: staff`.
+- [[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]] — jabatan `QA RND` di Kesekretariatan menurunkan peran `rnd: staff` (dan `manufacture: rnd`, PR bip-erp#3084, belum merged).
 - [[APP - Web ERP]] — kategori sidebar SEKRETARIAT.
 
 ## Dokumen Terkait

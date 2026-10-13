@@ -64,7 +64,7 @@ Sakelar `ROLE_FROM_POSITION=off` mengembalikan perilaku lama tanpa deploy kode.
 | Departemen | Jabatan | Peran diturunkan |
 |---|---|---|
 | Kesekretariatan | `Legal` | `legal: staff` |
-| Kesekretariatan | `QA RND` | `rnd: staff` |
+| Kesekretariatan | `QA RND` | `rnd: staff` + `manufacture: rnd` (tambahan 2026-10-13: pemegangnya PJT, pemutus Dokumen Produksi Batch dan penulis spesifikasi produk; PR bip-erp#3084, belum merged) |
 
 Keduanya ditambahkan bersama peleburan modul `legal` + `rnd` jadi `secretary`
 ([[QA - Register Perizinan & Sertifikasi]]). Ini **tampak** melanggar batas ADR ini, yang
