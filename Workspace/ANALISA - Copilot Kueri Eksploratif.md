@@ -152,7 +152,7 @@ Ukur prod `assistant_db.percakapan` 2026-10-12: 158 giliran, 10 penanya, ±10 "b
 ### 3/7 [BE] Pasang eksekutor kueri: area marketing dan marketplace
 
 - **Repo**: bip-erp (sub-issue induk)
-- **Issue**: (diisi saat dibuat)
+- **Issue**: [bip-erp#3026](https://github.com/bip-itteam-internal/bip-erp/issues/3026)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -190,7 +190,7 @@ Kunci `transaction_orders` prod 2026-10-12 memuat `buyer`, `items`, `payment`. R
 ### 4/7 [BE] Pasang eksekutor kueri: area HR
 
 - **Repo**: bip-erp (sub-issue induk)
-- **Issue**: (diisi saat dibuat)
+- **Issue**: [bip-erp#3027](https://github.com/bip-itteam-internal/bip-erp/issues/3027)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -228,7 +228,7 @@ Pertanyaan prod tak terjawab: lihat ADR 0173 § Context.
 ### 5/7 [BE] Pasang eksekutor kueri: area finance, procurement, gudang, manufaktur
 
 - **Repo**: bip-erp (sub-issue induk)
-- **Issue**: (diisi saat dibuat)
+- **Issue**: [bip-erp#3028](https://github.com/bip-itteam-internal/bip-erp/issues/3028)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -265,7 +265,7 @@ Pertanyaan prod "estimasi kedatangan supplier" (2026-10-02) dijawab "belum terse
 ### 6/7 [BE] Pasang eksekutor kueri: tiket, form, kalender, notifikasi
 
 - **Repo**: bip-erp (sub-issue induk)
-- **Issue**: (diisi saat dibuat)
+- **Issue**: [bip-erp#3029](https://github.com/bip-itteam-internal/bip-erp/issues/3029)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
