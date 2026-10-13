@@ -1,5 +1,7 @@
 > Papan kerja penataan fondasi sistem Manufaktur (produksi, PPIC, gudang bahan dan barang jadi, Quality), dibuat 2026-10-13. Temuan dan keputusan terbuka ada di [[Manufacture - Kajian Fondasi Sistem]]; peta rantai lintas modul di [[REF - Rantai Pengajuan Lintas Modul]]. Berkas ini berubah tiap butir bergerak; dok di atas tidak.
 
+**Issue induk:** bip-itteam-internal/bip-erp#3068 `[Fondasi Manufaktur] Penataan produksi, gudang, dan QC` (Project #15, label `fondasi-manufaktur` di semua issue terkait). Issue yang sudah punya induk lain (#2595 dan #3038 di bawah #2616; #2251 dengan sub-issue-nya) tidak dipindah, hanya ditautkan lewat komentar penghubung. Duplikat bip-erp#2357 ditutup, keputusan K-7 dibahas di #2189.
+
 # Aturan pakai papan ini
 
 1. **Sebelum membuat issue, kode, atau data master baru, cari butirnya di tabel ini.** Bila sudah ada issue, kerjakan di issue itu; jangan membuat yang baru.

@@ -20284,20 +20284,20 @@
         "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "c6810043cea7c5b813a1dbe429e87d95d9de32f174f0b6725a7bbfe78065904c",
-      "ukuran_kb": 6.3,
-      "ringkasan": "Menjawab: butir kerja apa saja (kode M-nn) untuk menata fondasi Manufaktur, PPIC, gudang bahan/barang jadi, dan Quality, beserta issue GitHub BE/FE yang sudah ada dan urutan fasenya. Juga menjawab keputusan mana (K-1 sampai K-11) yang masih ditunggu, siapa pemutusnya, dan butir mana yang sudah boleh dikerjakan atau harus menunggu ADR diterima. Memuat aturan pakai papan: cek butir sebelum membuat issue atau master data baru, serta apa yang di luar cakupan (scan retur marketplace, stok gudang packing).",
+      "hash": "0983b76e2d10211d7dc9f7e2fd65049bc3fb0dd0f9928ff0a566fa781e89c5ab",
+      "ukuran_kb": 6.7,
+      "ringkasan": "Menjawab: butir apa saja (kode M-nn) dalam penataan fondasi Manufaktur, PPIC, gudang, dan Quality, issue mana yang sudah menampung tiap butir, dan butir mana yang siap dikerjakan versus menunggu keputusan. Juga menjawab keputusan terbuka K-1 sampai K-11 (pemilik stok pabrik, zona WIP, rilis batch, karantina bahan masuk, COA, HPP per batch, master barang dan gudang) beserta siapa pemutusnya, serta aturan sebelum membuat issue atau kode baru di area ini.",
       "kata_kunci": [
-        "manufaktur",
+        "fondasi manufaktur",
         "manufacture",
         "PPIC",
         "Batch Record",
         "Quality Control",
         "karantina",
-        "stok opname",
-        "rilis produk",
         "COA",
-        "HPP per batch"
+        "HPP per batch",
+        "stok opname",
+        "Production Order"
       ]
     },
     {
