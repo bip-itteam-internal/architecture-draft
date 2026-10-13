@@ -1,6 +1,6 @@
 # ADR - 0176 Ulasan Shopee Dibalas dari ERP oleh Pemegang Toko, Otomatisasi Menyusul
 
-> **Status**: 🟡 **Diusulkan**, 2026-10-13. Kode: BE bip-erp#3054 dan FE erp-frontend#2393 merged 2026-10-13 atas perintah langsung Pemutus, halaman Rating erp-frontend#2416 belum merged, deploy prod belum diverifikasi (per 2026-10-14). Disetujui pemohon lewat `/analisa-kebutuhan` (opsi A dari tiga). Pemutus: irfanarfianto. Berdiri di atas grounding vault + kode `origin/main` + pengukuran prod read-only 2026-10-13. Papan kerja: [[ANALISA - Balas Ulasan Shopee dari ERP]].
+> **Status**: 🟡 **Diusulkan**, 2026-10-13. Kode: BE bip-erp#3054 dan FE erp-frontend#2393 merged 2026-10-13 atas perintah langsung Pemutus, halaman Rating erp-frontend#2416 merged 2026-10-14, deploy prod belum diverifikasi. Disetujui pemohon lewat `/analisa-kebutuhan` (opsi A dari tiga). Pemutus: irfanarfianto. Berdiri di atas grounding vault + kode `origin/main` + pengukuran prod read-only 2026-10-13. Papan kerja: [[ANALISA - Balas Ulasan Shopee dari ERP]].
 
 ## Untuk Manajemen
 

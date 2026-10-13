@@ -2679,20 +2679,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "3f43af3af83876087b80fa12390e297824d87e92e4f3712d52f6a2f4e223f9bb",
-      "ukuran_kb": 471.5,
-      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace (TikTok Shop, TikTok Ads, Shopee, Lazada) lewat webhook dan sync, bagaimana order dinormalkan jadi transaksi terpadu lalu di-bridge ke Accurate (invoice, sales return), dan cron/worker apa yang berjalan. Juga menjelaskan GMV Max monitoring, ICC account mapping, Shop ACL dan kepemilikan toko per departemen, ulasan marketplace, gross profit per produk, status sinkron toko, serta rencana Meta Ads.",
+      "hash": "b591fe63ce631d54ad70285a40472f68761fde387a7e3ec49be45046a8532839",
+      "ukuran_kb": 471.8,
+      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace (TikTok Shop, TikTok Ads/GMV Max, Shopee, Lazada) lewat webhook dan sync terjadwal, bagaimana order dinormalkan jadi model transaction lalu di-push ke Accurate sebagai Sales Invoice/Return, dan endpoint apa saja yang tersedia per modul. Juga menjawab soal Shop ACL dan kepemilikan toko per departemen, mapping akun ICC, ulasan marketplace, fulfillment ke WMS, cron worker, serta catatan ketahanan Shopee dan performa MongoDB.",
       "kata_kunci": [
-        "integration service",
+        "integration-service",
         "marketplace",
-        "Accurate bridging",
-        "webhook Shopee",
-        "TikTok Business",
+        "webhook",
+        "Accurate",
+        "TikTok Shop",
+        "Shopee",
         "GMV Max",
-        "ICC mapping",
+        "ulasan marketplace",
         "Shop ACL",
-        "cron sync",
-        "ulasan marketplace"
+        "ICC"
       ]
     },
     {
@@ -9831,7 +9831,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-13. Kode: BE bip-erp#3054 dan FE erp-frontend#2393 merged 2026-10-13 atas perintah langsung Pemutus, halaman Rating erp-frontend#2416 belum merged, deploy prod belum diverifikasi (per 2026-10-14). Disetujui pemohon lewat `/analisa-kebutuhan` (opsi A dari tiga). Pemutus: irfanarfianto. Berdiri di atas grounding vault + kode `origin/main` + pengukuran prod read-only 2026-10-13. Papan kerja: [[ANALISA - Balas Ulasan Shopee dari ERP]].",
+      "status_teks": "**Diusulkan**, 2026-10-13. Kode: BE bip-erp#3054 dan FE erp-frontend#2393 merged 2026-10-13 atas perintah langsung Pemutus, halaman Rating erp-frontend#2416 merged 2026-10-14, deploy prod belum diverifikasi. Disetujui pemohon lewat `/analisa-kebutuhan` (opsi A dari tiga). Pemutus: irfanarfianto. Berdiri di atas grounding vault + kode `origin/main` + pengukuran prod read-only 2026-10-13. Papan kerja: [[ANALISA - Balas Ulasan Shopee dari ERP]].",
       "publik": true,
       "tautan": [
         "ANALISA - Balas Ulasan Shopee dari ERP",
@@ -9845,9 +9845,9 @@
         "ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai",
         "API - Integration Service"
       ],
-      "hash": "7fd6f4c3ba9154b4d4b3f65f585da74d095c8790c37fed3b5017265b9b5189bd",
+      "hash": "2ee2ea045a6f0f3608726e448a45d92137c77f703ff435486d42910b77132e1f",
       "ukuran_kb": 11.1,
-      "ringkasan": "Menjawab: apakah ulasan Shopee bisa dibalas langsung dari ERP, siapa yang boleh membalas (pemegang toko lewat icc_account_mappings atau cs_shop_mappings, bukan pembaca semua toko), dan bagaimana balasan dikirim lewat reply_comment, dicatat di koleksi jejak terpisah, serta galat Shopee ditangani. Juga menjelaskan apa yang sengaja ditunda: balasan otomatis, template, kirim massal, draf AI, dan TikTok.",
+      "ringkasan": "Menjawab: apakah ulasan Shopee bisa dibalas langsung dari ERP, siapa yang boleh mengirim balasan (pemegang toko lewat icc_account_mappings atau cs_shop_mappings, bukan pembaca semua toko), dan bagaimana balasan dikirim lewat API reply_comment serta dicatat di koleksi jejak terpisah. Juga menjelaskan apa yang sengaja ditunda (balasan otomatis, template, kirim massal, draf AI, TikTok) dan kenapa data lokal diperbarui dengan $set, bukan ReplaceOne.",
       "kata_kunci": [
         "balas ulasan",
         "review reply",
@@ -9855,8 +9855,8 @@
         "Shopee",
         "pemegang toko",
         "boleh_balas",
-        "CS",
         "Seller Center",
+        "ulasan belum dibalas",
         "ADR 0176"
       ]
     },
@@ -14389,21 +14389,10 @@
         "IT - Big Pictures",
         "IT - Server, VMs and Databases"
       ],
-      "hash": "72b02716e8790e679d52d2e351d64af3aaa4f0f16802f220bf93b4acb172f653",
+      "hash": "798d0c52784244c7fc174033da610b0b02e441e642d6b87a92e4596870134672",
       "ukuran_kb": 2.1,
-      "ringkasan": "Menjawab: tools development internal apa saja yang dipakai tim IT (Hoppscotch, OneBharata dev/prod, Papan Aktivitas Developer), di mana masing-masing di-host, dan URL aksesnya. Juga menjelaskan bagaimana credentials didapat dan menunjuk ke dok QA Device Lab yang direncanakan.",
-      "kata_kunci": [
-        "Hoppscotch",
-        "OneBharata",
-        "development tools",
-        "API development",
-        "VM ERP-Development",
-        "VPS Biznet",
-        "papan aktivitas developer",
-        "dev-activity-board",
-        "akses tools internal",
-        "URL dev prod"
-      ]
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "IT/IT - Employee System.md",
@@ -14698,8 +14687,8 @@
       "judul": "IT - QA Device Lab",
       "area": "IT",
       "jenis": "domain",
-      "status_emoji": "🟡",
-      "status_teks": "Direncanakan — spec desain selesai 2026-10-13, belum ada kode.",
+      "status_emoji": "⚠️",
+      "status_teks": "Implemented (ada catatan) — Tahap 1 mode manual merged 2026-10-14 (PR #2); **belum diuji dengan HP sungguhan**; mode agen AI (Tahap 2) belum dibuat.",
       "publik": false,
       "tautan": [
         "Microservices - Assistant Service",
@@ -14709,23 +14698,10 @@
         "CORE - Kapabilitas AI dan Machine Learning",
         "IT - Big Pictures"
       ],
-      "hash": "2b6de0f16d76fb449b56b96b8743d456bca57292f071f9b7af1cbd578269785b",
-      "ukuran_kb": 6.3,
-      "ringkasan": "Menjawab: kenapa Panda tidak dipasang di PC/HP kantor, apa rancangan penggantinya untuk menguji aplikasi Android di banyak HP sekaligus (scrcpy, Maestro, adb, mode agen AI), apa yang sengaja tidak dibuat, dan apa saja yang masih TBD. Juga memuat ringkasan analisis keamanan Panda dan rujukan sumber dayanya.",
-      "kata_kunci": [
-        "QA Device Lab",
-        "Panda",
-        "scrcpy",
-        "Maestro",
-        "adb",
-        "uji Android massal",
-        "device farm",
-        "group control",
-        "mirroring HP",
-        "agen AI QA",
-        "analisis keamanan Panda",
-        "QA tester"
-      ]
+      "hash": "51badac8bc75b3949218d8f0bcff6468b9fde4fe34e480e07bd15d7aaf164601",
+      "ukuran_kb": 6.7,
+      "ringkasan": null,
+      "kata_kunci": []
     },
     {
       "path": "IT/IT - Runbooks.md",
@@ -20328,19 +20304,19 @@
         "ADR - 0160 Cakupan Baca Ulasan Mencakup Toko Pegangan CS, Menu Dibuka lewat Paket Izin yang Ada",
         "ANALISA - Shop Quality Membaca Ulasan Toko Pegangan CS"
       ],
-      "hash": "8f73bd5d0184a68d43197fe6f578a3c850d3d2f4d8ba792be40934c248418d65",
-      "ukuran_kb": 10.7,
-      "ringkasan": "Menjawab: bagaimana fitur balas ulasan Shopee dari ERP dipecah jadi issue induk dan sub-issue BE/FE, apa kriteria 'yang harus benar' tiap bagian, urutan deploy, PR mana yang terkait, dan langkah manusia apa yang tersisa. Juga memuat data pendukung tingkat balasan ulasan Shopee 90 hari per toko.",
+      "hash": "b8717b94042cad0697a7798ca5bc505d7f1ac3c3e012d2b236713c6b3e6d35bc",
+      "ukuran_kb": 10.8,
+      "ringkasan": "Menjawab: bagaimana pekerjaan balas ulasan Shopee dari ERP dipecah jadi issue induk dan sub-issue BE/FE, apa kriteria 'yang harus benar' untuk tiap bagian, PR mana yang terkait, dan langkah manusia apa yang tersisa (status ADR, urutan deploy integration-service lalu frontend, uji kirim balasan sungguhan). Juga memuat angka cakupan dan jeda balasan ulasan Shopee 90 hari sebagai latar masalah.",
       "kata_kunci": [
-        "analisa balas ulasan",
+        "ANALISA",
+        "balas ulasan Shopee",
         "review reply",
-        "Shopee",
-        "sub-issue BE FE",
-        "reply_comment",
-        "review_reply_attempts",
-        "halaman Rating",
+        "sub-issue",
+        "bip-erp#3050",
+        "urutan deploy",
         "Komplain Belum Dibalas",
-        "papan kerja"
+        "halaman Rating",
+        "cakupan balasan"
       ]
     },
     {
@@ -22572,5 +22548,8 @@
       ]
     }
   ],
-  "gagal": []
+  "gagal": [
+    "IT/IT - Development Apps and Tools.md",
+    "IT/IT - QA Device Lab.md"
+  ]
 }

@@ -22,14 +22,14 @@ Dikerjakan lewat `/kerjakan` 2026-10-13 atas perintah langsung Pemutus, sebelum 
 |---|---|---|---|
 | [BE] kirim balasan, jejak, `boleh_balas`, `balasan_erp`, `belum_dibalas` | bip-erp#3051 | [bip-erp#3054](https://github.com/bip-itteam-internal/bip-erp/pull/3054) | merged 2026-10-13; judge lolos percobaan 2 |
 | [FE] aksi Balas + kartu seragam | erp-frontend#2380 | [erp-frontend#2393](https://github.com/bip-itteam-internal/erp-frontend/pull/2393) | merged 2026-10-13; judge lolos percobaan 1 |
-| [FE] halaman Rating terpisah | erp-frontend#2382 (sub-issue saudara, dibuat sesudah mockup) | [erp-frontend#2416](https://github.com/bip-itteam-internal/erp-frontend/pull/2416) | terbuka; judge + gerbang penuh lolos atas baseline @ 0e9fb1b34 |
+| [FE] halaman Rating terpisah | erp-frontend#2382 (sub-issue saudara, dibuat sesudah mockup) | [erp-frontend#2416](https://github.com/bip-itteam-internal/erp-frontend/pull/2416) | merged 2026-10-14 (merge commit 3d6a88d8); judge + gerbang penuh lolos atas baseline @ 0e9fb1b34 |
 
 Sisa langkah manusia:
 
 - Tulis baris status ADR 0176 jadi Diterima (Pemutus), lalu hapus baris ⛔ di atas.
 - Deploy prod `integration-service` lebih dulu, baru `frontend-hris`; tanpa env baru atau paket izin baru. Koleksi `review_reply_attempts` + indeks dibuat `EnsureAllIndexes` saat start.
 - Kirim satu balasan sungguhan dari akun pemegang toko Shopee lalu cocokkan di Seller Center (balasan tak bisa ditarik), dan pastikan "dikirim dari ERP oleh" tampil di kartu.
-- Issue erp-frontend#2382 di Project #15 belum dipindah ke In Review (GraphQL GitHub putus saat dibuat).
+- Induk bip-erp#3050 sudah ditutup (ketiga sub-issue merged), tetapi field Status-nya di Project #15 belum diset ke **Menunggu Adopsi** (GraphQL GitHub putus dari mesin agent); pindahkan manual.
 
 ## Urutan dan ketergantungan
 
