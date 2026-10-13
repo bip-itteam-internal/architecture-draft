@@ -1,6 +1,6 @@
 # ADR - 0154 KONSUMSI Dibelikan Procurement seperti Raw Material, Bukan Permintaan Uang
 
-> **Status**: 🟢 **Diterima**, 2026-10-05, oleh pengguna Tech Development dalam sesi kerja. **Diperbarui 2026-10-06**: rancangan lengkapnya kini hidup di spec pembelian (lihat Deskripsi). ADR ini sengaja dipangkas jadi **penunjuk** plus satu keputusan yang tidak tertulis di spec (§2), supaya alur pembelian tidak punya dua sumber kebenaran.
+> **Status**: ⛔ **Superseded 2026-10-13** oleh [[ADR - 0177 KONSUMSI Dilebur ke Barang Umum]] untuk pengajuan baru: KONSUMSI tak lagi bisa diajukan, dokumen lamanya tetap mengikuti ADR ini. Sebelumnya: 🟢 **Diterima**, 2026-10-05, oleh pengguna Tech Development dalam sesi kerja. **Diperbarui 2026-10-06**: rancangan lengkapnya kini hidup di spec pembelian (lihat Deskripsi). ADR ini sengaja dipangkas jadi **penunjuk** plus satu keputusan yang tidak tertulis di spec (§2), supaya alur pembelian tidak punya dua sumber kebenaran.
 
 %% Vault ini PUBLIK. Nama orang dan employee_id tidak ditulis; yang disebut hanya angka agregat, departemen, dan posisi. %%
 

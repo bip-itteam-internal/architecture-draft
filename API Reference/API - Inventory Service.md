@@ -155,6 +155,30 @@ Grounded ke `services/inventory/peminjaman_*.go`. Keputusan desain: [[ADR - 0094
 - Yang dipancarkan hanya booking ber-`pemohon_id` pemanggil, ber-`company_id` perusahaan pemanggil, tanpa `asal`, dan beririsan dengan rentang (`filterFeedPeminjaman` + `saringFeedPeminjaman`). Jadwal ruang orang lain tidak masuk kalender siapa pun.
 - Prefix `/internal/` tidak membuat rute ini privat: penyaringan hak akses dikerjakan handler. Lihat [[Microservices - Calendar Service]].
 
+## Permintaan Barang GA & Stok Perlengkapan (spec permintaan GA 2026-10-13)
+
+Diukur ke `bip-erp` `origin/main` 2026-10-13 sesudah `bip-erp#3039`, `#3041`, `#3043` merged. Spec: `docs/superpowers/specs/2026-10-13-permintaan-ga-menunggu-stok-design.md` (bip-erp). Permintaan baru **tanpa persetujuan**: stok kurang → `MENUNGGU_STOK` (yang ada dicadangkan), semua tercadang → `SIAP_DISERAHKAN`; stok yang bertambah dibagi urut waktu (`BagiStok`). Dokumen lama berjenjang (`DIAJUKAN`) tetap terbaca.
+
+| Method | Path | Fungsi | Gerbang |
+|---|---|---|---|
+| GET | `/permintaan/katalog` | Katalog barang + `tersedia` (sudah dikurangi cadangan) | `ga.request.ajukan` (semua akun, bip-erp#3030) |
+| GET | `/permintaan/saya` | Permintaan milik pemanggil | `ga.request.ajukan` |
+| GET | `/permintaan/perlu-aksi` | Antrean dokumen lama berjenjang | salah satu izin permintaan |
+| GET | `/permintaan/kebutuhan` | Kebutuhan pembelian per barang: `qty_menunggu`, `jumlah_permintaan`, `tertua_pada`, `permintaan[]`, `pembelian_berjalan[]` (menggantikan `/sinyal-stok`) | `ga.request.serah` |
+| GET | `/permintaan/cadangan-mengendap` | Permintaan yang menahan cadangan lama | `ga.request.serah` |
+| POST | `/permintaan` | Buat; 201 → `SIAP_DISERAHKAN` atau `MENUNGGU_STOK`, tak ada lagi 409 stok kurang | `ga.request.ajukan` |
+| POST | `/permintaan/:nomor/tolak` | Body `{alasan}` wajib; melepas cadangan lalu membagi ulang | salah satu izin permintaan (penindak diperiksa di handler) |
+| POST | `/permintaan/:nomor/batal` | Pemohon membatalkan sebelum selesai | `ga.request.ajukan` |
+| POST | `/permintaan/:nomor/serahkan` | `SIAP_DISERAHKAN` → `SELESAI`, seluruh qty sekaligus. Body `{aset_ids: [][]}`: baris aset WAJIB membawa tag unit tepat sebanyak `qty` (`ValidasiAsetIDsPenyerahan`); perlengkapan dipotong dari stok | `ga.request.serah` |
+| GET | `/permintaan/:nomor/unit-tersedia` | 🟡 `bip-erp#3049` belum merged. Per baris aset yang belum diserahkan: `{indeks, master_id, nama_barang, varian, qty, unit:[{id, lokasi, catatan, accurate_asset_no}]}` dari `filterAsetMenganggur` (aturan yang sama dengan pembagian dan penyerahan); `data`/`unit` selalu array | `ga.request.serah` |
+| GET | `/permintaan` · `/permintaan/:nomor` | Daftar semua (staf GA saja) · detail | `ga.request.serah` atau `ga.view` · salah satu izin permintaan |
+| GET | `/ga-stok` | Barang ber-sifat perlengkapan + `qty_fisik`, `qty_dicadangkan`, `tersedia` | `ga.view` + `RequireGeneralAffair` |
+| POST | `/ga-stok/penyesuaian` | Body `{master_id, jenis: OPNAME\|TAMBAH\|KURANGI, qty, alasan}`; alasan wajib; tak boleh di bawah cadangan | `ga.work` + `RequireGeneralAffair` |
+| GET | `/ga-stok/:master_id/riwayat` | Riwayat perubahan stok fisik (`OPNAME`, `TAMBAH`, `KURANGI`, `PENERIMAAN`, `PENYERAHAN`) beserta `rujukan` dan `oleh{id,nama}` | `ga.view` + `RequireGeneralAffair` |
+| POST · PATCH | `/ga-katalog/perlengkapan` · `/ga-katalog/:master_id/sifat` | Tambah barang perlengkapan ke katalog · ubah jenis aset ↔ perlengkapan (`sifat` dibaca huruf kecil) | `ga.work` + `RequireGeneralAffair` |
+
+Bentuk dokumen permintaan tetap memakai nama field lama (`items`, `pemohon_id`/`pemohon_nama`, `metadata.created_at`, riwayat `{oleh, nama, aksi, alasan, waktu}`); usulan ganti nama di kontrak issue `bip-erp#3036` **tidak** dikerjakan. Progres pembelian (`pembelian_berjalan`) dibaca dari [[API - Procurement Service]] `GET /internal/pembelian-berjalan`, best-effort (gagal = kosong, timeout 3 detik).
+
 ## Kontrak request & validasi (grounded)
 
 Detail berikut grounded ke `services/inventory` (`controller.go`, `validation.go`).

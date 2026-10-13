@@ -494,22 +494,23 @@
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "Microservices - Notification Service",
         "Microservices - Calendar Service",
+        "API - Procurement Service",
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI"
       ],
-      "hash": "e133d6bb5e22c61613fa357034c81eb7f1d0540f8dc5aca27da7345b9cf74f34",
-      "ukuran_kb": 30.7,
-      "ringkasan": "Menjawab: endpoint apa saja milik inventory-service di /api/inventory untuk aset GA (item, master/data-type, kategori dan pemetaan ke golongan Accurate, repair history, serah-terima yang disetujui SPV, opname perlengkapan, padanan perlengkapan Accurate, baca aset per pemegang dan estimasi penyusutan), beserta gerbang akses tiap rute. Juga menjawab kontrak request, validasi, kode status, notifikasi, dan feed kalender Booking Ruang GA (/peminjaman).",
+      "hash": "dec6902fbfd1d37701c168c40e0224e788d3fc678f02cdf1fd724209be7f062a",
+      "ukuran_kb": 34.1,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki inventory-service untuk aset GA (item, master data, kategori, pemetaan golongan Accurate, repair history, serah-terima), siapa yang boleh memanggilnya, serta bentuk request dan validasinya. Juga menjawab cara kerja opname perlengkapan per periode, padanan perlengkapan ke item Accurate, baca aset pemegang dan estimasi penyusutan untuk Copilot, Booking Ruang GA beserta feed kalendernya, dan Permintaan Barang GA dengan stok perlengkapan.",
       "kata_kunci": [
-        "inventory-service",
-        "API aset GA",
+        "inventory service",
+        "aset GA",
         "inventaris",
-        "asset",
+        "serah-terima aset",
         "repair history",
         "opname perlengkapan",
         "penyusutan",
-        "depreciation",
         "booking ruang",
-        "peminjaman"
+        "peminjaman",
+        "permintaan barang GA"
       ]
     },
     {
@@ -745,25 +746,26 @@
         "API - Index",
         "Finance - Kas Kecil dan Pengajuan Budget",
         "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
+        "ADR - 0177 KONSUMSI Dilebur ke Barang Umum",
         "Finance - Serapan Anggaran dan Cost Control",
         "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
         "ADR - 0001 Akuntansi via Accurate",
         "CORE - API Master Gateway"
       ],
-      "hash": "39e106f146c6b2831b0938153183152a10ad9c0c3dca4a96faac3341ed418fda",
-      "ukuran_kb": 53.5,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan procurement-service (master Pemasok dan Barang & Jasa, cermin Pembelian Accurate, Permintaan/Pesanan/Penerimaan Barang ERP, Pengajuan Barang lima tipe, Tagihan Pemasok, Pembayaran Vendor, Aging Utang, Bukti Transfer, KPI Account Payable), bentuk request/response-nya, dan kode galatnya. Juga menjelaskan cara auth lewat gateway dan permission-set dengan fallback tier, sinkronisasi ke Accurate (sync_status), serta bahwa Kas Kecil dan Pengajuan Budget sudah dihapus dari service ini.",
+      "hash": "c712369fc2c44821e13ebade44c3dd1be49a3efde2e1f64617bd09e8165832a7",
+      "ukuran_kb": 54.4,
+      "ringkasan": "Menjawab: endpoint procurement-service untuk master Pemasok dan Barang & Jasa (CRUD, usul nomor/kode, katalog Accurate, import awal), bentuk request/response-nya, dan arti sync_status ke Accurate. Juga menjawab rute Pembelian (cermin Accurate dan Permintaan/Pesanan/Penerimaan ERP), Pengajuan Barang lima tipe, Tagihan Pemasok, pembayaran vendor, aging utang, bukti transfer, KPI Account Payable, serta status penghapusan Kas Kecil dan Pengajuan Budget.",
       "kata_kunci": [
-        "procurement",
-        "pengadaan",
+        "procurement service",
         "pemasok",
         "vendor",
-        "supplier",
         "barang dan jasa",
-        "purchase order",
         "pengajuan barang",
+        "purchase order",
+        "pesanan pembelian",
         "tagihan pemasok",
-        "aging utang"
+        "aging utang",
+        "Accurate sync"
       ]
     },
     {
@@ -1548,9 +1550,10 @@
         "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "CORE - IT Orchestrator",
         "Microservices - Inventory Service",
+        "API - Inventory Service",
+        "ADR - 0177 KONSUMSI Dilebur ke Barang Umum",
         "GA - Asset Loan & Room Booking",
         "ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor",
-        "API - Inventory Service",
         "QA - Register Perizinan & Sertifikasi",
         "HRIS - Kaizen (Ide Perbaikan)",
         "API - Form Builder Service",
@@ -1595,20 +1598,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "0d68f6eb8809d370cb71eebc11e137bd67dea3a868dde309a3e7c082b8814667",
-      "ukuran_kb": 592.0,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS \"One Bharata\" (erp-frontend), stack-nya, cara login dan di mana token disimpan (localStorage + cookie penanda sesi), cara kerja SSO Identity Provider, serta bagaimana sidebar dan menu digerbang lewat system_roles dan izin. Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts, multi-perusahaan, dan daftar modul yang sudah atau belum diimplementasikan.",
+      "hash": "8fa574f6a1bf0d77391cb48afc3545d4556031f4ffb624c0ec07aa4adf4933ef",
+      "ukuran_kb": 594.4,
+      "ringkasan": "Menjawab: apa itu portal web ERP One Bharata (erp-frontend), stack-nya, modul apa saja yang tersedia, dan bagaimana dukungan multi-perusahaan bekerja. Juga menjawab cara login dan penyimpanan token, gating menu berdasarkan system_roles dan paket izin, peran web sebagai SSO Identity Provider, arah baru sidebar, serta konvensi data-fetching TanStack Query dan bagan Recharts.",
       "kata_kunci": [
         "Web ERP",
         "erp-frontend",
         "One Bharata",
-        "sidebar menu",
-        "system_roles",
+        "hris-dashboard",
         "SSO",
-        "token localStorage",
+        "login token",
+        "system_roles",
+        "sidebar",
         "multi-tenant",
-        "TanStack Query",
-        "Hak Akses"
+        "Next.js"
       ]
     },
     {
@@ -2687,7 +2690,7 @@
       "area": "Core System and Modules",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan): aset, repair, dan reporting lengkap; **Booking Ruang GA** irisan 1 dari 7 di kode (backend + layar web); irisan 1b (aksi web) merged dan di prod 2026-09-15; irisan 2 (MyBharata, riwayat terstruktur) merged 2026-09-15, belum di PROD maupun store",
+      "status_teks": "Implemented (ada catatan): aset, repair, dan reporting lengkap; **Booking Ruang GA** irisan 1 dari 7 di kode (backend + layar web); irisan 1b (aksi web) merged dan di prod 2026-09-15; irisan 2 (MyBharata, riwayat terstruktur) merged 2026-09-15, belum di PROD maupun store; **Permintaan Barang GA tanpa persetujuan + Stok Perlengkapan** merged 2026-10-13 (endpoint pilihan unit aset untuk Serahkan masih PR)",
       "publik": true,
       "tautan": [
         "CORE - RBAC dan Permission Set",
@@ -2700,6 +2703,7 @@
         "ADR - 0067 Opname Perlengkapan GA via Rekonsiliasi Accurate",
         "Microservices - Integration Service",
         "ADR - 0088 Auto-Migrasi Padanan Perlengkapan Lewat ID Internal Accurate, Bukan Konfirmasi Manusia",
+        "ADR - 0175 Stok GA di ERP Jadi Stok Operasional, Barang Keluar dan Penyesuaian Dikirim ke Accurate",
         "ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor",
         "GA - Asset Loan & Room Booking",
         "ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web",
@@ -2719,20 +2723,20 @@
         "External - Accurate",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id"
       ],
-      "hash": "883b20426fe25172e5bdc96a04a3b09b9de252e2330ea0c8e957f1adcc2169c4",
-      "ukuran_kb": 32.0,
-      "ringkasan": "Menjawab: apa tugas inventory-service (pelacakan aset/inventaris GA, bukan stok gudang), fitur apa saja yang ada (item dan penomoran ID INV-BIP, serah-terima dengan persetujuan SPV, soft delete, riwayat perbaikan beserta bukti nota, pemetaan kategori ke Accurate, penyusutan per pemegang, Booking Ruang GA), dan bagaimana rute /item digerbang. Juga menjawab jebakan middleware grup Fiber per-prefix yang membuat SPV non-GA tak bisa menyetujui serah-terima, serta dependensi dan integrasinya.",
+      "hash": "cd8c224b56de0b6490cbc5662d57ad5aaacc3c504d43a6a179a4d936dd04124f",
+      "ukuran_kb": 33.2,
+      "ringkasan": "Menjawab: bagaimana inventory-service mengelola aset/inventaris GA, termasuk penomoran ID item, pemegang aset, soft delete, upload dokumen ke MinIO, dan riwayat perbaikan. Juga menjawab siapa yang boleh menyetujui serah-terima aset, bagaimana rekonsiliasi dan padanan ke Accurate dilakukan, cara penyusutan dihitung, serta catatan gap dan dependensi service ini.",
       "kata_kunci": [
-        "inventory-service",
+        "inventory service",
+        "asset tracking",
         "aset GA",
         "inventaris",
-        "asset tracking",
+        "soft delete aset",
         "serah-terima",
         "handover",
-        "soft delete",
-        "repair history",
-        "perbaikan",
-        "penyusutan"
+        "repair",
+        "penyusutan",
+        "MinIO"
       ]
     },
     {
@@ -3070,6 +3074,8 @@
         "Microservices - Employee Service",
         "ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget",
         "ADR - 0090 KONSUMSI Eskalasi ke Direktur di Ambang Berbagi, Bukan Kebal",
+        "ADR - 0177 KONSUMSI Dilebur ke Barang Umum",
+        "Microservices - Inventory Service",
         "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
         "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap",
         "RUN - Deploy Microservices bip-erp",
@@ -3082,25 +3088,20 @@
         "Microservices - Integration Service",
         "Finance - FAT Persona"
       ],
-      "hash": "49157d9f2b4805058a1293f0db82ca6afd5c0d2818aa8d708869db87cbcf2057",
-      "ukuran_kb": 89.3,
-      "ringkasan": "Menjawab: apa saja yang dikerjakan procurement-service (master Pemasok, Barang & Jasa, Tagihan/Faktur Pemasok, cermin baca-saja Pembelian dari Accurate), bagaimana sinkron ke Accurate Online berjalan, dan bagaimana alur Pengajuan Barang lima tipe (jenjang persetujuan, isian AP, bukti transfer, jurnal, serapan anggaran) bekerja. Juga menjawab ukuran data produksi, env kunci, izin/gate modul procurement, sumber KPI Account Payable, jebakan integrasi Accurate, dan dampak penghapusan Kas Kecil + Pengajuan Budget lama.",
+      "hash": "aa8c926113d3354722624790e4e5185c3ed68fbe6a856b6d22d08d9902059f21",
+      "ukuran_kb": 90.4,
+      "ringkasan": "Menjawab: bagaimana procurement-service menyinkronkan master Pemasok dan Barang ke Accurate serta menarik data Pembelian dari Accurate, struktur berkas dan env-nya, dan bagaimana gerbang izin (permission-set dengan fallback tier) bekerja. Juga menjawab alur Pengajuan Barang lima tipe (jenjang, isian AP, bukti transfer, serapan anggaran), faktur dan pembayaran vendor, KPI Account Payable, jebakan integrasi Accurate, dan apa yang tersisa setelah Kas Kecil dihapus.",
       "kata_kunci": [
-        "procurement",
+        "procurement service",
         "pengadaan",
         "pemasok",
-        "vendor",
-        "barang dan jasa",
-        "Accurate",
-        "faktur pembelian",
-        "tagihan pemasok",
         "pengajuan barang",
-        "pengajuan dana",
-        "KPI Account Payable",
-        "AP",
-        "penerimaan",
-        "pesanan pembelian",
-        "ACCURATE_KAS_PUSH"
+        "faktur pembelian",
+        "pembayaran vendor",
+        "Account Payable",
+        "KPI AP",
+        "Accurate",
+        "procurement_db"
       ]
     },
     {
@@ -9093,8 +9094,19 @@
       ],
       "hash": "db7202a062603803f25944476103df696dc34eb488f04339329fd89874b6ee40",
       "ukuran_kb": 5.0,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: mengapa pengajuan Konsumsi dulu diperlakukan sebagai pembelian barang lewat Procurement (bukan permintaan uang), di mana rancangan lengkap alur pembeliannya disimpan, dan mengapa tahap persetujuan atasan dilewati bila pengajunya supervisor HRGA. ADR ini sudah digantikan untuk pengajuan baru, tapi masih menjelaskan aturan bagi dokumen Konsumsi lama.",
+      "kata_kunci": [
+        "ADR 0154",
+        "KONSUMSI",
+        "konsumsi",
+        "pengajuan barang",
+        "procurement",
+        "raw material",
+        "HRGA",
+        "pb_spv_divisi",
+        "approval atasan",
+        "superseded"
+      ]
     },
     {
       "path": "Decisions/ADR - 0155 Build Sekali di Lokal, Image yang Sama Naik ke Prod lewat Jenkins dan Docker Swarm.md",
@@ -9844,8 +9856,19 @@
       ],
       "hash": "fd374722060795aae018dc553104323fb5839cabaeeb071a14564e1ce8cb6d7e",
       "ukuran_kb": 4.7,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: mengapa tipe pengajuan Konsumsi dilebur ke Barang Umum, apa yang terjadi bila seseorang masih mengajukan KONSUMSI (ditolak 400 dan tak ditawarkan), dan bagaimana dokumen Konsumsi lama tetap diproses. Juga menjawab urutan deploy backend dan frontend serta konsekuensinya terhadap pembayar barang konsumsi.",
+      "kata_kunci": [
+        "ADR 0177",
+        "KONSUMSI",
+        "Barang Umum",
+        "UMUM",
+        "pengajuan barang",
+        "tipe dilebur",
+        "tipe-boleh",
+        "stok GA",
+        "konsumsi pantry",
+        "procurement"
+      ]
     },
     {
       "path": "DEVELOPER GUIDE.md",
@@ -22281,8 +22304,5 @@
       ]
     }
   ],
-  "gagal": [
-    "Decisions/ADR - 0154 KONSUMSI Dibelikan Procurement seperti Raw Material, Bukan Permintaan Uang.md",
-    "Decisions/ADR - 0177 KONSUMSI Dilebur ke Barang Umum.md"
-  ]
+  "gagal": []
 }
