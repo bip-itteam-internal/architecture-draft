@@ -1982,20 +1982,24 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "7de4c9195ec94dfc024113437396c282a6885dd3075049206f15d6e59315184d",
-      "ukuran_kb": 150.6,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja lewat tiga sumbu (modul, tingkat aksi, cakupan data), bagaimana paket hak (permission set) dipasang ke posisi/jabatan lalu dirakit jadi izin efektif saat login, dan di mana penegakannya di gateway, service, serta frontend. Juga mencatat katalog modul yang terdaftar, modul mana yang sudah memeriksa izin per aksi vs masih bertumpu system_roles tier, fallback tier, fase dua yang dicabut, dan masalah paket Semua Izin terhadap batas cookie 4 KB.",
+      "hash": "9d2e6604a13315a087746c5729769caaa3fe5d73b77faa5a5071dedff3a75727",
+      "ukuran_kb": 151.6,
+      "ringkasan": "Menjawab: bagaimana RBAC tiga sumbu (modul, tingkat aksi, cakupan data) bekerja di seluruh bip-erp, apa itu paket hak (permission set) yang menempel pada posisi/jabatan, dan katalog izin apa saja yang terdaftar per modul. Juga menjelaskan bagaimana izin ditegakkan di gateway, service, dan frontend, cadangan tier lama `system_roles`, serta batas cookie 4 KB dan paket Semua Izin.",
       "kata_kunci": [
         "RBAC",
-        "hak akses",
         "permission set",
         "paket hak",
+        "hak akses",
         "izin",
-        "system_roles",
-        "fallback tier",
         "katalog izin",
         "reach",
-        "posisi jabatan"
+        "cakupan data",
+        "posisi",
+        "jabatan",
+        "system_roles",
+        "tier fallback",
+        "token JWT",
+        "Siapa Boleh Apa"
       ]
     },
     {
@@ -3088,20 +3092,25 @@
         "Microservices - Integration Service",
         "Finance - FAT Persona"
       ],
-      "hash": "aa8c926113d3354722624790e4e5185c3ed68fbe6a856b6d22d08d9902059f21",
+      "hash": "8aac848f174140d8b88f4a7c2d79468d70f4f33c64dc266d074950711050b0eb",
       "ukuran_kb": 90.4,
-      "ringkasan": "Menjawab: bagaimana procurement-service menyinkronkan master Pemasok dan Barang ke Accurate serta menarik data Pembelian dari Accurate, struktur berkas dan env-nya, dan bagaimana gerbang izin (permission-set dengan fallback tier) bekerja. Juga menjawab alur Pengajuan Barang lima tipe (jenjang, isian AP, bukti transfer, serapan anggaran), faktur dan pembayaran vendor, KPI Account Payable, jebakan integrasi Accurate, dan apa yang tersisa setelah Kas Kecil dihapus.",
+      "ringkasan": "Menjawab: apa saja yang dikerjakan procurement-service (master Pemasok, Barang & Jasa, Tagihan/Faktur Pemasok, cermin baca-saja Pembelian dari Accurate), bagaimana sinkronisasi ke Accurate berjalan, dan bagaimana alur Pengajuan Barang lima tipe (jenjang persetujuan, bukti transfer, jurnal, serapan anggaran). Juga memuat jebakan integrasi Accurate, KPI Account Payable, model data, dan dampak penghapusan modul Kas Kecil/Pengajuan Budget lama.",
       "kata_kunci": [
-        "procurement service",
+        "procurement",
         "pengadaan",
         "pemasok",
-        "pengajuan barang",
-        "faktur pembelian",
-        "pembayaran vendor",
-        "Account Payable",
-        "KPI AP",
+        "vendor",
+        "barang dan jasa",
         "Accurate",
-        "procurement_db"
+        "pengajuan barang",
+        "pengajuan dana",
+        "faktur pembelian",
+        "tagihan pemasok",
+        "pembayaran vendor",
+        "KPI Account Payable",
+        "AP",
+        "bukti transfer",
+        "sync"
       ]
     },
     {
@@ -9031,20 +9040,19 @@
         "ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync",
         "ADR - 0077 Koreksi Faktur via Impor Rekap Lengkap Mengalir ke Master-Data, Bukan Override per Baris"
       ],
-      "hash": "d45c99ab8698d71bc14b4881379b15977f2bd32ab31074f01baaa1abf0c8c4db",
-      "ukuran_kb": 12.5,
-      "ringkasan": "Menjawab: apa yang terjadi bila order FO (fake order) dilaporkan sesudah uang cair dan INC sudah dibukukan, yaitu INC dikurangi atau dihapus, faktur harian dikoreksi atau di-VOID, dan urutan INC lebih dulu baru faktur. Juga mencatat siapa yang berhak memutuskan penghapusan INC dan apa yang belum diputuskan.",
+      "hash": "b3a940ecc629d7c15d75eb4b2821b08ab228f294bf1ac2eaa7fa40a59935ea1d",
+      "ukuran_kb": 12.8,
+      "ringkasan": "Menjawab: apa yang terjadi pada INC (penerimaan) bila sebuah order ditandai FO (fake order) sesudah uangnya cair, kenapa INC dikurangi atau dihapus dan FO tidak boleh masuk penjualan, serta urutan koreksi INC lebih dulu baru faktur harian di Accurate. Juga menjelaskan bahwa penghapusan INC wajib lewat konfirmasi finance, dan apa yang belum diputuskan (FO yang dilaporkan sesudah periode ditutup).",
       "kata_kunci": [
         "FO",
         "fake order",
         "INC",
-        "income",
+        "penerimaan",
         "kaskade FO",
         "faktur harian",
-        "VOID",
+        "void",
+        "hapus INC",
         "uang cair",
-        "penghapusan INC",
-        "fake-order-override",
         "rekonsiliasi kas"
       ]
     },
@@ -9758,20 +9766,20 @@
         "Microservices - Integration Service",
         "APP - Web ERP"
       ],
-      "hash": "cd730e5be8b807f22f5c688f858083592ef18f5d961b20856480c00e22875688",
-      "ukuran_kb": 10.2,
-      "ringkasan": "Menjawab: di mana finance memutuskan draf beda dengan Accurate (hanya di menu Penyesuaian, bukan di halaman Penerimaan), apa akibat aksi Terima isi Accurate untuk periode tutup buku Agustus dan September 2026, dan mulai kapan koreksi dilakukan lewat Koreksi Manual ERP. Menjelaskan bahwa aksi ini tidak menulis ke Accurate.",
+      "hash": "025ee5ec60782c3bd4c1ea148a4fd8a0cd485f1221c13153c48718bfa93b06bf",
+      "ukuran_kb": 11.2,
+      "ringkasan": "Menjawab: di mana keputusan draf Beda dengan Accurate (receipt dan faktur) diambil, apa arti aksi Terima isi Accurate untuk periode tutup buku Agustus dan September 2026 yang menandai dokumen tanpa menulis ke Accurate, dan aturan koreksi ke depan lewat menu Koreksi Manual ERP mulai 1 November 2026. Juga memuat lingkup 63 receipt dan 26 faktur, serta penanganan receipt yang dihapus di Accurate.",
       "kata_kunci": [
+        "Beda dengan Accurate",
         "Penyesuaian",
-        "beda dengan Accurate",
-        "terima isi Accurate",
-        "tutup buku",
-        "koreksi manual",
+        "adopsi",
         "draf receipt",
         "draf faktur",
+        "Terima isi Accurate",
         "ADOPTED_MANUAL",
-        "adopsi",
-        "Accurate"
+        "tutup buku",
+        "Koreksi Manual",
+        "EXTERNAL_EDIT"
       ]
     },
     {
@@ -10356,9 +10364,9 @@
         "GA - Procurement System",
         "Finance - Big Pictures"
       ],
-      "hash": "e1211d98f14ef61e4775c62f5f98b9cfc674aa3775715c1a09ab2d3c266c3a34",
-      "ukuran_kb": 36.7,
-      "ringkasan": "Menjawab: apa aturan bisnis kas kecil per divisi (plafon, ambang Rp 500.000, sembilan aturan R-01 sampai R-09, matriks approval) dan apa yang terjadi pada modulnya, yang dihapus dari kode 2026-10-12 dan diganti Pengajuan Dana. Juga menjawab apa yang hilang dan apa yang tetap (outbox jurnal, ACCURATE_KAS_PUSH, katalog Accurate), lubang data hasil sensus produksi, tabrakan dengan arsitektur akuntansi via Accurate, dan sisa pekerjaan pencabutan izin kaskecil/budget. Dok ini kini catatan historis, bukan deskripsi sistem berjalan.",
+      "hash": "20468e7ca78004a2bae3819d2bbaa81260c504a19ae9f65b4acb8d9c1813b945",
+      "ukuran_kb": 37.0,
+      "ringkasan": "Menjawab: aturan bisnis kas kecil per divisi (plafon, sembilan aturan R-01 sampai R-09, matriks approval), apa yang dihapus dari kode pada 2026-10-12 dan apa yang tetap dipakai Pengajuan Dana. Juga mencatat lubang data hasil pengukuran prod, tabrakan dengan arsitektur Accurate, dan item TBD pencabutan katalog izin `kaskecil`.",
       "kata_kunci": [
         "kas kecil",
         "petty cash",
@@ -10367,12 +10375,13 @@
         "divisi",
         "approval",
         "pengajuan dana",
-        "penghapusan",
+        "dihapus",
         "kaskecil",
         "budget",
         "Finance",
-        "R-01",
-        "jurnal Accurate"
+        "outbox jurnal",
+        "ACCURATE_KAS_PUSH",
+        "top-up"
       ]
     },
     {
@@ -15242,18 +15251,18 @@
       ],
       "hash": "1ff54463cc9a154aff8785a988b367428eef47678e2f1b84a6f850d100559e98",
       "ukuran_kb": 13.8,
-      "ringkasan": "Menjawab: kenapa modul manufaktur di ERP (Batch Record, Material Order, QC, cycle count, lot) belum dipakai di prod, di mana kode manufaktur tumpang tindih (catatan produksi, rilis batch, karantina QC, PO bahan, sembilan jalur penyesuaian stok, pemilik angka stok vs Accurate), dan apa kata kuesioner pemakai soal karantina, opname, rilis APJ, serta kertas wajib BPOM. Juga menjelaskan bagaimana Google Sheet PPIC yang benar-benar berjalan bisa menjadi cetak biru ERP, celah COA, perbandingan Batch Record kertas vs model ERP, dan keputusan yang masih terbuka.",
+      "ringkasan": "Menjawab: kenapa modul manufaktur (produksi, PPIC, gudang bahan baku/FG, QC) di ERP belum dipakai, fitur mana yang benar-benar berjalan di prod, dan di mana kode manufaktur tumpang tindih (Batch Record, rilis batch, karantina QC, PO bahan, jalur penyesuaian stok, pemilik angka stok vs Accurate). Juga menjawab apa kata pemakai lewat kuesioner (karantina, stock opname mingguan, bahan keluar ke produksi, rilis oleh APJ, dokumen kertas untuk BPOM), bagaimana Google Sheet PPIC bisa jadi cetak biru ERP, dan keputusan apa yang masih terbuka.",
       "kata_kunci": [
         "manufaktur",
         "manufacture",
         "PPIC",
         "Batch Record",
-        "stock opname",
+        "rilis batch",
         "karantina QC",
-        "rilis batch APJ",
-        "spreadsheet PPIC",
+        "stock opname",
+        "Google Sheet PPIC",
         "MRP",
-        "COA"
+        "BPOM"
       ]
     },
     {
