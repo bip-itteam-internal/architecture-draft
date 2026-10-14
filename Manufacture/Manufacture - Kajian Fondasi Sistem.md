@@ -101,6 +101,21 @@ Satu Google Sheet (±40 tab, data Jan-Okt 2026, dipelihara tim PPIC/gudang) menc
 
 Kualitas data spreadsheet perlu dibereskan sebelum dijadikan sumber: banyak `#N/A`/`#REF!`, tab duplikat, satuan KG dan gram bercampur, formula di dua tab.
 
+## Temuan 4b: Pembelian bahan baku belum lewat ERP
+
+Diukur di prod 2026-10-14 (koleksi `pengajuan_barang`, baca saja):
+
+| Tipe Pengajuan Barang | Jumlah | Catatan |
+|---|---|---|
+| `RAWMATERIAL` | **0** | jenjang sudah ada (SPV Manufacture → Procurement beli → Cost Control → SPV Finance → [Direktur] → AP → QC → terima RM), belum pernah dipakai |
+| `DANA` | 265 | 61 dari departemen Procurement; Manufaktur 1, Quality 1 |
+| `IKLAN` / `PAJAK` / `UMUM` | 56 / 28 / 2 | di luar manufaktur |
+
+- **PO bahan baku dibuat di luar ERP.** Pengajuan DANA dari Procurement memuat ongkir PO bahan baku berpenomoran `PO/nnn/X/2026`, bukan format nomor PO ERP (`PO.<YYYY>.<MM>.<NNNNN>`). Yang masuk ERP hanya ongkir dan pengeluaran kecil (sampel, ATK, perbaikan, konsumsi), lewat jalur uang.
+- Cocok dengan Temuan 4: permintaan pengadaan PPIC tercatat di tab spreadsheet (186 baris, nomor `BG/mm/yy/nnn`), dan dengan kuesioner: PR dibuat PPIC; PPIC butuh status PO, ETA, qty diterima, dan qty lulus QC dari Procurement.
+- Akibatnya rantai bahan baku ERP (permintaan → beli → QC → terima RM → stok) tak pernah dilalui, sehingga penerimaan RM di ERP tak punya hulu dan status PO tak bisa dibaca PPIC. Tahap PPIC di Pengajuan Barang (M-14) baru berguna setelah pembelian benar-benar dipindah ke ERP.
+- Keputusan terbuka: TBD 11 di bawah.
+
 ## Temuan 5: COA (Certificate of Analysis) keluar belum ada
 
 Masukan SPV Manufacture (2026-10-13): barang jadi yang dikirim perlu **COA (Certificate of Analysis)** sebagai bukti
@@ -162,6 +177,7 @@ Dibandingkan dua Batch Record lengkap (Oktober 2026), satu diputuskan LULUS dan 
 8. **Pihak belum terpetakan**: SPV Manufacture tak punya SOP; departemen teknisi mesin. (APJ/PJT sudah teridentifikasi dari Lembar Keputusan, Temuan 6.)
 9. **COA (Certificate of Analysis) keluar**: format per lini (Pangan, OT, Kosmetik), per batch atau per Surat Jalan, dan penanda tangan (APJ dan/atau Supervisor Quality). Pemutus: Supervisor Quality + APJ.
 10. **Gerbang ketersediaan bahan sebelum produksi**: apakah batch boleh dimulai bila ada bahan formula yang kurang, dan siapa yang menyetujui penggantian bahan. Pemutus: SPV Manufacture + APJ.
+11. **Pembelian bahan baku wajib lewat Pengajuan Barang `RAWMATERIAL`, mulai kapan** (Temuan 4b): sekaligus atau bertahap, dan apakah PO di luar ERP dihentikan. Pemutus: SPV Manufacture + Leader Procurement, dengan PPIC dan Finance.
 
 ## Dokumen Terkait
 
