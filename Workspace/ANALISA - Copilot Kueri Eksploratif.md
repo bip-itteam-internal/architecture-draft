@@ -152,7 +152,7 @@ Ukur prod `assistant_db.percakapan` 2026-10-12: 158 giliran, 10 penanya, ±10 "b
 ### 3/7 [BE] Pasang eksekutor kueri: area marketing dan marketplace
 
 - **Repo**: bip-erp (sub-issue induk)
-- **Issue**: [bip-erp#3026](https://github.com/bip-itteam-internal/bip-erp/issues/3026)
+- **Issue**: [bip-erp#3026](https://github.com/bip-itteam-internal/bip-erp/issues/3026) (kini **marketing-analytics saja**, PR [#3096](https://github.com/bip-itteam-internal/bip-erp/pull/3096)) · dipecah 2026-10-14: `integration`, `insentive`, `tiktok-shop-service` → [bip-erp#3091](https://github.com/bip-itteam-internal/bip-erp/issues/3091), karena `integration_db` dilayani pemiliknya (REF Kepemilikan Data). ⚠️ Sebelum #3091: lengkapi daftar segmen pribadi majemuk dengan alamat pembeli (`recipient_address`, `shipping_address`, `full_address`, `address_line`) dan `bank_no`/`bank_akun`.
 
 **Pemutus:** @irfanarfianto
 **PIC:** @

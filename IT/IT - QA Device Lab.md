@@ -2,7 +2,7 @@
 
 *Alat QA internal untuk menguji aplikasi Android secara massal di banyak HP yang tercolok USB ke satu PC: mirroring, kontrol serentak, aksi massal, dan agen AI yang menjalankan uji dari satu perintah. Dibangun sebagai pengganti aman untuk software "group control" Panda.*
 
-- **Status**: ⚠️ Implemented (ada catatan) — mode manual sebagai aplikasi desktop Electron merged 2026-10-14 (PR #2 tahap 1, PR #4 tahap 1b); diuji dengan 1 HP (Samsung A50s, Android 11); belum diuji banyak HP sekaligus; mode agen AI (Tahap 2) belum dibuat.
+- **Status**: ⚠️ Implemented (ada catatan) — mode manual sebagai aplikasi desktop Electron merged 2026-10-14 (PR #2 tahap 1, PR #4 tahap 1b, PR #6 tahap 1c); tahap 1 dan 1b diuji dengan 1 HP (Samsung A50s, Android 11), fitur tahap 1c belum diuji ke HP sungguhan; belum diuji banyak HP sekaligus; mode agen AI (Tahap 2) belum dibuat.
 - **Stack**: Electron 44 + Node 24 + TypeScript; server Fastify di proses utama; dashboard React + Vite + Tailwind + shadcn/ui; video dan kontrol lewat scrcpy-server 3.1 + Tango (`@yume-chan/*`, MIT); vitest; pnpm; installer electron-builder (NSIS). Alat eksternal: `adb`, `scrcpy`, `maestro`.
 - **Path di repo**: repo privat `bip-itteam-internal/qa-device-lab` (sibling di workspace `erp/`); server di `server/`, proses utama Electron di `electron/`, dashboard di `web/`, spec di `docs/superpowers/specs/2026-10-13-qa-device-lab-design.md` (§14 untuk Electron). Data kerja aplikasi terpasang di `Documents\QA Device Lab`. Branch protection tidak tersedia (GitHub Free, repo privat).
 
@@ -28,13 +28,17 @@ Inti Panda ternyata alat open-source (scrcpy untuk mirroring). Karena itu pengga
 **Mode manual** (setara Panda, tanpa AI), aplikasi desktop dengan tata letak meniru Panda:
 - grid **video langsung** semua HP (scrcpy, 720p 30 fps per HP, didekode WebCodecs); klik ubin memperbesar HP ke **layar besar** dengan navigasi ▢ ○ ◁ dan kolom Fungsi; ubin yang diperbesar menampilkan "Sedang dikontrol";
 - kontrol serentak lewat socket kontrol scrcpy: sentuhan dan tombol di satu HP ikut ke semua HP terpilih (Alt = HP itu saja); teks termasuk non-ASCII lewat clipboard;
-- panel kanan tanpa tab: tombol Teks / Aplikasi / Skenario, sakelar Kontrol layar kecil dan penanda, slider ukuran layar, chip nomor HP per grup untuk memilih;
+- panel kanan tanpa tab: tombol Teks / Aplikasi / Skenario / Konsol, sakelar Kontrol layar kecil dan penanda, slider ukuran layar, chip nomor HP per grup untuk memilih;
 - penanda nomor urut + nama HP muncul saat kursor di atas ubin (tidak menutupi layar);
 - kirim teks sama atau berbeda per HP, pintasan teks, kirim dan tarik berkas;
-- aksi massal: install APK, buka/tutup aplikasi, hapus data aplikasi, screenshot, Home, buka halaman Settings;
-- konfirmasi untuk setiap aksi yang menghapus atau menghentikan (hapus data, tutup paksa, tombol daya, hapus pintasan, timpa skenario, menutup aplikasi saat uji berjalan) dan panduan bertahap untuk pengguna baru;
-- nama dan grup HP, rekam video sesi, rekam logcat + deteksi crash/ANR, clipboard dua arah;
-- editor skenario YAML (format Maestro) dan menjalankannya paralel di banyak HP, hasil per HP di `runs/`;
+- aksi massal: install APK, daftar aplikasi terpasang, uninstall, buka/tutup aplikasi, hapus data aplikasi, ganti keyboard aktif, kirim berkas ke Download atau Galeri, screenshot, Home, buka halaman Settings; geser atas/bawah/kiri/kanan dari layar besar;
+- konfirmasi untuk setiap aksi yang menghapus atau menghentikan (hapus data, uninstall, tutup paksa, tombol daya, hapus/keluarkan grup, hapus jadwal, jalankan konsol, hapus pintasan, timpa skenario, menutup aplikasi saat uji berjalan) dan panduan bertahap untuk pengguna baru;
+- nama, grup, dan nomor urut HP yang bisa diatur (HP tanpa nomor menyusul sesudah nomor terbesar); kelola grup sebagai label: ganti nama, hapus (HP tetap ada), masukkan/keluarkan HP terpilih;
+- rekam video sesi, rekam logcat + deteksi crash/ANR, clipboard dua arah (termasuk salin ke HP tanpa menempel);
+- editor skenario YAML (format Maestro) dan menjalankannya paralel di banyak HP, hasil per HP di `runs/`; **rekam aksi** di layar besar (tap, tekan lama, geser, tombol, teks) menjadi skenario dengan koordinat persen layar;
+- **jadwal uji** berkala dengan interval tetap (15 menit sampai 1 hari); jadwal terlewat dijalankan sekali, HP sibuk dilewati dan dicatat; hanya berjalan selama aplikasi terbuka;
+- **konsol ADB terbatas**: hanya `adb shell` di HP terpilih (bukan perintah di PC, bukan forward/reverse/root), satu baris, maks. 30 detik, selalu dikonfirmasi, dicatat ke `runs/konsol-*.log`;
+- **API lokal** untuk skrip otomasi (padanan Panda API): hanya `127.0.0.1`, wajib token acak yang berganti tiap aplikasi dibuka (`api-token.txt` di folder data); panduan dan contoh PowerShell/Python di dalam aplikasi;
 - dashboard yang sama tetap bisa dibuka di browser (`pnpm start`) dengan grid screenshot sebagai cadangan.
 
 **Mode agen** (pola sama dengan [[Microservices - Assistant Service]]):
@@ -46,9 +50,9 @@ Inti Panda ternyata alat open-source (scrcpy untuk mirroring). Karena itu pengga
 **Sengaja tidak dibuat** (tidak dibutuhkan QA, hanya berguna untuk menyamarkan otomasi sebagai banyak manusia):
 - pemalsuan identitas perangkat, rotasi IP/proxy per HP, *Random Delay* / *random offset* pada kontrol serentak;
 - impor massal akun dan password, integrasi aplikasi chat multi-akun;
-- konsol ADB atau shell bebas, akses lewat internet, HP cloud, root.
+- shell bebas di PC (konsol yang ada hanya shell HP, lihat di atas), interval jadwal acak, akses lewat internet, HP virtual/cloud, root.
 
-**Pengaman utama**: server hanya `127.0.0.1`; semua program eksternal lewat satu pintu (daftar-izin, argumen array, tanpa shell); serial HP divalidasi; berkas hanya dari folder proyek; tidak ada aplikasi pendamping di HP. Jendela Electron tanpa akses Node (`contextIsolation`, `sandbox`); IPC hanya diterima dari dashboard lokal dan setiap masukannya divalidasi di proses utama.
+**Pengaman utama**: server hanya `127.0.0.1`; semua program eksternal lewat satu pintu (daftar-izin, argumen array, tanpa shell); serial HP divalidasi; berkas hanya dari folder proyek; tidak ada aplikasi pendamping di HP. Jendela Electron tanpa akses Node (`contextIsolation`, `sandbox`); IPC hanya diterima dari dashboard lokal dan setiap masukannya divalidasi di proses utama. Di aplikasi desktop setiap `/api` wajib token; dashboard mendapatkannya lewat header yang disuntik proses utama, sehingga tautan hasil uji dibuka di jendela aplikasi sendiri (browser bawaan tidak membawa token) dan semua jendela turunan dikunci ke dashboard lokal. Mode dev (`pnpm start`) berjalan tanpa token.
 
 Target uji: aplikasi milik perusahaan (mis. [[APP - MyBharata]]) atau aplikasi pihak ketiga atas izin pemiliknya.
 
@@ -64,12 +68,13 @@ Target uji: aplikasi milik perusahaan (mis. [[APP - MyBharata]]) atau aplikasi p
 
 ## Belum Diimplementasikan / Catatan
 
-- **Baru diuji dengan 1 HP.** Video grid, layar besar, dan kontrol terbukti di Samsung A50s (Android 11); kode lolos 82 test, typecheck, build, dan review independen. Banyak HP sekaligus belum diuji, jadi batas HP per PC (asumsi 20) belum diukur.
+- **Baru diuji dengan 1 HP.** Video grid, layar besar, dan kontrol terbukti di Samsung A50s (Android 11). Banyak HP sekaligus belum diuji, jadi batas HP per PC (asumsi 20) belum diukur.
+- **Fitur tahap 1c belum diuji ke HP sungguhan** (rekam aksi, konsol, jadwal, kelola grup, uninstall, keyboard). Yang sudah terbukti: 120 test, typecheck, build installer, dan perilaku token di Electron (luar tanpa token 401, dashboard 200).
+- Skenario hasil rekaman memakai koordinat persen layar, jadi rapuh di HP beresolusi atau tata letak lain; sebaiknya disunting jadi `tapOn: "<teks>"` sebelum dipakai luas.
 - Spike yang masih tersisa:
   - Maestro paralel ke HP berbeda dengan data berbeda (bila bentrok: `PARALEL = false` di `server/orkestrator.ts`);
   - pembacaan hierarki layar lewat `maestro hierarchy` (dibutuhkan Tahap 2).
 - Installer (`QA Device Lab Setup 0.1.0.exe`, sekitar 120 MB) **belum bertanda tangan digital**; Windows SmartScreen memperingatkan saat pemasangan pertama.
-- Tahap 1c (rencana, belum dikerjakan): daftar aplikasi terpasang + uninstall, kirim berkas ke galeri, kelola grup, nomor urut HP yang bisa diatur, rekam aksi menjadi skenario, jadwal uji, API lokal.
 - Mode agen AI (Tahap 2) belum dibuat.
 - Siapa pemilik dan pengguna tetap alat ini (persona QA): TBD.
 

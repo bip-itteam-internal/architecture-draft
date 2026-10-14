@@ -9748,23 +9748,24 @@
         "DB - Overview and Notes",
         "REF - Kepemilikan Data",
         "ADR - 0166 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Satu Sumber, Cek Silang Dikerjakan Sistem dengan Tiga Keadaan",
+        "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
         "REF - Penyajian Laporan Copilot",
         "Microservices - Payroll Service"
       ],
-      "hash": "6dfbf9466de7703a0958a9eafcf4917c7f0f78cc3619f558db04bd1789f287b6",
-      "ukuran_kb": 16.2,
-      "ringkasan": "Menjawab: bagaimana Copilot boleh menjawab pertanyaan data yang belum punya endpoint lewat tool kueri eksploratif (pipeline agregasi MongoDB buatan model) yang dijalankan eksekutor bersama di service pemilik, serta pagar apa yang berlaku (daftar-tolak kredensial, cakupan departemen, tahap berdaftar-izin, user Mongo read-only, batas waktu dan baris). Juga menjawab siapa melihat apa, label eksploratif, kueri terverifikasi IT yang dipakai ulang, bagian ADR 0132 dan 0165 yang diubah, dan syarat persetujuan Direksi sebelum PROD.",
+      "hash": "22800af5966cd82ea3aaee9edd7a9f333b7ce5107963711875dadd4ce30f44f2",
+      "ukuran_kb": 17.2,
+      "ringkasan": "Menjawab: apakah Copilot boleh menyusun sendiri kueri agregasi MongoDB ke data service mana pun yang belum punya endpoint, pagar apa yang berlaku (user read-only, daftar-tolak kredensial, tahap agregasi berdaftar-izin, cakupan departemen, batas waktu dan baris), dan siapa boleh melihat data apa (Direktur, Supervisor HRD, IT vs supervisor lain). Juga menjelaskan label \"eksploratif, belum dibakukan\", kueri terverifikasi oleh IT yang dipakai ulang, bagian ADR 0132 dan ADR 0165 yang diubah, serta syarat persetujuan Direksi sebelum deploy PROD.",
       "kata_kunci": [
-        "ADR 0173",
+        "Copilot",
         "kueri eksploratif",
         "exploratory query",
-        "Copilot",
         "aggregation pipeline",
         "read-only",
-        "kueri terverifikasi",
         "kredensial",
+        "credentials",
         "cakupan departemen",
-        "shared-library eksekutor"
+        "kueri terverifikasi",
+        "assistant-service"
       ]
     },
     {
@@ -14702,7 +14703,7 @@
       "area": "IT",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — mode manual sebagai aplikasi desktop Electron merged 2026-10-14 (PR #2 tahap 1, PR #4 tahap 1b); diuji dengan 1 HP (Samsung A50s, Android 11); belum diuji banyak HP sekaligus; mode agen AI (Tahap 2) belum dibuat.",
+      "status_teks": "Implemented (ada catatan) — mode manual sebagai aplikasi desktop Electron merged 2026-10-14 (PR #2 tahap 1, PR #4 tahap 1b, PR #6 tahap 1c); tahap 1 dan 1b diuji dengan 1 HP (Samsung A50s, Android 11), fitur tahap 1c belum diuji ke HP sungguhan; belum diuji banyak HP sekaligus; mode agen AI (Tahap 2) belum dibuat.",
       "publik": false,
       "tautan": [
         "Microservices - Assistant Service",
@@ -14712,23 +14713,20 @@
         "CORE - Kapabilitas AI dan Machine Learning",
         "IT - Big Pictures"
       ],
-      "hash": "88d0f04fc4dddc88eb48b5465bd21f3a60049403d2e9852743215dbeb644ed25",
-      "ukuran_kb": 8.7,
-      "ringkasan": "Menjawab: apa itu QA Device Lab, kenapa Panda tidak dipasang di PC/HP kantor, fitur apa yang tersedia (mirroring scrcpy, kontrol serentak, aksi massal, skenario Maestro, mode agen AI), stack-nya, dan apa yang belum diuji atau dibuat. Juga menjawab batasan keamanan, hal yang sengaja tidak dibuat, dan rencana tahap berikutnya.",
+      "hash": "30c8485950a1c99ea0c854125e4e212ee2f78cc9a542a4cab006821419b1f7bf",
+      "ukuran_kb": 10.5,
+      "ringkasan": "Menjawab: alat apa yang dipakai tim untuk menguji aplikasi Android di banyak HP sekaligus (mirroring scrcpy, kontrol serentak, aksi massal, skenario Maestro, jadwal uji, konsol ADB terbatas, API lokal), kenapa software group control Panda tidak boleh dipasang di perangkat kantor, dan apa yang sengaja tidak dibuat. Juga menjelaskan stack Electron/Fastify/React, pengaman keamanannya, rencana mode agen AI, serta batas pengujian yang belum terbukti (banyak HP sekaligus).",
       "kata_kunci": [
         "QA Device Lab",
-        "Panda",
+        "device lab",
+        "uji Android",
         "scrcpy",
+        "Panda group control",
         "Maestro",
-        "Electron",
-        "Android",
-        "multi-device",
-        "mirroring",
         "kontrol serentak",
-        "pengujian mobile",
         "adb",
-        "agen AI",
-        "QA"
+        "Electron",
+        "QA tester"
       ]
     },
     {
@@ -20427,20 +20425,20 @@
         "Microservices - Marketing Analytics Service",
         "Microservices - Payroll Service"
       ],
-      "hash": "24ee47045834d20c8c2d286ecb70e67b05d668862935bccd30c7f36b14fe9dae",
-      "ukuran_kb": 14.9,
-      "ringkasan": "Menjawab: bagaimana pekerjaan tool kueri eksploratif Copilot (ADR 0173) dipecah jadi issue induk dan tujuh sub-issue (eksekutor bersama, tool dan kueri terverifikasi, pemasangan per area marketing/HR/finance/tiket, serta FE label dan tombol verifikasi), urutan pengerjaan, dan urutan deploy. Juga menjawab kriteria yang harus benar per issue, syarat PROD (persetujuan Direksi, user Mongo read-only), dan data pendukung kebutuhannya.",
+      "hash": "9811be71929aae6c3e19c46f5943d38df7fd13db875e5ff9212aaad0efd932f2",
+      "ukuran_kb": 15.4,
+      "ringkasan": "Menjawab: bagaimana pekerjaan kueri eksploratif Copilot (ADR 0173) dipecah jadi issue induk dan tujuh sub-issue BE/FE, urutan pengerjaan dan deploy-nya, serta kriteria \"yang harus benar\" tiap bagian (eksekutor bersama di shared-library, tool kueri dan kueri terverifikasi di assistant-service, pemasangan per area service, label dan tombol verifikasi di frontend). Juga mencatat syarat PROD di luar issue: persetujuan Direksi dan pembuatan user Mongo read-only oleh manusia.",
       "kata_kunci": [
         "analisa kebutuhan",
-        "kueri eksploratif",
         "Copilot",
+        "kueri eksploratif",
         "sub-issue",
-        "Siap Agent",
         "eksekutor kueri",
-        "urutan deploy",
+        "shared-library",
+        "kueri_terverifikasi",
         "bip-erp#3023",
-        "read-only Mongo",
-        "papan kerja"
+        "blueprint",
+        "Siap Agent"
       ]
     },
     {
