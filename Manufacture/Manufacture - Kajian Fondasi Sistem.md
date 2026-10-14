@@ -165,6 +165,18 @@ Dibandingkan dua Batch Record lengkap (Oktober 2026), satu diputuskan LULUS dan 
 - **Satu nomor lot tercatat untuk dua bahan berbeda.** Sistem perlu menegakkan satu lot = satu bahan.
 - **Data uji QC tipis**: parameter spesifikasi seperti pH tidak diukur. COA (Temuan 5) yang dirakit dari Batch Record akan kosong di parameter itu; praktik pengujian perlu dibenahi lebih dulu (di luar sistem).
 
+## Temuan 8: Tiket permintaan SPV Manufacture di Task Management
+
+Diukur di prod 2026-10-14: 15 tiket dari SPV Manufacture sejak 2026-07-28 (5 Done, 7 Todo, 2 Request, 1 Ditolak). Isinya memperjelas beberapa temuan di atas:
+
+- **Batch Record diisi dua admin, tujuannya rekonsiliasi Material Order.** Admin gudang RM mengisi penimbangan sebelum produksi; admin operasional produksi mengisi hasil (pcs) dan sisa timbangan bahan sesudahnya, supaya jumlah Material Order sesuai pemakaian; dicek SPV QC. Dokumennya dua versi: untuk BPOM dan untuk perusahaan. Menguatkan TBD 2 (serah ke WIP, sisa kembali).
+- **Verifikasi jumlah barang masuk dan keluar tak punya pemilik.** QC hanya mengambil sampel (mutu), tidak menghitung berat dan jumlah; security tak tahu jumlahnya. Arah SPV: gudang RM bertanggung jawab atas berat dan jumlah saat terima dari pemasok dan kirim ke gudang FG, disetujui QC dan Procurement; surat jalan tercetak; stempel security untuk penerimaan malam. Untuk TBD 4: **jumlah diperiksa gudang, mutu diperiksa QC**, dua pemeriksaan yang terpisah.
+- **Sebagian selisih stok RM berasal dari konversi satuan**: pemasok mengirim dalam liter, gudang menimbang dalam KG tanpa alat ukur liter (pengadaan alat masih tertunda). Master bahan perlu faktor konversi satuan beli ke satuan stok yang tercatat, bukan dihitung tangan saat terima. Cocok dengan satuan KG/gram bercampur di spreadsheet (Temuan 4).
+- **Data produk tersebar dan kode produk tak punya pemilik**: desain di Sekretariat, izin/halal di Quality, komposisi di RND. Diminta satu berkas per produk dengan satu PIC pemegang kode produk agar kode di Accurate tak berbeda. Spesifikasi produk di Batch Record baru menjawab sebagian; sisanya soal pemilik master barang ([[ADR - 0136 Pemilik Master Barang dan Master Gudang]]).
+- **Substitusi bahan adalah praktik rutin** (contoh: satu jenis air habis, diganti air dari sumber lain); yang diminta transparansi pemakaiannya ke Finance, bukan larangan. Untuk TBD 10: pengganti boleh, asal disetujui sebelum produksi dan tercatat.
+- **Retur sudah punya admin khusus**, tetapi pencatatannya masih Excel; permintaan fiturnya berstatus Request tanpa persetujuan sejak 2026-08-06.
+- **Pola tanggapan**: dua tiket ke IT berstatus Todo sejak 2026-07-28 tanpa gerak (salah satunya menunggu jawaban pertanyaan IT yang tak pernah dijawab), semua tiket ke GA lewat tenggat, dua Request tak disetujui siapa pun dua bulan, satu ditolak tanpa alasan tertulis. Permintaan pemakai yang tak dijawab adalah risiko adopsi: pekerjaan tetap kembali ke spreadsheet.
+
 ## Belum Diputuskan (TBD)
 
 1. **Pemilik angka stok pabrik**: ERP (push ke Accurate) atau Accurate. Jawaban pemakai bertentangan (Accurate vs stok fisik). Pemutus: Finance Supervisor. Syarat Finance: ERP mengikuti aturan pencatatan masuk/keluar (penjualan, retur, pembelian, pemakaian produksi); penyesuaian opname dibukukan setelah validasi Finance.

@@ -14754,7 +14754,7 @@
         "IT - Big Pictures"
       ],
       "hash": "4dd735663cab85b000ed12a844a8f47d1eb7e431d26df9f48001655b706a117f",
-      "ukuran_kb": 31.6,
+      "ukuran_kb": 32.3,
       "ringkasan": "Menjawab: apa itu Bharata Boost (QA Device Lab), kenapa dibangun ulang dari komponen open-source alih-alih memakai Panda, dan stack teknologinya (Electron, Fastify, scrcpy/Tango, Maestro). Juga menjelaskan fitur mode manual (grid video, kontrol serentak, Geser otomatis, Uji acak, skenario Maestro, API lokal), fitur tambahan QA, rencana agen AI, pengaman, serta apa yang belum diimplementasikan, rencana pengembangan, dan kriteria rilis.",
       "kata_kunci": [
         "Bharata Boost",
@@ -15373,6 +15373,7 @@
         "Microservices - Manufacture Service",
         "API - Manufacture Service",
         "Manufacture - Dokumen Produksi Batch",
+        "ADR - 0136 Pemilik Master Barang dan Master Gudang",
         "Manufacture - Fondasi Manufaktur Persona",
         "Manufacture - Rancangan Menu per Posisi",
         "Manufacture - Stock & Material Management",
@@ -15390,19 +15391,19 @@
         "REF - Kepemilikan Data",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)"
       ],
-      "hash": "4ebca72284c499ff92825c205ffcf9cf880b24decfe1cf9c722e594908bfccd4",
-      "ukuran_kb": 20.1,
-      "ringkasan": "Menjawab: fitur manufaktur mana di ERP yang benar-benar dipakai di prod dan mana yang belum pernah dipakai beserta penyebabnya, tumpang tindih apa yang ada di fondasi kode (catatan produksi, rilis batch, QC bahan masuk, PO bahan, jalur penyesuaian stok, pemilik angka stok), dan apa kata kuesioner pemakai. Juga menjelaskan spreadsheet PPIC sebagai sistem yang berjalan nyata, kenapa pembelian bahan baku belum lewat Pengajuan Barang RAWMATERIAL, kebutuhan COA keluar, perbandingan Batch Record kertas dengan model ERP, serta daftar keputusan yang belum diambil.",
+      "hash": "54a55f3d3151df29f96a8206aaf848b9d2e584413dc0c9d6449fb18c34d33cbe",
+      "ukuran_kb": 22.6,
+      "ringkasan": "Menjawab: fitur manufaktur mana di ERP yang benar-benar dipakai di prod dan mana yang belum pernah dipakai beserta penyebabnya, tumpang tindih apa yang ada di fondasi kode, dan apa kata kuesioner serta tiket permintaan SPV Manufacture. Juga menjelaskan spreadsheet PPIC sebagai sistem yang berjalan nyata, kenapa pembelian bahan baku belum lewat Pengajuan Barang RAWMATERIAL, siapa memeriksa jumlah vs mutu bahan masuk, kebutuhan COA keluar, perbandingan Batch Record kertas dengan model ERP, serta daftar keputusan yang belum diambil.",
       "kata_kunci": [
         "kajian fondasi manufaktur",
         "adopsi ERP",
         "spreadsheet PPIC",
         "kuesioner pemakai",
+        "tiket SPV manufaktur",
         "batch record",
         "pembelian bahan baku",
-        "pengajuan barang RAWMATERIAL",
-        "karantina",
-        "COA",
+        "substitusi bahan",
+        "konversi satuan",
         "pemilik stok",
         "TBD"
       ]
