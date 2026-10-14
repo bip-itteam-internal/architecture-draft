@@ -14737,7 +14737,7 @@
       "area": "IT",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan) — mode manual sebagai aplikasi desktop Electron merged 2026-10-14 (PR #2 tahap 1, PR #4 tahap 1b, PR #6 tahap 1c, PR #7 pemilih aplikasi, PR #8 panel Common); diuji dengan 1 HP (Samsung A50s, Android 11), sebagian fitur belum dicoba ke HP (lihat Catatan); belum diuji banyak HP sekaligus; mode agen AI (Tahap 2) belum dibuat.",
+      "status_teks": "Implemented (ada catatan) — mode manual sebagai aplikasi desktop Electron merged 2026-10-14 (PR #2 tahap 1, PR #4 tahap 1b, PR #6 tahap 1c, PR #7 pemilih aplikasi, PR #8 panel Common, PR #9 stabilitas adb, PR #10 pemilih elemen); diuji dengan 1 HP (Samsung A50s, Android 11), sebagian fitur belum dicoba ke HP (lihat Catatan); belum diuji banyak HP sekaligus; mode agen AI (Tahap 2) belum dibuat.",
       "publik": false,
       "tautan": [
         "Microservices - Assistant Service",
@@ -14747,9 +14747,9 @@
         "CORE - Kapabilitas AI dan Machine Learning",
         "IT - Big Pictures"
       ],
-      "hash": "a934fb2c8593bef24797bd6be02c675f18b123b64b86150df24fbecbe7693280",
-      "ukuran_kb": 12.8,
-      "ringkasan": "Menjawab: kenapa Panda (software group control) tidak boleh dipakai di perangkat kantor, apa penggantinya yang aman untuk QA aplikasi Android di banyak HP sekaligus, dan fitur apa saja yang ada (video langsung, panel Common ala Panda, rekam aksi berbahasa biasa, geser otomatis berbatas, jadwal uji, konsol ADB terbatas, API lokal bertoken). Juga menjawab fitur Panda mana yang sengaja tidak ditiru (jeda acak, Auto Swipe tanpa batas, WIFI Mode, berbagi cloud), pengamannya, dan apa yang belum diuji.",
+      "hash": "5b017241e49a32b36581b78609c9cb4e1831446fe65a6b030f89edd7d5684cda",
+      "ukuran_kb": 14.4,
+      "ringkasan": "Menjawab: kenapa Panda (software group control) tidak boleh dipakai di perangkat kantor, apa penggantinya yang aman untuk QA aplikasi Android di banyak HP sekaligus, fitur apa saja yang ada (video langsung, panel Common ala Panda, rekam aksi berbahasa biasa yang menyimpan ketukan sebagai pemilih elemen Maestro, geser otomatis berbatas, jadwal uji, konsol ADB terbatas, API lokal bertoken), dan bagaimana stabilitas banyak HP dijaga (antrean adb, shell lewat socket, cache info HP). Juga menjawab fitur yang sengaja tidak dibuat dan apa yang belum diuji.",
       "kata_kunci": [
         "QA Device Lab",
         "Panda",
@@ -14758,9 +14758,9 @@
         "Maestro",
         "uji massal HP Android",
         "rekam aksi",
-        "geser otomatis",
-        "konsol ADB",
-        "API lokal"
+        "pemilih elemen",
+        "uiautomator",
+        "antrean adb"
       ]
     },
     {
