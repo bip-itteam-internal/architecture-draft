@@ -35,7 +35,7 @@ Repo: **BE** = bip-erp, **FE** = erp-frontend. Status per 2026-10-13.
 
 | Kode | Butir | Issue yang ada | Butuh | Status |
 |---|---|---|---|---|
-| M-01 | Cek dan beri akses menu Manufaktur/Quality ke posisi yang benar (paket hak per jabatan) | BE #2434 (tolak setuju CAPA karena nama role) | - | Siap |
+| M-01 | Cek dan beri akses menu Manufaktur/Quality ke posisi yang benar (paket hak per jabatan) | BE #2434, #3089, FE #2422 | konfirmasi SPV (staf gudang RM/FG), HR (jabatan QA Leader) | PR terbuka 2026-10-14 (BE #3100, FE #2430): penyetuju CAPA gudang sisi RM. Sisa: paket `wms_gudang_*` untuk 3 Warehouse Staff sesudah SPV menjawab; akses PJT ke Rilis Batch menunggu K-3 |
 | M-02 | Uji coba Batch Record pada 1-2 batch nyata, paralel dengan kertas | - | M-01 | Siap |
 | M-03 | Tambah bagian spesifikasi produk di Batch Record (dasar COA) | BE #3077, FE #2413 | - | PR terbuka 2026-10-14 (BE #3084, FE #2417); deploy BE dulu, QA RND login ulang |
 | M-04 | Dashboard jembatan dari spreadsheet PPIC untuk SPV Manufacture | - | - | Siap |

@@ -50,7 +50,7 @@ Status ERP tiap halaman:
 | Operator Produksi | Manufaktur | Umum: Lapor Kerusakan Mesin (fase berikut), KPI | - |
 | Leader Warehouse | Manufaktur | Umum: Persetujuan, KPI · Bahan & Gudang: Penerimaan, Serah ke WIP, Stok, Opname, Barang Jadi, Mutasi Antar Gudang | hasil opname |
 | Admin Warehouse | Manufaktur | Umum: KPI · Bahan & Gudang: sama dengan Leader Warehouse | - |
-| Staf Warehouse | Manufaktur | Umum: KPI · Bahan & Gudang: Penerimaan, Serah ke WIP, Opname, Stok (baca), Barang Jadi (baca) | - |
+| Staf Warehouse | Manufaktur | Umum: KPI · Bahan & Gudang: Penerimaan, Serah ke WIP, Opname, Stok (baca), Barang Jadi (baca). Akses diberikan **per orang** lewat paket akun `wms_gudang_rm`/`wms_gudang_fg` (gudangnya tak tersirat dari nama jabatan; keputusan 2026-10-14) | - |
 | Admin Return | Manufaktur | Umum: KPI · Barang Jadi: Scan Retur Marketplace | - |
 | QC Assistant | Quality | Umum: KPI · Mutu: QC Bahan Masuk, Komplain (baca) | - |
 | QC Production | Quality | Umum: KPI · Mutu: COA Keluar, CAPA · Produksi: Batch Record | - |
