@@ -54,6 +54,15 @@ Tambahan di luar halaman ini: kotak **sisa pos** di bawah tiap baris form pencat
 
 ⛔ **Wajib dibaca sebelum merancang layar atau laporan yang memakai kolom-kolom ini.** Kegagalannya bukan galat, melainkan rupiah yang sama terhitung dua kali atau pos tanpa anggaran yang terbaca Rp 0. Aturan ini semula hanya hidup sebagai komentar kode.
 
+🟡 **Akan berubah, diusulkan [[ADR - 0178 Serapan Anggaran per Departemen Jurnal, Seluruh Perusahaan Dihapus, Pagu Gabungan per Departemen]]** (2026-10-15, kode belum ada). Tabel di bawah tetap menggambarkan kode yang berlaku sampai ADR itu diterima dan dikerjakan. Yang direncanakan berubah:
+- Baris `departemen` kosong ("Seluruh perusahaan") tidak lagi menjadi pos, tidak ditampilkan, dan tidak ikut total maupun KPI. Departemen wajib saat input anggaran.
+- Pagu gabungan beberapa akun per departemen per bulan ditambahkan.
+- Layar Serapan menampilkan **Varians = Terpakai − Anggaran** (minus = masih tersisa) dan **% Varians**. Field `varians` backend **tetap** Anggaran − Terpakai.
+
+⚠️ **Risiko hitung dobel yang berlaku hari ini.** `RingkasVarians` (`anggaran.go:338-360`) menjumlah semua baris terdefinisi tanpa membedakan baris `departemen` kosong dari baris per departemen, padahal realisasi baris kosong = jumlah semua departemen akun itu (`agregasi_riwayat_akun.go:144-152`). Kalau satu akun dianggarkan di keduanya, realisasinya terhitung **dua kali** di total kartu dan di KPI `varians_anggaran`.
+- Diukur di prod Oktober 2026: 38 dari 38 baris beranggaran ada di departemen kosong, jadi hitung dobel belum terjadi.
+- Hitung dobel langsung terjadi bila RAPB per departemen diunggah **tanpa** menghapus baris kosong.
+
 | Kolom / angka | Artinya | Aturan pemakaian |
 |---|---|---|
 | **Anggaran** | Nominal master anggaran pos (akun, departemen, bulan). Baris `departemen` kosong = seluruh perusahaan | Hanya baris yang anggarannya **terdefinisi** yang membawa angka |
@@ -130,6 +139,7 @@ Untuk proyeksi mingguan yang diatur (ADR 0161, Diterima 2026-10-09): yang tersis
 
 - [[ADR - 0159 Serapan Anggaran Dibaca dari Pengajuan sebagai Bagian dari Terpakai, Rute Tulis Anggaran Digerbang Izin Sendiri]]
 - [[ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB]]
+- [[ADR - 0178 Serapan Anggaran per Departemen Jurnal, Seluruh Perusahaan Dihapus, Pagu Gabungan per Departemen]] (🟡 Diusulkan)
 - [[Finance - Rancangan Finance Service]] · [[Finance - Proses Pengajuan Pengeluaran dan Persetujuan]] · [[Finance - FAT Persona]]
 - [[API - Procurement Service]] · [[API - Integration Service]] · [[Microservices - Procurement Service]]
 - [[CORE - RBAC dan Permission Set]] · [[APP - Web ERP]] · [[REF - Kepemilikan Data]]
