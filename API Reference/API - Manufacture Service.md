@@ -103,9 +103,9 @@
 
 Rujukan: rute `services/manufacture/main.go:186`, `:201`, `:213`, `:219`, `:256`, `:292`. Handler `services/manufacture/stok_dari_pengajuan.go:55` (`StokDariPengajuan`), `services/manufacture/master_bahan_internal.go:50` (`ListMasterBahanInternal`), `services/manufacture/retur_konfirmasi_ulang.go:357` (`KonfirmasiUlangRetur`; filter `:218`, keputusan `:156`), `services/manufacture/returns_export.go:597` (`ExportReturns`), `services/manufacture/production_plan.go:37` (`SimulateProductionPlan`; logika `production_plan_logic.go:91`), `services/manufacture/po_marketing_spv.go:434` (`HitungPoMarketingMenunggu`). Gerbang `services/manufacture/rbac.go:286` (`isInternalRobot`), `:324` (`requireTabReadOrRobot`), `:333` (`requireTabWriteOrRobot`), `:345` (`requireWmsSupervisor`).
 
-## Dashboard jembatan spreadsheet PPIC (M-04) 🟡
+## Dashboard jembatan spreadsheet PPIC (M-04) ✅
 
-> 🟡 **PR terbuka, belum merged** (bip-erp#3144, branch `manufacture/3143-m04-ppic-sheet`; diverifikasi di DEV lewat worktree branch 2026-10-14). Salinan **satu arah** spreadsheet Production Planning PPIC (tab hasil produksi dan FG keluar) untuk seksi "Produksi (dari spreadsheet PPIC)" di Dashboard Manufaktur, sampai datanya pindah ke Batch Record dan Kirim FG. Latar: [[Manufacture - Kajian Fondasi Sistem]] Temuan 4.
+> ✅ **Merged** (bip-erp#3144, FE erp-frontend#2462) dan **ter-deploy prod 2026-10-15**: sinkron pertama prod `OK masuk=404 keluar=420 tolak=50`, biner dan bundel FE diverifikasi. Salinan **satu arah** spreadsheet Production Planning PPIC (tab hasil produksi dan FG keluar) untuk seksi "Produksi (dari spreadsheet PPIC)" di Dashboard Manufaktur, sampai datanya pindah ke Batch Record dan Kirim FG. Latar: [[Manufacture - Kajian Fondasi Sistem]] Temuan 4.
 
 | Method | Path | Gerbang | Fungsi |
 |---|---|---|---|

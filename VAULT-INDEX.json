@@ -604,8 +604,8 @@
         "API - Integration Service",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line"
       ],
-      "hash": "5b39d8afcae8a6095d2440a95591d8538e3184886101e88694ef600b90b5632d",
-      "ukuran_kb": 55.2,
+      "hash": "eea5ca9897ac76137f3fa7135260772bd9b02e1a8e02e2aa4acf0eec2f298b9f",
+      "ukuran_kb": 55.3,
       "ringkasan": "Menjawab: endpoint apa saja yang disediakan manufacture-service (WMS pabrik) lewat gateway /api/manufacture, gerbang akses tiap rute, dan apa yang dibaca/ditulisnya: master bahan dan stok, transaksi, formula, produksi, Dokumen Produksi Batch dan spesifikasi produk, cycle count, lot FIFO/FEFO, K3/GMP, bahan KPI otomatis /kpi/*, aksi Warehouse Sadewa, PO, mutasi gudang dan konsinyasi. Juga memuat rute dashboard jembatan spreadsheet PPIC (ringkasan, rincian, sinkron).",
       "kata_kunci": [
         "manufacture-service",
@@ -2840,7 +2840,7 @@
         "DB - Overview and Notes",
         "ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace"
       ],
-      "hash": "69e43fa5ec36d0d7fb3047adbd6422646a340298512de22071e53e2af64ad0e1",
+      "hash": "1dba18f0e789ce7d049f2a814926f1f70a0ecb4769decdfb456f0bc42618ba65",
       "ukuran_kb": 75.8,
       "ringkasan": "Menjawab: bagaimana manufacture-service (WMS pabrik) bekerja: fitur yang sudah jalan, model data 31 koleksi manufacture_db, keputusan teknis seperti sync Accurate, retur, ekspor, dan fitur yang dipetakan 2026-10-14 (penerimaan bahan dari pengajuan, cycle count, lot, K3/GMP, KPI), beserta TBD yang belum diputuskan.",
       "kata_kunci": [
@@ -15396,7 +15396,7 @@
         "REF - Kepemilikan Data",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)"
       ],
-      "hash": "b7bf779fade7caa0b6f9a1d0376e0b7747706d506caa305ee4a9c1e5b2a99fdb",
+      "hash": "900c74cfb170e9b4f1a83d6bccaf586decea20521099c45fc49a831e0f39204d",
       "ukuran_kb": 23.9,
       "ringkasan": "Menjawab: fitur manufaktur mana di ERP yang benar-benar dipakai di prod dan mana yang belum pernah dipakai beserta penyebabnya, tumpang tindih apa yang ada di fondasi kode, dan apa kata kuesioner serta tiket permintaan SPV Manufacture. Juga menjelaskan spreadsheet PPIC sebagai sistem yang berjalan nyata, kenapa pembelian bahan baku belum lewat Pengajuan Barang RAWMATERIAL, siapa memeriksa jumlah vs mutu bahan masuk, kebutuhan COA keluar, perbandingan Batch Record kertas dengan model ERP, serta daftar keputusan yang belum diambil.",
       "kata_kunci": [
@@ -20605,7 +20605,7 @@
         "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "f56200b011db97f7ffe42f742f31abbb5650a430c535545b52d292cf4d466662",
+      "hash": "b66582f4e00bd5362fbb5d3197f0d9bb7e76610f798b61f55438342797920357",
       "ukuran_kb": 7.6,
       "ringkasan": "Menjawab: butir kerja apa saja (kode M-nn) dalam penataan fondasi Manufaktur per fase, issue GitHub mana yang terkait, dan butir mana yang siap dikerjakan atau masih menunggu keputusan. Juga menjawab keputusan apa yang ditunggu (K-1 sampai K-11, mis. pemilik angka stok, zona WIP, keputusan rilis, status bahan masuk, format BPOM, COA) beserta pemutusnya, aturan pakai papan, dan apa yang sengaja di luar cakupan.",
       "kata_kunci": [
