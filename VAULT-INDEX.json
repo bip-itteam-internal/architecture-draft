@@ -9901,8 +9901,8 @@
       "judul": "ADR - 0178 Serapan Anggaran per Departemen Jurnal, Seluruh Perusahaan Dihapus, Pagu Gabungan per Departemen",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** (2026-10-15). Belum ada baris `🟢 Diterima, <tanggal>, oleh <login/jabatan>` (aturan di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Kode belum ada.",
+      "status_emoji": null,
+      "status_teks": "🟢 Diterima, 2026-10-15, oleh Azzerith. Diusulkan 2026-10-15 lewat `/analisa-kebutuhan` (aturan persetujuan di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Kode belum ada. Pertanyaan terbuka Finance di §Consequences masih menahan pagu gabungan (T4–T5), tidak menahan T1–T3.",
       "publik": true,
       "tautan": [
         "ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia",
@@ -9913,20 +9913,20 @@
         "API - Integration Service",
         "Finance - Rancangan Finance Service"
       ],
-      "hash": "0f08b42b12b8e6c1af4583f26a06aeec841d2c27ac921246817ee8462bfe45b9",
-      "ukuran_kb": 13.1,
-      "ringkasan": "Menjawab: kenapa baris \"Seluruh perusahaan\" dihapus dari tabel Serapan dan KPI, kenapa departemen jurnal Accurate jadi dimensi wajib saat input RAPB, dan bagaimana pagu gabungan beberapa akun per departemen per bulan dihitung. Juga menjelaskan tanda Varians baru di layar (Terpakai − Anggaran, minus = masih tersisa) sementara field `varians` backend tetap, serta risiko hitung dobel di `RingkasVarians` dan dampaknya ke KPI Cost Control.",
+      "hash": "a2f17f1a2a4ef1b55223a84fab214c33065013b3a9bb87c038f052c29e8f180b",
+      "ukuran_kb": 13.2,
+      "ringkasan": "Menjawab: kenapa baris \"Seluruh perusahaan\" dihapus dari tabel Serapan dan KPI Cost Control, kenapa serapan anggaran kini dibaca per departemen sesuai tag jurnal Accurate, dan bagaimana pagu gabungan beberapa akun per departemen per bulan bekerja. Juga menjelaskan tanda Varians baru di layar (Terpakai − Anggaran, plus % Varians), risiko hitung dobel di RingkasVarians, dan ADR mana (0159, 0097) yang direvisi sebagian.",
       "kata_kunci": [
         "serapan anggaran",
         "budget absorption",
         "pagu gabungan",
+        "varians anggaran",
         "seluruh perusahaan",
-        "departemen jurnal",
-        "varians",
+        "departemen jurnal Accurate",
         "RAPB",
-        "cost control",
+        "Cost Control",
         "KPI varians_anggaran",
-        "OPEX"
+        "RingkasVarians"
       ]
     },
     {
@@ -11156,20 +11156,20 @@
         "Finance - FAT Persona",
         "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya"
       ],
-      "hash": "a5bbb1fd179ab249003d0fee74b25ce338a80d0c146ce4c63ad38855163ab317",
+      "hash": "0a1324fe131142c722a329fddfc88cc481b177c4c06c0198fd2a75224daeb56c",
       "ukuran_kb": 19.3,
-      "ringkasan": "Menjawab: apa isi tiap tab layar Anggaran & Cost Control (`/finance/anggaran`), bagaimana membaca kolom Anggaran, Terpakai, Sisa, dan Menunggu dicatat tanpa menghitung dobel, serta dari mana angka serapan lewat pengajuan berasal. Juga menjawab cara kerja Forecast Mingguan (minggu belum selesai tak dihitung, proyeksi diatur porsinya per minggu oleh Cost Control) dan apa yang akan berubah menurut ADR 0178.",
+      "ringkasan": "Menjawab: apa isi tiap tab layar Anggaran & Cost Control (/finance/anggaran), bagaimana membaca kolom Anggaran, Terpakai, Sisa, dan Menunggu dicatat tanpa menghitung rupiah dua kali, serta dari mana angka serapan dari Pengajuan Barang/Dana berasal. Juga menjelaskan Forecast Mingguan (minggu belum selesai tidak dihitung, porsi proyeksi per minggu diatur Cost Control) dan dampaknya ke KPI Cost Control.",
       "kata_kunci": [
         "serapan anggaran",
+        "budget",
         "cost control",
         "anggaran bulanan",
-        "budget",
         "forecast mingguan",
-        "weekly forecast",
-        "proyeksi",
-        "terpakai",
+        "proyeksi kas",
+        "OPEX",
         "pengajuan barang",
-        "RAPB"
+        "menunggu dicatat",
+        "varians"
       ]
     },
     {
@@ -21747,19 +21747,19 @@
         "ADR - 0178 Serapan Anggaran per Departemen Jurnal, Seluruh Perusahaan Dihapus, Pagu Gabungan per Departemen",
         "Finance - Serapan Anggaran dan Cost Control"
       ],
-      "hash": "a59856ad93adbb071c5c841adc4b464209697e4cb5d50201ff024fc9f3b675d1",
-      "ukuran_kb": 4.0,
-      "ringkasan": "Menjawab: apa kebutuhan sebenarnya di balik tujuh permintaan Cost Control atas tabel Serapan per pos, jawaban Finance yang sudah didapat dan pertanyaan yang masih terbuka (Packing Sadewa, akun lain-lain marketing, % Varians saat anggaran 0). Berisi urutan task T0–T5 per repo (unggah ulang RAPB per departemen, tampilan tabel, buang baris seluruh perusahaan, pagu gabungan BE lalu FE) beserta dependensi dan cara verifikasinya.",
+      "hash": "946cf8e83853154a3058fbdc22bd9f6e5be7ae8d31e2851da054004c4c284387",
+      "ukuran_kb": 4.2,
+      "ringkasan": "Menjawab: apa kebutuhan sebenarnya di balik permintaan Cost Control mengubah tabel Serapan per pos, jawaban Finance apa yang sudah didapat dan pertanyaan apa yang masih terbuka (Packing Sadewa, akun lain-lain marketing, % Varians saat anggaran 0). Juga memuat urutan task T0–T5 per repo beserta nomor issue, ketergantungan, urutan deploy, dan cara verifikasinya.",
       "kata_kunci": [
         "analisa kebutuhan",
-        "serapan anggaran",
+        "serapan anggaran per departemen",
         "pagu gabungan",
-        "task breakdown",
-        "RAPB per departemen",
+        "Cost Control",
+        "RAPB per divisi",
         "varians",
-        "cost control",
-        "lain-lain marketing",
-        "packing"
+        "task breakdown",
+        "issue bip-erp#3102",
+        "Packing Sadewa"
       ]
     },
     {

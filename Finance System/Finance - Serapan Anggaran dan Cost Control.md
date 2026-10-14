@@ -54,7 +54,7 @@ Tambahan di luar halaman ini: kotak **sisa pos** di bawah tiap baris form pencat
 
 ⛔ **Wajib dibaca sebelum merancang layar atau laporan yang memakai kolom-kolom ini.** Kegagalannya bukan galat, melainkan rupiah yang sama terhitung dua kali atau pos tanpa anggaran yang terbaca Rp 0. Aturan ini semula hanya hidup sebagai komentar kode.
 
-🟡 **Akan berubah, diusulkan [[ADR - 0178 Serapan Anggaran per Departemen Jurnal, Seluruh Perusahaan Dihapus, Pagu Gabungan per Departemen]]** (2026-10-15, kode belum ada). Tabel di bawah tetap menggambarkan kode yang berlaku sampai ADR itu diterima dan dikerjakan. Yang direncanakan berubah:
+🟢 **Akan berubah, diterima [[ADR - 0178 Serapan Anggaran per Departemen Jurnal, Seluruh Perusahaan Dihapus, Pagu Gabungan per Departemen]]** (diterima 2026-10-15 oleh Azzerith, kode belum ada). Tabel di bawah tetap menggambarkan kode yang berlaku sampai ADR itu dikerjakan. Yang direncanakan berubah:
 - Baris `departemen` kosong ("Seluruh perusahaan") tidak lagi menjadi pos, tidak ditampilkan, dan tidak ikut total maupun KPI. Departemen wajib saat input anggaran.
 - Pagu gabungan beberapa akun per departemen per bulan ditambahkan.
 - Layar Serapan menampilkan **Varians = Terpakai − Anggaran** (minus = masih tersisa) dan **% Varians**. Field `varians` backend **tetap** Anggaran − Terpakai.
@@ -139,7 +139,7 @@ Untuk proyeksi mingguan yang diatur (ADR 0161, Diterima 2026-10-09): yang tersis
 
 - [[ADR - 0159 Serapan Anggaran Dibaca dari Pengajuan sebagai Bagian dari Terpakai, Rute Tulis Anggaran Digerbang Izin Sendiri]]
 - [[ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB]]
-- [[ADR - 0178 Serapan Anggaran per Departemen Jurnal, Seluruh Perusahaan Dihapus, Pagu Gabungan per Departemen]] (🟡 Diusulkan)
+- [[ADR - 0178 Serapan Anggaran per Departemen Jurnal, Seluruh Perusahaan Dihapus, Pagu Gabungan per Departemen]] (🟢 Diterima)
 - [[Finance - Rancangan Finance Service]] · [[Finance - Proses Pengajuan Pengeluaran dan Persetujuan]] · [[Finance - FAT Persona]]
 - [[API - Procurement Service]] · [[API - Integration Service]] · [[Microservices - Procurement Service]]
 - [[CORE - RBAC dan Permission Set]] · [[APP - Web ERP]] · [[REF - Kepemilikan Data]]

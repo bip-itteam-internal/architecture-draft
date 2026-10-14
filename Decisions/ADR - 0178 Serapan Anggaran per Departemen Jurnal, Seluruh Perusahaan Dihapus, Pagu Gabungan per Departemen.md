@@ -1,6 +1,6 @@
 # ADR - 0178 Serapan Anggaran per Departemen Jurnal, Seluruh Perusahaan Dihapus, Pagu Gabungan per Departemen
 
-> **Status**: 🟡 **Diusulkan** (2026-10-15). Belum ada baris `🟢 Diterima, <tanggal>, oleh <login/jabatan>` (aturan di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Kode belum ada.
+> **Status**: 🟢 Diterima, 2026-10-15, oleh Azzerith. Diusulkan 2026-10-15 lewat `/analisa-kebutuhan` (aturan persetujuan di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Kode belum ada. Pertanyaan terbuka Finance di §Consequences masih menahan pagu gabungan (T4–T5), tidak menahan T1–T3.
 
 ## Untuk Manajemen
 
@@ -21,7 +21,7 @@
 
 *Serapan anggaran dibaca per departemen yang ditandai di jurnal Accurate. Baris departemen kosong ("Seluruh perusahaan") tidak lagi menjadi pos anggaran, tidak ditampilkan, dan tidak ikut total maupun KPI. Anggaran boleh berupa pagu gabungan beberapa akun pada satu departemen per bulan. Tanda varians di layar Serapan mengikuti Finance: Terpakai − Anggaran. Merevisi sebagian [[ADR - 0159 Serapan Anggaran Dibaca dari Pengajuan sebagai Bagian dari Terpakai, Rute Tulis Anggaran Digerbang Izin Sendiri]] K1/K4 dan [[ADR - 0097 Anggaran Iklan Dashboard Marketing Dibaca dari Master Anggaran Finance]] butir 2.*
 
-- **Status**: 🟡 Diusulkan, kode belum ada
+- **Status**: 🟢 Diterima 2026-10-15 (Azzerith), kode belum ada
 - **Path di repo**:
   - `bip-erp/services/integration/internal/domain/entity/anggaran.go`
   - `bip-erp/services/integration/internal/usecase/anggaran_varians.go`

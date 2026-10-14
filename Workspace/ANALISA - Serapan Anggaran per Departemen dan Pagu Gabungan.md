@@ -1,6 +1,6 @@
 # ANALISA - Serapan Anggaran per Departemen dan Pagu Gabungan
 
-Papan kerja hasil `/analisa-kebutuhan` atas permintaan Cost Control untuk tabel Serapan per pos, 2026-10-15. Keputusannya di [[ADR - 0178 Serapan Anggaran per Departemen Jurnal, Seluruh Perusahaan Dihapus, Pagu Gabungan per Departemen]] (🟡 Diusulkan). Cara kerjanya di [[Finance - Serapan Anggaran dan Cost Control]].
+Papan kerja hasil `/analisa-kebutuhan` atas permintaan Cost Control untuk tabel Serapan per pos, 2026-10-15. Keputusannya di [[ADR - 0178 Serapan Anggaran per Departemen Jurnal, Seluruh Perusahaan Dihapus, Pagu Gabungan per Departemen]] (🟢 Diterima 2026-10-15). Cara kerjanya di [[Finance - Serapan Anggaran dan Cost Control]].
 
 ## Kebutuhan sebenarnya, dipisah dari yang diminta
 
@@ -35,7 +35,7 @@ Tidak menahan T1–T3.
 
 ## Task berurutan
 
-Setiap task satu repo dan satu PR. Mulai sesudah ADR 0178 Diterima.
+Setiap task satu repo dan satu PR. ADR 0178 🟢 Diterima 2026-10-15 (Azzerith). Issue induk bip-erp#3102; sub-issue: T1 erp-frontend#2438, T2 bip-erp#3103, T3 erp-frontend#2439, T4 bip-erp#3104, T5 erp-frontend#2440.
 
 | # | Repo | Task | Bergantung | Catatan |
 |---|---|---|---|---|
