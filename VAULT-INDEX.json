@@ -15211,7 +15211,7 @@
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
         "Finance - FAT Persona"
       ],
-      "hash": "db20ca7701ae48641d79ccb2b3050262cd614473d4de346864736f29984b479e",
+      "hash": "56c3cb3bc887ce298c1e4e099ff29a523f39672c83b5450366db1800f79fc6cf",
       "ukuran_kb": 14.5,
       "ringkasan": "Menjawab: siapa saja persona yang bekerja di alur manufaktur (SPV Brand, PPIC, SPV Manufacture, Procurement, Gudang, QC, Admin/Leader/Operator Produksi, PJT, Finance, Admin Return) dan bagaimana pekerjaan mengalir antar jabatan dan antar service dalam rancangan target. Memuat alur rencana sampai bahan lulus QC, alur produksi sampai rilis dan pengiriman, arsitektur service, alur per jabatan, dan skenario gagal, dengan langkah yang masih menunggu keputusan ditandai TBD.",
       "kata_kunci": [
@@ -15318,7 +15318,7 @@
       "area": "Manufacture",
       "jenis": "domain",
       "status_emoji": "🟡",
-      "status_teks": "Konsep / kajian. Diukur **2026-10-13** (kode `origin/main` 2026-10-12, data prod baca-saja, kuesioner 14 responden dari 32).",
+      "status_teks": "Konsep / kajian. Diukur **2026-10-13** (kode `origin/main` 2026-10-12, data prod baca-saja, kuesioner 14 responden dari 32; kuesioner diperbarui 2026-10-14 menjadi 18 responden).",
       "publik": true,
       "tautan": [
         "Manufacture - Kesiapan Otomasi KPI (menunggu WMS)",
@@ -15344,8 +15344,8 @@
         "REF - Kepemilikan Data",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)"
       ],
-      "hash": "28c5a65ed4c8f65d58e4ff27309d4b7a7b9e9902d7ed7fe6c7e7ecb7bd34ea2c",
-      "ukuran_kb": 16.2,
+      "hash": "7d9913384cfc8fc31d9d3489e4fee86dad4bf8703393a97a15d0de5c110c0385",
+      "ukuran_kb": 17.0,
       "ringkasan": "Menjawab: fitur manufaktur mana di ERP yang benar-benar dipakai di prod dan mana yang belum pernah dipakai beserta penyebabnya, tumpang tindih apa yang ada di fondasi kode (catatan produksi, rilis batch, QC bahan masuk, PO bahan, jalur penyesuaian stok, pemilik angka stok), dan apa kata kuesioner pemakai. Juga menjelaskan spreadsheet PPIC sebagai sistem yang berjalan nyata, kebutuhan COA keluar, perbandingan Batch Record kertas dengan model ERP, serta daftar keputusan yang belum diambil.",
       "kata_kunci": [
         "kajian fondasi manufaktur",

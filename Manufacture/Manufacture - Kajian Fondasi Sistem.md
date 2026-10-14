@@ -2,7 +2,7 @@
 
 *Kajian fondasi sistem **Manufaktur** (produksi, PPIC, gudang bahan baku/FG, QC) sebelum menambah fitur baru. Menggabungkan empat sumber: SOP posisi, matriks KPI, kode `origin/main`, data prod, ditambah kuesioner ke pemakai dan spreadsheet operasional PPIC. Temuan intinya: **modul pabrik di ERP sudah dibangun tetapi belum pernah dipakai**, penyebabnya sosialisasi dan hak akses, bukan fiturnya; sementara **sistem yang benar-benar berjalan adalah satu Google Sheet PPIC** yang strukturnya bisa langsung menjadi cetak biru ERP. Dok ini mencatat temuan dan keputusan yang masih terbuka; belum ada keputusan final.*
 
-- **Status**: 🟡 Konsep / kajian. Diukur **2026-10-13** (kode `origin/main` 2026-10-12, data prod baca-saja, kuesioner 14 responden dari 32).
+- **Status**: 🟡 Konsep / kajian. Diukur **2026-10-13** (kode `origin/main` 2026-10-12, data prod baca-saja, kuesioner 14 responden dari 32; kuesioner diperbarui 2026-10-14 menjadi 18 responden).
 - **Path di repo**: `bip-erp/services/manufacture/`, `bip-erp/services/employee/quality_*.go`, `bip-erp/services/procurement/`; FE `erp-frontend/src/features/manufacture/`.
 - **Lanjutan dari**: [[Manufacture - Kesiapan Otomasi KPI (menunggu WMS)]] dan [[Manufacture - Dashboard per Posisi]], yang sudah menyimpulkan otomasi KPI terkunci di adopsi WMS.
 
@@ -51,26 +51,29 @@ Tidak ada satu pun gerakan bahan baku (terima, keluar ke produksi, opname) terca
 
 Tidak bermasalah: sumber KPI manufaktur di employee-service hanya adaptor `/kpi/*`, tidak ada hitung ganda. Dok [[Microservices - Manufacture Service]] dan [[API - Manufacture Service]] belum memuat batch-record, cycle-count, lot, K3/GMP, maupun `/kpi/*` (perlu `/sync-docs`).
 
-## Temuan 3: Kuesioner pemakai (5 form, 32 penerima, 14 responden)
+## Temuan 3: Kuesioner pemakai (5 form, 32 penerima, 18 responden per 2026-10-14)
 
 **Sudah cukup jelas**
 
-- **ERP tak dipakai karena sosialisasi dan akses**: "belum dilatih / belum diperkenalkan / tidak tahu fiturnya ada" dan "belum punya akses menu".
-- **Input cukup oleh Admin Produksi** dari kertas; operator tak perlu HP. Form ERP sebaiknya mengikuti urutan form kertas.
+- **ERP tak dipakai karena sosialisasi, akses, dan perangkat**: "belum dilatih / belum diperkenalkan / tidak tahu fiturnya ada", "belum punya akses menu", dan (tambahan 2026-10-14, operator produksi) "tidak ada perangkat di area produksi" (4 jawaban).
+- **Input cukup oleh Admin Produksi** dari kertas; operator tak perlu HP (11 dari 12 jawaban Form Produksi). Form ERP sebaiknya mengikuti urutan form kertas.
 - **Dokumen kertas tetap wajib untuk audit BPOM** (Batch Record fisik, kartu stok). ERP = salinan kerja; syarat meninggalkan kertas: ERP mencetak dokumen dalam format yang diterima BPOM.
 - **Karantina ada dalam praktik** walau SOP gudang tak menyebutnya: label kuning karantina, lalu **Lulus / Reject / Ditolak** (label merah, konfirmasi SPV Quality).
 - **Bahan Ditolak QC tak pernah masuk stok**; langsung diretur Procurement (cocok dengan procurement-service yang hanya mengirim qty LULUS).
 - **Stock opname mingguan** (SOP menyebut bulanan s.d. tahunan). **Dua kartu stok**: kosmetik dan obat tradisional. **Bahan kemas tak ber-ED**.
 - **Bahan keluar** via Form Permintaan Produksi kertas, disetujui PPIC; sisa bahan kembali dipilah layak/rusak/reject.
-- **Rilis batch: satu Batch Record** (5 lawan 3): QC menambah catatan pengujian di dalamnya, **APJ** memutuskan lulus di lembar keputusan rilis.
+- **Rilis batch: satu Batch Record**: QC menambah catatan pengujian di dalamnya, **APJ** memutuskan lulus di lembar keputusan rilis. Mayoritasnya menipis per 2026-10-14 (lihat "Masih terbelah").
 - **FG masuk stok** setelah rilis **dan** serah terima fisik.
 - **Marketing ingin Production Order + MOQ**; Marketing boleh mengubah rencana 1x sebelum produksi dikunci.
 - **Dashboard** diminta SPV Manufacture.
 
 **Masih terbelah**
 
-- **Kapan bahan terpakai**: selesai diolah (4) / pindah ke zona WIP atau diserahkan ke produksi (3) / lulus QC (2). Usulan penggabungan: stok gudang RM berkurang saat serah ke **zona WIP**; pemakaian final dihitung saat batch selesai; sisa kembali dengan 3 kategori.
+- **Kapan bahan terpakai**: pindah ke zona WIP atau ditimbang/diserahkan ke produksi (6, per 2026-10-14) / selesai diolah (4) / lulus QC (2). Usulan penggabungan: stok gudang RM berkurang saat serah ke **zona WIP**; pemakaian final dihitung saat batch selesai; sisa kembali dengan 3 kategori.
 - **Frekuensi perubahan rencana produksi**: "hampir setiap hari" vs "1-2x per bulan"; safety stock/ROP "lengkap" vs "sebagian".
+- **Catatan rilis**: cukup sekali di Batch Record (5) / perlu catatan terpisah di Quality (4) / belum tahu (3).
+- **Siapa pemutus rilis menurut pemakai** (pilihan ganda, 12 jawaban): SPV Quality/QA Leader 9, QC Production 8, PJT 6, APJ 2, SPV Manufacture 1. Lembar Keputusan kertas menunjukkan PJT; pemahaman di lapangan belum seragam, jadi keputusan TBD 3 perlu disosialisasikan, bukan cuma dibangun.
+- **Downtime mesin dan reject** tercatat di tempat berbeda (form kertas, Excel, papan dashboard) dan sebagian **tidak dicatat sama sekali** (2 operator).
 - **Definisi KPI PPIC belum seragam** antarposisi (Stockout tertukar dengan Stock Accuracy; ITO belum dipahami di luar SPV). Definisi SPV: ITO = HPP / ((persediaan awal + akhir) / 2).
 
 ## Temuan 4: Spreadsheet PPIC = sistem yang benar-benar berjalan
