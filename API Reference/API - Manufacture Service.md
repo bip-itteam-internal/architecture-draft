@@ -103,6 +103,24 @@
 
 Rujukan: rute `services/manufacture/main.go:186`, `:201`, `:213`, `:219`, `:256`, `:292`. Handler `services/manufacture/stok_dari_pengajuan.go:55` (`StokDariPengajuan`), `services/manufacture/master_bahan_internal.go:50` (`ListMasterBahanInternal`), `services/manufacture/retur_konfirmasi_ulang.go:357` (`KonfirmasiUlangRetur`; filter `:218`, keputusan `:156`), `services/manufacture/returns_export.go:597` (`ExportReturns`), `services/manufacture/production_plan.go:37` (`SimulateProductionPlan`; logika `production_plan_logic.go:91`), `services/manufacture/po_marketing_spv.go:434` (`HitungPoMarketingMenunggu`). Gerbang `services/manufacture/rbac.go:286` (`isInternalRobot`), `:324` (`requireTabReadOrRobot`), `:333` (`requireTabWriteOrRobot`), `:345` (`requireWmsSupervisor`).
 
+## Dashboard jembatan spreadsheet PPIC (M-04) 🟡
+
+> 🟡 **PR terbuka, belum merged** (bip-erp#3144, branch `manufacture/3143-m04-ppic-sheet`; diverifikasi di DEV lewat worktree branch 2026-10-14). Salinan **satu arah** spreadsheet Production Planning PPIC (tab hasil produksi dan FG keluar) untuk seksi "Produksi (dari spreadsheet PPIC)" di Dashboard Manufaktur, sampai datanya pindah ke Batch Record dan Kirim FG. Latar: [[Manufacture - Kajian Fondasi Sistem]] Temuan 4.
+
+| Method | Path | Gerbang | Fungsi |
+|---|---|---|---|
+| GET | `/ppic-sheet/ringkasan` (`?dari=YYYY-MM&sampai=YYYY-MM` opsional) | `requireTabRead("dashboard")` | Per bulan: `jumlah_batch`, `jumlah_batch_bertarget`, `qty_hasil`, `qty_target`, `qty_hasil_bertarget`, `persen_realisasi` (hanya dari batch ber-FORMULA; `null` bila tak ada), `jumlah_sj`, `qty_keluar`, `keluar_per_kategori`. Plus `status` sinkron (`terakhir_coba`, `terakhir_berhasil`, `galat`, jumlah baris, `dikonfigurasi`, `aktif`), `tolak` (jumlah per tab + alasan) dan `contoh_tolak` (maks 50: tab, nomor baris, cuplikan). Bulan rusak = 400 |
+| GET | `/ppic-sheet/baris?jenis=masuk\|keluar&bulan=YYYY-MM` | `requireTabRead("dashboard")` | Baris snapshot aktif untuk satu bulan WIB. `jenis`/`bulan` salah = 400 |
+| POST | `/ppic-sheet/sync` | `requireWmsSupervisor` | Sinkron sekarang. 200 + status; **409** bila sinkron sedang berjalan; **503** bila `PPIC_SHEET_ID` kosong; **502** + status bila unduh/parse/simpan gagal (snapshot lama tetap aktif) |
+
+**Aturan yang dijaga kode:**
+- Kolom dicari berdasarkan **nama header**, bukan posisi; header atau tab hilang = sinkron gagal utuh, snapshot lama dipertahankan.
+- Baris cacat (tanggal di luar 12 bulan terakhir, qty kosong, sel galat rumus) **ditolak dengan nomor baris dan alasan**, bukan dibuang diam-diam; baris templat yang kolom ketikannya kosong (hanya berisi `#N/A` turunan VLOOKUP) bukan data dan tidak dihitung.
+- Unduhan yang bukan xlsx (spreadsheet tak lagi terbuka: Google membalas halaman login berstatus 200) dikenali dari tanda tangan zip, bukan dari status HTTP.
+- Snapshot disimpan sebagai **satu dokumen** (pergantian atomik tanpa transaksi), status menunjuknya hanya sesudah tersimpan lengkap.
+
+Rujukan: rute `services/manufacture/main.go:153`-`:156`. Handler `ppic_sheet_handler.go:88` (`RingkasanPpicSheet`), `:124` (`BarisPpicSheet`), `:163` (`SinkronPpicSheet`); sinkron `ppic_sheet_sync.go:73` (`jalankanSinkronPpic`), `:277` (`mulaiSinkronPpicSheet`), penjaga DB `:193` (`koleksiPpic`); parse `ppic_sheet_parse.go:77` (`cariHeaderPpic`), `:120` (`bukanBarisDataPpic`), `:182`/`:230` (`parseMasukPrdJD`/`parseKeluarPrdJD`), `:290` (`ringkasPpicPerBulan`).
+
 ## Bahan KPI otomatis (`/kpi/*`)
 
 *Bahan penilaian, **bukan skor**: rumus, target, arah, dan bobot diisi HR lewat `KPIAutoConfig` di employee-service. Seluruh rute `/kpi/*` digerbang **`gerbangKunciKpiManufacture`**: query `?key=` wajib sama dengan env `common.Env.ManufactureServiceKey`; env kosong atau kunci salah → **401** `kunci layanan tidak sah`. Sengaja tidak bersandar pada `BIP-Gateway-ID` ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]): gateway memasangnya untuk tiap permintaan ber-JWT, sehingga rute yang bersandar padanya terbuka bagi semua karyawan yang login. Periode divalidasi `periodeSah` (`YYYY-MM`, kosong/tak terbaca → **400**) sebelum dipakai sebagai awalan `$regex`. Semua respons berbentuk `{data:{...}}`; nama tag JSON adalah **kontrak** dengan employee-service.*
