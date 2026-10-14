@@ -65,13 +65,15 @@ Tidak bermasalah: sumber KPI manufaktur di employee-service hanya adaptor `/kpi/
 - **Rilis batch: satu Batch Record**: QC menambah catatan pengujian di dalamnya, **APJ** memutuskan lulus di lembar keputusan rilis. Mayoritasnya menipis per 2026-10-14 (lihat "Masih terbelah").
 - **FG masuk stok** setelah rilis **dan** serah terima fisik.
 - **Marketing ingin Production Order + MOQ**; Marketing boleh mengubah rencana 1x sebelum produksi dikunci.
+- **Rencana produksi disetujui SPV Manufacture** (3 dari 3 jawaban Form Perencanaan); PR bahan baku dibuat PPIC (2) atau bersama Procurement (1).
+- **Informasi Procurement yang dibutuhkan PPIC** (Leader Procurement, 2026-10-14): status PO, perkiraan tanggal datang (ETA), qty diterima, qty lulus QC, keterlambatan vendor. Kandidat isi layar PPIC atau dashboard jembatan (M-04).
 - **Dashboard** diminta SPV Manufacture.
 
 **Masih terbelah**
 
 - **Kapan bahan terpakai**: pindah ke zona WIP atau ditimbang/diserahkan ke produksi (6, per 2026-10-14) / selesai diolah (4) / lulus QC (2). Usulan penggabungan: stok gudang RM berkurang saat serah ke **zona WIP**; pemakaian final dihitung saat batch selesai; sisa kembali dengan 3 kategori.
 - **Frekuensi perubahan rencana produksi**: "hampir setiap hari" (SPV Manufacture) vs "1-2x per bulan" (PPIC, Leader Procurement); safety stock/ROP "lengkap dan terdokumentasi" (SPV Manufacture) vs "ada untuk sebagian bahan" (PPIC, Leader Procurement). Per 2026-10-14 dua lawan satu, tetapi SPV adalah penyetuju rencana.
-- **Material Order di ERP dipahami sebagai form permintaan bahan ke gudang** (Leader Procurement). Cocok dengan praktik kertas (Form Permintaan Produksi) dan dengan syarat Dokumen Produksi Batch yang memilih No. Batch dari Material Order.
+- **Arti Material Order di ERP belum seragam**: form permintaan bahan ke gudang (Leader Procurement), baru dipakai untuk data gudang FG (SPV Manufacture), belum dipakai (PPIC). Arti pertama cocok dengan praktik kertas (Form Permintaan Produksi) dan dengan syarat Dokumen Produksi Batch yang memilih No. Batch dari Material Order, jadi arti ini perlu disosialisasikan sebelum pilot.
 - **Catatan rilis**: cukup sekali di Batch Record (5) / perlu catatan terpisah di Quality (4) / belum tahu (3).
 - **Siapa pemutus rilis menurut pemakai** (pilihan ganda, 12 jawaban): SPV Quality/QA Leader 9, QC Production 8, PJT 6, APJ 2, SPV Manufacture 1. Lembar Keputusan kertas menunjukkan PJT; pemahaman di lapangan belum seragam, jadi keputusan TBD 3 perlu disosialisasikan, bukan cuma dibangun.
 - **Downtime mesin dan reject** tercatat di tempat berbeda (form kertas, Excel, papan dashboard) dan sebagian **tidak dicatat sama sekali** (2 operator).
@@ -98,6 +100,21 @@ Satu Google Sheet (±40 tab, data Jan-Okt 2026, dipelihara tim PPIC/gudang) menc
 | Rencana vs realisasi | per tanggal/shift/tim | bulanan | belum ada |
 
 Kualitas data spreadsheet perlu dibereskan sebelum dijadikan sumber: banyak `#N/A`/`#REF!`, tab duplikat, satuan KG dan gram bercampur, formula di dua tab.
+
+## Temuan 4b: Pembelian bahan baku belum lewat ERP
+
+Diukur di prod 2026-10-14 (koleksi `pengajuan_barang`, baca saja):
+
+| Tipe Pengajuan Barang | Jumlah | Catatan |
+|---|---|---|
+| `RAWMATERIAL` | **0** | jenjang sudah ada (SPV Manufacture → Procurement beli → Cost Control → SPV Finance → [Direktur] → AP → QC → terima RM), belum pernah dipakai |
+| `DANA` | 265 | 61 dari departemen Procurement; Manufaktur 1, Quality 1 |
+| `IKLAN` / `PAJAK` / `UMUM` | 56 / 28 / 2 | di luar manufaktur |
+
+- **PO bahan baku dibuat di luar ERP.** Pengajuan DANA dari Procurement memuat ongkir PO bahan baku berpenomoran `PO/nnn/X/2026`, bukan format nomor PO ERP (`PO.<YYYY>.<MM>.<NNNNN>`). Yang masuk ERP hanya ongkir dan pengeluaran kecil (sampel, ATK, perbaikan, konsumsi), lewat jalur uang.
+- Cocok dengan Temuan 4: permintaan pengadaan PPIC tercatat di tab spreadsheet (186 baris, nomor `BG/mm/yy/nnn`), dan dengan kuesioner: PR dibuat PPIC; PPIC butuh status PO, ETA, qty diterima, dan qty lulus QC dari Procurement.
+- Akibatnya rantai bahan baku ERP (permintaan → beli → QC → terima RM → stok) tak pernah dilalui, sehingga penerimaan RM di ERP tak punya hulu dan status PO tak bisa dibaca PPIC. Tahap PPIC di Pengajuan Barang (M-14) baru berguna setelah pembelian benar-benar dipindah ke ERP.
+- Keputusan terbuka: TBD 11 di bawah.
 
 ## Temuan 5: COA (Certificate of Analysis) keluar belum ada
 
@@ -160,6 +177,7 @@ Dibandingkan dua Batch Record lengkap (Oktober 2026), satu diputuskan LULUS dan 
 8. **Pihak belum terpetakan**: SPV Manufacture tak punya SOP; departemen teknisi mesin. (APJ/PJT sudah teridentifikasi dari Lembar Keputusan, Temuan 6.)
 9. **COA (Certificate of Analysis) keluar**: format per lini (Pangan, OT, Kosmetik), per batch atau per Surat Jalan, dan penanda tangan (APJ dan/atau Supervisor Quality). Pemutus: Supervisor Quality + APJ.
 10. **Gerbang ketersediaan bahan sebelum produksi**: apakah batch boleh dimulai bila ada bahan formula yang kurang, dan siapa yang menyetujui penggantian bahan. Pemutus: SPV Manufacture + APJ.
+11. **Pembelian bahan baku wajib lewat Pengajuan Barang `RAWMATERIAL`, mulai kapan** (Temuan 4b): sekaligus atau bertahap, dan apakah PO di luar ERP dihentikan. Pemutus: SPV Manufacture + Leader Procurement, dengan PPIC dan Finance.
 
 ## Dokumen Terkait
 

@@ -14752,8 +14752,8 @@
         "CORE - Kapabilitas AI dan Machine Learning",
         "IT - Big Pictures"
       ],
-      "hash": "5b017241e49a32b36581b78609c9cb4e1831446fe65a6b030f89edd7d5684cda",
-      "ukuran_kb": 14.5,
+      "hash": "5a36504a67ea03696d64fbaf884237054c64bd19c56a2f866a0cd3517584a504",
+      "ukuran_kb": 17.2,
       "ringkasan": "Menjawab: kenapa Panda (software group control) tidak boleh dipakai di perangkat kantor, apa penggantinya yang aman untuk QA aplikasi Android di banyak HP sekaligus, fitur apa saja yang ada (video langsung, panel Common ala Panda, rekam aksi berbahasa biasa yang menyimpan ketukan sebagai pemilih elemen Maestro, geser otomatis berbatas, jadwal uji, konsol ADB terbatas, API lokal bertoken), dan bagaimana stabilitas banyak HP dijaga (antrean adb, shell lewat socket, cache info HP). Juga menjawab fitur yang sengaja tidak dibuat dan apa yang belum diuji.",
       "kata_kunci": [
         "QA Device Lab",
@@ -15385,18 +15385,19 @@
         "REF - Kepemilikan Data",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)"
       ],
-      "hash": "9d76d0a92ad05e3e6bc140a7f2bd24254e3e1fa0fe64beacff40f4e999b2e9d2",
-      "ukuran_kb": 18.1,
-      "ringkasan": "Menjawab: fitur manufaktur mana di ERP yang benar-benar dipakai di prod dan mana yang belum pernah dipakai beserta penyebabnya, tumpang tindih apa yang ada di fondasi kode (catatan produksi, rilis batch, QC bahan masuk, PO bahan, jalur penyesuaian stok, pemilik angka stok), dan apa kata kuesioner pemakai. Juga menjelaskan spreadsheet PPIC sebagai sistem yang berjalan nyata, kebutuhan COA keluar, perbandingan Batch Record kertas dengan model ERP, serta daftar keputusan yang belum diambil.",
+      "hash": "4ebca72284c499ff92825c205ffcf9cf880b24decfe1cf9c722e594908bfccd4",
+      "ukuran_kb": 20.1,
+      "ringkasan": "Menjawab: fitur manufaktur mana di ERP yang benar-benar dipakai di prod dan mana yang belum pernah dipakai beserta penyebabnya, tumpang tindih apa yang ada di fondasi kode (catatan produksi, rilis batch, QC bahan masuk, PO bahan, jalur penyesuaian stok, pemilik angka stok), dan apa kata kuesioner pemakai. Juga menjelaskan spreadsheet PPIC sebagai sistem yang berjalan nyata, kenapa pembelian bahan baku belum lewat Pengajuan Barang RAWMATERIAL, kebutuhan COA keluar, perbandingan Batch Record kertas dengan model ERP, serta daftar keputusan yang belum diambil.",
       "kata_kunci": [
         "kajian fondasi manufaktur",
         "adopsi ERP",
         "spreadsheet PPIC",
         "kuesioner pemakai",
         "batch record",
+        "pembelian bahan baku",
+        "pengajuan barang RAWMATERIAL",
         "karantina",
         "COA",
-        "stock opname",
         "pemilik stok",
         "TBD"
       ]
