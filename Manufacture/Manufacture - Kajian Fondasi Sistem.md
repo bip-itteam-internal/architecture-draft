@@ -2,7 +2,7 @@
 
 *Kajian fondasi sistem **Manufaktur** (produksi, PPIC, gudang bahan baku/FG, QC) sebelum menambah fitur baru. Menggabungkan empat sumber: SOP posisi, matriks KPI, kode `origin/main`, data prod, ditambah kuesioner ke pemakai dan spreadsheet operasional PPIC. Temuan intinya: **modul pabrik di ERP sudah dibangun tetapi belum pernah dipakai**, penyebabnya sosialisasi dan hak akses, bukan fiturnya; sementara **sistem yang benar-benar berjalan adalah satu Google Sheet PPIC** yang strukturnya bisa langsung menjadi cetak biru ERP. Dok ini mencatat temuan dan keputusan yang masih terbuka; belum ada keputusan final.*
 
-- **Status**: 🟡 Konsep / kajian. Diukur **2026-10-13** (kode `origin/main` 2026-10-12, data prod baca-saja, kuesioner 14 responden dari 32; kuesioner diperbarui 2026-10-14 menjadi 18 responden).
+- **Status**: 🟡 Konsep / kajian. Diukur **2026-10-13** (kode `origin/main` 2026-10-12, data prod baca-saja, kuesioner 14 responden dari 32; kuesioner diperbarui 2026-10-14 menjadi 19 responden dari 33 penerima).
 - **Path di repo**: `bip-erp/services/manufacture/`, `bip-erp/services/employee/quality_*.go`, `bip-erp/services/procurement/`; FE `erp-frontend/src/features/manufacture/`.
 - **Lanjutan dari**: [[Manufacture - Kesiapan Otomasi KPI (menunggu WMS)]] dan [[Manufacture - Dashboard per Posisi]], yang sudah menyimpulkan otomasi KPI terkunci di adopsi WMS.
 
@@ -51,7 +51,7 @@ Tidak ada satu pun gerakan bahan baku (terima, keluar ke produksi, opname) terca
 
 Tidak bermasalah: sumber KPI manufaktur di employee-service hanya adaptor `/kpi/*`, tidak ada hitung ganda. Dok [[Microservices - Manufacture Service]] dan [[API - Manufacture Service]] sudah memuat batch record, cycle count, lot, K3/GMP, dan `/kpi/*` sejak 2026-10-14 (M-05).
 
-## Temuan 3: Kuesioner pemakai (5 form, 32 penerima, 18 responden per 2026-10-14)
+## Temuan 3: Kuesioner pemakai (5 form, 33 penerima, 19 responden per 2026-10-14)
 
 **Sudah cukup jelas**
 
@@ -74,7 +74,9 @@ Tidak bermasalah: sumber KPI manufaktur di employee-service hanya adaptor `/kpi/
 - **Catatan rilis**: cukup sekali di Batch Record (5) / perlu catatan terpisah di Quality (4) / belum tahu (3).
 - **Siapa pemutus rilis menurut pemakai** (pilihan ganda, 12 jawaban): SPV Quality/QA Leader 9, QC Production 8, PJT 6, APJ 2, SPV Manufacture 1. Lembar Keputusan kertas menunjukkan PJT; pemahaman di lapangan belum seragam, jadi keputusan TBD 3 perlu disosialisasikan, bukan cuma dibangun.
 - **Downtime mesin dan reject** tercatat di tempat berbeda (form kertas, Excel, papan dashboard) dan sebagian **tidak dicatat sama sekali** (2 operator).
-- **Definisi KPI PPIC belum seragam** antarposisi (Stockout tertukar dengan Stock Accuracy; ITO belum dipahami di luar SPV). Definisi SPV: ITO = HPP / ((persediaan awal + akhir) / 2).
+- **Definisi KPI PPIC belum seragam** antarposisi (Stockout tertukar dengan Stock Accuracy; ITO belum dipahami di luar SPV). Definisi SPV: ITO = HPP / ((persediaan awal + akhir) / 2). HRD Supervisor (pemilik template KPI, menjawab 2026-10-14) memberi **target ITO pertama: 1 sampai 1,5 kali per bulan**, periode bulanan; stockout ditargetkan 0% tetapi apa yang dihitung sebagai satu kejadian stockout masih belum didefinisikan siapa pun.
+- **Definisi OTIF terbelah**: tepat waktu dan lengkap = tiba sesuai jadwal dan jumlah PO (HRD Supervisor, QA Staff) lawan siap kirim setelah lolos QC (SPV Manufacture, PPIC). Perlu diputuskan sebelum OTIF dihitung otomatis.
+- **KPI untuk PJT**: perlu dibuat menurut SPV Manufacture, PPIC, dan HRD Supervisor; tidak perlu menurut QA Staff.
 
 ## Temuan 4: Spreadsheet PPIC = sistem yang benar-benar berjalan
 
