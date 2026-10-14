@@ -65,13 +65,15 @@ Tidak bermasalah: sumber KPI manufaktur di employee-service hanya adaptor `/kpi/
 - **Rilis batch: satu Batch Record**: QC menambah catatan pengujian di dalamnya, **APJ** memutuskan lulus di lembar keputusan rilis. Mayoritasnya menipis per 2026-10-14 (lihat "Masih terbelah").
 - **FG masuk stok** setelah rilis **dan** serah terima fisik.
 - **Marketing ingin Production Order + MOQ**; Marketing boleh mengubah rencana 1x sebelum produksi dikunci.
+- **Rencana produksi disetujui SPV Manufacture** (3 dari 3 jawaban Form Perencanaan); PR bahan baku dibuat PPIC (2) atau bersama Procurement (1).
+- **Informasi Procurement yang dibutuhkan PPIC** (Leader Procurement, 2026-10-14): status PO, perkiraan tanggal datang (ETA), qty diterima, qty lulus QC, keterlambatan vendor. Kandidat isi layar PPIC atau dashboard jembatan (M-04).
 - **Dashboard** diminta SPV Manufacture.
 
 **Masih terbelah**
 
 - **Kapan bahan terpakai**: pindah ke zona WIP atau ditimbang/diserahkan ke produksi (6, per 2026-10-14) / selesai diolah (4) / lulus QC (2). Usulan penggabungan: stok gudang RM berkurang saat serah ke **zona WIP**; pemakaian final dihitung saat batch selesai; sisa kembali dengan 3 kategori.
 - **Frekuensi perubahan rencana produksi**: "hampir setiap hari" (SPV Manufacture) vs "1-2x per bulan" (PPIC, Leader Procurement); safety stock/ROP "lengkap dan terdokumentasi" (SPV Manufacture) vs "ada untuk sebagian bahan" (PPIC, Leader Procurement). Per 2026-10-14 dua lawan satu, tetapi SPV adalah penyetuju rencana.
-- **Material Order di ERP dipahami sebagai form permintaan bahan ke gudang** (Leader Procurement). Cocok dengan praktik kertas (Form Permintaan Produksi) dan dengan syarat Dokumen Produksi Batch yang memilih No. Batch dari Material Order.
+- **Arti Material Order di ERP belum seragam**: form permintaan bahan ke gudang (Leader Procurement), baru dipakai untuk data gudang FG (SPV Manufacture), belum dipakai (PPIC). Arti pertama cocok dengan praktik kertas (Form Permintaan Produksi) dan dengan syarat Dokumen Produksi Batch yang memilih No. Batch dari Material Order, jadi arti ini perlu disosialisasikan sebelum pilot.
 - **Catatan rilis**: cukup sekali di Batch Record (5) / perlu catatan terpisah di Quality (4) / belum tahu (3).
 - **Siapa pemutus rilis menurut pemakai** (pilihan ganda, 12 jawaban): SPV Quality/QA Leader 9, QC Production 8, PJT 6, APJ 2, SPV Manufacture 1. Lembar Keputusan kertas menunjukkan PJT; pemahaman di lapangan belum seragam, jadi keputusan TBD 3 perlu disosialisasikan, bukan cuma dibangun.
 - **Downtime mesin dan reject** tercatat di tempat berbeda (form kertas, Excel, papan dashboard) dan sebagian **tidak dicatat sama sekali** (2 operator).
