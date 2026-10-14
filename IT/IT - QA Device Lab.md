@@ -2,7 +2,7 @@
 
 *Alat QA internal untuk menguji aplikasi Android secara massal di banyak HP yang tercolok USB ke satu PC: mirroring, kontrol serentak, aksi massal, dan agen AI yang menjalankan uji dari satu perintah. Dibangun sebagai pengganti aman untuk software "group control" Panda.*
 
-- **Status**: ⚠️ Implemented (ada catatan) — mode manual sebagai aplikasi desktop Electron merged 2026-10-14 (PR #2 tahap 1, PR #4 tahap 1b, PR #6 tahap 1c, PR #7 pemilih aplikasi, PR #8 panel Common); diuji dengan 1 HP (Samsung A50s, Android 11), sebagian fitur belum dicoba ke HP (lihat Catatan); belum diuji banyak HP sekaligus; mode agen AI (Tahap 2) belum dibuat.
+- **Status**: ⚠️ Implemented (ada catatan) — mode manual sebagai aplikasi desktop Electron merged 2026-10-14 (PR #2 tahap 1, PR #4 tahap 1b, PR #6 tahap 1c, PR #7 pemilih aplikasi, PR #8 panel Common, PR #9 stabilitas adb); diuji dengan 1 HP (Samsung A50s, Android 11), sebagian fitur belum dicoba ke HP (lihat Catatan); belum diuji banyak HP sekaligus; mode agen AI (Tahap 2) belum dibuat.
 - **Stack**: Electron 44 + Node 24 + TypeScript; server Fastify di proses utama; dashboard React + Vite + Tailwind + shadcn/ui; video dan kontrol lewat scrcpy-server 3.1 + Tango (`@yume-chan/*`, MIT); vitest; pnpm; installer electron-builder (NSIS). Alat eksternal: `adb`, `scrcpy`, `maestro`.
 - **Path di repo**: repo privat `bip-itteam-internal/qa-device-lab` (sibling di workspace `erp/`); server di `server/`, proses utama Electron di `electron/`, dashboard di `web/`, spec di `docs/superpowers/specs/2026-10-13-qa-device-lab-design.md` (§14 untuk Electron). Data kerja aplikasi terpasang di `Documents\QA Device Lab`. Branch protection tidak tersedia (GitHub Free, repo privat).
 
@@ -55,9 +55,12 @@ Inti Panda ternyata alat open-source (scrcpy untuk mirroring). Karena itu pengga
 - pemalsuan identitas perangkat, rotasi IP/proxy per HP, *Random Delay* / *Random Offset* / *Delay Sync* pada kontrol serentak;
 - Auto Swipe versi Panda (loop tanpa batas, interval acak 1-10 detik), warm-up akun, like/komentar otomatis: pola untuk meniru penonton manusia di aplikasi media sosial, bukan untuk QA. Uji aplikasi pihak ketiga diarahkan ke pengukuran (jank, RAM, baterai/suhu, crash), yang justru butuh pola tetap supaya bisa dibandingkan;
 - impor massal akun dan password, integrasi aplikasi chat multi-akun;
+- sambungan ke tiket boosting modul Engagement ERP (Bank Komen, target URL, laporan realisasi): akan menjadikan alat ini eksekutor komentar/like/ulasan otomatis di media sosial dan marketplace, bukan alat QA (diputuskan 2026-10-14);
 - shell bebas di PC (konsol yang ada hanya shell HP, lihat di atas), interval jadwal acak, akses lewat internet, HP virtual/cloud, root;
 - WIFI Mode (`adb tcpip`): membuka port kontrol HP ke seluruh jaringan kantor; tetap lewat USB (diputuskan 2026-10-14);
 - berbagi HP dan skrip lewat cloud Panda (Get/Manage Shared, Merge Auth). Safe Mode Panda belum jelas perilakunya (TBD).
+
+**Stabilitas banyak HP**: semua pemanggilan adb lewat satu antrean berbatas (12 serentak, `MAKS_ADB` di `server/mulai.ts`; angka awal, belum diukur dengan banyak HP). `adb -s <serial> shell ...` dikirim lewat socket ke adb server (Tango, protokol shell v2) tanpa membuat proses `adb.exe`, dan kembali ke `adb.exe` bila gagal; di A50s keluarannya identik dan 30 perintah 346 ms vs 934 ms. Tombol Segarkan hanya menjalankan `adb devices -l`; baterai, versi, dan IP diambil dari cache yang diperbarui di latar (satu shell gabungan per HP, maks. 4 HP per 2 detik, umur info 30 detik). Maestro tidak ikut antrean karena satu uji bisa berjalan puluhan menit.
 
 **Pengaman utama**: server hanya `127.0.0.1`; semua program eksternal lewat satu pintu (daftar-izin, argumen array, tanpa shell); serial HP divalidasi; berkas hanya dari folder proyek; tidak ada aplikasi pendamping di HP. Jendela Electron tanpa akses Node (`contextIsolation`, `sandbox`); IPC hanya diterima dari dashboard lokal dan setiap masukannya divalidasi di proses utama. Di aplikasi desktop setiap `/api` wajib token; dashboard mendapatkannya lewat header yang disuntik proses utama, sehingga tautan hasil uji dibuka di jendela aplikasi sendiri (browser bawaan tidak membawa token) dan semua jendela turunan dikunci ke dashboard lokal. Mode dev (`pnpm start`) berjalan tanpa token.
 
