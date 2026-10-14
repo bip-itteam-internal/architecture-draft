@@ -49,7 +49,7 @@ Tidak ada satu pun gerakan bahan baku (terima, keluar ke produksi, opname) terca
 | 8 | MO Marketing | 1 koleksi, 3 rute, 2 set handler | satu rute |
 | 9 | FE | 4 berkas > 1.500 baris (terbesar 3.855); ID transaksi dibuat klien | logika stok ke server |
 
-Tidak bermasalah: sumber KPI manufaktur di employee-service hanya adaptor `/kpi/*`, tidak ada hitung ganda. Dok [[Microservices - Manufacture Service]] dan [[API - Manufacture Service]] belum memuat batch-record, cycle-count, lot, K3/GMP, maupun `/kpi/*` (perlu `/sync-docs`).
+Tidak bermasalah: sumber KPI manufaktur di employee-service hanya adaptor `/kpi/*`, tidak ada hitung ganda. Dok [[Microservices - Manufacture Service]] dan [[API - Manufacture Service]] sudah memuat batch record, cycle count, lot, K3/GMP, dan `/kpi/*` sejak 2026-10-14 (M-05).
 
 ## Temuan 3: Kuesioner pemakai (5 form, 32 penerima, 18 responden per 2026-10-14)
 

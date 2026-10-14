@@ -39,7 +39,7 @@ Repo: **BE** = bip-erp, **FE** = erp-frontend. Status per 2026-10-13.
 | M-02 | Uji coba Batch Record pada 1-2 batch nyata, paralel dengan kertas | - | M-01 | Siap |
 | M-03 | Tambah bagian spesifikasi produk di Batch Record (dasar COA) | BE #3077, FE #2413 | - | Kode selesai: merged (BE #3084, FE #2417), terverifikasi DEV 2026-10-14 kecuali Approve (tertahan paraf). Sisa: deploy PROD (BE dulu, QA RND login ulang), uji layar utuh oleh QC/PJT |
 | M-04 | Dashboard jembatan dari spreadsheet PPIC untuk SPV Manufacture | - | - | Siap |
-| M-05 | Sinkronkan [[Microservices - Manufacture Service]] dan [[API - Manufacture Service]] dengan kode (batch record, cycle count, lot, K3/GMP, /kpi/*) | - | - | Siap |
+| M-05 | Sinkronkan [[Microservices - Manufacture Service]] dan [[API - Manufacture Service]] dengan kode (batch record, cycle count, lot, K3/GMP, /kpi/*) | - | - | Selesai 2026-10-14: 45 rute yang belum tercatat dipetakan (gerbang, fungsi, rujukan baris), 12 koleksi baru dan angka pengaman ekspor dibetulkan; TBD fungsional dicatat di dok service |
 | M-06 | Rapikan data jabatan di HRIS (posisi yang menjalankan tugas PPIC) | - | konfirmasi SPV | Siap |
 
 ## Fase 2: rapikan fondasi
