@@ -5,7 +5,7 @@
 
 ## Sumber dan cara membaca
 
-- **Alur proses dan alur per jabatan** diturunkan dari [[REF - SOP Bharata 2026 per Posisi]], [[HRIS - Matriks KPI per Departemen]], kuesioner ke 33 pemakai (14 responden; 19 per 2026-10-14), spreadsheet operasional PPIC, dan Batch Record kertas. Rinciannya di Temuan 3 sampai 7 dok induk.
+- **Alur proses dan alur per jabatan** diturunkan dari [[REF - SOP Bharata 2026 per Posisi]], [[HRIS - Matriks KPI per Departemen]], kuesioner ke 33 pemakai (14 responden; 20 per 2026-10-14), spreadsheet operasional PPIC, dan Batch Record kertas. Rinciannya di Temuan 3 sampai 7 dok induk.
 - **Arsitektur** diturunkan dari kode `origin/main` 2026-10-12 dan data prod baca-saja 2026-10-13 (Temuan 1 dan 2 dok induk).
 - Dok ini **tidak memuat nama orang**. Persona memakai jabatan; siapa memegang jabatan apa ada di HRIS.
 - Diagram ditulis sebagai Mermaid supaya bisa disunting di vault. Versi interaktif (peta Archify) disimpan di luar vault sebagai salinan bertanggal; bila keduanya berbeda, dok ini yang berlaku.
