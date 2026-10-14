@@ -2,9 +2,9 @@
 
 *Alat QA internal untuk menguji aplikasi Android secara massal di banyak HP yang tercolok USB ke satu PC: mirroring, kontrol serentak, aksi massal, dan agen AI yang menjalankan uji dari satu perintah. Dibangun sebagai pengganti aman untuk software "group control" Panda.*
 
-- **Status**: 🟡 Direncanakan — spec desain selesai 2026-10-13, belum ada kode.
-- **Stack (rencana)**: Node 24 + TypeScript, Fastify, React + Vite, vitest, pnpm. Alat eksternal: `adb`, `scrcpy`, `maestro`.
-- **Path di repo**: repo `qa-device-lab` (sibling di workspace `erp/`), spec di `docs/superpowers/specs/2026-10-13-qa-device-lab-design.md`. Repo GitHub di org **belum dibuat** (TBD).
+- **Status**: ⚠️ Implemented (ada catatan) — mode manual sebagai aplikasi desktop Electron merged 2026-10-14 (PR #2 tahap 1, PR #4 tahap 1b); diuji dengan 1 HP (Samsung A50s, Android 11); belum diuji banyak HP sekaligus; mode agen AI (Tahap 2) belum dibuat.
+- **Stack**: Electron 44 + Node 24 + TypeScript; server Fastify di proses utama; dashboard React + Vite + Tailwind + shadcn/ui; video dan kontrol lewat scrcpy-server 3.1 + Tango (`@yume-chan/*`, MIT); vitest; pnpm; installer electron-builder (NSIS). Alat eksternal: `adb`, `scrcpy`, `maestro`.
+- **Path di repo**: repo privat `bip-itteam-internal/qa-device-lab` (sibling di workspace `erp/`); server di `server/`, proses utama Electron di `electron/`, dashboard di `web/`, spec di `docs/superpowers/specs/2026-10-13-qa-device-lab-design.md` (§14 untuk Electron). Data kerja aplikasi terpasang di `Documents\QA Device Lab`. Branch protection tidak tersedia (GitHub Free, repo privat).
 
 ## Latar Belakang
 
@@ -25,13 +25,17 @@ Inti Panda ternyata alat open-source (scrcpy untuk mirroring). Karena itu pengga
 
 ## Ruang Lingkup
 
-**Mode manual** (setara Panda, tanpa AI):
-- grid layar semua HP (screenshot berkala) dan mirror mulus per HP lewat scrcpy;
-- kontrol serentak: satu HP pemimpin, gerakan ditiru HP pengikut (koordinat dalam persen layar);
+**Mode manual** (setara Panda, tanpa AI), aplikasi desktop dengan tata letak meniru Panda:
+- grid **video langsung** semua HP (scrcpy, 720p 30 fps per HP, didekode WebCodecs); klik ubin memperbesar HP ke **layar besar** dengan navigasi ▢ ○ ◁ dan kolom Fungsi; ubin yang diperbesar menampilkan "Sedang dikontrol";
+- kontrol serentak lewat socket kontrol scrcpy: sentuhan dan tombol di satu HP ikut ke semua HP terpilih (Alt = HP itu saja); teks termasuk non-ASCII lewat clipboard;
+- panel kanan tanpa tab: tombol Teks / Aplikasi / Skenario, sakelar Kontrol layar kecil dan penanda, slider ukuran layar, chip nomor HP per grup untuk memilih;
+- penanda nomor urut + nama HP muncul saat kursor di atas ubin (tidak menutupi layar);
 - kirim teks sama atau berbeda per HP, pintasan teks, kirim dan tarik berkas;
-- aksi massal: install APK, buka/tutup aplikasi, hapus data aplikasi (dengan konfirmasi), screenshot, Home, buka halaman Settings;
-- label dan grup HP, rekam video sesi, rekam logcat + deteksi crash/ANR, layar mati saat dikontrol, clipboard dua arah;
-- editor skenario YAML (format Maestro) dan menjalankannya paralel di banyak HP, hasil per HP di `runs/`.
+- aksi massal: install APK, buka/tutup aplikasi, hapus data aplikasi, screenshot, Home, buka halaman Settings;
+- konfirmasi untuk setiap aksi yang menghapus atau menghentikan (hapus data, tutup paksa, tombol daya, hapus pintasan, timpa skenario, menutup aplikasi saat uji berjalan) dan panduan bertahap untuk pengguna baru;
+- nama dan grup HP, rekam video sesi, rekam logcat + deteksi crash/ANR, clipboard dua arah;
+- editor skenario YAML (format Maestro) dan menjalankannya paralel di banyak HP, hasil per HP di `runs/`;
+- dashboard yang sama tetap bisa dibuka di browser (`pnpm start`) dengan grid screenshot sebagai cadangan.
 
 **Mode agen** (pola sama dengan [[Microservices - Assistant Service]]):
 - satu perintah bahasa alami, lalu agen mengusulkan aplikasi target dan pengecekan hasil, disetujui QA, lalu dikunci;
@@ -44,7 +48,7 @@ Inti Panda ternyata alat open-source (scrcpy untuk mirroring). Karena itu pengga
 - impor massal akun dan password, integrasi aplikasi chat multi-akun;
 - konsol ADB atau shell bebas, akses lewat internet, HP cloud, root.
 
-**Pengaman utama**: server hanya `127.0.0.1`; semua program eksternal lewat satu pintu (daftar-izin, argumen array, tanpa shell); serial HP divalidasi; berkas hanya dari folder proyek; tidak ada aplikasi pendamping di HP.
+**Pengaman utama**: server hanya `127.0.0.1`; semua program eksternal lewat satu pintu (daftar-izin, argumen array, tanpa shell); serial HP divalidasi; berkas hanya dari folder proyek; tidak ada aplikasi pendamping di HP. Jendela Electron tanpa akses Node (`contextIsolation`, `sandbox`); IPC hanya diterima dari dashboard lokal dan setiap masukannya divalidasi di proses utama.
 
 Target uji: aplikasi milik perusahaan (mis. [[APP - MyBharata]]) atau aplikasi pihak ketiga atas izin pemiliknya.
 
@@ -58,21 +62,23 @@ Target uji: aplikasi milik perusahaan (mis. [[APP - MyBharata]]) atau aplikasi p
 - **Pain point**: Panda berisiko untuk perangkat kantor; uji manual per HP lambat.
 - **Aksi utama**: kontrol serentak, jalankan skenario, beri perintah ke agen, baca hasil.
 
-## Belum Diputuskan (TBD)
+## Belum Diimplementasikan / Catatan
 
-- Jumlah HP per PC. Asumsi spec: maks. 20, diukur saat spike laju screenshot.
-- Spike yang menentukan desain:
-  - Maestro paralel ke HP berbeda dengan data berbeda;
-  - pembacaan hierarki layar lewat `maestro hierarchy`;
-  - teks non-ASCII lewat Maestro;
-  - laju screenshot grid.
-- Pembuatan repo GitHub di org + branch protection.
-- Siapa pemilik dan pengguna tetap alat ini (persona QA).
+- **Baru diuji dengan 1 HP.** Video grid, layar besar, dan kontrol terbukti di Samsung A50s (Android 11); kode lolos 82 test, typecheck, build, dan review independen. Banyak HP sekaligus belum diuji, jadi batas HP per PC (asumsi 20) belum diukur.
+- Spike yang masih tersisa:
+  - Maestro paralel ke HP berbeda dengan data berbeda (bila bentrok: `PARALEL = false` di `server/orkestrator.ts`);
+  - pembacaan hierarki layar lewat `maestro hierarchy` (dibutuhkan Tahap 2).
+- Installer (`QA Device Lab Setup 0.1.0.exe`, sekitar 120 MB) **belum bertanda tangan digital**; Windows SmartScreen memperingatkan saat pemasangan pertama.
+- Tahap 1c (rencana, belum dikerjakan): daftar aplikasi terpasang + uninstall, kirim berkas ke galeri, kelola grup, nomor urut HP yang bisa diatur, rekam aksi menjadi skenario, jadwal uji, API lokal.
+- Mode agen AI (Tahap 2) belum dibuat.
+- Siapa pemilik dan pengguna tetap alat ini (persona QA): TBD.
 
 ## Sumber Daya
 
 **Komponen dan alat:**
 - [scrcpy](https://github.com/Genymobile/scrcpy) — mirroring dan kontrol HP, inti teknis yang juga dipakai Panda.
+- [Tango / ya-webadb](https://github.com/yume-chan/ya-webadb) — pustaka TypeScript (MIT) untuk adb dan klien scrcpy; dipakai untuk video langsung dan kontrol di aplikasi Electron.
+- [shadcn/ui](https://ui.shadcn.com) dan `DESIGN.md` dari [getdesign](https://getdesign.md) (template mydealz) — komponen dan panduan gaya dashboard.
 - [Maestro](https://maestro.mobile.dev) — framework uji UI mobile berbasis YAML, black-box lewat accessibility tree.
 - [Android SDK Platform-Tools](https://developer.android.com/tools/releases/platform-tools) — `adb`.
 - [Google USB Driver](https://developer.android.com/studio/run/win-usb) — driver USB resmi untuk Windows, pengganti pemasang driver Panda.
