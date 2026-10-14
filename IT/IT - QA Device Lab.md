@@ -9,7 +9,7 @@ Aplikasi dikembangkan sebagai alternatif internal terhadap software group contro
 
 - **Nama tampilan**: Bharata Boost (ikon petir), sejak PR #18.
 - **Identitas teknis**: nama repo, `appId`, dan folder data `Documents\QA Device Lab` dipertahankan agar data dan pembaruan versi lama tidak terputus.
-- **Status**: Implemented (ada catatan). Mode manual desktop Electron telah digabungkan melalui PR #2 tahap 1, PR #4 tahap 1b, PR #6 tahap 1c, PR #7 pemilih aplikasi, PR #8 panel Common, PR #9 stabilitas ADB, dan PR #10 pemilih elemen. Fitur tambahan dan mode agen AI memerlukan validasi atau implementasi lanjutan.
+- **Status**: ⚠️ Implemented (ada catatan). Mode manual desktop Electron telah digabungkan melalui PR #2 tahap 1, PR #4 tahap 1b, PR #6 tahap 1c, PR #7 pemilih aplikasi, PR #8 panel Common, PR #9 stabilitas ADB, dan PR #10 pemilih elemen. Fitur tambahan dan mode agen AI memerlukan validasi atau implementasi lanjutan.
 - **Platform**: Windows, dengan perangkat Android yang terhubung melalui USB.
 - **Pengguna utama**: QA tester dan tim pengembangan aplikasi internal.
 - **Prinsip**: pengujian terukur, hasil yang dapat direproduksi, kontrol perangkat yang eksplisit, serta pencatatan aktivitas.
