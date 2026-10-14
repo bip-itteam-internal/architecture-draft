@@ -4746,8 +4746,8 @@
         "HRIS - Organization Structure",
         "APP - Web ERP"
       ],
-      "hash": "6c8d400677c29bb663e5e96b5e432575fa4e624480362d4315c56da8ff8f78dc",
-      "ukuran_kb": 14.5,
+      "hash": "6ed5e5550d324f5d9f38cd379fd9f4ad9df301092c332aaf282d9cd1eff12830",
+      "ukuran_kb": 14.6,
       "ringkasan": "Menjawab: mengapa dan bagaimana `system_roles` yang kosong diisi otomatis dari departemen dan jabatan saat token diterbitkan (login, PIN, biometrik, refresh), serta aturan pengikatnya: tak pernah menimpa per modul, hanya untuk peran akses, jabatan ambigu tidak ditebak, dan kanon `KanonPosisi`. Juga menjawab jabatan mana yang sengaja tidak dipetakan (mis. Quality Supervisor, Personal Assistant, Admin Warehouse), tambahan Kesekretariatan (Legal, QA RND), sakelar `ROLE_FROM_POSITION`, dan hubungannya dengan ADR 0030 dan rencana ADR 0164.",
       "kata_kunci": [
         "peran dari jabatan",
@@ -6429,7 +6429,7 @@
         "APP - Web ERP"
       ],
       "hash": "cbe50357be0f60ff0c955244db65d7ea6a789c7e20f47bc80ee593d394467e49",
-      "ukuran_kb": 11.6,
+      "ukuran_kb": 11.7,
       "ringkasan": "Menjawab: kenapa modul Industrial Relation menyimpan catatan pelanggaran kepatuhan ringan (atribut kerja: sepatu, lanyard) di koleksi baru compliance_note yang terpisah dari Surat Peringatan dan kpi_score, dan kenapa catatan itu bukan sanksi, tidak memotong gaji, tidak menerbitkan SP otomatis, serta tidak masuk skor KPI. Menjelaskan siapa yang boleh mencatat (petugas IR/HR yang ditunjuk, lewat MyBharata, ditegakkan di server), siapa yang boleh membaca (visibilitas tiga-arah: petugas HR, karyawan atas dirinya, atasan atas departemennya via SupervisedDepartmentsStrict), dan kenapa jenis pelanggaran dibuat master data bukan enum Go. Juga menjawab kenapa data ini sensitif sehingga tidak didaftarkan ke calendar-service atau feed lintas modul.",
       "kata_kunci": [
         "industrial relation",
@@ -7954,7 +7954,7 @@
         "Microservices - Attendance Service"
       ],
       "hash": "d17340c57b6557ac0854f599e6dec6710b07c4c33edb90ac812f5b938a810e8f",
-      "ukuran_kb": 20.6,
+      "ukuran_kb": 20.7,
       "ringkasan": "Menjawab: kenapa inspeksi Satgas 5R & K3 untuk Office Boy dan Security pindah dari Form Builder ke entitas sendiri `satgas_finding` di employee-service, bagaimana petugas mencatat temuan bebas (tanpa form/periode pra-bangun) lengkap dengan foto dan tenggat SLA, dan bagaimana eskalasi memakai ulang mekanisme tahan-clock-out yang sudah ada. Menjelaskan juga bagaimana skor KPI kebersihan dihitung otomatis 0–100 dari temuan bulan itu (tanpa temuan = 100, tiap temuan mengurangi), kenapa 'menahan clock-out' adalah nudge bukan sanksi dan bukan potong gaji, serta batas terhadap Inspeksi Area (ADR 0111), Catatan Kepatuhan (ADR 0085), dan Surat Peringatan.",
       "kata_kunci": [
         "Satgas",
@@ -9117,7 +9117,7 @@
         "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap"
       ],
       "hash": "db7202a062603803f25944476103df696dc34eb488f04339329fd89874b6ee40",
-      "ukuran_kb": 5.0,
+      "ukuran_kb": 5.1,
       "ringkasan": "Menjawab: mengapa pengajuan Konsumsi dulu diperlakukan sebagai pembelian barang lewat Procurement (bukan permintaan uang), di mana rancangan lengkap alur pembeliannya disimpan, dan mengapa tahap persetujuan atasan dilewati bila pengajunya supervisor HRGA. ADR ini sudah digantikan untuk pengajuan baru, tapi masih menjelaskan aturan bagi dokumen Konsumsi lama.",
       "kata_kunci": [
         "ADR 0154",
@@ -9294,7 +9294,7 @@
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi"
       ],
       "hash": "2f1943fa67f1c6c7f4c6a975cdae67f14ba03a7986d5724f9e0d80fddcf9c8ee",
-      "ukuran_kb": 8.4,
+      "ukuran_kb": 8.5,
       "ringkasan": "Menjawab: bagaimana serapan anggaran dibaca di layar Anggaran & Cost Control (Terpakai tetap realisasi Accurate, dana dari pengajuan hanya bagian darinya dan tidak dijumlahkan), bagaimana pengajuan yang belum dicatat Accounting ditampilkan, dan siapa yang boleh menulis anggaran lewat izin baru finance.anggaran.kelola. Juga menjawab sembilan keputusan K1 sampai K9, apa yang sengaja tidak dijanjikan (lewat anggaran hanya memperingatkan, tanpa anggaran per proyek), konsekuensi urutan deploy, dan hal yang belum diputuskan.",
       "kata_kunci": [
         "ADR 0159",
@@ -9359,7 +9359,7 @@
         "CORE - RBAC dan Permission Set"
       ],
       "hash": "8655b60e872cd23135f1319a4df5b754223107be0bb7d30d24af6e70623e32de",
-      "ukuran_kb": 12.5,
+      "ukuran_kb": 12.6,
       "ringkasan": "Menjawab: mengapa proyeksi Forecast Kas Mingguan kini boleh diatur Cost Control per minggu, apa yang diketik dan apa yang disimpan (total rupiah per minggu, disimpan sebagai porsi/bobot), dan aturan penjaganya: jumlah sebulan harus sama dengan RAPB, minggu terkunci sejak hari pertamanya, maksimal 2 kali ubah, dan riwayat perubahan wajib. Juga menjawab mengapa skor KPI akurasi forecast akhir bulan tidak berubah karena fitur ini, keputusan lama mana yang dibalik, dan apa yang belum diputuskan.",
       "kata_kunci": [
         "ADR 0161",
@@ -9717,7 +9717,7 @@
         "APP - Web ERP"
       ],
       "hash": "1a19940c01a5ea1b9201a67f07f17aa7cc7dabbed5e51b8201e3797e2eeb6e25",
-      "ukuran_kb": 13.4,
+      "ukuran_kb": 13.5,
       "ringkasan": "Menjawab: kenapa akun berhak banyak terpental ke halaman login Web ERP (cookie token melewati batas ±4 KB browser), kenapa token dipindah ke localStorage dengan cookie penanda sesi, dan kenapa usulan penanda super admin di token ditolak. Juga menjelaskan paket bawaan Semua Izin yang dimekarkan saat token terbit, batasannya (tak berlaku untuk peran modul, menu terbatas, dan akun sendiri), serta konsekuensinya.",
       "kata_kunci": [
         "ADR 0172",
@@ -9881,7 +9881,7 @@
         "GA - Inventory Management"
       ],
       "hash": "fd374722060795aae018dc553104323fb5839cabaeeb071a14564e1ce8cb6d7e",
-      "ukuran_kb": 4.7,
+      "ukuran_kb": 4.8,
       "ringkasan": "Menjawab: mengapa tipe pengajuan Konsumsi dilebur ke Barang Umum, apa yang terjadi bila seseorang masih mengajukan KONSUMSI (ditolak 400 dan tak ditawarkan), dan bagaimana dokumen Konsumsi lama tetap diproses. Juga menjawab urutan deploy backend dan frontend serta konsekuensinya terhadap pembayar barang konsumsi.",
       "kata_kunci": [
         "ADR 0177",
@@ -9914,7 +9914,7 @@
         "Finance - Rancangan Finance Service"
       ],
       "hash": "a2f17f1a2a4ef1b55223a84fab214c33065013b3a9bb87c038f052c29e8f180b",
-      "ukuran_kb": 13.2,
+      "ukuran_kb": 13.4,
       "ringkasan": "Menjawab: kenapa baris \"Seluruh perusahaan\" dihapus dari tabel Serapan dan KPI Cost Control, kenapa serapan anggaran kini dibaca per departemen sesuai tag jurnal Accurate, dan bagaimana pagu gabungan beberapa akun per departemen per bulan bekerja. Juga menjelaskan tanda Varians baru di layar (Terpakai − Anggaran, plus % Varians), risiko hitung dobel di RingkasVarians, dan ADR mana (0159, 0097) yang direvisi sebagian.",
       "kata_kunci": [
         "serapan anggaran",
@@ -11157,7 +11157,7 @@
         "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya"
       ],
       "hash": "0a1324fe131142c722a329fddfc88cc481b177c4c06c0198fd2a75224daeb56c",
-      "ukuran_kb": 19.3,
+      "ukuran_kb": 19.5,
       "ringkasan": "Menjawab: apa isi tiap tab layar Anggaran & Cost Control (/finance/anggaran), bagaimana membaca kolom Anggaran, Terpakai, Sisa, dan Menunggu dicatat tanpa menghitung rupiah dua kali, serta dari mana angka serapan dari Pengajuan Barang/Dana berasal. Juga menjelaskan Forecast Mingguan (minggu belum selesai tidak dihitung, porsi proyeksi per minggu diatur Cost Control) dan dampaknya ke KPI Cost Control.",
       "kata_kunci": [
         "serapan anggaran",
@@ -12133,7 +12133,7 @@
         "GA - Form Pengadaan dan Pengajuan Dana"
       ],
       "hash": "5a506ef2f6690f2d0fd48bd5da4134bc63d99b6af98efef405cd97c1c4ee6447",
-      "ukuran_kb": 7.6,
+      "ukuran_kb": 7.7,
       "ringkasan": "Menjawab: apa saja 11 SOP Procurement resmi PT Bharata (perencanaan kebutuhan, PR, seleksi vendor, RFQ, penerbitan PO, monitoring pengiriman, penerimaan+QC, verifikasi invoice, pembayaran, evaluasi vendor, cost saving, pelaporan) dan sejauh mana masing-masing sudah didukung ERP. Memetakan tahap SOP mana yang sudah ada di kode (Permintaan/Pesanan/Penerimaan), mana yang sebagian, dan mana yang belum dibangun (RFQ 3-vendor, matriks approval nominal >Rp50jt, AVL & dokumen legalitas vendor, scorecard/OTD vendor, pelaporan formal). Berguna untuk mengecek kepatuhan SOP sebelum merancang fitur procurement/manufacture baru.",
       "kata_kunci": [
         "procurement",
@@ -15250,8 +15250,8 @@
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
         "Finance - FAT Persona"
       ],
-      "hash": "56c3cb3bc887ce298c1e4e099ff29a523f39672c83b5450366db1800f79fc6cf",
-      "ukuran_kb": 14.5,
+      "hash": "42885a6ca09052c8b65a46c41ebfef1467b0af1e17d16ee80f05d9242ba73cda",
+      "ukuran_kb": 14.6,
       "ringkasan": "Menjawab: siapa saja persona yang bekerja di alur manufaktur (SPV Brand, PPIC, SPV Manufacture, Procurement, Gudang, QC, Admin/Leader/Operator Produksi, PJT, Finance, Admin Return) dan bagaimana pekerjaan mengalir antar jabatan dan antar service dalam rancangan target. Memuat alur rencana sampai bahan lulus QC, alur produksi sampai rilis dan pengiriman, arsitektur service, alur per jabatan, dan skenario gagal, dengan langkah yang masih menunggu keputusan ditandai TBD.",
       "kata_kunci": [
         "persona manufaktur",
@@ -15383,7 +15383,7 @@
         "REF - Kepemilikan Data",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)"
       ],
-      "hash": "7d9913384cfc8fc31d9d3489e4fee86dad4bf8703393a97a15d0de5c110c0385",
+      "hash": "970a129f818cd3d37fbcd2e84528bd29e0f15787d93d1c05bc31b034fa8f3b95",
       "ukuran_kb": 17.0,
       "ringkasan": "Menjawab: fitur manufaktur mana di ERP yang benar-benar dipakai di prod dan mana yang belum pernah dipakai beserta penyebabnya, tumpang tindih apa yang ada di fondasi kode (catatan produksi, rilis batch, QC bahan masuk, PO bahan, jalur penyesuaian stok, pemilik angka stok), dan apa kata kuesioner pemakai. Juga menjelaskan spreadsheet PPIC sebagai sistem yang berjalan nyata, kebutuhan COA keluar, perbandingan Batch Record kertas dengan model ERP, serta daftar keputusan yang belum diambil.",
       "kata_kunci": [
@@ -17360,8 +17360,8 @@
         "APP - Web ERP",
         "QA - Register Perizinan & Sertifikasi"
       ],
-      "hash": "d4ac6988cf44bbac5c4a22a45b302506bae36d13914a0289869df713a9440d46",
-      "ukuran_kb": 33.8,
+      "hash": "c262a9a815993db7413f1c61eeb35416c5e0b6a7fa777d1896415f5f17ed1451",
+      "ukuran_kb": 33.9,
       "ringkasan": "Menjawab: register apa saja yang dimiliki divisi Quality di ERP (CAPA & temuan audit, incoming inspection bahan kemas, antrean release batch, komplain QC dari marketing, pengecekan RM), endpoint dan model datanya, serta siapa yang boleh membaca dan mengubahnya. Menjelaskan alur persetujuan CAPA tiga slot (Admin Produksi, Admin Warehouse, QA), gerbang baca CAPA untuk penyetuju, alert tenggat, dan bagian yang belum dibangun seperti Dashboard Mutu dan IPC/CPPB.",
       "kata_kunci": [
         "Quality",
@@ -17394,7 +17394,7 @@
         "APP - Web ERP",
         "Unlisted - Kesekretariatan (Big Pictures)"
       ],
-      "hash": "7617c916ac1d8263118829c1f47f4d0472e4ec1283f60b1d197dff42eaa0c9d5",
+      "hash": "fd7ecd6e3a437ca64ecdf178e797a6577978e14138cf949482dff1d12439786c",
       "ukuran_kb": 11.1,
       "ringkasan": "Menjawab: bagaimana posisi R&D Regulatory memantau registrasi izin edar NIE/BPOM/Halal sampai terbit beserta alert lewat target, dan bagaimana Papan Pengembangan Produk Baru melacak tahap ide sampai siap launching termasuk riwayat tahap milik server. Juga menjelaskan endpoint `/rnd/*`, model data, unggah PDF, dan perubahan izin sejak modul `rnd` dilebur ke `secretary` (izin `secretary.rnd.*`, paket, gerbang `gateSecretary`), serta pemetaan jabatan QA RND.",
       "kata_kunci": [
@@ -17429,7 +17429,7 @@
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)"
       ],
       "hash": "6afcfb89e7aad281cbe298ff5f821df67fc9b688299bf77f305e95cb151de49a",
-      "ukuran_kb": 15.2,
+      "ukuran_kb": 15.0,
       "ringkasan": "Menjawab: menu Quality apa yang tampil untuk tiap posisi (Quality Supervisor, QA Leader, QC Production, QC Assistant, QC Leader, PJT) dan pembaca luar Quality, cakupan data dan aksi per menu, siapa yang memutus rilis batch, CAPA, dan lot bahan masuk, serta perbaikan data D1-D5 dan keputusan Q1-Q7 yang ditunggu. Rancangan konsep urusan Pengendalian Mutu per ADR 0149, termasuk skenario uji pakai.",
       "kata_kunci": [
         "rancangan menu quality",
@@ -17842,7 +17842,7 @@
         "REF - Rantai Pengajuan Lintas Modul",
         "Microservices - Manufacture Service"
       ],
-      "hash": "5960f383914afe13cbe3bede9be8d2678365d1c71e903aa52f0ad1a946bb3b9b",
+      "hash": "a9a9fe26baa6c0bc2a3881c9ba49e38d9a752534b546ba75da6d92e2b3667ff1",
       "ukuran_kb": 83.4,
       "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis (karyawan, departemen, divisi, headcount, hak akses, kontrak, jadwal, master produk/SKU, vendor, gudang, dll.), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga menjawab salinan mana yang sah beserta arah dan penjaganya, pengecualian ADR 0002 yang masih hidup (mis. task-management membaca DB lain langsung), duplikasi yang belum diputuskan, jejak audit, dan cara memakai peta ini sebelum membangun penyimpanan baru.",
       "kata_kunci": [
@@ -19435,7 +19435,7 @@
         "Finance - Audit Internal",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi"
       ],
-      "hash": "7e8e1167053710425f3ea49df4bc9b1e8dd4aca80c9699f029a8a11289cb24ab",
+      "hash": "11f40c4d77422c7c2175428e98c578fd351821531178e881fee727f9e10d00af",
       "ukuran_kb": 12.6,
       "ringkasan": "Menjawab: apa saja jabatan di departemen Kesekretariatan (Direktur, Corporate Secretary, Legal, QA RND, Internal Audit, Personal Assistant, kreatif) dan modul sistem apa yang dipakai tiap jabatan, termasuk peran yang diturunkan dari jabatan dan template KPI-nya. Juga menjelaskan modul `secretary` (area Legal dan R&D, katalog izin, 25 rute, isi sidebar), mengapa `system_roles.secretary` sengaja tidak membuka Legal/R&D, Ruang Direktur, dan siapa yang setara Direktur dalam memutus persetujuan.",
       "kata_kunci": [
@@ -20532,8 +20532,8 @@
         "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "af264589419f232493fce61c2ccea734f9f16d865ae7de5a6ca0b59a52e5caf6",
-      "ukuran_kb": 7.1,
+      "hash": "8a59ed02097e1122bbb11e7619b751b41ec50f1cddd6fb4e60ddb7efaaea8fe7",
+      "ukuran_kb": 7.3,
       "ringkasan": "Menjawab: butir kerja apa saja (kode M-nn) dalam penataan fondasi Manufaktur per fase, issue GitHub mana yang terkait, dan butir mana yang siap dikerjakan atau masih menunggu keputusan. Juga menjawab keputusan apa yang ditunggu (K-1 sampai K-11, mis. pemilik angka stok, zona WIP, keputusan rilis, status bahan masuk, format BPOM, COA) beserta pemutusnya, aturan pakai papan, dan apa yang sengaja di luar cakupan.",
       "kata_kunci": [
         "fondasi manufaktur",
@@ -20623,7 +20623,7 @@
         "Microservices - Form Builder Service"
       ],
       "hash": "0a7626b938a8ed09b938634e03c022c604145b021c548a80c3fc8136f1b250d7",
-      "ukuran_kb": 6.3,
+      "ukuran_kb": 6.4,
       "ringkasan": "Menjawab: fitur pengelolaan Program Culture (klub Badminton, Football, Ladies Sport, Billiard, Music) apa saja yang sudah ada di ERP versus yang masih dilakukan manual di Excel, dan gap mana yang layak dibangun. Merinci mengapa jadwal berulang, matriks distribusi per-pekan, target frekuensi vs realisasi, dokumentasi/biaya sesi, dan indikator per-klub belum tersedia, serta mana yang sengaja tidak dibuat (RSVP, KPI officer-centric). Papan kerja temuan yang tiap kandidat scope-nya masih menunggu keputusan pemilik produk sebelum jadi ADR + task.",
       "kata_kunci": [
         "program culture",
@@ -21479,7 +21479,7 @@
         "API - Integration Service"
       ],
       "hash": "a5c9caa815f928cf24377928ebee153cfa7a8a86b8b2846acb7b72f53028c96a",
-      "ukuran_kb": 5.2,
+      "ukuran_kb": 5.3,
       "ringkasan": "Menjawab: task apa saja yang lahir dari kebutuhan \"proyeksi Forecast Mingguan bisa diedit manual\", urutan pengerjaannya di `bip-erp` dan `erp-frontend`, issue dan PR mana yang terkait, serta kriteria \"yang harus benar\" untuk task backend dan frontend. Juga menjawab apa yang diputuskan pemohon (total per minggu, kunci minggu, batas 2 kali ubah, riwayat, bentuk simpan porsi), apa yang sengaja tidak dikerjakan, apa yang masih terbuka, dan pesan untuk manajemen soal KPI yang tidak berubah.",
       "kata_kunci": [
         "analisa kebutuhan",
@@ -21569,7 +21569,7 @@
         "ANALISA - Inspeksi Satgas 5R dan K3"
       ],
       "hash": "78e2ab91fcd6914460f26a0a31fd8223880d6ea613808144abc0dfb1b0469391",
-      "ukuran_kb": 9.3,
+      "ukuran_kb": 9.4,
       "ringkasan": "Menjawab: apa saja task turunan (T1–T8) dari redesign Satgas menjadi input bebas dengan SLA temuan, apa status pengerjaan tiap task, di branch dan repo mana pekerjaannya (bip-erp `feat/satgas-finding`, erp-frontend `feat/satgas-finding-web`, my-bharata `feat/satgas-finding-mobile`), serta urutan dan dependensinya (backend dulu, lalu mobile & web, retire form-builder paling akhir). Menjelaskan juga penyempurnaan keputusan user 2026-09-24 (toggle 'Ada temuan?' dibuang, tanpa temuan sebulan skor 100 otomatis, approve tanpa mengetik nilai) dan gerbang 'selesai bila' tiap task. Ini papan kerja, bukan sumber kebenaran — detail keputusan ada di ADR 0122.",
       "kata_kunci": [
         "ANALISA Satgas",
@@ -22088,7 +22088,7 @@
         "CORE - SSO Flow"
       ],
       "hash": "65f048665617ba7bb1f1770d115b1d8ac58eacc0926285e64e14b42d8ab79803",
-      "ukuran_kb": 7.0,
+      "ukuran_kb": 7.1,
       "ringkasan": "Menjawab: task apa saja yang diturunkan dari ADR 0172 (ukur ukuran token, pindah token ke localStorage, paket Semua Izin di employee-service, tampilan di layar Hak Akses, sinkron dok), PR dan issue GitHub mana yang terkait, serta urutan deploy yang wajib (FE token dulu, lalu BE sebelum FE). Juga memuat test dan langkah verifikasi tiap task.",
       "kata_kunci": [
         "analisa kebutuhan",
@@ -22188,7 +22188,7 @@
         "2026-07-17 Temuan - Reject retur menambah stok FG"
       ],
       "hash": "9d3cb08e3ec79fdef0d632d66bc62b30a2de8d865bc976e0fcdbbd00aae7462e",
-      "ukuran_kb": 11.2,
+      "ukuran_kb": 11.5,
       "ringkasan": "Menjawab pertanyaan tentang desain perbaikan performa menu Master Resi yang lambat dibuka karena puluhan ribu dokumen resi, mencakup pagination sisi server per-hari (endpoint /resi/days), pencarian prefix no_resi di server, dan kontrak urutan data yang dibagi dengan menu Gudang FG (lookup resi, ambil rentang).",
       "kata_kunci": [
         "Master Resi",

@@ -35,9 +35,9 @@ Repo: **BE** = bip-erp, **FE** = erp-frontend. Status per 2026-10-13.
 
 | Kode | Butir | Issue yang ada | Butuh | Status |
 |---|---|---|---|---|
-| M-01 | Cek dan beri akses menu Manufaktur/Quality ke posisi yang benar (paket hak per jabatan) | BE #2434, #3089, FE #2422 | konfirmasi SPV (staf gudang RM/FG), HR (jabatan QA Leader) | PR terbuka 2026-10-14 (BE #3100, FE #2430): penyetuju CAPA gudang sisi RM. Sisa: paket `wms_gudang_*` untuk 3 Warehouse Staff sesudah SPV menjawab; akses PJT ke Rilis Batch menunggu K-3 |
+| M-01 | Cek dan beri akses menu Manufaktur/Quality ke posisi yang benar (paket hak per jabatan) | BE #2434, #3089, FE #2422 | konfirmasi SPV (staf gudang RM/FG), HR (jabatan QA Leader) | Kode selesai: penyetuju CAPA gudang sisi RM merged (BE #3100, FE #2430) dan terverifikasi DEV 2026-10-14; #2434 ditutup. Sisa: deploy PROD (employee-service lalu frontend); paket `wms_gudang_*` untuk 3 Warehouse Staff sesudah SPV menjawab; akses PJT ke Rilis Batch menunggu K-3 |
 | M-02 | Uji coba Batch Record pada 1-2 batch nyata, paralel dengan kertas | - | M-01 | Siap |
-| M-03 | Tambah bagian spesifikasi produk di Batch Record (dasar COA) | BE #3077, FE #2413 | - | PR terbuka 2026-10-14 (BE #3084, FE #2417); deploy BE dulu, QA RND login ulang |
+| M-03 | Tambah bagian spesifikasi produk di Batch Record (dasar COA) | BE #3077, FE #2413 | - | Kode selesai: merged (BE #3084, FE #2417), terverifikasi DEV 2026-10-14 kecuali Approve (tertahan paraf). Sisa: deploy PROD (BE dulu, QA RND login ulang), uji layar utuh oleh QC/PJT |
 | M-04 | Dashboard jembatan dari spreadsheet PPIC untuk SPV Manufacture | - | - | Siap |
 | M-05 | Sinkronkan [[Microservices - Manufacture Service]] dan [[API - Manufacture Service]] dengan kode (batch record, cycle count, lot, K3/GMP, /kpi/*) | - | - | Siap |
 | M-06 | Rapikan data jabatan di HRIS (posisi yang menjalankan tugas PPIC) | - | konfirmasi SPV | Siap |

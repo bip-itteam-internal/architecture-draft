@@ -16,7 +16,7 @@
 | Leader / Operator Produksi | mengisi Batch Record kertas di lantai produksi | tidak perlu input ERP (hasil kuesioner) | kertas |
 | Leader / Admin / Staf Warehouse | penerimaan, karantina, keluar ke produksi, opname mingguan | modul manufacture (WMS) | desktop |
 | QC Assistant / QC Production / QA | QC bahan masuk, pengujian IPC, rilis | modul quality | desktop |
-| APJ / PJT (Penanggung Jawab Teknis, posisi QA RND) | memutuskan rilis batch di Lembar Keputusan | `manufacture: rnd` diturunkan dari jabatan QA RND, membuka Dokumen Produksi Batch (PR bip-erp#3084, belum merged) | kertas |
+| APJ / PJT (Penanggung Jawab Teknis, posisi QA RND) | memutuskan rilis batch di Lembar Keputusan | `manufacture: rnd` diturunkan dari jabatan QA RND, membuka Dokumen Produksi Batch (bip-erp#3084, merged 2026-10-13, belum deploy PROD) | kertas |
 | Finance (Supervisor FAT, Accounting, Cost Control) | validasi opname, persediaan di Accurate, HPP | modul finance | desktop |
 
 - **Tujuan**: satu batch bisa ditelusuri dari rencana PPIC sampai FG masuk gudang, setiap data diketik sekali.
@@ -126,7 +126,7 @@ Dibandingkan satu Batch Record kertas lengkap (produk serum, ukuran batch 120 kg
 | Catatan Pengemasan: komposisi & foto bahan kemas, prosedur kemas sekunder | PR/SOP/007/01/F/01 | ✅ `komposisi_kemasan`, `foto_kemasan`, `prosedur_kemas` |
 | Ceklis Kelengkapan Dokumen Produksi | | ✅ `checklist_qa` |
 | Lembar Keputusan "Release for Sale" (Penanggung Jawab Teknis) | | ✅ `keputusan_rilis` + penyetuju |
-| **Spesifikasi produk** (pemerian, warna, bau, pH, netto, penandaan, ED) | | 🟡 M-03: master per produk + salinan di Batch Record (PR bip-erp#3084, belum merged + erp-frontend#2417), lihat [[Manufacture - Dokumen Produksi Batch]] |
+| **Spesifikasi produk** (pemerian, warna, bau, pH, netto, penandaan, ED) | | 🟡 M-03: master per produk + salinan di Batch Record (bip-erp#3084 + erp-frontend#2417, merged, terverifikasi DEV 2026-10-14, belum deploy PROD), lihat [[Manufacture - Dokumen Produksi Batch]] |
 | **Peralatan** (alat timbang, mesin mixing, mesin coding) | | ❌ belum ada |
 
 - **Batch Record ERP tak perlu dirancang ulang**: bentuknya sudah mengikuti kertas. Yang kurang: pelatihan, hak akses, dan bagian **spesifikasi produk**, yang sekaligus menjadi isi utama COA keluar (Temuan 5).
