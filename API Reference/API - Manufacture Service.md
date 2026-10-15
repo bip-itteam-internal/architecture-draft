@@ -103,6 +103,20 @@
 
 Rujukan: rute `services/manufacture/main.go:186`, `:201`, `:213`, `:219`, `:256`, `:292`. Handler `services/manufacture/stok_dari_pengajuan.go:55` (`StokDariPengajuan`), `services/manufacture/master_bahan_internal.go:50` (`ListMasterBahanInternal`), `services/manufacture/retur_konfirmasi_ulang.go:357` (`KonfirmasiUlangRetur`; filter `:218`, keputusan `:156`), `services/manufacture/returns_export.go:597` (`ExportReturns`), `services/manufacture/production_plan.go:37` (`SimulateProductionPlan`; logika `production_plan_logic.go:91`), `services/manufacture/po_marketing_spv.go:434` (`HitungPoMarketingMenunggu`). Gerbang `services/manufacture/rbac.go:286` (`isInternalRobot`), `:324` (`requireTabReadOrRobot`), `:333` (`requireTabWriteOrRobot`), `:345` (`requireWmsSupervisor`).
 
+## Master tujuan kirim FG ✅
+
+> ✅ **Merged** (bip-erp#3150, FE erp-frontend#2474) dan **ter-deploy prod 2026-10-15**. Tujuan pengiriman barang jadi yang bukan gudang sendiri: **PELANGGAN** (pelanggan / mitra makloon) dan **INTERNAL** (pemakaian internal). Gudang internal tetap dari master lokasi gudang (`/lokasi-gudang`); jenis GUDANG/TOKO ditolak di sini supaya nama gudang tak hidup di dua tempat. Latar: [[Manufacture - Kajian Fondasi Sistem]] TBD 12. Pemakai pertamanya kelak form Surat Jalan (M-21).
+
+| Method | Path | Gerbang | Fungsi |
+|---|---|---|---|
+| GET | `/tujuan-kirim` (`?aktif=true`, `?jenis=PELANGGAN\|INTERNAL`) | `requireTabRead("master_lokasi")` | Daftar, urut jenis lalu nama |
+| POST | `/tujuan-kirim` | `requireTabWrite("master_lokasi")` | Buat. `kode` huruf besar tanpa spasi/garis miring jadi `_id`; kode dobel (termasuk dua simpan bersamaan) = **409** |
+| PATCH | `/tujuan-kirim/:kode` | `requireTabWrite("master_lokasi")` | Ubah SEBAGIAN (struct seluruhnya pointer): `nama`, `jenis`, `alamat`, `kontak`, `aktif`. Patch kosong = 400, kode tak ada = 404 |
+
+Tidak ada DELETE: tujuan dinonaktifkan supaya dokumen lama tetap merujuk kodenya. Koleksi `manufacture_tujuan_kirim`. Layar: panel "Tujuan Kirim" di Manufaktur > Master & Referensi > Master Lokasi.
+
+Rujukan: rute `services/manufacture/main.go` (blok master lokasi), handler `services/manufacture/tujuan_kirim.go` (`ListTujuanKirim`, `CreateTujuanKirim`, `PatchTujuanKirim`, validasi murni `validasiTujuanKirimBaru` / `susunPatchTujuanKirim`).
+
 ## Dashboard jembatan spreadsheet PPIC (M-04) ✅
 
 > ✅ **Merged** (bip-erp#3144, FE erp-frontend#2462) dan **ter-deploy prod 2026-10-15**: sinkron pertama prod `OK masuk=404 keluar=420 tolak=50`, biner dan bundel FE diverifikasi. Salinan **satu arah** spreadsheet Production Planning PPIC (tab hasil produksi dan FG keluar) untuk seksi "Produksi (dari spreadsheet PPIC)" di Dashboard Manufaktur, sampai datanya pindah ke Batch Record dan Kirim FG. Latar: [[Manufacture - Kajian Fondasi Sistem]] Temuan 4.

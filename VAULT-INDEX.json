@@ -604,9 +604,9 @@
         "API - Integration Service",
         "ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line"
       ],
-      "hash": "eea5ca9897ac76137f3fa7135260772bd9b02e1a8e02e2aa4acf0eec2f298b9f",
-      "ukuran_kb": 55.3,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan manufacture-service (WMS pabrik) lewat gateway /api/manufacture, gerbang akses tiap rute, dan apa yang dibaca/ditulisnya: master bahan dan stok, transaksi, formula, produksi, Dokumen Produksi Batch dan spesifikasi produk, cycle count, lot FIFO/FEFO, K3/GMP, bahan KPI otomatis /kpi/*, aksi Warehouse Sadewa, PO, mutasi gudang dan konsinyasi. Juga memuat rute dashboard jembatan spreadsheet PPIC (ringkasan, rincian, sinkron).",
+      "hash": "bf4330d1fdf7bba6363beb20577a49b188369faa344b293dbff2deeead88b22c",
+      "ukuran_kb": 56.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan manufacture-service (WMS pabrik) lewat gateway /api/manufacture, gerbang akses tiap rute, dan apa yang dibaca/ditulisnya: master bahan dan stok, transaksi, formula, produksi, Dokumen Produksi Batch dan spesifikasi produk, cycle count, lot FIFO/FEFO, K3/GMP, bahan KPI otomatis /kpi/*, aksi Warehouse Sadewa, PO, mutasi gudang dan konsinyasi. Juga memuat rute dashboard jembatan spreadsheet PPIC (ringkasan, rincian, sinkron). Juga memuat master tujuan kirim FG (pelanggan/makloon, pemakaian internal).",
       "kata_kunci": [
         "manufacture-service",
         "API manufaktur",
@@ -619,7 +619,8 @@
         "KPI otomatis",
         "stok bahan",
         "spreadsheet PPIC",
-        "dashboard jembatan"
+        "dashboard jembatan",
+        "tujuan kirim"
       ]
     },
     {
@@ -15427,8 +15428,8 @@
         "REF - Kepemilikan Data",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)"
       ],
-      "hash": "81e4d7430ee51b4852dc38d23e702163b3693dc718191bcc894d6a1a8a246558",
-      "ukuran_kb": 24.8,
+      "hash": "d6068a0bb32c99a819ac6ff542c2cdd31da937a3f44d3b9f961570ab29b71223",
+      "ukuran_kb": 25.1,
       "ringkasan": "Menjawab: fitur manufaktur mana di ERP yang benar-benar dipakai di prod dan mana yang belum pernah dipakai beserta penyebabnya, tumpang tindih apa yang ada di fondasi kode, dan apa kata kuesioner serta tiket permintaan SPV Manufacture. Juga menjelaskan spreadsheet PPIC sebagai sistem yang berjalan nyata, kenapa pembelian bahan baku belum lewat Pengajuan Barang RAWMATERIAL, siapa memeriksa jumlah vs mutu bahan masuk, kebutuhan COA keluar, perbandingan Batch Record kertas dengan model ERP, serta daftar keputusan yang belum diambil.",
       "kata_kunci": [
         "kajian fondasi manufaktur",
