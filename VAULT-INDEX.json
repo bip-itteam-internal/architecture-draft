@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-15",
-  "jumlah_dokumen": 646,
+  "jumlah_dokumen": 648,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -713,6 +713,7 @@
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
         "CORE - API Master Gateway",
+        "ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca",
         "Microservices - Assistant Service",
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
         "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
@@ -726,20 +727,20 @@
         "Microservices - Attendance Service",
         "Microservices - Insentive Service"
       ],
-      "hash": "084af42915c966fc79fe99bf81c3e4a40a60fc7e2a0e8b35ee8ea5a8a059fa1f",
-      "ukuran_kb": 27.3,
-      "ringkasan": "Menjawab: endpoint payroll-service apa saja (config BPJS/pajak/potongan kehadiran, badan usaha, komponen gaji, gaji per karyawan, payroll run & THR, impor run, slip self-service, rute internal) dan izin permission-set mana yang menggerbangnya. Juga menjelaskan model gerbang `gate(izin, fallback)`, izin tanda tangan bertingkat ADR 0129, gerbang `/employer-cost`, serta mengapa `payroll.salary.write` dipisah dari `payroll.work`.",
+      "hash": "37da16134c9d3d00274e112a270589032903ec7287331a3bc7f6d377a98d4337",
+      "ukuran_kb": 27.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki payroll-service (config BPJS/pajak/potongan kehadiran, badan usaha, komponen gaji, gaji per karyawan, payroll run, THR, slip, rute internal) dan izin RBAC apa yang menggerbang tiap rute. Juga menjelaskan fallback tier `gate(izin, predikat)`, izin persetujuan bertingkat ADR 0129, dan gerbang `/employer-cost` yang dipakai modul insentif.",
       "kata_kunci": [
-        "payroll-service",
+        "payroll",
         "penggajian",
+        "endpoint payroll",
         "payroll run",
         "slip gaji",
+        "payslip",
         "BPJS",
-        "PPh21",
-        "THR",
-        "permission-set",
-        "employer-cost",
-        "gaji karyawan"
+        "PPh21 TER",
+        "payroll.salary.write",
+        "employer-cost"
       ]
     },
     {
@@ -1966,6 +1967,7 @@
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin",
         "Microservices - Recruitment Service",
         "Microservices - Employee Service",
+        "ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca",
         "QA - R&D Regulatory (Registrasi & Pipeline Produk)",
         "Microservices - Procurement Service",
         "APP - Web ERP",
@@ -1996,24 +1998,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "9d2e6604a13315a087746c5729769caaa3fe5d73b77faa5a5071dedff3a75727",
-      "ukuran_kb": 150.9,
-      "ringkasan": "Menjawab: bagaimana RBAC tiga sumbu (modul, tingkat aksi, cakupan data) bekerja di seluruh bip-erp, apa itu paket hak (permission set) yang menempel pada posisi/jabatan, dan katalog izin apa saja yang terdaftar per modul. Juga menjelaskan bagaimana izin ditegakkan di gateway, service, dan frontend, cadangan tier lama `system_roles`, serta batas cookie 4 KB dan paket Semua Izin.",
+      "hash": "ff520e25ab8f5b4c2cc35977cc3d72cb2c9928a6973295cca1c45369d6c19672",
+      "ukuran_kb": 151.8,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja (tiga sumbu modul, tingkat aksi, cakupan/reach), apa itu paket hak (permission set) yang menempel di posisi, modul mana yang sudah menegakkan izin per-aksi, dan katalog izin apa saja yang terdaftar. Juga menjelaskan fallback tier `system_roles`, fase dua yang dicabut, batas cookie 4 KB untuk paket Semua Izin, dan arah ADR satu pintu.",
       "kata_kunci": [
         "RBAC",
         "permission set",
         "paket hak",
         "hak akses",
-        "izin",
         "katalog izin",
         "reach",
-        "cakupan data",
-        "posisi",
-        "jabatan",
         "system_roles",
         "tier fallback",
-        "token JWT",
-        "Siapa Boleh Apa"
+        "Siapa Boleh Apa",
+        "Hak per Posisi"
       ]
     },
     {
@@ -3042,6 +3040,8 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca",
+        "ADR - 0182 Badan Usaha Satu Daftar untuk HR dan Finance, Entitas CV Menempel Tanpa Nama Sendiri",
         "APP - Web ERP",
         "Microservices - Employee Service",
         "Microservices - Attendance Service",
@@ -3066,20 +3066,20 @@
         "ADR - 0002 Database-per-Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "ff82e068dc2bf8e2f46f90873dabe5c0efe1074291a98064dc18c40e8a08ee86",
-      "ukuran_kb": 67.6,
-      "ringkasan": "Menjawab: endpoint dan fitur payroll service (config BPJS, pajak PPh21 TER, master badan usaha untuk kop slip, komponen gaji, gaji per karyawan, payroll run sampai publish slip, THR, PDF slip, impor run dari spreadsheet HRD) serta bagaimana potongan kehadiran, periode kehadiran, dan lingkup run dihitung. Juga menjawab di mana aturan bisnis gaji bersumber (Peraturan Perusahaan di repo mobile), keterbatasan multi-perusahaan, dan kondisi pemakaian payroll di produksi.",
+      "hash": "1d4a4c4ae978926f00bf0e31787ef4b5e5d1969c56f46db449651eb481ee5a62",
+      "ukuran_kb": 68.4,
+      "ringkasan": "Menjawab: apa yang dikerjakan payroll-service per fase (config, badan usaha, komponen gaji, payroll run, PPh21 TER, THR, PDF slip, impor run), bagaimana potongan kehadiran, periode kehadiran, lingkup run, dan pembulatan BPJS dihitung, serta model data `payroll_db`. Juga menjawab keadaan pemakaian di produksi dan di mana aturan bisnis Peraturan Perusahaan yang menentukan potongan berada.",
       "kata_kunci": [
-        "payroll",
+        "payroll service",
         "penggajian",
-        "slip gaji",
-        "payslip",
-        "BPJS",
-        "PPh21 TER",
-        "THR",
-        "potongan kehadiran",
         "payroll run",
-        "badan usaha"
+        "potongan kehadiran",
+        "attendance deduction",
+        "THR",
+        "badan usaha",
+        "komponen gaji",
+        "payroll_db",
+        "slip PDF"
       ]
     },
     {
@@ -10102,6 +10102,7 @@
       "publik": true,
       "tautan": [
         "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
+        "ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca",
         "REF - Kepemilikan Data",
         "Finance - Buku Besar CV",
         "ADR - 0131 Tanda Tangan Direktur-Sekutu pada BKK Otomatis Tanpa Approval",
@@ -10110,20 +10111,55 @@
         "Finance - Proses Gaji dan Iuran BPJS",
         "Microservices - Procurement Service"
       ],
-      "hash": "be5077a1ba9ba573ce319ae0bf3079c66735087c82821ee4879a0e42811da8a3",
-      "ukuran_kb": 10.8,
-      "ringkasan": "Menjawab: di mana identitas badan usaha grup (PT Bharata, 40 CV, PT lain) disimpan dan siapa pemiliknya, mengapa Entitas CV di Finance menempel ke Badan Usaha payroll lewat payroll_company_id tanpa nama sendiri, dan bagaimana CV/PT baru ditambahkan lewat HR lalu didaftarkan Finance (tombol Daftarkan, kode otomatis). Juga menjelaskan rekening CV (1299) dan PT (1298) yang tetap dibuat di Accurate, sumber dropdown pembayar, serta langkah merapikan nama sebelum Finance mengikuti nama HR.",
+      "hash": "940c4153c4002c6f49414eb6774603f58042001d58594b478b0e286072ba01e0",
+      "ukuran_kb": 11.2,
+      "ringkasan": "Menjawab: di mana satu-satunya daftar badan usaha (PT Bharata, CV, PT lain) disimpan, bagaimana Entitas CV Finance menempel lewat `payroll_company_id` tanpa nama sendiri, dan bagaimana badan usaha baru didaftarkan Finance lewat tombol Daftarkan. Juga menjelaskan rekening yang tetap dibuat di Accurate, dua daftar lama yang menyimpang, dan bagian ADR 0096 yang direvisi.",
       "kata_kunci": [
         "badan usaha",
         "entitas CV",
         "payroll_company",
-        "payroll_company_id",
         "akuntansi_cv_entitas",
         "PT lain",
-        "rekening 1299 1298",
-        "Accurate",
-        "laporan kecocokan",
-        "ADR 0096"
+        "CV",
+        "Accurate 1299",
+        "Daftarkan",
+        "satu daftar",
+        "legal entity"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca.md",
+      "judul": "ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "Diusulkan, 2026-10-15. Arahnya (satu pintu tambah/ubah badan usaha di Sekretariat, bukan HR) disetujui user dalam sesi `/analisa-kebutuhan` 2026-10-15. Merevisi sebagian [[ADR - 0182 Badan Usaha Satu Daftar untuk HR dan Finance, Entitas CV Menempel Tanpa Nama Sendiri]] (butir 4 dan 6: pintu tambah dan perapian nama). Pemutus: `wirkancil`. Blueprint: [[ANALISA - Badan Usaha Dikelola Sekretariat]].",
+      "publik": true,
+      "tautan": [
+        "ADR - 0182 Badan Usaha Satu Daftar untuk HR dan Finance, Entitas CV Menempel Tanpa Nama Sendiri",
+        "ANALISA - Badan Usaha Dikelola Sekretariat",
+        "CORE - RBAC dan Permission Set",
+        "REF - Kepemilikan Data",
+        "API - Payroll Service",
+        "Microservices - Payroll Service",
+        "Finance - Buku Besar CV",
+        "Unlisted - Kesekretariatan (Big Pictures)",
+        "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
+        "ADR - 0131 Tanda Tangan Direktur-Sekutu pada BKK Otomatis Tanpa Approval"
+      ],
+      "hash": "76eaca2788f76ddba0357a5884ad3f7a13285eae40b92cf07ebbde29b25e1e32",
+      "ukuran_kb": 8.6,
+      "ringkasan": "Menjawab: siapa yang boleh menambah dan mengubah badan usaha (Kesekretariatan lewat izin baru `secretary.badanusaha.kelola`), kenapa HR kehilangan hak tulis, dan bagaimana HR serta Finance tetap membaca daftar `payroll_company`. Juga menjawab gerbang rute `/companies*` yang berganti, layar baru `/secretary/badan-usaha`, urutan deploy, dan perapian data yang diketahui salah.",
+      "kata_kunci": [
+        "badan usaha",
+        "Kesekretariatan",
+        "Corporate Secretary",
+        "secretary.badanusaha.kelola",
+        "payroll_company",
+        "legal entity",
+        "gerbang tulis",
+        "Sekretariat",
+        "ADR 0182"
       ]
     },
     {
@@ -10296,6 +10332,7 @@
         "ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate",
         "Finance - Kas Kecil dan Pengajuan Budget",
         "REF - Kepemilikan Data",
+        "ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca",
         "Microservices - Procurement Service",
         "Microservices - Payroll Service",
         "Microservices - Integration Service",
@@ -10310,20 +10347,20 @@
         "CORE - RBAC dan Permission Set",
         "API - Payroll Service"
       ],
-      "hash": "64ea7ec56eded7c0e0cb31d27cf80d5c4ac52944f917a2022b29ab37d79ace8b",
-      "ukuran_kb": 17.6,
-      "ringkasan": "Menjawab: bagaimana rencana membangun buku besar dan konsolidasi 40 CV grup di dalam ERP (bagan akun, jurnal, laporan keuangan per CV, konsolidasi, tutup buku) menggantikan FINCON, dan sumber jurnal otomatis apa yang direncanakan. Juga menjelaskan master entitas CV dan penugasan pemegang yang sudah ada, persona, kendala, dan hal yang belum diputuskan.",
+      "hash": "1526c04da3ce765cbb18141696d64018b7a397611a81e6b673ad097a7c74485a",
+      "ukuran_kb": 17.9,
+      "ringkasan": "Menjawab: bagaimana modul buku besar dan konsolidasi 40 CV di ERP dirancang (master entitas CV, bagan akun/COA, jurnal, laporan, konsolidasi, tutup buku) dan apa saja yang sudah dikodekan T1 (semai, rujukan payroll dan rekening Accurate, laporan kecocokan, penugasan pemegang, cakupan tulis). Juga menjawab sumber jurnal otomatis yang direncanakan dan hubungannya dengan FINCON.",
       "kata_kunci": [
         "buku besar CV",
         "general ledger",
         "konsolidasi",
-        "FINCON",
         "entitas CV",
+        "FINCON",
+        "COA",
         "bagan akun",
-        "chart of accounts",
         "jurnal",
-        "tutup buku",
-        "laporan keuangan"
+        "BKK",
+        "laporan kecocokan"
       ]
     },
     {
@@ -18035,6 +18072,8 @@
         "Manufacture - Dokumen Produksi Batch",
         "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
         "RUN - Deploy Microservices bip-erp",
+        "ADR - 0182 Badan Usaha Satu Daftar untuk HR dan Finance, Entitas CV Menempel Tanpa Nama Sendiri",
+        "ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca",
         "REF - PRD ERP",
         "DB - Data Dictionary",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin",
@@ -18042,17 +18081,17 @@
         "REF - Rantai Pengajuan Lintas Modul",
         "Microservices - Manufacture Service"
       ],
-      "hash": "a9a9fe26baa6c0bc2a3881c9ba49e38d9a752534b546ba75da6d92e2b3667ff1",
-      "ukuran_kb": 83.2,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis (karyawan, departemen, divisi, headcount, hak akses, kontrak, jadwal, master produk/SKU, vendor, gudang, dll.), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga menjawab salinan mana yang sah beserta arah dan penjaganya, pengecualian ADR 0002 yang masih hidup (mis. task-management membaca DB lain langsung), duplikasi yang belum diputuskan, jejak audit, dan cara memakai peta ini sebelum membangun penyimpanan baru.",
+      "hash": "6208f621ba8094a98e13cd54df794fbd22672de5aa0084ad845773ed130b9994",
+      "ukuran_kb": 83.9,
+      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis di ERP, siapa yang boleh menulisnya, lewat jalan mana service lain membacanya, salinan mana yang sah beserta penjaganya, dan duplikasi mana yang belum diputuskan. Dipakai sebelum membangun penyimpanan baru untuk mengecek apakah datanya sudah dimiliki departemen lain.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "satu fakta satu tempat",
-        "single source of truth",
+        "sumber kebenaran",
+        "source of truth",
+        "duplikasi data",
+        "salinan sah",
         "database-per-service",
-        "salinan data",
-        "duplikasi",
         "SyncCollection",
         "master data",
         "audit trail"
@@ -19586,24 +19625,26 @@
         "APP - Audit Internal",
         "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "CORE - RBAC dan Permission Set",
+        "ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca",
+        "ANALISA - Badan Usaha Dikelola Sekretariat",
         "REF - Dashboard per Posisi (Indeks Cakupan)",
         "HRIS - Organization Structure",
         "Finance - Audit Internal",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi"
       ],
-      "hash": "11f40c4d77422c7c2175428e98c578fd351821531178e881fee727f9e10d00af",
-      "ukuran_kb": 12.5,
-      "ringkasan": "Menjawab: apa saja jabatan di departemen Kesekretariatan (Direktur, Corporate Secretary, Legal, QA RND, Internal Audit, Personal Assistant, kreatif) dan modul sistem apa yang dipakai tiap jabatan, termasuk peran yang diturunkan dari jabatan dan template KPI-nya. Juga menjelaskan modul `secretary` (area Legal dan R&D, katalog izin, 25 rute, isi sidebar), mengapa `system_roles.secretary` sengaja tidak membuka Legal/R&D, Ruang Direktur, dan siapa yang setara Direktur dalam memutus persetujuan.",
+      "hash": "566d138c1a9aea8fc95f39b6e1ef3f8b14edb634f89c095376734741399db335",
+      "ukuran_kb": 13.0,
+      "ringkasan": "Menjawab: jabatan apa saja di departemen Kesekretariatan (Direktur, Corporate Secretary, Legal, QA RND, Internal Audit, branding) dan modul sistem apa yang dipakai tiap jabatan, termasuk peran turunan dari jabatan. Juga menjawab isi modul `secretary` (katalog izin Legal dan R&D, rute backend, menu sidebar), kenapa `system_roles.secretary` tidak membuka Legal/R&D, dan rencana menu Badan Usaha.",
       "kata_kunci": [
         "Kesekretariatan",
         "secretary",
         "Corporate Secretary",
-        "Direktur",
-        "Ruang Direktur",
         "Legal",
-        "R&D",
+        "R&D Regulatory",
+        "Ruang Direktur",
         "Internal Audit",
-        "sidebar SEKRETARIAT",
+        "catalog_secretary",
+        "Sekretariat",
         "SetaraDirektur"
       ]
     },
@@ -20598,6 +20639,36 @@
         "pemisahan database / database split",
         "fase kerja",
         "ADR 0074"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Badan Usaha Dikelola Sekretariat.md",
+      "judul": "ANALISA - Badan Usaha Dikelola Sekretariat",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": "⛔",
+      "status_teks": "**Menunggu [[ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca]] Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**",
+      "publik": false,
+      "tautan": [
+        "ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca",
+        "ADR - 0182 Badan Usaha Satu Daftar untuk HR dan Finance, Entitas CV Menempel Tanpa Nama Sendiri",
+        "Unlisted - Kesekretariatan (Big Pictures)",
+        "Microservices - Payroll Service",
+        "REF - Kepemilikan Data"
+      ],
+      "hash": "78c6248bbc4e83c3ead6809c30edaa0cb4c9679f9bb2e4468dc6032528d2b9b3",
+      "ukuran_kb": 10.2,
+      "ringkasan": "Menjawab: bagaimana pemindahan pintu kelola badan usaha ke Sekretariat dipecah jadi issue induk plus sub-issue [BE] bip-erp dan [FE] erp-frontend, apa kriteria \"Yang harus benar\" tiap issue, dan langkah manusia apa yang perlu sesudah deploy. Juga menjawab prasyarat (ADR 0183 Diterima), urutan deploy, dan data produksi pendukungnya.",
+      "kata_kunci": [
+        "analisa kebutuhan",
+        "badan usaha",
+        "Sekretariat",
+        "secretary.badanusaha.kelola",
+        "sub-issue",
+        "Siap Agent",
+        "Corporate Secretary",
+        "payroll_company",
+        "blueprint"
       ]
     },
     {

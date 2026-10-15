@@ -24,7 +24,7 @@ Blueprint hasil `/analisa-kebutuhan` 2026-10-15 atas permintaan "master badan us
 
 ## Issue 1: Induk, `bip-erp`: Badan usaha dikelola Sekretariat, HR dan Finance membaca
 
-- **Repo**: `bip-erp` · **Urutan**: induk, tanpa PR sendiri · **Issue**: (diisi saat dibuat)
+- **Repo**: `bip-erp` · **Urutan**: induk, tanpa PR sendiri · **Issue**: [bip-erp#3184](https://github.com/bip-itteam-internal/bip-erp/issues/3184)
 
 **Pemutus:** @wirkancil
 **PIC:** @
@@ -63,7 +63,7 @@ ADR 0183 Diterima. ADR 0182 (bip-erp#3178, erp-frontend#2493) sudah merged.
 
 ## Issue 2: [BE] `bip-erp`: Izin Sekretariat untuk tulis daftar Badan Usaha
 
-- **Repo**: `bip-erp` · **Urutan**: 1 · **Issue**: (diisi saat dibuat)
+- **Repo**: `bip-erp` · **Urutan**: 1 · **Issue**: [bip-erp#3185](https://github.com/bip-itteam-internal/bip-erp/issues/3185)
 
 **Pemutus:** @wirkancil
 **PIC:** @
@@ -107,7 +107,7 @@ ADR 0183 Diterima. Deploy: bip-erp (payroll-service + service pembaca katalog) S
 
 ## Issue 3: [FE] `erp-frontend`: Layar Badan Usaha di menu Sekretariat, Pengaturan Gaji baca saja
 
-- **Repo**: `erp-frontend` · **Urutan**: 2, deploy sesudah [BE] · **Issue**: (diisi saat dibuat)
+- **Repo**: `erp-frontend` · **Urutan**: 2, deploy sesudah [BE] · **Issue**: [erp-frontend#2498](https://github.com/bip-itteam-internal/erp-frontend/issues/2498)
 
 **Pemutus:** @wirkancil
 **PIC:** @
