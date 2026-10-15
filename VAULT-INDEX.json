@@ -9978,7 +9978,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": null,
-      "status_teks": "🟢 Diterima, 2026-10-15, oleh Azzerith. Keputusan diambil dalam sesi lewat pilihan ganda atas permintaan Cost Control 2026-10-15 (chat). Kode belum ada.",
+      "status_teks": "🟢 Diterima, 2026-10-15, oleh Azzerith. Keputusan diambil dalam sesi lewat pilihan ganda atas permintaan Cost Control 2026-10-15 (chat). **Direvisi 2026-10-15 (siang)** atas jawaban Finance: butir 5–6 diubah, butir 8 ditambah. Kode: bip-erp#3162, #3166, erp-frontend#2484, #2485 (PR terbuka), dengan revisi menyusul.",
       "publik": true,
       "tautan": [
         "ADR - 0178 Serapan Anggaran per Departemen Jurnal, Seluruh Perusahaan Dihapus, Pagu Gabungan per Departemen",
@@ -9986,20 +9986,20 @@
         "HRIS - Otomasi Skor KPI",
         "API - Integration Service"
       ],
-      "hash": "6eb222bb13b1f6b45d190a5e41bd084ce4c86ada3fae99ac75c86ab54f2dd334",
-      "ukuran_kb": 9.2,
-      "ringkasan": "Menjawab: akun mana yang dianggarkan untuk seluruh perusahaan (bukan per divisi) dan siapa yang mengatur daftarnya, bagaimana realisasinya ditampilkan sebagai total perusahaan, kenapa laporan Non Ops tinggal dua akun dan Beban Bank pindah ke OPEX, bagaimana baseline Non Ops bisa diisi Finance, dan bagaimana tanda persentase penurunan di layar vs KPI.",
+      "hash": "6d5ff6385b70ae4595f8f62a6a94486b73cada22af6721b52912858501c8b799",
+      "ukuran_kb": 11.7,
+      "ringkasan": "Menjawab: akun mana yang dianggarkan untuk seluruh perusahaan dan siapa yang mengatur daftarnya, kenapa laporan Non Ops tinggal dua akun dan Beban Bank pindah ke OPEX, bagaimana baseline Non Ops diisi Finance (kosong sampai diisi, tanpa angka otomatis), kenapa KPI Cost Control #2 memakai metrik bertanda (Realisasi - Baseline)/Baseline, dan rekomendasi untuk anggaran gabungan.",
       "kata_kunci": [
         "seluruh perusahaan",
         "company-wide budget",
         "akun penyusutan",
         "non ops",
-        "admin non-ops",
         "baseline",
         "beban bank",
-        "penurunan YoY",
         "KPI cost control",
-        "anggaran"
+        "perubahan_yoy_persen",
+        "rekomendasi pagu",
+        "anggaran gabungan"
       ]
     },
     {
