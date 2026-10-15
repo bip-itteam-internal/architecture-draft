@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-10-15",
+  "digenerate": "2026-10-16",
   "jumlah_dokumen": 530,
   "dokumen": [
     {
@@ -1599,23 +1599,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "274d1fb77681a8beb054aca87ae08d4c6d2f7813719a93199cf47f4e71a6cf80",
+      "hash": "72a7c99cb6a1a09d5ecdf4d5f91f33d2ed93ad9dd28021ef0c5731036e82dbaf",
       "ukuran_kb": 579.3,
-      "ringkasan": "Menjawab: apa itu portal web One Bharata (erp-frontend), stack-nya, bagaimana login, SSO Identity Provider, dan role gating per module system_roles bekerja, serta bagaimana sidebar dan menu dikelompokkan. Juga mencakup dukungan multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), konvensi data-fetching TanStack Query, konvensi bagan Recharts, dan daftar modul yang sudah diimplementasikan.",
+      "ringkasan": "Menjawab: apa saja modul dan stack portal web ERP/HRIS \"One Bharata\" (erp-frontend), bagaimana login, refresh token, SSO Identity Provider, dan gating menu berdasarkan system_roles serta izin posisi bekerja, dan bagaimana multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan) ditangani. Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts/ChartContainer, pengelompokan sidebar dan Pengaturan HRGA, serta daftar fitur yang belum diimplementasikan.",
       "kata_kunci": [
-        "web ERP",
         "erp-frontend",
+        "Web ERP",
         "One Bharata",
-        "hris-dashboard",
         "Next.js",
         "SSO",
         "system_roles",
         "sidebar",
-        "multi-perusahaan",
-        "CompanySwitcher",
+        "multi-tenant",
         "TanStack Query",
-        "Recharts",
-        "role gating"
+        "Recharts"
       ]
     },
     {
@@ -11995,23 +11992,20 @@
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "d530a23db5d72e53a8bd6afcbaa3d720e36132c507d13aa43dd0ae9e2038eaf6",
-      "ukuran_kb": 59.2,
-      "ringkasan": "Menjawab: bagaimana struktur organisasi dimodelkan (departemen, posisi, jenjang jabatan, hierarki atasan), bagaimana penyetuju pengajuan per departemen dan cakupan supervisi antar-departemen (label HRGA) ditentukan, serta urutan pencarian atasan. Juga status org chart dan hasil verifikasi produksi.",
+      "hash": "d0b2a443a89be17b5b5d19c3812965881bd08f179a45754226a236d11753a8c2",
+      "ukuran_kb": 59.1,
+      "ringkasan": "Menjawab: bagaimana departemen, jabatan (position_items), dan jenjang jabatan dikelola sebagai master data, siapa penyetuju pengajuan per departemen (is_supervisor), dan bagaimana rantai pencarian atasan serta cakupan supervisi antar-departemen (supervised_by, label HRGA) bekerja. Juga menjelaskan bagan organisasi (org chart), kenapa jenjang bukan sumbu hak akses, dan bukti verifikasi produksinya.",
       "kata_kunci": [
         "struktur organisasi",
         "organization structure",
-        "departemen",
-        "posisi",
+        "org chart",
+        "bagan organisasi",
+        "master_department",
         "jenjang jabatan",
         "job level",
-        "atasan",
         "supervisor",
         "supervised_by",
-        "HRGA",
-        "org chart",
-        "approver",
-        "position_items"
+        "HRGA"
       ]
     },
     {
@@ -13586,20 +13580,19 @@
         "Microservices - Form Builder Service",
         "ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia"
       ],
-      "hash": "c462db7fb2810227474683aa98983d828a11303f7f66e8cfe91c62f290a35815",
-      "ukuran_kb": 45.9,
-      "ringkasan": "Menjawab: issue backlog mana saja yang disentuh agent otonom pada Oktober 2026, apa hasilnya (PR terbuka, Butuh Info, atau dilewati), dan kenapa. Memuat tabel per issue dengan estimasi, ketepatan, sebab terlambat, dan pelajaran, sehingga berguna untuk melihat pola mengapa issue berhenti di Butuh Info.",
+      "hash": "cf1f36d04be43bd98af31505f89b49583e6a90b4a44c2a08446e5d49dcdb2dad",
+      "ukuran_kb": 47.6,
+      "ringkasan": "Menjawab: issue backlog mana saja yang disentuh agent otonom pada Oktober 2026, apa hasilnya (PR, Butuh Info, dilewati), dan kenapa sebagian besar tertahan karena keputusan belum diambil. Berguna untuk melacak status issue tertentu, alasan Butuh Info, estimasi vs realisasi, dan pelajaran operasional runner backlog.",
       "kata_kunci": [
         "agent backlog otonom",
-        "runner",
+        "runner backlog",
         "Butuh Info",
+        "log agent",
         "GitHub Project",
-        "log operasional",
-        "Oktober 2026",
-        "estimasi selesai",
         "issue",
+        "estimasi",
         "pelajaran",
-        "In Review"
+        "autonomous agent"
       ]
     },
     {
@@ -14407,21 +14400,20 @@
         "HRIS - Otomasi Skor KPI",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "2941facfde425f614832f41eb91d93d1177162f9ec3ecf8dadf558db0a15d942",
+      "hash": "a5d38e3f84bb04a13788897f581020052b99630085dc6f07f3607f7586d148f2",
       "ukuran_kb": 13.4,
-      "ringkasan": "Menjawab: posisi mana saja yang punya dashboard, berapa metrik KPI yang benar-benar otomatis, dan penghambat lintas divisi apa yang paling besar daya ungkitnya. Juga memuat daftar metrik salah petak, posisi yang tidak direkomendasikan dibuatkan dashboard, dan tautan ke dok rancangan per divisi.",
+      "ringkasan": "Menjawab: posisi mana saja di tiap divisi yang sudah atau belum punya dashboard, berapa metrik KPI yang benar-benar otomatis, dan penghambat lintas divisi mana yang paling besar daya ungkitnya. Juga mendaftar metrik salah petak (sumber data keliru), posisi yang tidak direkomendasikan dibuatkan dashboard, dan posisi yang paling siap dibangun.",
       "kata_kunci": [
         "dashboard per posisi",
-        "KPI",
+        "position dashboard",
+        "cakupan KPI",
         "metrik otomatis",
-        "indeks cakupan",
         "penghambat",
         "salah petak",
         "Kaizen",
-        "divisi",
-        "template KPI",
+        "matriks KPI",
         "Batch Record",
-        "posisi"
+        "ADR 0076"
       ]
     },
     {
