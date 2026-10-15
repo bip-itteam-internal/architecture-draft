@@ -8035,8 +8035,8 @@
       "judul": "ADR - 0123 Preventive Maintenance Berjadwal per Aset di Inventory Service, Skor dari Penyelesaian Berbukti",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan** (2026-09-24) — kode belum ada. Mengikuti **cetakan arsitektur** [[ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval]] (entitas sendiri per subjek, bukan form-builder; approve sebagai **konfirmasi** dan skor **dihitung sistem**, bukan diketik), tetapi **sengaja berbeda pada model skornya** — lihat Decision §5. Tidak menyentuh [[ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor]], [[ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI]], maupun [[ADR - 0112 Ronda Security di Attendance Service, GPS Membuktikan Lokasi Bukan Titik]].",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-16, oleh irfanarfianto (IT lead). Supervisor GA belum mengonfirmasi; keputusan saat diterima ada di §9. Diusulkan 2026-09-24, kode belum ada. Mengikuti **cetakan arsitektur** [[ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval]] (entitas sendiri per subjek, bukan form-builder; approve sebagai **konfirmasi** dan skor **dihitung sistem**, bukan diketik), tetapi **sengaja berbeda pada model skornya** — lihat Decision §5. Tidak menyentuh [[ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor]], [[ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI]], maupun [[ADR - 0112 Ronda Security di Attendance Service, GPS Membuktikan Lokasi Bukan Titik]].",
       "publik": true,
       "tautan": [
         "ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval",
@@ -8047,6 +8047,7 @@
         "GA - Building Maintenance",
         "GA - Checklist Management",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional",
         "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
         "GA - Machine & Utility Maintenance",
         "GA - Dashboard per Posisi",
@@ -8055,20 +8056,20 @@
         "Microservices - Task Management Service",
         "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan"
       ],
-      "hash": "8d997ac380e4464d5fa355b7f48077a48702f9996923d81929c83b958b15cb0f",
-      "ukuran_kb": 18.0,
-      "ringkasan": "Menjawab: di mana perawatan berkala (preventive maintenance) gedung dan alat disimpan dan kenapa di inventory-service alih-alih form-builder, employee-service, atau ceklis KPI. Menjelaskan bagaimana nilai KPI-nya dihitung dari dua koleksi baru (`pm_jadwal` sebagai penyebut jatuh tempo, `pm_realisasi` sebagai pembilang berbukti foto), kenapa atasan hanya menolak bukti dan tidak memberi angka, dan kenapa skornya berbasis penyelesaian sehingga tanpa bukti bernilai nol bukan seratus. Juga menjawab apa yang sengaja tidak diputuskan: bobot, target, arah metrik, catatan perbaikan kerusakan, dan patroli Security.",
+      "hash": "a7439eb6f54d8fbbd5d75afd1ccb19c04388862591fc1ed8f4eaffcb6b36382c",
+      "ukuran_kb": 19.6,
+      "ringkasan": "Menjawab: bagaimana metrik KPI preventive maintenance gedung dan alat GA dihitung dari jadwal per aset (penyebut) dan realisasi berfoto yang diverifikasi SPV (pembilang), kenapa tanpa bukti bernilai nol dan jadwal kosong bernilai absen, dan kenapa tinggal di inventory-service bukan form-builder. Juga mencatat keputusan saat diterima: daftar perawatan tetap per aset, verifikasi disetor ke Portal Persetujuan, dan pemecahan lima PR.",
       "kata_kunci": [
         "preventive maintenance",
         "perawatan berkala",
-        "PM",
         "pm_jadwal",
         "pm_realisasi",
         "inventory-service",
-        "building maintenance",
         "KPI GA",
-        "foto bukti",
-        "ADR 0123"
+        "building maintenance",
+        "verifikasi SPV GA",
+        "pemeliharaan_preventif",
+        "Portal Persetujuan"
       ]
     },
     {
