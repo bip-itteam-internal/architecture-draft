@@ -5,7 +5,9 @@
 ## Untuk Manajemen
 
 **Apa yang berubah.**
-- **Badan usaha (PT Bharata, seluruh CV, seluruh PT lain) ditambah dan diubah oleh Kesekretariatan**, di menu baru Sekretariat › Badan Usaha. Isinya sama dengan yang hari ini diisi HR: nama resmi, NPWP, kota, bank, rekening, dan badan usaha default.
+- **Badan usaha (PT Bharata, seluruh CV, seluruh PT lain) ditambah dan diubah oleh Kesekretariatan**, di menu baru Sekretariat › Badan Usaha. Isinya yang hari ini diisi HR (nama resmi, NPWP, kota, bank dan rekening pengirim gaji, badan usaha default), ditambah data legal yang dipegang Corporate Secretary: alamat lengkap sesuai NPWP, NIB, nomor dan tanggal akta pendirian, nomor dan tanggal akta perubahan terakhir, nomor SK Kemenkumham, dan status beroperasi.
+- **Kop surat diunggah Kesekretariatan** di layar yang sama, karena yang mendesain kop adalah orang Sekretariat. Kop tetap dipakai BKK dan pengajuan barang seperti hari ini; Finance tidak lagi mengubahnya.
+- **Badan usaha yang ditandai tidak beroperasi tidak bisa lagi dipilih sebagai penggaji** dan tidak bisa jadi default. Karyawan yang sudah tercatat di sana tidak dipindah otomatis.
 - **HR tidak lagi menambah atau mengubah badan usaha.** HR tetap melihat daftarnya dan tetap memilih badan usaha penggaji per karyawan di struktur gaji.
 - **Finance tidak berubah.** Badan usaha baru dari Sekretariat muncul di Entitas CV sebagai "Badan usaha tanpa entitas", lalu Finance menekan Daftarkan untuk memberinya kode, singkatan BKK, rekening, pemegang, penandatangan, dan kop.
 - **Data tetap satu daftar**, yang sama dengan yang dibaca slip gaji, payroll, dan Finance hari ini. Tidak ada pemindahan data.
@@ -13,11 +15,12 @@
 **Siapa yang terdampak.** Corporate Secretary (pintu baru), HR (kehilangan hak tambah/ubah, tetap bisa melihat), Finance pengelola Entitas CV (tidak berubah).
 
 **Apa yang TIDAK dijanjikan.**
-- Tidak ada isian legal baru (akta, NIB, alamat lengkap, logo). Kop surat tetap diunggah Finance di Entitas CV.
+- Data legal baru (alamat, NIB, akta, SK) disimpan dan ditampilkan, **belum dicetak** di dokumen mana pun. Penandatangan tetap diatur Finance di Entitas CV.
+- Rekening pengirim gaji tetap catatan rujukan: daftar bayar payroll belum membacanya.
 - Tidak ada alur verifikasi atau persetujuan: yang disimpan Sekretariat langsung berlaku.
 - Slip gaji yang sudah terbit tidak berubah.
 
-**Perkiraan besaran kerja.** Dua PR berurutan: backend (izin baru dan gerbang tulis) lalu layar. Sesudah deploy, satu langkah manusia: memasang paket izin ke Corporate Secretary dan merapikan empat data yang sudah diketahui salah.
+**Perkiraan besaran kerja.** Bagian 1: dua PR berurutan, backend (izin baru, isian baru, gerbang tulis) lalu layar. Bagian 2 (kop): dua PR berurutan, backend Finance lalu layar. Sesudah deploy, satu langkah manusia: memasang paket izin ke Corporate Secretary dan merapikan empat data yang sudah diketahui salah.
 
 ## Deskripsi
 
@@ -50,8 +53,12 @@ Diukur 2026-10-15 ke bip-erp dan erp-frontend `origin/main` serta data PROD (bac
 2. **Gerbang tulis payroll-service berganti.** POST `/companies`, PUT dan DELETE `/companies/:id`, serta POST `/companies/impor` hanya untuk `secretary.badanusaha.kelola`. `payroll.manage` dan admin HR **tidak lagi** cukup. Gerbang baca `/companies` tetap (`payroll.view`) dan ditambah pemegang izin baru, supaya layar Sekretariat bisa memuat daftarnya.
 3. **Data tidak pindah.** `payroll_company` tetap di payroll-service, termasuk `GET /internal/badan-usaha` yang dibaca Finance. Aturan yang sudah ada tetap: satu default, default tak bisa dihapus.
 4. **Layar pindah ke menu Sekretariat**, rute `/secretary/badan-usaha` (bukan `/legal/*`, lihat Context 4), digerbang izin di halaman. Tab Badan Usaha di Pengaturan Gaji menjadi **baca saja** dengan keterangan bahwa perubahan dilakukan Kesekretariatan. Menu baru membawa panduannya.
-5. **Finance tidak berubah.** Daftarkan dan Sambungkan di Entitas CV tetap seperti ADR 0182; nama entitas tetap mengikuti daftar ini.
-6. **Perapian data pindah ke Kesekretariatan** (menggantikan ADR 0182 butir 6 yang menugaskannya ke HR): ejaan PT05, nama lengkap PT Bharata, NPWP PT Bharata, dan NPWP ganda Citrana/Citravana, dilakukan lewat layar baru sesudah deploy.
+5. **Finance tidak berubah, kecuali kop (butir 9).** Daftarkan dan Sambungkan di Entitas CV tetap seperti ADR 0182; nama entitas tetap mengikuti daftar ini.
+6. **Isian legal baru di `Company`** (keputusan user 2026-10-15), semuanya opsional, disimpan dan ditampilkan tanpa dicetak: alamat lengkap sesuai NPWP, NIB, nomor dan tanggal akta pendirian, nomor dan tanggal akta perubahan terakhir, nomor SK Kemenkumham. Tanggal disimpan `yyyy-MM-dd`.
+7. **Status beroperasi** disimpan sebagai penanda *tidak beroperasi* yang bawaannya kosong (= beroperasi), supaya 62 baris lama tetap beroperasi tanpa migrasi. Yang tidak beroperasi: ditolak dijadikan default, tidak muncul di pilihan badan usaha penggaji (struktur gaji, rencana badan usaha, buat karyawan) kecuali sebagai nilai yang sudah tersimpan, dan penetapan baru ke badan usaha itu ditolak backend. Karyawan yang sudah tercatat tidak dipindah.
+8. **Nama bank dan nomor rekening tetap**: rekening pengirim gaji untuk karyawan yang digaji atas nama badan usaha itu (keputusan user 2026-10-15). Tidak dipindah ke Finance; hari ini ia catatan rujukan, belum dibaca daftar bayar.
+9. **Kop surat: pintunya pindah ke Kesekretariatan, simpanannya tetap di Finance** (keputusan user 2026-10-15). kop_url tetap di kuntansi_cv_entitas, sehingga /internal/cv/kop, kuntansi_cv_pt_bharata.go, kuntansi_cv_pt_pemilik_rekening.go, dan procurement (cv_kop_sumber.go, BKK, detail pengajuan) tidak berubah. Yang berubah hanya penulisnya: unggah dan hapus kop lewat rute finance yang dikunci secretary.badanusaha.kelola dan dialamatkan dengan **id badan usaha** (payroll_company_id), bukan kode entitas, karena layar Sekretariat bekerja per badan usaha. PATCH /akuntansi-cv/entitas/:kode menolak kop_url dari pemegang kuntansicv.kelola. Badan usaha yang belum tersambung ke entitas (hari ini 22 PT) belum bisa diberi kop sampai Finance menyambungkannya; layar menyebutkan itu, bukan menyembunyikannya. Simpanan kop tidak dipindah ke payroll karena kuncinya kode entitas dan seluruh jalur cetak BKK membacanya dari sana; memindahnya menyentuh jalur pembayaran yang sedang dipakai demi letak, bukan demi perilaku.
+10. **Perapian data pindah ke Kesekretariatan** (menggantikan ADR 0182 butir 6 yang menugaskannya ke HR): ejaan PT05, nama lengkap PT Bharata, NPWP PT Bharata, dan NPWP ganda Citrana/Citravana, dilakukan lewat layar baru sesudah deploy.
 
 ## Consequences
 
@@ -64,8 +71,8 @@ Diukur 2026-10-15 ke bip-erp dan erp-frontend `origin/main` serta data PROD (bac
 
 ## Belum Diputuskan (TBD)
 
-- **Isian legal tambahan** (akta, NIB, alamat lengkap). Ditambah bila ada dokumen yang mencetaknya; kop tetap di Entitas CV Finance.
-- **Field bank di daftar ini**: identitas badan usaha atau rekening pembayar gaji (milik Finance/Accurate). Sampai diputuskan, tetap diisi di layar ini.
+- **Dokumen yang mencetak data legal** (alamat, NIB, akta): diputuskan saat dokumennya dibangun.
+- **Rekening pengirim di daftar bayar Finance**: menampilkan rekening pengirim per badan usaha di panel Daftar bayar, fitur terpisah.
 
 ## Dokumen Terkait
 
