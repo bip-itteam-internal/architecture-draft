@@ -1,6 +1,6 @@
 # ADR - 0178 Serapan Anggaran per Departemen Jurnal, Seluruh Perusahaan Dihapus, Pagu Gabungan per Departemen
 
-> **Status**: 🟢 Diterima, 2026-10-15, oleh Azzerith. Diusulkan 2026-10-15 lewat `/analisa-kebutuhan` (aturan persetujuan di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Kode belum ada. Pertanyaan terbuka Finance di §Consequences masih menahan pagu gabungan (T4–T5), tidak menahan T1–T3.
+> **Status**: 🟢 Diterima, 2026-10-15, oleh Azzerith. Diusulkan 2026-10-15 lewat `/analisa-kebutuhan` (aturan persetujuan di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Kode belum ada. Pertanyaan terbuka Finance di §Consequences masih menahan pagu gabungan (T4–T5), tidak menahan T1–T3. **Butir 1–2 direvisi sebagian oleh [[ADR - 0180 Akun Anggaran Seluruh Perusahaan Diatur Finance, Non Ops Dua Akun dengan Baseline Isian]]** (2026-10-15): departemen kosong kembali sah khusus untuk akun di daftar akun seluruh perusahaan yang diatur Finance.
 
 ## Untuk Manajemen
 
