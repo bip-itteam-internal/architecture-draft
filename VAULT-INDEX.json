@@ -9957,8 +9957,18 @@
       ],
       "hash": "08886f38194a3ea49f7f73a65a0be0348efdef90a15f0cafaac99fa75a87768e",
       "ukuran_kb": 6.8,
-      "ringkasan": null,
-      "kata_kunci": []
+      "ringkasan": "Menjawab: bagaimana anggota tim IT bisa membuka web ERP sebagai karyawan tertentu (lihat sebagai) untuk memeriksa menu dan halaman per jabatan, apa batasnya (baca-saja, tulis ditolak gateway, slip pribadi tertutup, sesi 30 menit wajib beralasan), dan bagaimana sesinya dijejak serta diberitahukan ke orang yang ditiru. Juga mencatat yang tidak dijanjikan (bertindak atas nama orang lain, layar jejak, MyBharata).",
+      "kata_kunci": [
+        "lihat sebagai",
+        "impersonate",
+        "view as",
+        "tim IT",
+        "baca-saja",
+        "jejak audit",
+        "token gateway",
+        "ADR 0149",
+        "uji menu per jabatan"
+      ]
     },
     {
       "path": "DEVELOPER GUIDE.md",
@@ -22763,7 +22773,5 @@
       ]
     }
   ],
-  "gagal": [
-    "Decisions/ADR - 0179 IT Lihat Sebagai Karyawan, Baca-Saja dan Berjejak.md"
-  ]
+  "gagal": []
 }
