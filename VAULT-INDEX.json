@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-15",
-  "jumlah_dokumen": 643,
+  "jumlah_dokumen": 645,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -7637,6 +7637,7 @@
       "status_teks": "**Diterima, irisan 1 terimplementasi dan BELUM merge** — erp-frontend [#1665](https://github.com/bip-itteam-internal/erp-frontend/pull/1665), 2026-09-21. Irisan 1 tidak menyentuh backend sama sekali. Irisan 2 (agregator `GET /pengajuan/antrean` dan enam kategori sisanya) belum dikerjakan. **Empat butir Decision di bawah ditandai menyimpang saat implementasi**; penyimpangannya diberi tanda di tempatnya masing-masing, bukan dengan menulis ulang keputusannya.",
       "publik": true,
       "tautan": [
+        "ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional",
         "REF - Alur Persetujuan",
         "HRIS - Employee Request & Approval",
         "REF - Rantai Pengajuan Lintas Modul",
@@ -7649,20 +7650,21 @@
         "APP - MyBharata",
         "Microservices - Employee Service"
       ],
-      "hash": "084332753e0e1994501b34ad199173ff5dbdd57041593c16c5b808739f1ce825",
-      "ukuran_kb": 20.0,
-      "ringkasan": "Menjawab: kenapa penyetuju di web mendapat satu tabel seragam berisi seluruh antrean keputusan miliknya, siapa yang menyediakan datanya (agregator GET /pengajuan/antrean di employee-service, bukan attendance), dan kenapa gerbang tiap baris tetap milik service asalnya lewat penerusan identitas pemanggil. Menjawab juga apa arti 'riwayat' di endpoint itu, yaitu keputusan pemanggil sendiri dan bukan 'sudah diputus siapa pun', beserta penanda per baris yang dituntutnya, serta kenapa riwayat pengajuan milik sendiri sengaja TIDAK masuk ke sana dan layar webnya dicabut lagi. Memuat penyimpangan irisan 1 yang ditandai di tempatnya masing-masing: kolom Nilai tak dibangun, hitungan judul satu angka bukan dua, baris Booking mengantar ke halaman lain, dan menu tampil tanpa gerbang.",
+      "hash": "a483a9580f59a20f4865f558d5866bdcd3cbb7ce1e6fbb63916df2c99bf108bd",
+      "ukuran_kb": 20.4,
+      "ringkasan": "Menjawab: mengapa dan bagaimana web ERP mendapat satu halaman /portal/persetujuan berisi satu tabel seragam untuk semua antrean keputusan penyetuju, dari absensi sampai pesanan pembelian. Menjelaskan agregator GET /pengajuan/antrean di employee-service yang memungut 11 endpoint di 7 service, kosakata status yang berbeda per modul, pembagian irisan 1 dan 2, serta perbedaan melihat versus memutus dan 'bukan urusan saya' versus sumber gagal (degraded).",
       "kata_kunci": [
         "antrean persetujuan",
         "approval queue",
-        "pengajuan antrean",
-        "agregator",
-        "employee service",
-        "penyetuju",
-        "reviewer",
-        "riwayat keputusan",
-        "riwayat pengajuan saya",
         "portal persetujuan",
+        "agregator",
+        "aggregator",
+        "employee-service",
+        "pengajuan antrean",
+        "degraded",
+        "penyetuju",
+        "approver",
+        "MainTable",
         "ADR 0114"
       ]
     },
@@ -8958,6 +8960,7 @@
       "status_teks": "🟢 **Diterima**, 2026-10-10, oleh irfanarfianto (diusulkan 2026-10-02). HRGA sudah berjalan (bip-erp#2488); Marketing sedang dikerjakan (bip-erp#2924); departemen lain dan penyatuan akhir belum.",
       "publik": true,
       "tautan": [
+        "ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional",
         "ADR - 0105 Beranda Portal Menumpuk Zona Personal di Atas Ruang Kerja Posisi",
         "ADR - 0051 Pencabutan Tampilan Menu per Posisi",
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
@@ -8972,20 +8975,24 @@
         "REF - Layout Dashboard erp-frontend",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
       ],
-      "hash": "85232b449bf3270361a1e1fab9b7fed30671342c83aa8e80b045e2b6d6cbc485",
-      "ukuran_kb": 21.3,
-      "ringkasan": "Menjawab: kenapa sidebar web ERP diubah jadi satu daftar urusan tanpa kategori departemen dan tanpa Portal Saya, bagaimana menu digerbang izin posisi per menu, dan bagaimana Beranda menjadi ruang kerja posisi. Juga menjawab departemen mana yang sudah dirancang, perbaikan data hak akses yang menyertainya, dan apa yang belum diputuskan.",
+      "hash": "b6e8b29f2530d1663b63ad74b8ddda3b845584e95e9d8bbbda95bd49df170e94",
+      "ukuran_kb": 21.5,
+      "ringkasan": "Menjawab: mengapa sidebar web ERP diubah dari kategori per departemen dan 'Portal Saya' menjadi satu daftar urusan yang sama untuk semua, siapa yang melihat menu apa, dan bagaimana data serta aksi disaring menurut cakupan posisi di server. Juga menjelaskan Beranda sebagai ruang kerja posisi, perbaikan data hak akses yang dijalankan manusia, rancangan per departemen, dan hal yang sengaja tidak dijanjikan.",
       "kata_kunci": [
-        "ADR 0149",
         "sidebar",
         "menu",
-        "Portal Saya",
-        "Beranda",
-        "dashboard posisi",
-        "izin per menu",
         "navigasi",
+        "navigation",
+        "izin posisi",
+        "permission",
+        "RBAC",
+        "system_roles",
+        "beranda",
+        "dashboard",
         "ruang kerja posisi",
-        "sidebar-menus.tsx"
+        "kategori departemen",
+        "Portal Saya",
+        "ADR 0149"
       ]
     },
     {
@@ -10000,6 +10007,43 @@
         "perubahan_yoy_persen",
         "rekomendasi pagu",
         "anggaran gabungan"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional.md",
+      "judul": "ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": null,
+      "status_teks": "🟢 Diterima, 2026-10-15, oleh irfanarfianto. Pemutus: irfanarfianto. Kode belum ada. Nama menu dan judul tetap \"Persetujuan\" (keputusan user 2026-10-15). Butir 13 (aturan untuk fitur baru) ditambahkan saat diterima. ADR ini **mengubah sebagian** [[ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service]] (butir 1, 4, 5, 10, dan arti \"antrean\" di seluruh dokumennya) dan [[ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi]] (§4 butir \"Persetujuan hanya berisi hal yang menunggu keputusan pembaca\").",
+      "publik": true,
+      "tautan": [
+        "ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service",
+        "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
+        "ANALISA - Portal Persetujuan Memuat Tindakan Operasional",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "ANALISA - Antrean Persetujuan Terpusat di Web",
+        "REF - Alur Persetujuan",
+        "APP - Web ERP",
+        "Microservices - Employee Service"
+      ],
+      "hash": "0cfdee6fec51b5f5aaff3cc2f1df212ead8dcfa38dea5466c8cbe3871af2a1c3",
+      "ukuran_kb": 20.4,
+      "ringkasan": "Menjawab: mengapa halaman Persetujuan diperluas dari keputusan saja menjadi semua yang menunggu tangan pembaca (cek stok, isi harga, transfer, catat accounting, triase tiket), berdasarkan pengukuran prod bahwa sekitar 99% antrean adalah tindakan operasional. Menjelaskan kode aksi dari agregator, Sheet detail, riwayat 30 hari, bagian ADR 0114 dan 0149 yang diubah, alternatif yang ditolak, dan besaran kerja.",
+      "kata_kunci": [
+        "portal persetujuan",
+        "tindakan operasional",
+        "operational action",
+        "antrean",
+        "queue",
+        "pengajuan barang",
+        "cek stok GA",
+        "aksi",
+        "agregator",
+        "tiket",
+        "Sheet detail",
+        "riwayat",
+        "ADR 0181"
       ]
     },
     {
@@ -20299,26 +20343,30 @@
       "publik": false,
       "tautan": [
         "ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service",
+        "ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional",
         "ADR - 0106 Tema dan Teaser Live Support Disetor dan Diputus Penyetuju Departemen sebagai Dasar KPI",
         "REF - Alur Persetujuan",
         "HRIS - Employee Request & Approval",
         "APP - Web ERP",
         "Microservices - Employee Service"
       ],
-      "hash": "2777e2c478f855fdda47125cd3477c4a889e25d6108b98d96592b9fcf7db432d",
-      "ukuran_kb": 13.9,
-      "ringkasan": "Menjawab: task apa saja yang menyusun antrean persetujuan terpusat /portal/persetujuan, apa urutan ketergantungannya, dan kenapa sebuah menu persetujuan per-modul belum boleh dicabut. Memuat keputusan produk bahwa sumber 'daftar modul' (Payroll, Rekrutmen, Pesanan ERP) hanya tampil bagi pemegang modulnya, serta hasil ukur bahwa payroll-runs dan requisition sudah digerbang di lapisan rute sehingga adapternya tak menunggu pekerjaan gerbang. Menjelaskan pula kenapa mencabut menu tidak sama dengan mencabut rute, dan mana dua entri menu Portal yang benar-benar ada.",
+      "hash": "495bf6e0f811fb41d7100061f1ebcee835f855b97dd52080e8a3fc902930eef0",
+      "ukuran_kb": 14.1,
+      "ringkasan": "Menjawab: apa saja task T1-T9 untuk mewujudkan ADR 0114, mana yang masuk irisan 1 (tabel di web tanpa ubah backend) dan irisan 2 (endpoint agregator GET /pengajuan/antrean serta adapter per sumber), dan apa prasyaratnya. Memuat keputusan produk tentang sumbu menunggu vs riwayat, pantauan modul hanya bagi pemegang modul, serta koreksi klaim keliru soal gerbang payroll dan rekrutmen.",
       "kata_kunci": [
         "antrean persetujuan",
         "approval queue",
-        "portal persetujuan",
+        "task breakdown",
+        "irisan",
+        "adapter",
         "agregator",
-        "aggregator",
-        "pengajuan barang",
-        "boleh_putus",
-        "pemegang modul",
-        "mode riwayat",
-        "cabut menu"
+        "pantauan modul",
+        "riwayat",
+        "pengajuan antrean",
+        "payroll-runs",
+        "rekrutmen",
+        "ANALISA",
+        "ADR 0114"
       ]
     },
     {
@@ -21546,6 +21594,41 @@
         "slip gaji email",
         "notifikasi payroll",
         "ADR 0129"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Portal Persetujuan Memuat Tindakan Operasional.md",
+      "judul": "ANALISA - Portal Persetujuan Memuat Tindakan Operasional",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": "🟡",
+      "status_teks": "Belum dikerjakan. ADR induk 🟢 Diterima 2026-10-15 oleh irfanarfianto; irisan 0 boleh jalan lebih dulu karena berupa perbaikan bug yang tidak bergantung pada keputusan baru.",
+      "publik": false,
+      "tautan": [
+        "ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional",
+        "ANALISA - Antrean Persetujuan Terpusat di Web",
+        "ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service",
+        "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
+        "REF - Alur Persetujuan",
+        "Microservices - Employee Service"
+      ],
+      "hash": "b59ae2db62c09cd1877d421f3c66d351e24b5b821de7c4109631652685932153",
+      "ukuran_kb": 16.3,
+      "ringkasan": "Menjawab: bagaimana ADR 0181 dipecah jadi pekerjaan, yaitu irisan 0 (perbaikan bug offer Draft palsu, tahap Live Support kosong, label tahap mentah, urutan terbaru dulu), irisan 1 (kontrak baris baru dengan aksi/nomor/nilai/tautan dan tabel FE), serta panel per kategori. Memuat tujuan klik per kategori, kriteria 'yang harus benar', rincian tampilan hasil mockup, dan urutan deploy BE sebelum FE.",
+      "kata_kunci": [
+        "portal persetujuan",
+        "tindakan operasional",
+        "irisan 0",
+        "kontrak baris",
+        "aksi",
+        "pengajuan barang",
+        "offer Draft",
+        "Live Support",
+        "urutan terlama",
+        "mockup",
+        "ANALISA",
+        "ADR 0181"
       ]
     },
     {
