@@ -66,7 +66,7 @@
 ## Penyetuju pengajuan per departemen (`work_data.is_supervisor`)
 
 - ✅ **Merged 2026-08-12** (BE PR [#1184](https://github.com/bip-itteam-internal/bip-erp/pull/1184), FE PR [#999](https://github.com/bip-itteam-internal/erp-frontend/pull/999)) dan ✅ **live di PRODUKSI**, diverifikasi 2026-08-26 (§Bukti verifikasi produksi). Catatan lama "belum diverifikasi lewat gateway dan belum deploy" sudah tidak berlaku.
-- Layar: **Pengaturan → Organisasi → Penyetuju Pengajuan** (`/pengaturan/organisasi?tab=penyetuju`). Endpoint: `GET /master/departments/approvers` & `PUT /master/departments/:key/approver` ([[API - Employee Service]]).
+- Layar: **Pengaturan → Organisasi → Penyetuju Pengajuan** (`/pengaturan/organisasi?tab=penyetuju`). Sesudah erp-frontend#2125 tiap tab `/pengaturan/organisasi` dan `/pengaturan/kepegawaian` jadi sub-halaman ber-URL sendiri dengan sub-menu sidebar di bawah induk **Organisasi** dan **Aturan Kepegawaian** (layar ini jadi `/pengaturan/organisasi/penyetuju`, Peta Struktur jadi `/pengaturan/organisasi/peta-struktur`); `?tab=` lama, `/hris/holiday`, dan `/hris/system-setup` dialihkan ke sub-halaman yang setara, dengan `sections.ts` sebagai satu sumber gerbang dan URL (menunggu merge PR https://github.com/bip-itteam-internal/erp-frontend/pull/2512). Endpoint: `GET /master/departments/approvers` & `PUT /master/departments/:key/approver` ([[API - Employee Service]]).
 
 ### Kenapa ada
 
