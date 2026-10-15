@@ -36,6 +36,16 @@ terduplikasi di dua berkas persis karena tak ada yang mencari lebih dulu. Aturan
 dengan `audit-keamanan` yang menuntut menyebut berapa kandidat dibuang — pencarian yang tak
 disebutkan tidak dianggap terjadi.
 
+⛔ **Larangan atau klaim "sudah begini" di rencana WAJIB dibuktikan Grep, bukan diasumsikan.**
+Terbukti 2026-10-15: rencana A4 (erp-frontend#2500) menulis `bulan` sengaja dipertahankan
+saat pindah tab, padahal issue §"Yang harus benar" + `page.test.tsx:188` sudah menguncinya
+dibuang — kebalikan kriteria, bukan tafsir; rencana A3 (erp-frontend#2499) melarang menyentuh
+`panel-aksi-pengajuan.tsx` padahal `LABEL_AKSI: Record<Aksi,string>` di baris 13 ekshaustif
+dan pasti pecah begitu union `Aksi` ditambah. Keduanya baru ketemu di `## REVIEW RENCANA`
+sebagai temuan KRITIS karena tak di-Grep/dibaca dulu saat menulis rencana. Sebelum menulis
+kalimat "tidak boleh disentuh" atau "sudah ada perilaku X", jalankan Grep/baca berkasnya dan
+tempel hasilnya — bukan sesudahnya, saat QA yang menemukan.
+
 Yang wajib dicek di sini:
 
 - **Komponen shared frontend.** Reuse yang asli lewat adapter, jangan bikin tiruan
