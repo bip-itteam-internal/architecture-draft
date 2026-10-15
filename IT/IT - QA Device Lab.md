@@ -279,8 +279,12 @@ Editor skenario menggunakan YAML dengan format Maestro.
 - Mendukung variabel dari judul kolom, dengan sintaks `${KOLOM}`.
 - Membatasi jumlah data hingga 200 baris.
 - Menyamarkan kolom yang bernama sandi, PIN, OTP, token, atau secret pada pratinjau, pembacaan skenario, dan status run.
+- Menyensor nilai kolom rahasia tersebut di mana pun ia muncul pada teks yang ditampilkan aplikasi: pesan langkah gagal, cuplikan crash, riwayat run, serta isi `hasil.json` dan `logcat.txt` yang dibuka dari kartu hasil (PR #25).
+- Menampilkan peringatan bila Rekam video dicentang untuk skenario yang data ujinya memiliki kolom rahasia, karena rekaman dapat memperlihatkan isian yang diketik. Peringatan tidak memblokir run.
 
-Data asli tetap tersimpan di folder `data/` dan `hasil.json` lokal. Folder tersebut harus diperlakukan sebagai data sensitif dan tidak boleh dimasukkan ke log publik atau commit repository.
+Dari aplikasi dan API lokal, berkas hasil uji yang dapat dibuka hanya `hasil.json`, `logcat.txt`, `monkey.log`, dan `ukuran.csv`. Berkas run lain, termasuk `flow.yaml` dan rekaman video, tidak disajikan dan hanya tersedia di folder data. Log run skenario yang data ujinya belum dapat dipastikan, misalnya ketika run masih berjalan, tidak ditampilkan sampai data tersebut tersedia.
+
+Data asli tetap tersimpan di folder `data/`, serta `hasil.json`, `flow.yaml`, rekaman, dan log di `runs/` lokal. Folder tersebut harus diperlakukan sebagai data sensitif dan tidak boleh dimasukkan ke log publik atau commit repository. Pada mode pengembangan, folder data adalah akar repository, sehingga `data/` (kecuali contoh `contacts-tambah-kontak.csv`) dan `video.json` dikecualikan melalui `.gitignore` (PR #26).
 
 #### Rekam aksi
 
@@ -621,6 +625,8 @@ Pembacaan layar membutuhkan sekitar 3,7 detik pada A50s. Pengguna harus menunggu
 ### Installer
 
 Installer `QA Device Lab Setup 0.1.0.exe` berukuran sekitar 120 MB dan belum memiliki tanda tangan digital. Windows SmartScreen memberi peringatan saat pemasangan pertama.
+
+Installer hanya membawa skenario dan data uji contoh `contacts-tambah-kontak` (PR #26), yang disemai ke folder data saat pertama dipasang. Skenario dan data uji lain di folder pembuat build tidak ikut terkemas. Isi `contoh/` pada build sungguhan belum diverifikasi.
 
 ### Agen AI
 
