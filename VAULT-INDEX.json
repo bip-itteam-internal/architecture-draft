@@ -1611,20 +1611,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "8fa574f6a1bf0d77391cb48afc3545d4556031f4ffb624c0ec07aa4adf4933ef",
-      "ukuran_kb": 594.4,
-      "ringkasan": "Menjawab: apa itu portal web ERP One Bharata (erp-frontend), stack-nya, modul apa saja yang tersedia, dan bagaimana dukungan multi-perusahaan bekerja. Juga menjawab cara login dan penyimpanan token, gating menu berdasarkan system_roles dan paket izin, peran web sebagai SSO Identity Provider, arah baru sidebar, serta konvensi data-fetching TanStack Query dan bagan Recharts.",
+      "hash": "567ab169d5e049353ae3a65179085d3919863e048288a250a9bad48727989733",
+      "ukuran_kb": 596.8,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS One Bharata (erp-frontend), stack-nya, bagaimana login, token, SSO, dan role/izin menggerbang sidebar serta halaman, dan bagaimana fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan) bekerja. Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts/ChartContainer, daftar modul yang sudah dan belum diimplementasikan, serta arah baru sidebar satu daftar urusan.",
       "kata_kunci": [
-        "Web ERP",
         "erp-frontend",
+        "web ERP",
         "One Bharata",
-        "hris-dashboard",
         "SSO",
         "login token",
         "system_roles",
         "sidebar",
         "multi-tenant",
-        "Next.js"
+        "TanStack Query",
+        "Recharts"
       ]
     },
     {
@@ -2686,20 +2686,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "b591fe63ce631d54ad70285a40472f68761fde387a7e3ec49be45046a8532839",
-      "ukuran_kb": 471.8,
-      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace (TikTok Shop, TikTok Business/Ads, Shopee, Lazada) lewat webhook dan sync terjadwal, bagaimana order dan laporan iklan dinormalkan jadi transaction lalu di-push ke Accurate (Sales Invoice/Return), dan endpoint apa yang tersedia untuk GMV Max, ICC, ulasan marketplace, Shop ACL, fulfillment WMS, serta worker cron. Juga menjelaskan gotcha operasional seperti rate limit TikTok, bypass signature webhook Shopee, status sinkron per toko, dan rencana Meta Ads.",
+      "hash": "b08e182b42497929f71bb6062d8942ae0c273f86d6c99fbadad746641c450857",
+      "ukuran_kb": 472.7,
+      "ringkasan": "Menjawab: bagaimana ERP terhubung ke marketplace (TikTok Shop, TikTok Ads/GMV Max, Shopee, Lazada) lewat webhook dan job sync, bagaimana order dinormalkan jadi model transaction lalu di-push ke Accurate (Sales Invoice/Return), dan endpoint apa yang tersedia untuk laporan iklan, GMV Max, affiliate, ulasan, dan profit per produk. Juga menjelaskan ICC account mapping, Shop ACL, kepemilikan toko per departemen, fulfillment WMS bridge, cron worker, status sinkron per toko, serta rencana Meta Ads.",
       "kata_kunci": [
         "integration-service",
         "marketplace",
-        "webhook",
-        "Accurate",
         "TikTok Shop",
         "Shopee",
+        "Lazada",
         "GMV Max",
-        "ulasan marketplace",
-        "sync cron",
-        "transaction"
+        "Accurate",
+        "webhook",
+        "ICC",
+        "sinkronisasi order"
       ]
     },
     {
@@ -17374,20 +17374,20 @@
         "APP - Web ERP",
         "QA - Register Perizinan & Sertifikasi"
       ],
-      "hash": "c262a9a815993db7413f1c61eeb35416c5e0b6a7fa777d1896415f5f17ed1451",
+      "hash": "3578231dce1e4383767b2dc408a40b8c9d488cffe690eb1edbcea43d130ca8f5",
       "ukuran_kb": 33.9,
-      "ringkasan": "Menjawab: register apa saja yang dimiliki divisi Quality di ERP (CAPA & temuan audit, incoming inspection bahan kemas, antrean release batch, komplain QC dari marketing, pengecekan RM), endpoint dan model datanya, serta siapa yang boleh membaca dan mengubahnya. Menjelaskan alur persetujuan CAPA tiga slot (Admin Produksi, Admin Warehouse, QA), gerbang baca CAPA untuk penyetuju, alert tenggat, dan bagian yang belum dibangun seperti Dashboard Mutu dan IPC/CPPB.",
+      "ringkasan": "Menjawab: bagaimana divisi Quality mencatat temuan audit dan tindakan korektif (CAPA), memeriksa bahan datang (incoming inspection), memutuskan release/hold batch, memvalidasi komplain QC dari marketing, dan mengecek RM. Menjelaskan siapa boleh membaca/menyetujui CAPA (Admin Produksi, Admin Warehouse, admin gudang RM/FG), alur approval CAPA, endpoint /quality/*, dan RBAC-nya.",
       "kata_kunci": [
-        "Quality",
-        "QA QC",
         "CAPA",
         "temuan audit",
+        "corrective action",
         "incoming inspection",
         "batch release",
         "komplain QC",
         "pengecekan RM",
-        "approval CAPA",
-        "penyetuju CAPA"
+        "quality",
+        "QA",
+        "approval CAPA"
       ]
     },
     {
