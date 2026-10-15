@@ -301,6 +301,10 @@ Yang membuatnya bergejala: `DepartmentFilterOptions` sengaja MENGGANTI anggota g
   sedangkan superpowers praktik umum yang dirawat upstream. Menyalinnya = fork yang berhenti
   menerima perbaikan lalu menyimpang diam-diam — kelas masalah "sumber kebenaran kedua" yang
   berulang kali dicatat di berkas ini.
+- ⛔ **`gh issue view --comments` membalas KOSONG di sandbox ini walau komentar ADA** (ditemukan
+  ulang ≥5 task retro 2026-10-15: review rencana & PR A1-A4). Selalu konfirmasi lewat
+  `gh api repos/<org>/<repo>/issues/<n>/comments` sebelum menyimpulkan "0 komentar" — jangan
+  percaya `--comments` kosong begitu saja.
 - **Bikin skill custom tim** (shareable): taruh `SKILL.md` di `.agent-kit/skills/<nama>/` → `init` menyalin ke `.claude/skills/`; bump versi kit → tim `git pull` + re-init.
 - **Update file ingatan-tim ini**: edit `.agent-kit/rules/team-memory.md` di vault → tim cukup `git pull architecture-draft` (di-import langsung sejak kit v1.3.0; **tanpa** re-init).
 
