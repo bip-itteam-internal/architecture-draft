@@ -1,7 +1,7 @@
 # Checklist Antarmuka (erp-frontend · MyBharata)
 
 > Dibaca **on-demand** saat merancang, membangun, atau mereview layar. Dirujuk dari
-> `team-memory.md` § Konvensi FE / UI, `plan-checklist.md` §1, dan `review-checklist.md` §J.
+> `team-memory/fe-konvensi-ui.md`, `plan-checklist.md` §1, dan `review-checklist.md` §J.
 > **Jangan** di-import ke `CLAUDE.md`. Update cukup `git pull architecture-draft` (tak perlu
 > re-run `init`).
 
@@ -55,8 +55,7 @@ lengkap: yang menentukan adalah pencarianmu sendiri (`git grep` atas `origin/mai
 
 Bukan selera. Untuk halaman berisi angka dan bagan, komposisinya diatur
 [[REF - Layout Dashboard erp-frontend]] (satu insight dominan, jarak `gap-6`/`gap-4`, alur
-baca); untuk halaman daftar, skill `/migrasi-tabel-hris`; untuk warna bagan, `team-memory.md`
-§ Bagan/chart. Yang di bawah berlaku untuk semua layar.
+baca); untuk halaman daftar, skill `/migrasi-tabel-hris`; untuk warna bagan, `team-memory/fe-bagan-chart.md`. Yang di bawah berlaku untuk semua layar.
 
 - **Tampilan jawaban atau laporan Copilot** (blok, grafik, paragraf, PDF/Excel): baca
   [[REF - Penyajian Laporan Copilot]] dulu. Bentuknya dipilih sistem dan dirakit dari
@@ -148,7 +147,7 @@ sehingga terbaca seperti keputusan tata letak, bukan seperti header yang dikorba
 
 ⚠️ `min-h-0` ditulis bersama `flex-1` walau `overflow-y-auto` pada elemen yang sama sudah
 membuat batas minimum otomatisnya nol. Tanpa itu, memindahkan gulirnya satu tingkat ke
-dalam mengembalikan bug yang sama persis (`team-memory.md` § Jebakan tabel/filter).
+dalam mengembalikan bug yang sama persis (`team-memory/fe-tabel-filter.md`).
 
 ⚠️ `side="top"` dan `side="bottom"` memakai `h-auto`, bukan `h-full`. Kolom flex yang
 tingginya tak terikat membuat `flex-1` tak membatasi apa pun, jadi badannya tumbuh setinggi
@@ -299,7 +298,7 @@ lainnya, jadi bagian ini bukan ringkasan antislop. Sisanya hidup di skill terpas
    "Ringkasan" atau "Performa", tanpa sumbu yang bisa ditindaklanjuti. **Yang benar**: tulis
    dulu pertanyaan yang dijawabnya, lalu taruh pertanyaan itu di judulnya ("Sesi gagal per
    jam, 24 jam terakhir"). Bila satu kalimat menjawabnya lebih baik, tulis kalimatnya.
-   Bersambung ke `team-memory.md` § Bagan/chart: deret KOSONG tetap menggambar sumbu dan kisi,
+   Bersambung ke `team-memory/fe-bagan-chart.md`: deret KOSONG tetap menggambar sumbu dan kisi,
    jadi panel rapi itu terbaca "datanya nol" padahal artinya "belum ada yang dinilai".
 5. **Kolom tabel datang dari komponennya, bukan dari keputusannya.** Nama, Status, Tanggal,
    Aksi, apa pun isi barisnya, plus menu tiga titik di tiap baris. Pemakainya memindai kolom
@@ -433,8 +432,7 @@ di-generate ulang oleh `init` sehingga pasangannya akan hilang tanpa pemberitahu
 ⚠️ **Karena per-mesin, ia TIDAK sampai lewat `git pull`.** Itu sebabnya §2c tetap memuat
 ketujuh polanya lengkap dan sengaja **tidak** dipangkas jadi rujukan: rekan yang belum
 memasang skill-nya akan kehilangan isinya, dan kegagalannya senyap. Kelas yang sama dengan
-`enabledPlugins` yang menyalakan tapi belum tentu memasang (`team-memory.md` § Skill & tooling
-AI).
+`enabledPlugins` yang menyalakan tapi belum tentu memasang (`team-memory/skill-tooling-ai.md`).
 
 **Cakupan yang sudah dipungut kecil.** Diukur 2026-09-22: `antislop-ui` memuat 43 pola (Visual
 & Color 10, Layout & Components 10, Decorative 11, Structural & Flow 3, App & Dashboard 7,

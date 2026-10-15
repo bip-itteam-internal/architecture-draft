@@ -61,7 +61,7 @@ sendiri, jadi tak ada berkas yang diperebutkan dan tak ada stash yang perlu dipa
 Untuk repo kode dari §1 (bukan `architecture-draft`, yang tak punya worktree): sebelum dispatch
 eksekutor, pastikan `codebase-memory-mcp` punya graf yang mencerminkan **worktree ini**, bukan
 checkout utama atau `origin/main` basi. Worktree baru = `root_path` baru yang tak pernah
-ter-index (team-memory.md § Memori & sumber kebenaran — hook `[codebase-memory]` menyala hanya
+ter-index (`rules/team-memory/memori-sumber-kebenaran.md` § Memori & sumber kebenaran — hook `[codebase-memory]` menyala hanya
 bila **cwd sesi** berada DI DALAM `root_path` proyek yang ter-index, `hook_augment.c:785-883`;
 bukan dipilih dari berkas yang disentuh), jadi graf milik checkout utama TIDAK mewakili apa yang
 sedang dikerjakan di sini.
@@ -147,9 +147,11 @@ Pilih skill relevan dari `.claude/skills/`: `migrasi-tabel-hris` untuk halaman d
 `deploy-bip-erp` hanya untuk `loop-devops`, `audit-keamanan` bila brief menyebut auth/RBAC/izin.
 Catat daftar itu; ia masuk log judge sebagai `skills_dibaca`.
 
-**Jangan menyuruh eksekutor membaca `rules/team-memory.md`.** Isinya sudah ada di konteks tiap
-subagent lewat `CLAUDE.md` (diukur 2026-09-21); menyuruhnya membaca ulang hanya membakar satu
-panggilan tool untuk isi yang sudah dipegangnya.
+**Jangan menyuruh eksekutor membaca `rules/team-memory.md`** — INDEKS-nya sudah ada di konteks tiap
+subagent lewat `CLAUDE.md` (diukur 2026-09-21). Yang WAJIB disebut di brief sebaliknya: path berkas
+`rules/team-memory/<topik>.md` yang pemicunya cocok dengan area task, karena isinya TIDAK lagi ikut
+konteks sejak team-memory dipecah jadi indeks + berkas topik (2026-10-15). Menyuruhnya membaca ulang
+INDEKS saja hanya membakar satu panggilan tool untuk isi yang sudah dipegangnya.
 
 ### Dua brief sekaligus (paralel)
 
@@ -288,7 +290,7 @@ Repo kode, di dalam worktree:
    `Refs` tidak menyambungkan apa pun) dan judul diakhiri ` (<repo>#<n>)`. Sesudah PR dibuat, set
    Status item issue itu di Project #15 ke **In Review**. Merge menutup issue lalu workflow project
    memindahkannya ke **Menunggu Adopsi**, BUKAN Done: Done berarti terbukti dipakai di prod, dan itu
-   tak bisa dibuktikan oleh merge (`team-memory.md` § Backlog: GitHub Project). Jangan memindahkan
+   tak bisa dibuktikan oleh merge (`rules/team-memory/backlog-github-project.md`). Jangan memindahkan
    issue ke Done dari sini. Brief lama yang masih berisi `BHA-<n>`: terjemahkan dulu lewat
    `gh search issues "BHA-<n>" --owner bip-itteam-internal`. Badan:
    - Tujuan (dari brief)

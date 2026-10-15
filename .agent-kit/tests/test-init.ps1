@@ -211,7 +211,7 @@ try {
   Check ($kjMd.Contains('Closes bip-itteam-internal/<repo>#<n>') -and $kjMd.Contains('Menunggu Adopsi') -and $kjMd.Contains('Jangan memindahkan') -and -not $kjMd.Contains('[BHA-<n>]')) 'kerjakan.md: PR ber-Closes <org>/<repo>#<n>, merge ke Menunggu Adopsi, bukan Done'
   $ppLinear = Get-Content (Join-Path $kitRoot 'hooks/githooks/pre-push') -Raw -Encoding UTF8
   Check ($ppLinear.Contains("grep -qiE '/[0-9]+-|bha-[0-9]'") -and $ppLinear.Contains('PERINGATAN: branch')) 'pre-push: peringatan branch tanpa nomor issue (tak menolak), bha-<n> lama diterima'
-  $tmSrc = Get-Content (Join-Path $kitRoot 'rules/team-memory.md') -Raw -Encoding UTF8
+  $tmSrc = Get-Content (Join-Path $kitRoot 'rules/team-memory/backlog-github-project.md') -Raw -Encoding UTF8
   Check ($tmSrc.Contains('## Backlog: GitHub Project') -and -not $tmSrc.Contains('## Linear: status issue')) 'team-memory: bagian Backlog GitHub Project menggantikan bagian Linear'
 
   # kit 1.34.0: sub-issue per repo. Yang dipatok: skrip tersalin init dan TERPARSE, pencocokan
@@ -226,6 +226,22 @@ try {
   Check ($bfTriase.Contains('2c. **Sub-issue per repo**') -and $bfTriase.Contains('buat-sub-issue.ps1')) 'brief.md 2c: brief lintas repo memakai sub-issue lewat buat-sub-issue.ps1'
   Check ($tmSrc.Contains('SATU sub-issue per repo') -and $tmSrc.Contains('Satu tingkat saja') -and $tmSrc.Contains('Masuk Todo = WAJIB ber-assignee')) 'team-memory: aturan sub-issue per repo dan assignee wajib di Todo'
   Check ($tmSrc.Contains('MyBharata: `Closes` TIDAK menutup issue') -and $tmSrc.Contains('WAJIB langsung diberi Status')) 'team-memory: issue my-bharata ditutup manual sesudah merge ke dev, item board wajib ber-Status'
+
+  # docs(agent-kit): pecah team-memory jadi indeks + berkas topik (2026-10-15). Yang dipatok:
+  # indeks tetap <= 15000 karakter (ia auto-load tiap sesi, tanpa penjaga pasti tumbuh kembali),
+  # tiap berkas topik yang disebut peta benar-benar ada, dan eksekutor loop diberi path topik
+  # (C1: detail TIDAK lagi ikut konteks subagent sejak pemecahan ini, jadi brief WAJIB menyebut
+  # path berkas topiknya -- tanpa Check ini gotcha yang dulu otomatis hadir jadi tak pernah dibaca,
+  # tak ada test, tak ada penanganan galat, gagalnya senyap).
+  $idx = Get-Content (Join-Path $kitRoot 'rules/team-memory.md') -Raw -Encoding UTF8
+  Check ($idx.Length -le 15000) "team-memory.md (indeks) $($idx.Length) karakter (batas 15000)"
+  $topik = Get-ChildItem (Join-Path $kitRoot 'rules/team-memory') -Filter *.md
+  Check ($topik.Count -eq 19) "rules/team-memory berisi 18 berkas topik + README ($($topik.Count))"
+  $hilang = @($topik | Where-Object { $_.Name -ne 'README.md' -and -not $idx.Contains($_.Name) })
+  Check ($hilang.Count -eq 0) "tiap berkas topik disebut peta indeks (tak disebut: $($hilang.Name -join ', '))"
+  $kjC1 = Get-Content (Join-Path $claude 'commands/kerjakan.md') -Raw -Encoding UTF8
+  $bfC1 = Get-Content (Join-Path $claude 'commands/brief.md') -Raw -Encoding UTF8
+  Check ($kjC1.Contains('rules/team-memory/') -and $bfC1.Contains('rules/team-memory/')) 'kerjakan.md + brief.md menyuruh menyebut path berkas team-memory/ ke eksekutor'
 
   # kit 1.35.0: gerbang nomor ADR ganda. Yang dipatok: skrip tersalin init, pre-push memanggilnya
   # atas POHON COMMIT (--rev HEAD, bukan working tree bersama), dan gerbang-kit menjalankan

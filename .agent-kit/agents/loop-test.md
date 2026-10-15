@@ -44,7 +44,7 @@ Pilih jenis test yang benar:
 
 ## Prosedur
 
-1. Baca brief dan `team-memory.md` bagian area terkait. Baca test yang sudah ada di area itu; jangan menduplikasi.
+1. Baca brief dan berkas `rules/team-memory/` yang pemicunya cocok dengan area terkait (indeks `team-memory.md` → § Peta). Baca test yang sudah ada di area itu; jangan menduplikasi.
 2. Tulis test sesuai rubrik ★★★ untuk perilaku yang disebut brief.
 3. Jalankan; untuk tiap test baru **buktikan bisa merah** (kontrol negatif) lalu kembalikan.
 4. Jalankan `pnpm tsc --noEmit` / `go vet ./...` supaya test-nya sendiri sehat.

@@ -18,7 +18,7 @@ Argumen: `[--hari N]` (bawaan 14), atau `--terapkan <nama-draft>`.
 3. Tutup dengan:
    ```
    Baca laporannya. Draft yang layak: /supervise --terapkan <nama>
-   Usulan untuk team-memory.md ada di laporan; sunting sendiri, jangan disalin mentah.
+   Usulan untuk ingatan tim (indeks atau berkas `team-memory/`) ada di laporan; sunting sendiri, jangan disalin mentah.
    ```
 
 Bila log judge/brief masih sedikit (sebutkan angkanya), katakan bahwa laporan berdiri di atas data

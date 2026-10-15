@@ -184,7 +184,7 @@ domain **saling menaut** dengan wikilink: ADR menyimpan kenapa dan keputusannya,
 menyimpan cara kerjanya.
 
 **c. Blueprint di `Workspace/ANALISA - <judul>.md`.** Kumpulan **draf issue** yang lolos checklist
-Siap Agent (team-memory § Definition of Ready, ADR 0151 "Issue Siap Dikerjakan Agent Bila
+Siap Agent (`rules/team-memory/backlog-github-project.md` § Definition of Ready, ADR 0151 "Issue Siap Dikerjakan Agent Bila
 Keputusannya Bisa Ditunjuk, Ditandai Manusia"). Sengaja tidak di dalam ADR: ADR adalah keputusan,
 blueprint papan kerja.
 
@@ -199,7 +199,7 @@ generik sebelum menghitungnya. Alasan ukuran menyebut bukti itu (`file:line`).
 
 | Ukuran | Kapan | Bentuk |
 |---|---|---|
-| **Kecil** | 1 repo | 1 issue tanpa induk. Butuh > 1 PR → issue **sejajar** "bagian i/N, sesudah #<n>", juga tanpa induk: team-memory "satu repo cukup satu issue", sub-issue tak dipakai di dalam satu repo |
+| **Kecil** | 1 repo | 1 issue tanpa induk. Butuh > 1 PR → issue **sejajar** "bagian i/N, sesudah #<n>", juga tanpa induk: `team-memory/backlog-github-project.md` "satu repo cukup satu issue", sub-issue tak dipakai di dalam satu repo |
 | **Sedang** | > 1 repo, tiap repo 1 PR | induk di repo tempat kontrak lahir (biasanya `bip-erp`, tanpa PR sendiri) + 1 sub-issue `[BE]`/`[FE]`/`[Mobile]` per repo |
 | **Besar** | > 1 repo, ada repo yang butuh > 1 PR | seperti Sedang + sub-issue **saudara** "bagian i/N" di bawah induk yang sama; tak pernah sub di bawah sub |
 
@@ -221,7 +221,7 @@ Tiap issue satu blok berbagian persis template `bip-erp/.github/ISSUE_TEMPLATE/t
 - ⛔ **Issue bertopik keamanan** (celah, akses, kebocoran data): vault ini repo **PUBLIK**, jadi blok
   di ANALISA hanya memuat judul, repo, dan kalimat "rincian di issue privat". Masalah, bukti, dan cara
   reproduksi hanya ditulis di badan issue (repo kode privat). Rincian celah yang belum ditambal tak
-  pernah ditulis ke vault (team-memory § Backlog).
+  pernah ditulis ke vault (`team-memory/backlog-github-project.md`).
 
 **d. Buat issue.** Dijalankan **di dalam §7, sesudah merge `origin/main`**, bukan di sini: judul ADR
 memuat nomornya, dan nomor itu baru pasti tak bertabrakan sesudah merge. Dari akar `erp/`, via PowerShell:

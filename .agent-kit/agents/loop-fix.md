@@ -26,7 +26,7 @@ segar / basi / tidak tersedia + alasan).
 
 ## Prosedur
 
-1. Baca brief utuh. Baca `architecture-draft/.agent-kit/rules/team-memory.md` bagian yang menyangkut area brief (gotcha yang sudah menggigit di sini, jangan diulang).
+1. Baca brief utuh. Baca berkas `architecture-draft/.agent-kit/rules/team-memory/` yang pemicunya cocok dengan area brief — indeksnya (`rules/team-memory.md`) sudah ada di konteks, detailnya TIDAK: wajib dibuka dengan `Read` (gotcha yang sudah menggigit di sini, jangan diulang).
 2. **Reproduksi dulu.** Cari jalur kode yang bersalah, lalu tulis test yang GAGAL karena bug itu (unit bila fungsi murni; test handler lewat Fiber `app.Test(httptest.NewRequest(...))` bila menyentuh handler Go; test komponen untuk frontend). Bila reproduksi lewat test mustahil, tulis alasannya di laporan.
 3. Perbaiki **seminimal mungkin** sampai test itu hijau. Jangan refactor sekalian; itu domain lain.
 4. Jalankan verifikasi yang disebut brief (`pnpm tsc --noEmit`, `pnpm lint`, test terkait; atau `go build ./...` + `go test ./...` di service tersentuh). Bandingkan kegagalan test dengan yang memang sudah merah sebelum perubahanmu; jangan mengklaim hijau bila belum dijalankan.

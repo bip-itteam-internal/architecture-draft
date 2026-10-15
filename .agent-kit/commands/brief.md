@@ -42,8 +42,7 @@ grounding pada satu dua pencarian yang mengisi bagian Konteks.
    lalu isi field `Issue` tiap brief dengan **sub-issue repo itu** (`<repo>#<sub> (sub-issue dari
    <repo>#<n>)`), bukan induknya. Skripnya idempoten, jadi menjalankannya ulang aman. Tanpa induk
    (field `Issue` = `tidak ada`) → JANGAN membuat induk diam-diam; tampilkan usulannya ke user.
-   Brief satu repo tidak memakai sub-issue. Aturan status induk dan urutan deploy di `team-memory.md`
-   § Backlog: GitHub Project.
+   Brief satu repo tidak memakai sub-issue. Aturan status induk dan urutan deploy di `rules/team-memory/backlog-github-project.md`.
 
 3. **Domain**, urutan menang bila lebih dari satu cocok: **fix** (bug, salah, gagal, error,
    tidak muncul, 502, hilang) > **test** (uji, test, coverage, kontrol negatif) > **refactor**
@@ -59,7 +58,8 @@ grounding pada satu dua pencarian yang mengisi bagian Konteks.
    tree, jadi ia bisa menjawab tentang kode berbulan lalu dengan percaya diri tanpa berbunyi.
    Graf basi, belum ter-index, atau MCP-nya mati **bukan alasan berhenti**: lanjutkan dengan
    `git grep` seperti biasa, asal ketidaksegarannya **ditulis** di Konteks, bukan didiamkan.
-   Tambahkan juga bagian `team-memory.md` yang menyangkut area itu. Yang tidak ditemukan
+   Tambahkan juga **path** berkas `rules/team-memory/` yang menyangkut area itu (eksekutor hanya
+   punya indeksnya di konteks, bukan detailnya). Yang tidak ditemukan
    **tidak ditulis**; Konteks kosong lebih jujur daripada Konteks karangan.
 
 4b. **`Sumber`** — field ini sudah ada di template dan selama ini tak pernah diisi berarti. Isi
@@ -72,7 +72,7 @@ grounding pada satu dua pencarian yang mengisi bagian Konteks.
    karangan tidak akan tertangkap siapa pun.
 
 4c. **`Issue`**: issue GitHub yang dikerjakan brief ini, bentuk lengkap `<repo>#<n>` (mis.
-   `bip-erp#2162`), di Project #15 (`team-memory.md` § Backlog: GitHub Project). Ambil dari teks
+   `bip-erp#2162`), di Project #15 (`rules/team-memory/backlog-github-project.md`). Ambil dari teks
    user; rujukan lama `BHA-<n>` diterjemahkan lewat `gh search issues "BHA-<n>" --owner
    bip-itteam-internal` (judul hasil migrasi berakhiran `[BHA-<n>]`). Bila tak disebut, cari satu
    kali (`gh issue list -R bip-itteam-internal/<repo> --search "<kata kunci>"`) lalu **tampilkan**

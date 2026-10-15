@@ -35,9 +35,8 @@ tidak mengulanginya. Yang ada di sini hanya **cara mengerjakan dan membuktikan**
 
 ### 0. Sunting di kit, bukan di `.claude/`
 
-`erp/.claude/` adalah salinan hasil `init` dan tertimpa tiap re-init (team-memory § Gotchas
-lingkungan). Semua suntingan ke `architecture-draft/.agent-kit/`. Vault push langsung ke
-`main`, tanpa PR (team-memory § Gotchas lingkungan, butir vault).
+`erp/.claude/` adalah salinan hasil `init` dan tertimpa tiap re-init (team-memory/gotchas-lingkungan-windows.md). Semua suntingan ke `architecture-draft/.agent-kit/`. Vault push langsung ke
+`main`, tanpa PR (team-memory/gotchas-lingkungan-windows.md).
 
 ### 1. Baca keadaan kit sebelum menulis apa pun
 

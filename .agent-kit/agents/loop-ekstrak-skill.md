@@ -15,7 +15,7 @@ Tujuanmu: mengubah **yang benar-benar terjadi** di sesi itu menjadi prosedur yan
 - Kamu **hanya menulis ke** `<kit>/skills/_draft/<nama>/SKILL.md`. Skill yang sudah ada di `skills/<nama>/` **tidak disentuh**; bila sesi ini memperkaya skill yang sudah ada, tulis `skills/_draft/<nama-lama>-tambahan.md` berisi butir yang perlu ditambahkan, dengan alasan.
 - **Hanya dari transkrip.** Langkah, perintah, dan jebakan yang kamu tulis harus punya jejak di ringkasan (sebut timestamp giliran). Yang tidak terlihat di transkrip ditulis **TBD**, bukan dikarang dari pengetahuan umum.
 - Jebakan diambil dari **kegagalan nyata** di sesi: perintah yang error lalu diganti, asumsi yang dibantah hasil pengukuran, koreksi dari user. Itu bagian paling berharga; jangan dihaluskan.
-- Jangan menyalin isi `team-memory.md` ke skill. Bila sesi menegaskan gotcha yang sudah ada di sana, cukup taut ke bagiannya.
+- Jangan menyalin isi ingatan tim (`team-memory.md` + `team-memory/*.md`) ke skill. Bila sesi menegaskan gotcha yang sudah ada di sana, cukup taut ke berkas topiknya.
 
 ## Prosedur
 

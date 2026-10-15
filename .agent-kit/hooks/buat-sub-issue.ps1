@@ -1,6 +1,6 @@
 # buat-sub-issue.ps1 - pecah issue induk jadi sub-issue per repo (BE / FE / Mobile) di Project #15.
 # Dipasang init dari architecture-draft/.agent-kit/hooks (kit 1.34.0); dipanggil /brief langkah 2c.
-# Aturan: agent-kit rules/team-memory.md bagian "Backlog: GitHub Project" butir sub-issue.
+# Aturan: agent-kit rules/team-memory/backlog-github-project.md butir sub-issue.
 #
 #   & '.claude/hooks/buat-sub-issue.ps1' -Induk bip-erp#2162 -Repo erp-frontend -Judul 'Layar anonim' [-Badan <berkas.md>]
 #

@@ -97,7 +97,7 @@ Kelas bug paling mahal di bip-erp: kodenya benar, tapi tak pernah terpanggil.
 - **Alat Copilot baru memanggil endpoint yang hanya butuh login.** Copilot meneruskan JWT
   penanya, jadi hak aksesnya persis sekuat gerbang endpoint sumber (ADR 0132). Endpoint tanpa
   gerbang peran di pendaftaran rute, middleware grup, atau filter dokumen (cari berurutan,
-  `team-memory.md` § Gotchas backend Go) berarti siapa pun pemakai Copilot bisa membaca
+  `team-memory/backend-go.md`) berarti siapa pun pemakai Copilot bisa membaca
   datanya lewat pertanyaan. Data upah dan nominal per orang juga wajib masuk keluarga alat
   bergerbang Copilot (ADR 0165). Rincian celah yang ditemukan ditulis di issue PRIVAT, bukan
   di vault.
@@ -268,8 +268,7 @@ enum status `menunggu_*`/`pending`/`request`, langkah jenjang baru), atau **tab/
 1. **Sumber terdaftar?** `git grep -n "registriAntrean" origin/main -- services/employee/` lalu
    baca entri kategori modul itu. Nol entri untuk modul yang diff-nya menambah tahap = temuan.
 2. **Endpoint antrean sumber ada dan menyaring per pemanggil?** Buka `PathMenunggu` entri itu
-   di service sumber; cek gerbangnya mulai dari pendaftaran rute (team-memory § Gotchas backend
-   Go: gerbang lazim satu lapis di atas). Tahap baru harus ikut terambil, bukan tersaring keluar.
+   di service sumber; cek gerbangnya mulai dari pendaftaran rute (`team-memory/backend-go.md`: gerbang lazim satu lapis di atas). Tahap baru harus ikut terambil, bukan tersaring keluar.
 3. **Tahap baru punya `aksi`?** Pemetaan tahap ke `aksi` di adapter agregator (atau setoran
    sumber) memuat tahap itu; test pemetaan per sumber yang mendaftar semua tahap ikut diperbarui.
    Kode `aksi` baru wajib berlabel di `erp-frontend src/i18n/locales/{id,en}.ts` dan dikenal

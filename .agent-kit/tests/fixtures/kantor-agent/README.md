@@ -5,7 +5,7 @@
 2026-09-15 dari Claude Code 2.1.269. `meta-subagent.json` berisi satu `.meta.json` subagent nyata.
 
 Kenapa baris nyata dan bukan rakitan tangan: test yang memalsukan bentuk sumbernya sudah terbukti
-buta di repo ini (`rules/team-memory.md`, bagian memanggil endpoint daftar service lain). Skenario uji
+buta di repo ini (`rules/team-memory/backend-endpoint-daftar-service.md`). Skenario uji
 disusun di `tests/test_kantor_agent.py` dengan menyalin templat ini lalu hanya mengubah field yang
 sedang diuji (id, nama tool, `stop_reason`, `timestamp`, `cwd`).
 
