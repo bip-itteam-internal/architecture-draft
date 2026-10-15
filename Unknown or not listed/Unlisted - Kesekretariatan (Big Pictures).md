@@ -50,7 +50,7 @@ Catatan tabel:
   - **Registrasi NIE / BPOM / Halal**, **Pengembangan Produk** (izin `secretary.rnd.view`).
   - **Referensi Procurement**: Kontrak Vendor dan Master Pemasok, baca-saja (izin `secretary.legal.view`).
   - **Data WMS**: Master Produk (BOM), Gudang RM, Analisa Stok, baca-saja (izin `secretary.rnd.view`).
-- 🟡 **Badan Usaha** (diusulkan 2026-10-15, belum dikode): Corporate Secretary jadi satu-satunya pintu tambah/ubah PT Bharata, CV, dan PT lain di `/secretary/badan-usaha`, izin baru `secretary.badanusaha.kelola`. Datanya tetap daftar `payroll_company` di payroll-service; HR dan Finance membaca. [[ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca]] · [[ANALISA - Badan Usaha Dikelola Sekretariat]].
+- ✅ **Badan Usaha** (prod 2026-10-16): Corporate Secretary jadi satu-satunya pintu tambah/ubah PT Bharata, CV, dan PT lain di `/secretary/badan-usaha` (daftar), `/secretary/badan-usaha/baru` dan `/secretary/badan-usaha/[id]` (halaman, bukan dialog), izin `secretary.badanusaha.kelola` (paket "Sekretariat: Badan Usaha", dipasang manusia di Hak per Posisi). Isian identitas, data legal, rekening pengirim gaji, status, dan **kop surat** (disimpan di entitas Finance). Datanya tetap daftar `payroll_company` di payroll-service; HR dan Finance membaca. Halaman memeriksa izin sendiri karena proxy hanya menggerbang `/secretary/kpi`. [[ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca]] · [[ANALISA - Badan Usaha Dikelola Sekretariat]].
 - **Alias kategori** (`modul-aktif.ts`): pemegang `system_roles.legal` atau `rnd` diarahkan ke kategori `secretary`. Tanpa alias itu mereka kehilangan seluruh menunya tanpa galat, karena kunci `legal` dan `rnd` sudah tidak ada di objek menu.
 
 ### Ruang Direktur

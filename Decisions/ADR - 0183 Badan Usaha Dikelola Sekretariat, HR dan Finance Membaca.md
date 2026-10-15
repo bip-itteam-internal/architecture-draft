@@ -1,6 +1,8 @@
 # ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca
 
 > **Status**: 🟡 Diusulkan, 2026-10-15. Arahnya (satu pintu tambah/ubah badan usaha di Sekretariat, bukan HR) disetujui user dalam sesi `/analisa-kebutuhan` 2026-10-15. Merevisi sebagian [[ADR - 0182 Badan Usaha Satu Daftar untuk HR dan Finance, Entitas CV Menempel Tanpa Nama Sendiri]] (butir 4 dan 6: pintu tambah dan perapian nama). Pemutus: `wirkancil`. Blueprint: [[ANALISA - Badan Usaha Dikelola Sekretariat]].
+>
+> ⚠️ **Kode sudah merged (2026-10-15) dan di PROD (2026-10-16) sementara ADR ini masih Diusulkan**, atas perintah user: bip-erp#3207 (izin, isian, gerbang), #3210 (kop), #3208 (master wilayah); erp-frontend#2526 (layar), #2527 (kop). Paket `secretary_badan_usaha` tersemai di prod; pemasangannya ke Corporate Secretary menunggu manusia.
 
 ## Untuk Manajemen
 
@@ -26,12 +28,13 @@
 
 *Memindahkan pintu tulis daftar Badan Usaha (`payroll_company`) dari HR ke Kesekretariatan lewat izin baru `secretary.badanusaha.kelola`, tanpa memindahkan data: payroll-service tetap menyimpan dan menyajikannya, HR dan Finance membaca.*
 
-- **Status**: 🟡 Diusulkan 2026-10-15
-- **Path di repo** (rencana):
+- **Status**: 🟡 Diusulkan 2026-10-15; kode merged 2026-10-15, prod 2026-10-16
+- **Path di repo** (terimplementasi):
   - `bip-erp/shared-library/common/catalog_secretary.go` (izin dan paket baru)
-  - `bip-erp/services/payroll/routes.go` (gerbang POST/PUT/DELETE `/companies` dan POST `/companies/impor`)
-  - `bip-erp/services/finance/akuntansi_cv_daftar.go` (komentar "Daftar Badan Usaha milik HR")
-  - `erp-frontend/src/app/(main)/secretary/badan-usaha/page.tsx` (baru)
+  - `bip-erp/services/payroll/badan_usaha_gate.go` (baru), `routes.go`, `models_company.go`, `company_handlers.go`, `salary_version_service.go`, `badan_usaha_rencana.go`
+  - `bip-erp/services/finance/akuntansi_cv_kop_sekretariat.go` (baru), `akuntansi_cv_handler.go`, `akuntansi_cv_daftar.go`
+  - `bip-erp/services/employee/wilayah.go` + `wilayah_data.json` (baru, master wilayah)
+  - `erp-frontend/src/app/(main)/secretary/badan-usaha/{page,baru/page,[id]/page}.tsx` (baru), `src/features/secretary/badan-usaha/` (baru)
   - `erp-frontend/src/features/hris/payroll/components/companies-page.tsx`, `src/components/layout/sidebar-menus.tsx`, `src/features/panduan/isi/` (baru untuk Sekretariat)
 - **Tanggal**: 2026-10-15
 
@@ -59,6 +62,10 @@ Diukur 2026-10-15 ke bip-erp dan erp-frontend `origin/main` serta data PROD (bac
 8. **Nama bank dan nomor rekening tetap**: rekening pengirim gaji untuk karyawan yang digaji atas nama badan usaha itu (keputusan user 2026-10-15). Tidak dipindah ke Finance; hari ini ia catatan rujukan, belum dibaca daftar bayar.
 9. **Kop surat: pintunya pindah ke Kesekretariatan, simpanannya tetap di Finance** (keputusan user 2026-10-15). kop_url tetap di kuntansi_cv_entitas, sehingga /internal/cv/kop, kuntansi_cv_pt_bharata.go, kuntansi_cv_pt_pemilik_rekening.go, dan procurement (cv_kop_sumber.go, BKK, detail pengajuan) tidak berubah. Yang berubah hanya penulisnya: unggah dan hapus kop lewat rute finance yang dikunci secretary.badanusaha.kelola dan dialamatkan dengan **id badan usaha** (payroll_company_id), bukan kode entitas, karena layar Sekretariat bekerja per badan usaha. PATCH /akuntansi-cv/entitas/:kode menolak kop_url dari pemegang kuntansicv.kelola. Badan usaha yang belum tersambung ke entitas (hari ini 22 PT) belum bisa diberi kop sampai Finance menyambungkannya; layar menyebutkan itu, bukan menyembunyikannya. Simpanan kop tidak dipindah ke payroll karena kuncinya kode entitas dan seluruh jalur cetak BKK membacanya dari sana; memindahnya menyentuh jalur pembayaran yang sedang dipakai demi letak, bukan demi perilaku.
 10. **Perapian data pindah ke Kesekretariatan** (menggantikan ADR 0182 butir 6 yang menugaskannya ke HR): ejaan PT05, nama lengkap PT Bharata, NPWP PT Bharata, dan NPWP ganda Citrana/Citravana, dilakukan lewat layar baru sesudah deploy.
+11. **Nama badan usaha unik** (keputusan user 2026-10-15): dibandingkan sesudah dinormalkan (huruf besar/kecil diabaikan, titik dan koma dianggap spasi, spasi beruntun jadi satu); bentrok dengan badan usaha lain ditolak 409 yang menyebut nama yang sudah ada. Data prod 2026-10-15: 62 nama, nol bentrok.
+12. **Tambah dan ubah di halaman sendiri**, bukan dialog (keputusan user 2026-10-15, isiannya banyak): `/secretary/badan-usaha/baru` dan `/secretary/badan-usaha/[id]`.
+13. **Istilah** (keputusan user 2026-10-15): **Badan Usaha** = pihak legal PT/CV (layar Sekretariat dan HR); **Entitas** = catatan pembukuannya di Finance (kode, singkatan BKK, rekening, pemegang). Keduanya dipakai berdampingan; `Badan usaha tanpa entitas` berarti badan usaha yang belum didaftarkan Finance.
+14. **Kota dan provinsi dipilih dari master wilayah** (keputusan user 2026-10-15): master wilayah ERP di employee-service (`GET /master/wilayah/*`, bip-erp#3203, prod 2026-10-16). Penyambungan ke form Badan Usaha adalah langkah lanjutan; sampai itu, kota diketik.
 
 ## Consequences
 

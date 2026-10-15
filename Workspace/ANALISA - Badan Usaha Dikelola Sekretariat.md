@@ -10,6 +10,16 @@ Blueprint hasil `/analisa-kebutuhan` 2026-10-15 atas permintaan "master badan us
 - **Ukuran**: **Besar** (sejak kop masuk, 2026-10-15): dua repo, masing-masing dua PR berurutan (bagian 1/2 izin + isian, bagian 2/2 kop). Awalnya Sedang: `bip-erp` (izin di `shared-library/common/catalog_secretary.go` + gerbang `/companies*` di `services/payroll/routes.go`) dan `erp-frontend` (halaman dan menu baru; FE tidak merender izin atau menu baru secara generik: menu Sekretariat dirakit eksplisit di `src/components/layout/sidebar-menus.tsx` dan tab Pengaturan Gaji di `src/app/(main)/pengaturan/lib/sections.ts:204-207`). `my-bharata` **tidak** berubah: slip membaca snapshot run (`lib/src/features/payroll/data/models/my_payslip_model.dart:32-39`).
 - **Urutan**: [BE] lalu [FE]; deploy BE sebelum FE.
 
+## Status 2026-10-16
+
+Kelima issue di bawah **merged (2026-10-15) dan di PROD (2026-10-16)** walau ADR masih Diusulkan, atas perintah user: bip-erp#3185 → PR #3207, bip-erp#3202 → PR #3210 (pengganti #3209 yang tertutup otomatis), bip-erp#3203 → PR #3208, erp-frontend#2498 → PR #2526, erp-frontend#2520 → PR #2527. Status board: Menunggu Adopsi.
+
+⚠️ Blok issue di bawah adalah salinan 2026-10-15 dan **tertinggal dari badan issue di GitHub** pada tiga hal yang diputuskan sesudahnya: form tambah/ubah berupa **halaman** (bukan dialog), **nama unik** (409), dan master wilayah. Badan issue di GitHub yang final; ADR 0183 butir 11-14 memuat keputusannya.
+
+Lanjutan (Backlog): **bip-erp#3212** "Provinsi dan kota badan usaha dipilih dari master wilayah" dengan sub [BE] bip-erp#3213 dan [FE] erp-frontend#2530 (ADR 0183 butir 14).
+
+Langkah manusia yang masih terbuka: pasang paket "Sekretariat: Badan Usaha" ke Corporate Secretary, umumkan ke HR, rapikan 4 data, Finance menekan Semai, catat rilis.
+
 ## Kebutuhan dan temuan
 
 - **Kebutuhan sebenarnya**: identitas badan usaha dikelola pemegang legalitasnya (Corporate Secretary); HR dan Finance memakai. Pemicunya prinsip kepemilikan, bukan insiden.

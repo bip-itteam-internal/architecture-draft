@@ -45,10 +45,11 @@ Seluruh config **singleton**, di-seed idempoten saat boot (`seedPayrollConfig`, 
 
 | Method | Path | Gerbang | Catatan |
 |---|---|---|---|
-| GET | `/companies` | `view` / `isHR` | Badan usaha (multi-company; identitas slip) |
-| POST | `/companies` | `manage` / `isHRAdmin` | 🟡 Pindah ke `secretary.badanusaha.kelola` (Kesekretariatan), [[ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca]]; belum dikode |
-| PUT | `/companies/:id` | `manage` / `isHRAdmin` | 🟡 idem ADR 0183 |
-| DELETE | `/companies/:id` | `manage` / `isHRAdmin` | 🟡 idem ADR 0183; juga POST `/companies/impor` |
+| GET | `/companies` | `view` / `isHR` ATAU `secretary.badanusaha.kelola` | Badan usaha (multi-company; identitas slip) |
+| POST | `/companies` | `secretary.badanusaha.kelola` (kill-switch mati: `isHRAdmin`) | Kesekretariatan, [[ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca]] (prod 2026-10-16). 409 nama bentrok, 400 tanggal tak sah atau `inactive`+default |
+| PUT | `/companies/:id` | idem | idem; nama sendiri tidak bentrok |
+| DELETE | `/companies/:id` | idem | default tak bisa dihapus |
+| POST | `/companies/impor` | idem | impor massal tidak memeriksa nama unik |
 | GET | `/salary-components` | `view` / `isHR` | Komponen gaji; di-seed default bila kosong |
 | GET | `/salary-components/:id` | `view` / `isHR` | |
 | POST | `/salary-components` | `manage` / `isHRAdmin` | |
