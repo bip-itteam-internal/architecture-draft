@@ -253,6 +253,36 @@ dulu bukan tugas diff ini: sebutkan sebagai catatan dan tunjuk ke dok inventaris
 memblokir PR yang tidak menyentuhnya. Arah perbaikan menyeluruh belum diputuskan, jadi
 menuntut satu PR menutup rantai lama adalah menuntut keputusan yang belum ada.
 
+### F3. Tahap yang menuntut tindakan tanpa setoran ke Portal Persetujuan
+
+Aturan: [[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] butir 13.
+Tiap tahap yang menunggu tangan orang tertentu (setujui/tolak, cek, isi, transfer,
+konfirmasi, catat, triase) wajib muncul di `/portal/persetujuan`. Gagalnya senyap: tahapnya
+jalan di modul, test hijau, dan orangnya tak menemukan pekerjaannya, atau menemukannya di tab
+modul yang salah kelompok (PB/284 cek stok GA di tab "Perlu Disetujui", buntu di portal).
+
+Berlaku untuk tiap diff yang menambah **status/tahap menunggu baru** (konstanta tahap, nilai
+enum status `menunggu_*`/`pending`/`request`, langkah jenjang baru), atau **tab/daftar/antrean
+"perlu disetujui" / "perlu tindakan" baru** di layar modul. Cara cek, berurutan:
+
+1. **Sumber terdaftar?** `git grep -n "registriAntrean" origin/main -- services/employee/` lalu
+   baca entri kategori modul itu. Nol entri untuk modul yang diff-nya menambah tahap = temuan.
+2. **Endpoint antrean sumber ada dan menyaring per pemanggil?** Buka `PathMenunggu` entri itu
+   di service sumber; cek gerbangnya mulai dari pendaftaran rute (team-memory § Gotchas backend
+   Go: gerbang lazim satu lapis di atas). Tahap baru harus ikut terambil, bukan tersaring keluar.
+3. **Tahap baru punya `aksi`?** Pemetaan tahap ke `aksi` di adapter agregator (atau setoran
+   sumber) memuat tahap itu; test pemetaan per sumber yang mendaftar semua tahap ikut diperbarui.
+   Kode `aksi` baru wajib berlabel di `erp-frontend src/i18n/locales/{id,en}.ts` dan dikenal
+   `src/features/persetujuan/lib/` (FE tidak menebak aksi dari tahap).
+4. **Tautan per item dan riwayat.** Baris membawa tautan ke item itu (bukan daftar), dan entri
+   registri punya `PathRiwayat`, atau TBD-nya tertulis di rencana.
+5. **Tab modul baru** berisi antrean tindakan: sumbernya sama dengan portal, bukan saringan
+   tandingan. Tab "Perlu Disetujui" di modul bukan pengganti setoran ke portal.
+
+**Keparahan.** Pass 1 bila diff menambah tahap atau antrean baru tanpa butir 1 sampai 3.
+Tahap lama yang belum tersetor bukan tugas diff ini: sebut sebagai catatan, jangan memblokir.
+Pengecualian sah hanya bila ada ADR yang menyebutnya.
+
 ### G. Satu fakta hidup di dua tempat
 
 Pertanyaannya bukan "apakah kodenya mirip" melainkan **"kalau fakta ini berubah, berapa

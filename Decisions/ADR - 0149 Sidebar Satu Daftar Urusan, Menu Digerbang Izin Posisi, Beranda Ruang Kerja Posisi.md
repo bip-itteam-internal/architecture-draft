@@ -1,4 +1,6 @@
 > **Status**: 🟢 **Diterima**, 2026-10-10, oleh irfanarfianto (diusulkan 2026-10-02). HRGA sudah berjalan (bip-erp#2488); Marketing sedang dikerjakan (bip-erp#2924); departemen lain dan penyatuan akhir belum.
+>
+> ⚠️ **Diubah sebagian (diterima 2026-10-15, oleh irfanarfianto)** oleh [[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] (🟢 Diterima): §4 butir "Persetujuan hanya berisi hal yang menunggu keputusan pembaca" menjadi "berisi semua yang menunggu tindakan pembaca, keputusan maupun tindakan operasional". **Bagian lain ADR ini tetap berlaku.**
 
 ## Untuk Manajemen
 

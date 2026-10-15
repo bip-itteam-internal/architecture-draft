@@ -19,6 +19,7 @@ Dua angka terpisah, tidak pernah dijumlahkan jadi satu. Baris pantauan tampil de
 
 **T3. Sheet detail berangka tiga, aksi di footer.**
 Header tetap, badan `flex-1 min-h-0 overflow-y-auto px-4 pb-4`, footer memakai `SheetFooter`. Badan diisi per kategori dari `GET /hr/requests/detail?type=&id=&as=reviewer`; untuk cuti dan dinas pakai ulang potongan bebas-rangka di `features/hris/requests/components/detail-sections.tsx`. Footer berisi Setujui dan Tolak untuk kategori yang bisa diputus di tempat, plus "Setujui lalu buka berikutnya"; kategori lain berisi "Buka halaman penuh". Sheet dikendalikan query param (`?detail=<kategori>:<id>`), `useSearchParams` dibungkus `Suspense`.
+⛔ **"Setujui lalu buka berikutnya" DIBATALKAN** oleh [[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] butir 7: membingungkan pengguna (keputusan user 2026-10-15). Sesudah tindakan, Sheet tertutup dan kembali ke daftar.
 *Tergantung*: T1. ⚠️ `AlertDialog` di dalam `Sheet` adalah modal bersarang Radix; wajib dicoba dengan tangan termasuk jalur Escape, jsdom buta terhadapnya.
 
 **T4. Aksi menembak endpoint keputusan milik modul asalnya.**

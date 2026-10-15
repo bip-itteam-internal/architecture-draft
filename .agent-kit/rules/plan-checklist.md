@@ -58,6 +58,12 @@ Yang wajib dicek di sini:
   menangnya sering berlapis, dan salinan itu pasti menyimpang.
 - **Kalender terpusat.** Fitur bertanggal WAJIB mendaftarkan feed ke `calendar-service`;
   dilarang bikin halaman kalender sendiri.
+- **Portal Persetujuan.** Rencana yang menambah tahap persetujuan atau tahap yang menunggu
+  tindakan orang tertentu (cek, isi, transfer, konfirmasi, catat, triase) WAJIB menulis satu
+  baris di artefak: `Portal Persetujuan: kategori <kunci>, aksi <kode>, detail di
+  <rute/komponen>, riwayat <endpoint>`. Tanpa baris itu rencananya belum lengkap. Dilarang
+  membuat tab/antrean "perlu disetujui" tandingan di modul tanpa juga menyetor ke portal
+  ([[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] butir 13).
 - **Endpoint baca baru dan Copilot.** Rencana yang menambah endpoint GET berisi data bisnis
   (ringkasan, rekap, peringkat, daftar yang wajar ditanyakan manajemen) WAJIB menulis satu
   baris keputusan di artefak: `Copilot: ya (alat <nama>) / tidak, karena <alasan> / nanti
