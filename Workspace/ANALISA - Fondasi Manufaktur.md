@@ -61,7 +61,7 @@ Repo: **BE** = bip-erp, **FE** = erp-frontend. Status per 2026-10-13.
 | Kode | Butir | Issue yang ada | Butuh | Status |
 |---|---|---|---|---|
 | M-20 | Jadwal produksi + gerbang ketersediaan bahan + permintaan bahan + serah ke WIP | (sebagian BE #2195) | K-2, K-9 | Menunggu keputusan |
-| M-21 | Surat Jalan + COA keluar | - | K-8, M-03 | Menunggu keputusan |
+| M-21 | Surat Jalan + COA keluar; tujuan kirim dari master (gudang internal, pelanggan/makloon, pemakaian internal), tanpa isian bebas (kajian TBD 12) | - | K-8, M-03, pemilik master pelanggan (ADR 0136) | Menunggu keputusan |
 | M-22 | Production Order dengan MOQ dan satu kali ubah | - | K-10 | Menunggu keputusan |
 | M-23 | Safety stock, ROP, MRP dengan bahan sedang dipesan | - | M-14 | Siap setelah M-14 |
 | M-24 | Retur ke pemasok dari bahan ditolak QC | - | K-4 | Menunggu keputusan |

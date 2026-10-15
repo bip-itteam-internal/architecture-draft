@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-15",
-  "jumlah_dokumen": 641,
+  "jumlah_dokumen": 642,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -9940,6 +9940,27 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0179 IT Lihat Sebagai Karyawan, Baca-Saja dan Berjejak.md",
+      "judul": "ADR - 0179 IT Lihat Sebagai Karyawan, Baca-Saja dan Berjejak",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-10-15. Menunggu persetujuan; tulis `🟢 Diterima, <tanggal>, oleh <login/jabatan>` di baris ini bila disetujui.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
+        "ADR - 0137 Model Persetujuan Tunggal dan Pemisahan Tugas Lintas Modul",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "CORE - RBAC dan Permission Set",
+        "APP - Web ERP",
+        "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
+      ],
+      "hash": "08886f38194a3ea49f7f73a65a0be0348efdef90a15f0cafaac99fa75a87768e",
+      "ukuran_kb": 6.8,
+      "ringkasan": null,
+      "kata_kunci": []
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -15396,8 +15417,8 @@
         "REF - Kepemilikan Data",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)"
       ],
-      "hash": "900c74cfb170e9b4f1a83d6bccaf586decea20521099c45fc49a831e0f39204d",
-      "ukuran_kb": 23.9,
+      "hash": "81e4d7430ee51b4852dc38d23e702163b3693dc718191bcc894d6a1a8a246558",
+      "ukuran_kb": 24.8,
       "ringkasan": "Menjawab: fitur manufaktur mana di ERP yang benar-benar dipakai di prod dan mana yang belum pernah dipakai beserta penyebabnya, tumpang tindih apa yang ada di fondasi kode, dan apa kata kuesioner serta tiket permintaan SPV Manufacture. Juga menjelaskan spreadsheet PPIC sebagai sistem yang berjalan nyata, kenapa pembelian bahan baku belum lewat Pengajuan Barang RAWMATERIAL, siapa memeriksa jumlah vs mutu bahan masuk, kebutuhan COA keluar, perbandingan Batch Record kertas dengan model ERP, serta daftar keputusan yang belum diambil.",
       "kata_kunci": [
         "kajian fondasi manufaktur",
@@ -15410,7 +15431,8 @@
         "substitusi bahan",
         "konversi satuan",
         "pemilik stok",
-        "TBD"
+        "TBD",
+        "master tujuan kirim"
       ]
     },
     {
@@ -20605,8 +20627,8 @@
         "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "b66582f4e00bd5362fbb5d3197f0d9bb7e76610f798b61f55438342797920357",
-      "ukuran_kb": 7.6,
+      "hash": "93b21b5070466382fe373765e31de09eb82193d4ccc6c942557095346317203d",
+      "ukuran_kb": 7.8,
       "ringkasan": "Menjawab: butir kerja apa saja (kode M-nn) dalam penataan fondasi Manufaktur per fase, issue GitHub mana yang terkait, dan butir mana yang siap dikerjakan atau masih menunggu keputusan. Juga menjawab keputusan apa yang ditunggu (K-1 sampai K-11, mis. pemilik angka stok, zona WIP, keputusan rilis, status bahan masuk, format BPOM, COA) beserta pemutusnya, aturan pakai papan, dan apa yang sengaja di luar cakupan.",
       "kata_kunci": [
         "fondasi manufaktur",
@@ -22741,5 +22763,7 @@
       ]
     }
   ],
-  "gagal": []
+  "gagal": [
+    "Decisions/ADR - 0179 IT Lihat Sebagai Karyawan, Baca-Saja dan Berjejak.md"
+  ]
 }
