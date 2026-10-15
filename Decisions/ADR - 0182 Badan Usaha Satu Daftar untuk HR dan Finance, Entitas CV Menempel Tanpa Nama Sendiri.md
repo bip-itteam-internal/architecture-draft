@@ -1,6 +1,8 @@
 # ADR - 0182 Badan Usaha Satu Daftar untuk HR dan Finance, Entitas CV Menempel Tanpa Nama Sendiri
 
 > **Status**: 🟡 Diusulkan, 2026-10-15. Arahnya (satu daftar badan usaha untuk HR dan Finance, rekening tetap di Accurate) disetujui user dalam sesi 2026-10-15. Merevisi sebagian [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]], jadi masih menunggu persetujuan pemutus ADR itu (SPV FAT bersama IT) dan pemilik data badan usaha di HR. Kode di bip-itteam-internal/bip-erp#3178 (BE) dan bip-itteam-internal/erp-frontend#2493 (FE), belum merged.
+>
+> ⚠️ **Direvisi sebagian oleh [[ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca]] (2026-10-15, 🟡 Diusulkan):** pintu tambah/ubah badan usaha pindah dari HR ke Kesekretariatan (butir 4), dan perapian nama di butir 6 dikerjakan Kesekretariatan. Satu daftar, Finance menempel, dan nama ikut daftar itu tetap berlaku.
 
 ## Untuk Manajemen
 
