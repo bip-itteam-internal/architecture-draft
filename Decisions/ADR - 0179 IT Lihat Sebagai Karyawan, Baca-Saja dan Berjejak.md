@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan**, 2026-10-15. Menunggu persetujuan; tulis `🟢 Diterima, <tanggal>, oleh <login/jabatan>` di baris ini bila disetujui.
+> **Status**: 🟡 **Diusulkan**, 2026-10-15; keputusan 2 dan 6 diubah user 2026-10-16 dan keputusan 8 ditambahkan (lihat § Riwayat perubahan). Kode versi 2026-10-15 sudah di prod sejak 2026-10-16 (bip-erp#3169, erp-frontend#2521). Menunggu persetujuan; tulis `🟢 Diterima, <tanggal>, oleh <login/jabatan>` di baris ini bila disetujui.
 
 ## Untuk Manajemen
 
@@ -7,11 +7,11 @@
 **Batasnya.**
 - Hanya melihat. Semua tombol yang mengubah data (menyetujui, membayar, menyimpan, menghapus) ditolak server.
 - Slip gaji pribadi orang yang ditiru tetap tertutup.
-- Satu sesi paling lama 30 menit, dan wajib menuliskan alasan.
+- Sesi berlaku selama umur login biasa dan berakhir saat staf IT kembali ke akunnya sendiri atau logout. Alasan wajib dituliskan.
 - Setiap sesi tercatat: siapa, menjadi siapa, kapan, untuk apa, dan halaman apa saja yang dibuka.
-- Orang yang ditiru menerima pemberitahuan di inbox web dan MyBharata.
+- Orang yang ditiru **tidak** diberi tahu (keputusan 2026-10-16), dan sesi tiruan tidak mengubah apa pun miliknya: tidak menandai notifikasinya terbaca, tidak mencatat bahwa ia membuka kontraknya.
 
-**Yang perlu disadari.** Fitur ini dibuka untuk **semua anggota IT**, bukan hanya supervisor. Artinya setiap staf IT bisa membaca data kerja siapa pun yang terlihat oleh orang itu, termasuk data tim, antrean persetujuan, dan data HR yang dibuka jabatannya. Pengamannya adalah jejak dan pemberitahuan, bukan larangan. Bila kelak dinilai terlalu luas, mempersempitnya cukup mengganti satu pemeriksaan pemakai.
+**Yang perlu disadari.** Fitur ini dibuka untuk **semua anggota IT**, bukan hanya supervisor. Artinya setiap staf IT bisa membaca data kerja siapa pun yang terlihat oleh orang itu, termasuk data tim, antrean persetujuan, dan data HR yang dibuka jabatannya. Sejak 2026-10-16 pengamannya **hanya jejak sesi**, bukan larangan dan bukan pemberitahuan, dan jejak itu belum punya layar baca. Bila kelak dinilai terlalu luas, mempersempitnya cukup mengganti satu pemeriksaan pemakai.
 
 **Yang tidak dijanjikan.**
 - Bertindak atas nama orang lain (akses darurat IT) tidak termasuk; itu menunggu SA-1 [[ADR - 0137 Model Persetujuan Tunggal dan Pemisahan Tugas Lintas Modul]].
@@ -20,7 +20,7 @@
 
 ## Deskripsi
 
-*Anggota IT dapat memulai sesi "lihat sebagai" seorang karyawan aktif. Gateway menerbitkan token berumur 30 menit berisi identitas penuh target ditambah penanda peniru; gateway menolak semua permintaan tulis, slip pribadi, dan penukaran token dari sesi itu; employee-service mencatat sesinya sebelum token terbit dan memberi tahu target.*
+*Anggota IT dapat memulai sesi "lihat sebagai" seorang karyawan aktif. Gateway menerbitkan token berumur sama dengan token login berisi identitas penuh target ditambah penanda peniru; gateway menolak semua permintaan tulis, slip pribadi, GET yang mengubah keadaan milik pemanggil, dan penukaran token dari sesi itu; employee-service mencatat sesinya sebelum token terbit. Target tidak diberi tahu.*
 
 - **Status**: 🟡 Diusulkan, 2026-10-15
 - **Path di repo** (akan disentuh): `bip-erp/api-gateway/main.go` · `bip-erp/api-gateway/redis.go` · `bip-erp/shared-library/auth/jwt.go` · `bip-erp/shared-library/routes/gateway_request.go` · `bip-erp/shared-library/common/header.go` · `bip-erp/shared-library/models/notification/models.go` · `bip-erp/services/employee/` (penerbit payload, kandidat, koleksi sesi) · `bip-erp/services/task-management/ws_handler.go` · `bip-erp/services/vault-mcp/erp.go` · `erp-frontend/src/components/layout/header.tsx` · `erp-frontend/src/lib/axios.ts` · `erp-frontend/src/lib/sesi-token.ts` · `my-bharata` `notification_type.dart`
@@ -41,12 +41,13 @@ Diukur ke `origin/main` bip-erp dan erp-frontend, 2026-10-15.
 ## Decision
 
 1. **Identitas tiruan adalah orang nyata.** Pemilih: jabatan, lalu pemegangnya. Target harus karyawan aktif, bukan akun pihak luar, bukan diri sendiri.
-2. **Token tiruan diterbitkan gateway** lewat jalur payload yang sama dengan login (satu jalur, dijaga test), ditambah klaim `diperankan_oleh`, `diperankan_nama`, `sesi_tiruan_id`. Umur 30 menit, tanpa perpanjangan.
+2. **Token tiruan diterbitkan gateway** lewat jalur payload yang sama dengan login (satu jalur, dijaga test), ditambah klaim `diperankan_oleh`, `diperankan_nama`, `sesi_tiruan_id`. Umurnya **sama dengan token login** (keputusan user 2026-10-16, menggantikan 30 menit), tanpa perpanjangan. Satu sumber angka: employee-service menetapkan `kedaluwarsa` sesi dari umur token login (`auth.UmurToken`), gateway menurunkan umur token tiruan dari `kedaluwarsa` itu.
 3. **Baca-saja ditegakkan di gateway, satu tempat.** Untuk token bertanda peniru: semua metode selain GET/HEAD ditolak 403 `mode_lihat_sebagai`; slip pribadi (`payroll` `/payroll-runs/my*`, `/me`) ditolak; `/auth/refresh`, `/auth/verify-pin`, `/auth/sso/*`, dan memulai tiruan baru ditolak. Service yang mem-parse JWT sendiri (WebSocket task-management, vault-mcp) menolak token tiruan.
 4. **Pemakai: siapa pun yang `system_roles`-nya memuat `it`**, keputusan user 2026-10-15. Bukan paket izin khusus.
 5. **Jejak wajib.** Sesi dicatat employee-service (`sesi_lihat_sebagai`) **sebelum** token terbit; gagal mencatat berarti tidak ada sesi. Alasan wajib diisi. Daftar halaman yang dibuka dicatat best-effort, tanpa query string.
-6. **Target diberi tahu** lewat inbox saat sesi mulai, dengan kategori yang dipetakan eksplisit di web dan MyBharata.
+6. ~~Target diberi tahu lewat inbox saat sesi mulai.~~ **Dicabut 2026-10-16 oleh user: target tidak diberi tahu.** Kategori inbox `account-viewed-by-it` tetap terdaftar (tak dipakai) supaya notification-service tak perlu ikut di-deploy; pemetaannya di MyBharata tak berbahaya.
 7. **Cache respons gateway dipisah** untuk sesi tiruan, supaya tidak berbagi atau mencemari cache milik target.
+8. **GET yang mengubah keadaan milik pemanggil ditolak** untuk sesi tiruan (ditambahkan 2026-10-16 dari sapuan seluruh service): `notification` `/inbox?id=` (menandai terbaca), `employee` `/me/contracts/*/ttd/dokumen` (mencatat bukti karyawan membuka kontraknya), `warehouse` `/fulfillment/queue/export` (menandai order diekspor atas nama pemanggil), `integration` `/lazada/auth` dan `/meta/auth` (state OAuth atas nama pemanggil). Satu tabel aturan di `api-gateway/lihat_sebagai.go`; GET baru yang menulis atas nama pemanggil wajib ditambahkan ke tabel itu.
 
 ## Consequences
 
@@ -55,11 +56,15 @@ Diukur ke `origin/main` bip-erp dan erp-frontend, 2026-10-15.
 - Seluruh service hilir bekerja tanpa diubah, karena header yang mereka baca memang milik target.
 
 **Yang harus diterima.**
-- Setiap anggota IT bisa membaca data yang terlihat oleh siapa pun. Pengamannya jejak dan pemberitahuan.
+- Setiap anggota IT bisa membaca data yang terlihat oleh siapa pun. Sejak 2026-10-16 pengamannya hanya jejak sesi; target tidak tahu, dan jejaknya belum punya layar baca.
 - Daftar halaman yang dibuka bisa bolong bila pencatatan asinkron gagal; awal dan akhir sesi tidak.
-- Daftar pencabutan token gateway ada di memori dan hilang saat restart; umur 30 menit membatasi dampaknya.
+- Daftar pencabutan token gateway ada di memori dan hilang saat restart. Dengan umur token 72 jam, token tiruan yang sudah "Kembali ke akun saya" bisa hidup lagi sampai 72 jam bila gateway restart sebelum ia kedaluwarsa (sebelumnya dibatasi 30 menit).
 - Tab lain yang dimuat ulang selama sesi ikut memakai token tiruan (penyimpanan token dibagi antar-tab); pita peringatan tampil di sana juga.
-- Kategori inbox baru berarti pengirim dan notification-service di-deploy bersama.
+- Daftar GET penanda (keputusan 8) hanya selengkap sapuan 2026-10-16; GET penulis baru yang tak didaftarkan akan mengubah keadaan milik target tanpa galat.
+
+## Riwayat perubahan
+
+- **2026-10-16, keputusan user**: target tidak diberi tahu (keputusan 6 dicabut); umur sesi sama dengan login biasa, bukan 30 menit (keputusan 2); GET yang menulis atas nama pemanggil diblokir (keputusan 8 baru). Implementasi: bip-erp#3219, erp-frontend#2532.
 
 ## Belum Diputuskan (TBD)
 
