@@ -20,7 +20,7 @@
 
 ## Deskripsi
 
-*Halaman `/portal/persetujuan` ("Persetujuan") memuat semua yang menunggu tindakan pemanggil, baik keputusan maupun tindakan operasional. Agregator employee-service mengirim kode tindakan (`aksi`) per baris; frontend hanya menerjemahkannya ke kalimat dua bahasa. Klik baris membuka Sheet berkerangka bersama yang badannya memakai komponen detail milik modul. Riwayat memuat dokumen yang pernah pemanggil proses 30 hari terakhir beserta posisinya saat ini.*
+*Halaman `/portal/persetujuan` ("Persetujuan") memuat semua yang menunggu tindakan pemanggil, baik keputusan maupun tindakan operasional. Agregator employee-service mengirim kode tindakan (`aksi`) per baris; frontend hanya menerjemahkannya ke kalimat dua bahasa. Klik baris membuka Sheet berkerangka bersama yang badannya memakai komponen detail milik modul. Riwayat memuat dokumen yang pernah pemanggil proses beserta posisinya saat ini.*
 
 - **Status**: 🟢 Diterima, kode belum ada (lihat baris status di atas)
 - **Path di repo** (akan disentuh): `bip-erp/services/employee/antrean_pengajuan.go` · `bip-erp/services/procurement/pengajuan_barang_diproses_saya.go` (disambung, tidak diubah perilakunya) · `erp-frontend/src/app/(main)/portal/persetujuan/` · `erp-frontend/src/features/persetujuan/` · `erp-frontend/src/i18n/locales/{id,en}.ts`
@@ -82,7 +82,8 @@ Diukur di `origin/main` 2026-10-15:
 
 **2. Menu terbuka untuk SEMUA karyawan** (sudah `public: true` hari ini). Penyaringan per pemanggil tetap dikerjakan **service sumber**, tidak berubah dari ADR 0114. Ini mengesahkan penyimpangan irisan 1 atas ADR 0114 butir 10 (gerbang data) menjadi keputusan.
 
-**3. Kode tindakan dikirim backend.** Agregator mengirim field `aksi` per baris, berupa kode enum: `putuskan`, `jawab_stok`, `isi_harga`, `transfer`, `konfirmasi_transfer`, `catat`, `triase`, `pantau`.
+**3. Kode tindakan dikirim backend.** Agregator mengirim field `aksi` per baris, berupa kode enum: `putuskan`, `jawab_stok`, `isi_harga`, `transfer`, `konfirmasi_transfer`, `catat`, `serah_terima`, `periksa_qc`, `triase`, `tindak_lanjut`, `pantau`.
+   - `catat` = HANYA pencatatan accounting. `serah_terima` = serah GA, barang tiba, terima GA, terima RM, dan serah GA Permintaan Barang GA. `periksa_qc` = QC dan QC GA. `tindak_lanjut` = kelebihan bayar (procurement menolak Setujui di tahap itu) dan jaring pengaman untuk tahap yang belum dikenal; tombolnya ke halaman dokumen, BUKAN Setujui. Tiga kode terakhir ditambahkan 2026-10-15 oleh irfanarfianto sesudah judge menemukan tahap operasional non-accounting terpetakan ke `catat` dan kelebihan bayar ke `putuskan`.
 - Pemetaan tahap ke aksi tinggal di **adapter agregator per sumber** untuk sumber yang sudah ada, dan **disetor sendiri** oleh sumber baru (sejalan ADR 0114 butir 7).
 - Frontend hanya menerjemahkan kode ke kalimat i18n `id` dan `en` ([[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]).
 - Alasannya satu fakta satu tempat. Frontend yang menebak aksi dari tahap menyimpan salinan pengetahuan tahap milik modul lain, dan salinan itu basi diam-diam begitu modul menambah tahap. Backend yang mengirim kalimat jadi melanggar ADR 0010.
@@ -127,7 +128,7 @@ Diukur di `origin/main` 2026-10-15:
 
 **10. Keadaan kosong total** (dialami mayoritas staf) menjelaskan fungsi halaman, lalu menautkan "Lihat status pengajuan saya" (menu Pengajuan) dan Riwayat. Kosong karena saringan dibedakan dari kosong total.
 
-**11. Riwayat** memuat dokumen yang pernah **pemanggil** proses dalam 30 hari terakhir, terbaru dulu.
+**11. Riwayat** memuat dokumen yang pernah **pemanggil** proses, terbaru dulu. Jendelanya mengikuti tiap sumber (attendance 30 hari, pengajuan barang 200 dokumen terbaru lewat `/diproses-saya`), jadi layar TIDAK menjanjikan angka jendela (dikoreksi 2026-10-15 sesudah judge menemukan klaim 30 hari tak berlaku untuk semua sumber).
 - Kolom: Diproses, Dokumen, Pemohon, Nilai, **Posisi sekarang** (tahap atau status dokumen **saat ini**, bukan saat pemanggil bertindak), Tindakan Anda (lencana hasil dan alasan).
 - Panel baca-saja. Filter per hasil.
 - Arti "riwayat" tetap yang ketat dari ADR 0114 butir 11: keputusan atau tindakan pemanggil sendiri, bukan "sudah diproses siapa pun".

@@ -19,7 +19,7 @@ Rinciannya di ADR induk; di sini hanya pegangan:
 - Pil per aksi; bawaan "Perlu tindakan" menyembunyikan `pantau`.
 - Sheet berkerangka bersama, badan dari komponen detail modul; footer per mode; tanpa "lalu berikutnya".
 - Spanduk volume ke layar kerja modul yang sudah ada (`catat` → tab Ringkasan `/finance/tim-accounting`; `transfer` → `/finance/ap`).
-- Riwayat 30 hari tindakan pemanggil, dengan kolom Posisi sekarang.
+- Riwayat tindakan pemanggil (terbaru dulu), dengan kolom Posisi sekarang. Jendelanya mengikuti sumber, BUKAN seragam 30 hari: attendance 30 hari, pengajuan barang 200 dokumen terbaru (`/diproses-saya`); layar tidak menjanjikan angka jendela.
 - Tanpa penanda SLA, kecuali usulan spanduk tiket >7 hari.
 
 ## Irisan 0: perbaikan bug, bisa langsung dan terpisah
@@ -96,7 +96,7 @@ Diputus pemilik produk lewat beberapa putaran mockup (https://claude.ai/artifact
 - Waktu relatif ditulis lengkap ("20 menit yang lalu", "7 hari yang lalu") lewat `Intl.RelativeTimeFormat` + `intlLocale(lang)`, tanggal kecil di bawahnya. Kolom cukup lebar supaya tidak terpotong tiga baris.
 - Dokumen: lencana kategori + nomor + perihal + satu baris keterangan yang tidak mengulang jenis (mis. entitas, jumlah item).
 - Pemohon: `Avatar` (foto profil, fallback inisial) satu baris dengan nama + posisi·departemen. Butuh field foto dari backend.
-- Lencana aksi = `Badge` berikon; identitas dari ikon + teks, warna penguat, pasangan yang tampil bersama berbeda rona dan terang: putuskan `info`, konfirmasi_transfer dan transfer `warning`, catat `pending`, jawab_stok dan triase `secondary`, pantau `outline`. Hasil riwayat: disetujui `success`, ditolak `destructive`, dikembalikan `warning`, lainnya `default`.
+- Lencana aksi = `Badge` berikon; identitas dari ikon + teks, warna penguat, pasangan yang tampil bersama berbeda rona dan terang: putuskan `info`, konfirmasi_transfer dan transfer `warning`, catat, isi_harga, dan periksa_qc `pending`, jawab_stok dan triase `secondary`, serah_terima `default` (beda dari jawab_stok yang tampil bersama di layar Gudang GA), tindak_lanjut dan pantau `outline`. Hasil riwayat: disetujui `success`, ditolak `destructive`, dikembalikan `warning`, lainnya `default`.
 - Lima keadaan (`ui-checklist.md` §2): Skeleton setinggi baris, galat bersebab + Coba lagi, terkunci menyebut siapa yang boleh, sebagian menandai sumber `degraded`, kosong `MascotState` (total vs saringan dibedakan).
 - Ponsel: periksa dulu apakah `MainTable` sudah punya tampilan kartu; bila belum, task terpisah, jangan menambah prop ke `MainTable` demi satu halaman.
 
