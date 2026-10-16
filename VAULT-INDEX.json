@@ -15111,20 +15111,20 @@
         "IT - Backup & DR",
         "DB - Overview and Notes"
       ],
-      "hash": "93387251705ccb535a6469c181cbe3f6983f391f956f4b66920b8e9661294db4",
-      "ukuran_kb": 8.6,
-      "ringkasan": "Menjawab: server, VM, dan VPS apa saja yang dimiliki IT beserta perannya (dev, testing, produksi, monitoring), mesin mana yang aktif atau tidak dipakai, dan isi container tiap mesin menurut potret terukur. Juga memuat cara akses database MongoDB produksi lewat tunnel dan daftar koneksi per service; dokumen sumber memuat kredensial akses internal yang tidak diringkas di sini.",
+      "hash": "852702c8cca7da7a3c9d49e53e25bb7e175788af8a1724bd5a23d51848043dcb",
+      "ukuran_kb": 8.9,
+      "ringkasan": "Menjawab: server, VM, dan VPS apa saja yang dimiliki tim IT beserta IP dan kredensial aksesnya, mesin mana yang menjadi server produksi ERP (VPS Biznet) dan mana yang sudah tidak dipakai, serta isi container dan compose project tiap mesin. Juga menjawab cara mengakses MongoDB produksi lewat SSH tunnel dan di mana relay AI 9router (code.bharatainternasional.com) berjalan.",
       "kata_kunci": [
         "server",
         "VM",
-        "VPS",
-        "inventaris",
-        "database",
-        "MongoDB",
-        "docker compose",
+        "VPS Biznet",
         "produksi",
+        "IP address",
+        "kredensial",
+        "MongoDB",
         "SSH tunnel",
-        "network monitor"
+        "docker compose",
+        "9router"
       ]
     },
     {
@@ -21714,22 +21714,20 @@
         "REF - Alur Persetujuan",
         "Microservices - Employee Service"
       ],
-      "hash": "c786fc67728cb484c8985eb8931e27ae78d02f7342516acddcaf0a7486829560",
-      "ukuran_kb": 16.6,
-      "ringkasan": "Menjawab: bagaimana ADR 0181 dipecah menjadi irisan kerja, yaitu irisan 0 perbaikan bug (offer Draft palsu, Live Support tanpa tahap, label tahap mentah, urutan terbaru dulu), irisan 1 kontrak baris baru dan tabel BE+FE, lalu panel per kategori. Memuat tabel tujuan klik per kategori, kriteria yang harus benar (urutan Terlama/Terbaru lewat ?urut=, nilai null bukan Rp 0), urutan deploy BE sebelum FE, dan hal yang masih TBD.",
+      "hash": "f567b5c0c6d9ad00d5da8c08216a2296b5310bb88ea198512b9bbfa8831d63a7",
+      "ukuran_kb": 19.3,
+      "ringkasan": "Menjawab: bagaimana halaman Persetujuan (/portal/persetujuan) diperluas agar memuat tindakan operasional selain keputusan, kode aksi apa yang dikirim agregator, kolom dan urutan tabel apa yang disepakati, dan ke mana klik tiap kategori diarahkan. Juga memecah pekerjaan jadi irisan siap /brief, termasuk perbaikan bug antrean (offer Draft palsu, Live Support tanpa tahap, label tahap mentah, urutan terlama dulu) beserta kriteria yang harus benar dan urutan deploy BE sebelum FE.",
       "kata_kunci": [
         "portal persetujuan",
-        "analisa",
-        "irisan",
-        "antrean_pengajuan",
+        "approval",
+        "antrean",
+        "tindakan operasional",
         "aksi",
-        "kontrak baris",
-        "offer draft",
-        "Live Support",
-        "urut terlama",
-        "task breakdown",
-        "brief",
-        "ADR 0181"
+        "agregator",
+        "ADR 0181",
+        "pengajuan barang",
+        "irisan",
+        "urutkan terlama"
       ]
     },
     {
