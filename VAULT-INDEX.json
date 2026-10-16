@@ -20775,16 +20775,17 @@
         "ADR - 0184 Forecast Kas Mingguan Mencakup Tujuh Komponen Uang Keluar, Dibagi Empat Minggu, Realisasi Bertahap",
         "Finance - Serapan Anggaran dan Cost Control"
       ],
-      "hash": "8ce2f3276131aada720ddc4b2025d136085ec804f1562e7c33cd72fabd164142",
-      "ukuran_kb": 3.8,
-      "ringkasan": "Menjawab: urutan task membangun cashflow tujuh komponen (verifikasi bagan akun, pemetaan komponen, isian proyeksi dan anggaran aset, realisasi bertahap, layar), dependensinya, dan pertanyaan terbuka untuk Finance.",
+      "hash": "676ca7531070dc51c43838104ad36dcef7e365f3cf26e4350892d2c7cd784d4e",
+      "ukuran_kb": 5.0,
+      "ringkasan": "Menjawab: urutan task membangun cashflow tujuh komponen (verifikasi bagan akun, pemetaan komponen, isian proyeksi dan anggaran aset, realisasi bertahap, layar), status tiap task, catatan risiko dari judge (akun beban pajak jangan dijumlahkan ke komponen pajak, minggu 5 lama), dan pertanyaan terbuka untuk Finance.",
       "kata_kunci": [
         "cashflow",
         "task",
         "forecast kas",
         "komponen kas",
         "analisa kebutuhan",
-        "cost control"
+        "cost control",
+        "pajak ganda"
       ]
     },
     {
