@@ -10135,9 +10135,9 @@
         "HRIS - Matriks KPI per Departemen",
         "REF - Kepemilikan Data"
       ],
-      "hash": "90880da9a47a586b219324794073011d0fc84bce94ec51da5d1a0718918901b1",
-      "ukuran_kb": 14.1,
-      "ringkasan": "Menjawab: komponen apa saja yang masuk cashflow/forecast kas mingguan (material, BOP, marketing, gaji, ops adum, pajak, aset), dari mana proyeksi dan realisasinya, kenapa sebulan dibagi empat minggu, bagaimana KPI Cost Control #4 akurasi forecast ikut berubah, dan asumsi yang masih menunggu Finance.",
+      "hash": "fa8c061c3ca91cd6fc598f9ea89cba69dbe8f67b8d507fced4932dc7417ce7f5",
+      "ukuran_kb": 14.7,
+      "ringkasan": "Menjawab: komponen apa saja yang masuk cashflow/forecast kas mingguan (material, BOP, marketing, gaji, ops adum, pajak, aset), dari mana proyeksi dan realisasinya, kenapa sebulan dibagi empat minggu, bagaimana KPI Cost Control #4 berubah dan kapan isian proyeksi masuk akurasi (bersama realisasinya di C3), serta asumsi yang menunggu Finance.",
       "kata_kunci": [
         "cashflow",
         "arus kas",
