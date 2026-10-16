@@ -48,6 +48,32 @@ Cara kerja:
 
 ⚠️ **Jangan dibaca sebagai cara menaikkan KPI.** Akurasi bulan dan KPI Cost Control #4 dihitung dari **total** sebulan, dan total itu tidak berubah saat porsi digeser antar-minggu. Yang berubah hanya akurasi **per minggu**, dan akurasi **bulan berjalan** (karena hanya minggu selesai yang dihitung, porsi minggu-minggu awal ikut menentukan angka tengah bulan). Angka akhir bulan tidak terpengaruh.
 
+### Cashflow Tujuh Komponen (🟡 diputuskan 2026-10-16, kode belum ada)
+
+Keputusan: [[ADR - 0184 Forecast Kas Mingguan Mencakup Tujuh Komponen Uang Keluar, Dibagi Empat Minggu, Realisasi Bertahap]]. Keputusan ini mengamandemen ADR 0161 pada cakupan, jumlah sebulan, dan pembagian minggu. Selama kodenya belum ada, perilaku yang tertulis di dua bagian di atas tetap berlaku.
+
+Cara kerja yang diputuskan:
+
+- **Cakupan.** Forecast mencakup tujuh komponen uang keluar:
+  - Pembelian material
+  - BOP produksi (akun 5201, 5102, seluruh 53xx, dan perlengkapan produksi)
+  - Beban marketing (61xx)
+  - Beban gaji
+  - Beban ops adum (62xx, 73xx)
+  - Pajak
+  - Pembelian aset
+
+  Akun penyusutan dikecualikan. Pemetaan akun ke komponen ditulis di satu tempat di integration-service. Layar menerima komponen dari respons dan tidak memetakan sendiri.
+- **Proyeksi.** Operasional (marketing, gaji, adum) diambil dari RAPB tanpa penyusutan. Material, BOP, Pajak, dan Aset berasal dari isian Cost Control per komponen per bulan. Jumlah sebulan = Σ proyeksi komponen, bukan lagi = RAPB.
+- **Aset.** Anggaran aset bersifat tahunan. Layar menampilkan sisa anggaran tahun berjalan, sedangkan total bulanan hanya memuat proyeksi aset bulan itu.
+- **Minggu.** Satu bulan selalu dibagi 4 minggu. Minggu 1–3 masing-masing 7 hari dari tanggal 1, dan minggu 4 mencakup tanggal 22 sampai akhir bulan. Porsi bawaan rata ¼. Atur proyeksi tetap berlaku.
+- **Realisasi bertahap.**
+  - Tahap 1: Operasional dan BOP memakai mutasi akun (akrual), Pajak memakai setoran nyata, dan Aset memakai salinan aset tetap.
+  - Tiap komponen ditandai `akrual` atau `kas`.
+  - Tahap 2 mengganti sumber per komponen ke basis kas setelah Finance menjelaskan sumber yang mereka pakai secara manual.
+- **Pembanding.** Total uang keluar riil dari seluruh rekening bank (salinan ADR 0163) tampil di samping total realisasi. ⚠️ Angka ini **tidak dipakai KPI**, dan **jangan dijumlahkan** dengan realisasi komponen karena keduanya mengukur uang yang sama dari dua sisi.
+- **KPI #4.** Cost Control #4 dan SPV Finance F4 ikut definisi baru dengan rumus yang sama. Skor periode yang sudah beku tidak dihitung ulang tanpa keputusan HRD.
+
 Tambahan di luar halaman ini: kotak **sisa pos** di bawah tiap baris form pencatatan Accounting, dan kartu **Anggaran** baca-saja di tahap Cost Control pada detail pengajuan (pos yang sudah lewat anggaran bulan ini, maksimal 5, sisanya diringkas, plus tautan ke tab Serapan). Kartu itu tidak memperkirakan pos pengajuan, karena pos baru ditetapkan Accounting.
 
 ## Aturan Membaca Angka
