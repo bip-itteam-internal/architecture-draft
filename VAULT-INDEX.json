@@ -13580,19 +13580,20 @@
         "Microservices - Form Builder Service",
         "ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia"
       ],
-      "hash": "cf1f36d04be43bd98af31505f89b49583e6a90b4a44c2a08446e5d49dcdb2dad",
-      "ukuran_kb": 47.6,
-      "ringkasan": "Menjawab: issue backlog mana saja yang disentuh agent otonom pada Oktober 2026, apa hasilnya (PR, Butuh Info, dilewati), dan kenapa sebagian besar tertahan karena keputusan belum diambil. Berguna untuk melacak status issue tertentu, alasan Butuh Info, estimasi vs realisasi, dan pelajaran operasional runner backlog.",
+      "hash": "7ef2e3021b0827f4ac856e5a524c3a874bef961f03858b2881b53ac9a3cbdd1e",
+      "ukuran_kb": 50.1,
+      "ringkasan": "Menjawab: issue backlog mana saja yang disentuh agent otonom selama Oktober 2026, apa hasilnya (PR, Butuh Info, dilewati), dan kenapa sebagian besar tertahan karena keputusan belum ada atau prasyarat belum selesai. Juga mencatat estimasi vs realisasi, sebab keterlambatan, dan pelajaran per issue untuk memperbaiki runner backlog.",
       "kata_kunci": [
         "agent backlog otonom",
         "runner backlog",
         "Butuh Info",
         "log agent",
-        "GitHub Project",
-        "issue",
-        "estimasi",
+        "GitHub Project #15",
+        "Siap Agent",
+        "estimasi selesai",
         "pelajaran",
-        "autonomous agent"
+        "autonomous agent",
+        "Oktober 2026"
       ]
     },
     {
@@ -18218,20 +18219,20 @@
       "status_teks": null,
       "publik": false,
       "tautan": [],
-      "hash": "f71a435b6a65cf404eb26f960d784249da6cf68405a01b6930e90050d5d1cc17",
-      "ukuran_kb": 7.2,
-      "ringkasan": "Menjawab: apa saja task untuk membangun Preventive Maintenance berjadwal per aset, urutannya, dan mana yang saling bergantung (T0 sampai T8). Menjelaskan mana yang bukan pekerjaan dev (GA menyusun daftar perawatan per aset, dan pemasangan sumber ke template KPI), jebakan teknis tiap task seperti fungsi murni penurunan jatuh tempo, nama koleksi literal untuk penjaga soft-delete, dan balasan kosong yang bukan `null`. Juga menjawab urutan deploy, bukti verifikasi end-to-end yang diterima, ukuran keberhasilan berupa dokumen Google teknisi berhenti dipakai, serta apa yang sengaja di luar lingkup seperti metrik biaya dan patroli Security.",
+      "hash": "094bcf61f12be2bae8eda9f77d2619af8527b3e62d8d4e8d8103646d86b870ad",
+      "ukuran_kb": 8.4,
+      "ringkasan": "Menjawab: task apa saja dan dalam urutan apa untuk membangun preventive maintenance berjadwal per aset (jadwal pm_jadwal, realisasi berfoto pm_realisasi, verifikasi SPV GA, endpoint metrik, sumber KPI pemeliharaan_preventif, layar GA), serta ketergantungannya pada daftar perawatan dari GA. Juga menjelaskan cara menghitung penyebut jatuh tempo, perlakuan status menunggu/draf, ukuran keberhasilan, dan apa yang sengaja tidak dikerjakan (metrik biaya).",
       "kata_kunci": [
-        "daftar task",
         "preventive maintenance",
+        "perawatan berkala",
         "PM",
         "pm_jadwal",
         "pm_realisasi",
+        "jatuh tempo",
+        "KPI GA",
+        "Building Maintenance",
         "inventory-service",
-        "employee-service",
-        "urutan deploy",
-        "GA Staff",
-        "papan kerja"
+        "verifikasi SPV"
       ]
     },
     {

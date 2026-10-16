@@ -41,6 +41,8 @@ Sumbernya dokumen GA **"Checklist Jumlah Aset yang di-maintenance"**, yang **bel
 - **Foto wajib**, realisasi tanpa foto ditolak di server. Ini inti keputusannya, bukan validasi kosmetik.
 - Status: `menunggu` → `diverifikasi` | `ditolak`. SPV **tidak memberi angka**, hanya menerima atau menolak beserta alasan.
 - Pola unggah meniru track Inspeksi Area (submit dulu lalu unggah), jangan membuat alur unggah baru.
+- ⚠️ Implementasi (menunggu merge PR https://github.com/bip-itteam-internal/bip-erp/pull/3221): status jadi **empat**. `draf` = tercatat, bukti belum lengkap (setara belum ada realisasi: tetap di penyebut, tidak di pembilang); `menunggu` dipasang **server** begitu ada ≥1 foto sebelum DAN ≥1 foto sesudah. T4 dan antrean Portal Persetujuan cukup membaca `menunggu`, dan `draf` wajib dikecualikan. Penyetuju = SPV strict `General Affair` (`menaungiDepartemen`, preseden approve-handover), bukan pelaksananya. Kirim ulang sesudah `ditolak` memakai dokumen yang sama dan mengosongkan `alasan_tolak`/`diverifikasi_oleh` (riwayat penolakan belum disimpan, TBD).
+- ⚠️ Setoran Portal Persetujuan (menunggu merge PR https://github.com/bip-itteam-internal/bip-erp/pull/3222): `GET /pm-realisasi/antrean` dan `/pm-realisasi/riwayat` di inventory, sumber `pm_realisasi` di `registriAntrean` (aksi `putuskan`, tahap `pm_verifikasi_spv`), umur tunggakan dari `menunggu_pada`.
 
 ## T3 — Penurunan jatuh tempo, sebagai FUNGSI MURNI
 
@@ -51,6 +53,8 @@ Dari `(frekuensi, mulai_berlaku, period_key)` menghasilkan daftar jadwal yang ja
 ## T4 — `GET /internal/pm-metrik?periode=`
 
 Mengembalikan per karyawan: jatuh tempo, terverifikasi, menunggu, dan nilainya.
+
+- ⛔ **TBD (2026-10-16, bip-erp#3216 Butuh Info)**: `pm_jadwal` tidak punya pemilik/PIC, jadi belum ada aturan jadwal mana yang menjadi penyebut karyawan mana (dan metrik mana untuk posisi Building Maintenance vs GA Staff). Opsi di issue.
 
 - Realisasi ber-status `menunggu` **keluar dari pembilang dan penyebut** (ADR 0123 §6).
 - Jatuh tempo nol menghasilkan **nilai absen**, bukan 0 dan bukan 100.
