@@ -112,6 +112,22 @@ Diputus pemilik produk lewat beberapa putaran mockup (https://claude.ai/artifact
 - Nomor rekening penuh hanya boleh terkirim ke pemanggil yang berhak menindak dokumen itu (gerbang di service sumber).
 - Data yang perlu diukur ke procurement sebelum panel dibangun (TBD bila belum ada): nominal + rekening yang dicatat AP saat transfer, nama pelaku tiap langkah jenjang, keperluan pengajuan.
 
+### Keputusan panel Pengajuan Barang (Pemutus irfanarfianto, 2026-10-16)
+
+Diukur ke kode `origin/main` sebelum dibangun:
+- **"Kembalikan ke AP" TIDAK dibangun di irisan ini.** Fitur itu belum ada di FE maupun BE, dan BE sengaja menutup tolak/revisi di `pb_spv_transfer` (`services/procurement/pengajuan_barang_transisi.go`). Panel hanya punya "Konfirmasi transfer"; bila bukti tak cocok SPV membuka halaman dokumen. Kembalikan ke AP = kebutuhan terpisah yang butuh ADR (mengubah alur finance).
+- **Rekening di blok Cocokkan memakai data yang ada.** Pembelian: `rekening_pemasok` (bank, nomor penuh, atas nama) dari amplop detail (sudah dikirim BE, belum dibaca FE). Non-pembelian (Dana/Iklan/Pajak): sistem tidak menyimpan rekening penerima; tampilkan nama penerima dari `bkk_isian.dibayarkan_kepada` + kalimat bahwa rekening dicocokkan di bukti transfer. Nominal dicocokkan pengajuan vs nominal transfer AP (`nominal_disesuaikan_ap` / `transfer[]`); bukti transfer dari `GET /pengajuan-barang/:id/bukti-transfer`.
+- **Badan panel disusun dari komponen modul yang sudah ada** (bukan salinan, bukan mengekstrak `SheetDetailPengajuan` yang merender Sheet utuh): `LinimasaPengajuan` (nama pelaku per langkah), `LampiranPengajuan`, `AksiPersetujuanSheet`, `KartuKonfirmasiTransferPembelian`, `FormCekStok`. Aksi yang perakitannya terikat halaman (transfer AP, isi harga, catat accounting, kedatangan/QC) = satu tombol ke `/pengajuan-barang/<id>`.
+
+### Keputusan panel Tiket (Pemutus irfanarfianto, 2026-10-16)
+
+Diukur ke kode `origin/main` sebelum dibangun (induk bip-erp#3223):
+- **Tautan baris tiket = `/task-management/pending/<id>`** (`TriageView`), bukan `/task-management/<id>` (`TaskDetailView`, tanpa aksi triase). Dihitung per baris di `petakanTiket` (`services/employee/antrean_pengajuan.go`).
+- **Form triase dan dialog tolak DIEKSTRAK dari `TriageView`** jadi komponen mandiri di modul task-management (`form-triase.tsx`: `useTriase` + `FormTriase`; `dialog-tolak-tiket.tsx`), dipakai bersama halaman triase dan panel. Navigasi lewat callback, bukan `router.push` di dalam komponen.
+- **Alasan tolak WAJIB**, berlaku juga di halaman triase karena dialognya dipakai bersama.
+- **Panel memuat** keluhan, pemohon · divisi · space, deskripsi, lampiran, form triase (prioritas dengan tenggat otomatis, PIC, tanggal mulai), footer Setujui + Tolak. Syarat Setujui mengikuti `useTriase` (sumber tunggal, logika halaman lama: prioritas dan PIC, kecuali space auto-assign yang punya anggota). **Koreksi tipe dan pindah space tetap di halaman triase.**
+- Spanduk tiket menunggu > 7 hari: TBD.
+
 ## Irisan 2 dan seterusnya: panel per kategori, urut volume prod
 
 1. **Pengajuan Barang**: aksi `catat`, `transfer`, `konfirmasi_transfer`, `jawab_stok`, `isi_harga`, `putuskan`. Badan memakai `SheetDetailPengajuan`; footer per mode (ADR induk butir 6). Spanduk volume: `catat` ke tabel antrean pencatatan di tab Ringkasan `/finance/tim-accounting` (`antrean-pencatatan-accounting.tsx`; halaman digerbang `finance.accounting.view`, tabelnya hanya bagi pemegang `budget.accounting.pencatatan`, jadi spanduk hanya untuk pemegang izin yang sama), `transfer` ke `/finance/ap`.
