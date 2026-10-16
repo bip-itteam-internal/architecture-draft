@@ -139,6 +139,10 @@ Untuk tiap komponen ditampilkan proyeksi dan realisasinya per minggu.
    - Rumus akurasi tidak berubah; yang berubah populasi dan proyeksinya.
    - employee-service tidak lagi menyalin angka "6 akun". Penyebut cakupan dibaca dari respons.
    - Berlaku untuk periode yang belum beku. Skor Juli–September yang sudah beku tidak dihitung ulang tanpa keputusan HRD.
+   - *Urutan penerapan (diputuskan Azzerith 2026-10-16, setelah judge C2):*
+     - Sampai realisasi komponen isian (Material, Pajak, Aset, bagian isian BOP) tersedia di C3, **akurasi forecast dan KPI tetap dihitung dari bagian RAPB saja**.
+     - Proyeksi yang memuat isian dikirim di field terpisah dengan nama yang tidak mungkin tertukar. Satu objek ringkasan minggu tidak boleh memuat proyeksi dan akurasi dari populasi yang berbeda.
+     - Isian masuk basis akurasi bersamaan dengan realisasinya di C3. Sejak saat itu, isian bulan berjalan wajib tunduk pada kunci minggu dan batas ubah yang sama (ADR 0161).
 8. **Pemisahan dari metrik #1 dilepas secara sadar.** Varians OPEX (metrik #1) dan forecast (#4) kini sama-sama memuat OPEX. Ini permintaan Finance, dan alasan subset di `kas_keluar_daftar.go:20-24` tidak berlaku lagi.
 
 ## Consequences
