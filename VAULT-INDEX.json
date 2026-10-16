@@ -13580,20 +13580,19 @@
         "Microservices - Form Builder Service",
         "ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia"
       ],
-      "hash": "7ef2e3021b0827f4ac856e5a524c3a874bef961f03858b2881b53ac9a3cbdd1e",
-      "ukuran_kb": 50.1,
-      "ringkasan": "Menjawab: issue backlog mana saja yang disentuh agent otonom selama Oktober 2026, apa hasilnya (PR, Butuh Info, dilewati), dan kenapa sebagian besar tertahan karena keputusan belum ada atau prasyarat belum selesai. Juga mencatat estimasi vs realisasi, sebab keterlambatan, dan pelajaran per issue untuk memperbaiki runner backlog.",
+      "hash": "a9e088c12711133c0f654ef3417d98b41ad83a5a30b92cedc30386726195e5ce",
+      "ukuran_kb": 50.4,
+      "ringkasan": "Menjawab: issue backlog mana saja yang disentuh agent otonom pada Oktober 2026, apa hasilnya (PR, Butuh Info, atau dilewati), dan mengapa sebagian besar berhenti di Butuh Info (keputusan belum ada, prasyarat belum merged, sub-issue tanpa badan). Juga memuat ketepatan estimasi, sebab keterlambatan, dan pelajaran per issue dari runner backlog.",
       "kata_kunci": [
         "agent backlog otonom",
         "runner backlog",
         "Butuh Info",
-        "log agent",
+        "log Oktober 2026",
         "GitHub Project #15",
-        "Siap Agent",
         "estimasi selesai",
-        "pelajaran",
-        "autonomous agent",
-        "Oktober 2026"
+        "keterlambatan",
+        "pelajaran agent",
+        "issue triage"
       ]
     },
     {
@@ -18219,20 +18218,20 @@
       "status_teks": null,
       "publik": false,
       "tautan": [],
-      "hash": "094bcf61f12be2bae8eda9f77d2619af8527b3e62d8d4e8d8103646d86b870ad",
-      "ukuran_kb": 8.4,
-      "ringkasan": "Menjawab: task apa saja dan dalam urutan apa untuk membangun preventive maintenance berjadwal per aset (jadwal pm_jadwal, realisasi berfoto pm_realisasi, verifikasi SPV GA, endpoint metrik, sumber KPI pemeliharaan_preventif, layar GA), serta ketergantungannya pada daftar perawatan dari GA. Juga menjelaskan cara menghitung penyebut jatuh tempo, perlakuan status menunggu/draf, ukuran keberhasilan, dan apa yang sengaja tidak dikerjakan (metrik biaya).",
+      "hash": "6def8d27feffe19d9ac70bc4ce6f2439deed904f2ae73a11991da459429250aa",
+      "ukuran_kb": 8.3,
+      "ringkasan": "Menjawab: urutan task (T0-T8) dan ketergantungan untuk membangun preventive maintenance berjadwal per aset di inventory-service sesuai ADR 0123, termasuk koleksi pm_jadwal/pm_realisasi, verifikasi foto oleh SPV, perhitungan jatuh tempo, endpoint metrik, dan sumber KPI pemeliharaan_preventif. Juga menjelaskan ukuran keberhasilan, kapan keputusan dinyatakan gagal, hal yang sengaja tidak dikerjakan, dan TBD soal PIC jadwal sebagai penyebut KPI.",
       "kata_kunci": [
         "preventive maintenance",
-        "perawatan berkala",
-        "PM",
+        "PM berjadwal",
+        "pemeliharaan preventif",
         "pm_jadwal",
         "pm_realisasi",
-        "jatuh tempo",
-        "KPI GA",
-        "Building Maintenance",
         "inventory-service",
-        "verifikasi SPV"
+        "KPI Building Maintenance",
+        "GA Staff",
+        "verifikasi SPV",
+        "ADR 0123"
       ]
     },
     {
