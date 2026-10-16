@@ -10001,7 +10001,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-15. Menunggu persetujuan; tulis `🟢 Diterima, <tanggal>, oleh <login/jabatan>` di baris ini bila disetujui.",
+      "status_teks": "**Diusulkan**, 2026-10-15; keputusan 2 dan 6 diubah user 2026-10-16 dan keputusan 8 ditambahkan (lihat § Riwayat perubahan). Kode versi 2026-10-15 sudah di prod sejak 2026-10-16 (bip-erp#3169, erp-frontend#2521). Menunggu persetujuan; tulis `🟢 Diterima, <tanggal>, oleh <login/jabatan>` di baris ini bila disetujui.",
       "publik": true,
       "tautan": [
         "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
@@ -10011,18 +10011,19 @@
         "APP - Web ERP",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa"
       ],
-      "hash": "08886f38194a3ea49f7f73a65a0be0348efdef90a15f0cafaac99fa75a87768e",
-      "ukuran_kb": 6.7,
-      "ringkasan": "Menjawab: bagaimana anggota tim IT bisa membuka web ERP sebagai karyawan tertentu (lihat sebagai) untuk memeriksa menu dan halaman per jabatan, apa batasnya (baca-saja, tulis ditolak gateway, slip pribadi tertutup, sesi 30 menit wajib beralasan), dan bagaimana sesinya dijejak serta diberitahukan ke orang yang ditiru. Juga mencatat yang tidak dijanjikan (bertindak atas nama orang lain, layar jejak, MyBharata).",
+      "hash": "cc45e6cb7f476807f10f74e38c1911b450fc90ca9ab67bcffecde2505f25dbb0",
+      "ukuran_kb": 8.8,
+      "ringkasan": "Menjawab: bagaimana anggota IT bisa membuka web ERP sebagai karyawan tertentu untuk menguji menu dan halaman per jabatan, apa batasnya (baca-saja, slip pribadi tertutup, alasan wajib, sesi tercatat), dan siapa yang berhak memakainya. Juga menjelaskan desain token tiruan di gateway, penolakan request tulis dan GET yang mengubah keadaan, serta risiko yang diterima.",
       "kata_kunci": [
         "lihat sebagai",
-        "impersonate",
+        "impersonation",
         "view as",
-        "tim IT",
+        "token tiruan",
+        "gateway",
         "baca-saja",
-        "jejak audit",
-        "token gateway",
-        "ADR 0149",
+        "read-only",
+        "jejak sesi",
+        "IT",
         "uji menu per jabatan"
       ]
     },
@@ -14872,19 +14873,19 @@
         "IT - CI-CD",
         "IT - Big Pictures"
       ],
-      "hash": "339e5923d4ed79eee969a57eb7a886d7b539c2cc4c69c8083807c979305f4277",
-      "ukuran_kb": 3.1,
-      "ringkasan": "Menjawab: bagaimana jaringan LAN dan WiFi kantor dikelola (subnet lokal, allowlist access point untuk validasi geofencing clock-in), bagaimana ingress/reverse proxy dan cloud firewall VPS Biznet dikonfigurasi selama migrasi, dan apa saja yang masih belum diputuskan (topologi/VLAN formal).",
+      "hash": "b2fde812aa3389f710bf6a99760d5f7604e48cd98998250e2412affab6a1792e",
+      "ukuran_kb": 3.4,
+      "ringkasan": "Menjawab: bagaimana jaringan kantor dikelola, meliputi LAN lokal, allowlist WiFi untuk geofencing clock-in, monitoring jaringan, jaringan multi-lokasi, serta ingress, reverse proxy, dan cloud firewall untuk VPS produksi. Juga memuat daftar hal jaringan yang belum diputuskan seperti topologi formal, VLAN, dan hardening.",
       "kata_kunci": [
-        "network management",
+        "jaringan",
+        "network",
         "LAN",
-        "WiFi allowlist",
+        "WiFi",
+        "access point",
+        "allowlist",
         "geofencing",
-        "VPS Biznet",
-        "nginx-proxy-manager",
         "firewall",
-        "migrasi cloud",
-        "subnet",
+        "reverse proxy",
         "VLAN"
       ]
     },
@@ -15104,25 +15105,26 @@
       "tautan": [
         "IT - CI-CD",
         "IT - Network Management",
-        "IT - Big Pictures",
+        "ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library",
         "IT - Monitoring System",
+        "IT - Big Pictures",
         "IT - Backup & DR",
         "DB - Overview and Notes"
       ],
-      "hash": "fbfa57a43209c2339825f2eb43c4a45f9b6141c066ff90d27bebf1e4ca43e473",
-      "ukuran_kb": 4.4,
-      "ringkasan": "Menjawab: server, VM, dan VPS mana saja yang ada beserta IP, username, dan password akses internal tim IT, dan yang paling menentukan — mesin mana yang benar-benar produksi (VPS Biznet 116.206.196.31), sementara `10.10.10.120` masih menyala tetapi tidak dipakai dan tidak boleh jadi sumber pengukuran. Juga menjawab cara terhubung ke MongoDB tiap service, port mana milik service mana, dan kenapa port Mongo kini diikat ke 127.0.0.1 sehingga wajib lewat SSH tunnel.",
+      "hash": "93387251705ccb535a6469c181cbe3f6983f391f956f4b66920b8e9661294db4",
+      "ukuran_kb": 8.6,
+      "ringkasan": "Menjawab: server, VM, dan VPS apa saja yang dimiliki IT beserta perannya (dev, testing, produksi, monitoring), mesin mana yang aktif atau tidak dipakai, dan isi container tiap mesin menurut potret terukur. Juga memuat cara akses database MongoDB produksi lewat tunnel dan daftar koneksi per service; dokumen sumber memuat kredensial akses internal yang tidak diringkas di sini.",
       "kata_kunci": [
         "server",
         "VM",
-        "VPS Biznet",
+        "VPS",
+        "inventaris",
+        "database",
         "MongoDB",
-        "kredensial akses",
-        "SSH tunnel",
+        "docker compose",
         "produksi",
-        "port database",
-        "infrastruktur IT",
-        "devops"
+        "SSH tunnel",
+        "network monitor"
       ]
     },
     {
@@ -15571,22 +15573,20 @@
         "REF - Kepemilikan Data",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)"
       ],
-      "hash": "d6068a0bb32c99a819ac6ff542c2cdd31da937a3f44d3b9f961570ab29b71223",
-      "ukuran_kb": 24.9,
-      "ringkasan": "Menjawab: fitur manufaktur mana di ERP yang benar-benar dipakai di prod dan mana yang belum pernah dipakai beserta penyebabnya, tumpang tindih apa yang ada di fondasi kode, dan apa kata kuesioner serta tiket permintaan SPV Manufacture. Juga menjelaskan spreadsheet PPIC sebagai sistem yang berjalan nyata, kenapa pembelian bahan baku belum lewat Pengajuan Barang RAWMATERIAL, siapa memeriksa jumlah vs mutu bahan masuk, kebutuhan COA keluar, perbandingan Batch Record kertas dengan model ERP, serta daftar keputusan yang belum diambil.",
+      "hash": "e1c6a87da3a1c37b7ecce59e23ea87bbdad57c52e34e9e23ac8555b3323fc901",
+      "ukuran_kb": 26.0,
+      "ringkasan": "Menjawab: seberapa jauh modul manufaktur di ERP sudah dipakai di produksi, di mana tumpang tindih fondasi kodenya, dan mengapa pemakai belum memakainya menurut kuesioner. Juga memetakan spreadsheet PPIC yang berjalan sebagai cetak biru, alur batch record, QC, karantina, rilis batch, opname, dan keputusan yang masih terbuka.",
       "kata_kunci": [
-        "kajian fondasi manufaktur",
-        "adopsi ERP",
-        "spreadsheet PPIC",
-        "kuesioner pemakai",
-        "tiket SPV manufaktur",
+        "manufaktur",
+        "manufacture",
+        "produksi",
+        "PPIC",
         "batch record",
-        "pembelian bahan baku",
-        "substitusi bahan",
-        "konversi satuan",
-        "pemilik stok",
-        "TBD",
-        "master tujuan kirim"
+        "QC",
+        "karantina",
+        "rilis batch",
+        "stock opname",
+        "BPOM"
       ]
     },
     {
