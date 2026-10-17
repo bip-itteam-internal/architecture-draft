@@ -1,12 +1,12 @@
 # ADR - 0185 Ringkasan AI Hasil Survei Dibuat Saat Dibaca, Hanya Survei Bercukup Pengisi
 
-> **Status**: 🟢 **Diterima**, 2026-10-17, oleh user (Tech Development). Kode ⚠️ **di branch `feat/form-builder-ringkasan-ai`** (bip-erp dan erp-frontend), terverifikasi lokal (test paket form-builder, `go vet`, `pnpm tsc`, `pnpm build`, 548 test folder form-builder FE), **belum merge, belum deploy, belum diuji lewat gateway**.
+> **Status**: 🟢 **Diterima**, 2026-10-17, oleh user (Tech Development). Kode ✅ **merged dan live di prod 2026-10-17** (bip-erp [#3243](https://github.com/bip-itteam-internal/bip-erp/pull/3243), erp-frontend [#2550](https://github.com/bip-itteam-internal/erp-frontend/pull/2550)); diverifikasi di prod: biner dan bundel memuat fitur, satu ringkasan survei 160 jawaban berstatus `ready`, nama dan `employee_id` pengisi tak muncul di isinya. ⚠️ **Revisi tampilan** (§Revisi 2026-10-17) di branch `feat/form-builder-ringkasan-ai-ringkas`, belum merge.
 
 %% Status di blockquote atas supaya terbaca VAULT-INDEX.json (15 baris pertama). Vault ini PUBLIK: tidak ada nama orang, kunci, atau isi jawaban survei. %%
 
 ## Untuk Manajemen
 
-**Yang berubah di layar.** Halaman Analisa form survei di web ERP mendapat kartu **Ringkasan AI** di tab Ringkasan Eksekutif dan Ringkasan. Pengelola form menekan "Buat ringkasan dengan AI" sekali; sesudahnya ringkasan memperbarui diri saat halaman dibuka bila ada jawaban baru. Isinya empat bagian: tema utama, hal yang dinilai baik, keluhan, dan rekomendasi, masing-masing menunjuk pertanyaan sumbernya.
+**Yang berubah di layar.** Halaman Analisa form survei di web ERP mendapat kartu **Ringkasan AI** di tab Ringkasan Eksekutif dan Ringkasan. Pengelola form menekan "Buat ringkasan dengan AI" sekali; sesudahnya ringkasan memperbarui diri saat halaman dibuka bila ada jawaban baru. Isinya empat bagian: tema utama, hal yang dinilai baik, keluhan, dan rekomendasi, masing-masing paling banyak tiga kalimat pendek.
 
 **Yang tidak dijanjikan.** Ringkasan tidak memuat angka (angka tetap dari tab analisa), tidak tersedia untuk form penilaian karyawan, dan tidak dibuat untuk survei dengan kurang dari 5 pengisi. Teks ditulis AI dan wajib diperiksa sebelum dipakai sebagai dasar keputusan.
 
@@ -37,7 +37,16 @@ Tiga batas yang sudah ada menentukan bentuknya:
 4. **Pemicu: tombol untuk ringkasan pertama, otomatis saat dibaca sesudahnya.** Ringkasan menyimpan `jumlah_jawaban` saat dibuat; bila jumlah sekarang lebih besar, ia **basi**. Kartu memicu `POST` sekali per pemuatan bila basi dan **jeda 10 menit** (`jedaPerbaruiRingkasan`) sejak pembuatan terakhir sudah lewat. Ringkasan yang gagal tidak memicu dirinya sendiri; ulangnya lewat tombol "Coba lagi". Ditolak: membuat ulang di tiap jawaban masuk (ongkos token untuk ringkasan yang tak dibaca).
 5. **Async dengan klaim atomik.** `POST` menandai `pending` lewat upsert berfilter `status != pending` (atau pending lebih tua dari 3 menit, dianggap goroutine-nya mati), lalu goroutine memanggil model dan menulis hasil hanya bila penanda klaimnya masih sama. Dua pengelola yang membuka halaman bersamaan menghasilkan satu panggilan: yang kalah menabrak indeks unik dan dijawab `dimulai:false`. Kartu melakukan polling tiap 3 detik selama `pending`.
 6. **Masukan tanpa identitas, keluaran tanpa angka.** `susunMasukanRingkasan` hanya membaca jawaban dan waktunya; statistik memakai `aggregateField` yang sama dengan halaman analisa; teks bebas dikirim terbaru dulu, dipotong 500 karakter per jawaban dan 30.000 karakter total (penanda `teks_terpotong` tampil di kartu). Model diminta tidak menulis angka dan tidak menyebut nama.
-7. **Keluaran dikunci dua lapis**, pola benefit ADR 0082: `json_schema strict` dengan `rujukan` ber-`enum` key pertanyaan, lalu `saringHasil` membuang rujukan yang bukan key, butir kosong, dan butir di atas 5 per bagian.
+7. **Keluaran dikunci dua lapis**, pola benefit ADR 0082: `json_schema strict` dengan `rujukan` ber-`enum` key pertanyaan, lalu `saringHasil` membuang rujukan yang bukan key, butir kosong, dan butir di atas `maksButirPerBagian` (3 sejak revisi di bawah; semula 5).
+
+### Revisi 2026-10-17: ringkas, tanpa rujukan di layar
+
+Ringkasan pertama di prod (survei 160 jawaban) dikeluhkan **sulit dibaca**: tiap butir ditempeli satu sampai tiga label pertanyaan rujukan yang panjang (sekitar 40 label di 20 butir, dua label yang sama berulang hampir di setiap butir), topik yang sama muncul di tiga bagian, dan butirnya dua kalimat. Disetujui user hari yang sama:
+
+8. **Rujukan disimpan, tidak ditampilkan.** Label pertanyaan survei terlalu panjang untuk ditempel per butir; data `rujukan` tetap tersimpan untuk pemakaian lain.
+9. **Paling banyak 3 butir per bagian, satu kalimat pendek**, tanpa mengutip kalimat pertanyaan atau jawaban dan tanpa mengulang topik di lebih dari satu bagian. Angka batas di prompt dibaca dari konstanta yang sama dengan penyaring (`maksButirPerBagian`), dikunci test, supaya prompt dan penyaring tak bisa menyimpang.
+10. **Tata letak**: tema utama selebar kartu, lalu hal baik, keluhan, dan rekomendasi tiga kolom (menumpuk di layar sempit).
+11. **`versi_prompt`**: ringkasan yang dibuat dengan versi prompt lain terbaca basi dan **langsung** boleh dibuat ulang, tanpa menunggu jawaban baru dan tanpa jeda 10 menit. Jedanya menjaga ongkos jawaban baru, bukan menahan perbaikan gaya. Naikkan `versiPromptRingkasan` setiap aturan prompt atau bentuk keluaran berubah.
 
 ## Konsekuensi
 

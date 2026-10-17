@@ -2512,20 +2512,20 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "dfc358b130c475487b32b935b1e2e9d9ea98dbebbc57cd90dbace451b671b25e",
-      "ukuran_kb": 137.5,
-      "ringkasan": "Menjawab: bagaimana Form Builder Service bekerja end-to-end, mulai dari tipe pertanyaan dan tipe form, kepemilikan per departemen, penilaian karyawan lain (subject, kerahasiaan penilai, skor gabungan), sampai form berulang bulanan/mingguan dan gerbang presensi yang menahan clock-in bila form wajib belum diisi. Juga menjelaskan Kaizen, program Culture, indeks layanan departemen, lampiran file, Inspeksi Satgas, ringkasan AI, notifikasi inbox (notification-service wajib ikut deploy), multi-tenant, dan dependensinya.",
+      "hash": "2606b79eeb747c5cbc5bf82f6e2a47c6839e3e2b9308f0577f3b1bc11a584776",
+      "ukuran_kb": 138.1,
+      "ringkasan": "Menjawab: bagaimana departemen membuat, menerbitkan, dan menganalisa form dinamis (survei, penilaian karyawan, checklist, kaizen) tanpa coding, tipe pertanyaan dan tipe form apa yang didukung, serta siapa yang boleh mengelola form. Juga menjelaskan form berulang per periode, gerbang presensi yang menahan clock-in bila form wajib belum diisi, kerahasiaan penilai, notifikasi inbox, ringkasan AI, program Culture, inspeksi 5R/K3, dan lampiran berkas.",
       "kata_kunci": [
         "form builder",
-        "form dinamis",
-        "dynamic form",
+        "survei",
+        "survey",
         "penilaian karyawan",
         "evaluation",
-        "form berulang",
-        "recurrence",
-        "gerbang presensi",
         "kaizen",
-        "culture"
+        "form berulang",
+        "gerbang presensi",
+        "form_type",
+        "requireFormManager"
       ]
     },
     {
@@ -10160,7 +10160,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": null,
-      "status_teks": "🟢 **Diterima**, 2026-10-17, oleh user (Tech Development). Kode ⚠️ **di branch `feat/form-builder-ringkasan-ai`** (bip-erp dan erp-frontend), terverifikasi lokal (test paket form-builder, `go vet`, `pnpm tsc`, `pnpm build`, 548 test folder form-builder FE), **belum merge, belum deploy, belum diuji lewat gateway**.",
+      "status_teks": "🟢 **Diterima**, 2026-10-17, oleh user (Tech Development). Kode ✅ **merged dan live di prod 2026-10-17** (bip-erp [#3243](https://github.com/bip-itteam-internal/bip-erp/pull/3243), erp-frontend [#2550](https://github.com/bip-itteam-internal/erp-frontend/pull/2550)); diverifikasi di prod: biner dan bundel memuat fitur, satu ringkasan survei 160 jawaban berstatus `ready`, nama dan `employee_id` pengisi tak muncul di isinya. ⚠️ **Revisi tampilan** (§Revisi 2026-10-17) di branch `feat/form-builder-ringkasan-ai-ringkas`, belum merge.",
       "publik": true,
       "tautan": [
         "ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library",
@@ -10169,20 +10169,20 @@
         "Microservices - Form Builder Service",
         "IT - Form Builder"
       ],
-      "hash": "be693edf6369612c4ac27cc8d98d83ac6f278aa6abb41b889abfaf35b30db08a",
-      "ukuran_kb": 7.0,
-      "ringkasan": "Menjawab: kenapa dan bagaimana ringkasan AI hasil survei dibuat (async saat halaman analisa dibaca, jeda 10 menit, disimpan per form dan periode), kapan ringkasan tidak tersedia (form penilaian, kurang dari 5 pengisi), dan bagaimana anonimitas pengisi serta bentuk keluaran dijaga. Juga mencatat risiko yang diterima sadar: isi jawaban dikirim ke layanan AI, prompt injection, dan env AI_* yang kini dibutuhkan form-builder-service.",
+      "hash": "1367d6eac0bf352ac23ce7249f8bdbb6f90fc807ac2036e469b3cb4d0cb00101",
+      "ukuran_kb": 8.6,
+      "ringkasan": "Menjawab: kapan ringkasan AI hasil survei dibuat dan diperbarui, form mana yang boleh diringkas (hanya survei tanpa sasaran penilaian dengan minimal 5 pengisi), dan bagaimana identitas pengisi dijaga agar tidak ikut ke model. Juga menjelaskan pola async dengan klaim atomik untuk menghindari timeout gateway, jeda 10 menit, versi prompt, serta batas keluaran (tanpa angka, maksimal 3 butir per bagian).",
       "kata_kunci": [
         "ringkasan AI",
         "AI summary",
         "survei",
         "survey",
-        "form_ai_summaries",
-        "analisa form",
+        "form builder",
+        "ai-summary",
         "anonim",
-        "minimal 5 pengisi",
-        "ADR 0185",
-        "LLM"
+        "form_ai_summaries",
+        "prompt",
+        "ADR 0185"
       ]
     },
     {
