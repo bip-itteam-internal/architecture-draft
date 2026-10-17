@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-10-16",
-  "jumlah_dokumen": 650,
+  "digenerate": "2026-10-17",
+  "jumlah_dokumen": 651,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -238,6 +238,7 @@
         "ADR - 0066 Modul Kelola Program Culture",
         "ADR - 0093 Tipe Program Culture Non-Event Dinilai Terlaksana dengan Approval SPV HR, plus Jadwal di Master",
         "HRIS - Pengembangan Organisasi (Community of Interest)",
+        "ADR - 0185 Ringkasan AI Hasil Survei Dibuat Saat Dibaca, Hanya Survei Bercukup Pengisi",
         "HRIS - Kaizen (Ide Perbaikan)",
         "Microservices - Attendance Service",
         "Microservices - Employee Service",
@@ -248,20 +249,20 @@
         "API - Attendance Service",
         "CORE - API Master Gateway"
       ],
-      "hash": "8dc38db298294ec606a8e933ee313dcd8887591b34d8c8d8bc9c9b3718d5d98e",
-      "ukuran_kb": 58.2,
-      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di form-builder-service lewat gateway `/api/form-builder/*`, siapa yang boleh mengelola form (cakupan departemen dari `SupervisedDepartments` diiris `FORM_BUILDER_DEPARTMENTS`, bukan modul), dan bagaimana alur draft menuju published lalu closed beserta aturan 409/422-nya. Juga menjawab bagaimana tipe form dilarang per departemen oleh IT (`/form-type-rules`), bagaimana karyawan mengisi form lewat rute `/me/*`, serta di mana letak Kaizen, Culture, dan Inspeksi Satgas 5R & K3 termasuk gerbang izin `kepatuhan.satgas.input`. Berisi juga rute analytics, export, response, template, form berulang (`recurrence`/`period_key`), indeks layanan departemen, dan rute `/internal/*` yang dipanggil service lain.",
+      "hash": "887fa7a1c28953b5c79cdbbe7e9f4a56749be0c81f3c7d1f0bdd5a48365b2831",
+      "ukuran_kb": 58.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki form-builder-service (kelola form, template, aturan tipe form per departemen, analisa & export, pengisian /me/*, Kaizen, Culture, Inspeksi Satgas 5R & K3, rute internal) beserta gerbang RBAC-nya. Juga menjawab kapan form bisa disunting atau dibalas 409/403, bagaimana kepemilikan per departemen dan owner_departments bekerja, serta bentuk data penting dan konsumen tiap rute (Web ERP vs MyBharata).",
       "kata_kunci": [
         "form builder",
-        "form dinamis",
+        "API form",
+        "endpoint form-builder",
         "survei",
         "kaizen",
         "satgas 5R K3",
-        "program culture",
-        "form-type-rules",
-        "owner_department",
-        "recurrence form berulang",
-        "endpoint gateway form-builder"
+        "form type rules",
+        "analytics export",
+        "/me/forms",
+        "RBAC departemen"
       ]
     },
     {
@@ -2495,6 +2496,8 @@
         "ADR - 0141 Potret Sasaran Penilaian Form Berulang Diambil Ulang tiap Periode, Beku di Dalam Periode",
         "Microservices - Notification Service",
         "IT - Background Jobs & Schedulers",
+        "ADR - 0185 Ringkasan AI Hasil Survei Dibuat Saat Dibaca, Hanya Survei Bercukup Pengisi",
+        "ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library",
         "HRIS - Kaizen (Ide Perbaikan)",
         "RUN - Deploy Microservices bip-erp",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
@@ -2509,20 +2512,20 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "1718d73886ba7646e9705fa02682967d0466cb6e3a55496c39a5f0f178c9de13",
-      "ukuran_kb": 134.4,
-      "ringkasan": "Menjawab: bagaimana cara membuat form dinamis (survey, evaluation, checklist, kaizen) tanpa coding, siapa yang boleh mengelola form per departemen, dan bagaimana alur terbit-isi-analisa bekerja termasuk export ke CSV. Juga menjelaskan penilaian karyawan lain (potret sasaran subject/audience), anonimitas pengisi (subject.anonymous, settings.anonymous, anonimAktif) dan keputusan anonim wajib untuk penilaian dan survei, form berulang periode bulanan/mingguan, serta gerbang presensi yang menahan clock-in mobile bila form wajib belum diisi.",
+      "hash": "dfc358b130c475487b32b935b1e2e9d9ea98dbebbc57cd90dbace451b671b25e",
+      "ukuran_kb": 137.5,
+      "ringkasan": "Menjawab: bagaimana Form Builder Service bekerja end-to-end, mulai dari tipe pertanyaan dan tipe form, kepemilikan per departemen, penilaian karyawan lain (subject, kerahasiaan penilai, skor gabungan), sampai form berulang bulanan/mingguan dan gerbang presensi yang menahan clock-in bila form wajib belum diisi. Juga menjelaskan Kaizen, program Culture, indeks layanan departemen, lampiran file, Inspeksi Satgas, ringkasan AI, notifikasi inbox (notification-service wajib ikut deploy), multi-tenant, dan dependensinya.",
       "kata_kunci": [
         "form builder",
-        "survey",
-        "evaluation",
+        "form dinamis",
+        "dynamic form",
         "penilaian karyawan",
-        "anonim",
-        "anonymous",
+        "evaluation",
         "form berulang",
+        "recurrence",
         "gerbang presensi",
-        "compliance",
-        "notifikasi inbox"
+        "kaizen",
+        "culture"
       ]
     },
     {
@@ -6440,7 +6443,7 @@
         "APP - Web ERP"
       ],
       "hash": "cbe50357be0f60ff0c955244db65d7ea6a789c7e20f47bc80ee593d394467e49",
-      "ukuran_kb": 11.6,
+      "ukuran_kb": 11.7,
       "ringkasan": "Menjawab: kenapa modul Industrial Relation menyimpan catatan pelanggaran kepatuhan ringan (atribut kerja: sepatu, lanyard) di koleksi baru compliance_note yang terpisah dari Surat Peringatan dan kpi_score, dan kenapa catatan itu bukan sanksi, tidak memotong gaji, tidak menerbitkan SP otomatis, serta tidak masuk skor KPI. Menjelaskan siapa yang boleh mencatat (petugas IR/HR yang ditunjuk, lewat MyBharata, ditegakkan di server), siapa yang boleh membaca (visibilitas tiga-arah: petugas HR, karyawan atas dirinya, atasan atas departemennya via SupervisedDepartmentsStrict), dan kenapa jenis pelanggaran dibuat master data bukan enum Go. Juga menjawab kenapa data ini sensitif sehingga tidak didaftarkan ke calendar-service atau feed lintas modul.",
       "kata_kunci": [
         "industrial relation",
@@ -7967,7 +7970,7 @@
         "Microservices - Attendance Service"
       ],
       "hash": "d17340c57b6557ac0854f599e6dec6710b07c4c33edb90ac812f5b938a810e8f",
-      "ukuran_kb": 20.6,
+      "ukuran_kb": 20.7,
       "ringkasan": "Menjawab: kenapa inspeksi Satgas 5R & K3 untuk Office Boy dan Security pindah dari Form Builder ke entitas sendiri `satgas_finding` di employee-service, bagaimana petugas mencatat temuan bebas (tanpa form/periode pra-bangun) lengkap dengan foto dan tenggat SLA, dan bagaimana eskalasi memakai ulang mekanisme tahan-clock-out yang sudah ada. Menjelaskan juga bagaimana skor KPI kebersihan dihitung otomatis 0–100 dari temuan bulan itu (tanpa temuan = 100, tiap temuan mengurangi), kenapa 'menahan clock-out' adalah nudge bukan sanksi dan bukan potong gaji, serta batas terhadap Inspeksi Area (ADR 0111), Catatan Kepatuhan (ADR 0085), dan Surat Peringatan.",
       "kata_kunci": [
         "Satgas",
@@ -9136,7 +9139,7 @@
         "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap"
       ],
       "hash": "db7202a062603803f25944476103df696dc34eb488f04339329fd89874b6ee40",
-      "ukuran_kb": 5.0,
+      "ukuran_kb": 5.1,
       "ringkasan": "Menjawab: mengapa pengajuan Konsumsi dulu diperlakukan sebagai pembelian barang lewat Procurement (bukan permintaan uang), di mana rancangan lengkap alur pembeliannya disimpan, dan mengapa tahap persetujuan atasan dilewati bila pengajunya supervisor HRGA. ADR ini sudah digantikan untuk pengajuan baru, tapi masih menjelaskan aturan bagi dokumen Konsumsi lama.",
       "kata_kunci": [
         "ADR 0154",
@@ -9313,7 +9316,7 @@
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi"
       ],
       "hash": "2f1943fa67f1c6c7f4c6a975cdae67f14ba03a7986d5724f9e0d80fddcf9c8ee",
-      "ukuran_kb": 8.4,
+      "ukuran_kb": 8.5,
       "ringkasan": "Menjawab: bagaimana serapan anggaran dibaca di layar Anggaran & Cost Control (Terpakai tetap realisasi Accurate, dana dari pengajuan hanya bagian darinya dan tidak dijumlahkan), bagaimana pengajuan yang belum dicatat Accounting ditampilkan, dan siapa yang boleh menulis anggaran lewat izin baru finance.anggaran.kelola. Juga menjawab sembilan keputusan K1 sampai K9, apa yang sengaja tidak dijanjikan (lewat anggaran hanya memperingatkan, tanpa anggaran per proyek), konsekuensi urutan deploy, dan hal yang belum diputuskan.",
       "kata_kunci": [
         "ADR 0159",
@@ -9379,7 +9382,7 @@
         "CORE - RBAC dan Permission Set"
       ],
       "hash": "743732140225d710cc4e3233c3dac177491a9ab0b5702eff66ad987cbd4a3e9d",
-      "ukuran_kb": 12.7,
+      "ukuran_kb": 12.8,
       "ringkasan": "Menjawab: bagaimana Cost Control mengatur porsi proyeksi kas keluar per minggu, aturan kunci minggu, batas dua kali ubah, riwayat perubahan, dan kenapa porsi tidak mengubah KPI akhir bulan. Cakupan, jumlah sebulan, dan pembagian minggu diamandemen ADR 0184.",
       "kata_kunci": [
         "forecast kas mingguan",
@@ -9735,7 +9738,7 @@
         "APP - Web ERP"
       ],
       "hash": "1a19940c01a5ea1b9201a67f07f17aa7cc7dabbed5e51b8201e3797e2eeb6e25",
-      "ukuran_kb": 13.4,
+      "ukuran_kb": 13.5,
       "ringkasan": "Menjawab: kenapa akun berhak banyak terpental ke halaman login Web ERP (cookie token melewati batas ±4 KB browser), kenapa token dipindah ke localStorage dengan cookie penanda sesi, dan kenapa usulan penanda super admin di token ditolak. Juga menjelaskan paket bawaan Semua Izin yang dimekarkan saat token terbit, batasannya (tak berlaku untuk peran modul, menu terbatas, dan akun sendiri), serta konsekuensinya.",
       "kata_kunci": [
         "ADR 0172",
@@ -9899,7 +9902,7 @@
         "GA - Inventory Management"
       ],
       "hash": "fd374722060795aae018dc553104323fb5839cabaeeb071a14564e1ce8cb6d7e",
-      "ukuran_kb": 4.7,
+      "ukuran_kb": 4.8,
       "ringkasan": "Menjawab: mengapa tipe pengajuan Konsumsi dilebur ke Barang Umum, apa yang terjadi bila seseorang masih mengajukan KONSUMSI (ditolak 400 dan tak ditawarkan), dan bagaimana dokumen Konsumsi lama tetap diproses. Juga menjawab urutan deploy backend dan frontend serta konsekuensinya terhadap pembayar barang konsumsi.",
       "kata_kunci": [
         "ADR 0177",
@@ -9933,7 +9936,7 @@
         "Finance - Rancangan Finance Service"
       ],
       "hash": "7668e3b1f9b8cda9103b6cac847ad34fca12d661a216efb7c4fc6f48407be87c",
-      "ukuran_kb": 13.5,
+      "ukuran_kb": 13.6,
       "ringkasan": "Menjawab: kenapa serapan anggaran dibaca per departemen tag jurnal Accurate, kenapa baris 'Seluruh perusahaan' dihapus dari varians dan KPI, bagaimana pagu gabungan (anggaran gabungan beberapa akun per departemen per bulan) dihitung, dan kenapa Varians di layar Serapan = Terpakai - Anggaran. Sebagian butirnya direvisi ADR 0180.",
       "kata_kunci": [
         "serapan anggaran",
@@ -9995,7 +9998,7 @@
         "API - Integration Service"
       ],
       "hash": "6d5ff6385b70ae4595f8f62a6a94486b73cada22af6721b52912858501c8b799",
-      "ukuran_kb": 11.7,
+      "ukuran_kb": 11.9,
       "ringkasan": "Menjawab: akun mana yang dianggarkan untuk seluruh perusahaan dan siapa yang mengatur daftarnya, kenapa laporan Non Ops tinggal dua akun dan Beban Bank pindah ke OPEX, bagaimana baseline Non Ops diisi Finance (kosong sampai diisi, tanpa angka otomatis), kenapa KPI Cost Control #2 memakai metrik bertanda (Realisasi - Baseline)/Baseline, dan rekomendasi untuk anggaran gabungan.",
       "kata_kunci": [
         "seluruh perusahaan",
@@ -10136,7 +10139,7 @@
         "REF - Kepemilikan Data"
       ],
       "hash": "fa8c061c3ca91cd6fc598f9ea89cba69dbe8f67b8d507fced4932dc7417ce7f5",
-      "ukuran_kb": 14.7,
+      "ukuran_kb": 14.8,
       "ringkasan": "Menjawab: komponen apa saja yang masuk cashflow/forecast kas mingguan (material, BOP, marketing, gaji, ops adum, pajak, aset), dari mana proyeksi dan realisasinya, kenapa sebulan dibagi empat minggu, bagaimana KPI Cost Control #4 berubah dan kapan isian proyeksi masuk akurasi (bersama realisasinya di C3), serta asumsi yang menunggu Finance.",
       "kata_kunci": [
         "cashflow",
@@ -10149,6 +10152,37 @@
         "anggaran aset",
         "KPI cost control",
         "akurasi forecast"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0185 Ringkasan AI Hasil Survei Dibuat Saat Dibaca, Hanya Survei Bercukup Pengisi.md",
+      "judul": "ADR - 0185 Ringkasan AI Hasil Survei Dibuat Saat Dibaca, Hanya Survei Bercukup Pengisi",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-17, oleh user (Tech Development). Kode ⚠️ **di branch `feat/form-builder-ringkasan-ai`** (bip-erp dan erp-frontend), terverifikasi lokal (test paket form-builder, `go vet`, `pnpm tsc`, `pnpm build`, 548 test folder form-builder FE), **belum merge, belum deploy, belum diuji lewat gateway**.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0082 Integrasi AI lewat Klien Tipis di Shared-Library",
+        "ADR - 0142 Pengisi Penilaian dan Survei Selalu Anonim, IT Membuka Identitas lewat Jalur Audit Bercatatan",
+        "API - Form Builder Service",
+        "Microservices - Form Builder Service",
+        "IT - Form Builder"
+      ],
+      "hash": "be693edf6369612c4ac27cc8d98d83ac6f278aa6abb41b889abfaf35b30db08a",
+      "ukuran_kb": 7.0,
+      "ringkasan": "Menjawab: kenapa dan bagaimana ringkasan AI hasil survei dibuat (async saat halaman analisa dibaca, jeda 10 menit, disimpan per form dan periode), kapan ringkasan tidak tersedia (form penilaian, kurang dari 5 pengisi), dan bagaimana anonimitas pengisi serta bentuk keluaran dijaga. Juga mencatat risiko yang diterima sadar: isi jawaban dikirim ke layanan AI, prompt injection, dan env AI_* yang kini dibutuhkan form-builder-service.",
+      "kata_kunci": [
+        "ringkasan AI",
+        "AI summary",
+        "survei",
+        "survey",
+        "form_ai_summaries",
+        "analisa form",
+        "anonim",
+        "minimal 5 pengisi",
+        "ADR 0185",
+        "LLM"
       ]
     },
     {
@@ -11381,7 +11415,7 @@
         "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya"
       ],
       "hash": "95b628a5564848587f50e680cb6ce73e010ae47be32c1f133472a34726b9765f",
-      "ukuran_kb": 21.5,
+      "ukuran_kb": 21.7,
       "ringkasan": "Menjawab: cara membaca tab Serapan, Forecast Mingguan, dan Rekomendasi di menu Anggaran & Cost Control; aturan varians, minggu selesai, atur proyeksi, cashflow tujuh komponen, dan kenapa angka tertentu tidak boleh dijumlahkan.",
       "kata_kunci": [
         "serapan anggaran",
@@ -12355,7 +12389,7 @@
         "GA - Form Pengadaan dan Pengajuan Dana"
       ],
       "hash": "5a506ef2f6690f2d0fd48bd5da4134bc63d99b6af98efef405cd97c1c4ee6447",
-      "ukuran_kb": 7.6,
+      "ukuran_kb": 7.7,
       "ringkasan": "Menjawab: apa saja 11 SOP Procurement resmi PT Bharata (perencanaan kebutuhan, PR, seleksi vendor, RFQ, penerbitan PO, monitoring pengiriman, penerimaan+QC, verifikasi invoice, pembayaran, evaluasi vendor, cost saving, pelaporan) dan sejauh mana masing-masing sudah didukung ERP. Memetakan tahap SOP mana yang sudah ada di kode (Permintaan/Pesanan/Penerimaan), mana yang sebagian, dan mana yang belum dibangun (RFQ 3-vendor, matriks approval nominal >Rp50jt, AVL & dokumen legalitas vendor, scorecard/OTD vendor, pelaporan formal). Berguna untuk mengecek kepatuhan SOP sebelum merancang fitur procurement/manufacture baru.",
       "kata_kunci": [
         "procurement",
@@ -14762,6 +14796,7 @@
         "GA - Checklist Management",
         "Microservices - Attendance Service",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
+        "ADR - 0185 Ringkasan AI Hasil Survei Dibuat Saat Dibaca, Hanya Survei Bercukup Pengisi",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0041 Izin Tipe Form Menempel di Departemen",
         "Microservices - File Service",
@@ -14770,20 +14805,20 @@
         "DB - Overview and Notes",
         "ROADMAP"
       ],
-      "hash": "ced666362bb109558f6f9f67623821a82a0ee975f9a538765479eae2a0d46345",
-      "ukuran_kb": 12.7,
-      "ringkasan": "Menjawab: kenapa Form Builder dibuat, seberapa jauh scope yang dieksekusi berbeda dari rencana awalnya, dan keputusan produk apa saja yang menyertainya. Mencakup identitas responden yang ditampilkan penuh, skor gabungan yang berhenti di layar analisa, indeks layanan departemen beserta penyimpangan sadarnya, intersep presensi, arah RBAC per jabatan, dan daftar hal yang belum diputuskan.",
+      "hash": "86c1a23f8ad3835e6f79dccf9cae77ad7f1cb1e8ad206a76289f5c538c1c7989",
+      "ukuran_kb": 13.7,
+      "ringkasan": "Menjawab: apa konsep produk Form Builder, kenapa dibangun (menggantikan form hardcoded per kasus), dan bagaimana scope-nya berubah dari rencana asli (RBAC per departemen, analisa jawaban, sasaran form, intersep presensi, multi-perusahaan). Juga menjelaskan bagi pemilik produk skor gabungan form penilaian, indeks layanan departemen, ringkasan AI survei, arah hak per jabatan, urutan rilis, dan keputusan yang masih TBD.",
       "kata_kunci": [
         "form builder",
-        "form dinamis",
-        "survei",
+        "konsep form builder",
+        "form request",
+        "survei internal",
         "skor gabungan",
         "indeks layanan",
-        "anonim",
+        "service index",
         "intersep presensi",
-        "gerbang presensi",
-        "RBAC",
-        "kaizen"
+        "ringkasan AI",
+        "Tech Development"
       ]
     },
     {
@@ -20966,7 +21001,7 @@
         "Microservices - Form Builder Service"
       ],
       "hash": "0a7626b938a8ed09b938634e03c022c604145b021c548a80c3fc8136f1b250d7",
-      "ukuran_kb": 6.3,
+      "ukuran_kb": 6.4,
       "ringkasan": "Menjawab: fitur pengelolaan Program Culture (klub Badminton, Football, Ladies Sport, Billiard, Music) apa saja yang sudah ada di ERP versus yang masih dilakukan manual di Excel, dan gap mana yang layak dibangun. Merinci mengapa jadwal berulang, matriks distribusi per-pekan, target frekuensi vs realisasi, dokumentasi/biaya sesi, dan indikator per-klub belum tersedia, serta mana yang sengaja tidak dibuat (RSVP, KPI officer-centric). Papan kerja temuan yang tiap kandidat scope-nya masih menunggu keputusan pemilik produk sebelum jadi ADR + task.",
       "kata_kunci": [
         "program culture",
@@ -21855,7 +21890,7 @@
         "API - Integration Service"
       ],
       "hash": "a5c9caa815f928cf24377928ebee153cfa7a8a86b8b2846acb7b72f53028c96a",
-      "ukuran_kb": 5.2,
+      "ukuran_kb": 5.3,
       "ringkasan": "Menjawab: task apa saja yang lahir dari kebutuhan \"proyeksi Forecast Mingguan bisa diedit manual\", urutan pengerjaannya di `bip-erp` dan `erp-frontend`, issue dan PR mana yang terkait, serta kriteria \"yang harus benar\" untuk task backend dan frontend. Juga menjawab apa yang diputuskan pemohon (total per minggu, kunci minggu, batas 2 kali ubah, riwayat, bentuk simpan porsi), apa yang sengaja tidak dikerjakan, apa yang masih terbuka, dan pesan untuk manajemen soal KPI yang tidak berubah.",
       "kata_kunci": [
         "analisa kebutuhan",
@@ -21945,7 +21980,7 @@
         "ANALISA - Inspeksi Satgas 5R dan K3"
       ],
       "hash": "78e2ab91fcd6914460f26a0a31fd8223880d6ea613808144abc0dfb1b0469391",
-      "ukuran_kb": 9.3,
+      "ukuran_kb": 9.4,
       "ringkasan": "Menjawab: apa saja task turunan (T1–T8) dari redesign Satgas menjadi input bebas dengan SLA temuan, apa status pengerjaan tiap task, di branch dan repo mana pekerjaannya (bip-erp `feat/satgas-finding`, erp-frontend `feat/satgas-finding-web`, my-bharata `feat/satgas-finding-mobile`), serta urutan dan dependensinya (backend dulu, lalu mobile & web, retire form-builder paling akhir). Menjelaskan juga penyempurnaan keputusan user 2026-09-24 (toggle 'Ada temuan?' dibuang, tanpa temuan sebulan skor 100 otomatis, approve tanpa mengetik nilai) dan gerbang 'selesai bila' tiap task. Ini papan kerja, bukan sumber kebenaran — detail keputusan ada di ADR 0122.",
       "kata_kunci": [
         "ANALISA Satgas",
@@ -22464,7 +22499,7 @@
         "CORE - SSO Flow"
       ],
       "hash": "65f048665617ba7bb1f1770d115b1d8ac58eacc0926285e64e14b42d8ab79803",
-      "ukuran_kb": 7.0,
+      "ukuran_kb": 7.1,
       "ringkasan": "Menjawab: task apa saja yang diturunkan dari ADR 0172 (ukur ukuran token, pindah token ke localStorage, paket Semua Izin di employee-service, tampilan di layar Hak Akses, sinkron dok), PR dan issue GitHub mana yang terkait, serta urutan deploy yang wajib (FE token dulu, lalu BE sebelum FE). Juga memuat test dan langkah verifikasi tiap task.",
       "kata_kunci": [
         "analisa kebutuhan",
@@ -22564,7 +22599,7 @@
         "2026-07-17 Temuan - Reject retur menambah stok FG"
       ],
       "hash": "9d3cb08e3ec79fdef0d632d66bc62b30a2de8d865bc976e0fcdbbd00aae7462e",
-      "ukuran_kb": 11.2,
+      "ukuran_kb": 11.5,
       "ringkasan": "Menjawab pertanyaan tentang desain perbaikan performa menu Master Resi yang lambat dibuka karena puluhan ribu dokumen resi, mencakup pagination sisi server per-hari (endpoint /resi/days), pencarian prefix no_resi di server, dan kontrak urutan data yang dibagi dengan menu Gudang FG (lookup resi, ambil rentang).",
       "kata_kunci": [
         "Master Resi",
