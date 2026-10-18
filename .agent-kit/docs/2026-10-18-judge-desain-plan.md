@@ -64,8 +64,8 @@
   - `test_manifest_stub_401_ditolak`, `test_manifest_tanpa_keadaan_kosong_ditolak`, `test_manifest_keadaan_tak_dikenal_ditolak`.
   - `test_klasifikasi_login_tangkapan_gagal`: `rute_akhir="/login"` → `"tangkapan_gagal"`.
   - `test_klasifikasi_404_tangkapan_gagal`: `status_http=404` → `"tangkapan_gagal"`.
-  - `test_error_boundary_menunjuk_diff_galat_kode`: `error_boundary=True`, `konsol=["TypeError ... at src/features/kpi/components/x.tsx:12"]`, diff memuat berkas itu → `"galat_kode"`.
-  - `test_error_boundary_bukan_diff_tangkapan_gagal`: konsol menunjuk `src/components/table/index.tsx`, tak di diff → `"tangkapan_gagal"`.
+  - `test_error_boundary_menunjuk_diff_galat_kode`: `error_boundary=True`, `konsol=["TypeError ... at src/features/kpi/components/x.tsx:12"]`, diff memuat berkas itu → `"galat_kode"` (sama dengan kasus berikutnya: boundary selalu galat_kode).
+  - `test_error_boundary_bukan_diff_galat_kode`: konsol menunjuk `src/components/table/index.tsx`, tak di diff → tetap `"galat_kode"` (diubah 2026-10-18: build produksi tanpa source map, jadi tak ada syarat konsol). Ditambah `test_error_boundary_konsol_chunk_kosong_galat_kode` dan `test_error_boundary_kalah_dari_galat_dan_login` (galat alat dan `/login` menang lebih dulu).
   - `test_ringkasan_tanpa_tangkapan_tidak_dinilai`: `{"rute": []}` → `layar_dinilai` False; semua `tangkapan_gagal` → False.
   - `test_bantahan_diterima_dihitung`, `test_bantahan_ditolak_dihitung`, `test_bantahan_tanpa_temuan_diabaikan`.
 
