@@ -10,7 +10,7 @@ Terukur di produksi 25 September 2026: **11 pesanan senilai Rp1.328.198** yang p
 
 *Penyesuaian statement TikTok dipisah oleh **dua pembeda**: pesanannya sudah pernah menerima uang atau belum, lalu punya Retur Penjualan atau tidak. Belum pernah ada uang masuk → kompensasi melunasi faktur (perilaku sekarang, dari [[ADR - 0056 Penyesuaian Statement TikTok Menambah Payout Order]]). Sudah ada uang masuk tapi ADA retur → tetap income biasa. Sudah ada uang masuk dan TANPA retur → kompensasi jadi baris Pendapatan Lain-lain tanpa menyentuh bayar faktur. Gerbang retur memakai pembeda pertama yang sama, dan seluruhnya digerbangi kv tanggal per hari penerimaan.*
 
-- **Status**: ⚠️ **Implemented (ada catatan)** — kode selesai di branch `feat/tiktok-kompensasi-payout` (2026-09-25), **belum merge, belum deploy, kv cutover belum diisi**. Selama kv kosong perilakunya persis seperti sebelum ADR ini ada. Aturannya diputuskan finance (tiket "Revisi Sistem Income" + penegasan 2026-09-22, 09-24, dan 09-25).
+- **Status**: ✅ **Implemented** — kode sudah ada di `origin/main` (diukur 2026-10-18: commit `fa420e6a0` sampai `e03676be9`, 3 Okt 2026, semuanya leluhur `origin/main`), kv `tiktok-kompensasi-cutover-date` terisi `2026-09-01` (diisi 2026-09-25 20:54 WIB), dan container `Integration-Service` prod dibuat 2026-10-18 14:48 WIB, sesudah commit terakhir itu. [[ADR - 0133 Kompensasi Logistik TikTok Pasca-Retur Dibedakan per Kondisi Barang, Otomasi Ditunda]] dan [[Finance - Proses Retur dan Piutang Marketplace]] sudah mencatatnya live sejak 2026-09-25, diverifikasi ke dokumen Accurate. ⚠️ Pengukuran 2026-10-18 ini sendiri hanya umur container, **bukan isi biner**. Aturannya diputuskan finance (tiket "Revisi Sistem Income" + penegasan 2026-09-22, 09-24, dan 09-25). Versi sebelumnya menulis "belum merge, belum deploy, kv belum diisi" (keadaan 2026-09-25).
 - **Path di repo**: `bip-erp/services/integration/internal/usecase/kompensasi_tiktok.go` **(baru)** · `internal/usecase/accurate_rts_usecase.go` (`diserapPenyesuaianStatement`) · `internal/usecase/accurate_receipt_usecase.go` (`processTiktokStatement`) · `internal/usecase/accurate_receipt_export_detail.go` (`dikompensasi`) · `internal/usecase/penyesuaian_tanpa_order.go` (`tempelPotonganPendapatanLain`, mekanik dipakai bersama) · `internal/domain/entity/accurate.go` (kv `tiktok-kompensasi-cutover-date`) · `internal/domain/entity/transaction.go` (`PayoutSebelumPenyesuaian`, `PayoutCair`) · `internal/infrastructure/repository/transaction_repo.go` (`terapkanPenyesuaian`, `incomeHanyaPenyesuaian` — pengisi penanda payout) · `internal/usecase/accurate_receipt_kompensasi_tiktok_test.go` + `..._orkestrasi_test.go` **(baru)**
 - **Tanggal**: 2026-09-22 (diamandemen 2026-09-25)
 
@@ -234,7 +234,7 @@ otomatis, tanggal deploy berarti dibiarkan dan seluruhnya jadi koreksi manual.
 
 ⚠️ Pilihan "dikoreksi" punya tenggat — penerimaan September tertua keluar dari jendela
 pindai 45 hari sekitar **17 Oktober 2026**. Lewat itu kv `2026-09-01` pun tak lagi
-menyentuh dokumennya, dan hasilnya jadi campuran yang sulit ditelusuri.
+menyentuh dokumennya, dan hasilnya jadi campuran yang sulit ditelusuri. **Tenggat itu sudah lewat per 2026-10-18**; apakah ketujuh pesanan sempat terkoreksi sebelum keluar jendela belum diukur ulang.
 
 ### 6. Hanya TikTok; aturan Shopee tidak ikut berubah
 

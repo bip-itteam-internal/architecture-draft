@@ -1,6 +1,6 @@
 # ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB
 
-> **Status**: 🟢 Diterima, 2026-10-09, oleh Azzerith (aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Asal keputusan: permintaan atasan Finance yang disampaikan Azzerith, bentuknya dipilih di sesi analisa 2026-10-09. ⚠️ Kode **merged 2026-10-09** (bip-erp #2882, erp-frontend #2238), **deploy prod TBD**. Belum terbukti: penyimpanan terhadap Mongo hidup, panggilan lewat gateway, dan layar di browser.
+> **Status**: 🟢 Diterima, 2026-10-09, oleh Azzerith (aturan persetujuan ADR di [[ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia]]). Asal keputusan: permintaan atasan Finance yang disampaikan Azzerith, bentuknya dipilih di sesi analisa 2026-10-09. ⚠️ Kode **merged 2026-10-09** (bip-erp #2882, erp-frontend #2238), **deploy prod TBD**. Belum terbukti: penyimpanan terhadap Mongo hidup, panggilan lewat gateway, dan layar di browser. **Diamandemen 2026-10-16 oleh [[ADR - 0184 Forecast Kas Mingguan Mencakup Tujuh Komponen Uang Keluar, Dibagi Empat Minggu, Realisasi Bertahap]]** pada K1 (cakupan tujuh komponen), K3 (jumlah sebulan = Σ proyeksi komponen), dan K5 (empat minggu).
 
 ## Untuk Manajemen
 
