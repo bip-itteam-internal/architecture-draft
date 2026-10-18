@@ -20809,19 +20809,18 @@
         "ADR - 0184 Forecast Kas Mingguan Mencakup Tujuh Komponen Uang Keluar, Dibagi Empat Minggu, Realisasi Bertahap",
         "Finance - Serapan Anggaran dan Cost Control"
       ],
-      "hash": "1be3acd5bf7e244de73fbeca9b0ef1cd776a52d580dc7547bd9b461946b8a8da",
-      "ukuran_kb": 7.3,
-      "ringkasan": "Menjawab: apa saja tujuh komponen uang keluar bulanan yang harus masuk forecast kas mingguan Cost Control, bagaimana akun Accurate dipetakan ke tiap komponen, dan bagaimana bulan dibagi empat minggu termasuk minggu ke-5. Juga memuat urutan task C0 sampai C6 per repo (bip-erp dan erp-frontend), pertanyaan terbuka A1 sampai A7 untuk Finance, serta cara memverifikasi tiap tahap terhadap laporan Excel Finance.",
+      "hash": "238552086d083f2261a889e18b09ce5d6e99dd45cc0788e4c020a615e804e611",
+      "ukuran_kb": 7.8,
+      "ringkasan": "Menjawab: bagaimana forecast kas mingguan Cost Control dipecah menjadi tujuh komponen uang keluar (Material, BOP, Pajak, Aset, dan lainnya), akun Accurate mana yang masuk tiap komponen, dan mengapa penyusutan serta akun beban pajak dikecualikan. Juga memuat urutan task C0 sampai C6 per repo beserta status PR-nya, catatan temuan dari judge C1, dan daftar pertanyaan terbuka untuk Finance (A1 sampai A7).",
       "kata_kunci": [
         "cashflow",
         "forecast kas mingguan",
         "uang keluar",
-        "tujuh komponen",
         "Cost Control",
         "proyeksi",
         "realisasi",
+        "akrual",
         "pemetaan akun Accurate",
-        "anggaran aset",
         "ADR 0184"
       ]
     },
