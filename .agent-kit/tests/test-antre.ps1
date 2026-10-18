@@ -167,7 +167,9 @@ try {
   $a = Start-Pemegang 25
   try {
     $sw = [Diagnostics.Stopwatch]::StartNew()
-    $g = Invoke-GerbangBatas 'uji' $tmp 'ping -n 2 127.0.0.1 >nul' 10
+    # jeda tanpa jaringan: `ping 127.0.0.1` sempat timeout di mesin dev (2026-10-18) dan keluar 1,
+    # sehingga pemeriksaan ini merah dan menolak SEMUA push .agent-kit/ tanpa ada yang rusak
+    $g = Invoke-GerbangBatas 'uji' $tmp 'powershell -NoProfile -Command Start-Sleep -Seconds 1' 10
     $sw.Stop()
     Check ($sw.Elapsed.TotalSeconds -ge 10) ("Invoke-GerbangBatas menunggu slot ({0:N1} dtk)" -f $sw.Elapsed.TotalSeconds)
     Check ($g.lolos) "Invoke-GerbangBatas: waktu antre TIDAK dihitung ke batas 10 dtk (exit $($g.exit))"
