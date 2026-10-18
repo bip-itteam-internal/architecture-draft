@@ -397,10 +397,13 @@ try {
   if (Test-Path $jdsPath) {
     $jds = Get-Content $jdsPath -Raw -Encoding UTF8
     Check ($jds -match '(?m)^tools: Read, Grep, Glob\s*$') 'loop-judge-desain: tools hanya Read, Grep, Glob'
-    Check ($jds.Contains('<<VERDICT_DESAIN>>') -and $jds.Contains('layar_dinilai') -and $jds.Contains('"bantahan"')) 'loop-judge-desain: kontrak keluaran VERDICT_DESAIN, layar_dinilai, bantahan'
+    Check ($jds.Contains('<<VERDICT_DESAIN>>') -and $jds.Contains('<<END>>') -and $jds.Contains('layar_dinilai') -and $jds.Contains('"bantahan"')) 'loop-judge-desain: kontrak keluaran VERDICT_DESAIN, END, layar_dinilai, bantahan'
+    Check (($jds -match '(?m)^model: opus\s*$') -and ($jds -match '(?m)^maxTurns: 40\s*$')) 'loop-judge-desain: model opus, maxTurns 40'
     Check ($jds.Contains('ui-checklist.md')) 'loop-judge-desain: merujuk path ui-checklist.md'
-    Check (-not $jds.Contains('## 2a. Sheet')) 'loop-judge-desain: isi ui-checklist.md dirujuk, bukan disalin'
+    Check (-not [regex]::IsMatch($jds, '(?m)^## 2[a-d]?\. ')) 'loop-judge-desain: tak memuat judul bagian ui-checklist (dirujuk, bukan disalin)'
   }
+  $peranIsi = Get-Content (Join-Path $kitRoot 'hooks/kantor-agent.py') -Raw -Encoding UTF8
+  Check ($peranIsi.Contains('"loop-judge-desain"')) 'kantor-agent PERAN memuat loop-judge-desain'
 
   # ---- v1.25.0: dua lubang gerbang ----
   $errf = Join-Path $tmp 'hook.err'

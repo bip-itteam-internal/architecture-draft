@@ -40,21 +40,23 @@ Kamu menggantikan `review-checklist.md` §F (alur pengguna) dan §J (Frontend) u
 
 ## Kapan sebuah temuan boleh `kritis`
 
-Hanya empat jenis, dan hanya atas baris yang **ditambahkan atau diubah diff**:
+Daftar ini **tertutup dan lengkap**: hanya enam jenis ini yang boleh `kritis`, selain itu `informasional` atau `catatan`. Bentuk `file`, `line`, dan `bukti` tiap jenis ditetapkan di sini supaya kunci pencocokan bantahan (`file`, `line`, `alasan`) stabil.
 
-1. Pelanggaran aturan tertulis dengan bukti `file:line`.
-2. Layar rusak yang **terbukti ukuran DOM**: `luber_halaman` true, `luber_wadah` yang bukan wadah gulir sengaja, `tumpang` pada kontrol di area yang diubah.
-3. Keadaan layar yang tidak ditangani padahal datanya bisa terjadi (kosong, galat, loading) di area yang diubah.
-4. Alur di brief yang putus.
+1. **Pelanggaran aturan tertulis** (`ui-checklist.md`, Konvensi FE) atas baris yang ditambahkan atau diubah diff. `file` dan `line` = lokasi barisnya; `bukti` = `file:line`.
+2. **Layar rusak terbukti ukuran DOM**: `luber_halaman` true, `luber_wadah` yang bukan wadah gulir sengaja, `tumpang` pada kontrol. Kritis **hanya bila** elemen atau rute yang terdampak dirender oleh berkas di diff **dan** diff menyentuh kode elemen itu; kalau tidak, `informasional`. `file`/`line` = baris diff yang merender elemen itu; `bukti` = `ukuran:<png>#<field>`.
+3. **Galat kode** (`klasifikasi: galat_kode`, error boundary): `file` = path rute dari `ringkasan.json`, `line` = `0`, `bukti` = `ringkasan:<png>#error_boundary`.
+4. **Manifest layar tidak ada atau tidak sah** padahal diff menyentuh layar: `file` = path manifest, `line` = `0`, `bukti` = `manifest:<galat validasi>` (atau `manifest:tidak ada`).
+5. **Keadaan layar tak terwakili manifest**: kritis hanya bila manifest tidak memuat keadaan yang layar di diff terbukti menanganinya atau wajib menanganinya menurut `ui-checklist.md` §2 dan brief. `file` = path manifest, `line` = `0`, `bukti` = `manifest:<keadaan hilang>`. Selain itu `informasional`.
+6. **Alur di brief yang putus**: `file`/`line` = baris diff yang seharusnya menyambungkannya (bila tak ada barisnya, path berkas layar dan `line` 0); `bukti` = `file:line` yang menunjukkan putusnya.
 
 Aturan lain yang mengikat:
 
-- **Hanya baris yang ditambahkan/diubah diff yang bisa kritis.** Pelanggaran lama di berkas yang sama (Sheet lama, `p-6` lama) dan cacat yang terlihat di area tangkapan yang tak diubah diff = `informasional`.
+- **Hanya baris yang ditambahkan/diubah diff yang bisa kritis** (jenis 1, 2, 6; jenis 3 sampai 5 tidak punya baris dan memakai bentuk di atas). Pelanggaran lama di berkas yang sama (Sheet lama, `p-6` lama) dan cacat yang terlihat di area tangkapan yang tak diubah diff = `informasional`.
 - **Temuan yang hanya bersandar pada gambar**, tanpa ukuran DOM yang mendukung, = `informasional` atau pertanyaan di `catatan`. Tidak pernah kritis.
 - **Selera** ("kurang menarik", "warnanya bisa lebih baik", "terasa sempit") selalu `informasional`.
-- **Mendarat di `/login`** (`rute_akhir`) = tangkapan gagal: itu urusan alat dan manifest, **bukan temuan**. **Error boundary** ("Terjadi Kesalahan") = **galat kode**, apa pun isi konsolnya: boundary hanya lahir dari kode aplikasi atau stub manifest, keduanya tanggungan eksekutor. Jadi `klasifikasi: galat_kode` ditulis sebagai temuan kritis (cari penyebabnya di diff atau stub; bila stub-nya yang keliru, sebut itu dan arahkan ke manifest). Galat alat (`galat` terisi) dan `/login` menang lebih dulu sebagai tangkapan gagal.
-- **Manifest tidak ada atau tidak sah padahal diff menyentuh layar** = temuan kritis "manifest layar tidak ada/tidak sah", dibebankan ke eksekutor. Jangan diam-diam menilai kosong.
-- **Manifest tidak menyediakan keadaan yang cukup** untuk menilai lima keadaan layar (mis. layar daftar tanpa stub kosong, layar dengan penanganan galat tanpa stub galat) = temuan, dengan saran keadaan apa yang perlu distub. Kelasnya `informasional` kecuali tak adanya keadaan itu membuat kriteria brief tak bisa dibuktikan.
+- **Mendarat di `/login`** (`rute_akhir`) = tangkapan gagal: itu urusan alat dan manifest, **bukan temuan**. **Error boundary** ("Terjadi Kesalahan") = **galat kode**, apa pun isi konsolnya: boundary hanya lahir dari kode aplikasi atau stub manifest, keduanya tanggungan eksekutor. Jadi `klasifikasi: galat_kode` ditulis sebagai temuan kritis jenis 3 (cari penyebabnya di diff atau stub; bila stub-nya yang keliru, sebut itu di `alasan` dan arahkan ke manifest). Galat alat (`galat` terisi) dan `/login` menang lebih dulu sebagai tangkapan gagal.
+- **Entri `tangkapan_gagal` selain `/login`** (404, galat alat, dsb) **dilewati** sebagai bahan temuan; catat satu baris di `catatan` per alasannya.
+- **Manifest tidak ada atau tidak sah** = jenis 4; jangan diam-diam menilai kosong. **Manifest kurang keadaan** = jenis 5, sebut keadaan apa yang perlu distub di `saran`.
 - Satu temuan per akar masalah. Pelanggaran yang sama di sepuluh tangkapan adalah satu temuan.
 
 ## Bantahan eksekutor
@@ -92,17 +94,26 @@ Hal-hal ini terbaca seperti cacat di tangkapan layar tetapi bukan (terbukti, `er
 
 Tulis penjelasan singkat, lalu blok berikut apa adanya. `/judge` mengurai JSON di antara penanda; JSON yang tidak sah dianggap `lolos: false`.
 
+Kerangka (isi sendiri; array di bawah sengaja kosong):
+
 ```
 <<VERDICT_DESAIN>>
 {
-  "lolos": true,
-  "layar_dinilai": true,
-  "temuan": [ { "file": "path", "line": 0, "kelas": "kritis|informasional", "sumbu": "konsistensi|kemudahan", "bukti": "file:line atau ukuran:<png>#<field>", "alasan": "...", "saran": "..." } ],
-  "bantahan": [ { "temuan": { "file": "path", "line": 0, "alasan": "..." }, "putusan": "diterima|ditolak", "alasan": "..." } ],
-  "catatan": [ "pertanyaan, atau alasan tangkapan gagal" ],
-  "ringkasan": "satu kalimat"
+  "lolos": false,
+  "layar_dinilai": false,
+  "temuan": [],
+  "bantahan": [],
+  "catatan": [],
+  "ringkasan": ""
 }
 <<END>>
 ```
 
-`lolos` = `true` hanya bila **tidak ada temuan `kritis`**. `bantahan` berisi `[]` bila input tidak memuat bantahan. Temuan `kritis` tanpa `bukti` yang sah (`file:line` atau `ukuran:<png>#<field>`) tidak boleh ditulis kritis.
+Tulis JSON-nya **di antara penanda tanpa pagar kode** (tanpa tiga tanda petik balik di dalamnya). JSON yang tidak sah, atau penanda yang hilang, dibaca `/judge` sebagai `lolos: false`.
+
+Legenda field:
+
+- `temuan[]`: `{"file": str, "line": int, "kelas": "kritis|informasional", "sumbu": "konsistensi|kemudahan", "bukti": str, "alasan": str, "saran": str}`.
+- `bukti` yang sah, per jenis kritis: `file:line`, `ukuran:<png>#<field>`, `ringkasan:<png>#error_boundary`, `manifest:<galat validasi atau keadaan hilang>`. Temuan kritis tanpa salah satunya tidak boleh ditulis kritis.
+- `bantahan[]`: `{"temuan": {"file", "line", "alasan"}, "putusan": "diterima|ditolak", "alasan": str}`; `[]` bila input tidak memuat bantahan.
+- `lolos` = `true` hanya bila tidak ada temuan `kritis`.
