@@ -763,9 +763,9 @@
         "ADR - 0001 Akuntansi via Accurate",
         "CORE - API Master Gateway"
       ],
-      "hash": "b5b7f0de16db84e06f75cfa8f94d9cbc8e60872d68f0695302963db41924d6a0",
-      "ukuran_kb": 57.9,
-      "ringkasan": "Menjawab: endpoint apa saja di procurement-service (master pemasok/barang, cermin pembelian Accurate, tagihan, Pengajuan Barang lima tipe), siapa yang berwenang tiap tahap, dan bentuk request/respons termasuk endpoint baru syarat-bayar, daftar PO, dan pratinjau nilai-po serta field form_permintaan dan lembar_po di amplop detail.",
+      "hash": "79dfe05feff26484d8808a0cf713486728b44fe15f9738f6ab210297a5264ec3",
+      "ukuran_kb": 59.5,
+      "ringkasan": "Menjawab: endpoint apa saja di procurement-service (master pemasok/barang, cermin pembelian Accurate, tagihan, Pengajuan Barang lima tipe), siapa yang berwenang tiap tahap, dan bentuk request/respons termasuk syarat-bayar, daftar PO, pratinjau nilai-po, field form_permintaan dan lembar_po di amplop detail, syarat_bayar wajib di POST /:id/harga Barang Umum (400), serta kunci diskon/ppn/termasuk_ppn dan arti total pencatatan_berjalan FAKTUR.",
       "kata_kunci": [
         "procurement",
         "pengajuan barang",
@@ -775,6 +775,8 @@
         "form_permintaan",
         "PONV",
         "daftar PO",
+        "pencatatan_berjalan",
+        "diskon faktur",
         "endpoint",
         "gateway /api/procurement"
       ]
@@ -3118,9 +3120,9 @@
         "Microservices - Integration Service",
         "Finance - FAT Persona"
       ],
-      "hash": "b27f697a7365f56869df00eb9bf464b5da9ae33d2e5811772d313313cac8f66d",
-      "ukuran_kb": 106.7,
-      "ringkasan": "Menjawab: apa yang dikerjakan procurement-service, jenjang persetujuan Pengajuan Barang per tipe, serta alur lembar dokumen pembelian (bingkai ?lembar=, Form Permintaan, lembar PO, rumus Nilai PO/HitungNilaiPO, syarat bayar dari Accurate, nomor PONV, tab PO dari Pengajuan, paket cetak Finance yang masih menyusul) dan gotcha amplop vs dokumen.",
+      "hash": "77911500cd455068731b6fcecea8e98e81c9220a218cdd53a82e2d4cea87ac18",
+      "ukuran_kb": 113.2,
+      "ringkasan": "Menjawab: apa yang dikerjakan procurement-service, jenjang persetujuan Pengajuan Barang per tipe, serta alur lembar dokumen pembelian (bingkai ?lembar=, Form Permintaan, lembar PO, rumus Nilai PO/HitungNilaiPO, diskon dan PPN PO ke faktur dengan pembagian proporsional, syarat bayar Accurate dan kewajibannya untuk Barang Umum, nomor PONV dan go-live counter, tab PO dari Pengajuan, paket cetak Finance, lembar ke-4 Penerimaan Barang QC) dan gotcha amplop vs dokumen.",
       "kata_kunci": [
         "procurement-service",
         "pengajuan barang",
@@ -3129,10 +3131,11 @@
         "Nilai PO",
         "PONV",
         "syarat bayar",
-        "payment term Accurate",
-        "bingkai dokumen",
-        "Raw Material",
-        "Barang Umum",
+        "cashDiscount",
+        "faktur diskon PPN",
+        "Daftar Status Penerimaan Barang",
+        "lembar QC",
+        "paket cetak Finance",
         "BKK"
       ]
     },
