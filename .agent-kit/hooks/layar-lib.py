@@ -23,7 +23,7 @@ ke /login), dan keadaan `berisi` + `kosong` selalu ada.
 CLI:
   python layar-lib.py perlu --repo <r> --berkas-dari <txt>
   python layar-lib.py validasi <manifest.json>        (exit 0 sah, 1 ada galat)
-  python layar-lib.py ringkas <ringkasan.json> --berkas-dari <txt>
+  python layar-lib.py ringkas <ringkasan.json> --berkas-dari <txt>   -> {rute, layar_dinilai, galat}
   python layar-lib.py salah-tuduh --sebelum <verdict desain n-1> --berikut <verdict desain n> --bantahan <json>
 """
 import argparse
@@ -205,7 +205,10 @@ def main(argv=None):
         ringkasan = json.load(f)
     diff = _baca_berkas_diff(a.berkas_dari)
     rute = [dict(r, klasifikasi=klasifikasi_rute(r, diff)) for r in ringkasan.get("rute") or []]
-    print(json.dumps({"rute": rute, "layar_dinilai": layar_dinilai(ringkasan, diff)}))
+    # `galat` tingkat atas (build tak ada, port dipakai, server tak listen, node tak ada) diteruskan:
+    # tanpa itu ringkasan ber-`rute: []` cuma terbaca "tidak dinilai" tanpa alasan di verdict/PR.
+    galat = ringkasan.get("galat") or None
+    print(json.dumps({"rute": rute, "layar_dinilai": layar_dinilai(ringkasan, diff), "galat": galat}))
     return 0
 
 

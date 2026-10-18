@@ -125,6 +125,16 @@ Manifest layar: <ws>/.task-plans/judge/<slug>-layar.json   (hanya repo erp-front
 layar erp-frontend; `/judge` langkah 3b membacanya dari path yang sama. Path di luar worktree
 supaya manifest tak ikut commit.
 
+**Sebelum dispatch percobaan 1** (hanya percobaan 1, hanya slug ini), buang sisa run lama dengan
+slug yang sama di `.task-plans/judge/`: `<slug>-layar.json`, `<slug>-<k>-verdict-desain.json`,
+`<slug>-<k>-bantahan.json`, dan folder `<slug>-<k>-layar/`, dengan `<k>` = angka percobaan 1..3
+(sebut ketiganya satu per satu, jangan glob `<slug>-*`: slug lain yang berawalan sama, mis.
+`<slug>-b`, ikut tersapu). Manifest yang tertinggal dari run
+sebelumnya akan lolos validasi atas nama eksekutor yang tak pernah menulisnya, sehingga temuan
+"manifest layar tidak ada" diam-diam tak pernah terbit; verdict dan bantahan lama mencemari hitungan
+salah tuduh. Percobaan 2 dan 3 **tidak** membuang apa pun di sini (manifest dan verdict sebelumnya
+masih dipakai); folder tangkapan `<slug>-<n>-layar/` dibersihkan `/judge` 3b(c) sebelum menangkap.
+
 **Anchor `file:line` itu titik mulai, bukan pagar.** Eksekutor tetap boleh membaca berkas utuh
 atau rentang lain bila perlu; jangan pernah menulis larangan "hanya baca rentang ini" ke prompt
 eksekutor, satu perbaikan yang salah karena konteks kurang jauh lebih mahal daripada token yang
@@ -198,6 +208,8 @@ Kirim verdict ke papan tim (best-effort; no-op bila mesin ini tidak menyalakan i
 & '.claude/hooks/loop-kirim.ps1' -Jenis judge.verdict -BriefSlug <slug> -Data '{"percobaan":<n>,"lolos":<true|false>,"temuan_kritis":<k>,"durasi_gerbang":<detik>}'
 ```
 (in-process dengan `&`, bukan `powershell -File`; alasannya di komentar skrip)
+`temuan_kritis` = temuan kritis **gabungan** `loop-judge` + judge desain (angka `Temuan kritis`
+laporan `/judge`), bukan bagian desain saja.
 
 Tulis log `.task-plans/judge/<slug>-<n>.json`:
 
@@ -219,17 +231,19 @@ Tiga field judge desain (`/judge` langkah 3b) bernilai `null` bila judge desain 
 
 - `verdict_desain`: JSON hasil langkah 3b(e) apa adanya, termasuk `layar_dinilai` dan `bantahan`.
 - `layar`: path `ringkasan.json` tangkapan, atau `"tidak tersedia: <alasan>"` (manifest tidak
-  ada/tidak sah, tangkap-layar gagal, `--tanpa-build`). Ringkasan yang ada tetapi tanpa satu pun
-  tangkapan terbaca tetap ditulis path-nya; `layar_dinilai: false` di verdict yang menyatakannya.
-- `salah_tuduh`: dihitung **mesin**, bukan ditaksir, pada percobaan ≥ 2 yang percobaan
-  sebelumnya juga punya verdict desain:
+  ada/tidak sah, tangkap-layar gagal, `galat` global dari keluaran `ringkas`, `--tanpa-build`).
+  Ringkasan yang ada tetapi tanpa satu pun tangkapan terbaca dan tanpa `galat` global tetap ditulis
+  path-nya; `layar_dinilai: false` di verdict yang menyatakannya.
+- `salah_tuduh`: dihitung **mesin**, bukan ditaksir, pada percobaan ≥ 2, dan **hanya bila kedua
+  berkas** `<slug>-<n-1>-verdict-desain.json` **dan** `<slug>-<n>-verdict-desain.json` ada (periksa
+  dengan `Test-Path` lebih dulu; tanpa salah satunya CLI akan gagal membaca berkas):
   ```
   & architecture-draft/Tools/.venv/Scripts/python.exe .claude/hooks/layar-lib.py salah-tuduh --sebelum .task-plans/judge/<slug>-<n-1>-verdict-desain.json --berikut .task-plans/judge/<slug>-<n>-verdict-desain.json --bantahan .task-plans/judge/<slug>-<n>-bantahan.json
   ```
   Keluarannya (fungsi `hitung_salah_tuduh`) disalin apa adanya. `diterima` = bantahan eksekutor yang
   diterima judge desain = **salah tuduh**; `ditolak` = temuan tetap kritis; `diabaikan` = bantahan
   atas temuan yang tak pernah ada di verdict sebelumnya, **tidak** dihitung salah tuduh. Percobaan 1,
-  atau percobaan sebelumnya tanpa verdict desain → `null`.
+  atau salah satu dari dua berkas verdict desain itu tidak ada → `null`.
 
 Field `agen` ditulis apa adanya karena ia yang membuat angka pengulangan bisa dibandingkan
 antar-peran nanti: apakah spesialis lapisan benar-benar lebih jarang ditolak judge daripada
@@ -272,7 +286,11 @@ terpenuhi, dan `gagal_baru` gerbang, apa adanya. Lalu kembali ke §3 dengan `per
 **Temuan judge desain** ikut di bagian yang sama, dalam batas 3 percobaan yang sama (judge desain
 tidak menambah percobaan). Tiap temuan `kritis` dari `verdict_desain` disalin apa adanya (`file`,
 `line`, `alasan`, `bukti`, `saran`) dengan awalan `[desain]`, termasuk temuan "manifest layar tidak
-ada / tidak sah" yang dibebankan ke eksekutor. Di bawahnya tulis kalimat ini apa adanya:
+ada / tidak sah" yang dibebankan ke eksekutor. Bila verdict desain **tak terurai** (`catatan`
+memuat `verdict desain tidak terurai`, `/judge` 3b(e)), tulis itu sebagai satu baris `[desain]
+verdict desain tidak terurai: percobaan ini gagal karena penilai, bukan karena kodemu; perbaiki
+temuan lain bila ada, tak ada yang perlu diubah karena baris ini`, supaya percobaan yang hangus
+terbaca di prompt dan di log, bukan hilang diam-diam. Di bawahnya tulis kalimat ini apa adanya:
 
 ```
 Temuan [desain] boleh kamu bantah dengan bukti (ukuran DOM, file:line, atau aturan yang dikutip) di bagian Bantahan laporanmu. Salin temuan {file, line, alasan} persis karakter-per-karakter; bantahan tanpa bukti ditolak dan temuannya tetap kritis.
@@ -338,10 +356,13 @@ Repo kode, di dalam worktree:
    - Kriteria lolos + bukti (dari verdict)
    - Ringkasan judge + gerbang yang dijalankan (nama, durasi, lolos)
    - **Judge desain**, bila menyala (`verdict_desain` bukan `null`): baris `Desain:` dari laporan
-     `/judge`, `ringkasan` verdict desain, dan daftar tangkapan yang dinilai (path PNG lokal di
-     `.task-plans/judge/<slug>-<k>-layar/`, tidak diunggah). Bila `layar_dinilai: false`, tulis
-     `layar tidak tertangkap: <alasan dari field layar atau catatan verdict>` supaya reviewer tahu
-     layarnya dinilai dari kode saja. Lalu **satu baris per temuan desain** dari semua percobaan
+     `/judge`, `ringkasan` verdict desain, dan daftar tangkapan yang dinilai. **Jangan berpura-pura
+     reviewer bisa melihatnya**: tulis terang satu kalimat bahwa tangkapan layar adalah berkas
+     **lokal** di mesin yang menjalankan `/kerjakan`, **tidak diunggah** ke PR, lalu path absolutnya
+     (`<ws>/.task-plans/judge/<slug>-<k>-layar/*.png`). Reviewer di mesin lain belum bisa melihat
+     layarnya. Bila `layar_dinilai: false`, tulis `layar tidak tertangkap: <alasan>` dengan alasan
+     dari field `layar` log (`tidak tersedia: ...`, termasuk `galat` global tangkapan), atau dari
+     `catatan` verdict bila `layar` berupa path, supaya reviewer tahu layarnya dinilai dari kode saja. Lalu **satu baris per temuan desain** dari semua percobaan
      (kritis yang sudah dituruti eksekutor dan informasional di verdict terakhir; satu baris per
      kunci `file`, `line`, `alasan`; bantahan yang diterima tidak ikut):
      ```

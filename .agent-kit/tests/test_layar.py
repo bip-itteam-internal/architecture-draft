@@ -260,6 +260,18 @@ def test_cli_ringkas_dengan_bom(tmp_path):
     assert [x["klasifikasi"] for x in out["rute"]] == ["tangkapan_gagal", "ok"]
 
 
+def test_cli_ringkas_membawa_galat_global(tmp_path):
+    # tangkap-layar.ps1 menulis galat global (build tak ada, port, server tak listen) sebagai
+    # `galat` tingkat atas dengan `rute: []`; tanpa diteruskan, alasannya hilang dari verdict/PR.
+    import json as _j
+    r = _tulis(tmp_path / "r.json", _j.dumps({"galat": "server tidak listen di port 4100", "rute": []}))
+    d = _tulis(tmp_path / "d.txt", "src/app/x.tsx\n")
+    kode, out = _jalan("ringkas", r, "--berkas-dari", d)
+    assert kode == 0 and out == {"rute": [], "layar_dinilai": False, "galat": "server tidak listen di port 4100"}
+    ok = _tulis(tmp_path / "o.json", _j.dumps({"rute": [_hasil()]}))
+    assert _jalan("ringkas", ok, "--berkas-dari", d)[1]["galat"] is None
+
+
 def test_cli_salah_tuduh_dengan_bom(tmp_path):
     # /kerjakan mengisi field log `salah_tuduh` lewat CLI ini; berkasnya ditulis PowerShell 5.1 (BOM)
     import json as _j

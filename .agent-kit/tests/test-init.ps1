@@ -425,8 +425,20 @@ try {
   Check ($kj3.Contains('"verdict_desain"') -and $kj3.Contains('"layar"') -and $kj3.Contains('"salah_tuduh"') -and $kj3.Contains('layar-lib.py salah-tuduh')) '/kerjakan 3: field log verdict_desain, layar, salah_tuduh (dari layar-lib.py)'
   Check ($kj4.Contains('Bantahan') -and $kj4 -match 'desain') '/kerjakan 4: temuan desain + bagian Bantahan'
   Check ($kj5.Contains('- [ ] salah tuduh:') -and $kj5.Contains('layar tidak tertangkap')) '/kerjakan 5: centang salah tuduh + alasan layar tak tertangkap di badan PR'
+  # Galat global tangkapan (build/port/server) dibawa ke `layar`, bukan hilang di rute kosong.
+  Check ($jd3b.Contains('"galat": str|null') -and $jd3b.Contains('"tidak tersedia: <galat>"')) '/judge 3b(c): galat global ringkas jadi layar tidak tersedia'
+  Check ($jd3b.Contains('<slug>-<n>-layar/') -and $jd3b -match 'Hapus dulu') '/judge 3b(c): folder tangkapan percobaan ini dibersihkan sebelum menangkap'
+  Check ($jd4 -match 'gabungan') '/judge 4: Temuan kritis = gabungan loop-judge + judge desain'
+  # Sisa run lama: manifest tertinggal tak boleh membungkam temuan "manifest layar tidak ada".
+  $kj2 = Potong $kjMd '## 2. Eksekutor' '## 3. Judge'
+  Check ($kj2.Contains('Sebelum dispatch percobaan 1') -and $kj2.Contains('<slug>-layar.json') -and $kj2.Contains('<slug>-<k>-bantahan.json')) '/kerjakan 2: sisa run lama slug ini dibuang di percobaan 1'
+  Check ($kj3 -match 'hanya bila kedua' -and $kj3.Contains('Test-Path')) '/kerjakan 3: salah-tuduh dijaga dua berkas verdict desain'
+  Check ($kj4.Contains('verdict desain tidak terurai')) '/kerjakan 4: verdict desain tak terurai dikirim balik sebagai temuan'
+  Check ($kj5.Contains('tidak diunggah') -and $kj5 -match 'lokal') '/kerjakan 5: PNG terang disebut lokal, tidak diunggah'
   $ljMd = Get-Content (Join-Path $claude 'agents/loop-judge.md') -Raw -Encoding UTF8
-  Check ($ljMd -match ("(?m)^.*judge desain.*" + $S + 'F.*' + $S + 'J.*$') -and $ljMd -match 'i18n') 'loop-judge: lewati F dan J bila judge desain menyala, i18n tetap'
+  # i18n diperiksa di POTONGAN pengecualian, bukan seluruh berkas (i18n juga ada di Pass 1).
+  $ljEks = Potong $ljMd '## Pengecualian saat judge desain menyala' '## Gerbang verifikasi'
+  Check ($ljEks -match ("(?m)^.*judge desain.*" + $S + 'F.*' + $S + 'J.*$') -and $ljEks -match 'i18n') 'loop-judge: lewati F dan J bila judge desain menyala, i18n tetap'
   foreach ($eks in 'loop-fe', 'loop-test', 'loop-fix', 'loop-refactor') {
     $eMd = Get-Content (Join-Path $claude ("agents/$eks.md")) -Raw -Encoding UTF8
     $eLap = Potong $eMd '## Laporan akhir' '#### tak-ada'

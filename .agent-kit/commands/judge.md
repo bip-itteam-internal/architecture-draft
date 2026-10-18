@@ -61,9 +61,12 @@ apakah diff itu memang butuh test baru.
    `architecture-draft/.agent-kit/rules/review-checklist.md`.
 
    - **Bila judge desain menyala (langkah 3b), `ui-checklist.md` TIDAK dikirim ke `loop-judge`**,
-     dan prompt memuat kalimat ini apa adanya: `Judge desain menyala: lewati review-checklist.md
-     §F dan §J untuk berkas erp-frontend; i18n tetap kamu nilai.` Aturan UI cuma punya satu
-     penilai; dua penilai atas aturan yang sama dengan hasil berbeda adalah satu fakta di dua tempat.
+     dan prompt memuat kalimat ini apa adanya:
+     ```
+     Judge desain menyala: lewati review-checklist.md §F dan §J untuk berkas erp-frontend; i18n tetap kamu nilai.
+     ```
+     Aturan UI cuma punya satu penilai; dua penilai atas aturan yang sama dengan hasil berbeda
+     adalah satu fakta di dua tempat.
    - **Bila judge desain tidak menyala tetapi diff menyentuh berkas layar** (UI mybharata: judge desain
      belum mencakup Flutter), sertakan path `architecture-draft/.agent-kit/rules/ui-checklist.md`
      supaya `loop-judge` menilai kriteria UX di sana — rujuk **path-nya saja**, jangan salin isinya
@@ -101,7 +104,9 @@ apakah diff itu memang butuh test baru.
       tidak ada / tidak sah" (dibebankan ke eksekutor) ditulis **oleh judge desain sendiri** (jenis 4,
       `file` = path manifest, `line` 0); `/judge` tidak menambahkannya lagi supaya tak terhitung dua kali.
    c. **Tangkap** (hanya bila manifest sah, dan **sesudah** langkah 1: skripnya memakai build yang
-      ditinggalkan gerbang lewat `pnpm start`):
+      ditinggalkan gerbang lewat `pnpm start`). Hapus dulu `.task-plans/judge/<slug>-<n>-layar/`
+      bila ada (sisa run lain dengan slug dan nomor yang sama; hanya folder itu, bukan milik
+      percobaan lain), supaya PNG lama tak ikut terbaca sebagai tangkapan percobaan ini:
       ```
       powershell -NoProfile -ExecutionPolicy Bypass -File .claude/hooks/tangkap-layar.ps1 -Path "<wt>" -Manifest ".task-plans/judge/<slug>-layar.json" -Keluaran ".task-plans/judge/<slug>-<n>-layar"
       ```
@@ -114,14 +119,18 @@ apakah diff itu memang butuh test baru.
       ```
       & $PY .claude/hooks/layar-lib.py ringkas .task-plans/judge/<slug>-<n>-layar/ringkasan.json --berkas-dari .task-plans/judge/<slug>-berkas.txt | Set-Content -Encoding utf8 .task-plans/judge/<slug>-<n>-layar/ringkas.json
       ```
+      Keluarannya `{"rute": [...], "layar_dinilai": bool, "galat": str|null}`. **`galat` bukan
+      `null`** = kegagalan global tangkapan (build tak ada, port dipakai, server tak listen, node tak
+      ada; `rute` kosong): `layar` = `"tidak tersedia: <galat>"` dan teks yang sama itulah yang
+      dikirim ke judge desain di (d), persis seperti cabang manifest gagal di (b). Selain itu
       `layar` = path `ringkasan.json`. `layar_dinilai` **dibaca** dari keluaran ini, tidak
       disimpulkan: ringkasan yang `rute`-nya kosong atau seluruhnya `tangkapan_gagal` = `false`,
-      bukan layar bersih. **Tangkapan gagal tidak memblokir**; alasannya dibawa ke verdict, log, dan
-      badan PR.
+      bukan layar bersih. **Tangkapan gagal tidak memblokir**; alasannya (field `layar`) dibawa ke
+      verdict, log, dan badan PR.
    d. **Dispatch** `Agent` `subagent_type: loop-judge-desain`, `run_in_background: false`, prompt
       berisi path absolut: brief, diff, `architecture-draft/.agent-kit/rules/ui-checklist.md` (path
       saja, jangan salin isinya), manifest (atau `tidak ada`), `ringkas.json` (atau teks `tidak
-      tersedia: <alasan>` dari b/c), worktree, bantahan eksekutor
+      tersedia: <alasan>` dari b/c, termasuk `galat` global), worktree, bantahan eksekutor
       `.task-plans/judge/<slug>-<n>-bantahan.json` (dari `/kerjakan` §4; `kosong` pada percobaan 1
       atau bila berkasnya tak ada), dan verdict desain sebelumnya
       `.task-plans/judge/<slug>-<n-1>-verdict-desain.json` bila ada (temuan yang dibantah dikutip
@@ -129,8 +138,11 @@ apakah diff itu memang butuh test baru.
    e. **Urai** JSON di antara `<<VERDICT_DESAIN>>` dan `<<END>>`, simpan ke
       `.task-plans/judge/<slug>-<n>-verdict-desain.json`. JSON tidak sah atau penanda tidak ada →
       `{"lolos": false, "layar_dinilai": false, "catatan": ["verdict desain tidak terurai"]}`; jangan
-      menebak isinya. `layar_dinilai` di verdict wajib sama dengan keluaran `ringkas` (atau `false`
-      bila `tidak tersedia`); bila beda, nilai mesin yang dipakai dan bedanya ditulis di `Catatan`.
+      menebak isinya. Verdict yang tak terurai **tetap disebut** di laporan (baris `Desain: gagal`
+      dengan alasan `verdict desain tidak terurai`), dan `/kerjakan` §4 mengirimnya balik sebagai
+      temuan supaya percobaan itu tidak hangus tanpa jejak. `layar_dinilai` di verdict wajib sama
+      dengan keluaran `ringkas` (atau `false` bila `tidak tersedia`); bila beda, nilai mesin yang
+      dipakai dan bedanya ditulis di `Catatan`.
 
 4. **Triangulasi dan laporan**
 
@@ -147,6 +159,10 @@ apakah diff itu memang butuh test baru.
    <daftar temuan file:line — alasan — saran; temuan judge desain diberi awalan [desain]>
    Catatan: <pertanyaan judge, peringatan baseline, alasan layar tak tertangkap>
    ```
+
+   `Temuan kritis: <n>` menghitung temuan kritis **gabungan** `loop-judge` + judge desain; `kritis
+   <n>` di baris `Desain:` adalah bagian judge desain saja (jadi selalu ≤ angka gabungan). Angka
+   gabungan yang sama dipakai `temuan_kritis` di `/kerjakan` §3.
 
    Bila dipanggil langsung oleh manusia (bukan dari `/kerjakan`), tutup dengan langkah berikutnya:
    lolos → "lanjut commit/PR lewat `/kerjakan`" ; gagal → daftar yang harus diperbaiki.

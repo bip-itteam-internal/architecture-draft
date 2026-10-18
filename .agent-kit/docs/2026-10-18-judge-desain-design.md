@@ -151,6 +151,7 @@ Keluaran: blok `<<VERDICT_DESAIN>> ... <<END>>` berbentuk sama dengan verdict `l
 - Log `.task-plans/judge/<slug>-<n>.json` mendapat field `verdict_desain` dan `layar`
   (path `ringkasan.json` atau `"tidak tersedia: <alasan>"`).
 - Badan PR memuat ringkasan judge desain dan daftar tangkapan, supaya reviewer melihat layar yang dinilai.
+- **Belum:** PNG belum diunggah ke PR; reviewer di mesin lain belum bisa melihat layar (2026-10-18).
 
 ### Aturan tambahan (keputusan Claude, dari builder check; user boleh membantah)
 
