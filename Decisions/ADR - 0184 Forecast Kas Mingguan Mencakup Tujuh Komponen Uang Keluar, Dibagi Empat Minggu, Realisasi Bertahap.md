@@ -143,6 +143,13 @@ Untuk tiap komponen ditampilkan proyeksi dan realisasinya per minggu.
      - Sampai realisasi komponen isian (Material, Pajak, Aset, bagian isian BOP) tersedia di C3, **akurasi forecast dan KPI tetap dihitung dari bagian RAPB saja**.
      - Proyeksi yang memuat isian dikirim di field terpisah dengan nama yang tidak mungkin tertukar. Satu objek ringkasan minggu tidak boleh memuat proyeksi dan akurasi dari populasi yang berbeda.
      - Isian masuk basis akurasi bersamaan dengan realisasinya di C3. Sejak saat itu, isian bulan berjalan wajib tunduk pada kunci minggu dan batas ubah yang sama (ADR 0161).
+     - *Penerapan C3 (2026-10-18):*
+       - C3 dipecah menjadi tiga bagian:
+         - **C3a** (bip-erp#3256): Aset, sisa anggaran aset, dan pengeluaran beban pajak dari ops adum;
+         - **C3b** (bip-erp#3259): Pajak dan total uang keluar riil;
+         - **C3c**: Material, menunggu bagan akun prod.
+       - Isian masuk basis **per komponen**, hanya bila sumber realisasi komponen itu terukur. Contohnya salinan aset sudah disinkron, atau setoran pajak terbaca dari finance.
+       - Isian Material tetap di luar basis sampai C3c.
 8. **Pemisahan dari metrik #1 dilepas secara sadar.** Varians OPEX (metrik #1) dan forecast (#4) kini sama-sama memuat OPEX. Ini permintaan Finance, dan alasan subset di `kas_keluar_daftar.go:20-24` tidak berlaku lagi.
 
 ## Consequences
@@ -157,7 +164,12 @@ Untuk tiap komponen ditampilkan proyeksi dan realisasinya per minggu.
   - integration-service dan **employee-service** naik bersama, karena salinan angka 6 dihapus;
   - finance-service hanya ikut bila task membaca pajak atau perlengkapan lewat rute baru;
   - BE sebelum FE, karena kontrak laporan mingguan berubah;
-  - tidak ada env baru.
+  - ~~tidak ada env baru.~~ **Diamandemen 2026-10-18 (Azzerith):**
+    - Realisasi Pajak (`pajak_setoran_accurate`) dan uang keluar riil (`kas_bank_arus_salinan`) dimiliki finance-service. integration-service membacanya lewat rute mesin baru `GET /internal/forecast-kas/{pajak,arus-keluar}` di finance, dengan gerbang `FINANCE_SERVICE_KEY`.
+    - Akibatnya blok compose integration-service mendapat env baru `FINANCE_MODULE_URL` dan `FINANCE_SERVICE_KEY`. Tidak ada variabel `.env` baru, karena kuncinya sudah dipakai procurement dan payroll.
+    - finance-service di-deploy lebih dulu, lalu integration-service dengan `--force-recreate`.
+    - Integration tidak menarik buku besar pajak dari Accurate sendiri, karena itu akan menjadi salinan kedua `akunPajakSetoran`.
+    - Populasi forecast: entitas PT Bharata saja. Ini asumsi yang menunggu konfirmasi Finance.
 - **REF - Kepemilikan Data** perlu baris baru: proyeksi komponen dan anggaran aset (integration), serta salinan arus kas-bank (finance). Baris salinan arus kas-bank sudah dijanjikan ADR 0163 tetapi belum ditambahkan.
 
 ## Dokumen Terkait
