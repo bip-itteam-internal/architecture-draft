@@ -12,7 +12,8 @@ $fixture = Join-Path $kitRoot 'tests/fixtures/layar'
 $fail = 0
 function Check($cond, $name) { if ($cond) { Write-Host "PASS $name" } else { Write-Host "FAIL $name"; $script:fail++ } }
 
-$chromeExe = 'C:\Program Files\Google\Chrome\Application\chrome.exe'
+$chromeExe = @('C:\Program Files\Google\Chrome\Application\chrome.exe', 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe') | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+if (-not $chromeExe) { $chromeExe = 'C:\Program Files\Google\Chrome\Application\chrome.exe' }
 if (-not (Test-Path -LiteralPath $chromeExe)) { Write-Host "LEWAT test-tangkap-layar: Chrome tidak ada di $chromeExe"; exit 0 }
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) { Write-Host 'LEWAT test-tangkap-layar: node tidak ada di PATH'; exit 0 }
 if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) { Write-Host 'LEWAT test-tangkap-layar: pnpm tidak ada di PATH'; exit 0 }
@@ -76,7 +77,7 @@ http.createServer((req, res) => {
   if (Get-Command python -ErrorAction SilentlyContinue) {
     & python $lib validasi $manifest | Out-Null
     Check ($LASTEXITCODE -eq 0) 'manifest uji sah menurut layar-lib.py validasi'
-  }
+  } else { Write-Host 'LEWAT validasi manifest uji: python tidak ada di PATH' }
 
   $out = Join-Path $tmp 'keluaran'
   $rc = Jalankan @('-Path', $wt, '-Manifest', $manifest, '-Keluaran', $out)
@@ -175,6 +176,20 @@ http.createServer((req, res) => {
   Check ($rDiam -and $rDiam.galat -match 'listen' -and @($rDiam.rute).Count -eq 0) "batas waktu server: galat menyebut listen, rute kosong ($($rDiam.galat))"
   Check ($sw.Elapsed.TotalSeconds -lt 45) "batas waktu server: berhenti berbatas ($([int]$sw.Elapsed.TotalSeconds) dtk)"
   Check (@(Proses "*$diam*").Count -eq 0) 'batas waktu server: proses start yang diam dihentikan'
+
+  # ---- node mati di tengah jalan: ringkasan sebagian wajib ber-galat ----
+  # Shim node.cmd di depan PATH: hanya pemanggilan tangkap-layar.mjs yang "crash" (menulis ringkasan
+  # sebagian lalu exit 3); `pnpm start` (serve-*.mjs) diteruskan ke node asli.
+  $nodeAsli = (Get-Command node -CommandType Application | Select-Object -First 1).Source
+  $shimDir = Join-Path $tmp 'shim'; New-Item -ItemType Directory -Force -Path $shimDir | Out-Null
+  Tulis (Join-Path $shimDir 'sebagian.json') '{"url_dasar":"x","rute":[],"galat":null}'
+  Tulis (Join-Path $shimDir 'node.cmd') ("@echo off`r`nif /i `"%~nx1`"==`"tangkap-layar.mjs`" (copy /y `"%~dp0sebagian.json`" `"%~7\ringkasan.json`" >nul & exit /b 3)`r`n`"$nodeAsli`" %*`r`nexit /b %errorlevel%`r`n")
+  $pathLama = $env:PATH; $env:PATH = $shimDir + ';' + $pathLama
+  $outC = Join-Path $tmp 'keluaran-crash'
+  try { $rc = Jalankan @('-Path', $wt, '-Manifest', $manifest, '-Keluaran', $outC) } finally { $env:PATH = $pathLama }
+  $rCrash = $null; $rjC = Join-Path $outC 'ringkasan.json'
+  if (Test-Path -LiteralPath $rjC) { $rCrash = [IO.File]::ReadAllText($rjC, $utf8) | ConvertFrom-Json }
+  Check ($rc -eq 0 -and $rCrash -and $rCrash.galat -match 'berhenti \(exit 3\), ringkasan sebagian') "node crash: exit 0, galat ringkasan sebagian (exit $rc; $($rCrash.galat))"
 
   # ---- tanpa build ----
   $wtKosong = Join-Path $tmp 'wt-tanpa-build'

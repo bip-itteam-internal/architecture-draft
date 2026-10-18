@@ -98,12 +98,12 @@ apakah diff itu memang butuh test baru.
       ```
       & $PY .claude/hooks/layar-lib.py validasi .task-plans/judge/<slug>-layar.json
       ```
-      Exit 0 = sah. Berkas tidak ada, atau exit 1 → **jangan tangkap**; `layar` = `"tidak tersedia:
+      Exit 0 = sah. Bila venv python / `layar-lib.py` hilang atau gagal jalan (di (a) maupun (b)), catat `layar` = `"tidak tersedia: layar-lib gagal: <pesan>"` dan tetap jalankan judge desain dari kode saja bila diff memuat `.tsx` layar; jangan pernah diam-diam menganggapnya "tidak menyala". Berkas tidak ada, atau exit 1 → **jangan tangkap**; `layar` = `"tidak tersedia:
       manifest tidak ada"` atau `"tidak tersedia: manifest tidak sah: <galat>"`, dan judge desain
       **tetap dijalankan** dari kode saja (`layar_dinilai: false`). Temuan kritis "manifest layar
       tidak ada / tidak sah" (dibebankan ke eksekutor) ditulis **oleh judge desain sendiri** (jenis 4,
       `file` = path manifest, `line` 0); `/judge` tidak menambahkannya lagi supaya tak terhitung dua kali.
-   c. **Tangkap** (hanya bila manifest sah, dan **sesudah** langkah 1: skripnya memakai build yang
+   c. **Tangkap** (hanya bila manifest sah, dan **sesudah** langkah 1; **lewati tangkapan bila gerbang build gagal**, `layar` = `"tidak tersedia: build gagal"`, supaya `.next` basi tak pernah dipotret; skripnya memakai build yang
       ditinggalkan gerbang lewat `pnpm start`). Hapus dulu `.task-plans/judge/<slug>-<n>-layar/`
       bila ada (sisa run lain dengan slug dan nomor yang sama; hanya folder itu, bukan milik
       percobaan lain), supaya PNG lama tak ikut terbaca sebagai tangkapan percobaan ini:

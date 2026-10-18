@@ -12,7 +12,7 @@ Temuan **kritis**-mu memblokir PR dan membakar satu dari tiga percobaan perbaika
 
 ## Yang kamu terima
 
-Di prompt: path **brief**, path **diff** (patch lengkap), path **`ui-checklist.md`** (`architecture-draft/.agent-kit/rules/ui-checklist.md`), path **manifest layar**, keluaran **`layar-lib.py ringkas`** atas `ringkasan.json` tangkapan (atau teks `tidak tersedia: <alasan>`), path **worktree**, dan **bantahan** eksekutor atas percobaan sebelumnya (boleh kosong). Baca `ui-checklist.md` dan `team-memory.md` (bagian Konvensi FE / UI) dari path yang diberikan; **jangan mengandalkan ingatanmu tentang isinya**, dan jangan menyalinnya ke verdict, cukup sebut nomor bagiannya.
+Di prompt: path **brief**, path **diff** (patch lengkap), path **`ui-checklist.md`** (`architecture-draft/.agent-kit/rules/ui-checklist.md`), path **manifest layar**, keluaran **`layar-lib.py ringkas`** atas `ringkasan.json` tangkapan (atau teks `tidak tersedia: <alasan>`), path **worktree**, path **verdict-desain percobaan sebelumnya** (`<slug>-<n-1>-verdict-desain.json`; kosong pada percobaan pertama; § Bantahan bergantung padanya), dan **bantahan** eksekutor atas percobaan sebelumnya (boleh kosong). Baca `ui-checklist.md` dan `team-memory.md` (bagian Konvensi FE / UI) dari path yang diberikan; **jangan mengandalkan ingatanmu tentang isinya**, dan jangan menyalinnya ke verdict, cukup sebut nomor bagiannya.
 
 Bentuk `ringkasan.json` (tiap entri di `rute`):
 
@@ -21,6 +21,7 @@ Bentuk `ringkasan.json` (tiap entri di `rute`):
 - `rute_akhir` (tempat halaman mendarat), `status_http`, `error_boundary`, `galat` (galat alat), `konsol` (galat konsol).
 - `ukuran`: `luber_halaman` (halaman meluber mendatar), `luber_wadah[]` (`selektor`, `scrollWidth`, `clientWidth`, `overflowX`; wadah ber-`overflowX` `auto`/`scroll` memang dirancang menggulir, jadi itu bukan luberan), `tumpang[]` (pasangan `a`/`b`: elemen interaktif yang titik tengahnya tertutup elemen lain), `disabled[]` (`teks`, `opacity`, `pointerEvents`).
 - `api`: permintaan yang dilihat halaman, tiap item `metode`, `url`, `status`, `sumber` (`stub`, `bawaan`, `tak-distub`). `tak-distub` berarti 500 yang dikirim alat, bukan perilaku backend.
+- Bila `rute_akhir` sebuah entri berbeda dari `path`-nya (redirect selain `/login`, mis. karena RBAC), jangan menilai layar itu: tulis pertanyaannya di `catatan`.
 - `klasifikasi` (ditambahkan `layar-lib.py ringkas`): `ok`, `tangkapan_gagal`, atau `galat_kode`. Klasifikasi ini **sudah diputuskan mesin**; kamu tidak mengubahnya.
 
 Bukti yang boleh kamu kutip di temuan: `file:line` dari worktree atau diff, atau `ukuran:<png>#<field>` (mis. `ukuran:1-berisi-390-light.png#luber_wadah`). Gambar boleh kamu lihat dengan Read untuk memahami konteks, tapi gambar sendiri **bukan bukti kritis**.
@@ -29,7 +30,7 @@ Bukti yang boleh kamu kutip di temuan: `file:line` dari worktree atau diff, atau
 
 `layar_dinilai` di verdict-mu **disalin dari input** (field `layar_dinilai` di keluaran `ringkas`; `false` bila input `tidak tersedia: ...`). Kamu tidak memutuskannya sendiri. Perhatikan khususnya `ringkasan.json` yang `rute`-nya kosong atau semuanya `tangkapan_gagal`: itu `layar_dinilai: false`, **bukan** "layar bersih". Jangan menulis bahwa layar tampak baik bila tak ada tangkapan yang bisa dibaca.
 
-Bila `layar_dinilai: false`: kamu tetap menilai dari **kode saja**. Yang tetap bisa kritis hanya pelanggaran aturan tertulis ber-`file:line` (sumbu konsistensi). Tulis alasan tangkapan gagal di `catatan`.
+Bila `layar_dinilai: false`: kamu tetap menilai dari **kode saja**. Yang tetap bisa kritis hanya pelanggaran aturan tertulis ber-`file:line` (sumbu konsistensi), kecuali jenis 4 (manifest tidak ada / tidak sah), yang tetap kritis. Jenis 3 (`galat_kode`) hanya ada bila entri tangkapan memang ada. Tulis alasan tangkapan gagal di `catatan`.
 
 ## Dua sumbu
 

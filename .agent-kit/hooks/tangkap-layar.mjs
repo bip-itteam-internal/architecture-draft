@@ -526,8 +526,13 @@ async function utama() {
   const profil = path.join(induk, `tangkap-layar-profil-${process.pid}-${Math.random().toString(36).slice(2, 8)}`);
 
   let chrome = null;
-  const bersihkan = () => { bunuhChrome(chrome, profil); };
+  let sudahBersih = false;
+  const bersihkan = () => { if (sudahBersih) return; sudahBersih = true; bunuhChrome(chrome, profil); };
   for (const sinyal of ["SIGINT", "SIGTERM", "SIGBREAK"]) process.on(sinyal, () => { bersihkan(); process.exit(1); });
+  // Crash node tak boleh meninggalkan Chrome yatim: handler `exit` berjalan sinkron, dan bunuhChrome
+  // sinkron seluruhnya (spawnSync).
+  process.on("uncaughtException", (err) => { console.error("tangkap-layar: uncaughtException", err); bersihkan(); process.exit(1); });
+  process.on("exit", () => { bersihkan(); });
   try {
     chrome = await nyalakanChrome(exe, profil);
     if (!chrome.versi) return gagal("chrome tidak menjawab /json/version dalam 60 dtk");

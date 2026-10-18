@@ -260,6 +260,18 @@ def test_cli_ringkas_dengan_bom(tmp_path):
     assert [x["klasifikasi"] for x in out["rute"]] == ["tangkapan_gagal", "ok"]
 
 
+def test_cli_ringkas_multibaris_dan_setara(tmp_path):
+    # Read memotong baris panjang: keluaran ringkas (bisa >80 KB) wajib berbaris-baris, bukan satu baris.
+    import json as _j
+    import subprocess
+    r = _tulis(tmp_path / "r.json", _j.dumps({"rute": [_hasil(), _hasil(rute_akhir="/login")]}))
+    d = _tulis(tmp_path / "d.txt", "src/app/x.tsx\n")
+    p = subprocess.run([sys.executable, str(HOOKS / "layar-lib.py"), "ringkas", str(r), "--berkas-dari", str(d)],
+                       capture_output=True, text=True)
+    assert p.returncode == 0 and len(p.stdout.splitlines()) > 10
+    assert _j.loads(p.stdout) == _jalan("ringkas", r, "--berkas-dari", d)[1]
+
+
 def test_cli_ringkas_membawa_galat_global(tmp_path):
     # tangkap-layar.ps1 menulis galat global (build tak ada, port, server tak listen) sebagai
     # `galat` tingkat atas dengan `rute: []`; tanpa diteruskan, alasannya hilang dari verdict/PR.

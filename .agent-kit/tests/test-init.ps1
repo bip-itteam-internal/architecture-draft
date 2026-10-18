@@ -801,6 +801,8 @@ try {
     $pLayar = Start-Process -FilePath 'powershell' -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"' + (Join-Path $kitRoot 'tests/test-tangkap-layar.ps1') + '"')) `
       -RedirectStandardOutput $logLayar -RedirectStandardError ($logLayar + '.err') -Wait -PassThru -NoNewWindow
     $rcLayar = $pLayar.ExitCode
+    # LEWAT di test dalam (node/pnpm/python hilang) tetap exit 0; tanpa dicetak di sini PASS-nya kosong.
+    @(Get-Content -LiteralPath $logLayar -ErrorAction SilentlyContinue | Where-Object { $_ -match '^LEWAT' }) | ForEach-Object { Write-Host "  tangkap-layar> $_" }
     Check ($rcLayar -eq 0) "tests/test-tangkap-layar.ps1 lulus (exit $rcLayar)"
     if ($rcLayar -ne 0) {
       @(Get-Content -LiteralPath $logLayar -ErrorAction SilentlyContinue | Where-Object { $_ -match '^(FAIL|LEWAT)|gagal$|^tangkap-layar: ' }) | ForEach-Object { Write-Host "  tangkap-layar> $_" }

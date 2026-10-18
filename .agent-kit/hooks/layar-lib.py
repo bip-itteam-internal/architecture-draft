@@ -187,7 +187,7 @@ def main(argv=None):
 
     if a.cmd == "perlu":
         berkas = _baca_berkas_diff(a.berkas_dari)
-        print(json.dumps({"perlu": perlu_judge_desain(a.repo, berkas), "berkas_layar": berkas_layar(berkas)}))
+        print(json.dumps({"perlu": perlu_judge_desain(a.repo, berkas), "berkas_layar": berkas_layar(berkas)}, indent=1))
         return 0
     if a.cmd == "validasi":
         try:
@@ -195,11 +195,11 @@ def main(argv=None):
                 galat = validasi_manifest(json.load(f))
         except (OSError, ValueError) as e:
             galat = ["manifest tidak terbaca: %s" % e]
-        print(json.dumps({"galat": galat}))
+        print(json.dumps({"galat": galat}, indent=1))
         return 1 if galat else 0
     if a.cmd == "salah-tuduh":
         sebelum, berikut, bantahan = (_baca_json(x) for x in (a.sebelum, a.berikut, a.bantahan))
-        print(json.dumps(hitung_salah_tuduh(berikut, bantahan or [], sebelum.get("temuan") or [])))
+        print(json.dumps(hitung_salah_tuduh(berikut, bantahan or [], sebelum.get("temuan") or []), indent=1))
         return 0
     with open(a.ringkasan, encoding="utf-8-sig") as f:
         ringkasan = json.load(f)
@@ -208,7 +208,8 @@ def main(argv=None):
     # `galat` tingkat atas (build tak ada, port dipakai, server tak listen, node tak ada) diteruskan:
     # tanpa itu ringkasan ber-`rute: []` cuma terbaca "tidak dinilai" tanpa alasan di verdict/PR.
     galat = ringkasan.get("galat") or None
-    print(json.dumps({"rute": rute, "layar_dinilai": layar_dinilai(ringkasan, diff), "galat": galat}))
+    # indent=1: Read memotong baris panjang, dan keluaran satu baris >80 KB terbaca sebagian oleh judge.
+    print(json.dumps({"rute": rute, "layar_dinilai": layar_dinilai(ringkasan, diff), "galat": galat}, indent=1))
     return 0
 
 

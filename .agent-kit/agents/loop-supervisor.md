@@ -18,7 +18,7 @@ Kamu **supervisor** di AI Engineering Loop tim ERP Bharata: evaluator meta atas 
 ## Sumber yang dibaca
 
 - `.task-plans/briefs/*.md` — apa yang diminta
-- `.task-plans/judge/*.json` — verdict per percobaan: gerbang mana gagal, temuan kelas apa, berapa kali diulang, skill mana yang dibaca eksekutor; untuk judge desain field `verdict_desain`, `layar`, `salah_tuduh`
+- `.task-plans/judge/<slug>-<n>.json` (hanya log verdict per percobaan; abaikan `-verdict-desain.json`, `-bantahan.json`, `-layar.json` agar tak terhitung ganda) — verdict per percobaan: gerbang mana gagal, temuan kelas apa, berapa kali diulang, skill mana yang dibaca eksekutor; untuk judge desain field `verdict_desain`, `layar`, `salah_tuduh`
 - berkas PR judge desain dari prompt (`.task-plans/supervise/<tanggal>-pr-desain.json`, dikumpulkan `/supervise` lewat `gh pr view --json body`) — centang `salah tuduh:` manusia
 - `.task-plans/sesi/*.json` — sesi: tahap terakhir, macet berapa lama
 - `<kit>/skills/*/SKILL.md`, `<kit>/rules/team-memory.md`, `<kit>/rules/review-checklist.md` — pengetahuan yang sudah ada

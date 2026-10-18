@@ -55,8 +55,9 @@
       return r.text().then(function (t) { catat("uji-stub " + u + " " + r.status + " " + t); });
     }).catch(function (e) { catat("uji-stub " + u + " gagal " + e); });
   });
-  // Pengecualian tak tertangkap: konsol wajib memuat pesan BESERTA url berkasnya, karena
-  // layar-lib memutus galat_kode dengan mencari path berkas diff di baris konsol.
+  // Pengecualian tak tertangkap: konsol wajib memuat pesan BESERTA url berkasnya, supaya
+  // pembaca (judge desain) bisa menelusuri penyebab error boundary. Klasifikasi galat_kode sendiri
+  // ditentukan oleh error boundary, bukan oleh isi konsol.
   setTimeout(function () { throw new Error("galat-uji-sengaja"); }, 0);
   // Overlay ajakan seperti AjakanPushDialog: muncul sesudah muat dan menelan klik.
   setTimeout(function () {

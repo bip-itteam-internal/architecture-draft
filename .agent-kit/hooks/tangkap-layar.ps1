@@ -114,6 +114,19 @@ try {
   & node @argNode
   $rcNode = $LASTEXITCODE
   if (-not (Test-Path -LiteralPath $ringkasan)) { Tulis-Galat "tangkap-layar.mjs berhenti tanpa ringkasan (exit $rcNode)" $url }
+  elseif ($rcNode -ne 0) {
+    # Node mati di tengah jalan: ringkasan sebagian tak boleh terbaca sebagai tangkapan utuh.
+    try {
+      $obj = [IO.File]::ReadAllText($ringkasan, $utf8).TrimStart([char]0xFEFF) | ConvertFrom-Json
+      $pesanCrash = "tangkap-layar.mjs berhenti (exit $rcNode), ringkasan sebagian"
+      if ($obj.PSObject.Properties.Name -contains 'galat') { $obj.galat = $pesanCrash } else { $obj | Add-Member -NotePropertyName galat -NotePropertyValue $pesanCrash }
+      # Larik kosong lewat pipeline menjadi `{}` di PS 5.1: -InputObject + depth cukup menjaga rute.
+      $tmpR = $ringkasan + '.tmp'
+      [IO.File]::WriteAllText($tmpR, (ConvertTo-Json -InputObject $obj -Depth 30), $utf8)
+      Move-Item -LiteralPath $tmpR -Destination $ringkasan -Force
+      [Console]::Error.WriteLine("tangkap-layar: $pesanCrash")
+    } catch { [Console]::Error.WriteLine("tangkap-layar: galat crash tak tertulis: $_") }
+  }
 }
 finally {
   # Hentikan HANYA pohon proses milik run ini: cmd -> pnpm -> next, lalu pemilik port bila ada
