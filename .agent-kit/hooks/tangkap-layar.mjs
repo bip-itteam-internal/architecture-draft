@@ -155,10 +155,20 @@ function bunuhChrome(chrome, profil) {
   }
   // Sapuan kedua: proses anak yang tercerai dari induknya. Disaring lewat folder profil, jadi
   // browser user dan run tangkapan lain tak tersentuh.
+  // Diulang sampai terbukti habis, maks 15 dtk: penghentian proses di Windows asinkron dan butuh
+  // CPU. Terukur 2026-10-18: tanpa beban Chrome yang di-taskkill hilang dalam 0,47 dtk; dengan
+  // semua inti sibuk 3 proses tetap terdaftar di Win32_Process >75 dtk lalu hilang 0,37 dtk
+  // sesudah beban berhenti. Proses itu SUDAH dihentikan, hanya belum selesai berhenti; menunggu
+  // lebih lama cuma menahan loop di mesin sibuk, jadi sisa dilaporkan lalu dibiarkan.
   const pola = profil.replace(/'/g, "''");
-  spawnSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command",
-    `Get-CimInstance Win32_Process -Filter "Name='chrome.exe' OR Name='msedge.exe'" | Where-Object { $_.CommandLine -and $_.CommandLine.Contains('${pola}') } | ForEach-Object { try { Stop-Process -Id $_.ProcessId -Force -ErrorAction Stop } catch {} }`],
-  { stdio: "ignore", timeout: 30000 });
+  const sapu = spawnSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command",
+    `$batas = (Get-Date).AddSeconds(15); do { $sisa = @(Get-CimInstance Win32_Process -Filter "Name='chrome.exe' OR Name='msedge.exe'" | Where-Object { $_.CommandLine -and $_.CommandLine.Contains('${pola}') }); ` +
+    `foreach ($p in $sisa) { try { Stop-Process -Id $p.ProcessId -Force -ErrorAction Stop } catch {} }; if ($sisa.Count -eq 0) { break }; Start-Sleep -Milliseconds 500 } while ((Get-Date) -lt $batas); Write-Output $sisa.Count`],
+  { encoding: "utf8", timeout: 60000 });
+  const sisa = parseInt(String(sapu.stdout || "").trim().split(/\s+/).pop(), 10);
+  if (sapu.error || !(sisa === 0)) {
+    console.error(`tangkap-layar: proses chrome berprofil uji sudah dihentikan tapi belum selesai berhenti (sisa ${Number.isNaN(sisa) ? "?" : sisa}${sapu.error ? ", " + sapu.error.code : ""})`);
+  }
   for (let i = 0; i < 10; i++) {
     try { fs.rmSync(profil, { recursive: true, force: true }); return; } catch { spawnSync("powershell.exe", ["-NoProfile", "-Command", "Start-Sleep -Milliseconds 500"], { stdio: "ignore" }); }
   }

@@ -138,8 +138,26 @@ http.createServer((req, res) => {
   $gal = @($rute | Where-Object { $_.path -eq '/galat.html' })
   Check ($gal.Count -ge 1 -and @($gal | Where-Object { $_.error_boundary -ne $true }).Count -eq 0) '/galat.html: error_boundary true (teks "Terjadi Kesalahan")'
 
-  Check ((Proses ('*' + $env:TANGKAP_LAYAR_PROFIL_DASAR + '*')).Count -eq 0) 'tidak ada proses Chrome berprofil uji tersisa'
-  Check ((Proses "*$serve*").Count -eq 0) 'server pnpm start dihentikan sesudah tangkapan'
+  # Chrome yang sudah di-taskkill bisa tetap TERDAFTAR lama saat CPU penuh: penghentian proses di
+  # Windows asinkron dan butuh CPU. Terukur 2026-10-18: tanpa beban hilang 0,47 dtk; semua inti
+  # sibuk >75 dtk, lalu hilang 0,37 dtk sesudah beban berhenti. Pemeriksaan "tak terdaftar" polos
+  # karena itu merah di gerbang pre-push (test-init penuh di mesin yang dipakai sesi lain) dan hijau
+  # bila dijalankan sendiri. Yang dicari di sini KEBOCORAN sungguhan: tunggu sebentar, lalu sisa
+  # dianggap bocor hanya bila port debug browsernya (dari command line) masih menjawab.
+  $sisaChrome = @(); $batasSisa = (Get-Date).AddSeconds(20)
+  do { $sisaChrome = @(Proses ('*' + $env:TANGKAP_LAYAR_PROFIL_DASAR + '*')); if ($sisaChrome.Count -eq 0) { break }; Start-Sleep -Milliseconds 500 } while ((Get-Date) -lt $batasSisa)
+  $hidup = @()
+  foreach ($x in $sisaChrome) {
+    $mPort = [regex]::Match([string]$x.CommandLine, '--remote-debugging-port=(\d+)')
+    if (-not $mPort.Success) { continue }
+    try {
+      $null = Invoke-WebRequest -UseBasicParsing -TimeoutSec 5 -Uri ("http://127.0.0.1:{0}/json/version" -f $mPort.Groups[1].Value)
+      $hidup += $x
+    } catch {}
+  }
+  foreach ($x in $sisaChrome) { Write-Host ("  catatan: pid {0} masih terdaftar, {1}" -f $x.ProcessId, $(if ($hidup -contains $x) { 'port debug MASIH MENJAWAB (bocor)' } else { 'port debug diam (sudah dihentikan, belum selesai berhenti)' })) }
+  Check ($hidup.Count -eq 0) "tidak ada Chrome berprofil uji yang masih hidup (port debug menjawab: $($hidup.Count), sedang berhenti: $($sisaChrome.Count - $hidup.Count))"
+  Check (@(Proses "*$serve*").Count -eq 0) 'server pnpm start dihentikan sesudah tangkapan'
 
   # ---- batas waktu server: `start` yang tak pernah listen tak boleh menggantung loop ----
   $wtDiam = Join-Path $tmp 'wt-diam'
@@ -156,7 +174,7 @@ http.createServer((req, res) => {
   Check ($rc -eq 0) "batas waktu server: exit 0 (exit $rc)"
   Check ($rDiam -and $rDiam.galat -match 'listen' -and @($rDiam.rute).Count -eq 0) "batas waktu server: galat menyebut listen, rute kosong ($($rDiam.galat))"
   Check ($sw.Elapsed.TotalSeconds -lt 45) "batas waktu server: berhenti berbatas ($([int]$sw.Elapsed.TotalSeconds) dtk)"
-  Check ((Proses "*$diam*").Count -eq 0) 'batas waktu server: proses start yang diam dihentikan'
+  Check (@(Proses "*$diam*").Count -eq 0) 'batas waktu server: proses start yang diam dihentikan'
 
   # ---- tanpa build ----
   $wtKosong = Join-Path $tmp 'wt-tanpa-build'

@@ -748,8 +748,17 @@ try {
   # bukan gagal, supaya gerbang kit tak merah permanen karena infrastruktur.
   $chromeUji = 'C:\Program Files\Google\Chrome\Application\chrome.exe'
   if (Test-Path -LiteralPath $chromeUji) {
-    $rcLayar = Invoke-Ps (Join-Path $kitRoot 'tests/test-tangkap-layar.ps1') @()
-    Check ($rcLayar -eq 0) "tests/test-tangkap-layar.ps1 lulus (exit $rcLayar; jalankan langsung untuk rinciannya)"
+    # Keluaran test dalam disimpan (Invoke-Ps membuangnya): bila merah, nama Check yang gagal
+    # dicetak di sini, bukan cuma "exit 1" yang memaksa orang menjalankan ulang 2 menit.
+    $logLayar = Join-Path $tmp 'test-tangkap-layar.log'
+    $pLayar = Start-Process -FilePath 'powershell' -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"' + (Join-Path $kitRoot 'tests/test-tangkap-layar.ps1') + '"')) `
+      -RedirectStandardOutput $logLayar -RedirectStandardError ($logLayar + '.err') -Wait -PassThru -NoNewWindow
+    $rcLayar = $pLayar.ExitCode
+    Check ($rcLayar -eq 0) "tests/test-tangkap-layar.ps1 lulus (exit $rcLayar)"
+    if ($rcLayar -ne 0) {
+      @(Get-Content -LiteralPath $logLayar -ErrorAction SilentlyContinue | Where-Object { $_ -match '^(FAIL|LEWAT)|gagal$|^tangkap-layar: ' }) | ForEach-Object { Write-Host "  tangkap-layar> $_" }
+      @(Get-Content -LiteralPath ($logLayar + '.err') -ErrorAction SilentlyContinue | Select-Object -Last 5) | ForEach-Object { Write-Host "  tangkap-layar stderr> $_" }
+    }
   } else {
     Write-Host "LEWAT tests/test-tangkap-layar.ps1: Chrome tidak ada di $chromeUji"
   }
