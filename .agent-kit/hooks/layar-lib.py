@@ -103,15 +103,17 @@ def klasifikasi_rute(hasil, berkas_diff):
     akhir = hasil.get("rute_akhir") or ""
     if re.match(r"^/login(?:[/?#]|$)", akhir):
         return "tangkapan_gagal"
-    status = hasil.get("status_http")
-    if isinstance(status, int) and status >= 400:
-        return "tangkapan_gagal"
+    # Boundary yang menunjuk berkas diff = galat kode APA PUN status dokumennya: crash SSR
+    # menghasilkan dokumen 500 + boundary, dan memaafkannya sebagai "tangkapan" meloloskan bug.
     if hasil.get("error_boundary"):
         konsol = [_norm(x) for x in hasil.get("konsol") or []]
         for b in berkas_diff:
             sufiks = _norm(b)
             if any(sufiks in baris for baris in konsol):
                 return "galat_kode"
+        return "tangkapan_gagal"
+    status = hasil.get("status_http")
+    if isinstance(status, int) and status >= 400:
         return "tangkapan_gagal"
     return "ok"
 
@@ -127,28 +129,31 @@ def _kunci(t):
 
 
 def hitung_salah_tuduh(verdict_desain_berikut, bantahan, temuan_sebelum):
-    """Bantahan eksekutor vs verdict berikut. Kunci temuan = (file, line, alasan).
+    """Bantahan eksekutor vs putusan judge. Kunci temuan = (file, line, alasan).
 
-    diterima: temuan ada sebelumnya dan sudah tak ada di verdict berikut.
-    ditolak: temuan ada sebelumnya dan masih ada.
-    diabaikan: bantahan merujuk temuan yang tak ada di verdict sebelumnya.
+    bantahan: {"temuan": {file,line,alasan}, "alasan", "bukti"}.
+    Putusan dibaca dari verdict_desain_berikut["bantahan"]: {"temuan", "putusan", "alasan"};
+    TIDAK disimpulkan dari hilangnya temuan (temuan bisa hilang karena kode diubah).
+    diabaikan: temuan tak ada di temuan_sebelum. Sah tanpa putusan = ditolak.
     """
     sebelum = {_kunci(t) for t in temuan_sebelum}
-    berikut = {_kunci(t) for t in verdict_desain_berikut.get("temuan") or []}
+    putusan = {}
+    for p in verdict_desain_berikut.get("bantahan") or []:
+        putusan[_kunci(p.get("temuan") or {})] = p.get("putusan")
     hasil = {"diterima": 0, "ditolak": 0, "diabaikan": 0}
     for b in bantahan:
-        k = _kunci(b)
+        k = _kunci(b.get("temuan") or {})
         if k not in sebelum:
             hasil["diabaikan"] += 1
-        elif k in berikut:
-            hasil["ditolak"] += 1
-        else:
+        elif putusan.get(k) == "diterima":
             hasil["diterima"] += 1
+        else:
+            hasil["ditolak"] += 1
     return hasil
 
 
 def _baca_berkas_diff(path):
-    with open(path, encoding="utf-8") as f:
+    with open(path, encoding="utf-8-sig") as f:  # PowerShell 5.1 menulis BOM
         return [baris.strip() for baris in f if baris.strip()]
 
 
@@ -171,13 +176,13 @@ def main(argv=None):
         return 0
     if a.cmd == "validasi":
         try:
-            with open(a.manifest, encoding="utf-8") as f:
+            with open(a.manifest, encoding="utf-8-sig") as f:
                 galat = validasi_manifest(json.load(f))
         except (OSError, ValueError) as e:
             galat = ["manifest tidak terbaca: %s" % e]
         print(json.dumps({"galat": galat}))
         return 1 if galat else 0
-    with open(a.ringkasan, encoding="utf-8") as f:
+    with open(a.ringkasan, encoding="utf-8-sig") as f:
         ringkasan = json.load(f)
     diff = _baca_berkas_diff(a.berkas_dari)
     rute = [dict(r, klasifikasi=klasifikasi_rute(r, diff)) for r in ringkasan.get("rute") or []]

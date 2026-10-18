@@ -173,19 +173,74 @@ def test_ringkasan_dengan_ok_atau_galat_kode_dinilai():
 TEMUAN = [{"file": "a.tsx", "line": 3, "alasan": "kontras"}, {"file": "b.tsx", "line": 9, "alasan": "tap target"}]
 
 
+def _bantah(t):
+    return {"temuan": t, "alasan": "keliru", "bukti": "offsetWidth 44"}
+
+
+def _putus(t, putusan):
+    return {"temuan": t, "putusan": putusan, "alasan": "dinilai ulang"}
+
+
 def test_bantahan_diterima_dihitung():
-    # temuan yang dibantah tak muncul lagi di verdict berikut = bantahan diterima
-    berikut = {"temuan": [TEMUAN[1]]}
-    bantahan = [{"file": "a.tsx", "line": 3, "alasan": "kontras"}]
-    assert L.hitung_salah_tuduh(berikut, bantahan, TEMUAN) == {"diterima": 1, "ditolak": 0, "diabaikan": 0}
+    berikut = {"temuan": [], "bantahan": [_putus(TEMUAN[0], "diterima")]}
+    assert L.hitung_salah_tuduh(berikut, [_bantah(TEMUAN[0])], TEMUAN) == {"diterima": 1, "ditolak": 0, "diabaikan": 0}
 
 
 def test_bantahan_ditolak_dihitung():
-    berikut = {"temuan": list(TEMUAN)}
-    bantahan = [{"file": "a.tsx", "line": 3, "alasan": "kontras"}]
-    assert L.hitung_salah_tuduh(berikut, bantahan, TEMUAN) == {"diterima": 0, "ditolak": 1, "diabaikan": 0}
+    berikut = {"temuan": list(TEMUAN), "bantahan": [_putus(TEMUAN[0], "ditolak")]}
+    assert L.hitung_salah_tuduh(berikut, [_bantah(TEMUAN[0])], TEMUAN) == {"diterima": 0, "ditolak": 1, "diabaikan": 0}
 
 
 def test_bantahan_tanpa_temuan_diabaikan():
-    bantahan = [{"file": "z.tsx", "line": 1, "alasan": "tak ada"}]
-    assert L.hitung_salah_tuduh({"temuan": list(TEMUAN)}, bantahan, TEMUAN) == {"diterima": 0, "ditolak": 0, "diabaikan": 1}
+    z = {"file": "z.tsx", "line": 1, "alasan": "tak ada"}
+    berikut = {"temuan": list(TEMUAN), "bantahan": [_putus(z, "diterima")]}
+    assert L.hitung_salah_tuduh(berikut, [_bantah(z)], TEMUAN) == {"diterima": 0, "ditolak": 0, "diabaikan": 1}
+
+
+def test_bantahan_tanpa_putusan_ditolak():
+    # temuan hilang dari verdict tapi judge tak memutus: tidak disimpulkan diterima
+    assert L.hitung_salah_tuduh({"temuan": []}, [_bantah(TEMUAN[0])], TEMUAN) == {"diterima": 0, "ditolak": 1, "diabaikan": 0}
+
+
+def test_boundary_500_menunjuk_diff_galat_kode():
+    h = _hasil(status_http=500, error_boundary=True, konsol=["Error at src/features/kpi/x.tsx:5"])
+    assert L.klasifikasi_rute(h, ["src/features/kpi/x.tsx"]) == "galat_kode"
+
+
+# --- CLI (subprocess, input ber-BOM seperti keluaran PowerShell 5.1) ---
+
+def _jalan(*args):
+    import json as _j
+    import subprocess
+    p = subprocess.run([sys.executable, str(HOOKS / "layar-lib.py"), *map(str, args)],
+                       capture_output=True, text=True)
+    return p.returncode, _j.loads(p.stdout)
+
+
+def _tulis(path, teks, bom=True):
+    path.write_bytes((b"\xef\xbb\xbf" if bom else b"") + teks.encode("utf-8"))
+    return path
+
+
+def test_cli_perlu_dengan_bom(tmp_path):
+    f = _tulis(tmp_path / "b.txt", "src/app/x.tsx\n")
+    kode, out = _jalan("perlu", "--repo", "erp-frontend", "--berkas-dari", f)
+    assert kode == 0 and out == {"perlu": True, "berkas_layar": ["src/app/x.tsx"]}
+
+
+def test_cli_validasi_sah_dan_gagal(tmp_path):
+    import json as _j
+    sah = _tulis(tmp_path / "m.json", _j.dumps(MANIFEST))
+    assert _jalan("validasi", sah) == (0, {"galat": []})
+    buruk = _tulis(tmp_path / "n.json", _j.dumps(_manifest(rute=[])))
+    kode, out = _jalan("validasi", buruk)
+    assert kode == 1 and out["galat"]
+
+
+def test_cli_ringkas_dengan_bom(tmp_path):
+    import json as _j
+    r = _tulis(tmp_path / "r.json", _j.dumps({"rute": [_hasil(rute_akhir="/login"), _hasil()]}))
+    d = _tulis(tmp_path / "d.txt", "src/app/x.tsx\n")
+    kode, out = _jalan("ringkas", r, "--berkas-dari", d)
+    assert kode == 0 and out["layar_dinilai"] is True
+    assert [x["klasifikasi"] for x in out["rute"]] == ["tangkapan_gagal", "ok"]
