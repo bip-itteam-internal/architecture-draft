@@ -24,6 +24,7 @@ CLI:
   python layar-lib.py perlu --repo <r> --berkas-dari <txt>
   python layar-lib.py validasi <manifest.json>        (exit 0 sah, 1 ada galat)
   python layar-lib.py ringkas <ringkasan.json> --berkas-dari <txt>
+  python layar-lib.py salah-tuduh --sebelum <verdict desain n-1> --berikut <verdict desain n> --bantahan <json>
 """
 import argparse
 import json
@@ -162,6 +163,11 @@ def _baca_berkas_diff(path):
         return [baris.strip() for baris in f if baris.strip()]
 
 
+def _baca_json(path):
+    with open(path, encoding="utf-8-sig") as f:
+        return json.load(f)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Keputusan deterministik judge desain")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -173,6 +179,10 @@ def main(argv=None):
     r = sub.add_parser("ringkas")
     r.add_argument("ringkasan")
     r.add_argument("--berkas-dari", required=True)
+    s = sub.add_parser("salah-tuduh")
+    s.add_argument("--sebelum", required=True)
+    s.add_argument("--berikut", required=True)
+    s.add_argument("--bantahan", required=True)
     a = ap.parse_args(argv)
 
     if a.cmd == "perlu":
@@ -187,6 +197,10 @@ def main(argv=None):
             galat = ["manifest tidak terbaca: %s" % e]
         print(json.dumps({"galat": galat}))
         return 1 if galat else 0
+    if a.cmd == "salah-tuduh":
+        sebelum, berikut, bantahan = (_baca_json(x) for x in (a.sebelum, a.berikut, a.bantahan))
+        print(json.dumps(hitung_salah_tuduh(berikut, bantahan or [], sebelum.get("temuan") or [])))
+        return 0
     with open(a.ringkasan, encoding="utf-8-sig") as f:
         ringkasan = json.load(f)
     diff = _baca_berkas_diff(a.berkas_dari)

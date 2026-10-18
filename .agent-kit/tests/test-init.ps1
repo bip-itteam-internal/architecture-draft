@@ -404,6 +404,38 @@ try {
   }
   $peranIsi = Get-Content (Join-Path $kitRoot 'hooks/kantor-agent.py') -Raw -Encoding UTF8
   Check ($peranIsi.Contains('"loop-judge-desain"')) 'kantor-agent PERAN memuat loop-judge-desain'
+  # ---- judge desain: sambungan ke /judge, /kerjakan, eksekutor, supervisor ----
+  # Tiap pemeriksaan dibatasi ke POTONGAN bagiannya (pola 1.39.0): kata yang sama muncul di langkah
+  # lain, jadi -match atas seluruh berkas tetap hijau walau aturannya hilang dari tempatnya.
+  $S = [string][char]0x00A7  # tanda pasal; berkas ini tanpa BOM, jadi literal non-ASCII terbaca cp1252 di PS 5.1
+  $jdMd = Get-Content (Join-Path $claude 'commands/judge.md') -Raw -Encoding UTF8
+  $jd3 = Potong $jdMd '3. **Agen judge**' '3b. **Judge desain**'
+  $jd3b = Potong $jdMd '3b. **Judge desain**' '4. **Triangulasi'
+  $jd4 = Potong $jdMd '4. **Triangulasi' '## Jangan'
+  Check ($jd3b.Contains('layar-lib.py perlu') -and $jd3b.Contains('tangkap-layar.ps1') -and $jd3b.Contains('loop-judge-desain') -and $jd3b.Contains('layar_dinilai')) '/judge 3b: perlu, tangkap-layar.ps1, loop-judge-desain, layar_dinilai'
+  Check ($jd3b.Contains('layar-lib.py validasi') -and $jd3b.Contains('layar-lib.py ringkas') -and $jd3b.Contains('run_in_background: true') -and $jd3b.Contains('<<VERDICT_DESAIN>>')) '/judge 3b: validasi manifest, tangkap di background, ringkas, urai VERDICT_DESAIN'
+  Check ($jd4.Contains('verdict_desain') -and $jd4.Contains('Desain:')) '/judge 4: triangulasi verdict_desain + baris Desain:'
+  # Satu penilai per aturan: saat judge desain menyala ui-checklist.md tak dikirim ke loop-judge.
+  Check ($jd3 -match 'judge desain menyala[^\n]*ui-checklist\.md[^\n]*TIDAK dikirim' -and -not $jd3.Contains('sertakan juga path')) '/judge 3: ui-checklist.md tidak dikirim ke loop-judge bila judge desain menyala'
+  Check ($jd3.Contains($S + 'F') -and $jd3.Contains($S + 'J')) '/judge 3: prompt loop-judge menyebut lewati F/J saat judge desain menyala'
+  $kjMd = Get-Content (Join-Path $claude 'commands/kerjakan.md') -Raw -Encoding UTF8
+  $kj3 = Potong $kjMd '## 3. Judge' '## 4. Loop perbaikan'
+  $kj4 = Potong $kjMd '## 4. Loop perbaikan' '## 5. Commit'
+  $kj5 = Potong $kjMd '## 5. Commit' '## 6. Tutup'
+  Check ($kj3.Contains('"verdict_desain"') -and $kj3.Contains('"layar"') -and $kj3.Contains('"salah_tuduh"') -and $kj3.Contains('layar-lib.py salah-tuduh')) '/kerjakan 3: field log verdict_desain, layar, salah_tuduh (dari layar-lib.py)'
+  Check ($kj4.Contains('Bantahan') -and $kj4 -match 'desain') '/kerjakan 4: temuan desain + bagian Bantahan'
+  Check ($kj5.Contains('- [ ] salah tuduh:') -and $kj5.Contains('layar tidak tertangkap')) '/kerjakan 5: centang salah tuduh + alasan layar tak tertangkap di badan PR'
+  $ljMd = Get-Content (Join-Path $claude 'agents/loop-judge.md') -Raw -Encoding UTF8
+  Check ($ljMd -match ("(?m)^.*judge desain.*" + $S + 'F.*' + $S + 'J.*$') -and $ljMd -match 'i18n') 'loop-judge: lewati F dan J bila judge desain menyala, i18n tetap'
+  foreach ($eks in 'loop-fe', 'loop-test', 'loop-fix', 'loop-refactor') {
+    $eMd = Get-Content (Join-Path $claude ("agents/$eks.md")) -Raw -Encoding UTF8
+    $eLap = Potong $eMd '## Laporan akhir' '#### tak-ada'
+    Check ($eMd.Contains('<slug>-layar.json') -and $eLap.Contains('Bantahan')) "${eks}: manifest <slug>-layar.json + Bantahan di laporan"
+  }
+  $svMd = Get-Content (Join-Path $claude 'commands/supervise.md') -Raw -Encoding UTF8
+  Check ($svMd.Contains('salah_tuduh') -and $svMd.Contains('salah tuduh:') -and $svMd.Contains('gh pr view')) '/supervise: salah_tuduh log + centang PR lewat gh pr view'
+  $lsMd = Get-Content (Join-Path $claude 'agents/loop-supervisor.md') -Raw -Encoding UTF8
+  Check ($lsMd.Contains('salah_tuduh') -and $lsMd.Contains('layar_dinilai')) 'loop-supervisor: hitung salah_tuduh dan layar_dinilai judge desain'
 
   # ---- v1.25.0: dua lubang gerbang ----
   $errf = Join-Path $tmp 'hook.err'

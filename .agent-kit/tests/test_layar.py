@@ -258,3 +258,24 @@ def test_cli_ringkas_dengan_bom(tmp_path):
     kode, out = _jalan("ringkas", r, "--berkas-dari", d)
     assert kode == 0 and out["layar_dinilai"] is True
     assert [x["klasifikasi"] for x in out["rute"]] == ["tangkapan_gagal", "ok"]
+
+
+def test_cli_salah_tuduh_dengan_bom(tmp_path):
+    # /kerjakan mengisi field log `salah_tuduh` lewat CLI ini; berkasnya ditulis PowerShell 5.1 (BOM)
+    import json as _j
+    z = {"file": "z.tsx", "line": 1, "alasan": "tak ada"}
+    sebelum = _tulis(tmp_path / "s.json", _j.dumps({"temuan": TEMUAN}))
+    berikut = _tulis(tmp_path / "b.json", _j.dumps({"temuan": [TEMUAN[1]], "bantahan": [
+        _putus(TEMUAN[0], "diterima"), _putus(TEMUAN[1], "ditolak")]}))
+    bantahan = _tulis(tmp_path / "x.json", _j.dumps([_bantah(TEMUAN[0]), _bantah(TEMUAN[1]), _bantah(z)]))
+    kode, out = _jalan("salah-tuduh", "--sebelum", sebelum, "--berikut", berikut, "--bantahan", bantahan)
+    assert kode == 0 and out == {"diterima": 1, "ditolak": 1, "diabaikan": 1}
+
+
+def test_cli_salah_tuduh_bantahan_kosong(tmp_path):
+    import json as _j
+    sebelum = _tulis(tmp_path / "s.json", _j.dumps({"temuan": TEMUAN}))
+    berikut = _tulis(tmp_path / "b.json", _j.dumps({"temuan": TEMUAN}))
+    bantahan = _tulis(tmp_path / "x.json", "[]")
+    assert _jalan("salah-tuduh", "--sebelum", sebelum, "--berikut", berikut, "--bantahan", bantahan) == (
+        0, {"diterima": 0, "ditolak": 0, "diabaikan": 0})

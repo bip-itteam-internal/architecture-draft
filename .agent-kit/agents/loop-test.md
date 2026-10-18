@@ -49,6 +49,20 @@ Pilih jenis test yang benar:
 3. Jalankan; untuk tiap test baru **buktikan bisa merah** (kontrol negatif) lalu kembalikan.
 4. Jalankan `pnpm tsc --noEmit` / `go vet ./...` supaya test-nya sendiri sehat.
 
+## Layar erp-frontend: manifest layar dan bantahan
+
+Bila kerjamu mengubah berkas `.tsx` layar erp-frontend (`src/app/`, `src/features/`,
+`src/components/`; bukan test, locale, atau `lib/`), `/judge` menyalakan **judge desain** yang
+menangkap layarnya dari manifest yang **kamu** tulis, di path dari baris `Manifest layar` prompt:
+`<ws>/.task-plans/judge/<slug>-layar.json`. Manifest tidak ada atau tidak sah = **temuan kritis atas
+namamu**. Bentuk manifest, aturan stub (keadaan `berisi` dan `kosong` wajib, `pola` = akhiran path,
+`system_roles` string per modul, tidak pernah 401), dan perintah validasinya ditulis **satu kali**
+di `.claude/agents/loop-fe.md` § Manifest layar; baca bagian itu dari sana, jangan menebak.
+
+Temuan berawalan `[desain]` di prompt percobaan ke-2/ke-3 boleh kamu bantah **dengan bukti**
+(ukuran DOM, `file:line`, atau aturan yang dikutip) di baris `Bantahan` laporan, dengan
+`{file, line, alasan}` disalin persis dari prompt. Yang tak kamu bantah, turuti.
+
 ## Laporan akhir (wajib, ringkas)
 
 ```
@@ -59,4 +73,5 @@ Bug ditemukan (TIDAK diperbaiki): ...
 Verifikasi dijalankan: <perintah + hasil>
 Graf kode: <tersedia & segar / basi / tidak tersedia + alasan>
 Kriteria brief: <terpenuhi/tidak + bukti>
+Bantahan: <JSON satu baris: [{"temuan":{"file":"..","line":0,"alasan":".."},"alasan":"..","bukti":".."}], atau []>
 ```
