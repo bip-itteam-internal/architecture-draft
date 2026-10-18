@@ -389,6 +389,19 @@ try {
   }
   Check ((Test-Path $devopsMd) -and $devopsTools -and $devopsTools -notmatch 'PowerShell' -and $devopsTools -notmatch 'Bash') "loop-devops penyiap: tools tanpa shell ('$devopsTools')"
 
+  # ---- judge desain: agen loop-judge-desain ----
+  # Read-only (alat dijaga di frontmatter, bukan di prosa), kontrak keluarannya dibaca /judge, dan isi
+  # ui-checklist.md DIRUJUK bukan disalin (satu fakta satu tempat).
+  $jdsPath = Join-Path $claude 'agents/loop-judge-desain.md'
+  Check (Test-Path $jdsPath) 'agen loop-judge-desain tersalin ke .claude/agents'
+  if (Test-Path $jdsPath) {
+    $jds = Get-Content $jdsPath -Raw -Encoding UTF8
+    Check ($jds -match '(?m)^tools: Read, Grep, Glob\s*$') 'loop-judge-desain: tools hanya Read, Grep, Glob'
+    Check ($jds.Contains('<<VERDICT_DESAIN>>') -and $jds.Contains('layar_dinilai') -and $jds.Contains('"bantahan"')) 'loop-judge-desain: kontrak keluaran VERDICT_DESAIN, layar_dinilai, bantahan'
+    Check ($jds.Contains('ui-checklist.md')) 'loop-judge-desain: merujuk path ui-checklist.md'
+    Check (-not $jds.Contains('## 2a. Sheet')) 'loop-judge-desain: isi ui-checklist.md dirujuk, bukan disalin'
+  }
+
   # ---- v1.25.0: dua lubang gerbang ----
   $errf = Join-Path $tmp 'hook.err'
   # Lubang 1: kit tidak menundukkan dirinya pada disiplinnya sendiri. init SENGAJA mengecualikan
