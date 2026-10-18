@@ -10,8 +10,10 @@ kegagalan yang SENYAP:
   ada temuan", gerbang lolos tanpa melihat satu layar pun.
 - **Mendarat di /login atau 404 adalah masalah tangkapan, bukan galat kode.** Menuduh eksekutor atas
   sesi palsu atau rute manifest yang keliru membuat loop berputar tanpa sebab.
-- **Error boundary hanya galat kode bila konsol menunjuk berkas DIFF.** Boundary yang menunjuk
-  komponen lain (mis. tabel bersama) bukan salah diff ini.
+- **Error boundary selalu galat kode** (diubah 2026-10-18), kecuali `galat` alat atau /login yang
+  menang lebih dulu. Syarat lama "konsol menunjuk berkas diff" tak pernah terpenuhi atas build
+  produksi tanpa source map. Parameter `berkas_diff` dipertahankan demi kompatibilitas tanda
+  tangan (`klasifikasi_rute`, `layar_dinilai`, CLI `ringkas`) tetapi tidak lagi memutus apa pun.
 - **Bantahan atas temuan yang tak pernah ada tidak dihitung salah tuduh.** Ia diabaikan dan dicatat.
 
 Manifest layar (skema di spec 2026-10-18-judge-desain-design.md) wajib sah sebelum skrip tangkapan
@@ -97,21 +99,24 @@ def validasi_manifest(obj):
 
 
 def klasifikasi_rute(hasil, berkas_diff):
-    """'ok' | 'tangkapan_gagal' | 'galat_kode' untuk satu entri rute dari ringkasan.json."""
+    """'ok' | 'tangkapan_gagal' | 'galat_kode' untuk satu entri rute dari ringkasan.json.
+
+    Urutan menang: galat alat, lalu /login, lalu error boundary (galat_kode), lalu status >= 400.
+    `berkas_diff` dipertahankan demi kompatibilitas tanda tangan; tidak memutus keputusan apa pun.
+    """
     if hasil.get("galat"):
         return "tangkapan_gagal"
     akhir = hasil.get("rute_akhir") or ""
     if re.match(r"^/login(?:[/?#]|$)", akhir):
         return "tangkapan_gagal"
-    # Boundary yang menunjuk berkas diff = galat kode APA PUN status dokumennya: crash SSR
-    # menghasilkan dokumen 500 + boundary, dan memaafkannya sebagai "tangkapan" meloloskan bug.
+    # Boundary = galat kode APA PUN isi konsol dan status dokumennya (diubah 2026-10-18). Build
+    # produksi tak menerbitkan source map browser, jadi stack konsol menunjuk chunk
+    # `/_next/static/...`, bukan berkas sumber: syarat lama "konsol menunjuk berkas diff" tak pernah
+    # terpenuhi dan crash sungguhan lolos sebagai tangkapan gagal. Boundary hanya lahir dari kode
+    # aplikasi atau stub manifest, dan keduanya tanggungan eksekutor. Konsol tetap direkam sebagai
+    # bukti untuk judge. `berkas_diff` tidak lagi ikut memutus di sini.
     if hasil.get("error_boundary"):
-        konsol = [_norm(x) for x in hasil.get("konsol") or []]
-        for b in berkas_diff:
-            sufiks = _norm(b)
-            if any(sufiks in baris for baris in konsol):
-                return "galat_kode"
-        return "tangkapan_gagal"
+        return "galat_kode"
     status = hasil.get("status_http")
     if isinstance(status, int) and status >= 400:
         return "tangkapan_gagal"

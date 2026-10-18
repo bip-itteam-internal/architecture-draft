@@ -15,7 +15,7 @@
 - Hanya repo `erp-frontend`. MyBharata tidak menyalakan apa pun.
 - Temuan **kritis** judge desain memblokir; `lolos = gerbang AND verdict AND verdict_desain` bila judge desain menyala.
 - Tangkapan gagal **tidak** memblokir: judge menilai dari kode saja, `layar_dinilai: false`, alasan ditulis di verdict, log, dan badan PR.
-- Mendarat di `/login` = tangkapan gagal. Error boundary = galat kode hanya bila galat konsol menunjuk berkas diff.
+- Mendarat di `/login` = tangkapan gagal. Error boundary = galat kode, apa pun isi konsol (diubah 2026-10-18: build produksi tanpa source map, jadi syarat konsol menunjuk berkas diff tak pernah terpenuhi); galat alat dan `/login` menang lebih dulu.
 - Manifest tidak ada / tidak sah padahal diff menyentuh layar = temuan kritis untuk eksekutor.
 - Hanya baris yang ditambahkan/diubah diff yang bisa kritis; pelanggaran lama = informasional.
 - Saat judge desain menyala, `loop-judge` melewati `review-checklist.md` §F dan §J untuk berkas erp-frontend; i18n tetap milik `loop-judge`.
@@ -188,4 +188,31 @@
 
 ## Hasil
 
-(diisi saat eksekusi)
+### Uji asap Task 2 (2026-10-18)
+
+- **Sasaran**: worktree `C:\Users\irfan\wt\fe-cek-main` (build sudah ada, commit `cbba5af04`, tanpa `.env`
+  sehingga API relatif `/api/` ke server Next dan seluruhnya tercegat), rute `/hris/resign`, manifest
+  tangan berkeadaan `berisi` (2 baris stub) dan `kosong`, lolos `layar-lib.py validasi`.
+- **Hasil**: `tangkap-layar.ps1` exit 0. Lima entri (berisi 1366/390 x terang/gelap + kosong desktop
+  terang), semuanya `status_http` 200, `rute_akhir` `/hris/resign` (tak satu pun ke `/login`),
+  `error_boundary` false, `tema_terbukti` sama dengan tema yang diminta di kelima entri, `luber_halaman`
+  false. Port dilepas, nol proses Chrome berprofil uji tersisa. PNG dilihat dengan `Read`: desktop
+  terang (sidebar HRGA, kartu statistik), ponsel gelap (tata letak 390 sungguhan), segmen gulir kedua
+  (tabel berisi dua baris stub dan paginasi), dan keadaan kosong (ilustrasi tabel kosong plus panel
+  backlog "Gagal memuat ..." karena endpointnya sengaja tak distub).
+- **Dua cacat alat ditemukan uji asap, diperbaiki, dan kini dijaga `test-tangkap-layar.ps1`**:
+  1. `pola` stub semula potongan teks, sehingga stub daftar `/api/employee/resign` ikut menjawab
+     `/resign/summary` dan `/resign/non-aktif-tanpa-catatan` dengan bentuk yang salah (baris daftar
+     tampil di panel lain, tanpa galat). Kini **akhiran path**: pathname sama atau berakhiran pola;
+     `/x/*` = awalan; `?k=v` di pola = parameter query wajib sama; pola terpanjang menang.
+  2. Jendela tenang 1 dtk berakhir di dalam jeda retry React Query (1, 2, 4 dtk), sehingga panel yang
+     tak distub terpotret sebagai Skeleton. Kini **4,5 dtk selama ada 5xx dalam 8 dtk terakhir**
+     (maks 20 dtk), 1 dtk selain itu.
+- **Waktu**: sekitar 15 dtk per entri di halaman nyata (5 entri = 76 dtk), ditambah Chrome menyala
+  (bisa sampai 30 dtk di mesin ini). `/judge` sebaiknya menjalankan tangkapan di background.
+- **Temuan source map**: build produksi Next tidak menerbitkan source map browser, jadi stack di
+  `konsol` menunjuk chunk `/_next/static/chunks/<hash>.js`, bukan berkas sumber. Aturan lama "error
+  boundary galat kode hanya bila konsol menunjuk berkas diff" karena itu tak pernah bisa terpenuhi.
+  Diputuskan controller 2026-10-18: error boundary **selalu** galat kode (galat alat dan `/login`
+  menang lebih dulu); `layar-lib.py`, `test_layar.py`, dan spec "Aturan tambahan" butir 1 sudah
+  disesuaikan.

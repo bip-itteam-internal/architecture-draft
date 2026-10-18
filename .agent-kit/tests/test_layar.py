@@ -6,7 +6,7 @@ Yang dijaga di sini adalah kegagalan yang SENYAP:
    tidak boleh dibaca sebagai layar yang dinilai bersih; itu `layar_dinilai: false`.
 2. **Mendarat di /login atau 404 bukan galat kode.** Itu masalah tangkapan (sesi/manifest), dan
    menuduh eksekutor atas hal itu membuat loop berputar tanpa sebab.
-3. **Error boundary hanya galat kode bila konsol menunjuk berkas diff.**
+3. **Error boundary selalu galat kode** (kecuali `galat` alat atau /login, yang menang lebih dulu).
 4. **Bantahan atas temuan yang tak ada dihitung nol**, bukan salah tuduh.
 
 Jalankan (Windows, dari akar workspace; tanpa cache supaya vault tidak kotor):
@@ -145,9 +145,23 @@ def test_error_boundary_menunjuk_diff_galat_kode():
     assert L.klasifikasi_rute(h, ["src/features/kpi/components/x.tsx"]) == "galat_kode"
 
 
-def test_error_boundary_bukan_diff_tangkapan_gagal():
+def test_error_boundary_bukan_diff_galat_kode():
+    # Diubah 2026-10-18: build produksi tanpa source map, stack konsol menunjuk chunk, jadi syarat
+    # "konsol menunjuk berkas diff" tak pernah terpenuhi. Boundary = kode aplikasi atau stub
+    # eksekutor, keduanya tanggungan eksekutor.
     h = _hasil(error_boundary=True, konsol=["TypeError at src/components/table/index.tsx:3"])
-    assert L.klasifikasi_rute(h, ["src/features/kpi/components/x.tsx"]) == "tangkapan_gagal"
+    assert L.klasifikasi_rute(h, ["src/features/kpi/components/x.tsx"]) == "galat_kode"
+
+
+def test_error_boundary_konsol_chunk_kosong_galat_kode():
+    h = _hasil(error_boundary=True, konsol=["TypeError at http://localhost:4000/_next/static/chunks/a1b2.js:1:99"])
+    assert L.klasifikasi_rute(h, []) == "galat_kode"
+    assert L.klasifikasi_rute(_hasil(error_boundary=True, status_http=500), []) == "galat_kode"
+
+
+def test_error_boundary_kalah_dari_galat_dan_login():
+    assert L.klasifikasi_rute(_hasil(error_boundary=True, galat="timeout"), []) == "tangkapan_gagal"
+    assert L.klasifikasi_rute(_hasil(error_boundary=True, rute_akhir="/login"), []) == "tangkapan_gagal"
 
 
 def test_error_boundary_konsol_backslash_cocok():
