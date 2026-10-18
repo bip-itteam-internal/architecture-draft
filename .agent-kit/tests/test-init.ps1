@@ -731,6 +731,15 @@ try {
   # worktree-bersih: worktree baru tanpa commit / kotor / baru disunting tak pernah dibuang (kit 1.36.0)
   $rcWtb = Invoke-Ps (Join-Path $kitRoot 'tests/test-worktree-bersih.ps1') @()
   Check ($rcWtb -eq 0) "tests/test-worktree-bersih.ps1 lulus (exit $rcWtb; jalankan langsung untuk rinciannya)"
+  # tangkap-layar (judge desain): butuh Chrome sungguhan; mesin tanpa Chrome dilewati dengan pesan,
+  # bukan gagal, supaya gerbang kit tak merah permanen karena infrastruktur.
+  $chromeUji = 'C:\Program Files\Google\Chrome\Application\chrome.exe'
+  if (Test-Path -LiteralPath $chromeUji) {
+    $rcLayar = Invoke-Ps (Join-Path $kitRoot 'tests/test-tangkap-layar.ps1') @()
+    Check ($rcLayar -eq 0) "tests/test-tangkap-layar.ps1 lulus (exit $rcLayar; jalankan langsung untuk rinciannya)"
+  } else {
+    Write-Host "LEWAT tests/test-tangkap-layar.ps1: Chrome tidak ada di $chromeUji"
+  }
   $bashEntry = $ptu | Where-Object { $_.matcher -eq 'Bash' }
   $psEntry   = $ptu | Where-Object { $_.matcher -eq 'PowerShell' }
   Check ($null -ne $bashEntry -and $null -ne $psEntry) "gerbang terpasang untuk tool Bash DAN PowerShell (matcher: $($ptu.matcher -join ', '))"
