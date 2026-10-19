@@ -151,13 +151,17 @@ Keluaran: blok `<<VERDICT_DESAIN>> ... <<END>>` berbentuk sama dengan verdict `l
 - Log `.task-plans/judge/<slug>-<n>.json` mendapat field `verdict_desain` dan `layar`
   (path `ringkasan.json` atau `"tidak tersedia: <alasan>"`).
 - Badan PR memuat ringkasan judge desain dan daftar tangkapan, supaya reviewer melihat layar yang dinilai.
+- **Belum:** PNG belum diunggah ke PR; reviewer di mesin lain belum bisa melihat layar (2026-10-18).
 
 ### Aturan tambahan (keputusan Claude, dari builder check; user boleh membantah)
 
 1. **Mendarat di `/login` = tangkapan gagal, bukan temuan.** Hampir semua sebabnya ada di alat atau
    manifest (JWT tanpa `exp`, 401 dari URL tak distub, `system_roles` berbentuk array). **Error
-   boundary** ("Terjadi Kesalahan") kritis hanya bila galat konsol yang direkam skrip menunjuk berkas
-   yang diubah diff; selain itu tangkapan gagal. Karena itu skrip juga merekam galat konsol per rute.
+   boundary** ("Terjadi Kesalahan") selalu galat kode, apa pun isi konsol dan status dokumennya: boundary
+   hanya lahir dari kode aplikasi atau stub manifest, dan keduanya tanggungan eksekutor (diubah
+   2026-10-18: build produksi tanpa source map, jadi syarat konsol menunjuk berkas diff tak pernah
+   terpenuhi). Galat alat dan mendarat di `/login` tetap menang lebih dulu sebagai tangkapan gagal.
+   Skrip tetap merekam galat konsol per rute sebagai bukti untuk judge.
 2. **Manifest wajib bila diff menyentuh layar.** Yang menulisnya eksekutor mana pun yang menyentuh
    layar erp-frontend (`loop-fe`, juga `loop-test`/`loop-fix`/`loop-refactor`). Manifest tidak ada
    atau tidak sah = temuan kritis "manifest layar tidak ada", dibebankan ke eksekutor, supaya gerbang

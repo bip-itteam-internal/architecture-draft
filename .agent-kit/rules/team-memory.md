@@ -269,6 +269,7 @@ Yang membuatnya bergejala: `DepartmentFilterOptions` sengaja MENGGANTI anggota g
   menyimpulkan "tidak perlu dibangun"**, dan itu bagian dari gunanya. Task teknis biasa tetap
   langsung `/start-task`; memaksa semua task lewat sini cuma menambah gesekan.
   Desain: `.agent-kit/docs/2026-08-28-analisa-kebutuhan-command-design.md`.
+- **Judge desain (kit ≥ 1.41.0) menilai diff layar `erp-frontend` dari tangkapan nyata, bukan dari kode saja, dan temuan kritisnya MEMBLOKIR PR** (`lolos = gerbang AND verdict AND verdict_desain`). Aturan, skema manifest layar, dan keputusan yang diambil ada di `.agent-kit/docs/2026-10-18-judge-desain-design.md`; jangan disalin ke sini. Alasannya terukur: Portal KPI membuat tombol kembali sendiri dan Sheet 16 dari 24 menyatukan gulirnya, lolos tsc/lint/test dan baru ketahuan dari layar.
 - **Prosedur pencarian vault kini SATU tempat**: `.agent-kit/rules/vault-retrieval.md`, dirujuk
   `/ask`, `/start-task`, dan `/analisa-kebutuhan`. Jangan menyalinnya lagi ke command baru.
 - **`/dampak` (kit ≥ 1.37.0) sebelum mengubah FAKTA di vault** (ambang, rumus, daftar-izin, rute, field).

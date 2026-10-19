@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Halaman uji tangkap-layar</title>
+<script>
+  // Meniru next-themes: kelas <html> dibaca dari localStorage.theme SEBELUM render. Kalau skrip
+  // tangkapan memasang tema lewat prefers-color-scheme, kelas ini kosong dan test-nya merah.
+  try { document.documentElement.className = localStorage.getItem("theme") || ""; } catch (e) {}
+</script>
+<style>
+  body { font-family: sans-serif; margin: 0; padding: 16px; background: #fff; color: #111; }
+  html.dark body { background: #111; color: #eee; }
+  .kotak { width: 200px; overflow-x: auto; border: 1px solid #888; margin: 8px 0; }
+  #lebar-ponsel { width: 600px; background: #cde; }
+  #panel { display: none; }
+  #tempat-tertutup { position: relative; width: 200px; height: 40px; }
+  #penutup { position: absolute; inset: 0; background: rgba(200, 0, 0, .4); }
+  #overlay { position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, .6); display: flex; align-items: center; justify-content: center; }
+</style>
+</head>
+<body>
+<h1>Halaman uji</h1>
+<button id="tombol-utama">Simpan</button>
+<button id="tombol-mati" disabled style="opacity: .5">Kirim</button>
+<button id="buka-panel" onclick="document.getElementById('panel').style.display='block'">Buka panel</button>
+
+<!-- Wadah yang SENGAJA meluber, dan pembandingnya yang tidak: tanpa pembanding, pengukur yang
+     melaporkan semua elemen tetap lolos. -->
+<div id="wadah-luber" class="kotak"><div style="width: 800px">isi selebar 800px</div></div>
+<div id="wadah-rapi" class="kotak"><div style="width: 100px">pendek</div></div>
+
+<!-- 600px: meluberkan halaman di 390, tidak di 1366. Membuktikan lebar ponsel benar-benar
+     diemulasi, bukan jendela 1366 yang dipotong. -->
+<div id="lebar-ponsel">enam ratus piksel</div>
+
+<!-- Tombol yang tertimpa elemen lain: harus muncul di `tumpang`. -->
+<div id="tempat-tertutup"><button id="tombol-tertutup">Tertutup</button><div id="penutup"></div></div>
+
+<!-- Hanya terlihat sesudah aksi klik_teks "Buka panel". -->
+<div id="panel"><div id="wadah-panel" class="kotak"><div style="width: 900px">isi panel</div></div></div>
+
+<pre id="status"></pre>
+<!-- Penambah tinggi: halaman lebih panjang dari viewport, jadi segmen gulir ikut ditangkap. -->
+<div style="height: 1600px"></div>
+<script>
+  function catat(baris) {
+    document.getElementById("status").textContent += baris + "\n";
+    // console.error supaya status stub terbaca di `konsol` ringkasan.json, bukan cuma di gambar.
+    console.error(baris);
+  }
+  ["/api/x", "/api/x/rinci", "/api/tak-distub", "/api/employee/me"].forEach(function (u) {
+    fetch(u).then(function (r) {
+      return r.text().then(function (t) { catat("uji-stub " + u + " " + r.status + " " + t); });
+    }).catch(function (e) { catat("uji-stub " + u + " gagal " + e); });
+  });
+  // Pengecualian tak tertangkap: konsol wajib memuat pesan BESERTA url berkasnya, supaya
+  // pembaca (judge desain) bisa menelusuri penyebab error boundary. Klasifikasi galat_kode sendiri
+  // ditentukan oleh error boundary, bukan oleh isi konsol.
+  setTimeout(function () { throw new Error("galat-uji-sengaja"); }, 0);
+  // Overlay ajakan seperti AjakanPushDialog: muncul sesudah muat dan menelan klik.
+  setTimeout(function () {
+    var o = document.createElement("div");
+    o.id = "overlay";
+    o.innerHTML = '<div style="background:#fff;padding:24px"><button id="nanti">Nanti saja</button></div>';
+    document.body.appendChild(o);
+    document.getElementById("nanti").onclick = function () { o.remove(); };
+  }, 400);
+</script>
+</body>
+</html>

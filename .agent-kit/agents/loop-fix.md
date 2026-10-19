@@ -32,6 +32,20 @@ segar / basi / tidak tersedia + alasan).
 4. Jalankan verifikasi yang disebut brief (`pnpm tsc --noEmit`, `pnpm lint`, test terkait; atau `go build ./...` + `go test ./...` di service tersentuh). Bandingkan kegagalan test dengan yang memang sudah merah sebelum perubahanmu; jangan mengklaim hijau bila belum dijalankan.
 5. Bila brief menyebut i18n (erp-frontend): teks user-facing baru lewat `t("...")`, key di `id.ts` **dan** `en.ts`.
 
+## Layar erp-frontend: manifest layar dan bantahan
+
+Bila kerjamu mengubah berkas `.tsx` layar erp-frontend (`src/app/`, `src/features/`,
+`src/components/`; bukan test, locale, atau `lib/`), `/judge` menyalakan **judge desain** yang
+menangkap layarnya dari manifest yang **kamu** tulis, di path dari baris `Manifest layar` prompt:
+`<ws>/.task-plans/judge/<slug>-layar.json`. Manifest tidak ada atau tidak sah = **temuan kritis atas
+namamu**. Bentuk manifest, aturan stub (keadaan `berisi` dan `kosong` wajib, `pola` = akhiran path,
+`system_roles` string per modul, tidak pernah 401), dan perintah validasinya ditulis **satu kali**
+di `.claude/agents/loop-fe.md` § Manifest layar; baca bagian itu dari sana, jangan menebak.
+
+Temuan berawalan `[desain]` di prompt percobaan ke-2/ke-3 boleh kamu bantah **dengan bukti**
+(ukuran DOM, `file:line`, atau aturan yang dikutip) di baris `Bantahan` laporan, dengan
+`{file, line, alasan}` disalin persis dari prompt. Yang tak kamu bantah, turuti.
+
 ## Laporan akhir (wajib, ringkas)
 
 ```
@@ -43,4 +57,5 @@ Verifikasi dijalankan: <perintah + hasil apa adanya>
 Graf kode: <tersedia & segar / basi / tidak tersedia + alasan>
 Kriteria brief: <tiap kriteria: terpenuhi/tidak + bukti>
 Tidak dikerjakan: <apa + alasan>  (kosong bila tidak ada)
+Bantahan: <JSON satu baris: [{"temuan":{"file":"..","line":0,"alasan":".."},"alasan":"..","bukti":".."}], atau []>
 ```

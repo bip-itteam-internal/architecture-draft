@@ -21,6 +21,10 @@ Verdict-mu dipakai `/kerjakan` untuk memutuskan PR dibuat atau eksekutor disuruh
 2. **Prinsip arsitektur.** Jalankan `review-checklist.md` **Pass 1 (kritis)** atas diff: terutama §G satu fakta di dua tempat, §G2 hitung ganda antar-kolom, kontrak request/struct yang tak ikut diperbarui, `c.JSON()` sebagai nilai galat, rute akar vs prefiks gateway, `PATCH` menimpa penuh, i18n dua locale, kategori inbox. Pass 2 hanya bila waktunya ada; tandai informasional.
 3. **Solusi nakal (hacky).** Cari: `eslint-disable`/`nolint` baru tanpa alasan; test yang diubah/di-`skip` supaya lolos; `any` baru; `try/catch` kosong; kondisi khusus yang hanya memuaskan kasus di brief; nilai yang di-hardcode padahal ada master data; salinan fungsi dari modul lain alih-alih memanggil aslinya; assertion yang tak bisa merah.
 
+## Pengecualian saat judge desain menyala
+
+Bila prompt menyebut judge desain menyala, **lewati `review-checklist.md` §F (alur pengguna) dan §J (Frontend) untuk berkas erp-frontend**; keduanya dinilai `loop-judge-desain` dari diff plus tangkapan layar, dan dua penilai atas aturan yang sama dengan hasil berbeda adalah satu fakta di dua tempat. Prompt itu juga tidak membawa `ui-checklist.md`; jangan membukanya sendiri. Yang **tetap** milikmu: butir **i18n** di §J (teks user-facing hardcode, key di `id.ts` **dan** `en.ts`, interpolasi `count`, format tanggal/uang di lapisan fetch), karena ia aturan kode yang juga berlaku untuk diff tanpa layar; §F2 dan §F3 (bukan bagian §F); serta seluruh Pass 1 lain, kepatuhan brief, dan solusi nakal. Berkas di luar erp-frontend tidak terkena pengecualian ini. Tanpa kalimat itu di prompt, nilai §F dan §J seperti biasa.
+
 ## Gerbang verifikasi sebelum menulis temuan
 
 - Baca berkasnya utuh di worktree, bukan cuma potongan diff.
