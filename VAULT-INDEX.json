@@ -10211,8 +10211,8 @@
         "WH - SOP Posisi Admin Warehouse",
         "Manufacture - Kajian Fondasi Sistem"
       ],
-      "hash": "a3f5646df832ba8866532c32ed837f9290056ee26597dee4cf2d3f4b602e83aa",
-      "ukuran_kb": 11.0,
+      "hash": "8ac0bedeccbdf83b3aabef725904312c3945d6a4db9e8edcc6e16864c113805a",
+      "ukuran_kb": 11.9,
       "ringkasan": "Menjawab: siapa pemegang angka stok bahan baku dan barang jadi pabrik (ERP atau Accurate), kenapa tarik stok Accurate tiap 6 jam yang menimpa angka ERP bermasalah, akun dan gudang Accurate untuk Penyesuaian Persediaan (kini jatuh ke Ekuitas Saldo Awal), dan batas selisih stock opname. Memuat empat pertanyaan terbuka untuk Finance (keputusan K-1) dan temuan push kedua di hari sama yang menghapus baris terkirim.",
       "kata_kunci": [
         "stok pabrik",
@@ -20988,8 +20988,8 @@
         "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "141ba4ba056e4651742585088691f7c6190e44f596b64c64fba984103d03d94e",
-      "ukuran_kb": 9.0,
+      "hash": "51434eb9ad162104de2b499b2519d480cce14da3b8524ef5d8a7109cfdf9fbf0",
+      "ukuran_kb": 9.1,
       "ringkasan": "Menjawab: apa saja butir kerja penataan fondasi Manufaktur (M-01 sampai M-42) per fase, keputusan mana yang ditunggu (K-1 sampai K-11) dan siapa Pemutusnya, butir mana yang siap dikerjakan, serta aturan urutan kerja dan pencatatan kode M di setiap PR.",
       "kata_kunci": [
         "fondasi manufaktur",
