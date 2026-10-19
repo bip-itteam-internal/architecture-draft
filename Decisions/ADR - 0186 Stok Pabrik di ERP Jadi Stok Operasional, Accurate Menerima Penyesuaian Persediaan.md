@@ -32,6 +32,17 @@ Rekomendasi disertakan; Pemutus boleh memilih lain.
 
 *Dicocokkan ke vault, kode, dan data prod 2026-10-19 sebelum dikirim, supaya Pemutus tak ditanya hal yang sudah tertulis. Pertanyaan disampaikan lewat Senior Accountant Finance; Pemutus di baris status tetap Finance Supervisor sampai ditegaskan lain.*
 
+### Jawaban Finance (Senior Accountant, 2026-10-19, lewat WA)
+
+| # | Jawaban | Arti untuk keputusan |
+|---|---|---|
+| 1 | "ERP sync ke Accurate" | Pilihan (a): stok operasional di ERP, Accurate menerima penyesuaian. Sesuai usulan Decision 1 |
+| 3 | "Wajib cek FAT" | Tidak ada batas selisih: **semua** selisih opname diverifikasi FAT sebelum menjadi penyesuaian (Decision 4) |
+| 4 | "Perlu diskusi langsung karena pencatatan pemakaian produksi cukup kompleks" | **Masih terbuka.** Akun dan gudang Accurate menunggu rapat dengan Finance; paket pengiriman (Decision 3) tidak dikerjakan sebelum itu |
+| 5 | "Seharusnya disesuaikan dengan fisik (to be confirmed)" | Condong ke opname fisik penuh di hari peralihan; **belum final** |
+
+Status tetap Diusulkan: butir 4 dan 5 belum final, dan belum ditegaskan apakah jawaban ini sudah atas nama Finance Supervisor.
+
 ## Deskripsi
 
 *Stok pabrik (manufacture `stok_sekarang`) menjadi stok operasional yang hanya diubah lewat transaksi ERP dan penyesuaian tervalidasi; Accurate menerima Penyesuaian Persediaan otomatis dan tidak lagi menimpa angka ERP; selisih ERP vs Accurate dilaporkan, tidak ditimpakan.*
