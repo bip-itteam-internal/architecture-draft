@@ -33,6 +33,16 @@ Jawab di issue K-4 atau langsung di dok ini. Rekomendasi disertakan; Pemutus bol
 
 *Dicocokkan ke vault (SOP QC, SOP PPIC, kajian), kode, dan data prod 2026-10-19 sebelum dikirim, supaya Pemutus tak ditanya hal yang sudah tertulis.*
 
+### Jawaban Quality Supervisor (2026-10-19, lewat WA)
+
+| # | Jawaban | Arti untuk keputusan |
+|---|---|---|
+| 1 | "Reject + Ditolak" | Dibaca sebagai **satu status**: Reject = Ditolak, sehingga sistem memakai **Lulus / Ditolak** seperti SOP QC. Kalimatnya bisa dibaca dua arah, jadi **perlu konfirmasi singkat** sebelum dikunci |
+| 3 | "Penolakan cukup diputuskan QC" | Tidak ada konfirmasi SPV Quality; QC menetapkan Lulus atau Ditolak |
+| 6 | "Hasil QC dicatat per batch" | Hasil QC ditempel per batch/lot pemasok (Decision 2-3), bukan per kedatangan |
+
+Pertanyaan 5 (barang masuk di luar pengajuan wajib karantina) menunggu jawaban Leader Warehouse RM.
+
 ## Deskripsi
 
 *Satu gerbang karantina untuk bahan masuk pabrik: penerimaan membentuk lot berstatus karantina, QC menetapkan hasil per lot, dan hanya qty Lulus yang menambah stok siap pakai; pengeluaran ke produksi menolak bahan yang belum Lulus.*
