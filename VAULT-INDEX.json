@@ -10208,11 +10208,12 @@
         "ADR - 0175 Stok GA di ERP Jadi Stok Operasional, Barang Keluar dan Penyesuaian Dikirim ke Accurate",
         "ADR - 0136 Pemilik Master Barang dan Master Gudang",
         "ADR - 0015 Push Pergerakan WMS ke Accurate",
+        "WH - SOP Posisi Admin Warehouse",
         "Manufacture - Kajian Fondasi Sistem"
       ],
-      "hash": "bd6554af57a7f229649774b2c212f3c7ccbf3ffd16c49e5ef6fa0808b472addd",
-      "ukuran_kb": 9.7,
-      "ringkasan": "Menjawab: siapa pemegang angka stok bahan baku dan barang jadi pabrik (ERP atau Accurate), kenapa tarik stok Accurate tiap 6 jam yang menimpa angka ERP bermasalah, bagaimana Penyesuaian Persediaan dikirim ke Accurate, dan urutan validasi stock opname oleh Finance. Memuat lima pertanyaan untuk Finance Supervisor (keputusan K-1) dan temuan push kedua di hari sama yang menghapus baris terkirim.",
+      "hash": "a3f5646df832ba8866532c32ed837f9290056ee26597dee4cf2d3f4b602e83aa",
+      "ukuran_kb": 11.0,
+      "ringkasan": "Menjawab: siapa pemegang angka stok bahan baku dan barang jadi pabrik (ERP atau Accurate), kenapa tarik stok Accurate tiap 6 jam yang menimpa angka ERP bermasalah, akun dan gudang Accurate untuk Penyesuaian Persediaan (kini jatuh ke Ekuitas Saldo Awal), dan batas selisih stock opname. Memuat empat pertanyaan terbuka untuk Finance (keputusan K-1) dan temuan push kedua di hari sama yang menghapus baris terkirim.",
       "kata_kunci": [
         "stok pabrik",
         "pemilik stok",
@@ -10238,9 +10239,9 @@
         "ANALISA - Fondasi Manufaktur",
         "Manufacture - Kajian Fondasi Sistem"
       ],
-      "hash": "4fb82d61b2de4da7aaa709327e9415c2f525246e95c49ecf69071fa3b38338e0",
-      "ukuran_kb": 8.8,
-      "ringkasan": "Menjawab: status apa yang dipakai untuk bahan baku dan kemas yang baru datang (Karantina, Lulus, Reject, Ditolak), siapa yang menetapkan dan mengonfirmasi, dan kapan bahan boleh keluar ke produksi. Memetakan empat tempat penyimpan status QC yang tak tersambung dan ketiadaan gerbang pemakaian; memuat enam pertanyaan untuk Leader Warehouse dan Supervisor Quality (keputusan K-4).",
+      "hash": "4c6a970f8037b6d2ad42d54feee66b6981794822d0f883cf58c15f38ba775b65",
+      "ukuran_kb": 9.0,
+      "ringkasan": "Menjawab: status apa yang dipakai untuk bahan baku dan kemas yang baru datang (Lulus/Ditolak, arti Reject), apakah penolakan dikonfirmasi SPV Quality, apakah barang masuk di luar pengajuan wajib karantina, dan apakah hasil QC dicatat per lot. Memetakan empat tempat penyimpan status QC yang tak tersambung dan ketiadaan gerbang pemakaian (keputusan K-4).",
       "kata_kunci": [
         "bahan masuk",
         "incoming QC",
@@ -20987,8 +20988,8 @@
         "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "3c09d370386377da178396161d04c0c7a62017d4c7241a31c201c1dcf4edefca",
-      "ukuran_kb": 8.9,
+      "hash": "141ba4ba056e4651742585088691f7c6190e44f596b64c64fba984103d03d94e",
+      "ukuran_kb": 9.0,
       "ringkasan": "Menjawab: apa saja butir kerja penataan fondasi Manufaktur (M-01 sampai M-42) per fase, keputusan mana yang ditunggu (K-1 sampai K-11) dan siapa Pemutusnya, butir mana yang siap dikerjakan, serta aturan urutan kerja dan pencatatan kode M di setiap PR.",
       "kata_kunci": [
         "fondasi manufaktur",
