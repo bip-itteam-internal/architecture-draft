@@ -4,7 +4,7 @@
 
 - **Status**: ⚠️ Implemented (ada catatan), **kode merged ke `main` 2026-10-08, deploy prod TBD**. Catatan: belum ada layar yang dilihat di browser dan belum ada endpoint yang dicoba lewat gateway (catatan penutup bip-erp#2779, 2026-10-08); keputusan terbuka dilacak di bip-erp#2814.
 - **Implementasi**: [[API - Procurement Service]] (`/pengajuan-barang/serapan-anggaran*`) · [[API - Integration Service]] (`/accounting/anggaran*`) · [[Microservices - Procurement Service]] · [[APP - Web ERP]] (layar) · izin: [[CORE - RBAC dan Permission Set]]
-- **Path di repo**: `bip-erp/services/procurement/pengajuan_barang_serapan.go` · `bip-erp/services/integration/internal/domain/entity/anggaran.go` · `erp-frontend/src/features/finance/anggaran/` · `erp-frontend/src/features/pengajuan-barang/` (kotak sisa pos, kartu Anggaran) · forecast mingguan: `bip-erp/services/integration/internal/usecase/laporan_mingguan.go` + `minggu_periode.go` + `proyeksi_mingguan.go`, `internal/interface/http/anggaran_mingguan_handler.go` + `anggaran_proyeksi_handler.go`
+- **Path di repo**: `bip-erp/services/procurement/pengajuan_barang_serapan.go` · `bip-erp/services/integration/internal/domain/entity/anggaran.go` · `erp-frontend/src/features/finance/anggaran/` · `erp-frontend/src/features/pengajuan-barang/` (kotak sisa pos, kartu Anggaran) · forecast mingguan: `bip-erp/services/integration/internal/usecase/laporan_mingguan.go` + `minggu_periode.go` + `proyeksi_mingguan.go`, `internal/interface/http/anggaran_mingguan_handler.go` + `anggaran_proyeksi_handler.go` · cashflow tujuh komponen: `usecase/komponen_kas.go`, `realisasi_aset.go`, `realisasi_pajak.go`, `realisasi_material.go`, `kunci_isian.go`, `interface/http/anggaran_komponen_handler.go`, `worker/tasks/realisasi_material_refresh.go`, `bip-erp/services/finance/forecast_kas_internal.go`, `erp-frontend/src/features/finance/anggaran/lib/komponen-forecast.ts` + `isian-komponen.ts`
 
 ## Latar Belakang
 
@@ -21,7 +21,7 @@ Tab di `/finance/anggaran`, urutan di layar (`tab-anggaran.ts`, array `TAB_ANGGA
 | Opex Marketing | Panel OPEX Marketing yang sudah ada; **tidak** disatukan ke Serapan |
 | Rekomendasi | Pencatatan rekomendasi efisiensi (bekas `/finance/cost-control`); periodenya mengikuti Tahun/Bulan halaman, akun dari katalog |
 | **Anggaran Bulanan** | Isian anggaran: unduh template, unggah Excel, tambah baris, koreksi, hapus (hapus meminta konfirmasi). `?tab=master` lama dipetakan **eksplisit** ke tab ini |
-| **Forecast Mingguan** | Ringkasan per minggu dan rincian per akun per minggu. Sejak 2026-10-09 (merged, deploy prod TBD): minggu **Berjalan** dan **Belum mulai** berpenanda, akurasi hanya dihitung atas minggu yang sudah selesai, dan baris total ringkasan berbunyi "Total minggu selesai (n dari m)" (lihat §Minggu yang Belum Selesai Tidak Dihitung); pemegang izin kelola bisa **Atur proyeksi** dan semua pembaca melihat **Riwayat perubahan** (lihat §Proyeksi Mingguan Diatur per Minggu) |
+| **Forecast Mingguan** | Sejak 2026-10-19 (merged, deploy prod TBD): 4 minggu, tujuh komponen uang keluar yang bisa dibuka sampai tingkat akun, badge Akrual/Kas, kartu pembanding uang keluar riil, anggaran aset tahunan beserta sisanya, dan form isian proyeksi komponen (lihat §Cashflow Tujuh Komponen). Backend lama jatuh ke tampilan rincian per akun. Sebelumnya: ringkasan per minggu dan rincian per akun per minggu. Sejak 2026-10-09 (merged, deploy prod TBD): minggu **Berjalan** dan **Belum mulai** berpenanda, akurasi hanya dihitung atas minggu yang sudah selesai, dan baris total ringkasan berbunyi "Total minggu selesai (n dari m)" (lihat §Minggu yang Belum Selesai Tidak Dihitung); pemegang izin kelola bisa **Atur proyeksi** dan semua pembaca melihat **Riwayat perubahan** (lihat §Proyeksi Mingguan Diatur per Minggu) |
 
 ### Minggu yang Belum Selesai Tidak Dihitung (⚠️ merged 2026-10-09, deploy prod TBD)
 
@@ -48,11 +48,21 @@ Cara kerja:
 
 ⚠️ **Jangan dibaca sebagai cara menaikkan KPI.** Akurasi bulan dan KPI Cost Control #4 dihitung dari **total** sebulan, dan total itu tidak berubah saat porsi digeser antar-minggu. Yang berubah hanya akurasi **per minggu**, dan akurasi **bulan berjalan** (karena hanya minggu selesai yang dihitung, porsi minggu-minggu awal ikut menentukan angka tengah bulan). Angka akhir bulan tidak terpengaruh.
 
-### Cashflow Tujuh Komponen (🟡 diputuskan 2026-10-16, kode belum ada)
+### Cashflow Tujuh Komponen (⚠️ merged ke `main` 2026-10-19, deploy prod TBD)
 
-Keputusan: [[ADR - 0184 Forecast Kas Mingguan Mencakup Tujuh Komponen Uang Keluar, Dibagi Empat Minggu, Realisasi Bertahap]]. Keputusan ini mengamandemen ADR 0161 pada cakupan, jumlah sebulan, dan pembagian minggu. Selama kodenya belum ada, perilaku yang tertulis di dua bagian di atas tetap berlaku.
+Keputusan: [[ADR - 0184 Forecast Kas Mingguan Mencakup Tujuh Komponen Uang Keluar, Dibagi Empat Minggu, Realisasi Bertahap]]. ADR ini mengamandemen ADR 0161 pada tiga hal: cakupan, jumlah sebulan, dan pembagian minggu.
 
-Cara kerja yang diputuskan:
+Kode:
+- BE: bip-erp #3234 (C1); #3275, pemulihan C2–C3c karena PR bertumpuk #3236/#3258/#3260/#3262 semula merged ke branch induk, bukan `main`; #3276 (`dapat_diisi`).
+- FE: erp-frontend #2570 (C4a); #2583, pemulihan C4b/#2572; #2584 (`dapat_diisi`).
+
+Status verifikasi:
+- Layar belum dilihat di browser.
+- Endpoint belum dicoba lewat gateway.
+- Penyegar Material belum dijalankan terhadap Accurate sungguhan.
+- Verifikasi yang dijanjikan: realisasi Material September 2026 = **Rp 385.370.294** (penerimaan barang 1601 Rp 82.853.623 + 1602 Rp 302.516.671), dan layar dicocokkan dengan Excel cashflow Finance September.
+
+Cara kerja:
 
 - **Cakupan.** Forecast mencakup tujuh komponen uang keluar:
   - Pembelian material
@@ -73,6 +83,43 @@ Cara kerja yang diputuskan:
   - Tahap 2 mengganti sumber per komponen ke basis kas setelah Finance menjelaskan sumber yang mereka pakai secara manual.
 - **Pembanding.** Total uang keluar riil dari seluruh rekening bank (salinan ADR 0163) tampil di samping total realisasi. ⚠️ Angka ini **tidak dipakai KPI**, dan **jangan dijumlahkan** dengan realisasi komponen karena keduanya mengukur uang yang sama dari dua sisi.
 - **KPI #4.** Cost Control #4 dan SPV Finance F4 ikut definisi baru dengan rumus yang sama. Skor periode yang sudah beku tidak dihitung ulang tanpa keputusan HRD.
+
+#### Yang benar-benar ada di kode (diukur 2026-10-19 di `origin/main`)
+
+**Pemetaan akun ke komponen.** Pemetaannya ditulis sekali di `services/integration/internal/usecase/komponen_kas.go` (`DaftarKomponenKas`, `cocokKomponen`), berbasis nomor akun:
+
+| Komponen | Akun | Sumber proyeksi | Sumber realisasi tahap 1 |
+|---|---|---|---|
+| Material | 1601 Bahan Baku, 1602 Bahan Kemas, 1603 Bahan Penolong | isian | buku besar akun persediaan, **hanya** jenis "Penerimaan Barang" dan "Faktur Pembelian"; "Retur Pembelian" mengurangi (`usecase/realisasi_material.go`, penyegar harian 03:50, koleksi `realisasi_material_mingguan`) · akrual |
+| BOP | 5201, 5102, 53xx | isian + RAPB 5xxx | mutasi akun · akrual |
+| Marketing | 61xx bukan gaji | RAPB | mutasi akun · akrual |
+| Gaji | 61xx/62xx yang namanya memuat "gaji" | RAPB | mutasi akun · akrual |
+| Ops adum | 62xx/73xx bukan gaji | RAPB | mutasi akun · akrual |
+| Pajak | — | isian | setoran nyata PT Bharata dari finance-service (`GET /internal/forecast-kas/pajak`) · kas |
+| Aset | — | isian | salinan aset tetap `accurate_fixed_assets` (biaya perolehan per tanggal transaksi, draft dibuang) · akrual |
+
+Aturan pengecualian:
+- Penyusutan dikecualikan. Penandanya dua: nomor 71xx, atau nama yang memuat "penyusutan".
+- Akun beban pajak (`DaftarBebanPajak`) dikeluarkan dari semua komponen.
+
+**Isian.** Isian per komponen per bulan disimpan di koleksi `anggaran_proyeksi_komponen`. Anggaran aset per tahun disimpan di `anggaran_aset_tahunan`. Pengisinya Cost Control, dengan gerbang `finance.anggaran.kelola`.
+- Laporan mengirim `komponen[].dapat_diisi` dan `ditambah_rapb`. Layar membaca kedua penanda ini dan tidak menyalin daftarnya; salinan lama di `isian-komponen.ts` hanya tinggal sebagai fallback untuk backend lama.
+- Isian sebuah komponen yang sudah masuk basis akurasi tunduk pada kunci minggu dan batas ubah ADR 0161. Pada bulan berjalan, isian itu praktis terkunci sejak minggu 1 mulai (422 `minggu_terkunci`).
+
+**Uang keluar riil.** Nilainya adalah Σ `keluar` rekening milik PT Bharata dari salinan arus kas-bank finance-service (`GET /internal/forecast-kas/arus-keluar`). Pemilik rekening ditentukan oleh `PemilikDariFakta` yang sama dengan layar arus kas-bank.
+
+#### Aturan membaca angka forecast (⛔ wajib sebelum memakai respons `/accounting/anggaran/mingguan`)
+
+| Angka | Artinya | Aturan |
+|---|---|---|
+| `minggu[].total_proyeksi`, `total`, akurasi, `/mingguan/kpi` | **Basis akurasi**: RAPB, ditambah isian **hanya** untuk komponen yang realisasinya sudah terukur | Satu objek selalu satu populasi. Jangan dicampur dengan `proyeksi_rencana` |
+| `minggu[].proyeksi_rencana`, `total_anggaran_bulan` | Proyeksi **lengkap** termasuk semua isian | Dipakai Atur proyeksi dan ringkasan bulan. ⛔ Bukan penyebut akurasi |
+| `komponen[].isian_masuk_basis` | Isian komponen ini sudah ikut basis akurasi | Bernilai false untuk Material/Pajak/Aset bila sumbernya belum terukur |
+| `realisasi_pajak` / `realisasi_material` / `realisasi_aset` | Keadaan sumber realisasi komponen | `tersedia: false` atau `disinkron_pada: null` berarti **belum terukur**, bukan Rp 0. Layar menampilkan `sebab` |
+| `uang_keluar_riil.keluar` | Pembanding dari sisi rekening bank | ⛔ Tidak masuk total, akurasi, maupun KPI, dan **jangan dijumlahkan** dengan realisasi komponen. `null` berarti salinan belum ada |
+| Realisasi Material | **Pembelian**, bukan mutasi bersih persediaan | Mutasi bersih = pembelian − pemakaian − penyesuaian, dan bisa negatif. Contoh 1601 September 2026: mutasi bersih −Rp 65,6 jt, pembelian Rp 82,9 jt |
+| `aset_tahunan.sisa` | Anggaran tahun − Σ realisasi aset 1 Jan s.d. akhir bulan laporan | `null` bila anggaran belum diisi atau aset belum disinkron. Boleh negatif. `BiayaPerolehan` adalah nilai current (sesudah pelepasan), bukan harga beli awal |
+| Beban pajak 72xx (7201–7212) | **Tidak masuk komponen mana pun** | Komponen Pajak hanya diisi setoran, yaitu delapan akun `akunPajakSetoran` milik finance: PPN, PPh 21/23/25/4(2)/Final UMKM/Badan, PBB. Akibatnya PKB (7206), BBNKB (7208), dan PPN Kurang Bayar (7212) belum terhitung sama sekali (§Belum Diputuskan) |
 
 Tambahan di luar halaman ini: kotak **sisa pos** di bawah tiap baris form pencatatan Accounting, dan kartu **Anggaran** baca-saja di tahap Cost Control pada detail pengajuan (pos yang sudah lewat anggaran bulan ini, maksimal 5, sisanya diringkas, plus tautan ke tab Serapan). Kartu itu tidak memperkirakan pos pengajuan, karena pos baru ditetapkan Accounting.
 
@@ -159,12 +206,25 @@ Dilacak di bip-erp#2814 (Pemutus: wirkancil):
   Deploy prod untuk semuanya TBD.
 - **Verifikasi**: belum ada layar yang dilihat di browser dan belum ada endpoint yang dicoba lewat gateway.
 
+Untuk cashflow tujuh komponen (ADR 0184), per 2026-10-19:
+
+- **Sumber realisasi berbasis kas (A1, tahap 2).** Finance menjawab bahwa sumbernya **laporan arus kas** dan sedang merekap detailnya. Pemetaan baris arus kas ke komponen masih menunggu contoh September dari Finance.
+- **Usulan keputusan yang belum disetujui Pemutus.** Semuanya bisa diputuskan dari data prod tanpa bertanya ke Finance:
+  - keluarkan 7303/7304 (laba/rugi aset) dari ops adum dan 5313 (selisih persediaan) dari BOP, karena bukan uang keluar;
+  - masukkan 7206 PKB dan 7208 BBNKB ke komponen Pajak, karena dibayar langsung dan tidak lewat setoran;
+  - 7212 PPN Kurang Bayar tidak dimasukkan, karena dibayar lewat setoran PPN sehingga akan terhitung ganda;
+  - 1606 Perlengkapan tidak dihitung saat dibeli, karena bebannya masuk komponen ops saat dipakai.
+- **Populasi PT Bharata saja.** Ini asumsi, dengan alasan proyeksinya RAPB milik PT. Belum dikonfirmasi Finance.
+- **Skor KPI #4/F4 Juli–September.** Keputusan HRD untuk menghitung ulang belum ada.
+- **Nama jenis "Retur Pembelian".** Belum pernah terlihat di data prod. Perlu diukur saat retur pertama terjadi.
+
 Untuk proyeksi mingguan yang diatur (ADR 0161, Diterima 2026-10-09): yang tersisa hanya asal nama pengubah di riwayat (diserahkan ke pelaksana). Sudah diputuskan di ADR-nya: unggah ulang RAPB menerapkan porsi ke anggaran baru untuk semua minggu, bulan mendatang boleh diatur, dan tidak ada tombol kembalikan ke bawaan.
 
 ## Dokumen Terkait
 
 - [[ADR - 0159 Serapan Anggaran Dibaca dari Pengajuan sebagai Bagian dari Terpakai, Rute Tulis Anggaran Digerbang Izin Sendiri]]
 - [[ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB]]
+- [[ADR - 0184 Forecast Kas Mingguan Mencakup Tujuh Komponen Uang Keluar, Dibagi Empat Minggu, Realisasi Bertahap]] · [[ADR - 0163 Salinan Saldo dan Arus Kas-Bank per Rekening Dimiliki Finance Service, Ditarik lewat Integration Service]] · [[API - Finance Service]]
 - [[ADR - 0178 Serapan Anggaran per Departemen Jurnal, Seluruh Perusahaan Dihapus, Pagu Gabungan per Departemen]] (🟢 Diterima)
 - [[Finance - Rancangan Finance Service]] · [[Finance - Proses Pengajuan Pengeluaran dan Persetujuan]] · [[Finance - FAT Persona]]
 - [[API - Procurement Service]] · [[API - Integration Service]] · [[Microservices - Procurement Service]]

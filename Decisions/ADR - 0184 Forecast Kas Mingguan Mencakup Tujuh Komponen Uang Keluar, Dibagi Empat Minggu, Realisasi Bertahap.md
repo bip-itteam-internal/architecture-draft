@@ -1,6 +1,6 @@
 # ADR - 0184 Forecast Kas Mingguan Mencakup Tujuh Komponen Uang Keluar, Dibagi Empat Minggu, Realisasi Bertahap
 
-> **Status**: 🟢 Diterima, 2026-10-16, oleh Azzerith (Opsi 3 beserta asumsinya disetujui di sesi `/analisa-kebutuhan`). Kode belum ada. Asumsi A1–A7 di §Context menunggu konfirmasi Finance/HRD; jawabannya bisa mengubah sumber realisasi (tahap 2) tanpa mengubah keputusan lain. Mengamandemen [[ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB]] K1, K3, dan K5.
+> **Status**: 🟢 Diterima, 2026-10-16, oleh Azzerith (Opsi 3 beserta asumsinya disetujui di sesi `/analisa-kebutuhan`). **Tahap 1 merged ke `main` 2026-10-19, deploy prod TBD.** BE: bip-erp #3234, #3275 (pemulihan C2–C3c), #3276. FE: erp-frontend #2570, #2583, #2584. Rincian perilaku dan aturan membaca angka ada di [[Finance - Serapan Anggaran dan Cost Control]] §Cashflow Tujuh Komponen. Tahap 2 (A1) menunggu rekap laporan arus kas dari Finance. Asumsi A1–A7 di §Context menunggu konfirmasi Finance/HRD; jawabannya bisa mengubah sumber realisasi (tahap 2) tanpa mengubah keputusan lain. Mengamandemen [[ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB]] K1, K3, dan K5.
 
 ## Untuk Manajemen
 
@@ -32,7 +32,7 @@ Untuk tiap komponen ditampilkan proyeksi dan realisasinya per minggu.
 
 *Forecast kas mingguan mengukur seluruh uang keluar bulanan dalam tujuh komponen: material, BOP, marketing, gaji, ops adum, pajak, dan aset. Cakupannya tidak lagi enam akun yang direproduksi dari berkas cashflow Juli. Jumlah sebulan = Σ proyeksi komponen, tidak lagi = RAPB. Sebulan dibagi empat minggu. Sumber realisasi per komponen diisolasi supaya bisa diganti dari akrual ke kas tanpa mengubah layar maupun KPI. KPI Cost Control #4 ikut definisi baru.*
 
-- **Status**: 🟢 Diterima 2026-10-16 (Azzerith), kode belum ada
+- **Status**: 🟢 Diterima 2026-10-16 (Azzerith). Kode tahap 1 merged ke `main` 2026-10-19, deploy prod TBD
 - **Path di repo** (rencana):
   - `bip-erp/services/integration/internal/usecase/kas_keluar_daftar.go` (diganti oleh pemetaan komponen)
   - `bip-erp/services/integration/internal/usecase/komponen_kas.go` (baru)
