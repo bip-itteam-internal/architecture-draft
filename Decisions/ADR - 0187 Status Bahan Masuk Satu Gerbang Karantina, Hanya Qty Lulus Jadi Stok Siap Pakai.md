@@ -24,12 +24,14 @@ Jawab di issue K-4 atau langsung di dok ini. Rekomendasi disertakan; Pemutus bol
 
 | # | Pertanyaan | Pilihan | Rekomendasi |
 |---|---|---|---|
-| 1 | Status apa saja yang dipakai? Kuesioner menyebut label kuning **Karantina**, lalu **Lulus / Reject / Ditolak**. Apa beda **Reject** dan **Ditolak**? | (a) Reject = sebagian kiriman tidak memenuhi syarat, Ditolak = seluruh kiriman; (b) Reject = keputusan QC, Ditolak = keputusan akhir sesudah dikonfirmasi SPV Quality; (c) keduanya sama, cukup satu | Perlu jawaban Pemutus. Sistem akan memakai persis istilah yang disepakati |
-| 2 | Boleh satu kiriman dipecah (sebagian Lulus, sebagian Ditolak)? | ya / tidak | **Ya**. Procurement sudah mencatat qty lulus, reject, dan karantina per baris |
-| 3 | Siapa yang menetapkan hasil, siapa yang mengonfirmasi penolakan? | QC menetapkan semua / QC menetapkan, SPV Quality mengonfirmasi Ditolak / lainnya | **QC menetapkan, SPV Quality mengonfirmasi Ditolak**, sesuai jawaban kuesioner (label merah dengan konfirmasi SPV Quality) |
-| 4 | Bahan karantina boleh dipakai produksi dalam keadaan mendesak? | tidak pernah / boleh dengan persetujuan tertulis (siapa?) | **Tidak pernah** di sistem. Bila ada pengecualian, ia dicatat sebagai keputusan QC, bukan dilewati |
-| 5 | Pencatatan barang masuk manual (tanpa pengajuan, mis. sampel atau kiriman lama) | wajib lewat karantina juga / boleh langsung masuk stok | **Wajib lewat karantina.** Hari ini jalur manual langsung menambah stok siap pakai |
-| 6 | Hasil QC ditempel per **lot** (no. lot pemasok + ED) atau per penerimaan saja? | per lot / per penerimaan | **Per lot**, karena FIFO/FEFO dan penelusuran batch bergantung padanya |
+| 1 | SOP QC hanya mengenal label **LULUS** dan **DITOLAK**; kuesioner menyebut juga **Reject**. Apakah Reject sama dengan Ditolak? | (a) sama, cukup Lulus/Ditolak seperti SOP; (b) berbeda (sebutkan bedanya) | **(a)** bila tak ada beda nyata. Kode pengajuan barang sudah memperlakukan `qty_reject` sebagai barang ditolak yang diklaim ke pemasok |
+| 2 | ~~Boleh satu kiriman dipecah?~~ | - | **Sudah terjawab, tidak ditanyakan lagi**: kode QC penerimaan mencatat sebagian lulus, sebagian ditolak, sebagian karantina per baris; SOP bahan kemas meminta yang memenuhi dan tidak memenuhi spesifikasi dipisahkan |
+| 3 | Apakah penolakan perlu dikonfirmasi SPV Quality, atau cukup keputusan QC? | cukup QC / QC lalu dikonfirmasi SPV Quality | **Sebagian sudah di SOP**: SOP QC menetapkan QC yang menyetujui atau menolak. Konfirmasi SPV Quality hanya muncul dari kuesioner, jadi itu yang ditanyakan |
+| 4 | ~~Bahan karantina boleh dipakai saat mendesak?~~ | - | **Sudah terjawab, tidak ditanyakan lagi**: SOP PPIC hanya mengizinkan bahan berstatus release dari QC dipindah ke penyimpanan. Sistem mengikuti: tidak pernah |
+| 5 | Pencatatan barang masuk manual (tanpa pengajuan, mis. sampel atau kiriman lama) | wajib lewat karantina juga / boleh langsung masuk stok | **Wajib lewat karantina.** Tidak ada aturan tertulis; hari ini jalur manual langsung menambah stok siap pakai |
+| 6 | Hasil QC ditempel per **lot** (no. lot pemasok + ED) atau per kedatangan saja? | per lot / per kedatangan | **Per lot**. Kode mencatat per kedatangan dan per baris (dengan beberapa batch per baris); SOP tidak menetapkan |
+
+*Dicocokkan ke vault (SOP QC, SOP PPIC, kajian), kode, dan data prod 2026-10-19 sebelum dikirim, supaya Pemutus tak ditanya hal yang sudah tertulis.*
 
 ## Deskripsi
 
