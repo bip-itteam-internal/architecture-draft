@@ -37,7 +37,7 @@ Jawab di issue K-4 atau langsung di dok ini. Rekomendasi disertakan; Pemutus bol
 
 | # | Jawaban | Arti untuk keputusan |
 |---|---|---|
-| 1 | "Reject + Ditolak" | Dibaca sebagai **satu status**: Reject = Ditolak, sehingga sistem memakai **Lulus / Ditolak** seperti SOP QC. Kalimatnya bisa dibaca dua arah, jadi **perlu konfirmasi singkat** sebelum dikunci |
+| 1 | "Reject + Ditolak", lalu dikonfirmasi "betul, = maksudnya" | **Satu status**: Reject = Ditolak. Sistem memakai dua hasil QC, **Lulus** dan **Ditolak**, seperti SOP QC (terkonfirmasi 2026-10-19) |
 | 3 | "Penolakan cukup diputuskan QC" | Tidak ada konfirmasi SPV Quality; QC menetapkan Lulus atau Ditolak |
 | 6 | "Hasil QC dicatat per batch" | Hasil QC ditempel per batch/lot pemasok (Decision 2-3), bukan per kedatangan |
 
