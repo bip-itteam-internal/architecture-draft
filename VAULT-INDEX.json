@@ -10242,8 +10242,8 @@
         "ANALISA - Fondasi Manufaktur",
         "Manufacture - Kajian Fondasi Sistem"
       ],
-      "hash": "4c6a970f8037b6d2ad42d54feee66b6981794822d0f883cf58c15f38ba775b65",
-      "ukuran_kb": 9.1,
+      "hash": "b8e75dc86b8185732b25c3626e813f4e4b7ee6279e71bec2f5c31c0dc4be785d",
+      "ukuran_kb": 9.6,
       "ringkasan": "Menjawab: status apa yang dipakai untuk bahan baku dan kemas yang baru datang (Lulus/Ditolak, arti Reject), apakah penolakan dikonfirmasi SPV Quality, apakah barang masuk di luar pengajuan wajib karantina, dan apakah hasil QC dicatat per lot. Memetakan empat tempat penyimpan status QC yang tak tersambung dan ketiadaan gerbang pemakaian (keputusan K-4).",
       "kata_kunci": [
         "bahan masuk",
@@ -20998,8 +20998,8 @@
         "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "51434eb9ad162104de2b499b2519d480cce14da3b8524ef5d8a7109cfdf9fbf0",
-      "ukuran_kb": 9.1,
+      "hash": "6699188bf876df4edae1aaae077a174cbcb66ae27d035cfc64bc131492426263",
+      "ukuran_kb": 9.2,
       "ringkasan": "Menjawab: apa saja butir kerja penataan fondasi Manufaktur (M-01 sampai M-42) per fase, keputusan mana yang ditunggu (K-1 sampai K-11) dan siapa Pemutusnya, butir mana yang siap dikerjakan, serta aturan urutan kerja dan pencatatan kode M di setiap PR.",
       "kata_kunci": [
         "fondasi manufaktur",
