@@ -16,10 +16,10 @@
 
 | Kode | Keputusan | Pemutus | Preseden / dok |
 |---|---|---|---|
-| K-1 | Pemilik angka stok pabrik (ERP lalu dikirim ke Accurate, atau Accurate) dan urutan validasi opname | Finance Supervisor | [[ADR - 0175 Stok GA di ERP Jadi Stok Operasional, Barang Keluar dan Penyesuaian Dikirim ke Accurate]] untuk GA |
+| K-1 | Pemilik angka stok pabrik (ERP lalu dikirim ke Accurate, atau Accurate) dan urutan validasi opname | Finance Supervisor | Lembar keputusan: [[ADR - 0186 Stok Pabrik di ERP Jadi Stok Operasional, Accurate Menerima Penyesuaian Persediaan]] (Diusulkan, 5 pertanyaan); preseden GA [[ADR - 0175 Stok GA di ERP Jadi Stok Operasional, Barang Keluar dan Penyesuaian Dikirim ke Accurate]] |
 | K-2 | Zona WIP: kapan stok bahan berkurang, kapan pemakaian final dihitung | SPV Manufacture + Supervisor Quality | kajian, Temuan 3 |
 | K-3 | Satu keputusan rilis oleh Penanggung Jawab Teknis; pilihan nasib barang yang ditolak | Supervisor Quality + PJT | kajian, Temuan 6-7 |
-| K-4 | Status bahan masuk (Karantina, Lulus, Reject, Ditolak) | Leader Warehouse + Supervisor Quality | kajian, Temuan 3 |
+| K-4 | Status bahan masuk (Karantina, Lulus, Reject, Ditolak) | Leader Warehouse + Supervisor Quality | Lembar keputusan: [[ADR - 0187 Status Bahan Masuk Satu Gerbang Karantina, Hanya Qty Lulus Jadi Stok Siap Pakai]] (Diusulkan, 6 pertanyaan); kajian, Temuan 3 |
 | K-5 | Format cetak yang diterima BPOM (kartu stok, Batch Record) | Supervisor Quality | kajian |
 | K-6 | Pemilik perhitungan HPP per batch | Finance Supervisor | kajian |
 | K-7 | Pemilik master barang dan gudang | TBD (IT + manajemen) | [[ADR - 0136 Pemilik Master Barang dan Master Gudang]] |
