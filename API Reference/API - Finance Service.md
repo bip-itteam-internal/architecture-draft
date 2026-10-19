@@ -37,6 +37,15 @@ Tiga keputusan yang layak dibaca sebelum menambah rute mesin berikutnya:
 - **Muatannya SEMPIT**, mengikuti preseden `/internal/badan-usaha`: nama resmi, singkatan, dan rujukan badan usaha payroll tidak ikut. Kunci layanan yang bocor tak boleh sekaligus membocorkan master.
 - **Gagal-tertutup di kedua pembacaan**, dan galat aslinya hanya masuk log. Daftar kosong di sisi procurement berarti "tak seorang pun ditugaskan", sehingga galat database akan menolak seluruh transfer CV dengan alasan yang salah. CV yang belum punya pemegang tetap dikirim dengan `pemegang: []`, supaya pemanggil dapat membedakannya dari CV yang tidak ada.
 
+### Rute mesin forecast kas (ADR 0184 C3b, merged ke `main` 2026-10-19, deploy prod TBD)
+
+Pemakainya integration-service untuk realisasi komponen Pajak dan pembanding uang keluar riil di forecast kas mingguan ([[Finance - Serapan Anggaran dan Cost Control]] §Cashflow Tujuh Komponen). Gerbangnya sama dengan rute penugasan CV di atas: `gerbangKunciLayananFinance`, yaitu `?key=FINANCE_SERVICE_KEY` ditambah `company_id` wajib. Responsnya 503 bila env kosong, 401 bila kunci salah, dan 400 bila parameter tidak sah. Header `BIP-Gateway-ID` tetap wajib. Rutenya literal tanpa saudara ber-`:param`. Kode di `services/finance/forecast_kas_internal.go`.
+
+| Method | Endpoint | Keterangan |
+|---|---|---|
+| GET | `/internal/forecast-kas/pajak?company_id=&dari=YYYY-MM-DD&sampai=YYYY-MM-DD&key=` | `{disegarkan_pada, setoran:[{tanggal, jenis_kode, entitas_kode, nominal}]}`. `setoran` selalu array dan nominalnya dalam rupiah. Datanya diambil dari gudang setoran yang **sama** dengan layar Tax Control (`pajak_setoran_accurate`); rute ini tidak memicu penyegaran Accurate. Yang dikirim **hanya entitas PT Bharata** (`SaringSetoranForecast`, satu tempat); CV dan PT lain tidak ikut, dan ini masih asumsi yang menunggu konfirmasi Finance. Rentang maksimal 366 hari. `disegarkan_pada: null` berarti ada tahun yang belum pernah disegarkan |
+| GET | `/internal/forecast-kas/arus-keluar?company_id=&bulan=YYYY-MM&key=` | `{bulan, disalin_pada, keluar_sen}`. `keluar_sen` adalah baris PT Bharata dari `layananArus.Baca`, perakit dan `PemilikDariFakta` yang sama dengan layar arus kas-bank (ADR 0163), bukan aturan kedua. Nilainya `null` bila bulan belum disalin atau arusnya belum lengkap. Gagal membaca salinan dibalas 500, bukan 200 berisi `null` |
+
 ### Penjaga rute `/internal/` — bentuknya TIDAK seperti feed kalender
 
 Prefix `/internal/` **bukan** batas keamanan: gateway tetap meneruskannya dari internet ([[ADR - 0031 Prefix internal Bukan Batas Keamanan]]). Tetapi penjaganya di sini **tidak bisa** sekadar "wajib ada identitas" seperti feed kalender, karena pemanggil sahnya justru sumber KPI di employee-service yang memakai `routes.InternalRequest(nil, …)` — panggilan itu hanya membawa kunci gateway, **tanpa header identitas sama sekali**. Menuntut identitas akan memblokir pemanggil yang benar sambil tetap meloloskan orang lewat gateway.
