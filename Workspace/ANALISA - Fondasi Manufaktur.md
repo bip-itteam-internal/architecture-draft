@@ -10,15 +10,16 @@
 4. **Data master** (barang, produk, gudang) tidak dibuat di tempat baru sampai [[ADR - 0136 Pemilik Master Barang dan Master Gudang]] diputuskan.
 5. **Cek kerja paralel**: `/papan-sesi` dan assignee issue sebelum mulai.
 6. Status bergerak (open, merged, deployed) diukur ulang dari GitHub, bukan disalin dari tabel ini. Kolom Status di sini hanya: Siap / Menunggu keputusan / Berjalan / Selesai.
+7. **Urutan kerja** (disepakati 2026-10-19, sesudah audit UI sempat berjalan di luar papan): tuntaskan Fase 1 dulu; dorong keputusan K yang membuka butir terbanyak (mulai K-1 dan K-4) lewat lembar keputusan untuk Pemutusnya; selama menunggu, ambil butir **Siap** teratas. Pekerjaan yang belum punya butir didaftarkan dulu di sini sebelum dikerjakan.
 
 # Keputusan yang ditunggu
 
 | Kode | Keputusan | Pemutus | Preseden / dok |
 |---|---|---|---|
-| K-1 | Pemilik angka stok pabrik (ERP lalu dikirim ke Accurate, atau Accurate) dan urutan validasi opname | Finance Supervisor | [[ADR - 0175 Stok GA di ERP Jadi Stok Operasional, Barang Keluar dan Penyesuaian Dikirim ke Accurate]] untuk GA |
+| K-1 | Pemilik angka stok pabrik (ERP lalu dikirim ke Accurate, atau Accurate) dan urutan validasi opname | Finance Supervisor | Lembar keputusan: [[ADR - 0186 Stok Pabrik di ERP Jadi Stok Operasional, Accurate Menerima Penyesuaian Persediaan]] (Diusulkan, 5 pertanyaan); preseden GA [[ADR - 0175 Stok GA di ERP Jadi Stok Operasional, Barang Keluar dan Penyesuaian Dikirim ke Accurate]] |
 | K-2 | Zona WIP: kapan stok bahan berkurang, kapan pemakaian final dihitung | SPV Manufacture + Supervisor Quality | kajian, Temuan 3 |
 | K-3 | Satu keputusan rilis oleh Penanggung Jawab Teknis; pilihan nasib barang yang ditolak | Supervisor Quality + PJT | kajian, Temuan 6-7 |
-| K-4 | Status bahan masuk (Karantina, Lulus, Reject, Ditolak) | Leader Warehouse + Supervisor Quality | kajian, Temuan 3 |
+| K-4 | Status bahan masuk (Karantina, Lulus, Reject, Ditolak) | Leader Warehouse + Supervisor Quality | Lembar keputusan: [[ADR - 0187 Status Bahan Masuk Satu Gerbang Karantina, Hanya Qty Lulus Jadi Stok Siap Pakai]] (Diusulkan, 6 pertanyaan); kajian, Temuan 3 |
 | K-5 | Format cetak yang diterima BPOM (kartu stok, Batch Record) | Supervisor Quality | kajian |
 | K-6 | Pemilik perhitungan HPP per batch | Finance Supervisor | kajian |
 | K-7 | Pemilik master barang dan gudang | TBD (IT + manajemen) | [[ADR - 0136 Pemilik Master Barang dan Master Gudang]] |
@@ -55,6 +56,7 @@ Repo: **BE** = bip-erp, **FE** = erp-frontend. Status per 2026-10-13.
 | M-16 | Menu Manufaktur dan Quality ke model [[ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi]] + panduan per menu | - | - | Siap |
 | M-17 | Kartu stok per lot, cetak | FE #1867 | K-5 | Menunggu keputusan |
 | M-18 | Mutasi antar gudang terkait status FG | FE #1869 | - | Siap |
+| M-19 | Kepatuhan UI halaman Manufaktur ke `rules/ui-checklist.md` (audit 2026-10-15): komponen bersama, i18n, konfirmasi aksi berbahaya. **Hanya halaman yang tak akan dirombak butir fondasi**; Gudang RM/FG, Material Order, Dokumen Produksi Batch, dan Saldo/opname menunggu M-10 sampai M-13, Master Barang menunggu K-7 (kajian TBD 13) | sub-issue FE di bawah BE #3068 (judul "Manufaktur Batch ...") | - | Berjalan. Sisa halaman daftar: Substitusi, Piutang Konsinyasi, Master Lokasi, Reports. Pecah berkas besar (GBJ, GBB, MO) ditunda sampai butir fondasinya diputuskan |
 
 ## Fase 3: fitur baru
 

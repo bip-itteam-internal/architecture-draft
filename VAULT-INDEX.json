@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-10-18",
-  "jumlah_dokumen": 651,
+  "digenerate": "2026-10-19",
+  "jumlah_dokumen": 653,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -10193,6 +10193,65 @@
         "form_ai_summaries",
         "prompt",
         "ADR 0185"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0186 Stok Pabrik di ERP Jadi Stok Operasional, Accurate Menerima Penyesuaian Persediaan.md",
+      "judul": "ADR - 0186 Stok Pabrik di ERP Jadi Stok Operasional, Accurate Menerima Penyesuaian Persediaan",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-10-19. Menunggu keputusan **Finance Supervisor** (keputusan K-1 di [[ANALISA - Fondasi Manufaktur]]). **Belum ada kode baru**; yang ditulis di sini usulan beserta pertanyaan yang harus dijawab Pemutus.",
+      "publik": true,
+      "tautan": [
+        "ANALISA - Fondasi Manufaktur",
+        "ADR - 0175 Stok GA di ERP Jadi Stok Operasional, Barang Keluar dan Penyesuaian Dikirim ke Accurate",
+        "ADR - 0136 Pemilik Master Barang dan Master Gudang",
+        "ADR - 0015 Push Pergerakan WMS ke Accurate",
+        "Manufacture - Kajian Fondasi Sistem"
+      ],
+      "hash": "bd6554af57a7f229649774b2c212f3c7ccbf3ffd16c49e5ef6fa0808b472addd",
+      "ukuran_kb": 9.7,
+      "ringkasan": "Menjawab: siapa pemegang angka stok bahan baku dan barang jadi pabrik (ERP atau Accurate), kenapa tarik stok Accurate tiap 6 jam yang menimpa angka ERP bermasalah, bagaimana Penyesuaian Persediaan dikirim ke Accurate, dan urutan validasi stock opname oleh Finance. Memuat lima pertanyaan untuk Finance Supervisor (keputusan K-1) dan temuan push kedua di hari sama yang menghapus baris terkirim.",
+      "kata_kunci": [
+        "stok pabrik",
+        "pemilik stok",
+        "stock ownership",
+        "Accurate",
+        "Penyesuaian Persediaan",
+        "stock opname",
+        "sync stok",
+        "ACCURATE_WMS_PUSH",
+        "K-1",
+        "WMS manufaktur"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0187 Status Bahan Masuk Satu Gerbang Karantina, Hanya Qty Lulus Jadi Stok Siap Pakai.md",
+      "judul": "ADR - 0187 Status Bahan Masuk Satu Gerbang Karantina, Hanya Qty Lulus Jadi Stok Siap Pakai",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-10-19. Menunggu keputusan **Leader Warehouse + Supervisor Quality** (keputusan K-4 di [[ANALISA - Fondasi Manufaktur]]). **Belum ada kode baru**; yang ditulis di sini usulan beserta pertanyaan yang harus dijawab Pemutus.",
+      "publik": true,
+      "tautan": [
+        "ANALISA - Fondasi Manufaktur",
+        "Manufacture - Kajian Fondasi Sistem"
+      ],
+      "hash": "4fb82d61b2de4da7aaa709327e9415c2f525246e95c49ecf69071fa3b38338e0",
+      "ukuran_kb": 8.8,
+      "ringkasan": "Menjawab: status apa yang dipakai untuk bahan baku dan kemas yang baru datang (Karantina, Lulus, Reject, Ditolak), siapa yang menetapkan dan mengonfirmasi, dan kapan bahan boleh keluar ke produksi. Memetakan empat tempat penyimpan status QC yang tak tersambung dan ketiadaan gerbang pemakaian; memuat enam pertanyaan untuk Leader Warehouse dan Supervisor Quality (keputusan K-4).",
+      "kata_kunci": [
+        "bahan masuk",
+        "incoming QC",
+        "karantina",
+        "quarantine",
+        "lot bahan",
+        "QC bahan baku",
+        "Lulus",
+        "Ditolak",
+        "K-4",
+        "gerbang QC"
       ]
     },
     {
@@ -20920,26 +20979,28 @@
         "Manufacture - Kajian Fondasi Sistem",
         "REF - Rantai Pengajuan Lintas Modul",
         "ADR - 0136 Pemilik Master Barang dan Master Gudang",
+        "ADR - 0186 Stok Pabrik di ERP Jadi Stok Operasional, Accurate Menerima Penyesuaian Persediaan",
         "ADR - 0175 Stok GA di ERP Jadi Stok Operasional, Barang Keluar dan Penyesuaian Dikirim ke Accurate",
+        "ADR - 0187 Status Bahan Masuk Satu Gerbang Karantina, Hanya Qty Lulus Jadi Stok Siap Pakai",
         "Microservices - Manufacture Service",
         "API - Manufacture Service",
         "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "93b21b5070466382fe373765e31de09eb82193d4ccc6c942557095346317203d",
-      "ukuran_kb": 7.8,
-      "ringkasan": "Menjawab: butir kerja apa saja (kode M-nn) dalam penataan fondasi Manufaktur per fase, issue GitHub mana yang terkait, dan butir mana yang siap dikerjakan atau masih menunggu keputusan. Juga menjawab keputusan apa yang ditunggu (K-1 sampai K-11, mis. pemilik angka stok, zona WIP, keputusan rilis, status bahan masuk, format BPOM, COA) beserta pemutusnya, aturan pakai papan, dan apa yang sengaja di luar cakupan.",
+      "hash": "1f2b8dc9d9c69e3abde285ef5a1dee6662fd0f80495c1c5ffd0e339e99bcc3bf",
+      "ukuran_kb": 8.9,
+      "ringkasan": "Menjawab: apa saja butir kerja penataan fondasi Manufaktur (M-01 sampai M-42) per fase, keputusan mana yang ditunggu (K-1 sampai K-11) dan siapa Pemutusnya, butir mana yang siap dikerjakan, serta aturan urutan kerja dan pencatatan kode M di setiap PR.",
       "kata_kunci": [
         "fondasi manufaktur",
         "papan kerja",
         "backlog manufaktur",
-        "keputusan tertunda",
-        "M-03",
-        "issue induk bip-erp#3068",
-        "batch record",
-        "pemilik stok",
-        "COA",
-        "PPIC"
+        "keputusan K",
+        "butir M",
+        "PPIC",
+        "gudang",
+        "QC",
+        "Batch Record",
+        "urutan kerja"
       ]
     },
     {
