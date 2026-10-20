@@ -23,7 +23,7 @@ Yang membuat inventaris ini sulit disusun, dan mudah salah:
 
 | Alur | Service | Penyetuju |
 |---|---|---|
-| Cuti / izin / sakit | attendance | atasan langsung; **dialihkan ke Direktur** bila pemohonnya supervisor sendiri |
+| Cuti / izin / sakit | attendance | atasan langsung; **dialihkan ke Direktur** bila pemohonnya supervisor sendiri. 🟡 Diusulkan: ke **Manager departemen** bila ditetapkan, Direktur hanya cadangan ([[ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya]]) |
 | Perjalanan dinas | attendance | idem |
 | Koreksi presensi | attendance | atasan langsung (tanpa pengalihan) |
 | Tukar jadwal | attendance | atasan langsung |

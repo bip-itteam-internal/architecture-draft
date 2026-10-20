@@ -95,6 +95,20 @@ Ini juga menjelaskan kalimat "data eksplisit selalu menang atas tebakan judul ja
 | Cakupan | Per orang, banyak bawahan | Per departemen, satu penyetuju |
 | Label grup | Dimekarkan (HRGA jadi satu tim) | **Tidak** dimekarkan |
 
+### 🟡 Manager departemen (Diusulkan 2026-10-20, kode belum ada)
+
+Konsep keempat di sekitar departemen, diputuskan di [[ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya]]. Seorang Manager ditetapkan HR per departemen (satu Manager per departemen, satu Manager boleh banyak departemen) dan tidak wajib anggotanya. Ia **menyetujui cuti/izin/sakit dan dinas milik penyetuju departemen** itu, menggantikan slot "Direktur", dan **melihat KPI seluruh karyawan aktif** departemen yang dinaunginya. Ia tidak menyetujui pengajuan staf.
+
+| | Penyetuju Pengajuan | Induk `supervised_by` | Atasan Langsung | **Manager departemen** |
+|---|---|---|---|---|
+| Wewenang | Menyetujui pengajuan staf | Mengambil alih penyetuju bila departemen tak punya sendiri | Tidak ada (tampilan) | Menyetujui pengajuan **milik penyetuju** |
+| Anggota departemen? | Wajib | Departemen lain | Bebas | Bebas |
+| Melebur grup? | Tidak | **Ya** (HRGA) | Tidak | Tidak |
+| Masuk cakupan supervisi token? | Ya | Ya | Tidak | **Tidak** |
+| KPI | Departemennya | Grupnya | Bawahan langsung | Seluruh departemen yang dinaungi |
+
+⚠️ Jangan memakai `supervised_by` untuk Manager: ia melebur delapan departemen jadi satu blok KPI dan diam-diam memberi jangkauan supervisor di 11 gerbang lintas 6 service (alasannya di ADR). Manager sendiri ditempatkan HR di Kesekretariatan sehingga pengajuannya mengalir ke Direktur sebagai orang. Jenjang `manager` (rank 45) ditambahkan sebagai penanda saja.
+
 Halaman Atasan Langsung berkali-kali disangka juga menetapkan penyetuju, jadi kini ia memuat keterangan **read-only** yang menunjuk ke tab penyetuju. Sengaja hanya memberi tahu, tidak menulis: menyatukan kedua kendali di satu layar akan melebur dua konsep yang tabel di §Cakupan supervisi sengaja pisahkan.
 
 ### Menemukan layar yang benar (erp-frontend PR [#1000](https://github.com/bip-itteam-internal/erp-frontend/pull/1000))

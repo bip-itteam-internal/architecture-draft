@@ -87,6 +87,8 @@ Pengajuan yang tak diputus dalam 24 jam ditandai `Diabaikan` oleh `AttendanceSys
 
 ### ⛔ 1. Jalur Direktur mengabari penerima KOSONG — 15 dari 15 mati, nol pernah disetujui
 
+> 🟡 **Diusulkan 2026-10-20**: [[ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya]] mengisi slot ini dengan **orang** Manager departemen bila HR menetapkannya, sehingga jalur Direktur tinggal cadangan (SPV Marketing, atau departemen tanpa Manager). Diukur ulang prod 2026-10-20: 16 dokumen pernah masuk jalur Direktur (9 cuti, 7 dinas), 15 `Diabaikan`, 1 `Dibatalkan`, nol disetujui.
+
 Ketika seorang supervisor mengajukan cuti atau dinas **untuk dirinya sendiri**, slot SPV dialihkan ke Direktur. Sebab langsungnya ada di kode, bukan dugaan (`services/attendance/main.go:2425-2429`, dan identik di `business_trip.go:159-162` + `:230`):
 
 ```go

@@ -76,7 +76,7 @@ Karyawan buat pengajuan (nomor dokumen di-generate)
                           └── ya → Disetujui → status kehadiran rentang tanggal = Dinas
 ```
 
-- Bila pemohon adalah supervisor-nya sendiri → review SPV dialihkan ke **Direktur** (sama seperti leave).
+- Bila pemohon adalah supervisor-nya sendiri → review SPV dialihkan ke **Direktur** (sama seperti leave). 🟡 Diusulkan: dialihkan ke **Manager departemen** bila HR menetapkannya, Direktur tinggal cadangan ([[ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya]]).
 - **HRD tidak boleh menyetujui pengajuannya sendiri** (guard `employee_id != reviewer`; lebih ketat dari leave, mengikuti pola [[HRIS - Attendance Correction]]).
 
 ## Nomor Dokumen
