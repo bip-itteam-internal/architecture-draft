@@ -10288,20 +10288,23 @@
         "APP - MyBharata",
         "APP - Web ERP"
       ],
-      "hash": "1e09643675d7964c865e9bad055444485e709441c76f2d60981d23be20a96612",
-      "ukuran_kb": 18.5,
-      "ringkasan": "Menjawab: bagaimana penyetuju bisa melihat dan memutus semua antrean persetujuan lintas modul dari HP lewat kartu \"Perlu Tindakan\" dan halaman Persetujuan MyBharata tanpa diarahkan ke web. Menjelaskan perubahan agregator employee-service (field `jenis`, bentuk `langkah[]` seragam, endpoint detail), akses baca penyetuju di service sumber, penyeragaman tampilan di web, urutan deploy, serta amandemen yang menghapus Permintaan ERP sehingga cakupan menjadi 15 jenis.",
+      "hash": "654bcb2f341debe7ad5ffca4fb71d4e5ab37c725dcd78a198d9c7bd973fd4569",
+      "ukuran_kb": 19.8,
+      "ringkasan": "Menjawab: bagaimana MyBharata mendapat halaman Persetujuan terpusat (kartu Beranda \"Perlu Tindakan\", tab Menunggu/Riwayat) yang memuat semua antrean lintas modul dari agregator employee-service, dengan detail dan aksi di dalam aplikasi tanpa arahan ke web. Juga menjawab apa yang ditambahkan di agregator (field jenis, langkah[] seragam, endpoint detail), bagaimana akses baca penyetuju di service sumber, cakupan 15 jenis setelah modul Permintaan ERP dihapus, serta urutan kerja backend, MyBharata, lalu web. Menjelaskan juga apa yang tidak dijanjikan (tanpa penanda SLA, tanpa PIN tambahan untuk rincian payroll).",
       "kata_kunci": [
-        "ADR 0188",
         "persetujuan terpusat",
         "approval",
         "Perlu Tindakan",
-        "antrean persetujuan",
-        "agregator",
-        "langkah persetujuan",
+        "Perlu Review",
         "MyBharata",
-        "Permintaan ERP",
-        "Portal Persetujuan"
+        "agregator antrean",
+        "pengajuan antrean",
+        "langkah[] stepper",
+        "detail seragam",
+        "Permintaan Pembelian",
+        "payroll approval",
+        "portal persetujuan",
+        "ADR 0188"
       ]
     },
     {
