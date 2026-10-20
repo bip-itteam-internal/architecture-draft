@@ -10394,21 +10394,23 @@
         "HRIS - Otomasi Skor KPI",
         "REF - Kepemilikan Data"
       ],
-      "hash": "f2a09a0a5a1e3472c2cd816037c7b12417b9e973e89a84fe5164078758b52114",
-      "ukuran_kb": 13.5,
-      "ringkasan": "Menjawab: apa yang diukur KPI Cost Control baris 2 setelah diubah, akun mana saja yang masuk populasi (OPEX plus Non Ops), dan bagaimana persen perubahan YoY dihitung dengan baseline bulan yang sama tahun lalu dari Accurate. Juga menjelaskan kenapa realisasi_opex tidak bisa dipakai untuk sisi tahun lalu, risiko R1 sampai R4, dan apa yang tidak dijanjikan (skor lama tidak dihitung ulang, penyusutan dan pajak ikut terhitung).",
+      "hash": "d1e8075161c35ceefedee93c625dcf9b52f2a923dcca2482b75e3b1c082230a1",
+      "ukuran_kb": 14.2,
+      "ringkasan": "Menjawab: apa yang diukur KPI Cost Control baris 2 setelah diubah (total OPEX + Non Ops, bukan hanya dua akun Non Ops), bagaimana rumus YoY dihitung dengan baseline bulan yang sama tahun lalu dari Accurate, dan siapa yang terdampak. Juga menjawab bukti data prod (template, populasi 58 akun + 2 akun Non Ops, hasil ukur Accurate 2025), risiko seperti penyusutan/pajak ikut terhitung, serta rencana dua PR di integration-service dan employee-service.",
       "kata_kunci": [
         "KPI Cost Control",
         "penurunan biaya",
-        "YoY",
         "OPEX",
         "Non Ops",
+        "YoY",
         "baseline Accurate",
         "biaya_yoy",
         "perubahan_yoy_persen",
-        "ADR 0191",
         "admin_non_ops",
-        "year over year"
+        "integration-service",
+        "employee-service",
+        "ADR 0191",
+        "ADR 0180"
       ]
     },
     {
@@ -21792,7 +21794,7 @@
       "area": "Workspace",
       "jenis": "workspace",
       "status_emoji": null,
-      "status_teks": "[[ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu]] 🟢 Diterima 2026-10-20 (Azzerith). Issue dibuat di Backlog Project #15; belum `Siap Agent` karena data prod issue 1 belum ditempel.",
+      "status_teks": "[[ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu]] 🟢 Diterima 2026-10-20 (Azzerith). Issue dibuat di Backlog Project #15; data prod issue 1 sudah ditempel 2026-10-20 (R1 terjawab). Label `Siap Agent` dipasang manusia.",
       "publik": false,
       "tautan": [
         "ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu",
@@ -21801,22 +21803,23 @@
         "HRIS - Matriks KPI per Departemen",
         "REF - Kepemilikan Data"
       ],
-      "hash": "03eb280795f793a9df263d5cfbac165c2c6e76e42fee44997b767e08448ae119",
-      "ukuran_kb": 8.4,
-      "ringkasan": "Menjawab: apa kebutuhan, temuan, dan pembagian kerja untuk KPI penurunan biaya OPEX + Non Ops YoY, termasuk langkah manusia setelah ADR 0191 diterima. Memuat dua draf issue bip-erp (cuplikan biaya dan endpoint di integration-service, lalu sumber KPI biaya_yoy di employee-service) beserta kriteria yang harus benar dan data prod yang perlu diukur.",
+      "hash": "2d6fb2fd5703a0a1734d0491937a5e3289ae0e1777e318d246005f6794071e6b",
+      "ukuran_kb": 8.5,
+      "ringkasan": "Menjawab: apa kebutuhan sebenarnya di balik permintaan KPI Cost Control baris 2, pekerjaan apa yang harus dilakukan (dua issue bip-erp#3336 dan #3337 dengan urutan deploy), dan langkah manusia yang tersisa (template, label Siap Agent). Berisi draf issue lengkap dengan kriteria 'Yang harus benar', data prod pendukung, dan batas cakupan.",
       "kata_kunci": [
         "analisa kebutuhan",
         "KPI Cost Control",
         "penurunan biaya",
-        "YoY",
         "OPEX",
         "Non Ops",
+        "YoY",
+        "issue 3336",
+        "issue 3337",
         "biaya_yoy",
-        "integration-service",
-        "employee-service",
-        "issue bip-erp",
         "Siap Agent",
-        "papan kerja"
+        "Definition of Ready",
+        "template KPI",
+        "Project 15"
       ]
     },
     {
