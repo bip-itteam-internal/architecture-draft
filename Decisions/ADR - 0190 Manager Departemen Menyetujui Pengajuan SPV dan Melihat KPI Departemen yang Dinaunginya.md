@@ -14,7 +14,7 @@
 
 **Yang TIDAK dijanjikan.**
 - Koreksi absen dan tukar shift milik SPV **tidak** lewat Manager. Keduanya tetap langsung ke HR.
-- SPV di Beautyhacks, Kyura, dan Marketing Offline Distribution **tidak** dinaungi Manager. Pengajuan mereka tetap ke jalur Direktur yang ada, termasuk masalahnya; memperbaikinya keputusan terpisah.
+- SPV di Finance, Beautyhacks, Kyura, dan Marketing Offline Distribution **tidak** dinaungi Manager. Pengajuan mereka tetap ke jalur Direktur yang ada, termasuk masalahnya; memperbaikinya keputusan terpisah.
 - Manager **tidak** menggantikan SPV. Ia tidak menyetujui pengajuan staf dan tidak mendapat hak di modul lain (keuangan, pengadaan, rekrutmen, form).
 - Jabatan atau jenjang "Manager" saja **tidak** memberi wewenang apa pun. Wewenang lahir dari penetapan HR di kolom Manager.
 - Pengajuan yang sudah berjalan tidak berpindah. Yang berlaku hanya pengajuan baru sesudah kolomnya diisi.
@@ -31,14 +31,14 @@
 
 ## Context
 
-Manajemen membuka posisi Manager yang menaungi seluruh departemen kecuali Marketing (Beautyhacks, Kyura, Marketing Offline Distribution), mulai minggu 2026-10-26. Permintaan awalnya "Manager ikut menyetujui pengajuan dan melihat KPI seluruh staf di bawahnya". Wawancara mempersempitnya: Manager **hanya** menyetujui pengajuan milik para SPV. Staf tetap disetujui SPV.
+Manajemen membuka posisi Manager yang menaungi seluruh departemen kecuali Marketing (Beautyhacks, Kyura, Marketing Offline Distribution) dan **Finance**, mulai minggu 2026-10-26. Finance ditambahkan ke pengecualian oleh user 2026-10-20 sesudah deploy; kode tidak berubah karena cakupan ditentukan HR saat mengisi kolom Manager per departemen. Permintaan awalnya "Manager ikut menyetujui pengajuan dan melihat KPI seluruh staf di bawahnya". Wawancara mempersempitnya: Manager **hanya** menyetujui pengajuan milik para SPV. Staf tetap disetujui SPV.
 
 Yang ditemukan di kode (`bip-erp` `origin/main` `c2ea6368`) dan data prod (diukur baca-saja 2026-10-20):
 
 1. **Pengajuan SPV sekarang tidak punya penyetuju yang bekerja.** Bila pemohon adalah penyetuju departemennya sendiri, slot SPV dikosongkan lalu diberi nama "Direktur" (`services/attendance/main.go:2441-2446`, `services/attendance/business_trip.go:159-164`). Yang boleh memutus slot itu ditentukan nama jabatan pemanggil (`services/attendance/penyetuju_jabatan.go:50-68`, `common.SetaraDirektur`). Notifikasinya siaran ke seluruh Kesekretariatan (`services/attendance/notification.go:326-344`). Prod: `leave_request` 9 dokumen (8 `Diabaikan`, 1 `Dibatalkan`), `business_trip_request` 7 dokumen (7 `Diabaikan`), rentang 2026-06-13 s.d. 2026-10-16, **nol disetujui**. Rincian sebabnya di [[HRIS - Employee Request & Approval]] §Pengajuan yang MATI.
 2. **Bahan yang ada tidak cocok dipakai ulang tanpa efek samping.**
 	- **Penyetuju departemen** (`is_supervisor`) wajib anggota departemen itu dan satu per departemen (`services/employee/department_approver.go:76-91`). Manager lintas departemen tak bisa dipasang di sana.
-	- **`supervised_by`** satu tingkat dan melebur departemen jadi satu grup seperti HRGA ([[HRIS - Organization Structure]]). Memakainya membuat delapan departemen tampil sebagai satu blok KPI. Lebih berat lagi, cakupan supervisi di token login (`resolveSupervisedDepartments`, `services/employee/department_scope.go:96`) dibaca 11 gerbang di 6 service (form-builder, recruitment, procurement budget, task-management, assistant, KPI), sehingga Manager diam-diam mendapat jangkauan supervisor di semuanya.
+	- **`supervised_by`** satu tingkat dan melebur departemen jadi satu grup seperti HRGA ([[HRIS - Organization Structure]]). Memakainya membuat tujuh departemen tampil sebagai satu blok KPI. Lebih berat lagi, cakupan supervisi di token login (`resolveSupervisedDepartments`, `services/employee/department_scope.go:96`) dibaca 11 gerbang di 6 service (form-builder, recruitment, procurement budget, task-management, assistant, KPI), sehingga Manager diam-diam mendapat jangkauan supervisor di semuanya.
 	- **Atasan langsung** (`supervisor_id`) mengatur cakupan tampilan, bukan wewenang, dan satu tingkat (`services/employee/subordinate.go:81-103`). Prod: 95 dari 225 karyawan BIP terisi, 0 dari 11 penyetuju departemen.
 	- **Master Divisi** khusus pelaporan ([[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]], masih 🟡 Diusulkan).
 	- **Jenjang** bukan sumber hak ([[ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi]], dikunci `TestJenjangBukanSumbuHakAkses`). Jenjang Manager belum ada; celah rank 45 sudah disiapkan (`shared-library/models/employee/master_data.go:198-209`).
@@ -86,7 +86,7 @@ Manager ditempatkan di departemen **Kesekretariatan**, yang penyetujunya Direktu
 
 ## Consequences
 
-- ✅ Pengajuan SPV di delapan departemen mendapat penyetuju yang menerima notifikasi pribadi, menggantikan jalur yang terukur 0 dari 16.
+- ✅ Pengajuan SPV di tujuh departemen (Human Resource, General Affair, Tech Development, Manufaktur, Quality, Procurement, Percetakan) mendapat penyetuju yang menerima notifikasi pribadi, menggantikan jalur yang terukur 0 dari 16.
 - ✅ Tidak ada hak baru di modul selain KPI, dan tidak ada departemen yang dilebur.
 - ✅ MyBharata dan Portal Persetujuan tidak berubah.
 - ⚠️ Konsep keempat di sekitar departemen (penyetuju, induk `supervised_by`, atasan langsung, Manager). Dok [[HRIS - Organization Structure]] wajib memuat tabel pembedanya, karena tiga yang lama sudah berkali-kali tertukar.

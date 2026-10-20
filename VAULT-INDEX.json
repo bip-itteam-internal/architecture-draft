@@ -10361,20 +10361,20 @@
         "HRIS - Key Performance Index",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "5ba246b027b533d74390bd8b2775f7c3af1aeb51f35caa09956e09b82195ae21",
-      "ukuran_kb": 11.5,
-      "ringkasan": "Menjawab: siapa yang menyetujui cuti/izin/sakit dan perjalanan dinas milik SPV (penyetuju departemen), kenapa jalur Direktur selama ini tak pernah menyetujui apa pun, dan bagaimana Manager yang ditetapkan HR per departemen di master data menggantikannya. Juga menjawab cakupan KPI Manager atas seluruh karyawan departemen yang dinaunginya, kenapa penanda ini bukan supervised_by/is_supervisor/jenjang, dan apa yang sengaja tidak dicakup (koreksi absen, tukar shift, departemen Marketing).",
+      "hash": "3e465c7e013a7605a4841f4862926c3371e7f123336906caa39a505e1008046d",
+      "ukuran_kb": 11.8,
+      "ringkasan": "Menjawab: siapa yang menyetujui cuti, izin, sakit, dan perjalanan dinas milik SPV (penyetuju departemen), bagaimana HR menetapkan Manager per departemen di master data, dan kenapa penetapan itu bukan supervised_by, is_supervisor, atau jenjang. Juga menjawab cakupan KPI yang dilihat Manager, departemen mana yang dikecualikan (Finance, Beautyhacks, Kyura, Marketing Offline Distribution), serta apa yang tidak berubah (koreksi absen, tukar shift, staf biasa).",
       "kata_kunci": [
         "Manager departemen",
         "penyetuju SPV",
-        "approval",
-        "pengajuan cuti",
-        "perjalanan dinas",
-        "jalur Direktur",
-        "KPI Manager",
+        "approval cuti SPV",
+        "slot Direktur",
         "master_department",
+        "KPI departemen",
         "jenjang Manager",
-        "ADR 0190"
+        "leave request",
+        "perjalanan dinas",
+        "Portal Persetujuan"
       ]
     },
     {
@@ -13763,20 +13763,20 @@
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "01ec6536f412186c5edbd557ccbdd553bd1772278c60be718b4eb2427fab3377",
+      "hash": "692b73c43d85756f18859bf445659eeda08a85726325acda563ed3a266a2c3cc",
       "ukuran_kb": 60.1,
-      "ringkasan": "Menjawab: bagaimana departemen, jabatan (position_items), jenjang jabatan, dan hierarki atasan disimpan dan dikelola di master data, serta di mana bagan organisasi (org chart) dan Peta Struktur. Juga menjawab siapa penyetuju pengajuan per departemen (is_supervisor), bedanya dengan atasan langsung dan cakupan supervisi supervised_by (grup HRGA), urutan pencarian atasan, dan kenapa jenjang bukan sumber hak akses.",
+      "ringkasan": "Menjawab: bagaimana departemen, jabatan (position_items, position_key), dan jenjang jabatan dikelola di master_department dan master_job_level, serta kenapa jenjang bukan sumber hak akses. Juga menjawab cara kerja penyetuju pengajuan per departemen (is_supervisor), beda dengan atasan langsung (supervisor_id), cakupan supervisi antar-departemen (supervised_by, label grup HRGA), urutan pencarian atasan, dan rencana Manager departemen.",
       "kata_kunci": [
         "struktur organisasi",
         "organization structure",
         "org chart",
         "bagan organisasi",
-        "master_department",
+        "master departemen",
+        "jabatan",
         "jenjang jabatan",
         "job level",
-        "penyetuju departemen",
         "supervised_by",
-        "atasan langsung"
+        "penyetuju departemen"
       ]
     },
     {
@@ -21918,19 +21918,19 @@
         "HRIS - Organization Structure",
         "HRIS - Key Performance Index"
       ],
-      "hash": "d6785d4fe6836905170c567c61bb5c066139bed3a6590f993a38bb6b808e0705",
-      "ukuran_kb": 9.9,
-      "ringkasan": "Menjawab: pekerjaan apa yang perlu dilakukan untuk mewujudkan Manager departemen sebagai penyetuju pengajuan SPV dan pembaca KPI departemen, dipecah jadi issue induk serta sub-issue [BE] bip-erp dan [FE] erp-frontend beserta kriteria yang harus benar. Juga menjawab langkah HR tanpa kode yang bisa dilakukan sekarang, urutan deploy, data prod pendukung, dan kenapa MyBharata tidak perlu berubah.",
+      "hash": "8e55b18719a71cbfe6e2a04d53ddc26ca833f21afca875fc417535a7ade4faca",
+      "ukuran_kb": 10.0,
+      "ringkasan": "Menjawab: pekerjaan apa saja yang harus dilakukan agar Manager departemen bisa menyetujui pengajuan SPV dan melihat KPI departemennya, dipecah jadi issue induk, sub-issue [BE] bip-erp#3329, dan [FE] erp-frontend#2639 beserta kriteria 'yang harus benar'. Juga menjawab langkah HR tanpa kode, urutan deploy BE sebelum FE, kenapa MyBharata tidak berubah, dan data prod pendukung (16 pengajuan SPV ke slot Direktur, nol disetujui).",
       "kata_kunci": [
         "analisa kebutuhan",
         "Manager departemen",
-        "penyetuju SPV",
+        "pengajuan SPV",
         "sub-issue BE FE",
         "bip-erp#3328",
-        "erp-frontend#2639",
-        "KPI Manager",
-        "pengajuan SPV",
-        "draf issue"
+        "cakupan KPI Manager",
+        "penyetuju pengajuan",
+        "slot Direktur",
+        "approval"
       ]
     },
     {

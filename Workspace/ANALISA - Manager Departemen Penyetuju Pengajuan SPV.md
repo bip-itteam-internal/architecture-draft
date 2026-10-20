@@ -5,7 +5,7 @@
 
 ## Kebutuhan yang dijawab
 
-Manajemen membuka posisi Manager yang menaungi seluruh departemen kecuali Beautyhacks, Kyura, dan Marketing Offline Distribution. Manager menyetujui pengajuan **milik para SPV** dan melihat KPI seluruh karyawan departemen yang dinaunginya. Analisa menemukan pengajuan SPV hari ini tidak punya penyetuju yang bekerja: 16 dokumen di jalur "Direktur" sejak Juni, nol disetujui (prod 2026-10-20).
+Manajemen membuka posisi Manager yang menaungi seluruh departemen kecuali Finance, Beautyhacks, Kyura, dan Marketing Offline Distribution (Finance ditambahkan user 2026-10-20 sesudah deploy; tanpa perubahan kode). Manager menyetujui pengajuan **milik para SPV** dan melihat KPI seluruh karyawan departemen yang dinaunginya. Analisa menemukan pengajuan SPV hari ini tidak punya penyetuju yang bekerja: 16 dokumen di jalur "Direktur" sejak Juni, nol disetujui (prod 2026-10-20).
 
 ## Langkah tanpa kode (HR, bisa hari ini)
 
@@ -31,7 +31,7 @@ Manajemen membuka posisi Manager yang menaungi seluruh departemen kecuali Beauty
 
 ## Masalah
 
-Pengajuan cuti/izin/sakit dan dinas milik penyetuju departemen (SPV) dialihkan ke slot bernama "Direktur" tanpa orang (`services/attendance/main.go:2441-2446`, `services/attendance/business_trip.go:159-164`). Prod 2026-10-20: 16 dokumen sejak 2026-06-13, 15 `Diabaikan`, 1 `Dibatalkan`, nol disetujui. Manajemen membuka posisi Manager yang menaungi delapan departemen dan harus menyetujui pengajuan SPV-nya serta melihat KPI seluruh staf departemen itu.
+Pengajuan cuti/izin/sakit dan dinas milik penyetuju departemen (SPV) dialihkan ke slot bernama "Direktur" tanpa orang (`services/attendance/main.go:2441-2446`, `services/attendance/business_trip.go:159-164`). Prod 2026-10-20: 16 dokumen sejak 2026-06-13, 15 `Diabaikan`, 1 `Dibatalkan`, nol disetujui. Manajemen membuka posisi Manager yang menaungi tujuh departemen dan harus menyetujui pengajuan SPV-nya serta melihat KPI seluruh staf departemen itu.
 
 ## Keputusan
 

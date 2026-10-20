@@ -107,7 +107,7 @@ Konsep keempat di sekitar departemen, diputuskan di [[ADR - 0190 Manager Departe
 | Masuk cakupan supervisi token? | Ya | Ya | Tidak | **Tidak** |
 | KPI | Departemennya | Grupnya | Bawahan langsung | Seluruh departemen yang dinaungi |
 
-⚠️ Jangan memakai `supervised_by` untuk Manager: ia melebur delapan departemen jadi satu blok KPI dan diam-diam memberi jangkauan supervisor di 11 gerbang lintas 6 service (alasannya di ADR). Manager sendiri ditempatkan HR di Kesekretariatan sehingga pengajuannya mengalir ke Direktur sebagai orang. Jenjang `manager` (rank 45) ditambahkan sebagai penanda saja.
+⚠️ Jangan memakai `supervised_by` untuk Manager: ia melebur tujuh departemen jadi satu blok KPI dan diam-diam memberi jangkauan supervisor di 11 gerbang lintas 6 service (alasannya di ADR). Manager sendiri ditempatkan HR di Kesekretariatan sehingga pengajuannya mengalir ke Direktur sebagai orang. Jenjang `manager` (rank 45) ditambahkan sebagai penanda saja.
 
 Halaman Atasan Langsung berkali-kali disangka juga menetapkan penyetuju, jadi kini ia memuat keterangan **read-only** yang menunjuk ke tab penyetuju. Sengaja hanya memberi tahu, tidak menulis: menyatukan kedua kendali di satu layar akan melebur dua konsep yang tabel di §Cakupan supervisi sengaja pisahkan.
 
