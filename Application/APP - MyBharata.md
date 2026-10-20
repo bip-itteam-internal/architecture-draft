@@ -73,7 +73,7 @@
 
 ### Persetujuan Terpusat (usulan)
 
-> Status: 🟡 **Konsep**, kode belum ada. Keputusan: [[ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web]] (🟡 Diusulkan). Pecahan kerja: [[ANALISA - Persetujuan Terpusat di MyBharata]].
+> Status: 🟡 **Konsep**, kode belum ada. Keputusan: [[ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web]] (🟢 Diterima 2026-10-20). Pecahan kerja: [[ANALISA - Persetujuan Terpusat di MyBharata]].
 
 Cara kerjanya bila ADR diterima:
 - **Kartu Beranda "Perlu Tindakan"** menggantikan "Perlu Review" dan menghitung baris `GET /pengajuan/antrean?as=reviewer` yang bukan `pantau` (agregator employee-service yang sama dengan web), bukan lagi `/hr/requests`. Galat pemuatan tampil sebagai galat, tidak dilipat ke 0. Tanpa penanda "lewat N hari".

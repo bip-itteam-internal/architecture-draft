@@ -1,6 +1,6 @@
 # ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web
 
-> **Status**: 🟡 **Diusulkan**, 2026-10-20, kode belum ada. Pemutus: irfanarfianto. Melanjutkan [[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] (yang mengatur isi baris dan kode `aksi`) ke MyBharata, dan menambah bentuk keluar langkah persetujuan yang seragam. **Tidak mengubah** butir 12 ADR 0181 (tanpa penanda SLA). Pecahan kerja: [[ANALISA - Persetujuan Terpusat di MyBharata]].
+> **Status**: 🟢 Diterima, 2026-10-20, oleh irfanarfianto. Pemutus: irfanarfianto. Kode belum ada. Melanjutkan [[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] (yang mengatur isi baris dan kode `aksi`) ke MyBharata, dan menambah bentuk keluar langkah persetujuan yang seragam. **Tidak mengubah** butir 12 ADR 0181 (tanpa penanda SLA). Pecahan kerja: [[ANALISA - Persetujuan Terpusat di MyBharata]].
 
 ## Untuk Manajemen
 
@@ -25,7 +25,7 @@
 
 *MyBharata mendapat halaman Persetujuan yang memuat seluruh antrean lintas modul dari agregator employee-service yang sama dengan web, dengan detail dan aksi di dalam aplikasi untuk semua jenis. Agregator menambah field `jenis`, bentuk keluar `langkah[]` yang seragam, dan endpoint detail; penyetuju boleh membaca detail dokumen yang ada di antrean atau riwayatnya. Web memakai bentuk yang sama.*
 
-- **Status**: 🟡 Diusulkan (lihat baris status di atas)
+- **Status**: 🟢 Diterima, kode belum ada (lihat baris status di atas)
 - **Path di repo** (akan disentuh):
   - `bip-erp/services/employee/antrean_pengajuan.go` · `bip-erp/services/employee/antrean_kontrak.go` · `bip-erp/services/employee/antrean_detail.go` (baru) · `bip-erp/services/employee/antrean_langkah.go` (baru)
   - rute detail/akses baca di service sumber: `bip-erp/services/procurement/permintaan_erp_handler.go` · `bip-erp/services/inventory/permintaan_gate.go` · `bip-erp/services/recruitment/` · `bip-erp/services/learning/request.go` · `bip-erp/services/marketing-analytics/karya_live_support_handler.go`

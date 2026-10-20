@@ -2,8 +2,6 @@
 
 *Pecahan kerja untuk [[ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web]]. Bukan rencana per berkas; tiap blok di bawah adalah draf issue yang dibuat di GitHub, cukup jelas untuk dilempar ke `/brief` setelah ADR-nya Diterima. Cara kerja di MyBharata: [[APP - MyBharata]] § Persetujuan Terpusat (usulan).*
 
-> ⛔ **Menunggu [[ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web]] Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**
-
 - **Status**: 🟡 Belum dikerjakan
 - **Tanggal**: 2026-10-20
 - **Pemutus**: irfanarfianto

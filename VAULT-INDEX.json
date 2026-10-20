@@ -1406,20 +1406,20 @@
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "77db49ae5afc3427cf940fb154eac996af13a82de3ce97220d942daa856252f2",
+      "hash": "6852e2dd0d011c032d453afa10d617bef4f33a55b717d2bfbd5b506a4fc16f20",
       "ukuran_kb": 122.4,
-      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, tech stack dan arsitekturnya (Flutter, BLoC, Clean Architecture feature-first), cara autentikasi (JWT, biometric, PIN, satu akun satu device), serta versi build vs versi rilis yang beredar di HP pemakai. Juga menjawab fitur apa saja yang live atau direncanakan (attendance, cuti/izin, lembur, payroll/slip gaji ber-PIN, KPI, survei, Kaizen, Sesi Live Host, Booking Ruang, Pelatihan, Persetujuan Terpusat) dan bagaimana perilaku multi-perusahaan per tenant.",
+      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, tech stack dan arsitekturnya (Flutter, BLoC, Clean Architecture feature-first), bagaimana autentikasi JWT/biometric/PIN bekerja, dan versi mana yang ada di dev versus yang beredar di HP pemakai. Juga menjawab fitur apa saja yang tersedia (attendance, cuti/izin, lembur, payroll/slip gaji, KPI, survei, Kaizen, pelatihan, booking ruang, sesi live host, persetujuan terpusat) serta bagaimana perilakunya untuk perusahaan multi-tenant non-BIP.",
       "kata_kunci": [
         "MyBharata",
         "my_bharata",
         "aplikasi mobile",
+        "mobile app",
         "Flutter",
         "HRIS mobile",
-        "presensi",
-        "attendance",
+        "multi-tenant",
+        "versi rilis",
         "slip gaji",
-        "payslip",
-        "multi-tenant"
+        "presensi"
       ]
     },
     {
@@ -10266,8 +10266,8 @@
       "judul": "ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-20, kode belum ada. Pemutus: irfanarfianto. Melanjutkan [[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] (yang mengatur isi baris dan kode `aksi`) ke MyBharata, dan menambah bentuk keluar langkah persetujuan yang seragam. **Tidak mengubah** butir 12 ADR 0181 (tanpa penanda SLA). Pecahan kerja: [[ANALISA - Persetujuan Terpusat di MyBharata]].",
+      "status_emoji": null,
+      "status_teks": "🟢 Diterima, 2026-10-20, oleh irfanarfianto. Pemutus: irfanarfianto. Kode belum ada. Melanjutkan [[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] (yang mengatur isi baris dan kode `aksi`) ke MyBharata, dan menambah bentuk keluar langkah persetujuan yang seragam. **Tidak mengubah** butir 12 ADR 0181 (tanpa penanda SLA). Pecahan kerja: [[ANALISA - Persetujuan Terpusat di MyBharata]].",
       "publik": true,
       "tautan": [
         "ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional",
@@ -10282,20 +10282,20 @@
         "APP - MyBharata",
         "APP - Web ERP"
       ],
-      "hash": "e23379307734bec62637498de30758d521ebd6a366a11d0d49035d499787c540",
-      "ukuran_kb": 16.7,
-      "ringkasan": "Menjawab: bagaimana penyetuju menuntaskan semua antrean persetujuan lintas modul dari HP (kartu Beranda \"Perlu Tindakan\", halaman Persetujuan Menunggu/Riwayat, detail dan aksi tanpa diarahkan ke web), dan apa yang ditambahkan ke agregator employee-service (field jenis, langkah[] seragam, endpoint detail). Juga menjawab siapa boleh membaca detail dokumen di antrean, kenapa label \"Permintaan ERP\" menjadi \"Permintaan Pembelian\", urutan deploy BE lalu Mobile lalu web, dan alternatif yang ditolak.",
+      "hash": "52ccd852bf737e3942f41cd55606d2fcc224920a0bcfcb5160eb5583d54e559d",
+      "ukuran_kb": 16.9,
+      "ringkasan": "Menjawab: bagaimana penyetuju melihat dan memutus semua antrean persetujuan lintas modul dari HP lewat kartu \"Perlu Tindakan\" dan halaman Persetujuan MyBharata tanpa diarahkan ke web. Menjelaskan keputusan menambah field `jenis`, bentuk `langkah[]` seragam, dan endpoint detail di agregator employee-service, akses baca penyetuju di service sumber, penggantian label \"Permintaan ERP\" menjadi \"Permintaan Pembelian\", serta urutan kerja dan deploy BE lalu Mobile lalu web.",
       "kata_kunci": [
-        "ADR 0188",
         "persetujuan terpusat",
         "approval",
-        "MyBharata",
         "Perlu Tindakan",
-        "agregator antrean",
+        "antrean persetujuan",
+        "agregator",
+        "pengajuan/antrean",
         "langkah persetujuan",
         "stepper",
         "Permintaan Pembelian",
-        "Portal Persetujuan"
+        "ADR 0188"
       ]
     },
     {
@@ -21928,20 +21928,20 @@
         "APP - MyBharata",
         "IT - Server, VMs and Databases"
       ],
-      "hash": "f3d26d7c19b314575a387dea73013c2d352f85c320b3824af09597f0446cdf67",
-      "ukuran_kb": 19.1,
-      "ringkasan": "Menjawab: bagaimana ADR 0188 dipecah jadi issue induk bip-erp#3316 dan delapan sub-issue BE/Mobile/FE, apa urutan dan ketergantungan antar issue, serta kriteria \"Yang harus benar\" tiap bagian (field jenis dan langkah, endpoint detail seragam, akses baca penyetuju, kartu dan halaman Persetujuan di MyBharata, Rincian Payroll, tabel compact dan Sheet di web). Juga menjawab data prod apa yang perlu diukur dulu sebelum issue diberi label Siap Agent.",
+      "hash": "4bfaf7db57da73f5a8c4e2fd11c335365e3ccba8db114da887308ff7855a854a",
+      "ukuran_kb": 19.2,
+      "ringkasan": "Menjawab: bagaimana pekerjaan ADR 0188 dipecah jadi issue induk bip-erp#3316 dan delapan sub-issue BE, Mobile, dan FE, berikut urutan ketergantungan dan urutan deploy-nya. Tiap draf issue memuat masalah, keputusan, kriteria \"Yang harus benar\", di luar cakupan, dan bukti pendukung, plus kueri mongosh untuk mengukur ulang jumlah dokumen menunggu di prod sebelum label Siap Agent dipasang.",
       "kata_kunci": [
-        "ANALISA persetujuan MyBharata",
-        "persetujuan terpusat",
-        "approval mobile",
-        "bip-erp#3316",
+        "ANALISA persetujuan terpusat",
+        "pecahan kerja",
         "sub-issue",
+        "bip-erp#3316",
+        "draf issue",
         "Siap Agent",
-        "langkah[]",
-        "endpoint detail antrean",
+        "detail seragam",
         "Rincian Payroll",
-        "stepper"
+        "urutan deploy",
+        "approval"
       ]
     },
     {
