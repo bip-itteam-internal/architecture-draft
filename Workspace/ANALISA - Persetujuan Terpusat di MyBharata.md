@@ -12,6 +12,17 @@
   - `erp-frontend`: kategori tampil sebagai lencana outline tanpa warna/ikon (`tabel-persetujuan.tsx:393-395`), Sheet hanya untuk 3 kategori (`page.tsx:277-295`), tiga stepper terpisah tanpa komponen bersama.
 - **Rujukan visual**: Figma `BUV8afcBrNSbkmm0qI8EYz`, halaman "Persetujuan Terpusat" (salinan bertanggal, bukan sumber kebenaran).
 
+## Pembaruan 2026-10-20 (baca dulu)
+
+Lihat [[ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web]] § Amandemen: modul Permintaan ERP dihapus (bip-erp#3309), cakupan 15 jenis. Blok di bawah ditulis sebelum itu; yang berubah:
+
+| Blok | Keadaan |
+|---|---|
+| #1 bip-erp#3317 | merged (PR #3326). `perihal` tidak diubah; penghapusan awalan dipindah ke sesudah erp-frontend#2627 |
+| #3 bip-erp#3319 | **dibatalkan, dipecah**: bip-erp#3330 (Permintaan ERP, dibatalkan karena modulnya dihapus) dan bip-erp#3331 (Permintaan Barang GA, merged PR #3344). Pelatihan/Live Support/Offer tak perlu diubah (alasan di komentar #3319) |
+| #4 my-bharata#224 | PR my-bharata#227 ke `dev` |
+| #7 erp-frontend#2627 | kriteria label `permintaanErp` gugur; 15 jenis |
+| #5, #8 | "16 jenis" dibaca 15 jenis; Permintaan Pembelian dicoret |
 ## Urutan
 
 ```

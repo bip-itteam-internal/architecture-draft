@@ -77,7 +77,7 @@
 
 Cara kerjanya bila ADR diterima:
 - **Kartu Beranda "Perlu Tindakan"** menggantikan "Perlu Review" dan menghitung baris `GET /pengajuan/antrean?as=reviewer` yang bukan `pantau` (agregator employee-service yang sama dengan web), bukan lagi `/hr/requests`. Galat pemuatan tampil sebagai galat, tidak dilipat ke 0. Tanpa penanda "lewat N hari".
-- **Halaman Persetujuan**: tab Menunggu/Riwayat, 16 jenis (kategori `karyawan` dipecah per `jenis`), kartu berbentuk `ReviewerLeaveCard` asli. Detail berbentuk `ReviewerSubmissionDetailPage` asli dari `GET /pengajuan/antrean/:kategori/:id`, stepper dari `langkah[]` seragam (ringkas dua langkah + "Lihat semua langkah").
+- **Halaman Persetujuan**: tab Menunggu/Riwayat, 15 jenis sesudah amandemen ADR 0188 (kategori `karyawan` dipecah per `jenis`), kartu berbentuk `ReviewerLeaveCard` asli. Detail berbentuk `ReviewerSubmissionDetailPage` asli dari `GET /pengajuan/antrean/:kategori/:id`, stepper dari `langkah[]` seragam (ringkas dua langkah + "Lihat semua langkah").
 - **Tanpa arahan ke ERP web.** Payroll punya halaman Rincian Payroll (tabel compact) dan Rincian Gaji per karyawan berbentuk `PayslipDetailBody`, tanpa PIN tambahan (akses `payroll.view`).
 - Hari ini layar peninjau mobile hanya mencakup enam jenis karyawan, booking ruang (`roomBookingDetail`), dan triase tiket (`TaskTriagePage`); jenis lain belum punya layar peninjau.
 

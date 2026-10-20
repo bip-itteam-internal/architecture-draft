@@ -1,6 +1,6 @@
 # ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web
 
-> **Status**: 🟢 Diterima, 2026-10-20, oleh irfanarfianto. Pemutus: irfanarfianto. Kode belum ada. Melanjutkan [[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] (yang mengatur isi baris dan kode `aksi`) ke MyBharata, dan menambah bentuk keluar langkah persetujuan yang seragam. **Tidak mengubah** butir 12 ADR 0181 (tanpa penanda SLA). Pecahan kerja: [[ANALISA - Persetujuan Terpusat di MyBharata]].
+> **Status**: 🟢 Diterima, 2026-10-20, oleh irfanarfianto. Pemutus: irfanarfianto. **Diamandemen 2026-10-20** (lihat § Amandemen): modul Permintaan ERP dihapus, butir 6 gugur, cakupan menjadi 15 jenis. Melanjutkan [[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] (yang mengatur isi baris dan kode `aksi`) ke MyBharata, dan menambah bentuk keluar langkah persetujuan yang seragam. **Tidak mengubah** butir 12 ADR 0181 (tanpa penanda SLA). Pecahan kerja: [[ANALISA - Persetujuan Terpusat di MyBharata]].
 
 ## Untuk Manajemen
 
@@ -91,7 +91,7 @@
 - Penyetuju atau pelaksana tahap **boleh membaca detail dokumen yang ada di antrean atau riwayatnya**, tanpa diberi izin modul penuh. Polanya `BolehMelihatPengajuan` (`procurement/pengajuan_barang_cakupan_baca.go:76-100`): pemohon, siapa pun di riwayat, dan siapa pun yang sedang boleh menindak.
 - Gerbangnya di service sumber, bukan di agregator (ADR 0181 dan aturan Portal Persetujuan). Rute detail per id dibuat untuk Live Support, Pelatihan, dan Offer; `GET /permintaan/:nomor` diberi jalur baca untuk penyetuju dengan aturan yang sama (`GET /permintaan-erp/:id` tidak lagi: rute dan sumber antreannya dihapus 2026-10-20, bip-erp#3309).
 
-### 6. Label "Permintaan ERP" menjadi "Permintaan Pembelian"
+### 6. Label "Permintaan ERP" menjadi "Permintaan Pembelian" (GUGUR 2026-10-20, lihat § Amandemen)
 - Di semua permukaan (portal web, MyBharata). Di sistem, istilah ini berarti entitas `permintaan_erp` milik procurement.
 - ⚠️ Di [[GA - SOP Posisi Procurement]] dan [[GA - Form Pengadaan dan Pengajuan Dana]] istilah "Permintaan Pembelian" dipakai untuk dokumen SOP/form GA. Pembaca yang mencocokkan dok SOP dengan layar harus tahu keduanya berbeda; kalimat ini sengaja ditulis di sini supaya tidak hanya hidup di kepala orang.
 
@@ -104,6 +104,16 @@
 - Backend lebih dulu, lalu MyBharata, lalu web. Semua field baru bersifat tambahan; konsumen lama tetap jalan selama field baru belum ada.
 - Jenis yang di prod masih 0 dokumen menunggu dikerjakan sesudah jenis yang berdata.
 
+## Amandemen
+
+### 2026-10-20: Permintaan ERP dihapus, cakupan 15 jenis
+
+Pada hari yang sama ADR ini diterima, Pemutus memutuskan "rute lama dihapus saja" untuk modul **Permintaan ERP** dan **Pesanan ERP** (bip-erp#3309, commit `a632d2df`): handler, model, rute, index, dan sumber antrean `permintaan_erp` di agregator dihapus karena di produksi berisi 0 dokumen. Koleksinya tidak di-drop. Akibatnya untuk ADR ini:
+
+- **Butir 6 gugur.** Tidak ada lagi entitas yang dilabeli "Permintaan ERP" atau "Permintaan Pembelian" di Persetujuan. Peringatan bentrok istilah dengan dok GA tidak relevan lagi.
+- **Cakupan menjadi 15 jenis** (butir 2 dan 7): Cuti, Izin, Sakit, Dinas, Koreksi Presensi, Tukar Jadwal, Booking Ruang, Pelatihan, Pengajuan Barang, Permintaan Barang GA, Tiket, Live Support, Payroll, Requisition, Offer.
+- **Butir 5 menyempit**: akses baca penyetuju hanya dibutuhkan untuk Permintaan Barang GA (bip-erp#3331, merged). Pelatihan, Live Support, dan Offer tidak diubah: daftar antreannya sudah tersaring per pemanggil dan membawa dokumen penuh, jadi detail di agregator membacanya dari daftar itu (bip-erp#3318). Issue untuk Permintaan ERP (bip-erp#3330) dibatalkan.
+- Alasan pergantian ikon kartu Beranda di butir 1 (clipboard-check bentrok dengan ikon Permintaan Pembelian) tidak berlaku lagi, tetapi keputusan ikon inbox tetap.
 ## Alternatif yang Ditolak
 
 - **MyBharata memanggil detail tiap sumber langsung.** Tanpa endpoint agregator baru, tetapi logika langkah ditulis dua kali (Dart dan TypeScript) untuk sepuluh sumber: satu fakta di dua tempat, kelas kerusakan yang paling sering tercatat di vault ini.
