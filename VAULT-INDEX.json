@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-20",
-  "jumlah_dokumen": 658,
+  "jumlah_dokumen": 660,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1956,6 +1956,7 @@
         "ADR - 0039 Menu Terbatas Default Terbuka sampai Di-assign",
         "ADR - 0043 Peran Sistem Diturunkan dari Jabatan",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
+        "ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya",
         "REF - Alur Persetujuan",
         "ADR - 0062 Jenjang Jabatan Menggerbangi Pengajuan Requisition Lintas-Departemen",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
@@ -2006,20 +2007,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "1b359c850bb17238597a357ead67284482d73c658bbd74987385f0bfa5c51b4e",
-      "ukuran_kb": 152.3,
-      "ringkasan": "Menjawab: bagaimana hak akses ERP bekerja (tiga sumbu modul, tingkat aksi, cakupan/reach), apa itu paket hak (permission set) yang menempel pada posisi, katalog izin per modul yang terdaftar, dan modul mana yang sudah menegakkan izin per-aksi. Juga menjelaskan fallback tier system_roles, fase dua, paket Semua Izin dan batas cookie 4 KB, serta arah keputusan hak akses satu pintu.",
+      "hash": "cf265370af6e747509adc2b0f723d8a9ae3bb3626d999d6b85a67202c705901d",
+      "ukuran_kb": 152.6,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja lewat tiga sumbu (modul, tingkat aksi, cakupan data), paket hak (permission set) yang menempel pada posisi/jabatan, dan di mana penegakannya (gateway, service, frontend). Juga menjawab katalog izin apa saja yang terdaftar per modul, modul mana yang sudah menegakkan izin per-aksi vs masih bergantung pada system_roles tier, serta apa itu fase dua (tier fallback) dan paket Semua Izin.",
       "kata_kunci": [
         "RBAC",
-        "hak akses",
         "permission set",
         "paket hak",
+        "hak akses",
         "katalog izin",
         "system_roles",
-        "reach",
         "tier fallback",
-        "Hak per Posisi",
-        "Siapa Boleh Apa"
+        "reach cakupan",
+        "posisi jabatan",
+        "ADR 0030"
       ]
     },
     {
@@ -10338,6 +10339,42 @@
       ]
     },
     {
+      "path": "Decisions/ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya.md",
+      "judul": "ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "Diusulkan, 2026-10-20, dari `/analisa-kebutuhan` (opsi A dipilih user). Pemutus: BIP-ITTeam. Kode belum ada. Pecahan kerja: [[ANALISA - Manager Departemen Penyetuju Pengajuan SPV]] · issue bip-erp#3328 (induk), bip-erp#3329 [BE], erp-frontend#2639 [FE].",
+      "publik": true,
+      "tautan": [
+        "ANALISA - Manager Departemen Penyetuju Pengajuan SPV",
+        "HRIS - Employee Request & Approval",
+        "HRIS - Organization Structure",
+        "ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal",
+        "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
+        "ADR - 0137 Model Persetujuan Tunggal dan Pemisahan Tugas Lintas Modul",
+        "REF - Alur Persetujuan",
+        "HRIS - Perjalanan Dinas",
+        "HRIS - Key Performance Index",
+        "CORE - RBAC dan Permission Set"
+      ],
+      "hash": "5e0ba37066910b49ac48ad3b244d7493abd94204b173b0e67d2aa501d02c1fe2",
+      "ukuran_kb": 11.4,
+      "ringkasan": "Menjawab: siapa yang menyetujui cuti/izin/sakit dan perjalanan dinas milik SPV (penyetuju departemen), kenapa jalur Direktur selama ini tak pernah menyetujui apa pun, dan bagaimana Manager yang ditetapkan HR per departemen di master data menggantikannya. Juga menjawab cakupan KPI Manager atas seluruh karyawan departemen yang dinaunginya, kenapa penanda ini bukan supervised_by/is_supervisor/jenjang, dan apa yang sengaja tidak dicakup (koreksi absen, tukar shift, departemen Marketing).",
+      "kata_kunci": [
+        "Manager departemen",
+        "penyetuju SPV",
+        "approval",
+        "pengajuan cuti",
+        "perjalanan dinas",
+        "jalur Direktur",
+        "KPI Manager",
+        "master_department",
+        "jenjang Manager",
+        "ADR 0190"
+      ]
+    },
+    {
       "path": "DEVELOPER GUIDE.md",
       "judul": "DEVELOPER GUIDE",
       "area": "root",
@@ -13228,6 +13265,7 @@
         "API - Attendance Service",
         "CORE - RBAC dan Permission Set",
         "Microservices - Notification Service",
+        "ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya",
         "APP - Web ERP",
         "REF - Alur Persetujuan",
         "RUN - Deploy Microservices bip-erp",
@@ -13236,20 +13274,20 @@
         "Microservices - Employee Service",
         "APP - MyBharata"
       ],
-      "hash": "928f304d3b681881280073eafd3a05ca359d4ca05862893af9b94d3152c7eaa3",
-      "ukuran_kb": 16.6,
-      "ringkasan": "Menjawab: jenis pengajuan HR apa saja yang ada (Izin/Cuti/Sakit, Dinas, Koreksi clock-in/out, Tukar jadwal, dan Lembur yang belum mengikuti pola ini), siapa yang meninjau di tiap tahap (SPV lalu HRD), serta izin apa yang dibutuhkan untuk melihat dan memutuskan pengajuan lewat endpoint admin GET /hr/requests. Juga menjawab bagaimana atasan menunjuk rekan pengganti saat menyetujui cuti atau dinas, siapa yang sah jadi kandidat pengganti, dan komponen bersama di attendance service (ReviewData, resolusi status, getSupervisorData, notifikasi, apply-to-attendance) yang dipakai semua jenis request. Memuat pula temuan pengukuran kenapa sebagian pengajuan mati karena didiamkan: jalur Direktur tanpa penerima, notifikasi yang tak bisa diklik, dan pengajuan yang jatuh di hari Sabtu.",
+      "hash": "7d23eb68e6798c98f05290b3ed031655f67cf7b993ce186b70ee933e2f8a0a2a",
+      "ukuran_kb": 17.0,
+      "ringkasan": "Menjawab: jenis pengajuan karyawan apa saja (izin/cuti/sakit, dinas, koreksi, tukar jadwal) dan bagaimana alur review berjenjang SPV ke HRD bekerja, termasuk endpoint admin HR untuk melihat semua pengajuan dan izin hris.pengajuan yang menggerbanginya. Juga menjawab cara menunjuk pengganti saat menyetujui, komponen review bersama di attendance service, serta kenapa banyak pengajuan mati karena didiamkan (jalur Direktur, notifikasi tak bisa diklik, Sabtu).",
       "kata_kunci": [
         "pengajuan karyawan",
         "employee request",
         "approval berjenjang",
-        "SPV",
-        "HRD",
-        "hris.pengajuan.approve",
+        "review SPV HRD",
         "pengganti",
         "replacement",
-        "tukar jadwal",
-        "koreksi absen"
+        "hr/requests",
+        "hris.pengajuan.approve",
+        "Submission",
+        "pengajuan kedaluwarsa"
       ]
     },
     {
@@ -13468,6 +13506,7 @@
         "APP - Web ERP",
         "HRIS - Key Performance Index",
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
+        "ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya",
         "HRIS - Organization Structure",
         "ADR - 0147 Rata-rata KPI Departemen Dibagi yang Sudah Dinilai, Cakupan Ditampilkan Terpisah",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
@@ -13481,18 +13520,20 @@
         "HRIS - Big Pictures",
         "HRIS - Interrelationship Matrices"
       ],
-      "hash": "ef2f4cd30981ef85d00197950014ae22ae969716224b3fda50c7b444633a029b",
-      "ukuran_kb": 50.9,
-      "ringkasan": "Menjawab: bagaimana penilaian kinerja berbasis skor KPI di ERP, apa beda engine KPI insentif marketing dengan appraisal per-karyawan lintas departemen di employee-service, dan bagian mana yang masih konsep (siklus bulanan wajib, review supervisor ke HR). Juga memuat kebutuhan dan detail yang tertunda.",
+      "hash": "c1f78057a220cefaf265a241593c8196a0050566e431aa06c22eedf84224f66c",
+      "ukuran_kb": 51.4,
+      "ringkasan": "Menjawab: bagaimana KPI dinilai di ERP, membedakan engine skor ke insentif tim marketing (insentive service) dari appraisal per-karyawan lintas departemen di employee-service (template per posisi, scoring per periode, snapshot template). Juga menjawab aturan posisi template wajib sesuai jabatan pada periode itu, RBAC KPI per departemen, cakupan tim untuk Leader, cakupan Manager departemen, dan tampilan gabungan grup seperti HRGA.",
       "kata_kunci": [
         "KPI",
-        "key performance indicator",
+        "Key Performance Index",
         "penilaian kinerja",
         "appraisal",
         "template KPI",
-        "skor",
-        "scoring",
-        "insentif marketing"
+        "kpi_score",
+        "insentif marketing",
+        "RequireKPIDepartmentRBAC",
+        "scope team Leader",
+        "HRGA"
       ]
     },
     {
@@ -13663,6 +13704,7 @@
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "API - Employee Service",
+        "ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya",
         "Microservices - Form Builder Service",
         "CORE - RBAC dan Permission Set",
         "HRIS - Key Performance Index",
@@ -13680,20 +13722,20 @@
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "73160a71d72c2877d1cf44220c832c467793b7623f0c51289b346d6729d6b8ee",
-      "ukuran_kb": 58.7,
-      "ringkasan": "Menjawab: bagaimana struktur organisasi disimpan (master departemen dan posisi, jenjang jabatan, bagan organisasi), siapa penyetuju pengajuan per departemen lewat is_supervisor, bagaimana cakupan supervisi antar-departemen (supervised_by, label HRGA) bekerja, dan urutan pencarian atasan langsung. Juga memuat bukti verifikasi produksi dan peta konsumen.",
+      "hash": "01ec6536f412186c5edbd557ccbdd553bd1772278c60be718b4eb2427fab3377",
+      "ukuran_kb": 60.1,
+      "ringkasan": "Menjawab: bagaimana departemen, jabatan (position_items), jenjang jabatan, dan hierarki atasan disimpan dan dikelola di master data, serta di mana bagan organisasi (org chart) dan Peta Struktur. Juga menjawab siapa penyetuju pengajuan per departemen (is_supervisor), bedanya dengan atasan langsung dan cakupan supervisi supervised_by (grup HRGA), urutan pencarian atasan, dan kenapa jenjang bukan sumber hak akses.",
       "kata_kunci": [
         "struktur organisasi",
         "organization structure",
         "org chart",
+        "bagan organisasi",
         "master_department",
-        "jabatan",
-        "is_supervisor",
+        "jenjang jabatan",
+        "job level",
+        "penyetuju departemen",
         "supervised_by",
-        "HRGA",
-        "atasan langsung",
-        "penyetuju"
+        "atasan langsung"
       ]
     },
     {
@@ -13940,6 +13982,7 @@
         "GA - Procurement System",
         "ADR - 0007 Reimbursement Perjalanan Dinas",
         "Microservices - Employee Service",
+        "ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya",
         "HRIS - Attendance Correction",
         "CORE - API Master Gateway",
         "APP - MyBharata",
@@ -13949,18 +13992,19 @@
         "HRIS - Big Pictures",
         "HRIS - Attendance System"
       ],
-      "hash": "9247ca464ae95227fa12ad4910666d40d8b033285511ed9401b4a3bfddea2da0",
-      "ukuran_kb": 7.3,
-      "ringkasan": "Menjawab: bagaimana cara mengajukan perjalanan dinas (business trip) beserta detail perjalanan, logistik, dan estimasi anggaran, apa bedanya dengan subtipe Dinas pada Leave Request, siapa yang menyetujui (Atasan Langsung lalu HRD), dan format penomoran dokumen perjadin.",
+      "hash": "838513676277e6c0a192910c3955a0978dd289d94ca3458426f8739320a72a53",
+      "ukuran_kb": 7.5,
+      "ringkasan": "Menjawab: bagaimana karyawan mengajukan perjalanan dinas beserta detail perjalanan dan estimasi anggaran, siapa yang menyetujui (atasan langsung lalu HRD), dan bagaimana status kehadiran otomatis menjadi Dinas setelah disetujui. Juga menjawab model data business_trip_request, format nomor dokumen PERJADIN, endpoint API, bedanya dengan subtype Dinas di leave request, dan keterbatasan (FE belum ada, anggaran tanpa Finance).",
       "kata_kunci": [
         "perjalanan dinas",
         "business trip",
-        "dinas",
-        "anggaran perjalanan",
         "PERJADIN",
+        "anggaran dinas",
+        "business_trip_request",
         "approval atasan HRD",
-        "nomor dokumen",
-        "formulir perjalanan dinas"
+        "status Dinas",
+        "attendance service",
+        "reimbursement"
       ]
     },
     {
@@ -18035,6 +18079,7 @@
       "status_teks": "Implemented — seluruh baris terverifikasi di kode.",
       "publik": true,
       "tautan": [
+        "ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
         "REF - Kepemilikan Data",
         "APP - Web ERP",
@@ -18052,21 +18097,20 @@
         "Microservices - Procurement Service",
         "Microservices - Manufacture Service"
       ],
-      "hash": "93c76466a84733019d549336ee101a620e83a6c2174c3192f1b2833e851866f7",
-      "ukuran_kb": 16.9,
-      "ringkasan": "Menjawab: apa saja alur persetujuan (approval) di ERP Bharata dan siapa yang berwenang memutuskan tiap alur, lintas 11 service. Mengelompokkan gerbang berdasarkan slot dokumen, jabatan, izin/peran, dan penunjukan, serta wewenang setingkat Direktur.",
+      "hash": "5e7fa841d9dd261529cc002005c2a08f7dc34d6573b4cb4a397b7b426eadfa24",
+      "ukuran_kb": 17.1,
+      "ringkasan": "Menjawab: alur persetujuan apa saja yang ada di seluruh ERP dan siapa yang berwenang memutuskannya, dikelompokkan berbasis slot dokumen, jabatan, izin/peran, dan penunjukan. Juga menjawab empat cara gerbang persetujuan ditulis di kode (kenapa menyapu routes.go saja menyesatkan), rincian persetujuan Booking Ruang, dan wewenang setingkat Direktur.",
       "kata_kunci": [
         "alur persetujuan",
-        "approval",
-        "approver",
+        "approval flow",
         "penyetuju",
-        "wewenang",
-        "direktur",
+        "siapa boleh menyetujui",
+        "SetaraDirektur",
+        "Booking Ruang",
         "gerbang persetujuan",
-        "cuti",
-        "dinas",
-        "pengajuan",
-        "siapa boleh menyetujui"
+        "inventaris approval",
+        "payroll approve",
+        "rekrutmen approve"
       ]
     },
     {
@@ -21781,6 +21825,34 @@
         "pemilih toko",
         "Beauty Hacks",
         "breakdown task"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Manager Departemen Penyetuju Pengajuan SPV.md",
+      "judul": "ANALISA - Manager Departemen Penyetuju Pengajuan SPV",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": "🟡",
+      "status_teks": "Daftar task dari `/analisa-kebutuhan` 2026-10-20. Keputusannya di [[ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya]]; cara kerjanya di [[HRIS - Organization Structure]] §Manager departemen dan [[HRIS - Key Performance Index]]. Dok ini papan kerja, bukan arsitektur.",
+      "publik": false,
+      "tautan": [
+        "ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya",
+        "HRIS - Organization Structure",
+        "HRIS - Key Performance Index"
+      ],
+      "hash": "1a80a26d20d1745403f210cd495cf5dd02ee99f9e142d5c4b069d242081ec7c4",
+      "ukuran_kb": 10.0,
+      "ringkasan": "Menjawab: pekerjaan apa yang perlu dilakukan untuk mewujudkan Manager departemen sebagai penyetuju pengajuan SPV dan pembaca KPI departemen, dipecah jadi issue induk serta sub-issue [BE] bip-erp dan [FE] erp-frontend beserta kriteria yang harus benar. Juga menjawab langkah HR tanpa kode yang bisa dilakukan sekarang, urutan deploy, data prod pendukung, dan kenapa MyBharata tidak perlu berubah.",
+      "kata_kunci": [
+        "analisa kebutuhan",
+        "Manager departemen",
+        "penyetuju SPV",
+        "sub-issue BE FE",
+        "bip-erp#3328",
+        "erp-frontend#2639",
+        "KPI Manager",
+        "pengajuan SPV",
+        "draf issue"
       ]
     },
     {

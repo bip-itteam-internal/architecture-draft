@@ -1,3 +1,5 @@
+> **Status**: 🟡 Diusulkan, 2026-10-20, dari `/analisa-kebutuhan` (opsi A dipilih user). Pemutus: BIP-ITTeam. Kode belum ada. Pecahan kerja: [[ANALISA - Manager Departemen Penyetuju Pengajuan SPV]] · issue bip-erp#3328 (induk), bip-erp#3329 [BE], erp-frontend#2639 [FE].
+
 ## Untuk Manajemen
 
 **Yang berubah di layar.**

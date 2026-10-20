@@ -26,7 +26,7 @@ Manajemen membuka posisi Manager yang menaungi seluruh departemen kecuali Beauty
 ### Induk: Manager departemen menyetujui pengajuan SPV dan melihat KPI departemen yang dinaunginya
 
 - **Repo**: bip-erp
-- **Issue**: _diisi saat dibuat_
+- **Issue**: [bip-erp#3328](https://github.com/bip-itteam-internal/bip-erp/issues/3328)
 
 **Pemutus:** @BIP-ITTeam
 **PIC:** @
@@ -61,7 +61,7 @@ ADR di atas berstatus Diterima.
 ### [BE] Manager departemen di master data, pengalihan pengajuan SPV ke Manager, cakupan KPI Manager
 
 - **Repo**: bip-erp
-- **Issue**: _diisi saat dibuat_
+- **Issue**: [bip-erp#3329](https://github.com/bip-itteam-internal/bip-erp/issues/3329)
 
 **Pemutus:** @BIP-ITTeam
 **PIC:** @
@@ -112,7 +112,7 @@ ADR di atas berstatus Diterima.
 ### [FE] Kolom Manager di layar Penyetuju Pengajuan dan cakupan KPI Manager
 
 - **Repo**: erp-frontend
-- **Issue**: _diisi saat dibuat_
+- **Issue**: [erp-frontend#2639](https://github.com/bip-itteam-internal/erp-frontend/issues/2639)
 
 **Pemutus:** @BIP-ITTeam
 **PIC:** @
