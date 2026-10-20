@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-10-19",
-  "jumlah_dokumen": 653,
+  "digenerate": "2026-10-20",
+  "jumlah_dokumen": 655,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -1368,6 +1368,8 @@
         "API - Attendance Service",
         "HRIS - Employee Request & Approval",
         "HRIS - Attendance Correction",
+        "ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web",
+        "ANALISA - Persetujuan Terpusat di MyBharata",
         "ADR - 0094 Booking Ruang lewat MyBharata, Penyetuju Ditunjuk HR, Satu Sumber Ruang Kantor",
         "ADR - 0095 Pengajuan dan Persetujuan Booking Ruang Juga Lewat Web",
         "API - Inventory Service",
@@ -1404,20 +1406,20 @@
         "HRIS - Attendance System",
         "HRIS - Payroll"
       ],
-      "hash": "9861627d0b3e451fbe0e877e56bd1aa9edd31f806bb3c3608722c29dc6ee24b2",
-      "ukuran_kb": 121.1,
-      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, tech stack dan arsitektur Flutter-nya (BLoC, Clean Architecture, go_router, Firebase), bagaimana autentikasi (JWT, PIN, biometric, satu akun satu device), dan fitur apa saja yang tersedia (presensi, pengajuan cuti/izin, lembur, slip gaji, KPI, survei, Kaizen, Sesi Live Host, pelatihan, booking ruang). Juga menjawab versi mana yang sudah dirilis ke toko versus yang baru di branch `dev`, serta bagaimana konten dan menu dibedakan per perusahaan (multi-tenant).",
+      "hash": "77db49ae5afc3427cf940fb154eac996af13a82de3ce97220d942daa856252f2",
+      "ukuran_kb": 122.4,
+      "ringkasan": "Menjawab: apa itu aplikasi mobile MyBharata, tech stack dan arsitekturnya (Flutter, BLoC, Clean Architecture feature-first), cara autentikasi (JWT, biometric, PIN, satu akun satu device), serta versi build vs versi rilis yang beredar di HP pemakai. Juga menjawab fitur apa saja yang live atau direncanakan (attendance, cuti/izin, lembur, payroll/slip gaji ber-PIN, KPI, survei, Kaizen, Sesi Live Host, Booking Ruang, Pelatihan, Persetujuan Terpusat) dan bagaimana perilaku multi-perusahaan per tenant.",
       "kata_kunci": [
         "MyBharata",
         "my_bharata",
         "aplikasi mobile",
         "Flutter",
         "HRIS mobile",
-        "versi rilis",
-        "multi-tenant",
+        "presensi",
+        "attendance",
         "slip gaji",
-        "Sesi Live Host",
-        "Codemagic"
+        "payslip",
+        "multi-tenant"
       ]
     },
     {
@@ -1610,6 +1612,7 @@
         "RUN - Deploy Microservices bip-erp",
         "REF - Alur Persetujuan",
         "ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service",
+        "ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web",
         "ANALISA - Antrean Persetujuan Terpusat di Web",
         "ADR - 0050 Notifikasi Inbox Mendorong Push ke Browser dan Ponsel Sekaligus",
         "BASE - Enterance Point",
@@ -1618,20 +1621,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "567ab169d5e049353ae3a65179085d3919863e048288a250a9bad48727989733",
-      "ukuran_kb": 596.8,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS One Bharata (erp-frontend), stack-nya, bagaimana login, token, SSO, dan role/izin menggerbang sidebar serta halaman, dan bagaimana fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan) bekerja. Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts/ChartContainer, daftar modul yang sudah dan belum diimplementasikan, serta arah baru sidebar satu daftar urusan.",
+      "hash": "db6764f97c4e76936006a449b1db24a2dfdb001cc720dd24d81ab67384ae0b16",
+      "ukuran_kb": 597.0,
+      "ringkasan": "Menjawab: apa itu portal web ERP (erp-frontend / One Bharata), stack-nya (Next.js, shadcn, TanStack Query, react-i18next), bagaimana login, token, SSO Identity Provider, dan gerbang role/sidebar dari system_roles maupun paket izin bekerja. Juga menjawab konvensi data-fetching dan bagan Recharts yang berlaku, fitur multi-perusahaan (pemilih perusahaan, rekrutmen lintas perusahaan), serta modul apa saja yang sudah ada di web.",
       "kata_kunci": [
+        "Web ERP",
         "erp-frontend",
-        "web ERP",
         "One Bharata",
+        "hris-dashboard",
+        "Next.js",
         "SSO",
-        "login token",
         "system_roles",
         "sidebar",
-        "multi-tenant",
-        "TanStack Query",
-        "Recharts"
+        "role gating",
+        "TanStack Query"
       ]
     },
     {
@@ -6449,7 +6452,7 @@
         "APP - Web ERP"
       ],
       "hash": "cbe50357be0f60ff0c955244db65d7ea6a789c7e20f47bc80ee593d394467e49",
-      "ukuran_kb": 11.6,
+      "ukuran_kb": 11.7,
       "ringkasan": "Menjawab: kenapa modul Industrial Relation menyimpan catatan pelanggaran kepatuhan ringan (atribut kerja: sepatu, lanyard) di koleksi baru compliance_note yang terpisah dari Surat Peringatan dan kpi_score, dan kenapa catatan itu bukan sanksi, tidak memotong gaji, tidak menerbitkan SP otomatis, serta tidak masuk skor KPI. Menjelaskan siapa yang boleh mencatat (petugas IR/HR yang ditunjuk, lewat MyBharata, ditegakkan di server), siapa yang boleh membaca (visibilitas tiga-arah: petugas HR, karyawan atas dirinya, atasan atas departemennya via SupervisedDepartmentsStrict), dan kenapa jenis pelanggaran dibuat master data bukan enum Go. Juga menjawab kenapa data ini sensitif sehingga tidak didaftarkan ke calendar-service atau feed lintas modul.",
       "kata_kunci": [
         "industrial relation",
@@ -7979,7 +7982,7 @@
         "Microservices - Attendance Service"
       ],
       "hash": "d17340c57b6557ac0854f599e6dec6710b07c4c33edb90ac812f5b938a810e8f",
-      "ukuran_kb": 20.6,
+      "ukuran_kb": 20.7,
       "ringkasan": "Menjawab: kenapa inspeksi Satgas 5R & K3 untuk Office Boy dan Security pindah dari Form Builder ke entitas sendiri `satgas_finding` di employee-service, bagaimana petugas mencatat temuan bebas (tanpa form/periode pra-bangun) lengkap dengan foto dan tenggat SLA, dan bagaimana eskalasi memakai ulang mekanisme tahan-clock-out yang sudah ada. Menjelaskan juga bagaimana skor KPI kebersihan dihitung otomatis 0–100 dari temuan bulan itu (tanpa temuan = 100, tiap temuan mengurangi), kenapa 'menahan clock-out' adalah nudge bukan sanksi dan bukan potong gaji, serta batas terhadap Inspeksi Area (ADR 0111), Catatan Kepatuhan (ADR 0085), dan Surat Peringatan.",
       "kata_kunci": [
         "Satgas",
@@ -9152,7 +9155,7 @@
         "ADR - 0057 Penyetuju Pengajuan Pembelian Ditetapkan per Tahap"
       ],
       "hash": "db7202a062603803f25944476103df696dc34eb488f04339329fd89874b6ee40",
-      "ukuran_kb": 5.0,
+      "ukuran_kb": 5.1,
       "ringkasan": "Menjawab: mengapa pengajuan Konsumsi dulu diperlakukan sebagai pembelian barang lewat Procurement (bukan permintaan uang), di mana rancangan lengkap alur pembeliannya disimpan, dan mengapa tahap persetujuan atasan dilewati bila pengajunya supervisor HRGA. ADR ini sudah digantikan untuk pengajuan baru, tapi masih menjelaskan aturan bagi dokumen Konsumsi lama.",
       "kata_kunci": [
         "ADR 0154",
@@ -9329,7 +9332,7 @@
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi"
       ],
       "hash": "2f1943fa67f1c6c7f4c6a975cdae67f14ba03a7986d5724f9e0d80fddcf9c8ee",
-      "ukuran_kb": 8.4,
+      "ukuran_kb": 8.5,
       "ringkasan": "Menjawab: bagaimana serapan anggaran dibaca di layar Anggaran & Cost Control (Terpakai tetap realisasi Accurate, dana dari pengajuan hanya bagian darinya dan tidak dijumlahkan), bagaimana pengajuan yang belum dicatat Accounting ditampilkan, dan siapa yang boleh menulis anggaran lewat izin baru finance.anggaran.kelola. Juga menjawab sembilan keputusan K1 sampai K9, apa yang sengaja tidak dijanjikan (lewat anggaran hanya memperingatkan, tanpa anggaran per proyek), konsekuensi urutan deploy, dan hal yang belum diputuskan.",
       "kata_kunci": [
         "ADR 0159",
@@ -9395,7 +9398,7 @@
         "CORE - RBAC dan Permission Set"
       ],
       "hash": "743732140225d710cc4e3233c3dac177491a9ab0b5702eff66ad987cbd4a3e9d",
-      "ukuran_kb": 12.7,
+      "ukuran_kb": 12.8,
       "ringkasan": "Menjawab: bagaimana Cost Control mengatur porsi proyeksi kas keluar per minggu, aturan kunci minggu, batas dua kali ubah, riwayat perubahan, dan kenapa porsi tidak mengubah KPI akhir bulan. Cakupan, jumlah sebulan, dan pembagian minggu diamandemen ADR 0184.",
       "kata_kunci": [
         "forecast kas mingguan",
@@ -9751,7 +9754,7 @@
         "APP - Web ERP"
       ],
       "hash": "1a19940c01a5ea1b9201a67f07f17aa7cc7dabbed5e51b8201e3797e2eeb6e25",
-      "ukuran_kb": 13.4,
+      "ukuran_kb": 13.5,
       "ringkasan": "Menjawab: kenapa akun berhak banyak terpental ke halaman login Web ERP (cookie token melewati batas ±4 KB browser), kenapa token dipindah ke localStorage dengan cookie penanda sesi, dan kenapa usulan penanda super admin di token ditolak. Juga menjelaskan paket bawaan Semua Izin yang dimekarkan saat token terbit, batasannya (tak berlaku untuk peran modul, menu terbatas, dan akun sendiri), serta konsekuensinya.",
       "kata_kunci": [
         "ADR 0172",
@@ -9915,7 +9918,7 @@
         "GA - Inventory Management"
       ],
       "hash": "fd374722060795aae018dc553104323fb5839cabaeeb071a14564e1ce8cb6d7e",
-      "ukuran_kb": 4.7,
+      "ukuran_kb": 4.8,
       "ringkasan": "Menjawab: mengapa tipe pengajuan Konsumsi dilebur ke Barang Umum, apa yang terjadi bila seseorang masih mengajukan KONSUMSI (ditolak 400 dan tak ditawarkan), dan bagaimana dokumen Konsumsi lama tetap diproses. Juga menjawab urutan deploy backend dan frontend serta konsekuensinya terhadap pembayar barang konsumsi.",
       "kata_kunci": [
         "ADR 0177",
@@ -9949,7 +9952,7 @@
         "Finance - Rancangan Finance Service"
       ],
       "hash": "7668e3b1f9b8cda9103b6cac847ad34fca12d661a216efb7c4fc6f48407be87c",
-      "ukuran_kb": 13.5,
+      "ukuran_kb": 13.6,
       "ringkasan": "Menjawab: kenapa serapan anggaran dibaca per departemen tag jurnal Accurate, kenapa baris 'Seluruh perusahaan' dihapus dari varians dan KPI, bagaimana pagu gabungan (anggaran gabungan beberapa akun per departemen per bulan) dihitung, dan kenapa Varians di layar Serapan = Terpakai - Anggaran. Sebagian butirnya direvisi ADR 0180.",
       "kata_kunci": [
         "serapan anggaran",
@@ -10011,7 +10014,7 @@
         "API - Integration Service"
       ],
       "hash": "6d5ff6385b70ae4595f8f62a6a94486b73cada22af6721b52912858501c8b799",
-      "ukuran_kb": 11.7,
+      "ukuran_kb": 11.9,
       "ringkasan": "Menjawab: akun mana yang dianggarkan untuk seluruh perusahaan dan siapa yang mengatur daftarnya, kenapa laporan Non Ops tinggal dua akun dan Beban Bank pindah ke OPEX, bagaimana baseline Non Ops diisi Finance (kosong sampai diisi, tanpa angka otomatis), kenapa KPI Cost Control #2 memakai metrik bertanda (Realisasi - Baseline)/Baseline, dan rekomendasi untuk anggaran gabungan.",
       "kata_kunci": [
         "seluruh perusahaan",
@@ -10152,7 +10155,7 @@
         "REF - Kepemilikan Data"
       ],
       "hash": "0c0e4dd46c99af36dea36c54228b0f24d708160da37328aea1fae5fff7b27ba2",
-      "ukuran_kb": 16.4,
+      "ukuran_kb": 16.5,
       "ringkasan": "Menjawab: mengapa forecast kas mingguan mencakup tujuh komponen uang keluar (material, BOP, marketing, gaji, ops adum, pajak, aset), mengapa sebulan dibagi empat minggu, dan mengapa realisasi tahap pertama masih berbasis akrual sebelum beralih ke kas. Juga apa yang diamandemen dari ADR 0161 dan asumsi A1-A7 yang menunggu konfirmasi Finance.",
       "kata_kunci": [
         "forecast kas mingguan",
@@ -10215,7 +10218,7 @@
         "Manufacture - Kajian Fondasi Sistem"
       ],
       "hash": "8ac0bedeccbdf83b3aabef725904312c3945d6a4db9e8edcc6e16864c113805a",
-      "ukuran_kb": 11.9,
+      "ukuran_kb": 12.0,
       "ringkasan": "Menjawab: siapa pemegang angka stok bahan baku dan barang jadi pabrik (ERP atau Accurate), kenapa tarik stok Accurate tiap 6 jam yang menimpa angka ERP bermasalah, akun dan gudang Accurate untuk Penyesuaian Persediaan (kini jatuh ke Ekuitas Saldo Awal), dan batas selisih stock opname. Memuat empat pertanyaan terbuka untuk Finance (keputusan K-1) dan temuan push kedua di hari sama yang menghapus baris terkirim.",
       "kata_kunci": [
         "stok pabrik",
@@ -10243,7 +10246,7 @@
         "Manufacture - Kajian Fondasi Sistem"
       ],
       "hash": "0ab3cb88f1b699daa5ae5f1b1f40fce5575520d679900c1e91f79adb28ded751",
-      "ukuran_kb": 9.6,
+      "ukuran_kb": 9.7,
       "ringkasan": "Menjawab: status apa yang dipakai untuk bahan baku dan kemas yang baru datang (Lulus/Ditolak, arti Reject), apakah penolakan dikonfirmasi SPV Quality, apakah barang masuk di luar pengajuan wajib karantina, dan apakah hasil QC dicatat per lot. Memetakan empat tempat penyimpan status QC yang tak tersambung dan ketiadaan gerbang pemakaian (keputusan K-4).",
       "kata_kunci": [
         "bahan masuk",
@@ -10256,6 +10259,43 @@
         "Ditolak",
         "K-4",
         "gerbang QC"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web.md",
+      "judul": "ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-10-20, kode belum ada. Pemutus: irfanarfianto. Melanjutkan [[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] (yang mengatur isi baris dan kode `aksi`) ke MyBharata, dan menambah bentuk keluar langkah persetujuan yang seragam. **Tidak mengubah** butir 12 ADR 0181 (tanpa penanda SLA). Pecahan kerja: [[ANALISA - Persetujuan Terpusat di MyBharata]].",
+      "publik": true,
+      "tautan": [
+        "ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional",
+        "ANALISA - Persetujuan Terpusat di MyBharata",
+        "ADR - 0137 Model Persetujuan Tunggal dan Pemisahan Tugas Lintas Modul",
+        "ANALISA - Antrean Persetujuan Terpusat di Web",
+        "GA - SOP Posisi Procurement",
+        "GA - Form Pengadaan dan Pengajuan Dana",
+        "ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service",
+        "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
+        "REF - Alur Persetujuan",
+        "APP - MyBharata",
+        "APP - Web ERP"
+      ],
+      "hash": "e23379307734bec62637498de30758d521ebd6a366a11d0d49035d499787c540",
+      "ukuran_kb": 16.7,
+      "ringkasan": "Menjawab: bagaimana penyetuju menuntaskan semua antrean persetujuan lintas modul dari HP (kartu Beranda \"Perlu Tindakan\", halaman Persetujuan Menunggu/Riwayat, detail dan aksi tanpa diarahkan ke web), dan apa yang ditambahkan ke agregator employee-service (field jenis, langkah[] seragam, endpoint detail). Juga menjawab siapa boleh membaca detail dokumen di antrean, kenapa label \"Permintaan ERP\" menjadi \"Permintaan Pembelian\", urutan deploy BE lalu Mobile lalu web, dan alternatif yang ditolak.",
+      "kata_kunci": [
+        "ADR 0188",
+        "persetujuan terpusat",
+        "approval",
+        "MyBharata",
+        "Perlu Tindakan",
+        "agregator antrean",
+        "langkah persetujuan",
+        "stepper",
+        "Permintaan Pembelian",
+        "Portal Persetujuan"
       ]
     },
     {
@@ -11494,7 +11534,7 @@
         "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya"
       ],
       "hash": "026af7a919a53d9f13b6f808c668ac7cd7cde08f4ad8fe30b725f6f9c5468582",
-      "ukuran_kb": 28.2,
+      "ukuran_kb": 28.4,
       "ringkasan": "Menjawab: bagaimana layar Anggaran dan Cost Control membaca angka Anggaran, Terpakai, dan Sisa per pos; mengapa dana dari pengajuan dihitung sebagai bagian Terpakai; dan bagaimana forecast mingguan, proyeksi per minggu, serta cashflow tujuh komponen bekerja. Juga aturan minggu yang belum selesai tidak dihitung dan total mana yang tidak boleh dijumlahkan.",
       "kata_kunci": [
         "serapan anggaran",
@@ -12470,7 +12510,7 @@
         "GA - Form Pengadaan dan Pengajuan Dana"
       ],
       "hash": "5a506ef2f6690f2d0fd48bd5da4134bc63d99b6af98efef405cd97c1c4ee6447",
-      "ukuran_kb": 7.6,
+      "ukuran_kb": 7.7,
       "ringkasan": "Menjawab: apa saja 11 SOP Procurement resmi PT Bharata (perencanaan kebutuhan, PR, seleksi vendor, RFQ, penerbitan PO, monitoring pengiriman, penerimaan+QC, verifikasi invoice, pembayaran, evaluasi vendor, cost saving, pelaporan) dan sejauh mana masing-masing sudah didukung ERP. Memetakan tahap SOP mana yang sudah ada di kode (Permintaan/Pesanan/Penerimaan), mana yang sebagian, dan mana yang belum dibangun (RFQ 3-vendor, matriks approval nominal >Rp50jt, AVL & dokumen legalitas vendor, scorecard/OTD vendor, pelaporan formal). Berguna untuk mengecek kepatuhan SOP sebelum merancang fitur procurement/manufacture baru.",
       "kata_kunci": [
         "procurement",
@@ -20568,28 +20608,26 @@
         "ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service",
         "ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional",
         "ADR - 0106 Tema dan Teaser Live Support Disetor dan Diputus Penyetuju Departemen sebagai Dasar KPI",
+        "ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web",
         "REF - Alur Persetujuan",
         "HRIS - Employee Request & Approval",
         "APP - Web ERP",
         "Microservices - Employee Service"
       ],
-      "hash": "495bf6e0f811fb41d7100061f1ebcee835f855b97dd52080e8a3fc902930eef0",
-      "ukuran_kb": 14.2,
-      "ringkasan": "Menjawab: apa saja task T1-T9 untuk mewujudkan ADR 0114, mana yang masuk irisan 1 (tabel di web tanpa ubah backend) dan irisan 2 (endpoint agregator GET /pengajuan/antrean serta adapter per sumber), dan apa prasyaratnya. Memuat keputusan produk tentang sumbu menunggu vs riwayat, pantauan modul hanya bagi pemegang modul, serta koreksi klaim keliru soal gerbang payroll dan rekrutmen.",
+      "hash": "4b99d1e9da79dae304dcd5bdf4e6bed20ffd8871e6f22040d86f2275c590cdb0",
+      "ukuran_kb": 14.3,
+      "ringkasan": "Menjawab: bagaimana pekerjaan ADR 0114 (antrean persetujuan terpusat di web) dipecah jadi task, apa isi irisan 1 (halaman /portal/persetujuan dari /hr/requests, Sheet detail, aksi ke endpoint modul asal, menu, Ruang Direktur) dan irisan 2 (agregator GET /pengajuan/antrean, adapter sumber lain). Juga menjawab apa arti sumbu Riwayat (keputusan pemanggil), kenapa adapter daftar modul seperti Payroll dan Rekrutmen digerbang di service sumber, dan koreksi tuduhan kebocoran yang ternyata sudah tergerbang di pendaftaran rute.",
       "kata_kunci": [
         "antrean persetujuan",
         "approval queue",
-        "task breakdown",
-        "irisan",
-        "adapter",
+        "Portal Persetujuan",
+        "/portal/persetujuan",
+        "ADR 0114",
         "agregator",
-        "pantauan modul",
-        "riwayat",
         "pengajuan antrean",
-        "payroll-runs",
-        "rekrutmen",
-        "ANALISA",
-        "ADR 0114"
+        "riwayat keputusan",
+        "Sheet detail",
+        "pantauan modul"
       ]
     },
     {
@@ -20999,7 +21037,7 @@
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
       "hash": "1cfd73ecf462c2dead1cfbc567bf1e6dc1c00338ed857f34c47bb69d6b147411",
-      "ukuran_kb": 9.7,
+      "ukuran_kb": 9.8,
       "ringkasan": "Menjawab: apa saja butir kerja penataan fondasi Manufaktur (M-01 sampai M-42) per fase, keputusan mana yang ditunggu (K-1 sampai K-11) dan siapa Pemutusnya, butir mana yang siap dikerjakan, serta aturan urutan kerja dan pencatatan kode M di setiap PR.",
       "kata_kunci": [
         "fondasi manufaktur",
@@ -21089,7 +21127,7 @@
         "Microservices - Form Builder Service"
       ],
       "hash": "0a7626b938a8ed09b938634e03c022c604145b021c548a80c3fc8136f1b250d7",
-      "ukuran_kb": 6.3,
+      "ukuran_kb": 6.4,
       "ringkasan": "Menjawab: fitur pengelolaan Program Culture (klub Badminton, Football, Ladies Sport, Billiard, Music) apa saja yang sudah ada di ERP versus yang masih dilakukan manual di Excel, dan gap mana yang layak dibangun. Merinci mengapa jadwal berulang, matriks distribusi per-pekan, target frekuensi vs realisasi, dokumentasi/biaya sesi, dan indikator per-klub belum tersedia, serta mana yang sengaja tidak dibuat (RSVP, KPI officer-centric). Papan kerja temuan yang tiap kandidat scope-nya masih menunggu keputusan pemilik produk sebelum jadi ADR + task.",
       "kata_kunci": [
         "program culture",
@@ -21878,6 +21916,35 @@
       ]
     },
     {
+      "path": "Workspace/ANALISA - Persetujuan Terpusat di MyBharata.md",
+      "judul": "ANALISA - Persetujuan Terpusat di MyBharata",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": "🟡",
+      "status_teks": "Belum dikerjakan",
+      "publik": false,
+      "tautan": [
+        "ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web",
+        "APP - MyBharata",
+        "IT - Server, VMs and Databases"
+      ],
+      "hash": "f3d26d7c19b314575a387dea73013c2d352f85c320b3824af09597f0446cdf67",
+      "ukuran_kb": 19.1,
+      "ringkasan": "Menjawab: bagaimana ADR 0188 dipecah jadi issue induk bip-erp#3316 dan delapan sub-issue BE/Mobile/FE, apa urutan dan ketergantungan antar issue, serta kriteria \"Yang harus benar\" tiap bagian (field jenis dan langkah, endpoint detail seragam, akses baca penyetuju, kartu dan halaman Persetujuan di MyBharata, Rincian Payroll, tabel compact dan Sheet di web). Juga menjawab data prod apa yang perlu diukur dulu sebelum issue diberi label Siap Agent.",
+      "kata_kunci": [
+        "ANALISA persetujuan MyBharata",
+        "persetujuan terpusat",
+        "approval mobile",
+        "bip-erp#3316",
+        "sub-issue",
+        "Siap Agent",
+        "langkah[]",
+        "endpoint detail antrean",
+        "Rincian Payroll",
+        "stepper"
+      ]
+    },
+    {
       "path": "Workspace/ANALISA - Portal Persetujuan Memuat Tindakan Operasional.md",
       "judul": "ANALISA - Portal Persetujuan Memuat Tindakan Operasional",
       "area": "Workspace",
@@ -21888,26 +21955,27 @@
       "tautan": [
         "ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional",
         "ANALISA - Antrean Persetujuan Terpusat di Web",
+        "ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web",
         "ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service",
         "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
         "ADR - 0010 Internasionalisasi (i18n) Dua Bahasa",
         "REF - Alur Persetujuan",
         "Microservices - Employee Service"
       ],
-      "hash": "f567b5c0c6d9ad00d5da8c08216a2296b5310bb88ea198512b9bbfa8831d63a7",
-      "ukuran_kb": 19.3,
-      "ringkasan": "Menjawab: bagaimana halaman Persetujuan (/portal/persetujuan) diperluas agar memuat tindakan operasional selain keputusan, kode aksi apa yang dikirim agregator, kolom dan urutan tabel apa yang disepakati, dan ke mana klik tiap kategori diarahkan. Juga memecah pekerjaan jadi irisan siap /brief, termasuk perbaikan bug antrean (offer Draft palsu, Live Support tanpa tahap, label tahap mentah, urutan terlama dulu) beserta kriteria yang harus benar dan urutan deploy BE sebelum FE.",
+      "hash": "1e37064456696c355b82ee2b86397dc04faa20edaa5865b893417f09d84ff70d",
+      "ukuran_kb": 19.5,
+      "ringkasan": "Menjawab: bagaimana ADR 0181 dipecah jadi irisan kerja agar Portal Persetujuan memuat keputusan dan tindakan operasional (jawab stok, isi harga, transfer, catat, triase), apa saja bug irisan 0 (offer Draft palsu, Live Support tahap kosong, label tahap mentah, urutan terbaru dulu), dan kontrak baris baru agregator (aksi, nomor, nilai nullable, pemohon, tautan). Juga menjawab tujuan klik per kategori, aturan urutan Terlama/Terbaru di ?urut=, rincian tampilan mockup yang disepakati, dan hal yang belum diputuskan.",
       "kata_kunci": [
-        "portal persetujuan",
+        "Portal Persetujuan",
+        "tindakan operasional",
+        "ADR 0181",
+        "kode aksi",
         "approval",
         "antrean",
-        "tindakan operasional",
-        "aksi",
-        "agregator",
-        "ADR 0181",
-        "pengajuan barang",
-        "irisan",
-        "urutkan terlama"
+        "urut terlama",
+        "Pengajuan Barang",
+        "triase tiket",
+        "irisan"
       ]
     },
     {
@@ -21978,7 +22046,7 @@
         "API - Integration Service"
       ],
       "hash": "a5c9caa815f928cf24377928ebee153cfa7a8a86b8b2846acb7b72f53028c96a",
-      "ukuran_kb": 5.2,
+      "ukuran_kb": 5.3,
       "ringkasan": "Menjawab: task apa saja yang lahir dari kebutuhan \"proyeksi Forecast Mingguan bisa diedit manual\", urutan pengerjaannya di `bip-erp` dan `erp-frontend`, issue dan PR mana yang terkait, serta kriteria \"yang harus benar\" untuk task backend dan frontend. Juga menjawab apa yang diputuskan pemohon (total per minggu, kunci minggu, batas 2 kali ubah, riwayat, bentuk simpan porsi), apa yang sengaja tidak dikerjakan, apa yang masih terbuka, dan pesan untuk manajemen soal KPI yang tidak berubah.",
       "kata_kunci": [
         "analisa kebutuhan",
@@ -22068,7 +22136,7 @@
         "ANALISA - Inspeksi Satgas 5R dan K3"
       ],
       "hash": "78e2ab91fcd6914460f26a0a31fd8223880d6ea613808144abc0dfb1b0469391",
-      "ukuran_kb": 9.3,
+      "ukuran_kb": 9.4,
       "ringkasan": "Menjawab: apa saja task turunan (T1–T8) dari redesign Satgas menjadi input bebas dengan SLA temuan, apa status pengerjaan tiap task, di branch dan repo mana pekerjaannya (bip-erp `feat/satgas-finding`, erp-frontend `feat/satgas-finding-web`, my-bharata `feat/satgas-finding-mobile`), serta urutan dan dependensinya (backend dulu, lalu mobile & web, retire form-builder paling akhir). Menjelaskan juga penyempurnaan keputusan user 2026-09-24 (toggle 'Ada temuan?' dibuang, tanpa temuan sebulan skor 100 otomatis, approve tanpa mengetik nilai) dan gerbang 'selesai bila' tiap task. Ini papan kerja, bukan sumber kebenaran — detail keputusan ada di ADR 0122.",
       "kata_kunci": [
         "ANALISA Satgas",
@@ -22587,7 +22655,7 @@
         "CORE - SSO Flow"
       ],
       "hash": "65f048665617ba7bb1f1770d115b1d8ac58eacc0926285e64e14b42d8ab79803",
-      "ukuran_kb": 7.0,
+      "ukuran_kb": 7.1,
       "ringkasan": "Menjawab: task apa saja yang diturunkan dari ADR 0172 (ukur ukuran token, pindah token ke localStorage, paket Semua Izin di employee-service, tampilan di layar Hak Akses, sinkron dok), PR dan issue GitHub mana yang terkait, serta urutan deploy yang wajib (FE token dulu, lalu BE sebelum FE). Juga memuat test dan langkah verifikasi tiap task.",
       "kata_kunci": [
         "analisa kebutuhan",
@@ -22687,7 +22755,7 @@
         "2026-07-17 Temuan - Reject retur menambah stok FG"
       ],
       "hash": "9d3cb08e3ec79fdef0d632d66bc62b30a2de8d865bc976e0fcdbbd00aae7462e",
-      "ukuran_kb": 11.2,
+      "ukuran_kb": 11.5,
       "ringkasan": "Menjawab pertanyaan tentang desain perbaikan performa menu Master Resi yang lambat dibuka karena puluhan ribu dokumen resi, mencakup pagination sisi server per-hari (endpoint /resi/days), pencarian prefix no_resi di server, dan kontrak urutan data yang dibagi dengan menu Gudang FG (lookup resi, ambil rentang).",
       "kata_kunci": [
         "Master Resi",

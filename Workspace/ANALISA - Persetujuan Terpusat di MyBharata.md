@@ -7,6 +7,7 @@
 - **Status**: 🟡 Belum dikerjakan
 - **Tanggal**: 2026-10-20
 - **Pemutus**: irfanarfianto
+- **Issue induk**: [bip-erp#3316](https://github.com/bip-itteam-internal/bip-erp/issues/3316) (8 sub-issue, semua Backlog di Project #15, tanpa label `Siap Agent`)
 - **Ukuran**: **Besar**. Tiga repo harus berubah dan masing-masing butuh lebih dari satu PR:
   - `bip-erp`: agregator belum punya `jenis`, `langkah[]`, maupun endpoint detail (`antrean_pengajuan.go:45-236`, `:1888`); lima service sumber belum memberi akses baca penyetuju atau rute detail (`procurement/main.go:873`, `inventory/permintaan_gate.go:46-54`, learning/marketing-analytics/recruitment tanpa GET by id).
   - `my-bharata`: belum memanggil agregator sama sekali (git grep `origin/dev` 2026-10-19), kartu beranda membaca `/hr/requests` (`pending_approval_card.dart:25`), layar peninjau hanya untuk 6 jenis karyawan + booking + tiket.
@@ -41,7 +42,9 @@ Jenis yang masih 0 dokumen menunggu dikerjakan paling akhir di #5 dan #8.
 
 ---
 
-## Induk · bip-erp
+## Induk · bip-erp#3316
+
+**Issue**: https://github.com/bip-itteam-internal/bip-erp/issues/3316
 
 **Judul**: Persetujuan Terpusat di MyBharata dan Portal Persetujuan seragam per jenis
 
@@ -68,7 +71,9 @@ ADR 0188 Diterima.
 
 ---
 
-## #1 · bip-erp · [BE] Antrean: field `jenis` + `langkah[]` ringkas di baris (bagian 1/3)
+## #1 · bip-erp#3317 · [BE] Antrean: field `jenis` + `langkah[]` ringkas di baris (bagian 1/3)
+
+**Issue**: https://github.com/bip-itteam-internal/bip-erp/issues/3317
 
 **Pemutus:** irfanarfianto
 **PIC:** (diisi saat In Progress)
@@ -99,7 +104,9 @@ ADR 0188 Diterima.
 
 ---
 
-## #2 · bip-erp · [BE] Detail seragam `GET /pengajuan/antrean/:kategori/:id` + `langkah[]` lengkap (bagian 2/3, sesudah #1)
+## #2 · bip-erp#3318 · [BE] Detail seragam `GET /pengajuan/antrean/:kategori/:id` + `langkah[]` lengkap (bagian 2/3, sesudah #1)
+
+**Issue**: https://github.com/bip-itteam-internal/bip-erp/issues/3318
 
 **Pemutus:** irfanarfianto
 **PIC:** (diisi saat In Progress)
@@ -129,7 +136,9 @@ Rute detail sumber hari ini: attendance `GET /hr/requests/detail` (`hr_admin.go:
 
 ---
 
-## #3 · bip-erp · [BE] Akses baca penyetuju + rute detail Live Support, Pelatihan, Offer, Permintaan Pembelian, Permintaan Barang GA (bagian 3/3)
+## #3 · bip-erp#3319 · [BE] Akses baca penyetuju + rute detail Live Support, Pelatihan, Offer, Permintaan Pembelian, Permintaan Barang GA (bagian 3/3)
+
+**Issue**: https://github.com/bip-itteam-internal/bip-erp/issues/3319
 
 **Pemutus:** irfanarfianto
 **PIC:** (diisi saat In Progress)
@@ -157,7 +166,9 @@ ADR 0188 Diterima.
 
 ---
 
-## #4 · my-bharata · [Mobile] Kartu "Perlu Tindakan" + halaman Persetujuan Menunggu/Riwayat 16 jenis (bagian 1/3)
+## #4 · my-bharata#224 · [Mobile] Kartu "Perlu Tindakan" + halaman Persetujuan Menunggu/Riwayat 16 jenis (bagian 1/3)
+
+**Issue**: https://github.com/bip-itteam-internal/my-bharata/issues/224
 
 **Pemutus:** irfanarfianto
 **PIC:** (diisi saat In Progress)
@@ -190,7 +201,9 @@ Rancangan: Figma "MyBharata: Persetujuan Terpusat versi compact" (kartu 16 jenis
 
 ---
 
-## #5 · my-bharata · [Mobile] Detail + aksi jenis non-karyawan, stepper ringkas/semua (bagian 2/3)
+## #5 · my-bharata#225 · [Mobile] Detail + aksi jenis non-karyawan, stepper ringkas/semua (bagian 2/3)
+
+**Issue**: https://github.com/bip-itteam-internal/my-bharata/issues/225
 
 **Pemutus:** irfanarfianto
 **PIC:** (diisi saat In Progress)
@@ -220,7 +233,9 @@ Perlu ukur prod: jumlah dokumen menunggu per koleksi (kueri di § Perlu ukur pro
 
 ---
 
-## #6 · my-bharata · [Mobile] Rincian Payroll: tabel compact + rincian gaji per karyawan (bagian 3/3)
+## #6 · my-bharata#226 · [Mobile] Rincian Payroll: tabel compact + rincian gaji per karyawan (bagian 3/3)
+
+**Issue**: https://github.com/bip-itteam-internal/my-bharata/issues/226
 
 **Pemutus:** irfanarfianto
 **PIC:** (diisi saat In Progress)
@@ -249,7 +264,9 @@ PIN tambahan (ditolak ADR 0188); perubahan perhitungan payroll.
 
 ---
 
-## #7 · erp-frontend · [FE] Tabel & Riwayat compact, ubin warna/ikon jenis, label "Permintaan Pembelian" (bagian 1/2)
+## #7 · erp-frontend#2627 · [FE] Tabel & Riwayat compact, ubin warna/ikon jenis, label "Permintaan Pembelian" (bagian 1/2)
+
+**Issue**: https://github.com/bip-itteam-internal/erp-frontend/issues/2627
 
 **Pemutus:** irfanarfianto
 **PIC:** (diisi saat In Progress)
@@ -279,7 +296,9 @@ Rancangan: Figma "Tabel web compact" dan "Tabel web compact · Riwayat".
 
 ---
 
-## #8 · erp-frontend · [FE] Sheet 16 jenis + komponen stepper bersama (bagian 2/2, sesudah #7)
+## #8 · erp-frontend#2628 · [FE] Sheet 16 jenis + komponen stepper bersama (bagian 2/2, sesudah #7)
+
+**Issue**: https://github.com/bip-itteam-internal/erp-frontend/issues/2628
 
 **Pemutus:** irfanarfianto
 **PIC:** (diisi saat In Progress)
