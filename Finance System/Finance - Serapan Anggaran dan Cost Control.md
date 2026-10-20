@@ -121,6 +121,27 @@ Aturan pengecualian:
 | `aset_tahunan.sisa` | Anggaran tahun − Σ realisasi aset 1 Jan s.d. akhir bulan laporan | `null` bila anggaran belum diisi atau aset belum disinkron. Boleh negatif. `BiayaPerolehan` adalah nilai current (sesudah pelepasan), bukan harga beli awal |
 | Beban pajak 72xx (7201–7212) | **Tidak masuk komponen mana pun** | Komponen Pajak hanya diisi setoran, yaitu delapan akun `akunPajakSetoran` milik finance: PPN, PPh 21/23/25/4(2)/Final UMKM/Badan, PBB. Akibatnya PKB (7206), BBNKB (7208), dan PPN Kurang Bayar (7212) belum terhitung sama sekali (§Belum Diputuskan) |
 
+### KPI Penurunan Biaya OPEX + Non Ops YoY (🟡 Diusulkan 2026-10-20, kode belum ada)
+
+KPI Cost Control #2 mengukur **perubahan total biaya OPEX + Non Ops dibanding bulan yang sama tahun lalu** ([[ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu]]). Rencana cara kerjanya:
+
+- **Populasi** = `DaftarKomponenOpex` ∪ `DaftarAkunAdminNonOps`. Keduanya daftar yang sudah ada, dan test menjaga agar tidak beririsan. Tidak ada daftar ketiga.
+- **Nama diresolusi ke kode akun** dari katalog akun beban saat ini. Kedua periode lalu dicocokkan per **kode**, sehingga rename akun antartahun tidak memutus pasangan.
+- **Kedua sisi dibaca lewat panggilan Accurate yang sama** dan disimpan sebagai cuplikan bulanan oleh penyegar harian. Periode yang ditarik: bulan berjalan, bulan lalu, dan pembanding tahun lalu keduanya.
+  - `realisasi_opex` **tidak** dipakai, karena tidak punya bulan tahun lalu dan populasinya lebih luas.
+- **Rumus** = (Realisasi − Baseline) ÷ Baseline × 100. Negatif berarti turun, dan targetnya ≤ −2. Tidak ada ×1,25.
+
+| Kolom/keadaan | Artinya | Aturan pemakaian |
+|---|---|---|
+| Total realisasi / total baseline | Σ akun populasi pada bulan penilaian / bulan yang sama tahun lalu | ⛔ **Jangan dijumlahkan** dengan total laporan Non Ops atau varians OPEX: populasinya beririsan dengan keduanya |
+| Persen tak terdefinisi | Salah satu sisi belum ditarik, Accurate belum punya data tahun lalu, atau baseline = 0 | Sumber KPI menggalatkannya dengan sebab yang dibedakan, bukan 0% |
+| `tak_ada` / `ambigu` | Nama di daftar yang tidak ketemu di katalog Accurate, atau dipakai lebih dari satu akun | Tidak ikut dihitung dan dilaporkan sebagai baris pengecualian |
+| `akun_satu_sisi` | Akun yang bersaldo hanya di salah satu periode | Tetap dihitung apa adanya, tetapi dicacah supaya baseline yang mengecil karena akun tutup terlihat |
+
+**Hubungan dengan metrik lain:**
+- **Laporan Non Ops** (baseline isian, ADR 0180) dan KPI Finance Supervisor F3 (`rasio_beban_non_ops_persen`) **tidak berubah**.
+- **Varians OPEX** (#3, terhadap anggaran) memuat populasi OPEX yang sama, tetapi menjawab pertanyaan yang berbeda. Jangan baca keduanya sebagai bukti independen.
+
 Tambahan di luar halaman ini: kotak **sisa pos** di bawah tiap baris form pencatatan Accounting, dan kartu **Anggaran** baca-saja di tahap Cost Control pada detail pengajuan (pos yang sudah lewat anggaran bulan ini, maksimal 5, sisanya diringkas, plus tautan ke tab Serapan). Kartu itu tidak memperkirakan pos pengajuan, karena pos baru ditetapkan Accounting.
 
 ## Aturan Membaca Angka
@@ -230,3 +251,4 @@ Untuk proyeksi mingguan yang diatur (ADR 0161, Diterima 2026-10-09): yang tersis
 - [[API - Procurement Service]] · [[API - Integration Service]] · [[Microservices - Procurement Service]]
 - [[CORE - RBAC dan Permission Set]] · [[APP - Web ERP]] · [[REF - Kepemilikan Data]]
 - [[ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya]]
+- [[ADR - 0180 Akun Anggaran Seluruh Perusahaan Diatur Finance, Non Ops Dua Akun dengan Baseline Isian]] · [[ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu]] (🟡 Diusulkan)
