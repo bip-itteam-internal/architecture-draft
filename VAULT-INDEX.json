@@ -10343,8 +10343,8 @@
       "judul": "ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "Diusulkan, 2026-10-20, dari `/analisa-kebutuhan` (opsi A dipilih user). Pemutus: BIP-ITTeam. Kode belum ada. Pecahan kerja: [[ANALISA - Manager Departemen Penyetuju Pengajuan SPV]] · issue bip-erp#3328 (induk), bip-erp#3329 [BE], erp-frontend#2639 [FE].",
+      "status_emoji": null,
+      "status_teks": "🟢 Diterima, 2026-10-20, oleh irfanarfianto. Pemutus: irfanarfianto. Opsi A dipilih lewat `/analisa-kebutuhan`; pengerjaan diperintahkan di sesi yang sama. Kode belum ada. Pecahan kerja: [[ANALISA - Manager Departemen Penyetuju Pengajuan SPV]] · issue bip-erp#3328 (induk), bip-erp#3329 [BE], erp-frontend#2639 [FE].",
       "publik": true,
       "tautan": [
         "ANALISA - Manager Departemen Penyetuju Pengajuan SPV",
@@ -10358,8 +10358,8 @@
         "HRIS - Key Performance Index",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "5e0ba37066910b49ac48ad3b244d7493abd94204b173b0e67d2aa501d02c1fe2",
-      "ukuran_kb": 11.4,
+      "hash": "5ba246b027b533d74390bd8b2775f7c3af1aeb51f35caa09956e09b82195ae21",
+      "ukuran_kb": 11.5,
       "ringkasan": "Menjawab: siapa yang menyetujui cuti/izin/sakit dan perjalanan dinas milik SPV (penyetuju departemen), kenapa jalur Direktur selama ini tak pernah menyetujui apa pun, dan bagaimana Manager yang ditetapkan HR per departemen di master data menggantikannya. Juga menjawab cakupan KPI Manager atas seluruh karyawan departemen yang dinaunginya, kenapa penanda ini bukan supervised_by/is_supervisor/jenjang, dan apa yang sengaja tidak dicakup (koreksi absen, tukar shift, departemen Marketing).",
       "kata_kunci": [
         "Manager departemen",
@@ -21840,8 +21840,8 @@
         "HRIS - Organization Structure",
         "HRIS - Key Performance Index"
       ],
-      "hash": "1a80a26d20d1745403f210cd495cf5dd02ee99f9e142d5c4b069d242081ec7c4",
-      "ukuran_kb": 10.0,
+      "hash": "d6785d4fe6836905170c567c61bb5c066139bed3a6590f993a38bb6b808e0705",
+      "ukuran_kb": 9.9,
       "ringkasan": "Menjawab: pekerjaan apa yang perlu dilakukan untuk mewujudkan Manager departemen sebagai penyetuju pengajuan SPV dan pembaca KPI departemen, dipecah jadi issue induk serta sub-issue [BE] bip-erp dan [FE] erp-frontend beserta kriteria yang harus benar. Juga menjawab langkah HR tanpa kode yang bisa dilakukan sekarang, urutan deploy, data prod pendukung, dan kenapa MyBharata tidak perlu berubah.",
       "kata_kunci": [
         "analisa kebutuhan",

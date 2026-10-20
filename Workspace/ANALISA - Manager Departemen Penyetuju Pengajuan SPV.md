@@ -1,9 +1,7 @@
 **Status**: 🟡 Daftar task dari `/analisa-kebutuhan` 2026-10-20. Keputusannya di [[ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya]]; cara kerjanya di [[HRIS - Organization Structure]] §Manager departemen dan [[HRIS - Key Performance Index]]. Dok ini papan kerja, bukan arsitektur.
 
-**Menunggu ADR "Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya" Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**
-
 - **Ukuran**: **Sedang**. Dua repo harus berubah, masing-masing satu PR: `bip-erp` (field, pengalihan, gerbang KPI, jenjang) dan `erp-frontend` (kolom Manager, cakupan KPI). MyBharata **tidak** dihitung: tahap persetujuan dirender generik dari key `spv` (`mybharata-app/lib/src/features/requests/presentation/widgets/request_steps_stepper.dart:152-180`, branch `dev`) dan hak memutus dibaca dari backend (`lib/src/features/submission/presentation/widgets/submission_detail/reviewer_action_policy.dart:6-10`), sementara slot Manager tetap di `spv_status`.
-- **Pemutus**: BIP-ITTeam
+- **Pemutus**: irfanarfianto (ADR Diterima 2026-10-20)
 
 ## Kebutuhan yang dijawab
 
@@ -28,7 +26,7 @@ Manajemen membuka posisi Manager yang menaungi seluruh departemen kecuali Beauty
 - **Repo**: bip-erp
 - **Issue**: [bip-erp#3328](https://github.com/bip-itteam-internal/bip-erp/issues/3328)
 
-**Pemutus:** @BIP-ITTeam
+**Pemutus:** @irfanarfianto
 **PIC:** @
 
 ## Masalah
@@ -37,7 +35,7 @@ Pengajuan cuti/izin/sakit dan dinas milik penyetuju departemen (SPV) dialihkan k
 
 ## Keputusan
 
-ADR "Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya" (vault `Decisions/`). Layak `Siap Agent` sesudah ADR berstatus Diterima. Induk ini tanpa PR; ditutup manual saat semua sub-issue merged.
+ADR "Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya" (vault `Decisions/`). ADR berstatus 🟢 Diterima 2026-10-20 oleh irfanarfianto. Induk ini tanpa PR; ditutup manual saat semua sub-issue merged.
 
 ## Yang harus benar
 
@@ -54,7 +52,7 @@ Lihat sub-issue [BE].
 
 ## Prasyarat
 
-ADR di atas berstatus Diterima.
+ADR Diterima 2026-10-20 (terpenuhi).
 
 ---
 
@@ -63,7 +61,7 @@ ADR di atas berstatus Diterima.
 - **Repo**: bip-erp
 - **Issue**: [bip-erp#3329](https://github.com/bip-itteam-internal/bip-erp/issues/3329)
 
-**Pemutus:** @BIP-ITTeam
+**Pemutus:** @irfanarfianto
 **PIC:** @
 
 ## Masalah
@@ -72,7 +70,7 @@ Penyetuju departemen wajib anggota departemen itu (`services/employee/department
 
 ## Keputusan
 
-ADR "Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya", §1 s.d. §4. Layak `Siap Agent` sesudah ADR berstatus Diterima. Ringkas bentuknya:
+ADR "Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya", §1 s.d. §4. ADR berstatus 🟢 Diterima 2026-10-20 oleh irfanarfianto. Ringkas bentuknya:
 - `master_department` satu field `employee_id` Manager; satu per departemen, boleh lintas departemen, akun aktif satu perusahaan; ditulis endpoint sendiri bergerbang `RequireHRISOrITSupervisor` dengan jejak audit.
 - Pemohon cuti/izin/sakit/dinas = penyetuju departemennya → slot SPV berisi orang Manager (bila ada, aktif, bukan pemohon), selain itu slot "Direktur" seperti sekarang.
 - Gerbang KPI cabang terpisah: lolos bila SEMUA departemen yang diminta dinaungi pemanggil, dibaca dari master saat permintaan.
@@ -105,7 +103,7 @@ Diukur prod baca-saja 2026-10-20:
 
 ## Prasyarat
 
-ADR di atas berstatus Diterima.
+ADR Diterima 2026-10-20 (terpenuhi).
 
 ---
 
@@ -114,7 +112,7 @@ ADR di atas berstatus Diterima.
 - **Repo**: erp-frontend
 - **Issue**: [erp-frontend#2639](https://github.com/bip-itteam-internal/erp-frontend/issues/2639)
 
-**Pemutus:** @BIP-ITTeam
+**Pemutus:** @irfanarfianto
 **PIC:** @
 
 ## Masalah
@@ -123,7 +121,7 @@ Layar Penyetuju Pengajuan hanya mengenal satu penyetuju per departemen dari angg
 
 ## Keputusan
 
-ADR "Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya", §1 dan §3. Layak `Siap Agent` sesudah ADR berstatus Diterima. Ringkas: HR memilih satu Manager per departemen dari seluruh karyawan aktif perusahaan; Manager melihat KPI seluruh karyawan departemen yang dinaunginya; FE tidak menghitung cakupan sendiri, ia membaca endpoint `me` dari BE.
+ADR "Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya", §1 dan §3. ADR berstatus 🟢 Diterima 2026-10-20 oleh irfanarfianto. Ringkas: HR memilih satu Manager per departemen dari seluruh karyawan aktif perusahaan; Manager melihat KPI seluruh karyawan departemen yang dinaunginya; FE tidak menghitung cakupan sendiri, ia membaca endpoint `me` dari BE.
 
 ## Yang harus benar
 

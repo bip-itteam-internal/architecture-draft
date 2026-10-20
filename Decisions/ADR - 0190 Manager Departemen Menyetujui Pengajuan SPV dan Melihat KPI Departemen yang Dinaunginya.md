@@ -1,4 +1,4 @@
-> **Status**: 🟡 Diusulkan, 2026-10-20, dari `/analisa-kebutuhan` (opsi A dipilih user). Pemutus: BIP-ITTeam. Kode belum ada. Pecahan kerja: [[ANALISA - Manager Departemen Penyetuju Pengajuan SPV]] · issue bip-erp#3328 (induk), bip-erp#3329 [BE], erp-frontend#2639 [FE].
+> **Status**: 🟢 Diterima, 2026-10-20, oleh irfanarfianto. Pemutus: irfanarfianto. Opsi A dipilih lewat `/analisa-kebutuhan`; pengerjaan diperintahkan di sesi yang sama. Kode belum ada. Pecahan kerja: [[ANALISA - Manager Departemen Penyetuju Pengajuan SPV]] · issue bip-erp#3328 (induk), bip-erp#3329 [BE], erp-frontend#2639 [FE].
 
 ## Untuk Manajemen
 
@@ -25,7 +25,7 @@
 
 *Seorang Manager menaungi beberapa departemen. HR menetapkannya per departemen di master data, dan penetapan itu, bukan nama jabatan atau jenjang, yang menjadi sumber dua hal: Manager menggantikan slot "Direktur" sebagai penyetuju pertama cuti/izin/sakit dan perjalanan dinas milik penyetuju departemen itu sendiri, dan Manager melihat KPI seluruh karyawan aktif departemen-departemen tersebut. Penanda ini sengaja bukan `supervised_by`, bukan penyetuju departemen, dan bukan Master Divisi.*
 
-- **Status**: 🟡 **Diusulkan**, 2026-10-20, kode belum ada. Analisa: [[ANALISA - Manager Departemen Penyetuju Pengajuan SPV]]
+- **Status**: 🟢 Diterima, kode belum ada (lihat baris status di atas). Analisa: [[ANALISA - Manager Departemen Penyetuju Pengajuan SPV]]
 - **Path di repo**: `bip-erp/shared-library/models/employee/master_data.go` (field Manager + jenjang Manager) · `bip-erp/services/employee/department_manager.go` (baru) · `bip-erp/services/employee/main.go` (cabang KPI) · `bip-erp/services/attendance/main.go`, `bip-erp/services/attendance/business_trip.go` (pengalihan) · `erp-frontend/src/features/hris/master-data/components/department-approver-manager.tsx` · `erp-frontend/src/features/hris/kpi/hooks/use-cakupan-kpi.ts` · `erp-frontend/src/components/layout/kpi-menu.ts`
 - **Tanggal**: 2026-10-20
 
