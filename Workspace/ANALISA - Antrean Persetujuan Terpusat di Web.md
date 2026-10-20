@@ -45,7 +45,7 @@ Bersaudara dengan `/pengajuan/ringkasan`, memakai ulang seluruh mekanismenya: re
 *Tergantung*: T1 (bentuk kolomnya sudah terbukti di layar).
 
 **T8. Adapter tiga sumber "menunggu saya" yang belum ikut.**
-Tinjau Setoran Live Support (`/live-support/karya/antrean`), Pengajuan Barang (`/pengajuan-barang/antrean`), Permintaan ERP (`/permintaan-erp/persetujuan`). Ketiganya sudah menyaring per pemanggil, jadi tak ada keputusan produk baru. Permintaan Barang GA (`/permintaan/perlu-aksi`) menyusul, dengan catatan daftarnya dipotong di 200.
+Tinjau Setoran Live Support (`/live-support/karya/antrean`), Pengajuan Barang (`/pengajuan-barang/antrean`), Permintaan Pembelian (dulu "Permintaan ERP", [[ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web]]) (`/permintaan-erp/persetujuan`). Ketiganya sudah menyaring per pemanggil, jadi tak ada keputusan produk baru. Permintaan Barang GA (`/permintaan/perlu-aksi`) menyusul, dengan catatan daftarnya dipotong di 200.
 
 ⚠️ **"Sudah menyaring per pemanggil" cukup untuk sumbu MENUNGGU, tidak untuk sumbu RIWAYAT.** Menunggu bisa disaring dengan slot yang masih terbuka; riwayat menuntut nama orang yang benar-benar memutus, dan itu field tersendiri. Adapter yang melewatkannya akan mengembalikan baris yang sah tapi bukan milik pembacanya, tanpa satu pun gejala. Lihat T7 dan ADR 0114 butir 11.
 *Tergantung*: T7.

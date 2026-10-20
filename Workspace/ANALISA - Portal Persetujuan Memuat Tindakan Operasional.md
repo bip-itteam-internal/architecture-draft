@@ -67,7 +67,7 @@ Tidak menunggu ADR induk Diterima; masing-masing benar menurut ADR 0114 yang ber
 | Requisition | `/hris/recruitment/requisitions/[id]` | rute ada |
 | Permintaan GA | `PermintaanDetailSheet` berdasarkan `nomor` | komponen menerima prop `nomor` |
 | Booking Ruang | `/ga/peminjaman?nomor=` | **verifikasi** bahwa id baris = nomor dan halaman membaca param itu |
-| Live Support, Pelatihan, Permintaan ERP, Offer | belum ada rute per id | **TBD** |
+| Live Support, Pelatihan, Permintaan Pembelian (dulu "Permintaan ERP", [[ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web]]), Offer | belum ada rute per id | **TBD** |
 | Karyawan (absensi) | Sheet detail yang sudah ada | sudah benar hari ini |
 
 **FE**: kolom baru, judul pil "Yang perlu Anda lakukan" dengan pil per aksi dan `pantau` tersembunyi di bawaan, keadaan kosong yang menjelaskan fungsi halaman, sambungkan riwayat Pengajuan Barang ke `GET /pengajuan-barang/diproses-saya` (sudah mengirim `aksi_saya`), kolom Posisi sekarang di Riwayat, kontrol "Urutkan: Terlama | Terbaru" di kedua tab (ADR induk butir 4a). Nama menu, judul, dan rute tidak disentuh.
@@ -132,7 +132,7 @@ Diukur ke kode `origin/main` sebelum dibangun (induk bip-erp#3223):
 
 1. **Pengajuan Barang**: aksi `catat`, `transfer`, `konfirmasi_transfer`, `jawab_stok`, `isi_harga`, `putuskan`. Badan memakai `SheetDetailPengajuan`; footer per mode (ADR induk butir 6). Spanduk volume: `catat` ke tabel antrean pencatatan di tab Ringkasan `/finance/tim-accounting` (`antrean-pencatatan-accounting.tsx`; halaman digerbang `finance.accounting.view`, tabelnya hanya bagi pemegang `budget.accounting.pencatatan`, jadi spanduk hanya untuk pemegang izin yang sama), `transfer` ke `/finance/ap`.
 2. **Tiket**: aksi `triase`. Spanduk tiket >7 hari bila ambangnya diputus (TBD 1).
-3. **Sisanya saat datanya ada.** Pelatihan, Permintaan GA, Permintaan ERP, dan Payroll belum perlu (0 data prod 2026-10-15).
+3. **Sisanya saat datanya ada.** Pelatihan, Permintaan GA, Permintaan Pembelian, dan Payroll belum perlu (0 data prod 2026-10-15).
 
 *Yang harus benar per panel*:
 - Sheet berangka tiga: header tetap, badan `flex-1 min-h-0 overflow-y-auto px-4 pb-4`, footer `SheetFooter`.
@@ -163,7 +163,7 @@ Diukur ke kode `origin/main` sebelum dibangun (induk bip-erp#3223):
 
 1. Ambang 7 hari spanduk tiket.
 2. Endpoint riwayat Tiket, Live Support, Permintaan GA, Rekrutmen.
-3. Rute per dokumen Live Support, Pelatihan, Permintaan ERP, Offer.
+3. Rute per dokumen Live Support, Pelatihan, Permintaan Pembelian, Offer.
 4. Pemilik panduan menu umum.
 5. Verifikasi tujuan Tiket (`pending/<id>`) dan Booking (`?nomor=`).
 
