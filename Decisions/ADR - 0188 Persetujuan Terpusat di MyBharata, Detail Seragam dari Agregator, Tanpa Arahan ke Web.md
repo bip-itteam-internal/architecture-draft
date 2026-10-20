@@ -53,7 +53,7 @@
 - Bentuk langkah seragam: tiap modul menyimpan riwayatnya berbeda (`ReviewStep` attendance, `ReviewSlot` learning, `RiwayatBarang`, `RiwayatRun`, `RiwayatPermintaan`, `RiwayatKarya`; Permintaan ERP hanya `DisetujuiOleh/Pada`; tiket hanya timestamp). `langkah_ke/langkah_total` hanya terisi untuk Pengajuan Barang dan Permintaan Barang GA (`antrean_kontrak.go:156-160`). Di web, tiga stepper terpisah dirakit tiap modul (`linimasa-pengajuan.tsx`, `stepper-tahap-payroll.tsx`, inline di `request-detail.tsx`).
 - Endpoint detail di agregator (hanya `/pengajuan/antrean` dan `/pengajuan/ringkasan`).
 - Rute detail per id untuk Live Support, Pelatihan, dan Offer.
-- Akses baca penyetuju: `GET /permintaan-erp/:id` digerbang `procurement.view` (`procurement/main.go:873`); `GET /permintaan/:nomor` (Permintaan Barang GA) 403 sesudah status `DIAJUKAN` kecuali staf GA (`inventory/permintaan_gate.go:46-54`); daftar Offer digerbang `recruitment.view`.
+- Akses baca penyetuju: ~~`GET /permintaan-erp/:id` digerbang `procurement.view` (`procurement/main.go:873`)~~ **rute ini dihapus 2026-10-20** (bip-erp#3309, jalur lama 0 dokumen; detail pembelian memakai `GET /pengajuan-barang/:id`); `GET /permintaan/:nomor` (Permintaan Barang GA) 403 sesudah status `DIAJUKAN` kecuali staf GA (`inventory/permintaan_gate.go:46-54`); daftar Offer digerbang `recruitment.view`.
 
 **Data nyata.** Per 2026-10-15, [[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] mencatat **0 dokumen menunggu** di prod untuk Permintaan ERP, Pelatihan, Payroll, Permintaan Barang GA, dan Requisition. Belum diukur ulang untuk ADR ini (lihat "Perlu ukur prod" di ANALISA). Karena itu urutan kerja per jenis mengikuti data, bukan daftar.
 
@@ -89,7 +89,7 @@
 
 ### 5. Akses baca penyetuju dikerjakan di service sumber
 - Penyetuju atau pelaksana tahap **boleh membaca detail dokumen yang ada di antrean atau riwayatnya**, tanpa diberi izin modul penuh. Polanya `BolehMelihatPengajuan` (`procurement/pengajuan_barang_cakupan_baca.go:76-100`): pemohon, siapa pun di riwayat, dan siapa pun yang sedang boleh menindak.
-- Gerbangnya di service sumber, bukan di agregator (ADR 0181 dan aturan Portal Persetujuan). Rute detail per id dibuat untuk Live Support, Pelatihan, dan Offer; `GET /permintaan-erp/:id` dan `GET /permintaan/:nomor` diberi jalur baca untuk penyetuju dengan aturan yang sama.
+- Gerbangnya di service sumber, bukan di agregator (ADR 0181 dan aturan Portal Persetujuan). Rute detail per id dibuat untuk Live Support, Pelatihan, dan Offer; `GET /permintaan/:nomor` diberi jalur baca untuk penyetuju dengan aturan yang sama (`GET /permintaan-erp/:id` tidak lagi: rute dan sumber antreannya dihapus 2026-10-20, bip-erp#3309).
 
 ### 6. Label "Permintaan ERP" menjadi "Permintaan Pembelian"
 - Di semua permukaan (portal web, MyBharata). Di sistem, istilah ini berarti entitas `permintaan_erp` milik procurement.

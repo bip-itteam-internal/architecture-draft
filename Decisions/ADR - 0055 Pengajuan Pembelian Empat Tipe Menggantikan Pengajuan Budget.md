@@ -94,7 +94,7 @@ Pembedahan alur menemukan empat titik yang benar secara kode namun membuat orang
 
 ### Yang memburuk atau tetap terbuka
 
-- ⚠️ **Rantai `permintaan_erp` → `pesanan_erp` → `penerimaan_erp` menjadi jalur kedua.** Pengajuan Pembelian menerbitkan PO dan RI sendiri, sementara jalur PR→PO→RI yang ada tetap hidup. [[REF - Rantai Pengajuan Lintas Modul]] §4 sudah mencatat jalur itu setengah tersambung dengan empat konstanta status yang tak pernah ditulis. **Belum diputuskan** apakah keduanya akhirnya dilebur.
+- ⚠️ **Rantai `permintaan_erp` → `pesanan_erp` → `penerimaan_erp` menjadi jalur kedua.** Pengajuan Pembelian menerbitkan PO dan RI sendiri, sementara jalur PR→PO→RI yang ada tetap hidup. [[REF - Rantai Pengajuan Lintas Modul]] §4 sudah mencatat jalur itu setengah tersambung dengan empat konstanta status yang tak pernah ditulis. ~~**Belum diputuskan** apakah keduanya akhirnya dilebur.~~ ✅ **Diputuskan 2026-10-20** (Pemutus wirkancil, MOM Dev ERP 19-10-2026 lanjutan): jalur `permintaan_erp` dan `pesanan_erp` **dihapus**, rute dan modul FE-nya ikut (bip-erp#3309, erp-frontend#2640; diukur prod 2026-10-20: 0 dokumen). `penerimaan_erp` lama **tetap** untuk sementara, dengan pemilih barang di `GET /penerimaan-erp/opsi-barang`. Pengadaan RM dan Barang Umum berjalan lewat Pengajuan Barang.
 - **Stok bertambah sebelum RI terbit** pada penerimaan bertahap. Diterima sadar: menahan stok sampai lengkap berarti barang fisik ada di gudang sementara sistem menyatakan belum.
 - **Barang gagal QC berhenti sebagai keadaan, bukan proses.** Retur ke pemasok di luar cakupan; notifikasi ke Procurement dan Finance yang menjaga agar dokumennya tidak diam tanpa penanggung jawab.
 - **Jalur top-up plafon kas kecil hilang** bersama pensiunnya kas kecil.
