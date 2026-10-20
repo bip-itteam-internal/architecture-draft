@@ -130,7 +130,7 @@ Untuk tiap komponen ditampilkan proyeksi dan realisasinya per minggu.
    - **Tahap 1:**
      - Operasional dan BOP memakai mutasi akun (akrual, penyegar yang sudah ada diperluas ke akun komponen);
      - Pajak memakai setoran nyata (`pajak_setoran_accurate`);
-     - Aset memakai salinan aset tetap (tanggal perolehan × biaya);
+     - Aset memakai salinan aset tetap (tanggal perolehan × biaya). **Diamandemen 2026-10-20 (Azzerith):** sumbernya diganti ke **buku besar** akun aset tetap 1801–1806 ditambah akun *Aset dlm Penyelesaian* (1701, 1702, 1703, 1726, 1727, 1728, 1730, 1737). Netto dihitung per transaksi, jadi reklasifikasi tidak terhitung dua kali dan pelepasan tidak dihitung (bip-erp#3321, PR #3325). Alasannya, uang keluar aset terbesar September 2026 (Gudang Baru Rp 461,2 jt) tercatat di Aset dlm Penyelesaian, yang tidak ada di register aset tetap;
      - Material memakai mutasi akun persediaan atau pembelian (diputuskan di task BE dari bagan akun prod).
    - Respons menandai sifat realisasi tiap komponen (`akrual` atau `kas`).
    - **Tahap 2** mengganti sumber per komponen ke basis kas setelah A1 terjawab, tanpa mengubah kontrak layar maupun KPI.

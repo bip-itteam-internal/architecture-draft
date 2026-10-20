@@ -22,6 +22,7 @@ Setiap task satu repo dan satu PR. Urutannya: BE dulu, lalu FE. Issue induk dibu
 | C4a 🟡 PR erp-frontend#2570 (issue #2568) | erp-frontend | Tampilan: tujuh komponen (buka ke akun), badge Akrual/Kas, sebab belum terukur (bukan Rp 0), kartu pembanding uang keluar riil, anggaran aset + sisa. Fallback backend lama | C1–C3c | Deploy sesudah BE |
 | C4b 🟡 PR erp-frontend#2572 (issue #2571) | erp-frontend | Isian proyeksi komponen (Material/BOP/Pajak/Aset) + anggaran aset tahunan (form, gerbang `finance.anggaran.kelola`, pesan 422 kunci minggu); Sheet Atur proyeksi memakai `proyeksi_rencana`/`total_anggaran_bulan` | C4a | Dialog (bukan Sheet). Daftar komponen penerima isian disalin di FE karena laporan belum membawa penanda; usulan BE: field `dapat_diisi` di `komponen[]` |
 | C4 (rencana awal) | erp-frontend | Tab Forecast Mingguan per komponen: ringkasan 4 minggu, rincian per komponen (lalu per akun), penanda akrual/kas, total uang keluar riil sebagai pembanding, seksi isian proyeksi komponen + anggaran aset (sisa tahun berjalan), Atur proyeksi untuk 4 minggu | C1–C3 | Deploy sesudah BE |
+| C3d 🟡 PR bip-erp#3325 (issue #3321) | bip-erp (integration) | Realisasi Aset dari buku besar (1801–1806 + Aset dlm Penyelesaian), netto per transaksi, penyegar 04:30, bukan dari register | C3a | Amandemen ADR 0184 Decision 5 (2026-10-20) |
 | C5 | (Finance/HRD) | Konfirmasi asumsi A1–A7 ADR 0184; HRD memutuskan apakah skor Juli–September dihitung ulang | — | Jawaban A1 membuka tahap 2 |
 | C6 | bip-erp | Tahap 2: sumber realisasi per komponen diganti ke basis kas sesuai jawaban A1 | C5 | Kontrak layar dan KPI tidak berubah |
 
@@ -48,6 +49,33 @@ Setiap task satu repo dan satu PR. Urutannya: BE dulu, lalu FE. Issue induk dibu
   - 7303 "Laba/Rugi Penjualan, Pembelian, & Revaluasi Aset" dan 7304 "Laba/Rugi Disposisi Aset Tetap" masuk ops adum (asumsi A6).
   - 5313 "Laba/Rugi Selisih Persediaan" masuk BOP.
 - **Material.** Persediaan 1601/1602/1603 didebit oleh jenis "Penerimaan Barang". Jenis "Pengambilan Bahan Baku" dan "Penyesuaian Persediaan" adalah pemakaian/koreksi, sehingga mutasi bersih tidak bisa dipakai sebagai realisasi. Contoh 1601 September: mutasi bersih −65,6 jt, sedangkan pembelian 82,9 jt.
+
+## Catatan dari Arus Kas (Langsung) Accurate (A1, 2026-10-20)
+
+Finance menjawab A1: sumber cashflow manual mereka adalah **laporan arus kas**. Yang cocok adalah **Laporan → Keuangan → Arus Kas (Langsung)**. Export September 2026 PT Bharata sudah dibaca. Laporan itu menyusun uang keluar per **akun lawan** transaksi kas/bank.
+
+- **Cocok persis dengan buku besar prod.**
+  - Utang Gaji 2202, jenis "Pembayaran", berjumlah Rp 587.564.829.
+  - Aset dlm Penyelesaian Gudang Baru 1728 berjumlah Rp 461.213.877, terdiri dari Jurnal Umum Rp 345,2 jt dan Pembayaran Rp 116,0 jt.
+- **Perkiraan per komponen, September:**
+
+  | Komponen | Baris laporan | Nilai |
+  |---|---|---|
+  | Material | Kas untuk Pembelian | Rp 832 jt (akrual kita Rp 385 jt) |
+  | BOP | — | Rp 8 jt |
+  | Marketing | termasuk iklan Rp 2.294 jt | Rp 2.279 jt |
+  | Gaji | Utang Gaji + asuransi | ~Rp 644 jt |
+  | Ops adum | Adum + Utang Beban + bank | ~Rp 321 jt |
+  | Pajak | Utang PPN/PPh, PPh 25 dibayar di muka | ~Rp 240 jt; akunnya sama dengan daftar setoran finance, jadi C3b di jalur yang benar |
+  | Aset | Aset dlm Penyelesaian | ~Rp 461 jt |
+
+- **Akibatnya:**
+  - Sumber realisasi Aset diganti ke buku besar (bip-erp#3321, amandemen ADR 0184 Decision 5).
+  - Gaji akrual jauh di bawah kas, karena gaji dibayar lewat Utang Gaji.
+  - Ada uang keluar yang belum masuk komponen mana pun: Anggaran FO/Kegiatan, Prepaid, piutang karyawan, investasi, dan cicilan kreditur.
+  - Laporan itu juga memuat baris yang bukan kas (Akumulasi Penyusutan −1,9 jt, 7303 −0,3 jt), jadi jangan dipakai mentah sebagai acuan.
+- **Untuk tahap 2 (C6):** "uang keluar" **tidak** bisa dikenali dari jenis transaksi saja. Utang Beban 2205 punya Pembayaran Rp 55,6 jt, ditambah sebagian Jurnal Umum yang menyentuh bank. Penandanya adalah transaksi yang menyentuh akun kas/bank, jadi perlu menggabungkan riwayat akun lawan dengan riwayat kas/bank per nomor transaksi.
+- **Pertanyaan yang tersisa untuk Finance:** dari "Kas untuk Pembelian" Rp 832 jt, bagian mana yang mereka hitung sebagai Material, dan sisanya masuk komponen apa?
 
 ## Pertanyaan terbuka untuk Finance (A1–A7 di ADR)
 
