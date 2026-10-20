@@ -10382,8 +10382,8 @@
       "judul": "ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "Diusulkan, 2026-10-20. Bentuknya dipilih Azzerith lewat pilihan ganda di sesi `/analisa-kebutuhan` atas permintaan pemilik KPI Cost Control (2026-10-20), tetapi baris status belum diubah ke Diterima. Kode belum ada. Mengamandemen [[ADR - 0180 Akun Anggaran Seluruh Perusahaan Diatur Finance, Non Ops Dua Akun dengan Baseline Isian]] butir 5 dan 6, **hanya** untuk KPI Cost Control #2.",
+      "status_emoji": null,
+      "status_teks": "🟢 Diterima, 2026-10-20, oleh Azzerith. Bentuknya dipilih lewat pilihan ganda di sesi `/analisa-kebutuhan` atas permintaan pemilik KPI Cost Control (2026-10-20). Kode belum ada; issue bip-erp#3336 (integration) lalu #3337 (employee). Mengamandemen [[ADR - 0180 Akun Anggaran Seluruh Perusahaan Diatur Finance, Non Ops Dua Akun dengan Baseline Isian]] butir 5 dan 6, **hanya** untuk KPI Cost Control #2.",
       "publik": true,
       "tautan": [
         "ADR - 0180 Akun Anggaran Seluruh Perusahaan Diatur Finance, Non Ops Dua Akun dengan Baseline Isian",
@@ -10394,9 +10394,9 @@
         "HRIS - Otomasi Skor KPI",
         "REF - Kepemilikan Data"
       ],
-      "hash": "e5c4cbc667a4138a0cf132238d2ea12029a12e47ad6849b53cec57ca727062d0",
-      "ukuran_kb": 13.4,
-      "ringkasan": "Menjawab: apa yang diukur KPI Cost Control baris 2 setelah diubah (seluruh OPEX ditambah Non Ops, dibanding bulan yang sama tahun lalu dari Accurate), bagaimana rumus YoY dan keadaan tak terdefinisi ditangani, serta siapa terdampak dan apa yang tidak dijanjikan. Juga menjawab komponen kode yang direncanakan di integration-service dan employee-service, serta asumsi dan risiko R1-R4.",
+      "hash": "f2a09a0a5a1e3472c2cd816037c7b12417b9e973e89a84fe5164078758b52114",
+      "ukuran_kb": 13.5,
+      "ringkasan": "Menjawab: apa yang diukur KPI Cost Control baris 2 setelah diubah, akun mana saja yang masuk populasi (OPEX plus Non Ops), dan bagaimana persen perubahan YoY dihitung dengan baseline bulan yang sama tahun lalu dari Accurate. Juga menjelaskan kenapa realisasi_opex tidak bisa dipakai untuk sisi tahun lalu, risiko R1 sampai R4, dan apa yang tidak dijanjikan (skor lama tidak dihitung ulang, penyusutan dan pajak ikut terhitung).",
       "kata_kunci": [
         "KPI Cost Control",
         "penurunan biaya",
@@ -10405,9 +10405,10 @@
         "Non Ops",
         "baseline Accurate",
         "biaya_yoy",
-        "admin_non_ops",
+        "perubahan_yoy_persen",
         "ADR 0191",
-        "perubahan_yoy_persen"
+        "admin_non_ops",
+        "year over year"
       ]
     },
     {
@@ -11647,22 +11648,22 @@
         "ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya",
         "ADR - 0180 Akun Anggaran Seluruh Perusahaan Diatur Finance, Non Ops Dua Akun dengan Baseline Isian"
       ],
-      "hash": "466c6a7d40f67b8fef353d32f1be3578ac681f142dabcf6082c854d0e8fc66ee",
+      "hash": "d1a4b25251a7d042d54100abe83b6a4905cea8e01dca0b0a6c855a9d7bedae01",
       "ukuran_kb": 30.6,
-      "ringkasan": "Menjawab: bagaimana membaca angka di layar Anggaran & Cost Control (Anggaran, Terpakai, Sisa, serapan dari pengajuan, menunggu dicatat), apa isi tiap tab, dan bagaimana forecast kas mingguan, proyeksi per minggu, serta cashflow tujuh komponen bekerja. Juga memuat aturan angka yang tidak boleh dijumlahkan, usulan KPI penurunan biaya OPEX + Non Ops YoY, urutan deploy, dan hal yang belum diputuskan.",
+      "ringkasan": "Menjawab: bagaimana membaca angka di layar Anggaran & Cost Control (Anggaran, Terpakai, Sisa, Menunggu dicatat), tab apa saja yang ada, dan kolom mana yang tidak boleh dijumlahkan. Juga menjelaskan forecast kas mingguan (minggu selesai vs berjalan, proyeksi per minggu, tujuh komponen uang keluar), rencana KPI penurunan biaya OPEX + Non Ops YoY, urutan deploy, dan hal yang belum diputuskan.",
       "kata_kunci": [
-        "anggaran",
-        "budget",
         "serapan anggaran",
         "cost control",
-        "terpakai",
-        "sisa",
+        "anggaran",
         "forecast kas mingguan",
-        "proyeksi mingguan",
-        "RAPB",
         "cashflow",
         "OPEX",
-        "pengajuan barang"
+        "Non Ops",
+        "pengajuan barang",
+        "terpakai",
+        "sisa anggaran",
+        "RAPB",
+        "finance anggaran"
       ]
     },
     {
@@ -13714,9 +13715,9 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "96df96227ac7640481eb4b2032583d35fa6584150853e07bb0720bfee05fa8a7",
+      "hash": "73f00024a5b585da6760c2181ab7fdc3f22a06944825271af0baec141473e046",
       "ukuran_kb": 285.0,
-      "ringkasan": "Menjawab: metrik KPI apa saja (label, bobot, target) yang ada di kpi_template production untuk tiap departemen dan posisi, mana yang sudah otomatis, semi, terblokir data, atau manual. Dipakai dev departemen untuk memilih metrik yang akan diotomatiskan, dengan catatan segar per bab, ralat, dan cacat yang diketahui.",
+      "ringkasan": "Menjawab: metrik, bobot, dan target KPI apa saja yang tersimpan di kpi_template production untuk tiap departemen dan posisi, serta mana yang sudah otomatis, semi, terblokir data, atau masih manual. Berguna bagi dev departemen yang akan mengotomatiskan metrik, termasuk catatan ralat, sumber KPI otomatis yang terpasang, dan cara memperbarui dokumen.",
       "kata_kunci": [
         "KPI",
         "kpi_template",
@@ -13728,8 +13729,10 @@
         "departemen",
         "template KPI",
         "auto score",
+        "HRIS",
         "Cost Control",
-        "Finance"
+        "Finance",
+        "Tech Development"
       ]
     },
     {
@@ -21788,8 +21791,8 @@
       "judul": "ANALISA - KPI Penurunan Biaya OPEX dan Non Ops YoY",
       "area": "Workspace",
       "jenis": "workspace",
-      "status_emoji": "⛔",
-      "status_teks": "**Menunggu [[ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu]] Diterima. Sebelum itu, ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**",
+      "status_emoji": null,
+      "status_teks": "[[ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu]] 🟢 Diterima 2026-10-20 (Azzerith). Issue dibuat di Backlog Project #15; belum `Siap Agent` karena data prod issue 1 belum ditempel.",
       "publik": false,
       "tautan": [
         "ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu",
@@ -21798,21 +21801,22 @@
         "HRIS - Matriks KPI per Departemen",
         "REF - Kepemilikan Data"
       ],
-      "hash": "746db3d90df182129b56318130f219e60b1e86740f79c948988ba01ec290a2e1",
-      "ukuran_kb": 8.3,
-      "ringkasan": "Menjawab: bagaimana kebutuhan KPI penurunan biaya OPEX + Non Ops YoY diterjemahkan jadi dua issue bip-erp (cuplikan biaya di integration-service, lalu sumber KPI biaya_yoy di employee-service), langkah manusia sebelum dikerjakan, dan kriteria Yang harus benar tiap issue. Berstatus menunggu ADR 0191 Diterima.",
+      "hash": "03eb280795f793a9df263d5cfbac165c2c6e76e42fee44997b767e08448ae119",
+      "ukuran_kb": 8.4,
+      "ringkasan": "Menjawab: apa kebutuhan, temuan, dan pembagian kerja untuk KPI penurunan biaya OPEX + Non Ops YoY, termasuk langkah manusia setelah ADR 0191 diterima. Memuat dua draf issue bip-erp (cuplikan biaya dan endpoint di integration-service, lalu sumber KPI biaya_yoy di employee-service) beserta kriteria yang harus benar dan data prod yang perlu diukur.",
       "kata_kunci": [
-        "ANALISA",
+        "analisa kebutuhan",
         "KPI Cost Control",
         "penurunan biaya",
         "YoY",
         "OPEX",
         "Non Ops",
         "biaya_yoy",
-        "issue draf",
-        "Siap Agent",
         "integration-service",
-        "employee-service"
+        "employee-service",
+        "issue bip-erp",
+        "Siap Agent",
+        "papan kerja"
       ]
     },
     {
