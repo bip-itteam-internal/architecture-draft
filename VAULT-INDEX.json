@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-20",
-  "jumlah_dokumen": 655,
+  "jumlah_dokumen": 656,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -19337,6 +19337,43 @@
         "CPA",
         "App Review",
         "insights"
+      ]
+    },
+    {
+      "path": "Runbooks/RUN - Onboarding Toko Marketplace Baru.md",
+      "judul": "RUN - Onboarding Toko Marketplace Baru",
+      "area": "Runbooks",
+      "jenis": "runbook",
+      "status_emoji": "🟡",
+      "status_teks": "Draft, 2026-10-20. Disusun dari kode `origin/main` dan dok vault; urutan lengkapnya belum pernah dijalankan ujung ke ujung sebagai satu prosedur.",
+      "publik": true,
+      "tautan": [
+        "Marketing - ICC Account Manager Mapping",
+        "API - Integration Service",
+        "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
+        "Microservices - Integration Service",
+        "Microservices - Marketing Analytics Service",
+        "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
+        "APP - Web ERP"
+      ],
+      "hash": "e54d48646112c9945ea54e6d2c8d07f00b36d3d44ec7163174e98d00e891da05",
+      "ukuran_kb": 5.0,
+      "ringkasan": "Menjawab: apa saja langkah dan urutan agar toko marketplace baru (Shopee, TikTok Shop, Lazada) benar-benar masuk ERP, siapa yang mengerjakan tiap langkah, dan bagaimana memverifikasinya. Mencakup OAuth, klaim kepemilikan toko ke departemen, pemetaan pemegang toko di ICC Management, Config Accurate, dan Mapping SKU untuk HPP. Juga menjawab gejala bila gagal, mis. toko Lazada tidak muncul di daftar belum dipetakan, galat `accurate shop not found`, atau laba tampak terlalu besar karena HPP nol.",
+      "kata_kunci": [
+        "onboarding toko",
+        "toko baru",
+        "marketplace",
+        "Shopee",
+        "TikTok Shop",
+        "Lazada",
+        "OAuth",
+        "ICC Management",
+        "kepemilikan toko",
+        "Config Accurate",
+        "Mapping SKU",
+        "HPP",
+        "unmapped_skus",
+        "runbook"
       ]
     },
     {
