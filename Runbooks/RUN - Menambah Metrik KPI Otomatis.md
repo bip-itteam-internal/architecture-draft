@@ -301,6 +301,8 @@ Metrik `forecast_kas`/`akurasi_forecast_kas` dikonfigurasi `arah: turun` dengan 
 
 Untuk arah `turun`, **`target: 0` sah dan bermakna**: "zero accident", "zero major finding", "selisih 0%". Realisasi 0 bernilai penuh; sekali melanggar langsung jatuh ke 0, karena tidak ada yang namanya sedikit zero accident.
 
+⚠️ **Target NEGATIF pada arah `turun`** (mis. "turun minimal 2% YoY" = target −2 atas metrik bertanda): di `origin/main` per 2026-10-20 cabang `target <= 0` membandingkan realisasi dengan **0**, bukan dengan targetnya, sehingga realisasi −1% atas target −2% bernilai **100**. Ditambal di PR [bip-erp#3342](https://github.com/bip-itteam-internal/bip-erp/pull/3342) (**belum merge**): realisasi ≤ target = 100, realisasi ≥ 0 = 0, di antaranya bergradasi `realisasi/target × 100` (−1 atas −2 = 50). Gradasi ini belum diputuskan ADR mana pun; bila pemilik KPI menghendaki lulus/gagal, nyalakan `hit_miss`. Sebelum PR itu ter-deploy, **jangan memasang target negatif arah turun** tanpa `hit_miss: true` (`NilaiBiner` sudah membandingkan terhadap target dengan benar).
+
 ### Target berlapis tiga: per karyawan, per periode, umum
 
 ```json

@@ -2374,6 +2374,7 @@
         "Microservices - Inventory Service",
         "HRIS - Matriks KPI per Departemen",
         "API - Finance Service",
+        "ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu",
         "ADR - 0086 Metrik Live Lintas Channel Digabung Satu Angka, Rincian Tetap per Channel",
         "Finance - FAT Persona",
         "Microservices - Attendance Service",
@@ -2423,20 +2424,20 @@
         "HRIS - Payroll",
         "IT - Background Jobs & Schedulers"
       ],
-      "hash": "13d0a1ec154fe839f8fcbeb3333398030af6f2aee0ba964931410c5976e2a071",
-      "ukuran_kb": 231.5,
-      "ringkasan": "Menjawab: apa peran employee-service sebagai master data karyawan dan sumber SSO (login username/PIN/biometric, onboarding, refresh token), operasi admin akun oleh IT (aktif/nonaktif, forget-device, reset akun, system roles), serta pengelolaan master departemen, divisi, KPI, kontrak, BPJS, dan kuota cuti. Juga menjelaskan status fitur resign/non-aktif, akun pihak luar (vendor/mitra), dan cakupan multi-perusahaan.",
+      "hash": "91859349c6b9e9d801babae543fc94121fb6fb40363d49622da031dbaa035e23",
+      "ukuran_kb": 233.3,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki employee-service untuk login (username/PIN/biometric), onboarding, reset akun, forget-device, dan pengelolaan system_roles. Juga menjelaskan master departemen dan master divisi (CRUD, seed, aturan field yang dipertahankan saat PUT), status resign/non-aktif akun, multi-tenant, serta akun pihak luar.",
       "kata_kunci": [
         "employee-service",
-        "master data karyawan",
-        "autentikasi",
-        "login",
-        "SSO",
+        "auth login",
         "onboarding",
         "reset akun",
+        "forget device",
         "master departemen",
         "master divisi",
-        "resign"
+        "system roles",
+        "resign",
+        "karyawan"
       ]
     },
     {
@@ -10394,23 +10395,20 @@
         "HRIS - Otomasi Skor KPI",
         "REF - Kepemilikan Data"
       ],
-      "hash": "d1e8075161c35ceefedee93c625dcf9b52f2a923dcca2482b75e3b1c082230a1",
-      "ukuran_kb": 14.2,
-      "ringkasan": "Menjawab: apa yang diukur KPI Cost Control baris 2 setelah diubah (total OPEX + Non Ops, bukan hanya dua akun Non Ops), bagaimana rumus YoY dihitung dengan baseline bulan yang sama tahun lalu dari Accurate, dan siapa yang terdampak. Juga menjawab bukti data prod (template, populasi 58 akun + 2 akun Non Ops, hasil ukur Accurate 2025), risiko seperti penyusutan/pajak ikut terhitung, serta rencana dua PR di integration-service dan employee-service.",
+      "hash": "b5cffe478e386c9d13c1bdff960d14634a6b1bf8bf6c5fd4f0fecfaf9546547c",
+      "ukuran_kb": 14.5,
+      "ringkasan": "Menjawab: apa yang diukur KPI Cost Control baris 2, akun mana yang masuk (OPEX dan Non Ops), dan bagaimana penurunan biaya YoY dihitung dengan baseline bulan yang sama tahun lalu dari Accurate. Juga menjelaskan kenapa sumber admin_non_ops dan realisasi_opex tidak dipakai, risiko data tahun lalu, serta rencana endpoint di integration-service dan sumber KPI di employee-service.",
       "kata_kunci": [
-        "KPI Cost Control",
-        "penurunan biaya",
+        "ADR 0191",
+        "Cost Control",
+        "KPI penurunan biaya",
         "OPEX",
         "Non Ops",
         "YoY",
-        "baseline Accurate",
-        "biaya_yoy",
-        "perubahan_yoy_persen",
-        "admin_non_ops",
-        "integration-service",
-        "employee-service",
-        "ADR 0191",
-        "ADR 0180"
+        "baseline",
+        "Accurate",
+        "biaya operasional",
+        "cost reduction"
       ]
     },
     {
@@ -13717,24 +13715,19 @@
         "HRIS - Key Performance Index",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik"
       ],
-      "hash": "73f00024a5b585da6760c2181ab7fdc3f22a06944825271af0baec141473e046",
-      "ukuran_kb": 285.0,
-      "ringkasan": "Menjawab: metrik, bobot, dan target KPI apa saja yang tersimpan di kpi_template production untuk tiap departemen dan posisi, serta mana yang sudah otomatis, semi, terblokir data, atau masih manual. Berguna bagi dev departemen yang akan mengotomatiskan metrik, termasuk catatan ralat, sumber KPI otomatis yang terpasang, dan cara memperbarui dokumen.",
+      "hash": "78937393bc66b67c63229e7006e19fa3724a4cf0050f8deb9c227a419ecc8f07",
+      "ukuran_kb": 285.2,
+      "ringkasan": "Menjawab: metrik KPI apa saja yang dipakai tiap departemen dan posisi di produksi, berapa bobot dan targetnya, serta metrik mana yang bisa diotomatiskan, semi, terblokir data, atau tetap manual. Dipakai dev departemen sebagai daftar kerja otomasi KPI, termasuk catatan ralat dan temuan per departemen (Finance, HRGA, Kyura, Beauty Hacks, Manufaktur, Tech Development, dll).",
       "kata_kunci": [
-        "KPI",
-        "kpi_template",
         "matriks KPI",
-        "metrik",
+        "kpi_template",
+        "KPI per departemen",
         "bobot",
-        "target",
-        "otomasi skor",
-        "departemen",
-        "template KPI",
+        "target KPI",
+        "otomasi KPI",
         "auto score",
-        "HRIS",
-        "Cost Control",
-        "Finance",
-        "Tech Development"
+        "scorecard",
+        "penilaian kinerja"
       ]
     },
     {
@@ -18360,21 +18353,20 @@
         "REF - Rantai Pengajuan Lintas Modul",
         "Microservices - Manufacture Service"
       ],
-      "hash": "cc5f35c83102c69053ebb20cc6fbd6a152897ca99de83731063203a62d5e27cc",
-      "ukuran_kb": 88.9,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis, siapa yang boleh menulis, lewat jalan apa service lain boleh membaca, salinan mana yang sah beserta penjaganya, dan duplikasi apa yang belum diputuskan. Dibuka sebelum membangun penyimpanan atau fitur baru agar tidak menduplikasi data departemen lain.",
+      "hash": "5466b0d7c357f1c4a47bccfa3b51481f58892539b0df83b97318c307e151a13d",
+      "ukuran_kb": 89.0,
+      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki sebuah fakta bisnis (karyawan, departemen, divisi, headcount, kontrak, hak akses, produk/SKU, vendor, dll), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga mendaftar salinan data yang sah beserta penjaganya, pengecualian database-per-service yang masih hidup, duplikasi yang belum diputuskan, dan jejak audit; dibuka sebelum membangun fitur atas data yang mungkin sudah dimiliki modul lain.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "pemilik data",
-        "single source of truth",
+        "source of truth",
+        "sumber kebenaran",
+        "duplikasi data",
+        "salinan data",
+        "SyncCollection",
         "database-per-service",
-        "duplikasi",
-        "salinan",
         "master data",
-        "pengecualian ADR 0002",
-        "audit trail",
-        "employee_db"
+        "audit trail"
       ]
     },
     {
@@ -19274,19 +19266,19 @@
         "Microservices - Marketing Analytics Service",
         "HRIS - Organization Structure"
       ],
-      "hash": "01401f56401ab7d45746ffc9be77ce31c373305caf4fd85eddb18d0c6595b221",
-      "ukuran_kb": 47.0,
-      "ringkasan": "Menjawab: langkah dev departemen menambahkan metrik KPI yang terisi otomatis, mulai dari memastikan metriknya layak, mendaftarkan sumber (`DaftarkanSumberBermetrik`), sampai mengisi konfigurasi metrik, reduksi, arah target, target berlapis, target dari modul lain, dan pratinjau. Juga menjawab sumber mana yang bisa dijadikan contoh (kinerja_toko, insentif_profit, kinerja_tiket, kedisiplinan_absensi, turnover_karyawan, kinerja_ar), env kunci layanan yang dibutuhkan di dev dan prod (termasuk FORM_BUILDER_SERVICE_KEY), aturan yang tidak boleh dilanggar, kesalahan yang pernah terjadi, dan checklist sebelum PR.",
+      "hash": "740e62f2488c41b50dbc2da106817ed02d3a62627af69eadc498f5988a34489b",
+      "ukuran_kb": 47.8,
+      "ringkasan": "Menjawab: bagaimana dev departemen menambah metrik KPI yang terisi otomatis, mulai dari menilai kelayakan metrik, mendaftarkan sumber (DaftarkanSumberBermetrik), mengisi KPIAutoConfig, memilih reduksi, arah dan target, sampai pratinjau sebelum menyimpan. Memuat contoh sumber yang sudah ada (kinerja_toko, insentif_profit, kinerja_tiket, kedisiplinan_absensi, dll), kunci layanan yang dibutuhkan, kesalahan yang pernah terjadi, dan checklist sebelum PR.",
       "kata_kunci": [
-        "KPI otomatis",
-        "auto score",
-        "sumber KPI",
-        "metrik otomatis",
+        "metrik KPI otomatis",
+        "auto KPI",
         "KPIAutoConfig",
+        "sumber KPI",
         "DaftarkanSumberBermetrik",
-        "arah target",
         "reduksi",
+        "arah target",
         "service key",
+        "kpi_score",
         "runbook KPI"
       ]
     },
