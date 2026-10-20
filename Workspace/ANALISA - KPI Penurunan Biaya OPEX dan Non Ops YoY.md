@@ -1,6 +1,6 @@
 # ANALISA - KPI Penurunan Biaya OPEX dan Non Ops YoY
 
-> **Status**: [[ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu]] 🟢 Diterima 2026-10-20 (Azzerith). Issue dibuat di Backlog Project #15; belum `Siap Agent` karena data prod issue 1 belum ditempel.
+> **Status**: [[ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu]] 🟢 Diterima 2026-10-20 (Azzerith). Issue dibuat di Backlog Project #15; data prod issue 1 sudah ditempel 2026-10-20 (R1 terjawab). Label `Siap Agent` dipasang manusia.
 
 Blueprint ini hasil `/analisa-kebutuhan` 2026-10-20, atas permintaan pemilik KPI Cost Control: *"baris 2 harus mengukur penurunan biaya operasional dan non-operasional secara keseluruhan minimal 2% YoY, bukan hanya biaya admin/non-ops"*. Berkas ini papan kerja dan berubah setiap issue selesai. Keputusannya ada di ADR.
 

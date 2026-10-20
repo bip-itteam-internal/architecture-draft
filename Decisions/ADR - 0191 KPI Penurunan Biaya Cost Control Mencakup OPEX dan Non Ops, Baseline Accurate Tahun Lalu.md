@@ -87,7 +87,11 @@ Tidak ada layar baru. HRD cukup memilih sumber baru lewat Kelola template.
 - label diganti, dan yang diukur hanya penurunan.
 
 **Asumsi dan risiko yang belum diukur:**
-- **R1.** Data Accurate untuk bulan-bulan 2025 dianggap lengkap. Belum diukur karena baca prod ke integration ditolak di sesi ini. Kolom "Mei 2025" di rekap Finance Juli memberi petunjuk bahwa data 2025 ada, tetapi itu belum bukti.
+- **R1. Terjawab 2026-10-20: data Accurate 2025 ada.** Diukur lewat `GET /accounting/account-balance` prod (baca saja, rinciannya di bip-erp#3336):
+  - total populasi Sep 2025 Rp 3.831,8 jt (46 akun bersaldo), Okt 2025 Rp 4.413,0 jt (47 akun), Sep 2026 Rp 3.184,1 jt (51 akun). YoY September 2026 = −16,9%;
+  - 59 dari 60 nama ketemu di katalog. `Beban PPN KMS Gedung` tak ketemu, dan tidak ada nama yang ambigu;
+  - kode akun 2025 sama dengan kode 2026 untuk semua akun yang ketemu;
+  - Non Ops: Entertainment Adum = 6226, Iuran & Sumbangan = 6225.
 - **R2.** Akun yang ada di 2025 tetapi tidak ada lagi di katalog sekarang (ditutup atau diganti kode) tidak tercakup di sisi tahun lalu. Akibatnya baseline mengecil tanpa tanda, kecuali dilaporkan.
 - **R3.** Mesin skor diasumsikan menerima target negatif dengan arah turun, sebagaimana sudah diputuskan ADR 0180 butir 6. Belum diverifikasi di `kpi_reduksi`.
 - **R4.** Entitas: populasi Accurate PT Bharata saja (database Accurate yang sama dengan `realisasi_opex`).
@@ -129,6 +133,7 @@ Tidak ada layar baru. HRD cukup memilih sumber baru lewat Kelola template.
   - Butir 5: baseline isian tidak lagi menjadi dasar KPI baris 2.
   - Butir 6: KPI-nya pindah ke sumber `biaya_yoy`.
   - Butir lain, serta laporan Non Ops, tetap berlaku.
+- ⚠️ **Beban Iklan (6107) sekitar 67% dari total populasi** (Rp 2.539,9 jt dari 3.831,8 jt pada Sep 2025; Rp 2.133,7 jt dari 3.184,1 jt pada Sep 2026). Skor baris ini praktis digerakkan oleh belanja iklan, dan −16,9% September 2026 sebagian besar berasal dari iklan yang turun. Ini konsekuensi pilihan cakupan. Mengecualikan iklan butuh keputusan baru; prasedennya `varians_absolut_persen_tanpa_iklan` di sumber varians.
 - **Angka KPI berubah skala.** Basisnya naik dari dua akun (puluhan juta) ke seluruh OPEX (miliaran per bulan). Satu beban besar yang musiman, misalnya bonus atau penyusutan aset baru, bisa membalik skor bulan itu. Pemilik KPI dan HRD perlu tahu ini sebelum template diganti.
 - **Metrik #3 (varians OPEX ≤ ±5%) dan #2 kini memuat populasi OPEX yang sama.** Ini disengaja, karena pertanyaannya berbeda: #3 membandingkan dengan anggaran, #2 membandingkan dengan tahun lalu. Kedua skor jangan dibaca sebagai bukti independen.
 - **Penyusutan dan beban pajak ikut**, mengikuti daftar OPEX. Jika kelak Finance memutuskan mengecualikannya, yang diubah adalah populasi KPI ini (dengan ADR baru), bukan `DaftarKomponenOpex`, karena daftar itu juga dipakai varians.
