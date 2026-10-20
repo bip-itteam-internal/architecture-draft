@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-20",
-  "jumlah_dokumen": 656,
+  "jumlah_dokumen": 658,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -3057,6 +3057,7 @@
         "ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca",
         "ADR - 0182 Badan Usaha Satu Daftar untuk HR dan Finance, Entitas CV Menempel Tanpa Nama Sendiri",
         "APP - Web ERP",
+        "ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti",
         "Microservices - Employee Service",
         "Microservices - Attendance Service",
         "Microservices - Assistant Service",
@@ -3080,20 +3081,20 @@
         "ADR - 0002 Database-per-Service",
         "ADR - 0033 Beban Operasional Insentif dari Proyek Accurate"
       ],
-      "hash": "346998bbf393434ef82230af14ea7ebc075ce6423f5096e880a746fdee0ae104",
-      "ukuran_kb": 69.3,
-      "ringkasan": "Menjawab: apa saja yang dikerjakan payroll-service (config BPJS/pajak TER, master badan usaha, komponen gaji, gaji per karyawan, payroll run, periode kehadiran, lingkup run, potongan kehadiran, THR, PDF slip, impor dari spreadsheet HRD) dan bagaimana model datanya. Juga menjawab kondisi pemakaian di produksi, kenapa company_id bukan tenant, dan di mana aturan bisnis Peraturan Perusahaan yang menentukan potongan.",
+      "hash": "703f9d8e3d0c6751c50fddb1d6c25de863e09cc4a50a311812ee2f51a115f3f4",
+      "ukuran_kb": 69.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki payroll-service (config BPJS/pajak, master badan usaha, komponen gaji, gaji per karyawan, payroll run, THR, PDF slip, impor spreadsheet), bagaimana potongan kehadiran, PPh21 TER, dan pembulatan BPJS dihitung, serta bagaimana badan usaha penggaji (company_id) disimpan dan ditetapkan. Juga menjelaskan kondisi pemakaian di produksi, batasan multi-perusahaan, dan di mana aturan bisnis Peraturan Perusahaan yang mengikat payroll berada.",
       "kata_kunci": [
-        "payroll service",
+        "payroll-service",
         "penggajian",
         "payroll run",
         "slip gaji",
+        "badan usaha",
+        "company_id",
         "PPh21 TER",
         "BPJS",
         "potongan kehadiran",
-        "THR",
-        "badan usaha penggaji",
-        "payroll_db"
+        "THR"
       ]
     },
     {
@@ -8942,6 +8943,7 @@
         "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
         "ADR - 0137 Model Persetujuan Tunggal dan Pemisahan Tugas Lintas Modul",
         "REF - Kepemilikan Data",
+        "ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti",
         "HRIS - Payroll",
         "Microservices - Recruitment Service",
         "Microservices - Employee Service",
@@ -8951,20 +8953,20 @@
         "ADR - 0002 Database-per-Service",
         "HRIS - Kepatuhan Peraturan Perusahaan"
       ],
-      "hash": "d927a23d8d3f0843395637bf248f70e055f0afeca5ec51db20befd3cc49b44e0",
-      "ukuran_kb": 21.1,
-      "ringkasan": "Menjawab: bagaimana menyimpan riwayat lengkap setiap perubahan gaji karyawan beserta dokumentasi hulu (offer, kontrak, promosi, mutasi), bagaimana menghitung gaji pokok dan tunjangan secara proporsional per hari saat ada perubahan di tengah periode, dan siapa yang terdampak (personalia, finance, karyawan baru dan yang resign). Merevisi ADR 0035 satu poin: resign di tengah periode tidak lagi dibayar gaji penuh.",
+      "hash": "4d6a38ccc683c0b7b67a0292c22c8f7c0640064d65b80dce4640f3fef790f9b8",
+      "ukuran_kb": 21.4,
+      "ringkasan": "Menjawab: kenapa struktur gaji karyawan disimpan sebagai riwayat versi bertanggal berlaku, dokumen hulu apa (offer, kontrak, mutasi/promosi, keputusan massal, impor sheet) yang memicu tiap versi, dan bagaimana gaji diprorata per hari saat karyawan masuk, resign, atau berubah gaji di tengah periode. Juga menjelaskan status versi dan persetujuannya, gerbang saat menyimpan versi, serta migrasi dari spreadsheet HRD.",
       "kata_kunci": [
-        "gaji",
-        "struktur",
-        "versi",
-        "riwayat",
+        "versi gaji",
+        "salary version",
+        "riwayat gaji",
+        "struktur gaji",
         "prorata",
-        "resign",
+        "proporsional per hari",
+        "effective date",
         "offer",
-        "kontrak",
-        "movement",
-        "payroll"
+        "mutasi",
+        "employee_salary"
       ]
     },
     {
@@ -10296,6 +10298,43 @@
         "stepper",
         "Permintaan Pembelian",
         "ADR 0188"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti.md",
+      "judul": "ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "Diusulkan, 2026-10-20. Bentuknya disetujui user dalam sesi `/analisa-kebutuhan` 2026-10-20 (desain layar di Figma, opsi endpoint massal di payroll-service). Merevisi sebagian [[ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari]] (butir persetujuan). Pemutus: `irfanarfianto`. Blueprint: `Workspace/ANALISA - Penetapan Badan Usaha Massal dari HRIS.md`.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari",
+        "HRIS - Kontrak Kerja Elektronik (e-Signing & e-Meterai)",
+        "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
+        "ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca",
+        "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
+        "ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional",
+        "RUN - Deploy Microservices bip-erp",
+        "Microservices - Payroll Service",
+        "HRIS - Payroll",
+        "REF - Kepemilikan Data",
+        "ADR - 0182 Badan Usaha Satu Daftar untuk HR dan Finance, Entitas CV Menempel Tanpa Nama Sendiri"
+      ],
+      "hash": "d0568f24f3321ff2663b34ac183ed8a19c119f56ffaeee4f93f194f6a95ca6ce",
+      "ukuran_kb": 12.0,
+      "ringkasan": "Menjawab: bagaimana HR menetapkan badan usaha (PT/CV) penggaji untuk banyak karyawan sekaligus dari menu HRIS, kenapa penggantian penggaji saja tidak perlu persetujuan SPV HRD, dan apa yang terjadi pada karyawan yang belum punya struktur gaji (rencana badan usaha). Juga menjelaskan endpoint massal mode cek/terapkan, notifikasi per batch, dan batasannya (gaji/BPJS/PTKP tetap lewat persetujuan, kontrak tidak disentuh).",
+      "kata_kunci": [
+        "penetapan badan usaha",
+        "badan usaha penggaji",
+        "company_id",
+        "penetapan massal",
+        "bulk",
+        "tanpa persetujuan",
+        "PersetujuanDilewati",
+        "keputusan_massal",
+        "rencana badan usaha",
+        "HRIS"
       ]
     },
     {
@@ -13826,24 +13865,25 @@
         "ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji",
         "ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit",
         "ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance",
+        "ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti",
         "HRIS - Overtime",
         "HRIS - Compensation & Benefits",
         "Finance - Big Pictures"
       ],
-      "hash": "dfb16e347abd2dd9bf45819a6dec4842b4da0d6a5ee1a04a613a5dc1e88c2e97",
-      "ukuran_kb": 13.5,
-      "ringkasan": "Menjawab: bagaimana payroll-service menghitung gaji dari komponen dan config sampai net (BPJS, PPh21 metode TER, potongan kehadiran, THR, PDF slip), apa saja tarif dan dasar tiap baris potongan kehadiran (telat, izin, mangkir, uang makan), dan bagaimana rencana persetujuan bertingkat per badan usaha akan bekerja.",
+      "hash": "4f301d5c46df531566673dec5464761c753653ff6bbd8e23a0290b1dd1f930a8",
+      "ukuran_kb": 15.0,
+      "ringkasan": "Menjawab: fitur payroll apa yang sudah ada dari sisi HRIS (setup gaji, BPJS, PPh21 TER, payroll run, THR, slip PDF self-service), bagaimana potongan kehadiran (telat, izin, mangkir, uang makan) dihitung dan di mana tarifnya dikonfigurasi, serta bagaimana data kehadiran masuk sebagai payroll supplement. Juga merangkum rencana persetujuan bertingkat, pembayaran per badan usaha, backfill dari spreadsheet HRD, dan penetapan badan usaha dari HRIS.",
       "kata_kunci": [
         "payroll",
+        "penggajian",
         "gaji",
-        "slip gaji",
-        "payslip",
-        "BPJS",
-        "PPh21",
-        "TER",
         "potongan kehadiran",
+        "mangkir",
+        "payroll supplement",
+        "slip gaji",
+        "PPh21",
         "THR",
-        "komponen gaji"
+        "badan usaha"
       ]
     },
     {
@@ -18206,6 +18246,7 @@
         "ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI",
         "HRIS - Payroll",
         "Microservices - Payroll Service",
+        "ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti",
         "ADR - 0087 Katalog Tipe Psikotes Jadi Master Data, Tiga Bentuk Jawaban Tetap Kode",
         "HRIS - Bank Soal dan Paket Psikotes",
         "HRIS - Psikotes Kraepelin",
@@ -18225,20 +18266,20 @@
         "REF - Rantai Pengajuan Lintas Modul",
         "Microservices - Manufacture Service"
       ],
-      "hash": "2e4ab3739cd99223f913deddc7e30340b2c2bf98776f21cc524edb75be1edf01",
-      "ukuran_kb": 87.3,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki sebuah fakta bisnis (karyawan, departemen, hak akses, kontrak, toko, master produk, dll), siapa yang boleh menulisnya, dan salinan mana yang sah atau masih berupa duplikasi yang belum diputuskan. Juga memuat aturan satu fakta satu pemilik dan daftar pengecualian ADR 0002 yang masih hidup di kode.",
+      "hash": "87bff1e24931dc897d1958aa2a923d9f5e98dece4078563be6b96193366f20ed",
+      "ukuran_kb": 88.1,
+      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis ERP (data karyawan, departemen, hak akses, kontrak, jadwal, produk, vendor, dll), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga menjelaskan salinan data yang sah beserta penjaganya, pengecualian database-per-service yang masih hidup, duplikasi yang belum diputuskan, dan cara memeriksa sebelum membangun fitur atas data yang mungkin sudah ada.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
         "sumber kebenaran",
-        "single source of truth",
-        "database per service",
-        "duplikasi data",
+        "source of truth",
+        "duplikasi",
         "salinan data",
+        "database-per-service",
+        "SyncCollection",
         "master data",
-        "fakta bisnis",
-        "RACI"
+        "audit trail"
       ]
     },
     {
@@ -21835,6 +21876,37 @@
         "pemilih tipe",
         "ADR 0067",
         "hitung fisik"
+      ]
+    },
+    {
+      "path": "Workspace/ANALISA - Penetapan Badan Usaha Massal dari HRIS.md",
+      "judul": "ANALISA - Penetapan Badan Usaha Massal dari HRIS",
+      "area": "Workspace",
+      "jenis": "workspace",
+      "status_emoji": "⛔",
+      "status_teks": "**Menunggu [[ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti]] Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**",
+      "publik": false,
+      "tautan": [
+        "ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti",
+        "ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari",
+        "HRIS - Payroll",
+        "Microservices - Payroll Service",
+        "REF - Kepemilikan Data"
+      ],
+      "hash": "7b690a913a73af19fd9006c3321ea78988a2a1664618a69c119d8996cf3768ad",
+      "ukuran_kb": 12.6,
+      "ringkasan": "Menjawab: bagaimana pekerjaan penetapan badan usaha penggaji massal dipecah jadi issue induk, [BE] bip-erp, dan [FE] erp-frontend, apa kriteria 'yang harus benar' tiap issue, dan langkah manusia apa yang dibutuhkan sebelum dikerjakan agent. Juga mencatat temuan kebutuhan (62 dari 186 employee_salary tanpa company_id), komponen yang sudah ada untuk dipakai ulang, urutan deploy, dan asumsi yang diambil.",
+      "kata_kunci": [
+        "analisa kebutuhan",
+        "penetapan badan usaha",
+        "blueprint",
+        "issue",
+        "sub-issue",
+        "bip-erp#3323",
+        "bip-erp#3324",
+        "erp-frontend",
+        "company_id",
+        "Siap Agent"
       ]
     },
     {

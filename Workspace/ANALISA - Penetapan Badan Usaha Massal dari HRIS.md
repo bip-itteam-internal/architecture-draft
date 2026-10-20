@@ -27,7 +27,7 @@ Blueprint hasil `/analisa-kebutuhan` 2026-10-20 atas permintaan "halaman baru un
 
 ## Issue 1: Induk, `bip-erp`: Penetapan badan usaha penggaji massal dari HRIS
 
-- **Urutan**: induk, tanpa PR sendiri · **Issue**: TBD
+- **Urutan**: induk, tanpa PR sendiri · **Issue**: [bip-erp#3323](https://github.com/bip-itteam-internal/bip-erp/issues/3323)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -67,7 +67,7 @@ ADR 0189 Diterima.
 
 ## Issue 2: [BE] `bip-erp`: Daftar lintas badan usaha dan penetapan badan usaha massal
 
-- **Urutan**: 1 · **Issue**: TBD
+- **Urutan**: 1 · **Issue**: [bip-erp#3324](https://github.com/bip-itteam-internal/bip-erp/issues/3324)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -118,7 +118,7 @@ ADR 0189 Diterima.
 
 ## Issue 3: [FE] `erp-frontend`: Halaman HRIS › Penetapan Badan Usaha
 
-- **Urutan**: 2 · **Issue**: TBD
+- **Urutan**: 2 · **Issue**: [erp-frontend#2631](https://github.com/bip-itteam-internal/erp-frontend/issues/2631)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
