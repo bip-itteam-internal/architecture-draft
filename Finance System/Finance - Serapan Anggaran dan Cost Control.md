@@ -121,7 +121,7 @@ Aturan pengecualian:
 | `aset_tahunan.sisa` | Anggaran tahun − Σ realisasi aset 1 Jan s.d. akhir bulan laporan | `null` bila anggaran belum diisi atau aset belum disinkron. Boleh negatif. `BiayaPerolehan` adalah nilai current (sesudah pelepasan), bukan harga beli awal |
 | Beban pajak 72xx (7201–7212) | **Tidak masuk komponen mana pun** | Komponen Pajak hanya diisi setoran, yaitu delapan akun `akunPajakSetoran` milik finance: PPN, PPh 21/23/25/4(2)/Final UMKM/Badan, PBB. Akibatnya PKB (7206), BBNKB (7208), dan PPN Kurang Bayar (7212) belum terhitung sama sekali (§Belum Diputuskan) |
 
-### KPI Penurunan Biaya OPEX + Non Ops YoY (🟡 Diusulkan 2026-10-20, kode belum ada)
+### KPI Penurunan Biaya OPEX + Non Ops YoY (🟡 Direncanakan, ADR Diterima 2026-10-20, kode belum ada: bip-erp#3336, #3337)
 
 KPI Cost Control #2 mengukur **perubahan total biaya OPEX + Non Ops dibanding bulan yang sama tahun lalu** ([[ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu]]). Rencana cara kerjanya:
 
@@ -251,4 +251,4 @@ Untuk proyeksi mingguan yang diatur (ADR 0161, Diterima 2026-10-09): yang tersis
 - [[API - Procurement Service]] · [[API - Integration Service]] · [[Microservices - Procurement Service]]
 - [[CORE - RBAC dan Permission Set]] · [[APP - Web ERP]] · [[REF - Kepemilikan Data]]
 - [[ADR - 0130 Dashboard FAT Diringkas, Isi Posisi Pindah ke Modul Kerjanya]]
-- [[ADR - 0180 Akun Anggaran Seluruh Perusahaan Diatur Finance, Non Ops Dua Akun dengan Baseline Isian]] · [[ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu]] (🟡 Diusulkan)
+- [[ADR - 0180 Akun Anggaran Seluruh Perusahaan Diatur Finance, Non Ops Dua Akun dengan Baseline Isian]] · [[ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu]] (🟢 Diterima)

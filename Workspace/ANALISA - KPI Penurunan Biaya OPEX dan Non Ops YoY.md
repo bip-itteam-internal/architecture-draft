@@ -1,6 +1,6 @@
 # ANALISA - KPI Penurunan Biaya OPEX dan Non Ops YoY
 
-> **Status**: ⛔ **Menunggu [[ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu]] Diterima. Sebelum itu, ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**
+> **Status**: [[ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu]] 🟢 Diterima 2026-10-20 (Azzerith). Issue dibuat di Backlog Project #15; belum `Siap Agent` karena data prod issue 1 belum ditempel.
 
 Blueprint ini hasil `/analisa-kebutuhan` 2026-10-20, atas permintaan pemilik KPI Cost Control: *"baris 2 harus mengukur penurunan biaya operasional dan non-operasional secara keseluruhan minimal 2% YoY, bukan hanya biaya admin/non-ops"*. Berkas ini papan kerja dan berubah setiap issue selesai. Keputusannya ada di ADR.
 
@@ -44,7 +44,7 @@ Blueprint ini hasil `/analisa-kebutuhan` 2026-10-20, atas permintaan pemilik KPI
 
 ## Issue 1: `bip-erp`: Cuplikan biaya OPEX + Non Ops YoY dan endpoint KPI di integration-service
 
-- **Urutan**: bagian 1/2 · **Issue**: TBD (draf, belum dibuat)
+- **Urutan**: bagian 1/2 · **Issue**: [bip-erp#3336](https://github.com/bip-itteam-internal/bip-erp/issues/3336)
 
 **Pemutus:** @Azzerith
 **PIC:** @
@@ -95,7 +95,7 @@ Bentuknya:
 
 ## Issue 2: `bip-erp`: Sumber KPI `biaya_yoy` di employee-service
 
-- **Urutan**: bagian 2/2, sesudah issue 1 merged · **Issue**: TBD (draf, belum dibuat)
+- **Urutan**: bagian 2/2, sesudah issue 1 merged · **Issue**: [bip-erp#3337](https://github.com/bip-itteam-internal/bip-erp/issues/3337)
 
 **Pemutus:** @Azzerith
 **PIC:** @

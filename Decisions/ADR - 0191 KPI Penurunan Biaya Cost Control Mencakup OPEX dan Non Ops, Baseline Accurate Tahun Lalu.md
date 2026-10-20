@@ -1,6 +1,6 @@
 # ADR - 0191 KPI Penurunan Biaya Cost Control Mencakup OPEX dan Non Ops, Baseline Accurate Tahun Lalu
 
-> **Status**: 🟡 Diusulkan, 2026-10-20. Bentuknya dipilih Azzerith lewat pilihan ganda di sesi `/analisa-kebutuhan` atas permintaan pemilik KPI Cost Control (2026-10-20), tetapi baris status belum diubah ke Diterima. Kode belum ada. Mengamandemen [[ADR - 0180 Akun Anggaran Seluruh Perusahaan Diatur Finance, Non Ops Dua Akun dengan Baseline Isian]] butir 5 dan 6, **hanya** untuk KPI Cost Control #2.
+> **Status**: 🟢 Diterima, 2026-10-20, oleh Azzerith. Bentuknya dipilih lewat pilihan ganda di sesi `/analisa-kebutuhan` atas permintaan pemilik KPI Cost Control (2026-10-20). Kode belum ada; issue bip-erp#3336 (integration) lalu #3337 (employee). Mengamandemen [[ADR - 0180 Akun Anggaran Seluruh Perusahaan Diatur Finance, Non Ops Dua Akun dengan Baseline Isian]] butir 5 dan 6, **hanya** untuk KPI Cost Control #2.
 
 ## Untuk Manajemen
 
@@ -31,7 +31,7 @@ Tidak ada layar baru. HRD cukup memilih sumber baru lewat Kelola template.
 
 *KPI Cost Control #2 mengukur perubahan YoY total biaya OPEX + Non Ops: populasi yang sudah ditanam di kode (`DaftarKomponenOpex` ∪ `DaftarAkunAdminNonOps`), dengan bulan yang sama tahun lalu sebagai pembanding. Kedua sisi dibaca dari Accurate lewat satu mekanisme yang sama, lalu disimpan sebagai cuplikan bulanan di integration-service. Sumber `admin_non_ops` tidak disentuh.*
 
-- **Status**: 🟡 Diusulkan 2026-10-20, kode belum ada
+- **Status**: 🟢 Diterima 2026-10-20 (Azzerith), kode belum ada
 - **Path di repo** (rencana):
   - `bip-erp/services/integration/internal/usecase/biaya_yoy.go` (baru): populasi, ringkasan, rumus
   - `bip-erp/services/integration/internal/domain/entity/biaya_yoy.go` (baru)
