@@ -114,6 +114,15 @@ Pada hari yang sama ADR ini diterima, Pemutus memutuskan "rute lama dihapus saja
 - **Cakupan menjadi 15 jenis** (butir 2 dan 7): Cuti, Izin, Sakit, Dinas, Koreksi Presensi, Tukar Jadwal, Booking Ruang, Pelatihan, Pengajuan Barang, Permintaan Barang GA, Tiket, Live Support, Payroll, Requisition, Offer.
 - **Butir 5 menyempit**: akses baca penyetuju hanya dibutuhkan untuk Permintaan Barang GA (bip-erp#3331, merged). Pelatihan, Live Support, dan Offer tidak diubah: daftar antreannya sudah tersaring per pemanggil dan membawa dokumen penuh, jadi detail di agregator membacanya dari daftar itu (bip-erp#3318). Issue untuk Permintaan ERP (bip-erp#3330) dibatalkan.
 - Alasan pergantian ikon kartu Beranda di butir 1 (clipboard-check bentrok dengan ikon Permintaan Pembelian) tidak berlaku lagi, tetapi keputusan ikon inbox tetap.
+
+### 2026-10-20: Bentuk detail lima kategori sisa dan bahasa rincian
+
+Diputuskan Pemutus (irfanarfianto) sesudah bagian pertama endpoint detail merged (bip-erp#3352), untuk bip-erp#3347:
+
+- **Tiket**: detail diambil dengan mencocokkan id dari daftar antrean tiket milik pemanggil (`/tasks/filter?pending_my_approval=true`, sudah tersaring cakupan space), dan riwayat tiket (`/tasks/:id/history`) baru dibaca sesudah dokumen terbukti ada di daftar itu. `GET /tasks/:id` tidak dipakai karena gerbangnya lebih longgar daripada daftar; task-management tidak diubah. Tiket yang tak ada di daftar pemanggil membalas 404.
+- **Offer**: `gaji_evaluasi` dan `gaji_kontrak` ditampilkan di rincian. Pembaca antrean Offer sudah pasti pemegang `recruitment.view`, yang di web juga melihat angka ini, dan penyetuju tak bisa menilai offer tanpa gaji.
+- **Bahasa rincian (ADR 0010)**: `rincian[]` berbentuk `{kunci, nilai}`. `kunci` adalah kode yang diterjemahkan klien (web `id.ts`/`en.ts`, MyBharata `app_id.arb`/`app_en.arb`); `nilai` tetap teks siap tampil. Bentuk `{label, nilai}` dari bip-erp#3352 diganti di PR yang sama dengan bip-erp#3347, sebelum ada klien yang memakainya.
+- **Pengajuan Barang yang dikembalikan**: stepper detail menampilkan semua putaran (langkah putaran lama berstatus `dikembalikan`, `putaran` naik), seperti yang sudah dibangun di bip-erp#3352.
 ## Alternatif yang Ditolak
 
 - **MyBharata memanggil detail tiap sumber langsung.** Tanpa endpoint agregator baru, tetapi logika langkah ditulis dua kali (Dart dan TypeScript) untuk sepuluh sumber: satu fakta di dua tempat, kelas kerusakan yang paling sering tercatat di vault ini.
