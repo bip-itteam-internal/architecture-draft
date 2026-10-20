@@ -153,8 +153,23 @@ Alur yang diputuskan (langkah orang):
 
 Setiap langkah punya izinnya sendiri (`payroll.approve.cost_control`, `.hrd`, `.finance`, `.direksi`, `payroll.bayar`, `payroll.publish`) lewat paket di jabatan, dan tercatat di riwayat run. Penanda tangan berikutnya mendapat notifikasi inbox. Tanda insentif `terbayar` ([[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]]) pindah dari saat terbit ke saat badan usaha karyawan itu lunas.
 
+## Penetapan Badan Usaha Penggaji dari HRIS (🟡 Direncanakan)
+
+Keputusannya [[ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti]] (2026-10-20); kodenya belum ada. Hari ini badan usaha penggaji ditetapkan per karyawan di Payroll › Gaji Karyawan (form struktur gaji) dan setiap perubahan menunggu persetujuan SPV HRD; karyawan belum bergaji lewat rencana badan usaha.
+
+Alur yang diputuskan (langkah orang):
+
+1. **Staf HR** (izin `payroll.salary.write`) membuka **HRIS › Penetapan Badan Usaha**: daftar seluruh karyawan aktif dengan badan usaha penggaji dan status (Ditetapkan, Rencana, Belum ditetapkan), bawaan tersaring "Belum ditetapkan".
+2. Memilih banyak karyawan, menekan **Tetapkan**, memilih badan usaha (hanya yang beroperasi) dan tanggal berlaku (bawaan awal bulan depan).
+3. Dialog memecah pilihan jadi dua jalur: yang **punya struktur gaji** mendapat versi baru yang hanya mengganti badan usaha, **langsung terjadwal tanpa persetujuan**; yang **belum** mendapat rencana badan usaha.
+4. Hasil per baris tampil (diterapkan, tanpa ubah, ditolak + alasan); karyawan yang sedang punya perubahan gaji menunggu persetujuan ditolak sampai perubahan itu diputus.
+5. **SPV HRD** menerima satu notifikasi per penetapan; jejaknya di riwayat struktur gaji tiap karyawan.
+
+Perubahan gaji, BPJS, atau PTKP tetap lewat Struktur Gaji dan tetap menunggu persetujuan.
+
 ## Dokumen Terkait
 
+- [[ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti]] (penetapan badan usaha massal)
 - [[ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit]] (alur tanda tangan dan pembayaran per badan usaha)
 - [[ADR - 0070 Impor Payroll Run dari Spreadsheet HRD untuk Backfill Riwayat Gaji]] (backfill riwayat)
 - [[Microservices - Payroll Service]] (implementasi Fase 1) · [[Microservices - Attendance Service]] (`payroll-supplement`) · [[Microservices - Employee Service]] (`payroll-approx`) · [[CORE - HRIS Orchestrator]]

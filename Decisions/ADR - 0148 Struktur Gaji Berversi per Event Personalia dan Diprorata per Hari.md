@@ -125,6 +125,7 @@ Butir ketiga **merevisi** keputusan produk di [[ADR - 0035 HR Menonaktifkan Akun
 - Perubahan Gaji Pokok atau Tunjangan Jabatan (dua komponen ber-`bpjs_base`) **tidak dapat disimpan** sebelum dasar upah BPJS dikonfirmasi, entah diubah atau sengaja dibiarkan. Dok Payroll mencatat nol dari 120 record lama punya dasar upah yang masuk akal; gerbang ini mencegah kelas itu tumbuh lagi.
 - Versi yang menaikkan struktur untuk karyawan ber-SP II aktif memunculkan **peringatan** (Pasal 55 jo. 53), tidak menolak.
 - **Persetujuan**: versi baru berstatus menunggu persetujuan **Manajer HRD** sebelum menjadi terjadwal atau berlaku. Sampai [[ADR - 0137 Model Persetujuan Tunggal dan Pemisahan Tugas Lintas Modul]] diputuskan, gerbangnya paket SPV HRD yang sudah ada di [[ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit]]. Pengisi dan penyetuju tak boleh orang yang sama.
+  - ⚠️ **Pengecualian (2026-10-20, 🟡 Diusulkan)**: versi yang hanya mengganti badan usaha penggaji lewat penetapan massal HRIS lahir `terjadwal` tanpa persetujuan, berpengaman notifikasi ke SPV HRD dan riwayat versi. Lihat [[ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti]].
 - **Visibilitas** tetap mengikuti ADR 0129 dan 0089: staf payroll berizin, karyawan yang bersangkutan, dan Direktur. Atasan tidak.
 
 ### 9. Migrasi dan pensiun sheet
