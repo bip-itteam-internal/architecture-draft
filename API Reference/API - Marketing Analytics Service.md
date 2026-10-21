@@ -61,6 +61,18 @@ Verifikasinya menemukan yang test tak bisa: `vonis.laba_kotor` **cocok sampai ru
 
 ⚠️ **Granularitas bulanan (bawaan) semua `/profit/*` di atas menjumlah SELURUH baris harian rentangnya** (`bacaProfitPenuh`, bip-erp #2369, 2026-09-30). Sebelumnya baris harian dibaca paling banyak 5.000 sebelum digabung, dan PROD September 2026 sudah 6.790 baris level product, 7.278 SKU, 15.011 item (issue #2366), jadi angka bulanan per produk/SKU/item tampil kurang tanpa tanda. `limit` pengguna berlaku atas **baris bulanan hasil**, bukan baris harian. `granularitas=harian` tetap satu bacaan dengan `limit` pengguna.
 
+🟡 **Belum merged per 2026-10-21 — branch `feat/3403-sertakan-pembanding` (bip-erp#3403).** Tambahan opt-in `/profit/*`, tanpa parameternya respons tak berubah (`sertakan_profit.go`):
+
+| Parameter / field | Arti |
+|---|---|
+| `sertakan=pembanding,laba_harian` | Koma-terpisah. Nilai tak dikenal → **400** + `sertakan_valid`. `pembanding` di `/profit/ads` → 400 (revenue & laba level iklan tak bersumber). `laba_harian` selain `/profit/shops` → 400 |
+| `pembanding` (amplop) | Objek `Pembanding` yang sama dengan `vonis.pembanding` `/beranda`: angka **periode sebelumnya** (`periodeSebelumnya`, sepanjang rentang, berakhir sehari sebelum `dari`), level & saringan **sama** dengan barisnya, dibaca penuh. Delta (`delta_persen`, `delta_revenue_persen`, `delta_ads_cost_persen`, `delta_roas_persen`) terhadap periode sekarang yang **juga dibaca penuh**, termasuk di jalur harian yang tabelnya berlimit. `label` dibentuk `labelPembanding` ("YYYY-MM-DD s.d. YYYY-MM-DD"), satu fungsi untuk kedua endpoint |
+| `laba_harian` (amplop) | Grid `TitikLabaHarian` per hari WIB, dirakit `rakitLabaHarian` yang sama dengan `/beranda` dari pembacaan penuh level toko |
+| `sertakan_gagal` (amplop) | Nama tambahan yang diminta tapi gagal dibaca. Kunci absen + nama di sini = gagal; kunci absen tanpa nama = tak diminta. Tabelnya tetap terkirim |
+| `terpotong` (amplop) | `true` bila baris harian **pas** di `limit` atau baris bulanan **melebihi** `limit` hasil. `limit` bawaan 500 (`jinakkanLimit`) berlaku walau tak dikirim, jadi ini satu-satunya cara FE yang tak mengirim `limit` mengetahui kartunya kurang |
+
+⚠️ `pembanding` menambah satu pembacaan penuh periode lalu (dan satu lagi rentang sekarang di jalur harian), masing-masing berbatas 15 dtk (`panggilBerbatas`). Waktunya di level besar (`skus`, `campaigns`) **belum diukur** terhadap batas 30 dtk gateway. Copilot: tidak, karena hanya menambah field opsional ke endpoint yang sudah ada.
+
 ⛔ **`/profit/products`, `/profit/items`, dan `/profit/skus` TIDAK boleh dijumlahkan silang.** Ketiganya menjawab pertanyaan yang berbeda atas koleksi yang sama: satu listing memayungi banyak SKU, satu SKU dijual lewat banyak listing, dan satu SKU bundel mengandung banyak kode master. Menjumlahkan dua di antaranya menghasilkan angka yang tak berarti apa-apa tetapi tampak wajar, dan itulah yang membuatnya berbahaya. Nama menunya sengaja **tidak** sejajar dengan nama path-nya: menu *Profit per Produk* → `/profit/items`, menu *Profit per SKU* → `/profit/skus` (`handler_mart.go`).
 
 ## Video & live
