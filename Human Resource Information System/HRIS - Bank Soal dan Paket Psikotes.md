@@ -194,7 +194,7 @@ Dipasang **sekali per lingkungan** (penanda `psikotes_seed`), tipe by `kode` dan
 2. **Bentuk jawaban EPPS**: diasumsikan muat di `most_least`, belum diperiksa.
 3. **Mesin kandidat resmi** (B2): dibangun di career portal (de facto jalur prod); keputusan tertulisnya belum ada.
 4. **Pendampingan CFIT** (B3): dibangun dengan asumsi boleh jarak jauh, batas waktu ditegakkan server. HRD perlu menerima risikonya tertulis atau memilih pengerjaan diawasi. Rincian di ADR 0087 §Belum Diputuskan.
-5. **Tenggat tautan dan status kandidat** (B4): tautan yang belum dibuka tak pernah kedaluwarsa, dan kandidat yang sudah ditolak tetap bisa mengerjakan.
+5. **Tenggat tautan dan status kandidat** (B4): 🟡 sebagian dijawab 2026-10-21 (di PR, belum merged/deploy): sesi **baru** punya batas untuk memulai tes dan tautan yang lewat batas ditolak ([[HRIS - Recruitment]] §Komunikasi Kandidat Terkendali); sesi lama tanpa batas tetap tak pernah kedaluwarsa. Yang belum diputuskan: kandidat yang sudah ditolak tetap bisa mengerjakan.
 6. **Urutan babak di prod** (`sequence_number` bertabrakan): dirapikan sebagai data atau diberi penjaga keunikan.
 7. **Keterangan per baris di pratinjau impor** ditampilkan dari kalimat server berbahasa Indonesia, juga saat bahasa layar Inggris. Belum diputuskan apakah dibiarkan (sama dengan pesan galat server di toast) atau diganti kode yang diterjemahkan FE.
 8. ✅ Bentuk perbaikan skor artefak: diputuskan 2026-09-10 (tahap nol), sesi tak tuntas menulis Hasil Tes tanpa skor.

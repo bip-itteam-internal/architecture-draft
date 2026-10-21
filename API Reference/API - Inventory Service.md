@@ -91,7 +91,7 @@ Grounded ke `services/inventory/peminjaman_*.go`. Keputusan desain: [[ADR - 0094
 | GET | `/peminjaman/penyetuju[?company=]` | Daftar penyetuju satu perusahaan | identitas + `RequireHRISOrITSupervisor` | `{data: PenyetujuPeminjaman}` |
 | PUT | `/peminjaman/penyetuju[?company=]` | Menimpa seluruh daftar penyetuju | identitas + `RequireHRISOrITSupervisor` | `{data: PenyetujuPeminjaman}` |
 | GET | `/peminjaman[?status=&ruang_id=&dari=&sampai=]` | Jadwal seluruh booking perusahaan pemanggil, `mulai_at` terbaru dulu, maks 200 | identitas + `ga.view` | `{data: [Peminjaman], batas: 200, terpotong: bool}` |
-| POST | `/peminjaman` | Ajukan booking | identitas | 201 `{data: Peminjaman}` |
+| POST | `/peminjaman` | Ajukan booking. 🟡 **(bip-erp [#3418](https://github.com/bip-itteam-internal/bip-erp/pull/3418), belum merged/deploy 2026-10-21)** badan menerima `asal{modul, id}` opsional untuk booking yang lahir dari modul lain: `modul` harus ada di daftar-izin `modulAsalPeminjamanDiizinkan` (kini hanya `interview`), `id` wajib dan maksimal 64 karakter; selain itu `400`. Booking ber-`asal` tetap `DIAJUKAN` dan butuh persetujuan, dan tidak ikut feed kalender pemohon | identitas | 201 `{data: Peminjaman}` |
 | POST | `/peminjaman/:nomor/setujui` | Setujui | identitas + ditunjuk HR | `{data: Peminjaman, ditolak_otomatis: [nomor]}` |
 | POST | `/peminjaman/:nomor/tolak` | Tolak, badan `{alasan}` wajib | identitas + ditunjuk HR | `{data: Peminjaman}` |
 | POST | `/peminjaman/:nomor/batal` | Batal oleh pemohon, badan `{alasan}` opsional (badan kosong sah) | identitas + pemohon | `{data: Peminjaman}` |
