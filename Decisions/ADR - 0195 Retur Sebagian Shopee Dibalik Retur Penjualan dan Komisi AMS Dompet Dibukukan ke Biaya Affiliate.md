@@ -1,3 +1,5 @@
+> **Status**: 🟡 **Diusulkan, 2026-10-21** (Pemutus: @bagusizzanm). **Belum ada kode.** Menunggu persetujuan tertulis di baris ini (`🟢 Diterima, <tanggal>, oleh <login>`). Bagian retur sebagian berdiri di atas butir 🟡 keputusan pemilik 2026-08-05 di ADR 0024, yang belum pernah masuk kode.
+
 ## Untuk Manajemen
 
 **Apa yang berubah.** Dua hal di penerimaan marketplace Shopee, keduanya berlaku mulai penerimaan 1 Oktober 2026.
@@ -19,7 +21,7 @@
 
 *Retur sebagian Shopee yang uangnya tetap cair (payout > 0) dibalik lewat dokumen Retur Penjualan per qty yang diretur, dan penerimaan hanya melunasi qty sisa. Komisi AMS yang dipotong dari dompet Shopee (`AMS_COMMISSION_FEE_DEDUCT`) dibukukan ke akun Biaya Affiliate. Keduanya digerbangi kv tanggal per hari penerimaan.*
 
-- **Status**: 🟡 **Diusulkan** (2026-10-21), belum ada kode. Pemutus: @bagusizzanm. Bagian retur sebagian berdiri di atas butir 🟡 "nilai barang selalu via retur" di [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]] (keputusan pemilik 2026-08-05, belum pernah masuk kode), dan ADR ini yang menjadikannya terimplementasi untuk Shopee retur sebagian.
+- **Status**: lihat blockquote di baris pertama dokumen ini. Bagian retur sebagian berdiri di atas butir 🟡 "nilai barang selalu via retur" di [[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]] (keputusan pemilik 2026-08-05, belum pernah masuk kode), dan ADR ini yang menjadikannya terimplementasi untuk Shopee retur sebagian.
 - **Path di repo** (yang akan disentuh): `bip-erp/services/integration/internal/domain/entity/shopee.go` (`refundShopee`, `normalizeShopeeIncomeIdentity`) · `internal/usecase/accurate_rts_usecase.go` (`returnPayoutGate`) · `internal/usecase/accurate_receipt_export_detail.go` (`receiptOrderPorsi`) · `internal/usecase/accurate_receipt_export_rekap.go` (`klasifikasiJenisOrder`) · `internal/usecase/accurate_receipt_usecase.go` (`buildReceiptPayload`) · `internal/usecase/accurate_receipt_wallet_adjustment.go` (`splitWalletAdjustments`, `applyWalletAdjustments`) · `internal/usecase/receipt_export_penyesuaian.go` · `internal/domain/entity/accurate.go` (dua kv tanggal baru, `shopee-retur-sebagian-cutover-date` dan `shopee-ams-wallet-cutover-date`) **(baru)**
 - **Tanggal**: 2026-10-21
 - **Permintaan**: sheet "CEK REKON" tab CEK (finance AR, 2026-10-21); butir 1 retur sebagian, butir 2 biaya affiliate yang hanya ada di mutasi.

@@ -21,13 +21,13 @@ Permintaan itu diterima sebagai kebutuhan "pembukuan penerimaan Shopee cocok den
 
 ### T1. Komisi AMS dompet Shopee dibukukan ke Biaya Affiliate (6113)
 - **Repo**: bip-erp · **Ukuran**: Kecil, 1 PR · **Urutan**: 1 (lebih kecil dan selisihnya terus bertambah)
-- **Issue**: _(diisi sesudah dibuat)_
+- **Issue**: https://github.com/bip-itteam-internal/bip-erp/issues/3397
 - **Isi**: kategori baru untuk `AMS_COMMISSION_FEE_DEDUCT`, satu baris per toko-hari ke kv `affiliate-commision`, rincian per pesanan di ekspor, kv tanggal `shopee-ams-wallet-cutover-date` (≥ 2026-10-01).
 - **Verifikasi**: penerimaan 12 dan 13 Okt memuat 99 potongan (−Rp1.136.138); Beautyhack's Original Shop −Rp908.333 cocok sheet.
 
 ### T2. Retur sebagian Shopee dibalik Retur Penjualan dan penerimaan melunasi qty sisa
 - **Repo**: bip-erp · **Ukuran**: Kecil (1 repo), 1 PR karena dua sisi wajib berubah serentak (ADR 0195 butir 4) · **Urutan**: 2
-- **Issue**: _(diisi sesudah dibuat)_
+- **Issue**: https://github.com/bip-itteam-internal/bip-erp/issues/3398
 - **Isi**: gerbang retur dilonggarkan untuk retur sebagian Shopee, base penerimaan dikurangi qty retur, refund identitas dari `seller_return_refund`, klasifikasi dibetulkan, kv `shopee-retur-sebagian-cutover-date` (≥ 2026-10-01).
 - **Verifikasi**: `INC/2026/10/17/008-BH` memuat Bayar faktur Rp92.000 dan Biaya Admin sekitar Rp16.035, dengan Retur Penjualan Rp92.000 NOT_RETURNED.
 - **Dependensi**: tidak bergantung pada T1.
