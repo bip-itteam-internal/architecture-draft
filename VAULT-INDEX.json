@@ -504,20 +504,21 @@
         "API - Procurement Service",
         "ADR - 0037 Rekonsiliasi Aset GA dengan Accurate untuk KPI"
       ],
-      "hash": "dec6902fbfd1d37701c168c40e0224e788d3fc678f02cdf1fd724209be7f062a",
-      "ukuran_kb": 34.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki inventory-service untuk aset GA (item, master data, kategori, pemetaan golongan Accurate, repair history, serah-terima), siapa yang boleh memanggilnya, serta bentuk request dan validasinya. Juga menjawab cara kerja opname perlengkapan per periode, padanan perlengkapan ke item Accurate, baca aset pemegang dan estimasi penyusutan untuk Copilot, Booking Ruang GA beserta feed kalendernya, dan Permintaan Barang GA dengan stok perlengkapan.",
+      "hash": "82d07c0dce49c8fb77c04c117f2a65c7878f396d901d3078d7f8a79dd7eef51e",
+      "ukuran_kb": 34.5,
+      "ringkasan": "Menjawab: endpoint apa saja yang tersedia di inventory-service (item aset, master data, repair history, opname perlengkapan, booking ruang GA, feed kalender), siapa yang boleh memanggilnya, dan bagaimana kontrak request serta validasinya. Juga menjelaskan gerbang izin GA, padanan perlengkapan ke Accurate, serta rute baca aset pemegang dan estimasi penyusutan.",
       "kata_kunci": [
         "inventory service",
-        "aset GA",
         "inventaris",
-        "serah-terima aset",
-        "repair history",
-        "opname perlengkapan",
-        "penyusutan",
+        "aset GA",
         "booking ruang",
         "peminjaman",
-        "permintaan barang GA"
+        "opname perlengkapan",
+        "penyusutan aset",
+        "repair history",
+        "approve handover",
+        "API endpoint",
+        "accurate_item_no"
       ]
     },
     {
@@ -727,24 +728,27 @@
         "RUN - Menyalakan Persetujuan Payroll Bertingkat",
         "Finance - Buku Besar CV",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari",
         "CORE - RBAC dan Permission Set",
         "Microservices - Attendance Service",
         "Microservices - Insentive Service"
       ],
-      "hash": "3ebd1afdd0b59642c23d5c7a66280070869463593f92c6234827c81e7b3c68c5",
-      "ukuran_kb": 27.9,
-      "ringkasan": "Menjawab: endpoint payroll-service apa saja (konfigurasi BPJS/pajak/potongan kehadiran, badan usaha, komponen gaji, gaji per karyawan, payroll run, THR, impor run, slip self-service, persetujuan bertingkat) dan izin permission-set apa yang menggerbang tiap rute. Juga menjawab perbedaan payroll.salary.write vs payroll.work, siapa boleh mengelola badan usaha, dan rute internal berkunci layanan.",
+      "hash": "f6912112f1c2f4a72e346ef5e2522d89155ac228ccf194c9b5559900add10ed6",
+      "ukuran_kb": 28.6,
+      "ringkasan": "Menjawab: rute apa saja yang dimiliki payroll-service, izin permission-set mana yang menggerbanginya, dan bagaimana config, gaji karyawan, payroll run, THR, impor run, slip self-service, serta persetujuan bertingkat per badan usaha diakses. Juga memuat rute internal dan catatan keadaan produksi.",
       "kata_kunci": [
         "payroll",
         "penggajian",
-        "API payroll",
+        "API endpoint",
         "payroll run",
         "slip gaji",
-        "payslip",
+        "THR",
+        "employee salary",
         "BPJS",
-        "PPh21",
-        "badan usaha",
-        "permission-set payroll"
+        "PPh21 TER",
+        "persetujuan payroll",
+        "RBAC",
+        "badan usaha"
       ]
     },
     {
@@ -808,22 +812,25 @@
         "HRIS - Bank Soal dan Paket Psikotes",
         "HRIS - Psikotes Kraepelin",
         "HRIS - Recruitment",
+        "ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari",
         "CORE - API Master Gateway"
       ],
-      "hash": "92efcf5e85a059db0f8713e973abdc1d51fdcbbe02394db382199d82ba168400",
-      "ukuran_kb": 57.1,
-      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki recruitment-service (requisition, job posting, MPP, kandidat, tahap/offer, psikotes, interview & feedback, onboarding, portal karir publik), siapa boleh memanggilnya, dan bagaimana rekrutmen lintas perusahaan membatasi cakupan baca/tulis lewat paket izin. Juga menjelaskan endpoint bahan KPI dan feed kalender sesi seleksi yang dipanggil mesin dengan service key.",
+      "hash": "7de2ee26e25e67e05f024a3beac683711f805c88f28e880778d54813b42e4641",
+      "ukuran_kb": 61.8,
+      "ringkasan": "Menjawab: endpoint recruitment-service untuk requisition, posting, kandidat, interview, offer, MPP, psikotes, onboarding, dan portal publik, beserta role yang boleh memakainya. Juga menjelaskan cakupan rekrutmen lintas perusahaan, bahan KPI untuk panggilan mesin, dan feed kalender interview.",
       "kata_kunci": [
-        "rekrutmen",
         "recruitment",
+        "rekrutmen",
         "ATS",
-        "job requisition",
-        "lowongan",
+        "requisition",
         "job posting",
         "kandidat",
         "interview",
-        "portal karir",
-        "lintas perusahaan"
+        "offer",
+        "MPP",
+        "lintas perusahaan",
+        "API endpoint",
+        "psikotes"
       ]
     },
     {
@@ -1444,20 +1451,21 @@
         "CORE - SSO Flow",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "dd5ada5012eb038e138e6b1f7a3cad9706a8a3724d549b5cf604a7183dc4084b",
-      "ukuran_kb": 19.2,
-      "ringkasan": "Menjawab: apa itu portal karir publik grup Bharata (repo career-bharata, domain career.bharatainternasional.com), halaman apa saja yang dipakai pelamar (daftar dan detail lowongan dengan nama perusahaan perekrut, form lamaran dengan satu PDF gabungan, halaman sukses, pengerjaan psikotes lewat magic link), dan endpoint /public/recruitment mana yang dikonsumsinya. Juga menjelaskan stack Next.js dengan pnpm, deploy Docker standalone di VPS prod beserta jebakan pemetaan port 3005:3011, bahwa pelamar tidak punya cara memeriksa status lamaran sendiri, dan bedanya dengan halaman karir website korporat.",
+      "hash": "b9ff1ebc83253504fe7fad09602301c7da14a3fd3048f8b0a958158849edc4fd",
+      "ukuran_kb": 20.3,
+      "ringkasan": "Menjawab: apa itu portal karir publik grup Bharata, halaman dan fitur apa yang ada (daftar lowongan, detail, form lamaran, psikotes via magic link), bagaimana arsitektur dan deploy-nya, serta kontrak backend yang dipakai. Juga menjelaskan status go-live, domain, dan catatan yang belum selesai.",
       "kata_kunci": [
         "portal karir",
         "career portal",
         "career-bharata",
-        "lowongan kerja",
+        "lowongan",
         "lamaran",
-        "job application",
         "pelamar",
-        "psikotes magic link",
-        "career.bharatainternasional.com",
-        "Next.js"
+        "psikotes kandidat",
+        "Next.js",
+        "deploy prod",
+        "public recruitment",
+        "magic link"
       ]
     },
     {
@@ -8958,6 +8966,7 @@
         "ADR - 0137 Model Persetujuan Tunggal dan Pemisahan Tugas Lintas Modul",
         "REF - Kepemilikan Data",
         "ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti",
+        "API - Recruitment Service",
         "HRIS - Payroll",
         "Microservices - Recruitment Service",
         "Microservices - Employee Service",
@@ -8967,20 +8976,22 @@
         "ADR - 0002 Database-per-Service",
         "HRIS - Kepatuhan Peraturan Perusahaan"
       ],
-      "hash": "4d6a38ccc683c0b7b67a0292c22c8f7c0640064d65b80dce4640f3fef790f9b8",
-      "ukuran_kb": 21.4,
-      "ringkasan": "Menjawab: kenapa struktur gaji karyawan disimpan sebagai riwayat versi bertanggal berlaku, dokumen hulu apa (offer, kontrak, mutasi/promosi, keputusan massal, impor sheet) yang memicu tiap versi, dan bagaimana gaji diprorata per hari saat karyawan masuk, resign, atau berubah gaji di tengah periode. Juga menjelaskan status versi dan persetujuannya, gerbang saat menyimpan versi, serta migrasi dari spreadsheet HRD.",
+      "hash": "ddfc443f5653b9378c9f569c6d8165c9e107ade05cd76cfed6d39622f80d23d0",
+      "ukuran_kb": 27.1,
+      "ringkasan": "Menjawab: mengapa struktur gaji karyawan diubah menjadi riwayat berversi yang menunjuk dokumen hulunya, bagaimana prorata per hari dihitung saat masuk, resign, atau perubahan di tengah periode, dan apa dampaknya bagi HR, payroll, serta offer. Memuat konteks masalah terukur, keputusan, konsekuensi, dan hal yang sengaja tidak dilakukan.",
       "kata_kunci": [
-        "versi gaji",
+        "struktur gaji",
         "salary version",
         "riwayat gaji",
-        "struktur gaji",
         "prorata",
-        "proporsional per hari",
+        "payroll",
         "effective date",
         "offer",
         "mutasi",
-        "employee_salary"
+        "promosi",
+        "ADR",
+        "employee_salary",
+        "compensation"
       ]
     },
     {
@@ -10299,7 +10310,7 @@
         "APP - Web ERP"
       ],
       "hash": "654bcb2f341debe7ad5ffca4fb71d4e5ab37c725dcd78a198d9c7bd973fd4569",
-      "ukuran_kb": 19.8,
+      "ukuran_kb": 19.9,
       "ringkasan": "Menjawab: bagaimana MyBharata mendapat halaman Persetujuan terpusat (kartu Beranda \"Perlu Tindakan\", tab Menunggu/Riwayat) yang memuat semua antrean lintas modul dari agregator employee-service, dengan detail dan aksi di dalam aplikasi tanpa arahan ke web. Juga menjawab apa yang ditambahkan di agregator (field jenis, langkah[] seragam, endpoint detail), bagaimana akses baca penyetuju di service sumber, cakupan 15 jenis setelah modul Permintaan ERP dihapus, serta urutan kerja backend, MyBharata, lalu web. Menjelaskan juga apa yang tidak dijanjikan (tanpa penanda SLA, tanpa PIN tambahan untuk rincian payroll).",
       "kata_kunci": [
         "persetujuan terpusat",
@@ -10441,7 +10452,7 @@
         "APP - MyBharata"
       ],
       "hash": "fe94c09c9574c8417740df380ddb25979e6221e9cb134db9fdeff211a32659e6",
-      "ukuran_kb": 7.2,
+      "ukuran_kb": 7.3,
       "ringkasan": "Menjawab: dari mana MyBharata menentukan menu yang tampil (klaim permissions di JWT, bukan lagi system_roles saja), menu mana yang self-service dan mana yang digerbang paket hak, dan apa aturan cadangannya (klaim, lalu peran, lalu tertutup). Juga menjawab izin baru apa yang ditambahkan ke katalog (Buku Tamu, Cek Izin satpam, Reset Akun IT, Sesi Live host), kenapa tiap menu mendapat modul baru, dan kenapa peninjau sekretaris dikeluarkan dari cakupan.",
       "kata_kunci": [
         "MyBharata",
@@ -10586,7 +10597,7 @@
         "ADR - 0115 Spreadsheet People and Development Belum Dipindah ke ERP, KPI Ganda Diselesaikan Lebih Dulu"
       ],
       "hash": "91e345ebde42624e46aee7e953d524089ad69287765fb328c3a72bc980850f61",
-      "ukuran_kb": 8.4,
+      "ukuran_kb": 8.5,
       "ringkasan": "Menjawab: apa saja yang diputuskan agar pelatihan bisa dijalani penuh dari MyBharata (hadir, berhalangan, penilaian trainer dan materi, pre/post-test), jenis soal apa yang didukung (single, true_false, multi, essay) dan bagaimana essay dinilai, serta siapa yang boleh menyusun soal lewat izin training.soal. Juga menjawab bagaimana HR membuka ulang pre-test per peserta, bagaimana kelas berulang (seri) dibuat otomatis oleh cron, dan bagaimana status kelas berganti otomatis Terjadwal, Berlangsung, Selesai.",
       "kata_kunci": [
         "pelatihan",
@@ -12182,7 +12193,7 @@
       "area": "General Affairs",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "Implemented (ada catatan). **Booking ruang**: irisan 1 dari 7 ada di kode (inventory-service, feed kalender, notifikasi, layar web Ruang & Booking, penunjukan penyetuju). **Irisan 1b** (mengajukan, mengubah jadwal, membatalkan, menyetujui, dan menolak lewat web, plus kartu Booking Ruang di halaman Pengajuan) merged 2026-09-15 (erp-frontend #1576, bip-erp #1884) dan naik ke prod hari itu juga; perjalanan di dev belum diverifikasi. **Irisan 2** (MyBharata: kartu Booking Ruang di menu Pengajuan, form dan detail booking, booking di daftar pengajuan terpadu, notifikasi berlabel; riwayat terstruktur dua bahasa di web dan MyBharata) merged 2026-09-15 (bip-erp #1898 dan #1899, erp-frontend #1587, my-bharata #149 ke `dev`), **belum di PROD maupun store**. Booking berulang (irisan 3) dan pemilih ruang di modul lain (irisan 4 sampai 7) belum ada. **Barang dan kendaraan**: masih konsep, ditunda.",
+      "status_teks": "Implemented (ada catatan). **Booking ruang**: irisan 1 dari 7 ada di kode (inventory-service, feed kalender, notifikasi, layar web Ruang & Booking, penunjukan penyetuju). **Irisan 1b** (mengajukan, mengubah jadwal, membatalkan, menyetujui, dan menolak lewat web, plus kartu Booking Ruang di halaman Pengajuan) merged 2026-09-15 (erp-frontend #1576, bip-erp #1884) dan naik ke prod hari itu juga; perjalanan di dev belum diverifikasi. **Irisan 2** (MyBharata: kartu Booking Ruang di menu Pengajuan, form dan detail booking, booking di daftar pengajuan terpadu, notifikasi berlabel; riwayat terstruktur dua bahasa di web dan MyBharata) merged 2026-09-15 (bip-erp #1898 dan #1899, erp-frontend #1587, my-bharata #149 ke `dev`), **belum di PROD maupun store**. Booking berulang (irisan 3) dan pemilih ruang di modul lain (irisan 4 sampai 7) belum ada di `main`; satu pengecualian sedang di PR: **interview** (lihat butir \"Satu sumber ruang kantor\"). **Barang dan kendaraan**: masih konsep, ditunda.",
       "publik": true,
       "tautan": [
         "GA - Inventory Management",
@@ -12191,6 +12202,7 @@
         "Microservices - Inventory Service",
         "DB - Data Dictionary",
         "API - Inventory Service",
+        "HRIS - Recruitment",
         "GA - Machine & Utility Maintenance",
         "APP - Web ERP",
         "APP - MyBharata",
@@ -12203,20 +12215,21 @@
         "REF - Alur Persetujuan",
         "GA - Big Pictures"
       ],
-      "hash": "86cd59d8311f7d80c42be21104c50eccb70e17133eb7cafea759110db33fee66",
-      "ukuran_kb": 13.0,
-      "ringkasan": "Menjawab: bagaimana konsep peminjaman aset GA (ruang rapat, barang, kendaraan operasional) dan booking ruang bekerja dari sisi bisnis, siapa personanya (pemohon, penyetuju yang ditunjuk HR, Team GA, HR) beserta akses dan perangkatnya, serta urutan irisan pembangunannya. Menjelaskan status booking, aturan anti-bentrok, keputusan desain yang menggantikan rilis-1 versi lama, alur proses, kontrak data dan konsumennya, kendala, serta hal yang masih TBD seperti durasi dan sanksi peminjaman barang dan kendaraan.",
+      "hash": "ef3638217216b51b70e0e59fee7d0130e1fe1945a1ce5601f4d010d38ef0de8e",
+      "ukuran_kb": 13.8,
+      "ringkasan": "Menjawab: bagaimana alur peminjaman aset dan booking ruang rapat bekerja (status, anti-bentrok, penyetuju yang ditunjuk HR), siapa saja personanya, dan bagian mana yang sudah dibangun versus ditunda. Juga menjelaskan irisan implementasi, kontrak data, dan keputusan desain ADR 0094 dan 0095.",
       "kata_kunci": [
-        "peminjaman aset",
-        "asset loan",
         "booking ruang",
+        "peminjaman aset",
         "room booking",
-        "ruang rapat",
-        "meeting room",
-        "peminjaman kendaraan",
-        "General Affairs",
+        "asset loan",
+        "General Affair",
         "GA",
-        "anti-bentrok"
+        "anti-bentrok",
+        "penyetuju",
+        "ruang rapat",
+        "kalender",
+        "inventory service"
       ]
     },
     {
@@ -13205,25 +13218,26 @@
         "APP - Portal Karir Bharata",
         "API - Recruitment Service",
         "REF - Kepemilikan Data",
+        "HRIS - Recruitment",
         "Microservices - File Service",
         "Microservices - Notification Service",
-        "HRIS - Recruitment",
         "ADR - 0041 Izin Tipe Form Menempel di Departemen"
       ],
-      "hash": "fdbdcb0f03d90b3da448334515c2cca53fb29301f63fcbaaafc47a7c53db0259",
-      "ukuran_kb": 38.7,
-      "ringkasan": "Menjawab: bagaimana psikotes multi-jenis bekerja dari sisi HR dan kandidat, yaitu cara menyusun tipe tes, mengisi bank soal (manual, impor Excel, soal bergambar), membentuk paket tes berurutan, dan bagaimana tiap bentuk jawaban dinilai (benar per subtes, tally Most/Least/Change, metrik Kraepelin). Juga menjawab model data koleksi psikotes_tipe dan psikotes_item, aturan penjaga server, siapa boleh membaca daftar soal berkunci, cara kerja DISC tanpa kunci dan bank Penalaran Gambar internal pengganti CFIT, serta jebakan dan hal yang belum diputuskan.",
+      "hash": "c5a1e7271f74e9d7a45fc29d12f34712d55af764b53e175dd056c77fbe41cddd",
+      "ukuran_kb": 38.9,
+      "ringkasan": "Menjawab: bagaimana psikotes multi-jenis bekerja (katalog tipe, bank soal, paket tes, tiga bentuk jawaban CFIT, DISC, Kraepelin), bagaimana HR menyusun dan mengirim paket, serta bagaimana hasil dinilai. Juga memuat model data, aturan penjaga server, seed bawaan, dan jebakan yang sudah diketahui.",
       "kata_kunci": [
+        "psikotes",
         "bank soal",
-        "question bank",
-        "paket psikotes",
-        "tipe tes",
-        "psikotes_tipe",
-        "psikotes_item",
-        "DISC",
+        "paket tes",
         "CFIT",
-        "Penalaran Gambar",
-        "impor Excel"
+        "DISC",
+        "Kraepelin",
+        "katalog tipe",
+        "recruitment",
+        "kandidat",
+        "most least",
+        "psychological test"
       ]
     },
     {
@@ -14485,32 +14499,36 @@
         "CORE - OCR Document Service",
         "Marketing - Veo (Gemini) Implementation",
         "APP - Web ERP",
+        "GA - Asset Loan & Room Booking",
+        "ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari",
+        "REF - Kepemilikan Data",
         "ANALISA - Actual vs Planning MPP",
         "HRIS - Attrition",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "ADR - 0030 RBAC Tiga Sumbu dengan Hak Menempel di Posisi",
         "ADR - 0080 Permission Set Menggerbangi Pengajuan Requisition Lintas-Departemen",
-        "REF - Kepemilikan Data",
         "CORE - RBAC dan Permission Set",
         "APP - Website Bharata Internasional",
         "HRIS - Personalia",
         "HRIS - Big Pictures",
         "HRIS - Recruitment Roadmap (Adopsi ERPGo)"
       ],
-      "hash": "a0a0b020e7a4d2ebc5588159c0a3fc747db6b7685ea473851d56a1bfd3bd0211",
-      "ukuran_kb": 69.0,
-      "ringkasan": "Menjawab: bagaimana subsistem rekrutmen dirancang dari sisi bisnis, langkah demi langkah dari permintaan posisi (Form Permintaan Karyawan dan persetujuan SPV HRD) ke sourcing, manajemen pelamar, screening, interview multi-tahap, psikotes, offer, sampai onboarding jadi karyawan aktif. Menjelaskan siapa aktor dan rolenya, bagaimana pewawancara mengisi feedback lewat tautan email dan bagaimana bentuk formnya ditentukan, serta bagaimana masa evaluasi dan performance review onboarding dirancang. Juga menjawab apa isi Rencana Tenaga Kerja (MPP), bagaimana rekrutmen lintas perusahaan dan portal karir publik diposisikan, dan keputusan mana yang sudah disepakati HRD versus yang masih terbuka.",
+      "hash": "3c8280ac4c2c60941b187746b81b7d8e601d9d5820e73e3a2145128804a5e09c",
+      "ukuran_kb": 76.5,
+      "ringkasan": "Menjawab: bagaimana alur rekrutmen end-to-end berjalan dari requisition sampai karyawan aktif (posting, screening, interview, psikotes, offer, onboarding), siapa aktornya, dan apa yang sudah serta belum diimplementasi. Juga membahas MPP, rekrutmen lintas perusahaan, pemakaian nyata di produksi, dan keputusan HRD.",
       "kata_kunci": [
         "recruitment",
         "rekrutmen",
         "talent acquisition",
-        "screening CV",
-        "interview feedback",
-        "psikotes",
+        "requisition",
+        "interview",
+        "offer",
         "onboarding",
         "MPP",
-        "job requisition",
-        "portal karir"
+        "manpower planning",
+        "lintas perusahaan",
+        "ATS",
+        "HRD"
       ]
     },
     {
@@ -18557,6 +18575,7 @@
         "Manufacture - Dokumen Produksi Batch",
         "ADR - 0066 Salinan Dokumen Retur Accurate + Pemindai Drift",
         "RUN - Deploy Microservices bip-erp",
+        "ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari",
         "ADR - 0182 Badan Usaha Satu Daftar untuk HR dan Finance, Entitas CV Menempel Tanpa Nama Sendiri",
         "REF - PRD ERP",
         "DB - Data Dictionary",
@@ -18565,20 +18584,21 @@
         "REF - Rantai Pengajuan Lintas Modul",
         "Microservices - Manufacture Service"
       ],
-      "hash": "d9376bcf616514272536331d52ff0740ba1fb261c6694015d95f00493358bfac",
-      "ukuran_kb": 91.1,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis (karyawan, departemen, divisi, headcount, hak akses, kontrak, jadwal, produk/SKU, vendor, gudang, anggaran, forecast kas, arus kas, dll), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga menjawab salinan data mana yang sah beserta penjaganya, pengecualian ADR 0002 (database-per-service) yang masih hidup, duplikasi yang belum diputuskan, jejak audit, dan langkah memeriksa sudah ada belum sebelum membangun fitur baru.",
+      "hash": "8ef0118ddd74ec4802b1c2370b3438d31fad4be39fba03f3b1d0eddad61af1f1",
+      "ukuran_kb": 93.4,
+      "ringkasan": "Menjawab: siapa pemilik tiap fakta bisnis di ERP (service dan koleksi), siapa yang boleh menulis, lewat jalan mana service lain boleh membaca, dan salinan mana yang sah beserta penjaganya. Juga mendaftar pengecualian database-per-service dan duplikasi yang belum diputuskan, untuk dicek sebelum membangun penyimpanan baru.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
-        "sumber kebenaran",
-        "source of truth",
-        "duplikasi data",
-        "salinan data",
-        "SyncCollection",
-        "database-per-service",
+        "single source of truth",
+        "database per service",
+        "duplikasi",
+        "salinan",
         "master data",
-        "arus kas"
+        "ADR 0002",
+        "sumber kebenaran",
+        "pemilik fakta",
+        "audit trail"
       ]
     },
     {
