@@ -95,7 +95,7 @@ Ini juga menjelaskan kalimat "data eksplisit selalu menang atas tebakan judul ja
 | Cakupan | Per orang, banyak bawahan | Per departemen, satu penyetuju |
 | Label grup | Dimekarkan (HRGA jadi satu tim) | **Tidak** dimekarkan |
 
-### 🟡 Manager departemen (Diusulkan 2026-10-20, kode belum ada)
+### ✅ Manager departemen (live prod 2026-10-20, bip-erp #3345, erp-frontend #2643)
 
 Konsep keempat di sekitar departemen, diputuskan di [[ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya]]. Seorang Manager ditetapkan HR per departemen (satu Manager per departemen, satu Manager boleh banyak departemen) dan tidak wajib anggotanya. Ia **menyetujui cuti/izin/sakit dan dinas milik penyetuju departemen** itu, menggantikan slot "Direktur", dan **melihat KPI seluruh karyawan aktif** departemen yang dinaunginya. Ia tidak menyetujui pengajuan staf.
 
@@ -124,6 +124,14 @@ Keterangan satu arah di atas ternyata belum cukup: ia menolong orang yang sudah 
 - **Menyatukan kedua layar** mengabaikan bahwa gerbangnya berbeda: `/supervisor-assignment` digerbang `RequireHRISOrITStaff`, sedangkan `/master/departments/:key/approver` digerbang `RequireHRISOrITSupervisor`. Menyatukannya membuat staf HRIS melihat kendali yang tak boleh mereka pakai.
 
 Efek sampingnya menguntungkan: `PETA_URL_MENU_LAMA` dan setelan `menu_hidden` yang menyimpan URL tak perlu disentuh sama sekali.
+
+### 🟡 Struktur bertingkat Direksi → Divisi → Departemen (Diusulkan 2026-10-21, kode belum ada)
+
+Diputuskan di [[ADR - 0193 Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi]]. Ringkas cara kerjanya:
+- **Direksi** = baris `master_department` berjenis `pimpinan` (Direktur + para Manager). Setiap karyawan tetap punya `work_data.department`; unit pimpinan disaring dari daftar departemen operasional, tidak menjadi kunci modul, dan menerima jadwal UNSET.
+- **Divisi** (`master_divisi`) mendapat **kepala**; Manager sebuah departemen = kepala divisinya (menggantikan `manager_employee_id` per departemen dari ADR 0190). Pengecualian lewat pemetaan divisi.
+- Pengajuan **Direktur** langsung ke HR; **Manager** disetujui Direktur sebagai orang; **Kesekretariatan** disetujui Corporate Secretary.
+- ⚠️ Daftar titik yang wajib menangani jenis `pimpinan` (peran turunan dikunci nama departemen, paket posisi, system-list, data-type, jadwal, cuti tanpa penyetuju = 500, notifikasi slot Direktur, bagan) ada di ADR itu §Context; jangan memindahkan Direktur sebelum semuanya berkode.
 
 ## Cakupan supervisi antar-departemen (`supervised_by`)
 
@@ -324,7 +332,7 @@ Ada **dua cara** memakainya, dan membedakannya penting karena skalanya jauh berb
 	- **Yang masih terbuka setelahnya**: apakah jenjang perlu bisa ditambah/diubah lewat layar (sekarang lewat `DefaultJobLevels()` + deploy), dan apakah ELT (Percetakan, 14 orang) memakai tangga yang sama atau tangganya sendiri. ELT sengaja **ditunda**
 		- ⚠️ **Angka lama "`position_key` 11 karyawan ELT menunjuk key milik BIP" SUDAH TIDAK BENAR.** Pengukuran ulang ke `employee_db` **produksi** 2026-08-19: **13 dari 14** karyawan ELT ber-`position_key` yang cocok dengan `position_items` departemen `pct` miliknya sendiri (`admin`, `operator_mesin`, `spv_operasional`, dst). Yang menyimpang tinggal **satu**, `ELT-2010-07-26`, ber-`department` = `Manufaktur` dan `position_key` = `operator_production` — keduanya milik BIP, sementara ELT **tidak punya** departemen `Manufaktur` sama sekali di `master_department`. Jadi sisa masalahnya bukan ketidakcocokan massal, melainkan satu karyawan yang menunjuk departemen yang tak ada di perusahaannya
 - Penanganan posisi rangkap / matriks
-- **Relasi supervisi berjenjang** — saat ini sengaja dibatasi SATU tingkat. Organisasi bertingkat (divisi → departemen → sub-departemen) perlu keputusan tersendiri
+- **Relasi supervisi berjenjang** — saat ini sengaja dibatasi SATU tingkat. Organisasi bertingkat (divisi → departemen → sub-departemen) perlu keputusan tersendiri 🟡 Organisasi bertingkat kini diusulkan di [[ADR - 0193 Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi]] (Direksi → Divisi → Departemen; relasi supervisi tetap satu tingkat).
 	- ⚠️ **Divisi lahir sebagai master data tersendiri** (`master_divisi`, [[ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal]], disetujui 2026-09-21). 🔜 **Kodenya sudah ada, belum merge & belum deploy** (bip-erp `feat/employee-master-divisi`, erp-frontend `feat/hris-master-divisi`): koleksi ter-scope per perusahaan, CRUD di Pengaturan → Organisasi, departemen menunjuknya lewat `divisi_key`, dan modul lain membacanya lewat `GET /data-type/divisi`. Empat divisi di-seed **tanpa pemetaan** — memetakan departemen ke divisi pekerjaan HRD. Pemicunya lembar HRD "Actual vs Planning MPP" yang bertingkat Divisi > Departemen > Posisi, dan HRD meminta divisinya bisa dipakai modul mana pun, bukan daftar tetap di satu layar. Empat divisi awal: Commercial, Operational, Supporting, Management, dipetakan ke 12 departemen BIP yang ada. **Ini tidak membatalkan batasan satu tingkat di atas**: yang diputuskan barulah pengelompokan untuk pelaporan, bukan rantai supervisi berjenjang. Pecahan tugasnya di [[ANALISA - Actual vs Planning MPP]] T2.
 	- ⚠️ Jangan bingungkan dengan **`supervision_label`** yang sudah ada (mis. `HRGA` atas Human Resource dan General Affair): itu label supervisi antar-departemen, bukan divisi, dan lembar HRD memakai keduanya sekaligus.
 - **Satukan `deptKeyToNames`** (`shared-library/common/roles.go`) ke master data — pemetaan role key → nama departemen masih hardcode, dan `finance` → `Finance` + `Procurement` sebenarnya konsep yang sama dengan `supervised_by`. Departemen yang benar-benar baru masih butuh ubah kode di situ **dan** di picker jadwal absensi
