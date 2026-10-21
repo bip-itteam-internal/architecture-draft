@@ -119,7 +119,34 @@ Aturan pengecualian:
 | `uang_keluar_riil.keluar` | Pembanding dari sisi rekening bank | ⛔ Tidak masuk total, akurasi, maupun KPI, dan **jangan dijumlahkan** dengan realisasi komponen. `null` berarti salinan belum ada |
 | Realisasi Material | **Pembelian**, bukan mutasi bersih persediaan | Mutasi bersih = pembelian − pemakaian − penyesuaian, dan bisa negatif. Contoh 1601 September 2026: mutasi bersih −Rp 65,6 jt, pembelian Rp 82,9 jt |
 | `aset_tahunan.sisa` | Anggaran tahun − Σ realisasi aset 1 Jan s.d. akhir bulan laporan | `null` bila anggaran belum diisi atau aset belum disinkron. Boleh negatif. `BiayaPerolehan` adalah nilai current (sesudah pelepasan), bukan harga beli awal |
-| Beban pajak 72xx (7201–7212) | **Tidak masuk komponen mana pun** | Komponen Pajak hanya diisi setoran, yaitu delapan akun `akunPajakSetoran` milik finance: PPN, PPh 21/23/25/4(2)/Final UMKM/Badan, PBB. Akibatnya PKB (7206), BBNKB (7208), dan PPN Kurang Bayar (7212) belum terhitung sama sekali (§Belum Diputuskan) |
+| Beban pajak 72xx (7201–7212) (tahap 1) | **Tidak masuk komponen mana pun** | Komponen Pajak hanya diisi setoran, yaitu delapan akun `akunPajakSetoran` milik finance: PPN, PPh 21/23/25/4(2)/Final UMKM/Badan, PBB. Akibatnya PKB (7206), BBNKB (7208), dan PPN Kurang Bayar (7212) belum terhitung sama sekali (§Belum Diputuskan) |
+
+#### Tahap 2: realisasi berbasis kas (⚠️ BE merged 2026-10-21, FE PR terbuka, deploy prod TBD)
+
+Keputusan: ADR 0184 Decision 5, bagian "Tahap 2 ditetapkan 2026-10-21" dan "Penerapan C6b". Acuannya laporan Accurate **Arus Kas (Langsung)**, yang hanya bisa ditarik per bulan. Karena itu integration menyusunnya ulang per minggu dari buku besar.
+
+**Data mentah (C6a, bip-erp#3376, PR #3386):**
+- Penyegar harian **01:30 WIB** menarik bulan berjalan dan bulan lalu. Hasilnya disimpan di koleksi `arus_kas_langsung_bulanan`, satu dokumen per bulan.
+- Populasi kas = semua akun daun `CASH_BANK` dari bagan `glaccount/list.do` saat penyegaran (`ListGLAccountBagan`), bukan daftar nomor di kode. Laporan saldo hanya dipakai sebagai penanda induk cadangan, karena laporan saldo bisa melewatkan akun bersaldo nol.
+- Transaksi dikunci jenis + nomor lintas akun kas. Jenis **"Penerimaan Penjualan" dikecualikan**, dan transfer antar-akun kas netonya nol.
+- Gagal satu akun berarti bulan itu tidak ditulis ulang: angka lama utuh dan penanda gagal dicatat. Bulan yang belum pernah berhasil punya `disinkron_pada: null`, artinya belum ditarik, bukan nol.
+- Rute baca untuk verifikasi: `GET /accounting/anggaran/arus-kas` ([[API - Integration Service]]).
+
+**Pemetaan dan realisasi (C6b, bip-erp#3393, PR #3394):**
+- Pemetaan akun lawan → komponen ditulis sekali di `PetaAkunArusKas` (`usecase/komponen_arus_kas.go`), mengikuti tabel ADR. Tiap akun masuk tepat satu kelompok: salah satu komponen, "tidak dihitung", CapEx, atau "tak terpetakan". Nomor CapEx dibaca dari `AkunAset()` dan beban pajak dari `akunBebanPajak`.
+- Hanya **sel akun × minggu yang netonya minus** yang dihitung. Sel plus diabaikan dan tidak mengurangi.
+- **Bulan tersinkron:** keenam komponen `sifat_realisasi = kas`, dan sumber tahap 1 tidak dicampur. **Bulan belum tersinkron** (mis. Juli–Agustus) tetap tahap 1 dan angkanya identik, jadi skor beku tidak bergeser.
+- Pada bulan kas, `baris[]` tetap menjadi rincian proyeksi. Realisasinya 0 dengan `status_realisasi = diganti_kas`, supaya angka akrual tidak terjumlah bersama kas. Rincian realisasi ada di `komponen[].akun_arus_kas[]`.
+- Bentuk agregat KPI (`/mingguan/kpi`) tidak berubah. Pada bulan kas, `baris_belum_tersinkron` = 0 karena ketersediaan diukur per bulan.
+
+**Layar (C6b FE, erp-frontend#2691, PR #2697 terbuka):** pada bulan kas, keenam komponen bertanda "Kas". Tiap komponen menampilkan rincian per akun Arus Kas, sel akun anggaran berbunyi "Dipantau di Serapan", dan kotak kontrol "tak terpetakan"/"tidak dihitung" tampil.
+
+| Angka (tahap 2) | Aturan |
+|---|---|
+| `realisasi_arus_kas.dipakai` | true = realisasi komponen bulan ini berbasis kas. Bila false, baca `sebab` dan perlakukan bulan itu sebagai tahap 1 |
+| `realisasi_arus_kas.tak_terpetakan` | Uang keluar ke akun lawan yang belum dipetakan Finance. Bila bukan nol, itu pertanyaan pemetaan, bukan galat |
+| `realisasi_arus_kas.dikecualikan` | Akumulasi penyusutan, 6113 Potongan Afiliasi, 6114 Ongkir E-Commerce, dan CapEx: tercatat, sengaja tidak dihitung |
+| `GET /anggaran/arus-kas` `akun[]` | ⛔ Memuat arus masuk **dan** keluar, sedangkan `kas_keluar_total` dan `tidak_terpetakan` hanya memuat transaksi netto keluar. **Jangan menjumlahkan `akun[]` ke `kas_keluar_total`** |
 
 ### KPI Penurunan Biaya OPEX + Non Ops YoY (🟡 Direncanakan, ADR Diterima 2026-10-20, kode belum ada: bip-erp#3336, #3337)
 
@@ -229,7 +256,11 @@ Dilacak di bip-erp#2814 (Pemutus: wirkancil):
 
 Untuk cashflow tujuh komponen (ADR 0184), per 2026-10-19:
 
-- **Sumber realisasi berbasis kas (A1, tahap 2).** Finance menjawab bahwa sumbernya **laporan arus kas** dan sedang merekap detailnya. Pemetaan baris arus kas ke komponen masih menunggu contoh September dari Finance.
+- ~~**Sumber realisasi berbasis kas (A1, tahap 2).**~~ Diputuskan 2026-10-21 (ADR 0184 tahap 2) dan diterapkan di C6a/C6b, lihat §Tahap 2 di atas. Yang masih perlu ditanyakan ke Finance:
+  - **5201**, yang di tahap 1 dihitung BOP, tidak ada di tabel tahap 2 sehingga masuk "tak terpetakan".
+  - Akun **72xx** yang namanya tidak memuat PPh/PPN dan tidak ada di `DaftarBebanPajak` juga masuk "tak terpetakan".
+  - **6101 Gaji Sales** masuk Marketing menurut tabel. Komponen Gaji tahap 2 hanya berisi Utang Gaji dan Utang Asuransi.
+  - Apakah `glaccount/list.do` benar-benar mengirim `isParent`. Cek sekali di dev sebelum prod.
 - **Usulan keputusan yang belum disetujui Pemutus.** Semuanya bisa diputuskan dari data prod tanpa bertanya ke Finance:
   - keluarkan 7303/7304 (laba/rugi aset) dari ops adum dan 5313 (selisih persediaan) dari BOP, karena bukan uang keluar;
   - masukkan 7206 PKB dan 7208 BBNKB ke komponen Pajak, karena dibayar langsung dan tidak lewat setoran;
