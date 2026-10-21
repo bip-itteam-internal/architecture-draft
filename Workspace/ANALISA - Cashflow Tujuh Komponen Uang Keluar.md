@@ -77,6 +77,42 @@ Finance menjawab A1: sumber cashflow manual mereka adalah **laporan arus kas**. 
 - **Untuk tahap 2 (C6):** "uang keluar" **tidak** bisa dikenali dari jenis transaksi saja. Utang Beban 2205 punya Pembayaran Rp 55,6 jt, ditambah sebagian Jurnal Umum yang menyentuh bank. Penandanya adalah transaksi yang menyentuh akun kas/bank, jadi perlu menggabungkan riwayat akun lawan dengan riwayat kas/bank per nomor transaksi.
 - **Pertanyaan yang tersisa untuk Finance:** dari "Kas untuk Pembelian" Rp 832 jt, bagian mana yang mereka hitung sebagai Material, dan sisanya masuk komponen apa?
 
+## Catatan dari prod sesudah deploy C3d (2026-10-21, baca saja)
+
+- **Penyegar Aset (04:30) sukses pada run pertama**, 21 Okt, untuk Januari–September 2026. Durasinya 7,6 detik. Lognya mencatat `dinetralkan=0` di semua bulan, dengan `dilepas` antara 1 dan 13.
+- **`dilepas` di April (13) adalah kredit asli, bukan reklasifikasi:**
+  - 12 baris *Disposisi Aset Tetap* (penjualan laptop bekas ke Flash Computer, 28 April, Rp 91,4 jt);
+  - satu Jurnal Umum penyusutan ATB yang dikreditkan **langsung** ke 1806 Aset Tetap Lainnya, bukan ke akun akumulasi.
+- **Pola reklasifikasi Aset dlm Penyelesaian ke aset tetap terbukti satu dokumen.** Dokumen berjenis "Aset Tetap" mengkredit akun ADP dan mendebit 1802 dengan nomor yang sama. Sudah terjadi tiga kali:
+
+  | Dokumen | Dari | Nilai |
+  |---|---|---|
+  | AB-003, 01/04/2025 | 1701 Gerbang Utama | Rp 367,4 jt |
+  | AB-005, 01/07/2025 | 1702 Office Lt 3 | Rp 2.293,3 jt |
+  | AB-006, 24/08/2025 | 1703 Gedung 3 Lt | Rp 3.531,1 jt |
+
+  Netting jenis + nomor di C3d menangkap pola ini. Saat Gudang Baru (1728, saldo Rp 2,68 M, progres 95% per September) direklasifikasi, angkanya tidak akan dihitung dua kali, **asalkan** Finance memakai dokumen "Aset Tetap" yang sama. Sesudah reklasifikasi itu, cek log: `dinetralkan` harus ≥ 1.
+- **Akrual dan kas berbeda untuk mesin.** Pembelian mesin April (AMP-015/016, Rp 178,3 jt) tercatat sebagai dokumen "Aset Tetap" di 1803. Di Arus Kas (Langsung), uangnya kemungkinan muncul di "Kas untuk Pembelian" saat faktur dibayar. Ini perlu diperhatikan saat pemetaan C6: jangan sampai terhitung di Aset dan Material sekaligus.
+
+## Catatan dari jawaban Finance 2026-10-20 (WA Tika)
+
+Cara Finance menyusun realisasi:
+1. Buka Arus Kas (Langsung), periode bulan berjalan, semua cabang.
+2. Ambil **angka minus saja**. Uang masuk (penjualan, pendapatan non-operasional) tidak dihitung.
+3. Klasifikasikan per anggaran:
+   - akun yang berkaitan dengan pajak masuk realisasi Pajak;
+   - piutang selain pajak masuk Ops Umum;
+   - **tidak semua beban marketing** dihitung: beban yang memotong uang masuk di toko marketplace (mis. admin toko) bukan uang yang kita keluarkan;
+   - aset lancar: Anggaran FO masuk ops Marketing, Anggaran Kegiatan masuk ops Adum, PPN Masukan masuk Pajak, Aset dlm Penyelesaian masuk Aset/capex;
+   - utang dipilah per baris, rinciannya belum disebut.
+4. Masalah yang Finance sendiri sebutkan: laporan ini tidak bisa ditarik per minggu, jadi mereka memakai total sebulan. **C6 menjawab ini**, karena baris yang sama dibangun ulang dari buku besar per transaksi yang bertanggal.
+
+Pemetaan per baris yang masih menunggu koreksi Finance (WA 2026-10-21):
+- beban marketing mana yang tidak dihitung;
+- apakah seluruh "Kas untuk Pembelian" masuk Material;
+- klasifikasi tiap utang;
+- Investasi Elite SK, Prepaid Desty, Utang kepada Kreditur, dan Akumulasi Penyusutan.
+
 ## Pertanyaan terbuka untuk Finance (A1–A7 di ADR)
 
 1. Saat menyusun realisasi cashflow secara manual, angka uang keluar per komponen diambil dari laporan atau menu Accurate apa?
