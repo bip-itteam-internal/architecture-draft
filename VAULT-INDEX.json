@@ -10291,7 +10291,7 @@
         "APP - Web ERP"
       ],
       "hash": "654bcb2f341debe7ad5ffca4fb71d4e5ab37c725dcd78a198d9c7bd973fd4569",
-      "ukuran_kb": 19.9,
+      "ukuran_kb": 19.8,
       "ringkasan": "Menjawab: bagaimana MyBharata mendapat halaman Persetujuan terpusat (kartu Beranda \"Perlu Tindakan\", tab Menunggu/Riwayat) yang memuat semua antrean lintas modul dari agregator employee-service, dengan detail dan aksi di dalam aplikasi tanpa arahan ke web. Juga menjawab apa yang ditambahkan di agregator (field jenis, langkah[] seragam, endpoint detail), bagaimana akses baca penyetuju di service sumber, cakupan 15 jenis setelah modul Permintaan ERP dihapus, serta urutan kerja backend, MyBharata, lalu web. Menjelaskan juga apa yang tidak dijanjikan (tanpa penanda SLA, tanpa PIN tambahan untuk rincian payroll).",
       "kata_kunci": [
         "persetujuan terpusat",
@@ -10432,23 +10432,25 @@
         "CORE - RBAC dan Permission Set",
         "APP - MyBharata"
       ],
-      "hash": "879f46be0d4444a8f409088a478189c84ecf60d2864e7887e846e1d5a5285c66",
-      "ukuran_kb": 5.8,
-      "ringkasan": "Menjawab: bagaimana menu di aplikasi MyBharata ditentukan hak aksesnya (dari klaim permissions di JWT, bukan lagi system_roles di HP), menu mana yang self-service dan mana yang bergerbang izin, serta apa yang terjadi bila izin tak terbaca. Juga menjawab izin baru apa yang ditambahkan ke katalog untuk Buku Tamu, Cek Izin satpam, Reset Akun IT, Sesi Live host, dan peninjau sekretaris, serta nasib menu Satgas.",
+      "hash": "fe94c09c9574c8417740df380ddb25979e6221e9cb134db9fdeff211a32659e6",
+      "ukuran_kb": 7.2,
+      "ringkasan": "Menjawab: dari mana MyBharata menentukan menu yang tampil (klaim permissions di JWT, bukan lagi system_roles saja), menu mana yang self-service dan mana yang digerbang paket hak, dan apa aturan cadangannya (klaim, lalu peran, lalu tertutup). Juga menjawab izin baru apa yang ditambahkan ke katalog (Buku Tamu, Cek Izin satpam, Reset Akun IT, Sesi Live host), kenapa tiap menu mendapat modul baru, dan kenapa peninjau sekretaris dikeluarkan dari cakupan.",
       "kata_kunci": [
         "MyBharata",
         "menu",
         "permission set",
         "paket hak",
-        "klaim token",
         "JWT permissions",
+        "klaim token",
         "system_roles",
         "RBAC",
         "gagal-terbuka",
-        "fail-closed",
+        "fail-open",
         "Buku Tamu",
-        "Satgas",
-        "katalog izin"
+        "Cek Izin satpam",
+        "Reset Akun IT",
+        "Sesi Live host",
+        "Satgas"
       ]
     },
     {

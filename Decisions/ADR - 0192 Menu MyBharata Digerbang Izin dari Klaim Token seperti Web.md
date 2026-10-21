@@ -42,7 +42,14 @@ Diukur 2026-10-21 (riset read-only atas mybharata-app `origin/dev`, erp-frontend
 
 ## Amandemen
 
-_(belum ada)_
+### 2026-10-21: Penempatan izin, Buku Tamu, sekretaris, dan Semua Izin
+
+Diputuskan Pemutus (irfanarfianto) sesudah riset katalog untuk bip-erp#3367:
+
+- **Satu modul baru per menu**, mengikuti pola `catalog_engagement.go`: Buku Tamu, Cek Izin satpam, Reset Akun IT, dan Sesi Live host. Alasannya terukur: aturan cadangan butir 3 berlaku per modul. Bila izin baru ditaruh di modul yang paketnya sudah dipegang seseorang, cadangan perannya padam dan menunya hilang tanpa galat (insiden `engagement` 2026-09-09). Dengan modul baru yang belum dipegang paket siapa pun, nol orang kehilangan menu tanpa migrasi data. Nama modul tidak boleh bertabrakan dengan kategori sidebar web (`it`, `ga`, `hris`, `secretary`, `marketing`, dan seterusnya).
+- **Cadangan Buku Tamu mencerminkan gerbang server** `RequireGuestbookRBAC`: `ga` security/supervisor, `hris` staff/supervisor, atau posisi Cost Control. Aturan HP lama (`hris != null || ga == security`) tidak dipakai, karena meloloskan `hris: admin` yang ditolak server dan menyembunyikan menu dari `ga: supervisor` serta Cost Control yang diterima server.
+- **"Peninjau sekretaris" dikeluarkan dari cakupan.** Ia bukan menu, hanya penanda tampilan kolom pengganti, dan tidak punya gerbang server. Ia tetap memakai peran. Cakupan butir 2 menjadi **empat** menu.
+- **Keempat modul dikecualikan dari paket "Semua Izin"**, seperti modul `menu`, supaya pemegangnya tidak melihat tombol yang dibalas 403 oleh server.
 
 ## Alternatif yang Ditolak
 
