@@ -1,6 +1,6 @@
 # ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti
 
-> **Status**: 🟡 Diusulkan, 2026-10-20. Bentuknya disetujui user dalam sesi `/analisa-kebutuhan` 2026-10-20 (desain layar di Figma, opsi endpoint massal di payroll-service). Merevisi sebagian [[ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari]] (butir persetujuan). Pemutus: `irfanarfianto`. Blueprint: `Workspace/ANALISA - Penetapan Badan Usaha Massal dari HRIS.md`.
+> **Status**: 🟢 Diterima, 2026-10-21, oleh irfanarfianto (Pemutus). Diusulkan 2026-10-20. Data PROD 2026-10-21 (bip-erp#3324): 62 `employee_salary` tanpa `company_id`, 5 versi menunggu persetujuan, 0 rencana; penerima notifikasi `payroll.approve.hrd` = 1 orang lewat paket JABATAN `HRD Supervisor` (bukan akun), jadi penerima di-resolve lewat paket jabatan. Bentuknya disetujui user dalam sesi `/analisa-kebutuhan` 2026-10-20 (desain layar di Figma, opsi endpoint massal di payroll-service). Merevisi sebagian [[ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari]] (butir persetujuan). Pemutus: `irfanarfianto`. Blueprint: `Workspace/ANALISA - Penetapan Badan Usaha Massal dari HRIS.md`.
 
 ## Untuk Manajemen
 
@@ -24,7 +24,7 @@
 
 *Menambah pintu penetapan badan usaha penggaji (`company_id`) secara massal dari menu HRIS: satu endpoint di payroll-service yang, per karyawan, menerbitkan versi gaji salinan versi berlaku dengan `company_id` baru dan langsung `terjadwal`, atau menulis rencana badan usaha bila karyawan belum bergaji; ditambah daftar lintas badan usaha dan notifikasi per batch ke SPV HRD.*
 
-- **Status**: 🟡 Diusulkan 2026-10-20, kode belum ada
+- **Status**: 🟢 Diterima 2026-10-21, kode belum ada
 - **Path di repo** (rencana):
   - `bip-erp/services/payroll/penetapan_badan_usaha.go` (baru): daftar lintas badan usaha + penetapan massal
   - `bip-erp/services/payroll/salary_version_service.go`, `models_salary_version.go`, `badan_usaha_rencana.go`, `notifikasi.go`, `routes.go`

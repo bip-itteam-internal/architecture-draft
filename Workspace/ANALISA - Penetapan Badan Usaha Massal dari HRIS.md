@@ -1,6 +1,6 @@
 # ANALISA - Penetapan Badan Usaha Massal dari HRIS
 
-> **Status**: ⛔ **Menunggu [[ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti]] Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**
+> **Status**: ADR 0189 🟢 Diterima 2026-10-21 oleh irfanarfianto; data prod ditempel di bip-erp#3324; label `Siap Agent` dipasang di bip-erp#3324 dan erp-frontend#2631.
 
 Blueprint hasil `/analisa-kebutuhan` 2026-10-20 atas permintaan "halaman baru untuk HRD memetakan karyawan ke badan usaha, tidak lagi di Payroll". Papan kerja, berubah tiap issue selesai; keputusannya di ADR.
 
@@ -20,10 +20,10 @@ Blueprint hasil `/analisa-kebutuhan` 2026-10-20 atas permintaan "halaman baru un
 
 ## Langkah manusia
 
-1. Setujui ADR 0189 (`🟢 Diterima, <tanggal>, oleh <login>`), lalu hapus baris "Menunggu ADR … Diterima" di atas.
-2. Jalankan kueri **Perlu ukur prod** di issue [BE] (baca saja) dan tempel hasilnya.
+1. ~~Setujui ADR 0189~~ selesai 2026-10-21.
+2. ~~Jalankan kueri **Perlu ukur prod**~~ selesai 2026-10-21 (komentar di bip-erp#3324).
 3. Perbarui frame 2 dan 3 Figma (tanpa "Menunggu persetujuan") sebelum [FE] dikerjakan.
-4. Pasang label `Siap Agent` pada issue yang lolos Definition of Ready.
+4. ~~Pasang label `Siap Agent`~~ selesai 2026-10-21.
 
 ## Issue 1: Induk, `bip-erp`: Penetapan badan usaha penggaji massal dari HRIS
 
