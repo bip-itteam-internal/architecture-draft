@@ -146,6 +146,30 @@ Untuk tiap komponen ditampilkan proyeksi dan realisasinya per minggu.
      - Material memakai mutasi akun persediaan atau pembelian (diputuskan di task BE dari bagan akun prod).
    - Respons menandai sifat realisasi tiap komponen (`akrual` atau `kas`).
    - **Tahap 2** mengganti sumber per komponen ke basis kas setelah A1 terjawab, tanpa mengubah kontrak layar maupun KPI.
+   - **Tahap 2 ditetapkan 2026-10-21.** Dasarnya keputusan Azzerith, jawaban Finance (Tika, WA 20–21 Okt), dan uji kelayakan atas data prod September 2026 (baca saja).
+     - **Acuan: laporan Accurate "Arus Kas (Langsung)".** Laporan itu mengelompokkan setiap transaksi yang menyentuh akun **kas** menurut **akun lawannya**.
+       - "Kas" berarti **seluruh akun bertipe CASH_BANK**: 229 akun daun di prod, termasuk saldo toko marketplace (1310–1340), rekening CV (1299), rekening PT lain (1298), dan deposito.
+       - Transaksi berjenis **"Penerimaan Penjualan" tidak dihitung**, karena potongan marketplace di dalamnya sudah bersih di "Kas dari Penjualan".
+       - Transfer antar-akun kas saling meniadakan.
+       - Hasil uji September sama persis dengan laporan untuk Utang Gaji, Utang Beban, Utang PPN, Utang Ongkir SPX, Beban Iklan, Beban FO, dan Potongan Afiliasi. Utang Usaha masih selisih Rp 2.500 dan sedang ditelusuri.
+     - **Aturan Finance:**
+       - hanya baris **minus** (uang keluar) yang dihitung; uang masuk (penjualan, pendapatan, nilai plus) tidak ikut;
+       - hanya transaksi yang **lawannya kas**, bukan jurnal penyesuaian;
+       - rincian realisasi memakai **nama akun seperti di laporan Arus Kas**, sedangkan pemantauan per akun anggaran tetap di tab Serapan.
+     - **Pemetaan akun lawan → komponen** (Finance, 21 Okt):
+
+       | Komponen | Akun lawan |
+       |---|---|
+       | Material | "Kas untuk Pembelian" (2101 Utang Usaha Supplier) |
+       | BOP | Beban Pokok Penjualan (Biaya Angkut Pembelian, BOP Variabel/Tetap) |
+       | Marketing | Beban Penjualan & Pemasaran **kecuali** Potongan Afiliasi E-Commerce (6113) dan Beban Ongkir E-Commerce (6114); Anggaran FO; Prepaid Desty; Utang Ongkir SPX |
+       | Gaji | Utang Gaji, Utang Asuransi Kesehatan, Utang Asuransi Ketenagakerjaan |
+       | Ops adum | Beban Administrasi & Umum; Utang Beban; Beban Lainnya (bank dll.); Piutang Karyawan/Lainnya; Anggaran Kegiatan; Investasi pada Elite SK; Utang Kepada Kreditur |
+       | Pajak | Beban pajak; Pajak Dibayar Di Muka (PPh 25); PPN Masukan; Utang PPN/PPh |
+       | Tidak dihitung | Akumulasi Penyusutan (bukan pengeluaran uang); Potongan Afiliasi; Beban Ongkir E-Commerce |
+       | CapEx (di luar cashflow, Decision 3) | Aset dlm Penyelesaian, Aset Tetap |
+
+     - Pemetaan ini ditulis **sekali** di integration-service, sama seperti pemetaan akun → komponen tahap 1.
 6. **Total uang keluar riil berdampingan.** Laporan bulanan menampilkan Σ uang keluar seluruh rekening bank dari salinan ADR 0163, di samping total realisasi komponen, sebagai kontrol. Angka ini **tidak** dipakai KPI.
 7. **KPI #4 ikut definisi baru.**
    - Rumus akurasi tidak berubah; yang berubah populasi dan proyeksinya.
