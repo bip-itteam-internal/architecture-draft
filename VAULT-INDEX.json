@@ -10162,20 +10162,18 @@
         "HRIS - Matriks KPI per Departemen",
         "REF - Kepemilikan Data"
       ],
-      "hash": "b2bba04ece3466f8c4eb6ca4e145a49ecb0b9fe79243a5639931613fa8576e0d",
-      "ukuran_kb": 18.4,
-      "ringkasan": "Menjawab: apa saja tujuh komponen uang keluar di forecast kas mingguan (material, BOP, marketing, gaji, ops adum, pajak, aset), bagaimana sebulan dibagi menjadi empat minggu, dan mengapa realisasi tahap pertama masih berbasis akrual sementara realisasi kas menyusul. Juga menjelaskan asal angka proyeksi per komponen (RAPB atau isian Cost Control), aturan jumlah sebulan = total komponen, dan dampaknya ke KPI akurasi forecast Cost Control.",
+      "hash": "b797aa04410f9a6b4f767d724b0a0037dc146c2c081e82cc5803f82c62122693",
+      "ukuran_kb": 20.7,
+      "ringkasan": "Menjawab: mengapa forecast kas mingguan diperluas dari 6 akun menjadi tujuh komponen uang keluar (material, BOP, marketing, gaji, ops adum, pajak, aset), bagaimana sebulan dibagi empat minggu, dan dari mana proyeksi serta realisasi tiap komponen diambil. Juga menjawab bagaimana KPI akurasi Cost Control #4 ikut terdampak dan mengapa realisasi tahap pertama masih berbasis akrual, bukan kas.",
       "kata_kunci": [
         "forecast kas mingguan",
         "cashflow",
         "uang keluar",
         "tujuh komponen",
         "realisasi akrual",
-        "proyeksi RAPB",
-        "anggaran cost control",
-        "KPI akurasi forecast",
-        "weekly cash forecast",
-        "outflow"
+        "cash basis",
+        "KPI Cost Control #4",
+        "proyeksi mingguan"
       ]
     },
     {
@@ -21205,22 +21203,18 @@
         "ADR - 0184 Forecast Kas Mingguan Mencakup Tujuh Komponen Uang Keluar, Dibagi Empat Minggu, Realisasi Bertahap",
         "Finance - Serapan Anggaran dan Cost Control"
       ],
-      "hash": "7d9a7e688d736a9e386b76868b96f08b0239e44c17b5dad25a5d3ceeab3df027",
-      "ukuran_kb": 13.7,
-      "ringkasan": "Menjawab: apa saja tujuh komponen uang keluar dalam forecast kas mingguan (Material, BOP, Pajak, Aset, Ops Adum, dan seterusnya), bagaimana pembagian empat minggu dan realisasi bertahap dilakukan, dan akun Accurate mana masuk komponen mana. Juga menjawab urutan task C0 sampai C7 lintas bip-erp dan erp-frontend, catatan jebakan hitung ganda pajak dan minggu 5, serta pertanyaan terbuka untuk Finance (A1 sampai A7).",
+      "hash": "b6a4b56e8b6f1d77595c476caaf5f00f04c29e361cac9bacd6c3872ad5ed0e3b",
+      "ukuran_kb": 14.2,
+      "ringkasan": "Menjawab: daftar pekerjaan bertahap (task C0 sampai C7b) untuk memperluas cashflow mingguan ke tujuh komponen uang keluar, termasuk urutan deploy BE sebelum FE, pemetaan akun Accurate ke komponen, isian proyeksi, realisasi pajak, material, dan aset, serta CapEx. Juga memuat catatan jebakan dari review judge, hasil pengukuran bagan akun, dan daftar pertanyaan terbuka untuk Finance.",
       "kata_kunci": [
-        "cashflow",
-        "forecast kas",
-        "uang keluar",
-        "cash outflow",
-        "tujuh komponen",
-        "proyeksi mingguan",
-        "realisasi",
-        "akrual vs kas",
-        "CapEx",
-        "anggaran aset",
-        "Accurate",
-        "cost control"
+        "backlog cashflow",
+        "pecahan task",
+        "urutan deploy",
+        "pemetaan akun",
+        "bagan akun Accurate",
+        "belanja modal CapEx",
+        "pertanyaan Finance",
+        "asumsi A1-A7"
       ]
     },
     {
