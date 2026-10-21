@@ -1,8 +1,8 @@
-**Status**: 🟡 Daftar task dari `/analisa-kebutuhan` 2026-10-21. Keputusannya di [[ADR - 0193 Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi]] dan [[ADR - 0194 Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat]]; cara kerjanya di [[HRIS - Organization Structure]]. Dok ini papan kerja, bukan arsitektur.
+**Status**: 🟡 Daftar task dari `/analisa-kebutuhan` 2026-10-21. Keputusannya di [[ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen]] dan [[ADR - 0194 Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat]]; cara kerjanya di [[HRIS - Organization Structure]]. Dok ini papan kerja, bukan arsitektur.
 
-**Menunggu ADR "Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi" dan ADR "Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat" Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**
+**Menunggu ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen" dan ADR "Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat" Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**
 
-- **Ukuran**: **Besar** (struktur): `bip-erp` butuh lebih dari satu PR (unit pimpinan + titik patah, lalu kepala divisi + bagan, lalu skrip migrasi) dan `erp-frontend` satu PR. **Sedang** (peta penyetuju): satu PR per repo. MyBharata tidak dihitung: departemen hanya ditampilkan sebagai teks, unit baru cuma jatuh ke warna abu-abu (`mybharata-app/lib/src/core/utils/department_color_utils.dart:13-50`, branch `dev`).
+- **Ukuran**: **Besar** (struktur): `bip-erp` butuh lebih dari satu PR (unit pimpinan + penyetuju lintas departemen + titik patah, lalu bagan bertingkat, lalu skrip migrasi) dan `erp-frontend` satu PR. **Sedang** (peta penyetuju): satu PR per repo. MyBharata tidak dihitung: departemen hanya ditampilkan sebagai teks, unit baru cuma jatuh ke warna abu-abu (`mybharata-app/lib/src/core/utils/department_color_utils.dart:13-50`, branch `dev`).
 - **Pemutus**: irfanarfianto
 
 ## Kebutuhan yang dijawab
@@ -12,7 +12,7 @@ Manajemen ingin struktur organisasi "selayaknya perusahaan": pimpinan tidak terc
 ## Urutan
 
 1. Induk A `bip-erp`: struktur. Sub: [BE] 1/3 → [BE] 2/3 → [BE] 3/3 (skrip migrasi) ; [FE] deploy sesudah [BE] 1/3 dan 2/3 live.
-2. Induk B `bip-erp`: peta penyetuju. Sub: [BE] → [FE]. Boleh paralel dengan A, kecuali butir sumber "Manager/kepala divisi" yang menyesuaikan sesudah A [BE] 2/3.
+2. Induk B `bip-erp`: peta penyetuju. Sub: [BE] → [FE]. Boleh paralel dengan A, kecuali sumber "penyetuju departemen" yang menyesuaikan sesudah A [BE] 1/3 (pilihan eksplisit lintas departemen).
 3. Migrasi data prod (A [BE] 3/3) dijalankan MANUSIA sesudah seluruh BE A live.
 
 ---
@@ -31,7 +31,7 @@ Direktur dan Manager tercatat di departemen Kesekretariatan karena ERP tak menge
 
 ## Keputusan
 
-ADR "Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi". Layak `Siap Agent` sesudah ADR berstatus Diterima. Induk tanpa PR; ditutup manual saat semua sub-issue merged.
+ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen". Layak `Siap Agent` sesudah ADR berstatus Diterima. Induk tanpa PR; ditutup manual saat semua sub-issue merged.
 
 ## Yang harus benar
 
@@ -65,7 +65,7 @@ Titik yang menganggap departemen = unit operasional (diverifikasi `origin/main` 
 
 ## Keputusan
 
-ADR "Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi" §2, §4. Layak `Siap Agent` sesudah ADR berstatus Diterima. Ringkas: `master_department.jenis` (`departemen` bawaan | `pimpinan`); unit pimpinan disaring dari daftar operasional dan system-list; peran & paket Direktur ikut unit Direksi; pengajuan penyetuju unit pimpinan tanpa atasan langsung HR.
+ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen" §2, §4. Layak `Siap Agent` sesudah ADR berstatus Diterima. Ringkas: `master_department.jenis` (`departemen` bawaan | `pimpinan`); unit pimpinan disaring dari daftar operasional dan system-list; peran & paket Direktur ikut unit Direksi; pengajuan penyetuju unit pimpinan tanpa atasan langsung HR.
 
 ## Yang harus benar
 
@@ -78,12 +78,15 @@ ADR "Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjen
 - [ ] Slot "Direktur" cadangan: notifikasi ke unit Direksi, bukan Kesekretariatan (test).
 - [ ] Unit `pimpinan` menerima jadwal UNSET; picker jadwal tidak 400 (test).
 - [ ] Override penyetuju di `getSupervisorData` dihapus; penyetuju IT dari data (test regresi: IT tetap ke penyetuju departemennya).
+- [ ] Penyetuju departemen = pilihan eksplisit di master departemen, boleh lintas departemen (Leader, SPV lain, Manager, Direktur); `validasiPenyetuju` tak lagi menolak non-anggota; jejak audit; resolver membaca pilihan eksplisit lebih dulu; `is_supervisor` anggota dimigrasikan (test).
+- [ ] Penyetuju pilihan TIDAK menambah cakupan supervisi token / KPI (test: `resolveSupervisedDepartments` sama sebelum-sesudah).
+- [ ] Cadangan bila tak ada pilihan: Manager departemen itu → Direktur; tebakan judul `Supervisor|^Leader$` dan `supervised_by` tidak lagi dipakai untuk persetujuan; tak ada lagi 500 "Couldn't find suitable supervisor" (test).
 - [ ] Regresi: staf, SPV dengan Manager, koreksi, tukar shift tidak berubah.
 - [ ] `go build` + `go test` employee, attendance, shared-library tanpa kegagalan baru.
 
 ## Di luar cakupan
 
-Kepala divisi dan bagan bertingkat (bagian 2/3); migrasi data (3/3); FE.
+Bagan bertingkat (bagian 2/3); migrasi data (3/3); FE.
 
 ## Data / bukti pendukung
 
@@ -95,7 +98,7 @@ ADR Diterima.
 
 ---
 
-### [BE] Struktur organisasi bagian 2/3: kepala divisi, Manager dari divisi, bagan bertingkat
+### [BE] Struktur organisasi bagian 2/3: bagan bertingkat Direksi, Manager, Departemen
 
 - **Repo**: bip-erp
 - **Issue**: [bip-erp#3371](https://github.com/bip-itteam-internal/bip-erp/issues/3371)
@@ -105,19 +108,19 @@ ADR Diterima.
 
 ## Masalah
 
-`MasterDivisi` tak punya kepala (`shared-library/models/employee/master_data.go:123-132`); Manager departemen diisi per departemen (`master_department.manager_employee_id`, ADR 0190, resolver `services/employee/department_manager.go:349-356`); bagan organisasi berkerangka departemen saja (`services/employee/org_chart.go`).
+Bagan organisasi berkerangka departemen saja (`services/employee/org_chart.go`; FE `bangun-pohon.ts:8-11,181-185`), sehingga Direktur dan Manager tak tampil di atas departemen. Manager per departemen sudah ada (`master_department.manager_employee_id`, ADR 0190, resolver `services/employee/department_manager.go:349-356`) dan tetap menjadi sumbernya.
 
 ## Keputusan
 
-ADR "Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi" §3, §5. Layak `Siap Agent` sesudah ADR berstatus Diterima. Ringkas: `master_divisi.kepala_employee_id` (satu, aktif, satu perusahaan, endpoint sendiri ber-audit); Manager departemen = kepala divisi dari `divisi_key`-nya; `manager_employee_id` tidak lagi ditulis.
+ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen" §1, §3, §5. Layak `Siap Agent` sesudah ADR berstatus Diterima. Ringkas: Manager tetap per departemen (bebas lintas divisi); divisi tanpa kepala; endpoint bagan mengirim tingkat.
 
 ## Yang harus benar
 
-- [ ] `PUT /master/divisi/:key/kepala` (gerbang setara `PUT /master/departments/:key/manager`): validasi aktif/perusahaan, kosong = lepas, jejak audit dalam transaksi (test Fiber).
-- [ ] Resolver Manager (`/internal/department-manager`, `/me/managed-departments`, gerbang KPI) membaca kepala divisi; departemen tanpa divisi atau divisi tanpa kepala = tanpa Manager (test, termasuk Finance dipetakan ke divisi tanpa kepala).
-- [ ] `PUT /master/departments/:key/manager` dinonaktifkan (410 atau dialihkan) dan `GET .../approvers` menurunkan `manager_*` dari divisi; kontrak bentuk respons tetap.
-- [ ] `GET /org-chart` mengirim tingkat: unit Direksi, divisi (key, nama, kepala), departemen dengan `divisi_key`.
-- [ ] Regresi ADR 0190: pengajuan SPV ke Manager tetap jalan dengan sumber kepala divisi (test).
+- [ ] `GET /org-chart` mengirim tingkat: unit Direksi (Direktur), para Manager beserta departemen yang dinaungi (dari `manager_employee_id`), departemen beserta `divisi_key` dan penyetujunya; departemen tanpa Manager ditandai langsung di bawah Direksi.
+- [ ] Satu Manager yang menaungi departemen dari divisi berbeda tampil sebagai satu simpul Manager (test).
+- [ ] Penetapan Manager (`PUT /master/departments/:key/manager`) tetap; calon Manager yang tidak tercatat di unit `pimpinan` dibalas peringatan (bukan penolakan) selama masa transisi (test).
+- [ ] Bentuk respons lama `/org-chart` tetap terbaca FE lama (field baru opsional).
+- [ ] Regresi ADR 0190: pengajuan SPV ke Manager dan KPI Manager tetap jalan (test).
 
 ## Di luar cakupan
 
@@ -125,7 +128,7 @@ FE; migrasi data.
 
 ## Data / bukti pendukung
 
-Prod 2026-10-20: 0 departemen ber-`manager_employee_id` (tak ada data yang hilang saat sumber dipindah).
+Prod 2026-10-20: 0 departemen ber-`manager_employee_id`.
 
 ## Prasyarat
 
@@ -143,16 +146,16 @@ Bagian 1/3 merged.
 
 ## Masalah
 
-Struktur baru butuh data: unit Direksi, Direktur dan Manager pindah, `position_items` + paket Direktur pindah, penyetuju Kesekretariatan berganti, pemetaan divisi dan kepala divisi.
+Struktur baru butuh data: unit Direksi, Direktur dan Manager pindah, `position_items` + paket Direktur pindah, penyetuju Kesekretariatan berganti, `is_supervisor` per departemen dimigrasikan jadi pilihan eksplisit, Manager per departemen dan pemetaan divisi sesuai keputusan HR.
 
 ## Keputusan
 
-ADR "Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi" §6. Layak `Siap Agent` sesudah ADR Diterima DAN keputusan HR di bawah tertulis. Skrip `.ps1` + `.js` dua fase (dry-run, apply), `mongodump` dulu, rollback, `ssh -n` + `Out-Host` + gerbang `[int]`.
+ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen" §6. Layak `Siap Agent` sesudah ADR Diterima DAN keputusan HR di bawah tertulis. Skrip `.ps1` + `.js` dua fase (dry-run, apply), `mongodump` dulu, rollback, `ssh -n` + `Out-Host` + gerbang `[int]`.
 
 ## Yang harus benar
 
 - [ ] Dry-run mencetak rencana perubahan per dokumen tanpa menulis.
-- [ ] Apply: unit Direksi berjenis `pimpinan` dengan jabatan Direktur (+paket) dan Manager; Direktur dan Manager pindah; penyetuju Direksi = Direktur; penyetuju Kesekretariatan = orang yang diputuskan HR; `divisi_key` + kepala divisi sesuai keputusan HR.
+- [ ] Apply: unit Direksi berjenis `pimpinan` dengan jabatan Direktur (+paket) dan Manager; Direktur dan Manager pindah; penyetuju Direksi = Direktur; `is_supervisor` tiap departemen menjadi pilihan eksplisit; penyetuju Kesekretariatan, penyetuju lintas departemen, Manager per departemen, dan `divisi_key` sesuai keputusan HR.
 - [ ] Gerbang: hak efektif Direktur (`GET /account/effective-access`) sebelum = sesudah, per modul; jika beda, berhenti dan rollback.
 - [ ] Rollback memulihkan dari cadangan.
 
@@ -170,7 +173,7 @@ Bagian 1/3 dan 2/3 live di prod.
 
 ---
 
-### [FE] Struktur organisasi: kepala divisi, bagan bertingkat, unit pimpinan di dropdown
+### [FE] Struktur organisasi: penyetuju lintas departemen, bagan bertingkat, unit pimpinan di dropdown
 
 - **Repo**: erp-frontend
 - **Issue**: [erp-frontend#2668](https://github.com/bip-itteam-internal/erp-frontend/issues/2668)
@@ -180,18 +183,19 @@ Bagian 1/3 dan 2/3 live di prod.
 
 ## Masalah
 
-Master Divisi hanya `name/urutan` (`src/features/hris/master-data/components/divisi-form-modal.tsx:105-112`); bagan berkerangka departemen (`src/features/hris/org-chart/lib/bangun-pohon.ts:8-11,181-185`); kolom Manager per departemen di layar penyetuju (ADR 0190); ±50 pemakai daftar departemen.
+Pemilih penyetuju hanya menawarkan anggota departemen (`src/features/hris/master-data/lib/penyetuju.ts:87-97`); bagan berkerangka departemen (`src/features/hris/org-chart/lib/bangun-pohon.ts:8-11,181-185`); ±50 pemakai daftar departemen tak mengenal unit pimpinan.
 
 ## Keputusan
 
-ADR "Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi" §3, §5. Layak `Siap Agent` sesudah ADR Diterima.
+ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen" §2, §4b, §5. Layak `Siap Agent` sesudah ADR Diterima.
 
 ## Yang harus benar
 
-- [ ] Master Divisi: pilih/ganti/lepas kepala (karyawan aktif satu perusahaan), dialog konfirmasi, umpan balik.
-- [ ] Layar Penyetuju Pengajuan: kolom Manager menjadi baca-saja ("dari kepala divisi X") dengan tautan ke Master Divisi.
+- [ ] Layar Penyetuju Pengajuan: pemilih penyetuju menampilkan karyawan aktif seluruh perusahaan (dikelompokkan: anggota departemen, Leader/SPV lain, Manager, Direktur), dengan keterangan bahwa penyetuju luar akan melihat pengajuan staf departemen itu; status "cadangan: Manager X / Direktur" tampil bila belum dipilih.
+- [ ] Kolom Manager tetap bisa dipilih untuk departemen mana saja (perilaku ADR 0190), kini menawarkan anggota unit Direksi lebih dulu.
+- [ ] Master Divisi tetap tanpa kepala; departemen menampilkan divisinya sebagai pengelompokan dan filter.
 - [ ] Master departemen: tampilkan `jenis`; unit pimpinan tidak bisa dipilih sebagai departemen operasional di form yang menulis departemen operasional.
-- [ ] Bagan organisasi dan mode kanvas: Direksi → Divisi → Departemen → orang; atasan lintas unit tidak memutus Manager dari bawahannya.
+- [ ] Bagan organisasi dan mode kanvas: Direksi → Manager → Departemen → orang; departemen tanpa Manager di bawah Direksi; divisi sebagai filter; atasan lintas unit tidak memutus Manager dari bawahannya.
 - [ ] i18n dua bahasa, Skeleton, lima keadaan; tsc/lint/build hijau; test tanpa kegagalan baru.
 - [ ] Fallback: bila BE belum mengirim tingkat, bagan tampil seperti sekarang.
 
@@ -261,7 +265,7 @@ ADR "Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Ter
 
 ## Yang harus benar
 
-- [ ] Mencakup minimal: penyetuju departemen, Manager/kepala divisi, tahap pengajuan barang/budget, payroll run, rekrutmen, pelatihan, triase tiket/admin space, booking ruang, komite kaizen, penandatangan kontrak, slot jabatan Direktur.
+- [ ] Mencakup minimal: penyetuju departemen (pilihan eksplisit, termasuk lintas departemen), Manager per departemen, tahap pengajuan barang/budget, payroll run, rekrutmen, pelatihan, triase tiket/admin space, booking ruang, komite kaizen, penandatangan kontrak, slot jabatan Direktur.
 - [ ] Tiap sumber dibaca dari pemiliknya (endpoint baca internal berkunci bila belum ada); tidak ada aturan "siapa boleh" yang disalin ke agregator (test pemindai sumber atau test kontrak per sumber).
 - [ ] Modul tak terjangkau → masuk `tidak_terbaca`, respons tetap 200 (test).
 - [ ] Gerbang: non-HRIS/IT 403 (test Fiber).

@@ -31,7 +31,7 @@ Pertanyaan "orang ini bisa menyetujui apa saja" tidak bisa dijawab dari satu tem
 
 Yang sudah ada dan dipakai ulang: `GET /account/effective-access` (izin dan peran efektif satu orang beserta asalnya, khusus IT; `services/employee/hak_efektif.go`), `GET /internal/permission-holders` (izin → orang; `permission_holders.go`), `GET /master/departments/approvers` (penyetuju + Manager per departemen), dan endpoint "punya saya" per modul (`/me/managed-departments`, `/peminjaman/penyetuju/saya`, `/me/kaizen/committee`, `/contract-ttd/direktur/antrean`). Agregator antrean `GET /pengajuan/antrean` menjawab "apa yang menunggu saya sekarang", bukan wewenang.
 
-Bukti tidak ada pembalik orang → wewenang: `git grep` pola peta/wewenang/penyetuju-per-orang di kedua repo hanya mengenai komentar. Selama itu tidak ada, penyimpangan senyap tak terlihat, contohnya override penyetuju Tech Development yang ditulis di kode attendance tidak tampak di layar penyetuju (dihapus oleh [[ADR - 0193 Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi]] §4).
+Bukti tidak ada pembalik orang → wewenang: `git grep` pola peta/wewenang/penyetuju-per-orang di kedua repo hanya mengenai komentar. Selama itu tidak ada, penyimpangan senyap tak terlihat, contohnya override penyetuju Tech Development yang ditulis di kode attendance tidak tampak di layar penyetuju (dihapus oleh [[ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen]] §4).
 
 [[ADR - 0137 Model Persetujuan Tunggal dan Pemisahan Tugas Lintas Modul]] (🟡 Diusulkan, Decision TBD) memetakan masalah yang sama dan mengusulkan penyetuju = pemegang izin tahap ∩ penunjukan berjejak. Keputusan ini tidak mendahuluinya: ia hanya membaca sumber yang ada.
 
@@ -70,4 +70,4 @@ Mengatur penyetuju dari halaman ini (menulis) baru dibangun setelah ADR 0137 dip
 - ⚠️ Peran lama hanya bisa ditampilkan sebagai kategori sampai modulnya berkatalog izin.
 - Deploy: BE (employee-service + modul yang mendapat endpoint baca) sebelum FE.
 
-Terkait: [[ADR - 0193 Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi]] · [[REF - Alur Persetujuan]] · [[CORE - RBAC dan Permission Set]]
+Terkait: [[ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen]] · [[REF - Alur Persetujuan]] · [[CORE - RBAC dan Permission Set]]

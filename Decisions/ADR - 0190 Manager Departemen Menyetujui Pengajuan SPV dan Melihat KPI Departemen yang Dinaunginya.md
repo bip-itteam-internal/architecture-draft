@@ -1,6 +1,6 @@
 > **Status**: 🟢 Diterima, 2026-10-20, oleh irfanarfianto. Pemutus: irfanarfianto. Opsi A dipilih lewat `/analisa-kebutuhan`; pengerjaan diperintahkan di sesi yang sama. Kode belum ada. Pecahan kerja: [[ANALISA - Manager Departemen Penyetuju Pengajuan SPV]] · issue bip-erp#3328 (induk), bip-erp#3329 [BE], erp-frontend#2639 [FE].
 
-> ⚠️ **Diubah sebagian oleh [[ADR - 0193 Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi]] (🟡 Diusulkan 2026-10-21)**: Manager departemen akan DITURUNKAN dari kepala divisi (bukan diisi per departemen lewat `manager_employee_id`), dan Direktur serta Manager pindah ke unit pimpinan Direksi (§5 di bawah tidak berlaku lagi setelah ADR itu diterima dan berkode). Status kode ADR ini: live prod 2026-10-20 (bip-erp #3345, erp-frontend #2643).
+> ⚠️ **Diubah sebagian oleh [[ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen]] (🟡 Diusulkan 2026-10-21)**: bentuk penetapan Manager per departemen di sini TETAP (bebas departemen mana pun, lintas divisi), tetapi Direktur serta Manager pindah ke unit pimpinan Direksi dan penyetuju departemen boleh lintas departemen (§5 di bawah tidak berlaku lagi setelah ADR itu diterima dan berkode). Status kode ADR ini: live prod 2026-10-20 (bip-erp #3345, erp-frontend #2643).
 
 ## Untuk Manajemen
 

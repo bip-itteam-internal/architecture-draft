@@ -19,7 +19,7 @@ Yang membuat inventaris ini sulit disusun, dan mudah salah:
 
 ## Inventaris
 
-> 🟡 **Diusulkan 2026-10-21**: struktur Direksi → Divisi → Departemen ([[ADR - 0193 Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi]]) mengubah penyetuju pimpinan: pengajuan Direktur langsung ke HR, Manager disetujui Direktur sebagai orang, Manager departemen diturunkan dari kepala divisi. Peta per orang seluruh baris inventaris ini: [[ADR - 0194 Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat]].
+> 🟡 **Diusulkan 2026-10-21**: struktur Direksi → Divisi → Departemen ([[ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen]]) mengubah penyetuju pimpinan: pengajuan Direktur langsung ke HR, Manager disetujui Direktur sebagai orang, penyetuju departemen dipilih HR dan boleh lintas departemen dengan cadangan Manager lalu Direktur. Peta per orang seluruh baris inventaris ini: [[ADR - 0194 Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat]].
 
 
 ### Berbasis SLOT pada dokumen
