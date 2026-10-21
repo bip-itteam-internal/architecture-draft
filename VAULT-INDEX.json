@@ -3855,7 +3855,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "076b1a4fb212adebd3801ec7b3443d492438a6a76da2345516b17d06f0ada9bb",
-      "ukuran_kb": 4.8,
+      "ukuran_kb": 4.9,
       "ringkasan": "Menjawab sumber tanggal yang dipakai untuk membukukan retur TikTok ke Accurate: kenapa update_time menyesatkan (ikut mundur karena settle refund) dan kenapa order_update_date dipilih sebagai gantinya, serta perbaikan zona waktu WIB untuk penomoran dokumen retur (RTR).",
       "kata_kunci": [
         "tanggal retur",
@@ -4591,7 +4591,7 @@
         "RUN - Menambah Metrik KPI Otomatis"
       ],
       "hash": "ddca0201da7959b033620b4d876a8b18d58d146a1dd721bf9d3f6b75c917f3ec",
-      "ukuran_kb": 15.1,
+      "ukuran_kb": 15.2,
       "ringkasan": "Menjawab: bagaimana aset GA di ERP direkonsiliasi terhadap Aktiva Tetap di Accurate untuk menghasilkan skor KPI akurasi input aset staff GA, dan kenapa pencocokannya per-item lewat ceklis manual berbantuan (bukan agregat per-golongan) dengan `accurate_asset_no` disimpan agar periode berikutnya cocok otomatis. Menjelaskan pula kenapa aset yang belum ada di Accurate dihitung 100% (antrean tanggung jawab Finance, bukan GA) sementara Cakupan wajib tampil berdampingan dengan Akurasi, tiga tab modul Aset, penempatan yang menghormati batas service (inventory menyimpan nomor Accurate, feed KPI lewat employee-service), serta bagian mana yang di-supersede ADR-0049.",
       "kata_kunci": [
         "rekonsiliasi aset",
@@ -5764,7 +5764,7 @@
         "External - Accurate"
       ],
       "hash": "140f2789e531f6209bfdfc17bceca336e6f6048522951825a418bd4a22e2da22",
-      "ukuran_kb": 10.4,
+      "ukuran_kb": 10.5,
       "ringkasan": "Menjawab: mengapa opname perlengkapan GA dibuat sebagai perluasan tab Data Accurate (lewat pemilih tipe Aset Tetap/Perlengkapan) alih-alih modul baru, bagaimana perlengkapan dicocokkan per-KUANTITAS (hitung fisik GA vs qty Accurate) bukan per-unit, dan bagaimana skor akurasi opname dihitung untuk KPI staff GA. Menjelaskan juga koleksi ga_opname + endpoint /perlengkapan-opname, penangkapan kategori item Accurate saat sync, serta amandemen 2026-09-02 yang mengubah tab FE dari form opname jadi explorer padanan read-only (BE dibiarkan dormant).",
       "kata_kunci": [
         "opname perlengkapan",
@@ -7864,7 +7864,7 @@
         "APP - Web ERP"
       ],
       "hash": "4d7a4749403407de1c1518929ce4516203c1a8ce866baee74f53c3ffb05ebf09",
-      "ukuran_kb": 25.2,
+      "ukuran_kb": 25.3,
       "ringkasan": "Menjawab: mengapa beban ongkir Shopee di pembukuan bisa tercatat lebih besar daripada yang ditampilkan Shopee (rumus lama menghitung ongkir aktual dua kali lewat final_shipping_fee), dan bagaimana rumus yang benar dihitung — ongkir aktual dikurangi bagian pembeli, ditambah proteksi kirim dan ongkir retur, dengan subsidi Shopee sengaja tidak ikut dikurangkan di rumus ini karena sudah ditangani mekanisme lain. Menjawab juga sejarah penerapannya: tanggal cutover per-order, status deploy, amandemen backfill September yang belum merge, dan amandemen kedua (2026-10-06) untuk instance kedua dari kelas bug yang sama pada premi proteksi pengiriman seller dan order retur penuh.",
       "kata_kunci": [
         "ongkir Shopee",
@@ -8424,7 +8424,7 @@
         "Finance - Proses Retur dan Piutang Marketplace"
       ],
       "hash": "80e288d1aed5fd5b5df5d918351ef6e9f58b21bf3d759eb7df01614f615cf120",
-      "ukuran_kb": 14.1,
+      "ukuran_kb": 14.4,
       "ringkasan": "Menjawab: bagaimana kompensasi logistik TikTok yang turun SETELAH retur pesanan sudah dibukukan di Accurate harus diperlakukan tergantung kondisi fisik barang hasil scan gudang (reject vs reuse/rework), dan kenapa aturannya dijalankan manual dulu (SOP) bukan langsung diotomasi. Menjelaskan populasi terukur (16 dari 458 kompensasi logistik, 8.647 total retur) yang jadi alasan otomasi ditunda, serta bagaimana keputusan ini mengamandemen ADR-0119 (pemisahan kompensasi ke Pendapatan Lain-lain) dan keputusan lama soal retur reject tetap menambah stok WMS, khusus untuk sub-populasi sempit ini.",
       "kata_kunci": [
         "kompensasi logistik",
@@ -8818,7 +8818,7 @@
         "ANALISA - Retur Dibukukan Manual oleh Finance"
       ],
       "hash": "fce74b366cc9ad169118e0b39006fec4011fd11d59108b3457c54d14a763a751",
-      "ukuran_kb": 15.2,
+      "ukuran_kb": 15.3,
       "ringkasan": "Menjawab: bagaimana finance menandai sebuah order bahwa Retur Penjualannya sudah dibukukan manual di Accurate agar Auto-Sync Retur berhenti menyentuhnya, dan mengapa baris SKIPPED lama bisa hidup lagi dan berisiko membukukan retur ganda. Menjelaskan keputusan penanda per order di transaction_orders (terpisah dari invoice_excluded) yang dibaca satu fungsi keputusan returTakDibukukan oleh semua jalur, siapa yang boleh menandai dan mencabut (izin returselisih.tandai), kewajiban alasan dan nomor Retur Penjualan, penolakan bila sistem sudah lebih dulu membukukan, serta konsekuensi dan hal yang sengaja tidak dilakukan.",
       "kata_kunci": [
         "retur",
@@ -9119,7 +9119,7 @@
         "ADR - 0077 Koreksi Faktur via Impor Rekap Lengkap Mengalir ke Master-Data, Bukan Override per Baris"
       ],
       "hash": "2417a26dea2922bdde8b9fa43f5b19ed020b22f1ee737ffb86589145fa5e04e5",
-      "ukuran_kb": 14.8,
+      "ukuran_kb": 14.9,
       "ringkasan": "Menjawab: apa yang terjadi pada INC dan faktur harian bila order ditandai FO (fake order) sesudah uangnya cair, siapa yang menghapus INC kosong, dan bagaimana FO yang dilaporkan sesudah tutup buku diperlakukan. Juga menjawab kenapa kaskade FO belum bisa mengecilkan INC sampai nol, jawaban finance tentang uang FO, dan bagian yang masih TBD.",
       "kata_kunci": [
         "FO",
@@ -9322,7 +9322,7 @@
         "ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync"
       ],
       "hash": "1db073080ec5afe94a911c1b3e30ac27f163cf761e291c7233401c1784d5baa1",
-      "ukuran_kb": 18.6,
+      "ukuran_kb": 18.8,
       "ringkasan": "Menjawab: mengapa retur bisa tercatat dua kali di gudang dan membuat stok WMS berbeda dari pembukuan Accurate, berdasarkan insiden 2026-10-07 dan pengukuran produksi (simpan ganda, jumlah kurang, komponen paket tak discan, SKU di luar klaim). Juga menjawab apa saja pagar yang diputuskan (D1-D5: kunci Simpan dan idempotensi, konfirmasi saat kurang, batas kumulatif per order-SKU di server, jumlah kumulatif ke pembukuan, form hanya menawarkan sisa), mengapa jalur koreksi (D6) lewat Proposal ditunda, dan apa yang belum diputuskan.",
       "kata_kunci": [
         "ADR 0158",
@@ -10333,8 +10333,8 @@
       "judul": "ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "Diusulkan, 2026-10-20. Bentuknya disetujui user dalam sesi `/analisa-kebutuhan` 2026-10-20 (desain layar di Figma, opsi endpoint massal di payroll-service). Merevisi sebagian [[ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari]] (butir persetujuan). Pemutus: `irfanarfianto`. Blueprint: `Workspace/ANALISA - Penetapan Badan Usaha Massal dari HRIS.md`.",
+      "status_emoji": null,
+      "status_teks": "🟢 Diterima, 2026-10-21, oleh irfanarfianto (Pemutus). Diusulkan 2026-10-20. Data PROD 2026-10-21 (bip-erp#3324): 62 `employee_salary` tanpa `company_id`, 5 versi menunggu persetujuan, 0 rencana; penerima notifikasi `payroll.approve.hrd` = 1 orang lewat paket JABATAN `HRD Supervisor` (bukan akun), jadi penerima di-resolve lewat paket jabatan. Bentuknya disetujui user dalam sesi `/analisa-kebutuhan` 2026-10-20 (desain layar di Figma, opsi endpoint massal di payroll-service). Merevisi sebagian [[ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari]] (butir persetujuan). Pemutus: `irfanarfianto`. Blueprint: `Workspace/ANALISA - Penetapan Badan Usaha Massal dari HRIS.md`.",
       "publik": true,
       "tautan": [
         "ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari",
@@ -10349,20 +10349,20 @@
         "REF - Kepemilikan Data",
         "ADR - 0182 Badan Usaha Satu Daftar untuk HR dan Finance, Entitas CV Menempel Tanpa Nama Sendiri"
       ],
-      "hash": "d0568f24f3321ff2663b34ac183ed8a19c119f56ffaeee4f93f194f6a95ca6ce",
-      "ukuran_kb": 12.0,
-      "ringkasan": "Menjawab: bagaimana HR menetapkan badan usaha (PT/CV) penggaji untuk banyak karyawan sekaligus dari menu HRIS, kenapa penggantian penggaji saja tidak perlu persetujuan SPV HRD, dan apa yang terjadi pada karyawan yang belum punya struktur gaji (rencana badan usaha). Juga menjelaskan endpoint massal mode cek/terapkan, notifikasi per batch, dan batasannya (gaji/BPJS/PTKP tetap lewat persetujuan, kontrak tidak disentuh).",
+      "hash": "4814c8d7ead3dc05e918a92c7cb8603b7ec28e464a9522a58cd42dca9789b28d",
+      "ukuran_kb": 12.4,
+      "ringkasan": "Menjawab: bagaimana HR menetapkan badan usaha penggaji (company_id, PT/CV) untuk banyak karyawan sekaligus dari menu HRIS, kenapa penggantian penggaji saja tidak lagi menunggu approval SPV HRD, dan apa yang terjadi pada karyawan yang belum punya struktur gaji (rencana badan usaha). Juga menjelaskan endpoint massal mode cek/terapkan di payroll-service, versi gaji salinan yang langsung terjadwal, notifikasi per batch, dan batasannya (gaji/BPJS/PTKP tetap lewat persetujuan, kontrak tidak disentuh).",
       "kata_kunci": [
-        "penetapan badan usaha",
         "badan usaha penggaji",
         "company_id",
         "penetapan massal",
-        "bulk",
+        "bulk assignment",
+        "versi gaji",
+        "salary version",
         "tanpa persetujuan",
-        "PersetujuanDilewati",
-        "keputusan_massal",
-        "rencana badan usaha",
-        "HRIS"
+        "approval",
+        "payroll.salary.write",
+        "rencana badan usaha"
       ]
     },
     {
@@ -10558,7 +10558,7 @@
         "Finance - Proses Penjualan Marketplace dan Uang Masuk"
       ],
       "hash": "8ff07d305522d9b0738875340184534275cf1eeb5c6d3dca5fb5761550b90b86",
-      "ukuran_kb": 13.7,
+      "ukuran_kb": 13.8,
       "ringkasan": "Menjawab: bagaimana retur sebagian Shopee (uang tetap cair, payout > 0) dibukukan lewat dokumen Retur Penjualan per qty dan penerimaan hanya melunasi qty sisa, serta mengapa Biaya Admin sebelumnya membengkak (contoh INC/2026/10/17/008-BH) akibat refund yang terbaca salah dan residual. Juga menjawab bagaimana potongan komisi AMS dari dompet Shopee (AMS_COMMISSION_FEE_DEDUCT, 99 mutasi Rp1.136.138) dibukukan ke akun Biaya Affiliate, apa batas berlakunya (kv tanggal cutover per hari penerimaan, mulai 1 Oktober 2026, periode tutup buku tidak disentuh), file kode yang akan disentuh, dan jebakan kolom escrow seperti SubtotalAfterSellerDiscount.",
       "kata_kunci": [
         "retur sebagian",
@@ -10766,7 +10766,7 @@
         "Finance - Incentive"
       ],
       "hash": "8a3dba53269a5104fd1106064d8ed8159f96a7207b2c5a97ffc4a66f7a399504",
-      "ukuran_kb": 19.5,
+      "ukuran_kb": 19.6,
       "ringkasan": "Menjawab fitur dan struktur sistem Finance lama (Java/PostgreSQL/ReactJS) sebagai jembatan antara Accurate dan marketplace: master data, upload Excel per platform (TikTok/Shopee/Lazada/Tokopedia/KiriminAja), sinkronisasi ke Accurate, dan lokasi repositori kodenya.",
       "kata_kunci": [
         "Finance Bridging lama",
@@ -19543,7 +19543,7 @@
         "APP - Web ERP"
       ],
       "hash": "0115ceffe21b522769faac6e9286fe16c1737ff46d15d0f58ff2e9333c9cd7f0",
-      "ukuran_kb": 14.0,
+      "ukuran_kb": 14.2,
       "ringkasan": "Menjawab: bagaimana menerbitkan akun ERP untuk vendor, mitra, atau kontraktor tanpa menjadikannya karyawan, lalu memberinya akses ke modul tertentu. Menjelaskan cara memilih antara dua sumbu hak akses yang paling sering tertukar (Paket Hak vs Role Modul), cara memperpanjang dan menutup akses beserta batasnya, serta gejala umum saat vendor sudah dibuat tapi tetap tak bisa masuk.",
       "kata_kunci": [
         "akun eksternal",
@@ -20527,7 +20527,7 @@
         "APP - Web ERP"
       ],
       "hash": "c4637f8509f5c1a5a4144b1a335e575e34704efa5110b9829b98aa991eb3b130",
-      "ukuran_kb": 8.4,
+      "ukuran_kb": 8.5,
       "ringkasan": "Menjawab: apa rencana penyatuan menu-menu gudang yang kini terpecah per-tahap (Perlu Diproses, Antrian Pesanan, Pengambilan, Pengemasan, Riwayat Cetak Resi, Serah Terima) menjadi satu layar omnichannel \"Kelola Pesanan\" ala Desty tanpa mengubah backend, dan apa beda pratinjau Beta FE-only (data dummy, aksi mati) dengan menu produksi yang sudah wired ke endpoint nyata. Juga menjelaskan pemetaan tiap tab/sub-tab \"Siap Dikirim\" ke endpoint warehouse/integration, rencana mutasi bertahap fase 0-5 sampai cutover, gerbang dan nuansa yang wajib dipertahankan saat \"cuma ganti UI\" (gerbang rekon `exported_at`, kode packer T1/T2, guard TikTok `package_id` kosong, batch cap 100), persona pengguna dan RBAC-nya, serta hal yang belum diputuskan (tab Belum Dibayar, cakupan Sadewa, nasib menu lama).",
       "kata_kunci": [
         "Kelola Pesanan",
@@ -20565,7 +20565,7 @@
         "RUN - Deploy Microservices bip-erp"
       ],
       "hash": "68b724ac75ee130ffd22ea9f7beaa779cfb2b35b1bea55ee394e95ff6a6d639d",
-      "ukuran_kb": 15.5,
+      "ukuran_kb": 15.6,
       "ringkasan": "Menjawab: bagaimana laporan harian produk terkirim, dibatalkan, dan diretur per produk master untuk gudang Sadewa dan Tinggarjaya dihitung (rumus Qty Terkirim, Cancel, Retur, Total), siapa pemakainya, dan bagaimana keluarannya berbentuk Excel maupun pesan WhatsApp terjadwal ke grup stok. Juga menjelaskan pembagian gudang lewat sadewa_shops, pemecahan bundle dan produk tak terpetakan, aturan hari yang dilewati, rute manual, env, serta catatan status rilis.",
       "kata_kunci": [
         "laporan produk terkirim",
@@ -21913,7 +21913,7 @@
         "Finance - Proses Retur dan Piutang Marketplace"
       ],
       "hash": "e2d143889408149960b09d92d58880acfbe2c83c31ea38eff0341e09067932aa",
-      "ukuran_kb": 3.2,
+      "ukuran_kb": 3.3,
       "ringkasan": "Menjawab: apa saja task tindak lanjut dari ADR-0133 soal kompensasi logistik TikTok pasca-retur — menyebarkan SOP ke tim finance/accounting, pertanyaan terbuka yang masih perlu dikonfirmasi (dokumen retur campuran kondisi barang), cara mengukur ulang populasi secara berkala, dan daftar task kode yang TERTUNDA sampai pemicu otomasi (Opsi A) terpenuhi.",
       "kata_kunci": [
         "kompensasi logistik",
@@ -22216,8 +22216,8 @@
       "judul": "ANALISA - Penetapan Badan Usaha Massal dari HRIS",
       "area": "Workspace",
       "jenis": "workspace",
-      "status_emoji": "⛔",
-      "status_teks": "**Menunggu [[ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti]] Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**",
+      "status_emoji": null,
+      "status_teks": "ADR 0189 🟢 Diterima 2026-10-21 oleh irfanarfianto; data prod ditempel di bip-erp#3324; label `Siap Agent` dipasang di bip-erp#3324 dan erp-frontend#2631.",
       "publik": false,
       "tautan": [
         "ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti",
@@ -22226,19 +22226,19 @@
         "Microservices - Payroll Service",
         "REF - Kepemilikan Data"
       ],
-      "hash": "7b690a913a73af19fd9006c3321ea78988a2a1664618a69c119d8996cf3768ad",
-      "ukuran_kb": 12.7,
-      "ringkasan": "Menjawab: bagaimana pekerjaan penetapan badan usaha penggaji massal dipecah jadi issue induk, [BE] bip-erp, dan [FE] erp-frontend, apa kriteria 'yang harus benar' tiap issue, dan langkah manusia apa yang dibutuhkan sebelum dikerjakan agent. Juga mencatat temuan kebutuhan (62 dari 186 employee_salary tanpa company_id), komponen yang sudah ada untuk dipakai ulang, urutan deploy, dan asumsi yang diambil.",
+      "hash": "08719545fddc43c368936d958855df9e1ff554041aedb686e2c0efa8570f2fdb",
+      "ukuran_kb": 12.6,
+      "ringkasan": "Menjawab: bagaimana kebutuhan halaman HRIS untuk memetakan karyawan ke badan usaha dipecah jadi issue induk, sub-issue [BE] bip-erp dan [FE] erp-frontend, apa kriteria 'Yang harus benar' tiap issue, urutan deploy (BE sebelum FE, payroll-service + notification-service bersama), dan langkah manusia yang tersisa (Figma, label Siap Agent). Juga merangkum temuan kode yang sudah ada (buatVersiGaji, keputusan_massal, pola bulk BPJS) dan asumsi yang dipakai.",
       "kata_kunci": [
         "analisa kebutuhan",
         "penetapan badan usaha",
         "blueprint",
-        "issue",
         "sub-issue",
-        "bip-erp#3323",
         "bip-erp#3324",
-        "erp-frontend",
-        "company_id",
+        "erp-frontend#2631",
+        "badan usaha penggaji",
+        "bulk",
+        "HRIS",
         "Siap Agent"
       ]
     },
@@ -22257,7 +22257,7 @@
         "ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync"
       ],
       "hash": "055761dd2a4bdd0d80f24139bfc1f9f275619df80f07309476c8586211a25943",
-      "ukuran_kb": 6.1,
+      "ukuran_kb": 6.2,
       "ringkasan": "Menjawab: task apa saja (T0-T9) yang diturunkan dari ADR 0158 tentang pengaman scan retur gudang, mana yang termasuk tahap pagar dan mana tahap koreksi, serta apa dependensi dan urutan antar task. Juga menjawab keputusan apa yang menjadi gerbang (T5: tanggal dokumen koreksi, aturan koreksi ke nol) sebelum koreksi boleh dibangun, pembagian kerja BE/FE per repo, hasil pengukuran frekuensi jumlah kurang pada paket, dan pekerjaan dokumentasi/prosedur manusia yang tersisa.",
       "kata_kunci": [
         "ANALISA",
@@ -22548,7 +22548,7 @@
         "API - Integration Service"
       ],
       "hash": "15311d96ce19afd582bf5609ce8312b1a5433f1db782391b9b5f1d1bfe023c1f",
-      "ukuran_kb": 15.8,
+      "ukuran_kb": 15.9,
       "ringkasan": "Menjawab: bagaimana mekanisme ACL yang membatasi daftar toko marketplace yang boleh dilihat staf marketing (AllowedShops di endpoint GET /transactions/master/shops, integration-service) bekerja, kenapa sumber datanya bisa dipindah dari team_members/team_shops ke department_shops + work_data.department, dan bug apa yang sempat membuat staf non-marketing menerima daftar toko kosong. Mencatat status FINAL: redesign merge+deploy+live (PR #1727, 2026-09-05) DAN Fase Contract-nya SENDIRI SUDAH SELESAI (2026-09-15, bip-erp PR #1888 + erp-frontend PR #1579) — team_shops/team_members/menu Teams/CRUD-nya sudah dicabut fisik dari kode. Juga mencatat batas lingkup keputusan yang sengaja tidak diubah (gate rute RequireIntegrationStaff, exemption admin/supervisor integration).",
       "kata_kunci": [
         "AllowedShops",
@@ -22637,7 +22637,7 @@
         "ADR - 0104 Selisih Retur Dihitung Terjadwal per Periode dan Bisa Ditandai Beres"
       ],
       "hash": "bfda69cf856a2964ef3a3f887533e9cead707f3aba5224af9de2d32bcc36e66d",
-      "ukuran_kb": 7.8,
+      "ukuran_kb": 7.9,
       "ringkasan": "Menjawab: apa saja task yang perlu dikerjakan (T1 sampai T6) untuk mewujudkan ADR 0144, urutan dependensinya, di repo mana, apa kriteria selesainya, dan perintah /start-task untuk tiap task. Mencakup penanda per order dan penjagaan, endpoint tandai/cabut, aksi di layar Auto-Sync Retur, perkakas menandai ulang order yang sudah ditutup lewat skrip, daftar dan ekspor order bertanda, verifikasi prod lewat gateway, serta titik yang belum tertutup dan tahap 2 yang belum diputuskan.",
       "kata_kunci": [
         "analisa kebutuhan",
@@ -22704,7 +22704,7 @@
         "ADR - 0116 Setelan Akun Marketplace Bergerbang dan Berjejak, Komponen Tak Dikenal Wajib Terlihat"
       ],
       "hash": "502459db9078ed7439df8748be1bfdda0af7c4bf4e9fbcd046d5f84fcb04c1cf",
-      "ukuran_kb": 7.9,
+      "ukuran_kb": 8.0,
       "ringkasan": "Menjawab: seberapa besar dampak dua masalah yang dilaporkan tiket finance \"Revisi Sistem Income\" (ongkir Shopee salah pos 3.870 pesanan senilai Rp96.826.227 dan masih bertambah sekitar Rp16 juta per bulan, versus kompensasi TikTok atas pesanan yang sudah cair 14 pesanan senilai Rp1.610.697, dengan 360 pesanan kompensasi yang sudah benar sebagai kontrol), kenapa Shopee didahulukan, dan apa urutan kerja T1 sampai T5 beserta mana yang eksekusi prod-nya dijalankan manusia. Juga memuat 10 pertanyaan terbuka untuk Finance/FAT yang menahan penerapan (akun tersendiri untuk baris Penyesuaian yang kini berbagi akun dengan Beban Admin E-Commerce 6112, pos yang benar untuk ongkir pengembalian barang, proteksi pengiriman Rp7,4 juta di 21.148 pesanan, 208 dokumen retur menggantung, 54 penyesuaian TikTok tanpa pesanan padanan) serta daftar utang di luar lingkup tiket. Menjelaskan pula cara mengukur ulang angkanya secara read-only di VPS Biznet lewat `docker exec Integration-MongoDB mongosh` dan kenapa `10.10.10.120` tidak boleh dipakai sebagai pembanding.",
       "kata_kunci": [
         "Revisi Sistem Income",
@@ -23421,7 +23421,7 @@
         "WH - Warehouse Sadewa"
       ],
       "hash": "256b39d712a784b9ff443d528747ca065ab9eb8bbe91a08ffc13607cc07cb67a",
-      "ukuran_kb": 17.7,
+      "ukuran_kb": 17.9,
       "ringkasan": "Menjawab kenapa sidebar erp-frontend memicu request polling 30 detik ke endpoint warehouse/sadewa/accurate untuk semua karyawan tanpa peduli role atau halaman yang dibuka, dan rencana perbaikannya lewat gerbang enabled yang diturunkan dari menu yang benar-benar tampil. Memuat dua pembaruan 2026-08-29 yang menandai sebagian rencana ini usang lalu sebagian lagi sudah dikerjakan lewat jalan lain: branch fix/badge-sidebar-per-halaman memilih gerbang HALAMAN, sehingga Task 4 (kuartet refetch) gugur karena keduanya alternatif bukan pelengkap, Task 1 dan 3 turun prioritas, dan Task 5 tetap berdiri sendiri.",
       "kata_kunci": [
         "sidebar",
