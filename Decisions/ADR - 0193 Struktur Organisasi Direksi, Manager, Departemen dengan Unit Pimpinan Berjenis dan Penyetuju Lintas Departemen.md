@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan**, 2026-10-21, dari `/analisa-kebutuhan` (opsi A dipilih user; direvisi hari yang sama: Manager dipilih per departemen bebas, penyetuju boleh lintas departemen). Pemutus: irfanarfianto. Kode belum ada. Pecahan kerja: [[ANALISA - Struktur Organisasi Bertingkat dan Peta Penyetuju]].
+> **Status**: 🟢 Diterima, 2026-10-21, oleh irfanarfianto. Dari `/analisa-kebutuhan` (opsi A dipilih user; direvisi hari yang sama: Manager dipilih per departemen bebas, penyetuju boleh lintas departemen). Pemutus: irfanarfianto. Kode belum ada. Pecahan kerja: [[ANALISA - Struktur Organisasi Bertingkat dan Peta Penyetuju]].
 
 ## Untuk Manajemen
 
@@ -25,7 +25,7 @@
 
 *Organisasi dimodelkan Direksi → (Manager) → Departemen, dengan Divisi sebagai pengelompokan laporan. Unit pimpinan (Direksi) adalah baris master departemen berpenanda **jenis = pimpinan**, sehingga invarian "setiap karyawan punya unit" yang dipakai presensi, hak akses, payroll, dan pengajuan tetap utuh, sementara semua tempat yang menganggap departemen = unit operasional menanganinya dengan sengaja. Manager tetap ditetapkan per departemen (ADR 0190) dan bebas lintas divisi; penyetuju departemen menjadi pilihan eksplisit yang boleh lintas departemen, dengan cadangan otomatis Manager lalu Direktur.*
 
-- **Status**: 🟡 Diusulkan, 2026-10-21. Kode belum ada.
+- **Status**: 🟢 Diterima, kode belum ada (lihat baris status di atas).
 - **Path di repo**: `bip-erp/shared-library/models/employee/master_data.go` (field jenis departemen, penyetuju eksplisit) · `bip-erp/services/employee/peran_dari_jabatan.go` · `bip-erp/services/employee/permission_resolve.go` · `bip-erp/services/employee/master_data.go` (system-list) · `bip-erp/services/employee/main.go` (data-type department, `/list?type=supervisor`) · `bip-erp/services/employee/department_approver.go` · `bip-erp/services/employee/supervisor_lookup.go` · `bip-erp/services/employee/department_manager.go` · `bip-erp/services/employee/org_chart.go` · `bip-erp/services/attendance/main.go`, `business_trip.go`, `manager_departemen.go`, `schedule_list.go`, `jadwal_buatan_hr.go`, `notification.go` · `erp-frontend/src/features/hris/org-chart/lib/bangun-pohon.ts` · `erp-frontend/src/features/hris/master-data/` (departemen, penyetuju) · skrip migrasi prod `.ps1` (baru)
 - **Tanggal**: 2026-10-21
 

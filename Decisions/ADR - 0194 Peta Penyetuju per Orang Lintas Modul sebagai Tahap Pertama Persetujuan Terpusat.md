@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan**, 2026-10-21, dari `/analisa-kebutuhan`. Pemutus: irfanarfianto. Kode belum ada. Pecahan kerja: [[ANALISA - Struktur Organisasi Bertingkat dan Peta Penyetuju]].
+> **Status**: 🟢 Diterima, 2026-10-21, oleh irfanarfianto. Dari `/analisa-kebutuhan`. Pemutus: irfanarfianto. Kode belum ada. Pecahan kerja: [[ANALISA - Struktur Organisasi Bertingkat dan Peta Penyetuju]].
 
 ## Untuk Manajemen
 
@@ -17,7 +17,7 @@
 
 *Tahap pertama persetujuan terpusat adalah peta BACA-SAJA per orang: satu endpoint di employee-service menghimpun seluruh wewenang menyetujui seorang karyawan dari semua sumber yang hari ini tersebar, menandai sumber dan layar pengaturnya, dan satu halaman web menampilkannya. Tahap kedua (mengatur dari satu tempat) menunggu keputusan ADR 0137.*
 
-- **Status**: 🟡 Diusulkan, 2026-10-21. Kode belum ada.
+- **Status**: 🟢 Diterima, kode belum ada (lihat baris status di atas).
 - **Path di repo**: `bip-erp/services/employee/peta_penyetuju.go` (baru) · `bip-erp/services/employee/hak_efektif.go` · `bip-erp/services/employee/permission_holders.go` · endpoint baca per modul yang sudah ada (procurement, inventory, form-builder, payroll, recruitment, learning, task-management) · `erp-frontend/src/app/(main)/pengaturan/organisasi/` (halaman baru) · `erp-frontend/src/features/hris/master-data/` atau fitur baru `peta-penyetuju` (baru)
 - **Tanggal**: 2026-10-21
 

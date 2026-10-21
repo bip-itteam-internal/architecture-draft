@@ -10454,8 +10454,8 @@
       "judul": "ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-21, dari `/analisa-kebutuhan` (opsi A dipilih user; direvisi hari yang sama: Manager dipilih per departemen bebas, penyetuju boleh lintas departemen). Pemutus: irfanarfianto. Kode belum ada. Pecahan kerja: [[ANALISA - Struktur Organisasi Bertingkat dan Peta Penyetuju]].",
+      "status_emoji": null,
+      "status_teks": "🟢 Diterima, 2026-10-21, oleh irfanarfianto. Dari `/analisa-kebutuhan` (opsi A dipilih user; direvisi hari yang sama: Manager dipilih per departemen bebas, penyetuju boleh lintas departemen). Pemutus: irfanarfianto. Kode belum ada. Pecahan kerja: [[ANALISA - Struktur Organisasi Bertingkat dan Peta Penyetuju]].",
       "publik": true,
       "tautan": [
         "ANALISA - Struktur Organisasi Bertingkat dan Peta Penyetuju",
@@ -10466,7 +10466,7 @@
         "ADR - 0137 Model Persetujuan Tunggal dan Pemisahan Tugas Lintas Modul",
         "REF - Alur Persetujuan"
       ],
-      "hash": "d1e387581778599677a2d7000b6387df9896bbca7ede3bc3168f91f4e839c230",
+      "hash": "b10fb854ba189d4019e35fcb472574a064e9c7357d25409f30866ebfb639a42d",
       "ukuran_kb": 14.6,
       "ringkasan": "Menjawab: bagaimana struktur organisasi bertingkat Direksi, Manager, Departemen dimodelkan di ERP (unit pimpinan sebagai `master_department` berjenis `pimpinan`, Divisi untuk laporan), siapa menyetujui pengajuan Direktur dan Manager, dan bagaimana departemen tanpa SPV memilih penyetuju lintas departemen dengan cadangan Manager lalu Direktur. Juga mendaftar titik kode yang patah bila Direktur dipindah dari Kesekretariatan dan rencana migrasi data prod.",
       "kata_kunci": [
@@ -10487,8 +10487,8 @@
       "judul": "ADR - 0194 Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-21, dari `/analisa-kebutuhan`. Pemutus: irfanarfianto. Kode belum ada. Pecahan kerja: [[ANALISA - Struktur Organisasi Bertingkat dan Peta Penyetuju]].",
+      "status_emoji": null,
+      "status_teks": "🟢 Diterima, 2026-10-21, oleh irfanarfianto. Dari `/analisa-kebutuhan`. Pemutus: irfanarfianto. Kode belum ada. Pecahan kerja: [[ANALISA - Struktur Organisasi Bertingkat dan Peta Penyetuju]].",
       "publik": true,
       "tautan": [
         "ANALISA - Struktur Organisasi Bertingkat dan Peta Penyetuju",
@@ -10497,7 +10497,7 @@
         "REF - Alur Persetujuan",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "508c605937e21a5e0d77616b04c8b9353e199e50c20c97b6050c7067498a8511",
+      "hash": "8cc4c8a5336493f0e7800e66bc8d26c77c7ff96c3db122c2f562fe71a2168198",
       "ukuran_kb": 6.4,
       "ringkasan": "Menjawab: bagaimana mengetahui seorang karyawan bisa menyetujui apa saja di seluruh ERP, dari mana wewenang itu berasal (penetapan, izin, peran lama, jabatan), dan di layar mana mengubahnya. Menjelaskan endpoint baca-saja `GET /peta-penyetuju` dan halaman Peta Penyetuju di Pengaturan Organisasi, serta kenapa tahap mengatur penyetuju dari satu tempat menunggu ADR 0137.",
       "kata_kunci": [
@@ -22921,8 +22921,8 @@
         "ADR - 0194 Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat",
         "HRIS - Organization Structure"
       ],
-      "hash": "640ed763b1bae20db75f9d25f7def4798f6fa780c3fd8dd4f8e31476367e6283",
-      "ukuran_kb": 16.1,
+      "hash": "7f827611fbd2fa1923bd9820a9360db268ea15d098fa7c7708ed403bb4e62ace",
+      "ukuran_kb": 15.9,
       "ringkasan": "Menjawab: bagaimana pekerjaan struktur organisasi bertingkat (Direksi, Manager, Departemen) dan peta penyetuju per orang dipecah jadi issue induk dan sub-issue BE/FE, urutan pengerjaan dan deploy, serta kriteria \"Yang harus benar\" tiap bagian. Berisi rujukan issue GitHub, titik kode yang harus diubah, dan prasyarat ADR 0193/0194 diterima.",
       "kata_kunci": [
         "analisa",

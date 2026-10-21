@@ -1,9 +1,7 @@
 **Status**: 🟡 Daftar task dari `/analisa-kebutuhan` 2026-10-21. Keputusannya di [[ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen]] dan [[ADR - 0194 Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat]]; cara kerjanya di [[HRIS - Organization Structure]]. Dok ini papan kerja, bukan arsitektur.
 
-**Menunggu ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen" dan ADR "Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat" Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**
-
 - **Ukuran**: **Besar** (struktur): `bip-erp` butuh lebih dari satu PR (unit pimpinan + penyetuju lintas departemen + titik patah, lalu bagan bertingkat, lalu skrip migrasi) dan `erp-frontend` satu PR. **Sedang** (peta penyetuju): satu PR per repo. MyBharata tidak dihitung: departemen hanya ditampilkan sebagai teks, unit baru cuma jatuh ke warna abu-abu (`mybharata-app/lib/src/core/utils/department_color_utils.dart:13-50`, branch `dev`).
-- **Pemutus**: irfanarfianto
+- **Pemutus**: irfanarfianto (kedua ADR Diterima 2026-10-21)
 
 ## Kebutuhan yang dijawab
 
@@ -31,7 +29,7 @@ Direktur dan Manager tercatat di departemen Kesekretariatan karena ERP tak menge
 
 ## Keputusan
 
-ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen". Layak `Siap Agent` sesudah ADR berstatus Diterima. Induk tanpa PR; ditutup manual saat semua sub-issue merged.
+ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen". ADR berstatus 🟢 Diterima 2026-10-21 oleh irfanarfianto. Induk tanpa PR; ditutup manual saat semua sub-issue merged.
 
 ## Yang harus benar
 
@@ -65,7 +63,7 @@ Titik yang menganggap departemen = unit operasional (diverifikasi `origin/main` 
 
 ## Keputusan
 
-ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen" §2, §4. Layak `Siap Agent` sesudah ADR berstatus Diterima. Ringkas: `master_department.jenis` (`departemen` bawaan | `pimpinan`); unit pimpinan disaring dari daftar operasional dan system-list; peran & paket Direktur ikut unit Direksi; pengajuan penyetuju unit pimpinan tanpa atasan langsung HR.
+ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen" §2, §4. ADR berstatus 🟢 Diterima 2026-10-21 oleh irfanarfianto. Ringkas: `master_department.jenis` (`departemen` bawaan | `pimpinan`); unit pimpinan disaring dari daftar operasional dan system-list; peran & paket Direktur ikut unit Direksi; pengajuan penyetuju unit pimpinan tanpa atasan langsung HR.
 
 ## Yang harus benar
 
@@ -112,7 +110,7 @@ Bagan organisasi berkerangka departemen saja (`services/employee/org_chart.go`; 
 
 ## Keputusan
 
-ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen" §1, §3, §5. Layak `Siap Agent` sesudah ADR berstatus Diterima. Ringkas: Manager tetap per departemen (bebas lintas divisi); divisi tanpa kepala; endpoint bagan mengirim tingkat.
+ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen" §1, §3, §5. ADR berstatus 🟢 Diterima 2026-10-21 oleh irfanarfianto. Ringkas: Manager tetap per departemen (bebas lintas divisi); divisi tanpa kepala; endpoint bagan mengirim tingkat.
 
 ## Yang harus benar
 
@@ -150,7 +148,7 @@ Struktur baru butuh data: unit Direksi, Direktur dan Manager pindah, `position_i
 
 ## Keputusan
 
-ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen" §6. Layak `Siap Agent` sesudah ADR Diterima DAN keputusan HR di bawah tertulis. Skrip `.ps1` + `.js` dua fase (dry-run, apply), `mongodump` dulu, rollback, `ssh -n` + `Out-Host` + gerbang `[int]`.
+ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen" §6. ADR 🟢 Diterima 2026-10-21; masih menunggu keputusan HR di bawah. Skrip `.ps1` + `.js` dua fase (dry-run, apply), `mongodump` dulu, rollback, `ssh -n` + `Out-Host` + gerbang `[int]`.
 
 ## Yang harus benar
 
@@ -187,7 +185,7 @@ Pemilih penyetuju hanya menawarkan anggota departemen (`src/features/hris/master
 
 ## Keputusan
 
-ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen" §2, §4b, §5. Layak `Siap Agent` sesudah ADR Diterima.
+ADR "Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen" §2, §4b, §5. ADR berstatus 🟢 Diterima 2026-10-21 oleh irfanarfianto.
 
 ## Yang harus benar
 
@@ -227,7 +225,7 @@ Tidak perlu data prod tambahan.
 
 ## Keputusan
 
-ADR "Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat". Layak `Siap Agent` sesudah ADR Diterima. Induk tanpa PR.
+ADR "Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat". ADR berstatus 🟢 Diterima 2026-10-21 oleh irfanarfianto. Induk tanpa PR.
 
 ## Yang harus benar
 
@@ -261,7 +259,7 @@ Tak ada endpoint orang → wewenang (git grep pola peta/wewenang/penyetuju-per-o
 
 ## Keputusan
 
-ADR "Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat" §1-§2. Layak `Siap Agent` sesudah ADR Diterima. Ringkas: `GET /peta-penyetuju?employee_id=` (HRIS supervisor / IT), baris `{jenis, cakupan, sumber, mekanisme, layar_pengatur}`, satu resolver per sumber, modul gagal = `tidak_terbaca`.
+ADR "Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat" §1-§2. ADR berstatus 🟢 Diterima 2026-10-21 oleh irfanarfianto. Ringkas: `GET /peta-penyetuju?employee_id=` (HRIS supervisor / IT), baris `{jenis, cakupan, sumber, mekanisme, layar_pengatur}`, satu resolver per sumber, modul gagal = `tidak_terbaca`.
 
 ## Yang harus benar
 
@@ -299,7 +297,7 @@ Tak ada layar yang menampilkan wewenang menyetujui seseorang; yang ada `hak-efek
 
 ## Keputusan
 
-ADR "Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat" §3. Layak `Siap Agent` sesudah ADR Diterima.
+ADR "Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat" §3. ADR berstatus 🟢 Diterima 2026-10-21 oleh irfanarfianto.
 
 ## Yang harus benar
 
