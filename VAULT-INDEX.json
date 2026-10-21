@@ -656,22 +656,20 @@
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
         "CORE - API Master Gateway"
       ],
-      "hash": "4081858c7da987620bb4875e056c2adfdafe3e55b38310a5fb38919d51a462b1",
-      "ukuran_kb": 72.8,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service (beranda, laba, video, live, retur, pagu, ambang, live-shifts, setoran karya Live Support, pengumpul KPI), parameter dan amplop responsnya, serta rute mana yang digerbang RequireAnalitikMarketing. Juga menjawab cara mengaudit kelengkapan daftar rute dan status deploy tiap kelompok rute.",
+      "hash": "581be71c6e9c7e1bb230fd18a975ef99a96280251c5e8a84017949d28afc3baa",
+      "ukuran_kb": 74.7,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan Marketing Analytics Service (beranda, laba per toko/produk/iklan, video, live, retur, affiliate, ambang, pagu, sesi live host, setoran karya Live Support, pengumpul KPI), parameter dan bentuk responsnya, serta rute mana yang digerbang RequireAnalitikMarketing dan siapa yang boleh membacanya. Juga menjelaskan konvensi amplop respons (unavailable_channels, kolom_tidak_berlaku, paginasi drill) dan cara mengaudit kelengkapan daftar rute terhadap kode.",
       "kata_kunci": [
         "marketing analytics",
         "endpoint",
         "API",
-        "route",
-        "beranda",
+        "laba",
         "profit",
         "live-shifts",
-        "pagu",
-        "ambang",
-        "gerbang baca",
-        "RequireAnalitikMarketing",
-        "KPI live"
+        "sesi live",
+        "ambang ROAS",
+        "pagu iklan",
+        "RequireAnalitikMarketing"
       ]
     },
     {
@@ -1625,25 +1623,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "b791daf8cd42602a78bc1cfce758a5cb182062b331bc4f0b07132e9821a0f5aa",
-      "ukuran_kb": 597.3,
-      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS \"One Bharata\" (erp-frontend, Next.js), bagaimana login, token, dan SSO Identity Provider bekerja, bagaimana role `system_roles` menggerbangi sidebar dan menu, serta konvensi data-fetching (TanStack Query) dan bagan (Recharts + ChartContainer) yang berlaku. Juga memuat fitur multi-perusahaan (CompanySwitcher, rekrutmen lintas perusahaan), arah baru sidebar, daftar modul yang sudah diimplementasikan, dan catatan yang belum selesai.",
+      "hash": "83fff15b92edaad3cf7cf0d3b3ce9d39940d422bc4709a2b5e86e53f33eeac9d",
+      "ukuran_kb": 598.8,
+      "ringkasan": "Menjawab: apa itu portal web ERP (One Bharata / erp-frontend), stack yang dipakai, bagaimana login, token, SSO, dan role gating sidebar bekerja, serta fitur multi-perusahaan apa yang tersedia bagi admin pusat. Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts/ChartContainer, daftar modul yang sudah diimplementasikan, dan arah baru sidebar berbasis izin posisi.",
       "kata_kunci": [
-        "erp-frontend",
         "web ERP",
+        "erp-frontend",
         "One Bharata",
         "hris-dashboard",
-        "login",
-        "JWT",
         "SSO",
+        "login token",
         "system_roles",
         "sidebar",
-        "role gating",
-        "multi-perusahaan",
-        "TanStack Query",
-        "Recharts",
-        "i18n",
-        "Next.js"
+        "multi-tenant",
+        "TanStack Query"
       ]
     },
     {
@@ -2940,22 +2933,20 @@
         "Marketing - Marketing Dashboard (Analisis Rekap)",
         "Marketing - Marketing Analytics (Audit Ketersediaan Data)"
       ],
-      "hash": "f9d004b77a3e6710377237a7a2f16bf349533a11c690b01dc5947b4a23a1801b",
-      "ukuran_kb": 178.6,
-      "ringkasan": "Menjawab: bagaimana service agregasi laba dan performa marketing bekerja (mart_* pre-agregasi, penjadwal 48 jam, baca-saja ke integration_db), endpoint, job sync, dan koleksinya. Juga menjawab aturan pemakaian angka (larangan hitung ganda), kejujuran data, gerbang baca, dan fitur live-shifts serta setoran karya Live Support.",
+      "hash": "9c3c0cbf61b317a6e28a04f24d8162431d15b596c72c57587a4660a8a206f3e2",
+      "ukuran_kb": 179.5,
+      "ringkasan": "Menjawab: bagaimana service Marketing Analytics menghitung laba dan performa marketing per toko, produk, kampanye, iklan, video, dan live dari integration_db ke koleksi mart_*, bagaimana penjadwal dan job sync bekerja, serta prinsip arsitekturnya (baca-saja lintas database, health degraded, gerbang baca). Juga menjelaskan aturan pemakaian angka agar tidak hitung ganda (iklan_sia_sia, pembatalan, GMV live), kejujuran data per channel TikTok/Shopee/Lazada, alokasi bundel SKU, dan pencatatan sesi live host beserta ambil alih dan tutup otomatis.",
       "kata_kunci": [
         "marketing analytics",
         "mart",
         "laba",
         "profit attribution",
-        "penjadwal",
-        "live shifts",
-        "integration_db",
-        "hitung ganda",
-        "iklan_sia_sia",
-        "KPI live",
+        "live host",
+        "sesi live",
         "TikTok",
-        "Shopee"
+        "Shopee",
+        "hitung ganda",
+        "KPI Live Support"
       ]
     },
     {
