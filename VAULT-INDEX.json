@@ -10540,8 +10540,8 @@
       "judul": "ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan, 2026-10-21** (Pemutus: @bagusizzanm). **Belum ada kode.** Menunggu persetujuan tertulis di baris ini (`🟢 Diterima, <tanggal>, oleh <login>`). Bagian retur sebagian berdiri di atas butir 🟡 keputusan pemilik 2026-08-05 di ADR 0024, yang belum pernah masuk kode.",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima, 2026-10-21, oleh bagusizzanm** (Pemutus; instruksi \"lanjut kerjakan perbaikan yang finance butuhkan\" sesudah ADR disajikan lengkap). **Belum ada kode** (issue bip-erp#3397 dan #3398). Bagian retur sebagian berdiri di atas butir 🟡 keputusan pemilik 2026-08-05 di ADR 0024, yang belum pernah masuk kode.",
       "publik": true,
       "tautan": [
         "ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution",
@@ -10557,20 +10557,26 @@
         "Finance - Proses Retur dan Piutang Marketplace",
         "Finance - Proses Penjualan Marketplace dan Uang Masuk"
       ],
-      "hash": "df44e430b4900d1b147523343018d6ea17ebd9ba503d41e1ce3a24ad10eed755",
+      "hash": "8ff07d305522d9b0738875340184534275cf1eeb5c6d3dca5fb5761550b90b86",
       "ukuran_kb": 13.7,
-      "ringkasan": "Menjawab: mengapa retur sebagian Shopee (payout tetap cair) menumpuk refund di Biaya Admin dan bagaimana usulan pembaliknya lewat dokumen Retur Penjualan per qty dengan penerimaan hanya melunasi qty sisa. Juga menjawab bagaimana mutasi dompet AMS_COMMISSION_FEE_DEDUCT (99 mutasi, Rp1.136.138) dibukukan ke akun Biaya Affiliate, kv tanggal cutover per hari penerimaan yang menggerbanginya, jebakan kolom escrow (seller_return_refund vs drc_adjustable_refund, SubtotalAfterSellerDiscount), serta batasan tutup buku dan apa yang tidak diubah (TikTok, Lazada, periode sebelum 1 Oktober 2026).",
+      "ringkasan": "Menjawab: bagaimana retur sebagian Shopee (uang tetap cair, payout > 0) dibukukan lewat dokumen Retur Penjualan per qty dan penerimaan hanya melunasi qty sisa, serta mengapa Biaya Admin sebelumnya membengkak (contoh INC/2026/10/17/008-BH) akibat refund yang terbaca salah dan residual. Juga menjawab bagaimana potongan komisi AMS dari dompet Shopee (AMS_COMMISSION_FEE_DEDUCT, 99 mutasi Rp1.136.138) dibukukan ke akun Biaya Affiliate, apa batas berlakunya (kv tanggal cutover per hari penerimaan, mulai 1 Oktober 2026, periode tutup buku tidak disentuh), file kode yang akan disentuh, dan jebakan kolom escrow seperti SubtotalAfterSellerDiscount.",
       "kata_kunci": [
         "retur sebagian",
         "partial return",
         "Shopee",
-        "Retur Penjualan",
         "komisi AMS",
         "AMS_COMMISSION_FEE_DEDUCT",
         "Biaya Affiliate",
+        "Retur Penjualan",
+        "penerimaan",
+        "receipt",
         "Biaya Admin",
-        "penerimaan marketplace",
-        "escrow"
+        "escrow",
+        "seller_return_refund",
+        "cutover date",
+        "integration-service",
+        "Accurate",
+        "rekonsiliasi"
       ]
     },
     {
@@ -22653,7 +22659,7 @@
       "area": "Workspace",
       "jenis": "workspace",
       "status_emoji": "🟡",
-      "status_teks": "Daftar task dari `/analisa-kebutuhan` 2026-10-21. **Menunggu [[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]] Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.** Cara kerja dan akunnya di [[Finance - Pemetaan Komponen Marketplace ke Akun Accurate]] dan [[Microservices - Integration Service]]. Dok ini papan kerja, bukan arsitektur: coret item begitu PR-nya merge dan pindahkan keadaannya ke dok domain lewat `/sync-docs`.",
+      "status_teks": "Daftar task dari `/analisa-kebutuhan` 2026-10-21. Keputusannya [[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]] **🟢 Diterima 2026-10-21 oleh bagusizzanm**, jadi dok ini bisa ditunjuk `/brief`. Cara kerja dan akunnya di [[Finance - Pemetaan Komponen Marketplace ke Akun Accurate]] dan [[Microservices - Integration Service]]. Dok ini papan kerja, bukan arsitektur: coret item begitu PR-nya merge dan pindahkan keadaannya ke dok domain lewat `/sync-docs`.",
       "publik": false,
       "tautan": [
         "ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate",
@@ -22661,22 +22667,24 @@
         "Microservices - Integration Service",
         "ADR - 0152 FO yang Dilaporkan Sesudah Uang Cair Mengecilkan atau Menghapus INC, FO Tidak Masuk Penjualan"
       ],
-      "hash": "fadcab591959fd1ba5e225e17027739b68731e7b5b67781ed0953fadb191d672",
+      "hash": "b7586159ad15117ad60dbad44b3505bbf2991dc215808e4d640f06eec8cfab58",
       "ukuran_kb": 4.1,
-      "ringkasan": "Menjawab: kebutuhan finance AR apa yang melatarbelakangi dua perubahan penerimaan Shopee, bagaimana pekerjaannya dipecah menjadi dua task (T1 komisi AMS dompet ke Biaya Affiliate, T2 retur sebagian dibalik Retur Penjualan) dengan issue GitHub masing-masing, apa urutan deploy yang mengikat, dan apa verifikasinya. Juga mencatat hal terbuka yang tidak masuk ADR dan bahwa dok ini menunggu ADR 0195 Diterima.",
+      "ringkasan": "Menjawab: apa saja task kerja turunan dari ADR 0195 (T1 komisi AMS dompet Shopee ke Biaya Affiliate, issue bip-erp#3397; T2 retur sebagian dibalik Retur Penjualan, issue bip-erp#3398), apa kebutuhan finance AR dari sheet CEK REKON yang melatarinya, dan mengapa ukurannya Kecil (backend saja, frontend tidak tersentuh). Juga menjawab urutan deploy yang mengikat (kv tanggal diisi lewat layar Config Accurate, integration-service di-recreate saat worker_locks kosong, prod dijalankan manusia), cara verifikasi tiap task, dan hal terkait yang masih terbuka dan belum jadi issue.",
       "kata_kunci": [
         "analisa kebutuhan",
         "retur sebagian",
         "komisi AMS",
         "Shopee",
-        "daftar task",
-        "T1 T2",
-        "urutan deploy",
-        "kv tanggal cutover",
-        "CEK REKON",
-        "integration-service",
         "Biaya Affiliate",
-        "issue"
+        "daftar task",
+        "task list",
+        "issue 3397",
+        "issue 3398",
+        "urutan deploy",
+        "deploy order",
+        "Config Accurate",
+        "CEK REKON",
+        "finance AR"
       ]
     },
     {

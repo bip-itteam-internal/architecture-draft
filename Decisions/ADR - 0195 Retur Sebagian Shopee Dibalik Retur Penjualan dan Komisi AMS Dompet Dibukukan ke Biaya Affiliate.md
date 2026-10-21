@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan, 2026-10-21** (Pemutus: @bagusizzanm). **Belum ada kode.** Menunggu persetujuan tertulis di baris ini (`🟢 Diterima, <tanggal>, oleh <login>`). Bagian retur sebagian berdiri di atas butir 🟡 keputusan pemilik 2026-08-05 di ADR 0024, yang belum pernah masuk kode.
+> **Status**: 🟢 **Diterima, 2026-10-21, oleh bagusizzanm** (Pemutus; instruksi "lanjut kerjakan perbaikan yang finance butuhkan" sesudah ADR disajikan lengkap). **Belum ada kode** (issue bip-erp#3397 dan #3398). Bagian retur sebagian berdiri di atas butir 🟡 keputusan pemilik 2026-08-05 di ADR 0024, yang belum pernah masuk kode.
 
 ## Untuk Manajemen
 
