@@ -20,7 +20,7 @@ Manajemen ingin struktur organisasi "selayaknya perusahaan": pimpinan tidak terc
 ### Induk A: Struktur organisasi Direksi, Divisi, Departemen
 
 - **Repo**: bip-erp
-- **Issue**: _diisi saat dibuat_
+- **Issue**: [bip-erp#3368](https://github.com/bip-itteam-internal/bip-erp/issues/3368)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -54,7 +54,7 @@ ADR di atas Diterima.
 ### [BE] Struktur organisasi bagian 1/3: unit pimpinan berjenis dan alur pengajuan pimpinan
 
 - **Repo**: bip-erp
-- **Issue**: _diisi saat dibuat_
+- **Issue**: [bip-erp#3370](https://github.com/bip-itteam-internal/bip-erp/issues/3370)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -98,7 +98,7 @@ ADR Diterima.
 ### [BE] Struktur organisasi bagian 2/3: kepala divisi, Manager dari divisi, bagan bertingkat
 
 - **Repo**: bip-erp
-- **Issue**: _diisi saat dibuat_
+- **Issue**: [bip-erp#3371](https://github.com/bip-itteam-internal/bip-erp/issues/3371)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -136,7 +136,7 @@ Bagian 1/3 merged.
 ### [BE] Struktur organisasi bagian 3/3: skrip migrasi data prod (dijalankan manusia)
 
 - **Repo**: bip-erp
-- **Issue**: _diisi saat dibuat_
+- **Issue**: [bip-erp#3372](https://github.com/bip-itteam-internal/bip-erp/issues/3372)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -173,7 +173,7 @@ Bagian 1/3 dan 2/3 live di prod.
 ### [FE] Struktur organisasi: kepala divisi, bagan bertingkat, unit pimpinan di dropdown
 
 - **Repo**: erp-frontend
-- **Issue**: _diisi saat dibuat_
+- **Issue**: [erp-frontend#2668](https://github.com/bip-itteam-internal/erp-frontend/issues/2668)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -212,7 +212,7 @@ Tidak perlu data prod tambahan.
 ### Induk B: Peta penyetuju per orang lintas modul (tahap 1, baca saja)
 
 - **Repo**: bip-erp
-- **Issue**: _diisi saat dibuat_
+- **Issue**: [bip-erp#3369](https://github.com/bip-itteam-internal/bip-erp/issues/3369)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -246,7 +246,7 @@ ADR Diterima.
 ### [BE] Peta penyetuju per orang: agregator wewenang menyetujui
 
 - **Repo**: bip-erp
-- **Issue**: _diisi saat dibuat_
+- **Issue**: [bip-erp#3373](https://github.com/bip-itteam-internal/bip-erp/issues/3373)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -284,7 +284,7 @@ ADR Diterima.
 ### [FE] Peta penyetuju per orang: halaman di Pengaturan Organisasi
 
 - **Repo**: erp-frontend
-- **Issue**: _diisi saat dibuat_
+- **Issue**: [erp-frontend#2669](https://github.com/bip-itteam-internal/erp-frontend/issues/2669)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
