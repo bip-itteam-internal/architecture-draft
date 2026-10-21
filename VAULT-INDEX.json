@@ -133,20 +133,20 @@
         "HRIS - Payroll",
         "HRIS - Personalia"
       ],
-      "hash": "78e2124f0d07a39856cf1b779736c82cf14a0690d256795ded285a2845db08ec",
-      "ukuran_kb": 90.6,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service (auth/login, data personal & work, system-auth, master departemen/posisi/divisi/perusahaan/wilayah, kontrak, resign, promosi-mutasi, surat peringatan, KPI) beserta gerbang RBAC-nya. Juga menjawab cara memakai filter departemen bergrup (HRGA), kunci apa yang boleh dikirim ke system-auth, dan siapa boleh mengubah status aktif akun.",
+      "hash": "56d8bb0138c5127b1c01d314db919737c17ccfab93b32a0fd72082acbdc8d972",
+      "ukuran_kb": 90.8,
+      "ringkasan": "Menjawab: endpoint apa saja yang disediakan employee-service (login, onboarding, personal/work data, dokumen, jadwal, akun, master departemen/divisi/perusahaan/wilayah, KPI, kontrak, resign, promosi/mutasi, SP, quality) beserta gerbang RBAC tiap rute. Juga menjelaskan perilaku khusus seperti `/data-type/department?grouped=true`, daftar-izin kunci system-auth, dan cara menonaktifkan akun lewat `PATCH /account/active-status`.",
       "kata_kunci": [
         "employee-service",
-        "endpoint karyawan",
-        "employee API",
+        "API karyawan",
+        "endpoint HRIS",
         "master data departemen",
         "system-auth",
         "login",
-        "data-type grouped",
-        "master wilayah",
-        "resign",
-        "surat peringatan"
+        "data-type",
+        "master divisi",
+        "wilayah provinsi",
+        "RBAC"
       ]
     },
     {
@@ -7619,7 +7619,7 @@
         "ADR - 0035 HR Menonaktifkan Akun lewat Catatan Resign",
         "Microservices - Employee Service",
         "API - Employee Service",
-        "ADR - 0193 Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi",
+        "ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen",
         "HRIS - Recruitment",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin",
         "HRIS - Attrition",
@@ -7630,18 +7630,18 @@
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "ANALISA - Actual vs Planning MPP"
       ],
-      "hash": "9ecf2873953701cea31fd2210a1d57d1ebfb0324a08a381336048da3fdda48d1",
+      "hash": "14da966b3bdfd5083509b7cd15438b74e41034f4a259b7ac152ce142e394298d",
       "ukuran_kb": 15.3,
-      "ringkasan": "Menjawab: bagaimana kolom Actual pada lembar Actual vs Planning MPP dihitung sistem dari data karyawan per bulan, kenapa rencana MPP diberi sumbu bulan berlaku, dan kenapa Divisi dijadikan master data tersendiri. Juga menjelaskan kenapa angka bulan lampau ditahan sampai setiap penonaktifan karyawan punya tanggal keluar (selisih 188 vs 158 di Juni) serta pembagian kerja T1 sampai T6.",
+      "ringkasan": "Menjawab: bagaimana kolom Actual lembar MPP (Manpower Planning) dihitung sistem per bulan dan dibandingkan dengan Rencana, kenapa riwayat bulan lampau baru dibuka setelah setiap penonaktifan karyawan punya tanggal keluar, dan kenapa Divisi dibuat sebagai master data tersendiri. Juga memuat angka ukur prod (selisih headcount sistem vs lembar HRD) dan pecahan kerja T1-T6.",
       "kata_kunci": [
         "MPP",
         "manpower planning",
-        "rencana tenaga kerja",
         "actual vs planning",
         "headcount",
+        "rencana tenaga kerja",
+        "master divisi",
         "jejak keluar",
         "resign",
-        "master divisi",
         "rekrutmen",
         "headcount-periode"
       ]
@@ -10356,7 +10356,7 @@
       "publik": true,
       "tautan": [
         "ANALISA - Manager Departemen Penyetuju Pengajuan SPV",
-        "ADR - 0193 Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi",
+        "ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen",
         "HRIS - Employee Request & Approval",
         "HRIS - Organization Structure",
         "ADR - 0113 Actual vs Planning MPP Dihitung Sistem per Bulan, Berpijak pada Jejak Keluar Bertanggal",
@@ -10367,20 +10367,20 @@
         "HRIS - Key Performance Index",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "e247a49ea5edf78ebe4b2820325a90ad57e53f684c78be4c5eaacfa40e1823e3",
+      "hash": "873c1a1b98c3793a84dc6e0fe4f2ce1de158220ce80e579a5d6242f75c49cad7",
       "ukuran_kb": 12.3,
-      "ringkasan": "Menjawab: siapa yang menyetujui cuti, izin, sakit, dan perjalanan dinas milik SPV (Manager yang ditetapkan HR per departemen, bukan slot Direktur yang macet), departemen mana yang dikecualikan, dan bagaimana Manager melihat KPI seluruh karyawan departemen yang dinaunginya. Menjelaskan juga kenapa penetapan ini bukan supervised_by, penyetuju departemen, atasan langsung, Master Divisi, atau jenjang.",
+      "ringkasan": "Menjawab: siapa yang menyetujui cuti, izin, sakit, dan perjalanan dinas milik SPV (penyetuju departemen), bagaimana HR menetapkan Manager per departemen di master data, dan bagaimana Manager melihat KPI seluruh karyawan departemen yang dinaunginya. Menjelaskan kenapa penanda Manager sengaja bukan `supervised_by`, `is_supervisor`, jenjang, atau Master Divisi, serta apa yang tidak lewat Manager.",
       "kata_kunci": [
         "manager departemen",
-        "manager_employee_id",
-        "pengajuan SPV",
-        "cuti",
-        "leave",
+        "penyetuju SPV",
+        "approval cuti",
         "perjalanan dinas",
-        "business trip",
-        "approval",
         "KPI departemen",
-        "penyetuju"
+        "manager_employee_id",
+        "slot Direktur",
+        "master department",
+        "approver",
+        "jenjang Manager"
       ]
     },
     {
@@ -10452,12 +10452,12 @@
       ]
     },
     {
-      "path": "Decisions/ADR - 0193 Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi.md",
-      "judul": "ADR - 0193 Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi",
+      "path": "Decisions/ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen.md",
+      "judul": "ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen",
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-21, dari `/analisa-kebutuhan` (opsi A dipilih user). Pemutus: irfanarfianto. Kode belum ada. Pecahan kerja: [[ANALISA - Struktur Organisasi Bertingkat dan Peta Penyetuju]].",
+      "status_teks": "**Diusulkan**, 2026-10-21, dari `/analisa-kebutuhan` (opsi A dipilih user; direvisi hari yang sama: Manager dipilih per departemen bebas, penyetuju boleh lintas departemen). Pemutus: irfanarfianto. Kode belum ada. Pecahan kerja: [[ANALISA - Struktur Organisasi Bertingkat dan Peta Penyetuju]].",
       "publik": true,
       "tautan": [
         "ANALISA - Struktur Organisasi Bertingkat dan Peta Penyetuju",
@@ -10468,20 +10468,20 @@
         "ADR - 0137 Model Persetujuan Tunggal dan Pemisahan Tugas Lintas Modul",
         "REF - Alur Persetujuan"
       ],
-      "hash": "0bca38d035480fcb5928bae5e1a75abe879bbfd9b651d1df655f185976b30b55",
-      "ukuran_kb": 11.6,
-      "ringkasan": "Menjawab: bagaimana organisasi dimodelkan bertingkat Direksi, Divisi, Departemen, bagaimana Direktur dan Manager dipindah ke unit pimpinan (master_department berjenis pimpinan) tanpa mematahkan peran, paket izin, cuti, jadwal, dan bagan, serta bagaimana Manager departemen diturunkan dari kepala divisi. Juga mengatur alur pengajuan pimpinan (Direktur langsung ke HR, Manager disetujui Direktur) dan migrasi data prod yang dijalankan manusia.",
+      "hash": "d1e387581778599677a2d7000b6387df9896bbca7ede3bc3168f91f4e839c230",
+      "ukuran_kb": 14.6,
+      "ringkasan": "Menjawab: bagaimana struktur organisasi bertingkat Direksi, Manager, Departemen dimodelkan di ERP (unit pimpinan sebagai `master_department` berjenis `pimpinan`, Divisi untuk laporan), siapa menyetujui pengajuan Direktur dan Manager, dan bagaimana departemen tanpa SPV memilih penyetuju lintas departemen dengan cadangan Manager lalu Direktur. Juga mendaftar titik kode yang patah bila Direktur dipindah dari Kesekretariatan dan rencana migrasi data prod.",
       "kata_kunci": [
         "struktur organisasi",
-        "organization structure",
+        "org structure",
         "Direksi",
-        "divisi",
-        "division",
         "unit pimpinan",
-        "kepala divisi",
-        "Kesekretariatan",
+        "Manager",
+        "penyetuju lintas departemen",
+        "approver",
+        "bagan organisasi",
         "org chart",
-        "bagan organisasi"
+        "Kesekretariatan"
       ]
     },
     {
@@ -10495,23 +10495,23 @@
       "tautan": [
         "ANALISA - Struktur Organisasi Bertingkat dan Peta Penyetuju",
         "ADR - 0137 Model Persetujuan Tunggal dan Pemisahan Tugas Lintas Modul",
-        "ADR - 0193 Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi",
+        "ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen",
         "REF - Alur Persetujuan",
         "CORE - RBAC dan Permission Set"
       ],
-      "hash": "7482783b7f69f75084570d33421177084e80f18d1288d6b7beec810fb50aefd5",
+      "hash": "508c605937e21a5e0d77616b04c8b9353e199e50c20c97b6050c7067498a8511",
       "ukuran_kb": 6.4,
-      "ringkasan": "Menjawab: bagaimana melihat semua yang bisa disetujui seorang karyawan di seluruh ERP, dari mana wewenang itu berasal (penetapan, izin, peran lama, jabatan), dan di layar mana mengubahnya. Menjelaskan endpoint baca-saja GET /peta-penyetuju, resolver per sumber tanpa menyalin aturan, halaman Peta Penyetuju di Pengaturan, dan kenapa tahap mengatur dari satu tempat menunggu ADR 0137.",
+      "ringkasan": "Menjawab: bagaimana mengetahui seorang karyawan bisa menyetujui apa saja di seluruh ERP, dari mana wewenang itu berasal (penetapan, izin, peran lama, jabatan), dan di layar mana mengubahnya. Menjelaskan endpoint baca-saja `GET /peta-penyetuju` dan halaman Peta Penyetuju di Pengaturan Organisasi, serta kenapa tahap mengatur penyetuju dari satu tempat menunggu ADR 0137.",
       "kata_kunci": [
         "peta penyetuju",
         "approver map",
         "wewenang menyetujui",
         "persetujuan terpusat",
-        "effective-access",
-        "permission-holders",
-        "penyetuju per orang",
         "approval",
-        "pengaturan organisasi"
+        "effective-access",
+        "permission holders",
+        "lintas modul",
+        "ADR 0137"
       ]
     },
     {
@@ -13849,8 +13849,8 @@
         "ADR - 0044 Mutasi Antar-Tenant Mempertahankan employee_id",
         "ADR - 0029 Multi-Tenant Presensi Row-Level company_id",
         "API - Employee Service",
+        "ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen",
         "ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya",
-        "ADR - 0193 Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi",
         "Microservices - Form Builder Service",
         "CORE - RBAC dan Permission Set",
         "HRIS - Key Performance Index",
@@ -13868,20 +13868,20 @@
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "f95b0ac6986bca456889be9cd2c730942b24ca64216d7d28fe6f574aacc86b6d",
-      "ukuran_kb": 61.5,
-      "ringkasan": "Menjawab: bagaimana departemen, posisi (position_items), dan jenjang jabatan disimpan di master_department dan master_job_level, kenapa jenjang bukan sumber hak akses, siapa penyetuju pengajuan per departemen dan Manager departemen, serta bagaimana bagan organisasi bekerja. Juga menjelaskan cakupan supervisi supervised_by (mis. HRGA), urutan pencarian atasan, dan rencana struktur bertingkat Direksi, Divisi, Departemen.",
+      "hash": "f344eb630a5330d3c5a2efc606ba430ac6f06607a03ac02e823f3527fb42dfcd",
+      "ukuran_kb": 62.1,
+      "ringkasan": "Menjawab: bagaimana departemen, posisi/jabatan (`position_items`), jenjang jabatan, penyetuju pengajuan per departemen (`is_supervisor`), Manager departemen, dan cakupan supervisi `supervised_by` (mis. HRGA) dimodelkan dan dikelola. Juga menjelaskan urutan pencarian atasan, beda penyetuju dengan atasan langsung, bagan organisasi, kenapa jenjang bukan sumber hak akses, dan rencana struktur bertingkat Direksi.",
       "kata_kunci": [
         "struktur organisasi",
         "organization structure",
-        "departemen",
+        "master_department",
         "jabatan",
-        "position",
         "jenjang jabatan",
         "job level",
-        "org chart",
+        "is_supervisor",
         "supervised_by",
-        "penyetuju departemen"
+        "HRGA",
+        "org chart"
       ]
     },
     {
@@ -18225,7 +18225,7 @@
       "status_teks": "Implemented — seluruh baris terverifikasi di kode.",
       "publik": true,
       "tautan": [
-        "ADR - 0193 Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi",
+        "ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen",
         "ADR - 0194 Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat",
         "ADR - 0190 Manager Departemen Menyetujui Pengajuan SPV dan Melihat KPI Departemen yang Dinaunginya",
         "QA - Quality Operasional (CAPA, Incoming, Batch Release)",
@@ -18245,20 +18245,20 @@
         "Microservices - Procurement Service",
         "Microservices - Manufacture Service"
       ],
-      "hash": "f64fc55e2ed956e88be029aaa883f7724d49afa115fb7b99c8885e16650a2a18",
+      "hash": "78a5cb8e13b62e8b2eed5411e150d32a973836fc33e811769c2ace3181d51e59",
       "ukuran_kb": 17.6,
-      "ringkasan": "Menjawab: persetujuan apa saja yang ada di ERP Bharata dan siapa yang berwenang memutuskannya, dikelompokkan per mekanisme (slot dokumen, jabatan, izin/peran, penunjukan). Menjelaskan empat cara gerbang persetujuan ditulis sehingga menyapu routes.go saja menyesatkan, rincian alur Booking Ruang, dan wewenang setingkat Direktur.",
+      "ringkasan": "Menjawab: persetujuan apa saja yang ada di ERP Bharata dan siapa yang berwenang memutus masing-masing (cuti, dinas, pembelian, payroll, rekrutmen, CAPA, WMS, booking ruang, dll), dikelompokkan per mekanisme gerbang: slot dokumen, jabatan, izin/peran, dan penunjukan. Juga menjelaskan kenapa menyapu `routes.go` saja menyesatkan, rincian alur Booking Ruang, dan wewenang setingkat Direktur.",
       "kata_kunci": [
         "alur persetujuan",
         "approval flow",
+        "inventaris persetujuan",
         "penyetuju",
         "approver",
-        "gerbang",
-        "booking ruang",
         "SetaraDirektur",
-        "cuti",
+        "booking ruang",
+        "gerbang",
         "payroll approve",
-        "inventaris persetujuan"
+        "cuti"
       ]
     },
     {
@@ -22920,26 +22920,26 @@
       "area": "Workspace",
       "jenis": "workspace",
       "status_emoji": "🟡",
-      "status_teks": "Daftar task dari `/analisa-kebutuhan` 2026-10-21. Keputusannya di [[ADR - 0193 Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi]] dan [[ADR - 0194 Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat]]; cara kerjanya di [[HRIS - Organization Structure]]. Dok ini papan kerja, bukan arsitektur.",
+      "status_teks": "Daftar task dari `/analisa-kebutuhan` 2026-10-21. Keputusannya di [[ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen]] dan [[ADR - 0194 Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat]]; cara kerjanya di [[HRIS - Organization Structure]]. Dok ini papan kerja, bukan arsitektur.",
       "publik": false,
       "tautan": [
-        "ADR - 0193 Struktur Organisasi Direksi, Divisi, Departemen dengan Unit Pimpinan Berjenis dan Manager dari Kepala Divisi",
+        "ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen",
         "ADR - 0194 Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat",
         "HRIS - Organization Structure"
       ],
-      "hash": "ee0aa3c3ec4c0989b786951beb1c7590d4a040ce12bcf27b772081060ecdc34b",
-      "ukuran_kb": 15.0,
-      "ringkasan": "Menjawab: bagaimana pekerjaan struktur organisasi Direksi, Divisi, Departemen dan peta penyetuju per orang dipecah jadi issue induk dan sub-issue BE/FE, urutan pengerjaan dan deploy-nya, serta kriteria yang harus benar tiap bagian. Berisi draf issue (bip-erp#3368 dan turunannya) termasuk skrip migrasi prod yang dijalankan manusia.",
+      "hash": "640ed763b1bae20db75f9d25f7def4798f6fa780c3fd8dd4f8e31476367e6283",
+      "ukuran_kb": 16.1,
+      "ringkasan": "Menjawab: bagaimana pekerjaan struktur organisasi bertingkat (Direksi, Manager, Departemen) dan peta penyetuju per orang dipecah jadi issue induk dan sub-issue BE/FE, urutan pengerjaan dan deploy, serta kriteria \"Yang harus benar\" tiap bagian. Berisi rujukan issue GitHub, titik kode yang harus diubah, dan prasyarat ADR 0193/0194 diterima.",
       "kata_kunci": [
-        "analisa kebutuhan",
-        "struktur organisasi",
+        "analisa",
+        "struktur organisasi bertingkat",
         "peta penyetuju",
         "sub-issue",
         "Direksi",
-        "kepala divisi",
-        "migrasi data",
-        "unit pimpinan",
-        "issue breakdown"
+        "migrasi data prod",
+        "bagan organisasi",
+        "penyetuju lintas departemen",
+        "ANALISA"
       ]
     },
     {
