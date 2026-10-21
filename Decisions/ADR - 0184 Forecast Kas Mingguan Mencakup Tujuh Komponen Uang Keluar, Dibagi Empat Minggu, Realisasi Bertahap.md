@@ -170,6 +170,14 @@ Untuk tiap komponen ditampilkan proyeksi dan realisasinya per minggu.
        | CapEx (di luar cashflow, Decision 3) | Aset dlm Penyelesaian, Aset Tetap |
 
      - Pemetaan ini ditulis **sekali** di integration-service, sama seperti pemetaan akun → komponen tahap 1.
+     - *Penerapan C6b (diputuskan 2026-10-21, sesi orkestrator):*
+       - **Data mentah**: simpanan arus kas per akun lawan per minggu dari C6a (bip-erp#3376).
+       - **"Hanya baris minus" diukur per akun lawan per minggu.** Sel akun × minggu yang netonya minus dihitung sebagai uang keluar. Sel yang plus diabaikan, tidak mengurangi.
+       - **Bulan yang arus kasnya belum tersinkron tetap memakai sumber tahap 1** dengan `sifat_realisasi` apa adanya. Bulan yang sudah tersinkron memakai kas untuk seluruh komponen. Ini terjadi misalnya pada Juli–Agustus, karena penyegar C6a hanya menarik bulan berjalan dan bulan lalu. Akibatnya angka dan skor bulan lama tidak bergeser.
+       - **Yang berganti sumber hanya realisasi di tingkat komponen**: `komponen[]`, `minggu[]`, `total`, dan agregat KPI.
+         - `baris[]` (akun RAPB × minggu) tetap menjadi rincian proyeksi.
+         - Rincian realisasi per akun Arus Kas dikirim sebagai field baru di tiap komponen.
+         - Cakupan KPI pada bulan berbasis kas dihitung dari ketersediaan data arus kas bulan itu.
 6. **Total uang keluar riil berdampingan.** Laporan bulanan menampilkan Σ uang keluar seluruh rekening bank dari salinan ADR 0163, di samping total realisasi komponen, sebagai kontrol. Angka ini **tidak** dipakai KPI.
 7. **KPI #4 ikut definisi baru.**
    - Rumus akurasi tidak berubah; yang berubah populasi dan proyeksinya.
