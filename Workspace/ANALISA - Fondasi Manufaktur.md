@@ -55,7 +55,7 @@ Repo: **BE** = bip-erp, **FE** = erp-frontend. Status per 2026-10-13.
 | M-15 | Satu rute Production Order / MO Marketing | - | K-10 | Menunggu keputusan |
 | M-16 | Menu Manufaktur dan Quality ke model [[ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi]] + panduan per menu | induk BE #3315 (FE #2626 dan sub Manufaktur) | - | Berjalan. Manufaktur merged FE #2636 (2026-10-20): menu per urusan, "Antrean Pengajuan" dibuang karena pengajuan sudah di Portal Persetujuan, panduan per menu. Gudang Online (Tinggar/Sadewa) di FE #2663, terbuka: gerbang menu pindah dari teks judul/grup ke URL, dua urusan + CAPA. Kedua PR dikunci uji potret per jabatan: menu yang terlihat tiap jabatan identik dengan sebelum disusun ulang. Deploy FE oleh manusia |
 | M-17 | Kartu stok per lot, cetak | FE #1867 | K-5 | Menunggu keputusan |
-| M-18 | Mutasi antar gudang terkait status FG | FE #1869 | - | Siap |
+| M-18 | Mutasi antar gudang terkait status FG | FE #1869 | K-1, K-7 | Menunggu keputusan. Ditinjau 2026-10-21: WMS belum punya konsep transfer antar gudang sama sekali; fiturnya transaksi dua sisi + persetujuan + kirim ke Accurate, jadi bentuknya bergantung pada pemilik angka stok (K-1) dan pemilik master gudang (K-7) |
 | M-19 | Kepatuhan UI halaman Manufaktur ke `rules/ui-checklist.md` (audit 2026-10-15): komponen bersama, i18n, konfirmasi aksi berbahaya. **Hanya halaman yang tak akan dirombak butir fondasi**; Gudang RM/FG, Material Order, Dokumen Produksi Batch, dan Saldo/opname menunggu M-10 sampai M-13, Master Barang menunggu K-7 (kajian TBD 13) | sub-issue FE di bawah BE #3068 (judul "Manufaktur Batch ...") | - | Berjalan. Sisa halaman daftar: Substitusi, Piutang Konsinyasi, Master Lokasi, Reports. Gudang FG dan Gudang RM dirapikan **tampilannya saja** atas permintaan user 2026-10-20 (perilaku dikunci uji lebih dulu, satu-satunya perubahan perilaku: paginasi): FG FE #2642, #2645, #2650; RM FE #2652, #2654; semuanya merged 2026-10-21. Keanehan perilaku yang ditemukan dicatat sebagai issue, tidak diperbaiki: FE #2644, #2647, #2651, #2653 (dua terakhir High: barang keluar RM tanpa tanggal; Kirim FG tanpa sopir tak pernah bisa diterima). Pecah berkas besar (GBJ, GBB, MO) tetap ditunda sampai butir fondasinya diputuskan |
 
 ## Fase 3: fitur baru
@@ -70,7 +70,7 @@ Repo: **BE** = bip-erp, **FE** = erp-frontend. Status per 2026-10-13.
 | M-25 | Laporan mutasi persediaan dan fisik vs Accurate | - | K-1 | Menunggu keputusan |
 | M-26 | HPP per batch | BE #2505 (keamanan biaya variabel) | K-6 | Menunggu keputusan |
 | M-27 | Dashboard KPI Quality | BE #2246 | M-11, M-13 | Menunggu |
-| M-28 | CAPA dari komplain dan penyimpangan | BE #2251, #2191, #2247; #2235 (Marketing) | - | Siap |
+| M-28 | CAPA dari komplain dan penyimpangan | BE #2251, #2191, #2247; #2235 (Marketing) | keputusan QA Manager | Menunggu keputusan. Ditinjau 2026-10-21: satu-satunya bagian kode (#2191, CAPA menyimpan id komplain) bertentangan dengan [[ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori]] keputusan 9 ("tidak disambungkan ke CAPA sekarang"); perlu tunda atau amandemen ADR, plus satu komplain satu CAPA atau banyak. #2251, #2247, #2235 soal adopsi (kode ada, belum dipakai), bukan kode |
 | M-29 | Pengawasan proses produksi | FE #1848 | M-10 | Menunggu |
 
 ## Fase 4: berikutnya

@@ -21382,10 +21382,11 @@
         "Microservices - Manufacture Service",
         "API - Manufacture Service",
         "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
+        "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "fbae1e3b29796cf9603b978433e6c738a475f0beaf86f1a2fc39b7e58c9559bd",
-      "ukuran_kb": 10.8,
+      "hash": "5fc8dd4a1c514842ea420e74b4c31aeb1d316a7b6be8cb4de81fc277f5ab2c24",
+      "ukuran_kb": 11.4,
       "ringkasan": "Menjawab: butir kerja apa saja dalam penataan fondasi Manufaktur (produksi, PPIC, gudang bahan baku dan barang jadi, Quality), mana yang siap dikerjakan dan mana yang menunggu keputusan, siapa pemutus tiap keputusan (stok pabrik, zona WIP, rilis batch, status bahan masuk), dan issue/PR mana yang sudah memegang tiap butir. Juga aturan pakai papan: cari butir dulu sebelum membuat issue atau kode baru, dan urutan kerja per fase.",
       "kata_kunci": [
         "fondasi manufaktur",
@@ -21396,8 +21397,8 @@
         "batch record",
         "Quality",
         "keputusan terbuka",
-        "sidebar manufaktur",
-        "UI checklist"
+        "CAPA",
+        "transfer antar gudang"
       ]
     },
     {
