@@ -119,7 +119,19 @@ Untuk tiap komponen ditampilkan proyeksi dan realisasinya per minggu.
    - Operasional (marketing, gaji, adum) diambil dari RAPB tanpa penyusutan.
    - Material, BOP, Pajak, dan Aset diambil dari **isian proyeksi per komponen per bulan** oleh Cost Control. Gerbang izinnya `finance.anggaran.kelola`, dengan pola isian yang sama dengan anggaran gabungan.
    - BOP = isian proyeksi ditambah bagian RAPB bila akun 5xxx dianggarkan. Aturannya dikunci di task BE supaya tidak terhitung ganda.
-3. **Aset tahunan.** Anggaran aset diisi per tahun, dan layar menampilkan "sisa anggaran tahun berjalan" = anggaran tahun − realisasi aset sejak Januari. Aset ikut total bulanan hanya lewat proyeksi bulan itu.
+3. ~~**Aset tahunan.** Anggaran aset diisi per tahun, dan layar menampilkan "sisa anggaran tahun berjalan" = anggaran tahun − realisasi aset sejak Januari. Aset ikut total bulanan hanya lewat proyeksi bulan itu.~~
+
+   **Diamandemen 2026-10-21 (Azzerith, atas usulan Finance/Tika di WA hari itu): Belanja Modal (CapEx) di luar cashflow bulanan.**
+   - **Aset bukan lagi komponen cashflow.** Aset tidak ikut total proyeksi, total realisasi, akurasi, maupun KPI #4/F4. Ia tampil sebagai bagian terpisah **di bawah** forecast. Alasannya, waktu realisasi aset tidak bisa dijadwalkan per minggu (Gudang Baru Rp 461 jt jatuh di September, padahal anggarannya dibagi rata), sehingga memasukkannya membuat akurasi naik-turun karena hal yang bukan kendali Cost Control.
+   - **Anggaran aset per periode**, bukan per tahun. Periode berisi bulan mulai, bulan selesai, dan nominal; contohnya RAPB Rev 3 Juli–Desember 2026 sebesar Rp 2,3 M (sheet "Rincian CAPEX"). Periode tidak boleh tumpang tindih.
+   - **Isi bagian CapEx:**
+     - proyeksi per bulan = anggaran periode ÷ jumlah bulan periode, hanya sebagai info;
+     - realisasi bulan laporan;
+     - realisasi kumulatif sejak awal periode;
+     - **sisa** = anggaran − kumulatif.
+   - Sumber realisasinya tetap buku besar (amandemen Decision 5, 2026-10-20). Isian proyeksi Aset per bulan (C2) tidak dipakai lagi.
+   - **Rincian per anggaran CapEx** (4 anggaran di RAPB: Setup Divisi Pangan, Pembangunan Gudang, Aset Adum, Aset Gudang) belum dikerjakan. Tahap ini hanya menampilkan total. Rincian menyusul bila transaksi CapEx di Accurate bisa dipetakan per anggaran, misalnya lewat kolom Proyek; ini masih ditanyakan ke Finance.
+   - Akibatnya jumlah komponen cashflow menjadi **enam** (Material, BOP, Marketing, Gaji, Ops adum, Pajak), ditambah CapEx sebagai info.
 4. **Empat minggu.** Amandemen ADR 0161 K5.
    - Minggu 1–3 masing-masing 7 hari dari tanggal 1; minggu 4 berisi tanggal 22 sampai akhir bulan.
    - Porsi bawaan rata ¼.
