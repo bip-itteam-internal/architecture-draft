@@ -155,6 +155,8 @@ yang fixture-nya sengaja membuat kedua cara memberi jawaban berbeda.
 - **Payout ≈ 0** → retur tetap **di-skip**; kompensasi yang melunasi faktur, membukukan retur berarti pembalikan dobel.
 - **Payout > 0** → kompensasi **tidak lagi menyerap**, jadi alasan men-skip retur hilang bersamanya.
 
+*Catatan 2026-10-21: gerbang retur di atas hanya untuk TikTok. [[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]] (🟡 Diusulkan) melonggarkan gerbang payout > 0 khusus untuk retur sebagian **Shopee**; TikTok tidak berubah.*
+
 ⚠️ **Pemeriksaan kas akhir untuk payout ≤ 0 WAJIB dipertahankan.** Bentuk yang tampak lebih
 sederhana (`payout > 0 → tidak diserap; selain itu → diserap`) merusak kasus payout **negatif**
 yang kompensasinya tak menutup refund: kas akhirnya tetap ≤ 0, penjualannya memang batal, dan

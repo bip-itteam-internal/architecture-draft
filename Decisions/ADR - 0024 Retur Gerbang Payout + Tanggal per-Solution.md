@@ -30,8 +30,8 @@ Dipasang di `SyncOrderReturn` (auto) & `RetryDailyReturn` (manual tolak payout>0
 
 ## Consequences
 
-- **Dobel mustahil by-design**: payout>0 & payout≈0 saling eksklusif — Receipt ATAU Retur, tak pernah keduanya.
-- **Income/Auto Sync Income sync TIDAK diubah** — ia sudah benar (menyerap refund payout>0, defer payout≈0 ke retur). Perbaikan 100% di sisi retur.
+- **Dobel mustahil by-design**: payout>0 & payout≈0 saling eksklusif — Receipt ATAU Retur, tak pernah keduanya. ⚠️ *Untuk retur sebagian Shopee mulai penerimaan 1 Okt 2026 premis ini diusulkan diubah ([[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]], 🟡 Diusulkan 2026-10-21): retur dibukukan DAN penerimaan hanya melunasi qty sisa, serentak, bukan keduanya menyerap nilai yang sama.*
+- **Income/Auto Sync Income sync TIDAK diubah** — ia sudah benar (menyerap refund payout>0, defer payout≈0 ke retur). Perbaikan 100% di sisi retur. ⚠️ *Terukur 2026-10-21 tidak benar untuk retur sebagian Shopee: `refundShopee` menjumlahkan `seller_return_refund` dan `drc_adjustable_refund` sehingga refund terbaca −20.616 (bukan −92.001) dan sisanya Rp112.617 masuk Biaya Admin 6112 (order `261010944296TR`). Sisi income juga diubah oleh ADR 0195.*
 - **Tanggal benar go-forward**: refund-only pakai tanggal ajukan (stabil), barang-balik pakai tanggal fisik sampai gudang.
 - **Menggantikan**: ADR-0023 **keputusan #1** (accepted-seragam) — premisnya salah; ADR-0023 **keputusan #2** — struktur split tetap, **basis cutover retur diubah** (tanggal-retur → hari-kirim, lihat Decision #3). Juga menutup premis "refund-only selalu jadi retur" di [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] / [[ADR - 0012 Retur Refund-only Push-all]].
 - **Cleanup data existing (✅ SELESAI 2026-07-19)**: `cmd/returndescope` mengeluarkan **1565 retur hari-kirim < 1 Jul** dari auto (**1007 dok Retur Penjualan dihapus dari Accurate** via `delete.do`, semua ditandai `SKIPPED`); **1 dobel post-cutover** `RTR/2026/07/16/006-BH` (payout>0 + receipt) di-void. Era kept ≥ 1 Jul: 615 SENT sah + 8 FAILED (SKU era-baru, ditunda).
@@ -119,6 +119,8 @@ Pembatalan kini memakai `basePorsi` (harga faktur) dan selisih basis pulang lewa
 📌 **Belum dikerjakan**: menyembunyikan baris jejak `SKIPPED` saat ordernya sudah punya baris hidup. Menyaring setelah paginasi merusak ukuran halaman; menandai baris saat booking adalah perubahan tulis tersendiri. Sesudah PR ini `2607180VU58AJP` tampil **2 baris** (1 jejak + 1 retur nyata), bukan 3.
 
 ### 🟡 Keputusan bisnis 2026-08-05 — nilai barang SELALU via retur (BELUM diimplementasi)
+
+> **Diperbarui 2026-10-21:** untuk **retur sebagian Shopee** (payout > 0) keputusan ini dijabarkan dan diusulkan diimplementasikan oleh [[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]] (🟡 Diusulkan), digerbangi kv tanggal per hari penerimaan mulai 2026-10-01. Kanal lain dan jalur dompet RR tetap seperti tertulis di bawah.
 
 **Status: 🟡 Diputuskan, belum ada di kode.** Gerbang payout masih aktif di produksi per 2026-08-06.
 

@@ -44,7 +44,7 @@ Laci kosong berarti barisnya **tidak dikirim**, kecuali `sample-shipping-account
 
 Bagian ini yang paling mahal bila dilewatkan. Kolom yang namanya terdengar berdiri sendiri sering merupakan **bagian dari kolom lain**, dan menjumlahkannya menghitung rupiah yang sama dua kali. Gagalnya bukan galat, melainkan angka masuk akal yang salah.
 
-**Komponen sejajar, aman dijumlahkan** sebagai beban: Biaya Layanan, Ongkir, Afiliasi, Iklan, Penyesuaian, Pajak, Asuransi (setelah clamp), dan Pendapatan Lain-lain (bertanda negatif).
+**Komponen sejajar, aman dijumlahkan** sebagai beban: Biaya Layanan, Ongkir, Afiliasi, Iklan, Penyesuaian, Pajak, Asuransi (setelah clamp), dan Pendapatan Lain-lain (bertanda negatif). Komisi AMS yang dipotong di **mutasi dompet** Shopee sejajar dengan komisi AMS di escrow, bukan duplikatnya: terukur 2026-10-21, 99 dari 99 order bermutasi AMS punya komisi AMS 0 di escrow dan income ([[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]]).
 
 **Himpunan bagian, JANGAN dijumlahkan ke induknya:**
 
@@ -55,7 +55,7 @@ Bagian ini yang paling mahal bila dilewatkan. Kolom yang namanya terdengar berdi
 | `order_seller_discount` | `seller_discount` | duplikat agregat, terbukti di data escrow produksi |
 | `seller_shipping_discount` | ongkir neto | subsidi seller sudah terpotong di ongkir neto |
 | Komisi afiliasi TikTok sebelum PIT | komisi afiliasi + pajak kreator | informasional, bukan komponen |
-
+| `drc_adjustable_refund` Shopee | (bukan refund; terukur mendekati prorata voucher Shopee) | menjumlahkannya dengan `seller_return_refund` membuat refund retur sebagian terbaca −20.616, bukan −92.001, dan sisanya masuk residual Biaya Admin ([[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]]) |
 **Bukan komponen sama sekali:**
 
 - **Diskon adalah penyeimbang, bukan data.** Ia dihitung mundur agar dokumen balance, dan **bisa bernilai positif**. Bila kolom ini terlihat aneh, yang salah biasanya kolom lain.
@@ -94,7 +94,7 @@ Daftar ini penting supaya ketiadaannya tidak dibaca sebagai kelalaian:
 - Kompensasi cicilan kedua dan seterusnya, ditahan untuk dicatat AR ([[ADR - 0097 Kompensasi Shopee Susulan Ditahan dan Dicatat AR lewat Koreksi Manual ERP]]).
 - Kompensasi untuk order yang tidak dibukukan sebagai penjualan.
 - Beberapa field escrow Shopee: voucher dari Shopee, proteksi produk final (wadah saja), promosi kartu kredit, biaya transaksi pembeli.
-- Jenis mutasi dompet yang benar-benar tak dikenal: tidak ditebak akunnya, hanya dilaporkan.
+- Jenis mutasi dompet yang benar-benar tak dikenal: tidak ditebak akunnya, hanya dilaporkan. ⚠️ **Potongan komisi AMS di dompet Shopee (`AMS_COMMISSION_FEE_DEDUCT`) sudah tidak termasuk "tak dikenal" menurut usulan [[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]] (🟡 Diusulkan 2026-10-21): dibukukan ke akun Biaya Affiliate (`affiliate-commision`), satu baris per toko-hari, mulai penerimaan 2026-10-01. Sampai kodenya ada, ia masih jatuh ke "tak dikenal" (terukur prod: 99 mutasi, −Rp1.136.138 pada 12–13 Okt tidak terbukukan).**
 - Order fiktif (FO): tidak dibukukan ke Accurate sama sekali.
 
 ## Klasifikasi per marketplace

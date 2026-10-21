@@ -18,7 +18,7 @@ Retur divalidasi di empat sumber (ERP, marketplace, Accurate, gudang); retur yan
 
 ## Sudah ada di ERP
 
-Sinkron retur ke Accurate dengan gerbang payout ([[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]]) dan gerbang gudang: retur barang kembali ditahan PENDING sampai gudang men-scan barangnya ([[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]]). Per 2026-08-06: 908 baris PENDING, 900 menunggu scan ([[Microservices - Integration Service]]). Order yang dikirim sebelum 1 Juli 2026 memang dibukukan manual oleh Finance.
+Sinkron retur ke Accurate dengan gerbang payout ([[ADR - 0024 Retur Gerbang Payout + Tanggal per-Solution]]) dan gerbang gudang: retur barang kembali ditahan PENDING sampai gudang men-scan barangnya ([[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]]). Per 2026-08-06: 908 baris PENDING, 900 menunggu scan ([[Microservices - Integration Service]]). Order yang dikirim sebelum 1 Juli 2026 memang dibukukan manual oleh Finance. Pembagian tugas yang finance tetapkan 2026-08-31 (penerimaan mengurus kas dan alokasi piutang, pendapatan dan stok dibalik dokumen Retur Penjualan) kini tertulis di [[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]].
 
 ## Alur target
 
@@ -38,7 +38,7 @@ Gudang men-scan retur tepat waktu → retur terbukukan otomatis → AR menangani
 
 ## Kontrol wajib
 
-Retur yang sudah diserap penerimaan tidak dibukukan lagi (gerbang payout).
+Retur yang sudah diserap penerimaan tidak dibukukan lagi (gerbang payout). ⚠️ *Untuk retur sebagian Shopee yang uangnya tetap cair, usulan [[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]] (🟡 Diusulkan 2026-10-21) mengubahnya mulai penerimaan 1 Okt 2026: retur dibukukan dan penerimaan hanya melunasi qty sisa. Terukur: refund retur sebagian sekarang masuk Biaya Admin, bukan pengurang penjualan.*
 
 ## Ukuran efisiensi
 
