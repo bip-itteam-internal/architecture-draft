@@ -10162,18 +10162,20 @@
         "HRIS - Matriks KPI per Departemen",
         "REF - Kepemilikan Data"
       ],
-      "hash": "b797aa04410f9a6b4f767d724b0a0037dc146c2c081e82cc5803f82c62122693",
-      "ukuran_kb": 20.7,
-      "ringkasan": "Menjawab: mengapa forecast kas mingguan diperluas dari 6 akun menjadi tujuh komponen uang keluar (material, BOP, marketing, gaji, ops adum, pajak, aset), bagaimana sebulan dibagi empat minggu, dan dari mana proyeksi serta realisasi tiap komponen diambil. Juga menjawab bagaimana KPI akurasi Cost Control #4 ikut terdampak dan mengapa realisasi tahap pertama masih berbasis akrual, bukan kas.",
+      "hash": "b362cd99141f4893c81c91701d3a67fb1cc3b6908583b9656c8071634334c956",
+      "ukuran_kb": 21.8,
+      "ringkasan": "Menjawab: komponen apa saja yang masuk forecast kas mingguan Cost Control (Material, BOP, Marketing, Gaji, Ops adum, Pajak; CapEx di luar cashflow), dari mana proyeksi dan realisasinya diambil, dan bagaimana tahap 2 berbasis kas memetakan akun lawan laporan Arus Kas (Langsung) Accurate ke komponen. Juga menjelaskan dampaknya ke KPI #4 akurasi forecast, aturan bulan yang belum tersinkron, dan urutan deploy.",
       "kata_kunci": [
         "forecast kas mingguan",
         "cashflow",
-        "uang keluar",
-        "tujuh komponen",
-        "realisasi akrual",
-        "cash basis",
-        "KPI Cost Control #4",
-        "proyeksi mingguan"
+        "arus kas langsung",
+        "komponen uang keluar",
+        "akurasi forecast",
+        "KPI Cost Control",
+        "realisasi kas",
+        "akrual",
+        "CapEx",
+        "RAPB"
       ]
     },
     {
