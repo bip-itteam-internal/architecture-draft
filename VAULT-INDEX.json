@@ -21206,20 +21206,20 @@
         "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "1cfd73ecf462c2dead1cfbc567bf1e6dc1c00338ed857f34c47bb69d6b147411",
-      "ukuran_kb": 9.8,
-      "ringkasan": "Menjawab: apa saja butir kerja penataan fondasi Manufaktur (M-01 sampai M-42) per fase, keputusan mana yang ditunggu (K-1 sampai K-11) dan siapa Pemutusnya, butir mana yang siap dikerjakan, serta aturan urutan kerja dan pencatatan kode M di setiap PR.",
+      "hash": "fbae1e3b29796cf9603b978433e6c738a475f0beaf86f1a2fc39b7e58c9559bd",
+      "ukuran_kb": 10.8,
+      "ringkasan": "Menjawab: butir kerja apa saja dalam penataan fondasi Manufaktur (produksi, PPIC, gudang bahan baku dan barang jadi, Quality), mana yang siap dikerjakan dan mana yang menunggu keputusan, siapa pemutus tiap keputusan (stok pabrik, zona WIP, rilis batch, status bahan masuk), dan issue/PR mana yang sudah memegang tiap butir. Juga aturan pakai papan: cari butir dulu sebelum membuat issue atau kode baru, dan urutan kerja per fase.",
       "kata_kunci": [
         "fondasi manufaktur",
         "papan kerja",
-        "backlog manufaktur",
-        "keputusan K",
-        "butir M",
         "PPIC",
-        "gudang",
-        "QC",
-        "Batch Record",
-        "urutan kerja"
+        "gudang RM",
+        "gudang FG",
+        "batch record",
+        "Quality",
+        "keputusan terbuka",
+        "sidebar manufaktur",
+        "UI checklist"
       ]
     },
     {
