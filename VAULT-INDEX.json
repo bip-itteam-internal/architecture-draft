@@ -10331,8 +10331,8 @@
       "judul": "ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "Diusulkan, 2026-10-20. Bentuknya disetujui user dalam sesi `/analisa-kebutuhan` 2026-10-20 (desain layar di Figma, opsi endpoint massal di payroll-service). Merevisi sebagian [[ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari]] (butir persetujuan). Pemutus: `irfanarfianto`. Blueprint: `Workspace/ANALISA - Penetapan Badan Usaha Massal dari HRIS.md`.",
+      "status_emoji": null,
+      "status_teks": "🟢 Diterima, 2026-10-21, oleh irfanarfianto (Pemutus). Diusulkan 2026-10-20. Data PROD 2026-10-21 (bip-erp#3324): 62 `employee_salary` tanpa `company_id`, 5 versi menunggu persetujuan, 0 rencana; penerima notifikasi `payroll.approve.hrd` = 1 orang lewat paket JABATAN `HRD Supervisor` (bukan akun), jadi penerima di-resolve lewat paket jabatan. Bentuknya disetujui user dalam sesi `/analisa-kebutuhan` 2026-10-20 (desain layar di Figma, opsi endpoint massal di payroll-service). Merevisi sebagian [[ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari]] (butir persetujuan). Pemutus: `irfanarfianto`. Blueprint: `Workspace/ANALISA - Penetapan Badan Usaha Massal dari HRIS.md`.",
       "publik": true,
       "tautan": [
         "ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari",
@@ -10347,20 +10347,20 @@
         "REF - Kepemilikan Data",
         "ADR - 0182 Badan Usaha Satu Daftar untuk HR dan Finance, Entitas CV Menempel Tanpa Nama Sendiri"
       ],
-      "hash": "d0568f24f3321ff2663b34ac183ed8a19c119f56ffaeee4f93f194f6a95ca6ce",
-      "ukuran_kb": 12.0,
-      "ringkasan": "Menjawab: bagaimana HR menetapkan badan usaha (PT/CV) penggaji untuk banyak karyawan sekaligus dari menu HRIS, kenapa penggantian penggaji saja tidak perlu persetujuan SPV HRD, dan apa yang terjadi pada karyawan yang belum punya struktur gaji (rencana badan usaha). Juga menjelaskan endpoint massal mode cek/terapkan, notifikasi per batch, dan batasannya (gaji/BPJS/PTKP tetap lewat persetujuan, kontrak tidak disentuh).",
+      "hash": "4814c8d7ead3dc05e918a92c7cb8603b7ec28e464a9522a58cd42dca9789b28d",
+      "ukuran_kb": 12.4,
+      "ringkasan": "Menjawab: bagaimana HR menetapkan badan usaha penggaji (company_id, PT/CV) untuk banyak karyawan sekaligus dari menu HRIS, kenapa penggantian penggaji saja tidak lagi menunggu approval SPV HRD, dan apa yang terjadi pada karyawan yang belum punya struktur gaji (rencana badan usaha). Juga menjelaskan endpoint massal mode cek/terapkan di payroll-service, versi gaji salinan yang langsung terjadwal, notifikasi per batch, dan batasannya (gaji/BPJS/PTKP tetap lewat persetujuan, kontrak tidak disentuh).",
       "kata_kunci": [
-        "penetapan badan usaha",
         "badan usaha penggaji",
         "company_id",
         "penetapan massal",
-        "bulk",
+        "bulk assignment",
+        "versi gaji",
+        "salary version",
         "tanpa persetujuan",
-        "PersetujuanDilewati",
-        "keputusan_massal",
-        "rencana badan usaha",
-        "HRIS"
+        "approval",
+        "payroll.salary.write",
+        "rencana badan usaha"
       ]
     },
     {
@@ -22212,8 +22212,8 @@
       "judul": "ANALISA - Penetapan Badan Usaha Massal dari HRIS",
       "area": "Workspace",
       "jenis": "workspace",
-      "status_emoji": "⛔",
-      "status_teks": "**Menunggu [[ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti]] Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.**",
+      "status_emoji": null,
+      "status_teks": "ADR 0189 🟢 Diterima 2026-10-21 oleh irfanarfianto; data prod ditempel di bip-erp#3324; label `Siap Agent` dipasang di bip-erp#3324 dan erp-frontend#2631.",
       "publik": false,
       "tautan": [
         "ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti",
@@ -22222,19 +22222,19 @@
         "Microservices - Payroll Service",
         "REF - Kepemilikan Data"
       ],
-      "hash": "7b690a913a73af19fd9006c3321ea78988a2a1664618a69c119d8996cf3768ad",
-      "ukuran_kb": 12.7,
-      "ringkasan": "Menjawab: bagaimana pekerjaan penetapan badan usaha penggaji massal dipecah jadi issue induk, [BE] bip-erp, dan [FE] erp-frontend, apa kriteria 'yang harus benar' tiap issue, dan langkah manusia apa yang dibutuhkan sebelum dikerjakan agent. Juga mencatat temuan kebutuhan (62 dari 186 employee_salary tanpa company_id), komponen yang sudah ada untuk dipakai ulang, urutan deploy, dan asumsi yang diambil.",
+      "hash": "08719545fddc43c368936d958855df9e1ff554041aedb686e2c0efa8570f2fdb",
+      "ukuran_kb": 12.6,
+      "ringkasan": "Menjawab: bagaimana kebutuhan halaman HRIS untuk memetakan karyawan ke badan usaha dipecah jadi issue induk, sub-issue [BE] bip-erp dan [FE] erp-frontend, apa kriteria 'Yang harus benar' tiap issue, urutan deploy (BE sebelum FE, payroll-service + notification-service bersama), dan langkah manusia yang tersisa (Figma, label Siap Agent). Juga merangkum temuan kode yang sudah ada (buatVersiGaji, keputusan_massal, pola bulk BPJS) dan asumsi yang dipakai.",
       "kata_kunci": [
         "analisa kebutuhan",
         "penetapan badan usaha",
         "blueprint",
-        "issue",
         "sub-issue",
-        "bip-erp#3323",
         "bip-erp#3324",
-        "erp-frontend",
-        "company_id",
+        "erp-frontend#2631",
+        "badan usaha penggaji",
+        "bulk",
+        "HRIS",
         "Siap Agent"
       ]
     },
