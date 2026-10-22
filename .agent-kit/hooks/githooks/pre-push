@@ -4,8 +4,10 @@
 # git, termasuk di Windows (Git for Windows), jadi satu skrip untuk semua OS.
 #
 # Menolak push bila pemeriksaan dasar gagal:
-#   - repo Node (package.json + pnpm-lock.yaml): pnpm tsc, pnpm lint, pnpm build
-#       (build dilewati bila AGENTKIT_SKIP_BUILD=1, dan itu DICETAK supaya tidak senyap)
+#   - repo Node (package.json + pnpm-lock.yaml): pnpm tsc, pnpm lint. `pnpm build` SENGAJA tidak
+#       di sini (keputusan user 2026-10-22, kit 1.42.0): next build makan ~6 menit dan memori
+#       terbesar, sehingga tiap push membebani laptop. Build tetap dijalankan gerbang /kerjakan
+#       dan /judge (gerbang.ps1) sebelum PR, dan wajib dijalankan sendiri sebelum merge.
 #   - repo Go multi-modul (services/<x>/go.mod): `go build ./...` per service yang tersentuh
 #       oleh commit yang dipush; semua service bila shared-library tersentuh
 #   - berkas compose (docker-compose*.yml, compose.yaml, di REPO MANA PUN) yang tersentuh:
@@ -79,7 +81,7 @@ if [ ! -d "$top/.agent-kit" ]; then
 fi
 
 # ---- antrean kerja berat (kit 1.30.0) ----
-# pnpm tsc/lint/build dan go build di bawah mengantre di antre.ps1 bersama gerbang dan run penuh
+# pnpm tsc/lint dan go build di bawah mengantre di antre.ps1 bersama gerbang dan run penuh
 # sesi Claude lain di mesin ini, supaya tak berebut CPU. Langsung jalan (tanpa antre) bila: bukan
 # Windows (mac/linux sengaja no-op), antre.ps1 tak ada, atau proses ini SUDAH anak pemegang slot
 # (AGENTKIT_ANTRE_PEGANG) -- mengambil kunci lagi di sana berarti deadlock. Push yang menunggu
@@ -103,13 +105,9 @@ if [ -f package.json ] && [ -f pnpm-lock.yaml ]; then
       if ! berat pnpm "$s"; then echo "[agent-kit pre-push] GAGAL: pnpm $s"; gagal=1; fi
     fi
   done
-  if [ "$gagal" -eq 0 ] && grep -q "\"build\"[[:space:]]*:" package.json; then
-    if [ "${AGENTKIT_SKIP_BUILD:-0}" = "1" ]; then
-      echo "[agent-kit pre-push] pnpm build DILEWATI (AGENTKIT_SKIP_BUILD=1). Jalankan sendiri sebelum merge."
-    else
-      echo "[agent-kit pre-push] pnpm build ... (lewati sadar: AGENTKIT_SKIP_BUILD=1)"
-      if ! berat pnpm build; then echo "[agent-kit pre-push] GAGAL: pnpm build"; gagal=1; fi
-    fi
+  # pnpm build tidak dijalankan di pre-push (lihat kepala berkas). Dicetak supaya tak senyap.
+  if grep -q "\"build\"[[:space:]]*:" package.json; then
+    echo "[agent-kit pre-push] pnpm build tidak dijalankan di pre-push; gerbang /judge menjalankannya, jalankan sendiri sebelum merge."
   fi
 fi
 

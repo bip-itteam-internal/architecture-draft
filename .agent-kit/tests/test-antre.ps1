@@ -176,7 +176,9 @@ try {
   } finally { Stop-Pohon $a }
   Check (-not $env:AGENTKIT_ANTRE_PEGANG) 'gerbang-lib: env pemegang dibersihkan sesudah langkah'
 
-  # ---- 5. pre-push: pnpm tsc/lint/build lewat antre (push SUNGGUHAN ke remote bare sandbox) ----
+  # ---- 5. pre-push: pnpm tsc/lint lewat antre, build TIDAK dijalankan (push SUNGGUHAN ke remote bare sandbox) ----
+  # Kit 1.42.0: package.json di bawah SENGAJA punya skrip build, supaya uji ini merah bila pre-push
+  # kembali menjalankan pnpm build.
   # pnpm palsu mencatat AGENTKIT_ANTRE_PEGANG: env itu hanya dipasang pemegang slot, jadi isinya
   # PID membuktikan perintahnya dijalankan di dalam antrean, bukan sekadar lolos.
   $bin = Join-Path $tmp 'bin'; New-Item -ItemType Directory -Force -Path $bin | Out-Null
@@ -208,8 +210,9 @@ try {
   } finally { $env:PATH = $pathLama }
   $baris = @(if (Test-Path $tanda) { Get-Content $tanda })
   Check ($pp.ExitCode -eq 0) ("pre-push: push sandbox lolos (exit {0}) {1}" -f $pp.ExitCode, (Get-Content ($pushOut + '.err') -Raw -ErrorAction SilentlyContinue))
-  Check ($baris.Count -eq 3) ("pre-push: pnpm palsu dipanggil 3x (tsc, lint, build), dapat {0}" -f $baris.Count)
-  Check (@($baris | Where-Object { $_ -match 'pegang=\d+\s*$' }).Count -eq 3) ("pre-push: SETIAP pnpm berjalan di dalam antrean: {0}" -f ($baris -join ' | '))
+  Check ($baris.Count -eq 2) ("pre-push: pnpm palsu dipanggil 2x (tsc, lint), dapat {0}" -f $baris.Count)
+  Check (@($baris | Where-Object { $_ -match '^build\b' }).Count -eq 0) ("pre-push: pnpm build TIDAK dijalankan: {0}" -f ($baris -join ' | '))
+  Check (@($baris | Where-Object { $_ -match 'pegang=\d+\s*$' }).Count -eq 2) ("pre-push: SETIAP pnpm berjalan di dalam antrean: {0}" -f ($baris -join ' | '))
 }
 finally {
   if (Test-Path $tmp) { Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue }

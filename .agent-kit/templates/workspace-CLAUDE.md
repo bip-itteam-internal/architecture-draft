@@ -29,7 +29,8 @@ otomatis → perbaikan maks 2× → **PR**). **Merge tetap manusia** (ADR 0077 �
 `/papan-sesi` (sesi mana mengerjakan apa), `/dashboard` (HTML statis: SHIPPED, MIX, LOOP, CYCLE,
 SESI dari gh + data lokal), `/kantor-agent` (denah kantor isometrik: sesi hidup sedang apa), `/ekstrak-skill` (sesi → draft skill), `/supervise` (evaluasi loop →
 draft, tidak auto-apply). Gerbang lokal: pre-commit **menolak** commit di branch
-utama repo kode; pre-push menjalankan tsc/lint/build atau go build. Jangan `--no-verify` tanpa
+utama repo kode; pre-push menjalankan tsc/lint (repo Node, **tanpa** `pnpm build` sejak kit 1.42.0;
+build tetap dijalankan gerbang `/judge` dan wajib sebelum merge) atau go build. Jangan `--no-verify` tanpa
 alasan tertulis. Papan tim (`dev-activity-board`) menerima peristiwa loop bila mesin ini punya
 `~/.agent-kit/loop-ingest.json` (opt-in, best-effort, tanpa judul brief/teks task).
 

@@ -341,7 +341,8 @@ Repo kode, di dalam worktree:
    lalu membaca sisa pesan sebagai pathspec dan commit gagal, sementara push berikutnya tetap
    jalan dan mendorong branch **tanpa commit**. Terjadi 2026-09-06 pada PR pertama loop ini.
 3. `git -C "<wt>" -c core.fsmonitor=false push -u origin <branch>`. Hook `pre-push` akan
-   menjalankan tsc/lint/build atau go build. Bila **ditolak**: JANGAN `--no-verify`. Perlakukan
+   menjalankan tsc/lint (repo Node; `pnpm build` tidak, sejak kit 1.42.0, karena gerbang §judge
+   sudah menjalankannya) atau go build. Bila **ditolak**: JANGAN `--no-verify`. Perlakukan
    sebagai kegagalan judge (kembali ke §4 dengan keluaran hook sebagai temuan).
 4. `gh pr create --repo bip-itteam-internal/<repo> --head <branch> --title "<judul commit>" --body-file <berkas>`.
    Bila field `Issue` brief berisi `<repo>#<n>`, badan PR memuat baris
