@@ -1,6 +1,6 @@
 # ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko
 
-> **Status**: 🟡 **Diusulkan**, 2026-10-22, oleh `/analisa-kebutuhan`. Bentuk A disetujui user dalam sesi yang sama; berlaku setelah Pemutus menulis baris Diterima, dan karena menyentuh lingkup [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] (T8), SPV FAT ikut diminta menyetujui. Pemutus: `irfanarfianto`. Blueprint: `Workspace/ANALISA - Badan Usaha Pemilik Toko dari Marketing.md`.
+> **Status**: 🟢 Diterima, 2026-10-22, oleh irfanarfianto (Pemutus). Diusulkan 2026-10-22 oleh `/analisa-kebutuhan`, bentuk A. Menyentuh lingkup [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] (T8); persetujuan SPV FAT belum tercatat. Pemutus: `irfanarfianto`. Blueprint: `Workspace/ANALISA - Badan Usaha Pemilik Toko dari Marketing.md`.
 
 ## Untuk Manajemen
 
@@ -23,7 +23,7 @@
 
 *Menambahkan badan usaha pemilik toko (`payroll_company_id`) sebagai atribut kepemilikan di `department_shops`, diisi leader Marketing di alur klaim toko yang sudah ada, lalu tab Toko di sheet Badan Usaha membaca atribut itu menggantikan turunan rekening. Memecah bagian "pemetaan toko" dari T8 ADR 0096 menjadi T8a dan memindahkan penulisnya dari Finance ke Marketing.*
 
-- **Status**: 🟡 Diusulkan, kode belum ada
+- **Status**: 🟢 Diterima 2026-10-22, kode belum ada
 - **Path di repo** (rencana):
   - `bip-erp/services/integration/internal/domain/entity/department_shop.go`, `internal/interface/http/department_shop_handler.go`, `internal/infrastructure/repository/department_shop_repo.go`, `internal/interface/http/toko_ringkas_handler.go`, `main.go`
   - `bip-erp/services/payroll/` (daftar pilihan badan usaha untuk panggilan antar-service, bila endpoint yang ada tak bisa dipakai)
