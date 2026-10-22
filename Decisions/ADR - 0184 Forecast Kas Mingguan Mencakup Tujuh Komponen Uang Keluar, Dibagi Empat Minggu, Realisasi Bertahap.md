@@ -194,6 +194,17 @@ Untuk tiap komponen ditampilkan proyeksi dan realisasinya per minggu.
          - **C3c**: Material, menunggu bagan akun prod.
        - Isian masuk basis **per komponen**, hanya bila sumber realisasi komponen itu terukur. Contohnya salinan aset sudah disinkron, atau setoran pajak terbaca dari finance.
        - Isian Material tetap di luar basis sampai C3c.
+     - *Kelonggaran masa transisi isian komponen (diputuskan 2026-10-22, sesi orkestrator, atas keluhan Finance yang tidak bisa mengisi proyeksi September):*
+       - **Alasannya:** ERP masih baru. Finance belum terbiasa mengisi proyeksi sebelum bulannya mulai, sehingga kunci minggu ADR 0161 K6 membuat bulan-bulan awal tanpa proyeksi sama sekali.
+       - **Hingga 31 Desember 2026 (WIB)**, isian komponen (Material, BOP, Pajak) **boleh diubah walaupun menggeser minggu yang sudah mulai atau sudah lewat**, termasuk untuk bulan yang sudah lewat. Sesudah tanggal itu kunci minggu kembali berlaku otomatis, tanpa deploy.
+       - **Yang tidak dilonggarkan:** "Atur proyeksi" (porsi mingguan RAPB) tetap tunduk K6.
+       - **Pengaman yang tetap berlaku:**
+         - perubahan susulan (yang menggeser minggu sudah mulai) dibatasi **2 kali per komponen per bulan**, sama dengan `BatasUbahProyeksiMingguan`;
+         - setiap perubahan isian **tercatat di riwayat**: siapa, kapan, nominal sebelum → sesudah, dan apakah susulan;
+         - isian yang diubah susulan **ditandai** di laporan dan di layar.
+       - **Isian susulan tetap dihitung** di basis akurasi dan KPI seperti biasa. HRD bisa melihat penandanya.
+       - **Skor KPI yang sudah beku tidak dihitung ulang** (Decision 7).
+       - Konsekuensi yang diterima sadar: selama masa transisi, akurasi forecast bulan yang isiannya disusulkan bisa terbaca lebih baik daripada ramalan sesungguhnya. Penanda susulan ada untuk itu.
 8. **Pemisahan dari metrik #1 dilepas secara sadar.** Varians OPEX (metrik #1) dan forecast (#4) kini sama-sama memuat OPEX. Ini permintaan Finance, dan alasan subset di `kas_keluar_daftar.go:20-24` tidak berlaku lagi.
 
 ## Consequences
