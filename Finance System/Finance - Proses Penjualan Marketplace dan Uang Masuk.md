@@ -4,7 +4,7 @@
 
 *Proses P3, penjualan marketplace dan uang masuk, dari [[Finance - Proses Bisnis dan Kebutuhan Sistem]]. Dok ini memuat tujuan, cara dikerjakan hari ini, yang sudah ada di ERP, alur target di sistem, celah yang harus ditutup, kontrol yang wajib dijaga, dan ukuran untuk membuktikan efisiensinya. Penilaian cakupan dan kesesuaiannya ada di dok induk.*
 
-- **Status**: ⚠️ **Implemented (ada catatan)**. Sinkron marketplace ke Accurate berjalan; pemetaan toko ke CV dan penjualan per CV 🟡 direncanakan (T8).
+- **Status**: ⚠️ **Implemented (ada catatan)**. Sinkron marketplace ke Accurate berjalan; pemetaan toko ke CV 🟡 diusulkan (T8a, [[ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko]]) dan penjualan per CV 🟡 direncanakan (T8).
 - **Sumber**: survei alur kerja Finance (isian mandiri 14 sampai 16 September 2026, butir bertanda *survei 2026-09*), kode `bip-erp` dan `erp-frontend` di `origin/main` 2026-09-17. Keadaan prod bertanggal di tiap butir; ukur ulang sebelum dipakai memutuskan.
 - **Kelompok celah**: **A** sudah ada, tinggal dipakai · **B** sudah ada, perlu diperbaiki · **C** belum ada, perlu dibangun (definisi di dok induk).
 
@@ -30,7 +30,7 @@ Toko dipetakan ke entitas CV di master CV → sistem menghasilkan penjualan, pot
 
 ## Celah
 
-- **C** Pemetaan toko ke CV dan penjualan per CV (T8). Hari ini `accurate_shops` tidak punya field CV ([[REF - Kepemilikan Data]] § Duplikasi).
+- **C** Pemetaan toko ke CV dan penjualan per CV (T8). Hari ini `accurate_shops` tidak punya field CV ([[REF - Kepemilikan Data]] § Duplikasi). Pemetaannya diusulkan dipisah jadi T8a: diisi Marketing di `department_shops` ([[ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko]]); penjualan per CV tetap T8.
 - **C** Aturan kolom yang tidak boleh dijumlahkan ikut tertulis di rancangan ([[Finance - Buku Besar CV]] § Gerbang kolom).
 - **TBD** Isi, aturan, dan pemilik alat web rekap penarikan CV ditelusuri sebelum T8 dirancang, supaya tidak membangun tandingannya dari nol.
 - **TBD** Income yang belum masuk sinkron dan masih diinput manual: kanal dan penyebabnya belum diukur.

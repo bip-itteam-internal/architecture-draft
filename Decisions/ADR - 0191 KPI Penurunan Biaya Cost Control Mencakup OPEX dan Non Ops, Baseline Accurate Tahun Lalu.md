@@ -94,6 +94,10 @@ Tidak ada layar baru. HRD cukup memilih sumber baru lewat Kelola template.
   - Non Ops: Entertainment Adum = 6226, Iuran & Sumbangan = 6225.
 - **R2.** Akun yang ada di 2025 tetapi tidak ada lagi di katalog sekarang (ditutup atau diganti kode) tidak tercakup di sisi tahun lalu. Akibatnya baseline mengecil tanpa tanda, kecuali dilaporkan.
 - **R3.** Mesin skor diasumsikan menerima target negatif dengan arah turun, sebagaimana sudah diputuskan ADR 0180 butir 6. **Diverifikasi 2026-10-20: asumsi ini SALAH di `origin/main`.** Cabang `target <= 0` di `NilaiDenganArah` membandingkan realisasi dengan 0, jadi −1% atas target −2% bernilai 100. Ditambal di PR bip-erp#3342 (belum merge) dengan gradasi `realisasi/target × 100` di antara target dan 0. Gradasi itu bukan bagian keputusan ini dan perlu dikonfirmasi pemilik KPI; alternatifnya `hit_miss`.
+  - *Pembaruan 2026-10-22:*
+    - #3342 sudah merged dan ter-deploy.
+    - Ditemukan lapisan kedua: **validasi simpan template** (`ValidateKPIAutoConfig` dan layar KPI) masih menolak target negatif pada arah turun. Ditambal di bip-erp#3432 dan erp-frontend#2729, keduanya belum merge.
+    - Konfirmasi gradasi dari pemilik KPI masih terbuka.
 - **R4.** Entitas: populasi Accurate PT Bharata saja (database Accurate yang sama dengan `realisasi_opex`).
 
 ## Decision

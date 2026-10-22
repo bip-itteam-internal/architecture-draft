@@ -129,6 +129,10 @@ Keputusan: ADR 0184 Decision 5, bagian "Tahap 2 ditetapkan 2026-10-21" dan "Pene
 - Penyegar harian **01:30 WIB** menarik bulan berjalan dan bulan lalu. Hasilnya disimpan di koleksi `arus_kas_langsung_bulanan`, satu dokumen per bulan.
 - Populasi kas = semua akun daun `CASH_BANK` dari bagan `glaccount/list.do` saat penyegaran (`ListGLAccountBagan`), bukan daftar nomor di kode. Laporan saldo hanya dipakai sebagai penanda induk cadangan, karena laporan saldo bisa melewatkan akun bersaldo nol.
 - Transaksi dikunci jenis + nomor lintas akun kas. Jenis **"Penerimaan Penjualan" dikecualikan**, dan transfer antar-akun kas netonya nol.
+  - ⚠️ **Cacat terukur 2026-10-22.** Accurate memberi semua jurnal penutupan bulan nomor yang sama (`"September 2026"`), sehingga jurnal-jurnal itu terlebur menjadi satu transaksi. Akibatnya penyusutan dan selisih biaya produksi ikut terhitung. Contoh September: 5104 −168,6 jt masuk "tak terpetakan", dan 6222 kelebihan 729.167.
+  - Laporan Accurate yang dicetak ulang 22 Okt cocok persis untuk 62 akun.
+  - Perbaikannya ada di PR bip-erp#3442 (issue #3440, **belum merge**): kunci menjadi `transId` dari `glaccount/history.do` lewat satu fungsi `KunciTransaksi`, yang juga dipakai netting realisasi aset.
+  - Sesudah deploy, bulan berjalan dan bulan lalu ditulis ulang. Bulan yang lebih lama tetap memakai kunci lama sampai ditarik ulang.
 - Gagal satu akun berarti bulan itu tidak ditulis ulang: angka lama utuh dan penanda gagal dicatat. Bulan yang belum pernah berhasil punya `disinkron_pada: null`, artinya belum ditarik, bukan nol.
 - Rute baca untuk verifikasi: `GET /accounting/anggaran/arus-kas` ([[API - Integration Service]]).
 

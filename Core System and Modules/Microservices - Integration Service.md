@@ -358,7 +358,9 @@ Yang **bertahan** hanyalah fungsi ACL "siapa boleh lihat toko apa" — kini `Sho
 
 - `GET /department-shops` — daftar pemetaan · `RequireIntegrationStaff`
 - `GET /department-shops/kesehatan` — **laporan ketidakcocokan**: toko terotorisasi yang belum dipetakan (yatim) + pemetaan tanpa otorisasi (sisa) · `RequireIntegrationStaff`
-- `POST /department-shops` (upsert) · `DELETE /department-shops` — **`RequireIntegrationAdmin`**
+- `POST /department-shops` (upsert) — **`RequireMarketingLeader`**; non-IT hanya boleh menulis departemennya sendiri (`department_shop_handler.go:50`). Diperiksa ulang 2026-10-22 ke `main.go:1659`.
+- `DELETE /department-shops` — **`RequireIntegrationAdmin`**
+- 🟡 *Direncanakan* ([[ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko]]): field `payroll_company_id` (badan usaha pemilik toko) di baris yang sama, diisi lewat upsert di atas.
 
 **Beda konsep dari §Shop ACL di atas, bukan bertumpuk.** ACL menjawab "siapa boleh lihat toko apa" (satu toko boleh dilihat banyak departemen, lewat filter `AllowedShops`). `department_shops` adalah **kepemilikan**, dan karenanya tunggal: satu toko yang dimiliki dua departemen membuat omzetnya terhitung dua kali dan menaikkan skor dua supervisor sekaligus. Ketunggalan ditegakkan index unik `(channel, shop_id)`. Sejak Fase Contract 2026-09-15, keduanya bahkan membaca koleksi yang SAMA (`department_shops`) — beda konsepnya murni di lapisan pertanyaan yang dijawab, bukan lagi di sumber datanya.
 

@@ -67,7 +67,7 @@ Diukur 2026-10-21 (riset read-only bip-erp `origin/main` fd63a742, erp-frontend 
    - menghentikan seri tidak menghapus kelas yang sudah dibuat.
 8. **Status kelas berganti otomatis** oleh cron yang sama: Terjadwal → Berlangsung saat jendela mulai, Berlangsung → Selesai saat jendela berakhir (WIB). Kelas Batal tidak disentuh, dan HR tetap boleh mengubah status manual. *Alasan:* semua tahap pasca-kelas (evaluasi, post-test, sertifikat) menunggu status Selesai yang hari ini hanya berubah bila HR ingat; data prod per 2026-09-21 menunjukkan modul nyaris tak dipakai.
 9. **Presensi mandiri bawaannya terbuka di jendela kelas.** Saklar `attendance_open` tetap ada untuk HR yang ingin mematikannya. *Alasan:* bawaan mati membuat tombol hadir tampil sebagai teks alasan bagi hampir semua peserta.
-10. **Web peserta disetarakan dengan mobile**: menu "Pelatihan Saya" kembali di sidebar, ada tombol hadir dan berhalangan, dan pre-test/post-test tampil di kartu yang sama. Tampilan peserta di kedua klien mengikuti satu urutan langkah:
+10. **Web peserta disetarakan dengan mobile** ⚠️ *dikoreksi, lihat § Amandemen 2026-10-22: menu sidebarnya dicabut lagi.* Layar `/hris/pelatihan-saya` punya tombol hadir dan berhalangan, dan pre-test/post-test tampil di kartu yang sama. Tampilan peserta di kedua klien mengikuti satu urutan langkah:
     1. Hadir/Berhalangan
     2. Pre-test
     3. (kelas berlangsung)
@@ -76,6 +76,16 @@ Diukur 2026-10-21 (riset read-only bip-erp `origin/main` fd63a742, erp-frontend 
     6. Sertifikat
 
     Tiap langkah menyebut keadaannya dengan kalimat: terbuka, terkunci karena apa, atau selesai.
+
+## Amandemen
+
+### 2026-10-22: Menu "Pelatihan Saya" tidak di sidebar web
+
+Diputuskan pemilik produk (irfanarfianto): urusan karyawan atas dirinya sendiri tempatnya **MyBharata**, jadi menu "Pelatihan Saya" **tidak** ada di sidebar web. Bagian butir 10 yang mengembalikan menu itu adalah keputusan orkestrator, bukan Pemutus, dan dibatalkan (erp-frontend, PR pencabutan menu sesudah #2719).
+
+- Rute `/hris/pelatihan-saya` dan layar langkahnya tetap hidup tanpa menu (pola "Interview Saya"), supaya tautan langsung tidak patah.
+- Kunci i18n `sidebar.pelatihan_saya` dibuang; test penjaga self-service melarangnya hidup kembali.
+- Pelajaran: menu self-service karyawan tidak dikembalikan ke web tanpa keputusan Pemutus, walau layarnya setara.
 
 ## Alternatif yang Ditolak
 
