@@ -40,7 +40,8 @@ Diukur 2026-10-22 di `bip-erp` `origin/main`:
 6. **Lewat tenggat tetap bisa dikerjakan**; yang berubah hanya status tampilannya. Pengingat tenggat lewat notifikasi **di luar cakupan ADR ini** (issue tersendiri, karena menambah kategori inbox = deploy dua container).
 7. **Sertifikat** belajar mandiri terbit begitu lulus (tidak ada penilaian trainer). **Penilaian materi** (kejelasan, kegunaan, kesesuaian; komponen form yang sama dengan kelas) opsional dan **tidak menahan** sertifikat.
 8. **Satu mesin ujian**: pre/post-test mandiri memakai `quiz`, `quiz_attempt`, skoring, penilaian essay, batas percobaan, dan jeda yang SAMA dengan kelas. Yang ditambah hanya jalur mulai berbasis course (tanpa `trainingId`); aturan penilaian tidak disalin.
-9. **Course diterbitkan** (`published`) hanya bila punya post-test dan minimal satu materi; draf tidak terlihat peserta.
+9. **Course diterbitkan** (`published`) hanya bila punya minimal satu materi, bank **pre-test**, dan bank post-test; draf tidak terlihat peserta.
+   - *Amandemen 2026-10-22 (orkestrator, atas mandat Pemutus):* syarat pre-test ditambahkan saat implementasi bagian 3 (bip-erp#3457). Tanpa pre-test, kelulusan (butir 4: naik dari pre-test) tak punya pembanding dan post-test tak pernah terbuka, jadi course terbit tanpa pre-test buntu bagi semua pesertanya tanpa satu pun galat. Kelas tatap muka sudah berperilaku sama (post-test terkunci tanpa pre-test). Baseline nol untuk course tanpa pre-test ditolak karena melahirkan aturan lulus kedua. Urutan pemeriksaan: materi, pre-test, post-test.
 
 ## Alternatif yang Ditolak
 
