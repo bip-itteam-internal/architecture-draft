@@ -32,6 +32,12 @@ Permintaan itu diterima sebagai kebutuhan "pembukuan penerimaan Shopee cocok den
 - **Verifikasi**: `INC/2026/10/17/008-BH` memuat Bayar faktur Rp92.000 dan Biaya Admin sekitar Rp16.035, dengan Retur Penjualan Rp92.000 NOT_RETURNED.
 - **Dependensi**: tidak bergantung pada T1.
 
+### T3. Retur sebagian BERNILAI (refund bukan kelipatan harga), ADR 0195 butir 10
+- **Repo**: bip-erp · **Ukuran**: M, 1 PR · ditemukan 2026-10-22 saat memeriksa order contoh: 5 dari 6 order Oktober berbentuk ini dan tidak terjangkau T2.
+- **Issue**: https://github.com/bip-itteam-internal/bip-erp/issues/3450 · **PR**: #3451 (lolos judge dan gerbang, **belum merged**).
+- **Isi**: penanda `ReturNilai`, refund identitas = `seller_return_refund`, klasifikasi "Retur Sebagian", tanpa Retur Penjualan, payout > 0 di kedua jalur, sapuan 31 hari.
+- **Verifikasi**: lima order (`261012ED5EQT1Q`, `261001FKDBAKND`, `261002J0ETWP8S`, `261001F6MEWPCH`, `2609288HFWXW90`): Biaya Admin tanpa tumpukan residual (total lama Rp452.717), Potongan Penjualan 4003 membawa refund, faktur terlunasi, tidak ada Retur Penjualan baru.
+
 ## Sisa sesudah merge (manusia, belum terukur selesai)
 
 1. Deploy `integration-service` saat `worker_locks` kosong (prod dijalankan manusia).
