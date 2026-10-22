@@ -10190,9 +10190,9 @@
         "HRIS - Matriks KPI per Departemen",
         "REF - Kepemilikan Data"
       ],
-      "hash": "01cd33f5f8b315f99dc246967bbeecd826a106ed484e79a01d217366420ea2c6",
-      "ukuran_kb": 23.2,
-      "ringkasan": "Menjawab: komponen apa saja yang masuk forecast kas mingguan Cost Control (Material, BOP, Marketing, Gaji, Ops adum, Pajak; CapEx di luar cashflow), dari mana proyeksi dan realisasinya diambil, dan bagaimana tahap 2 berbasis kas memetakan akun lawan laporan Arus Kas (Langsung) Accurate ke komponen. Juga menjelaskan dampaknya ke KPI #4 akurasi forecast, aturan bulan yang belum tersinkron, dan urutan deploy. Termasuk kelonggaran masa transisi isian komponen hingga 31 Desember 2026.",
+      "hash": "d714cac9287e68718856ac68d12fe5ec1d188a2bce13afb6f130c7ee82ec8321",
+      "ukuran_kb": 24.3,
+      "ringkasan": "Menjawab: komponen apa saja yang masuk forecast kas mingguan Cost Control (Material, BOP, Marketing, Gaji, Ops adum, Pajak; CapEx di luar cashflow), dari mana proyeksi dan realisasinya diambil, dan bagaimana tahap 2 berbasis kas memetakan akun lawan laporan Arus Kas (Langsung) Accurate ke komponen. Juga menjelaskan dampaknya ke KPI #4 akurasi forecast, aturan bulan yang belum tersinkron, dan urutan deploy. Termasuk kelonggaran masa transisi isian komponen hingga 31 Desember 2026. Isian proyeksi berlaku untuk semua komponen dan menggantikan RAPB.",
       "kata_kunci": [
         "forecast kas mingguan",
         "cashflow",
