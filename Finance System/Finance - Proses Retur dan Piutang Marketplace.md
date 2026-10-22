@@ -38,7 +38,7 @@ Gudang men-scan retur tepat waktu → retur terbukukan otomatis → AR menangani
 
 ## Kontrol wajib
 
-Retur yang sudah diserap penerimaan tidak dibukukan lagi (gerbang payout). ⚠️ *Untuk retur sebagian Shopee yang uangnya tetap cair, usulan [[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]] (🟡 Diusulkan 2026-10-21) mengubahnya mulai penerimaan 1 Okt 2026: retur dibukukan dan penerimaan hanya melunasi qty sisa. Terukur: refund retur sebagian sekarang masuk Biaya Admin, bukan pengurang penjualan.*
+Retur yang sudah diserap penerimaan tidak dibukukan lagi (gerbang payout). ⚠️ *Untuk retur sebagian Shopee yang uangnya tetap cair, [[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]] (🟢 Diterima 2026-10-21; kode merged ke `main` 2026-10-22) mengubahnya mulai penerimaan 1 Okt 2026, bila kv `shopee-retur-sebagian-cutover-date` terisi: retur dibukukan dan penerimaan hanya melunasi qty sisa. Jumlah pcs yang diretur dihitung dari nilai refund escrow, bukan dari kolom `returned_quantity` Shopee (yang bisa keliru). Terukur: refund retur sebagian sekarang masuk Biaya Admin, bukan pengurang penjualan.*
 
 ## Ukuran efisiensi
 

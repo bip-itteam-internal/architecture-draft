@@ -1,4 +1,4 @@
-**Status**: 🟡 Daftar task dari `/analisa-kebutuhan` 2026-10-21. Keputusannya [[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]] **🟢 Diterima 2026-10-21 oleh bagusizzanm**, jadi dok ini bisa ditunjuk `/brief`. Cara kerja dan akunnya di [[Finance - Pemetaan Komponen Marketplace ke Akun Accurate]] dan [[Microservices - Integration Service]]. Dok ini papan kerja, bukan arsitektur: coret item begitu PR-nya merge dan pindahkan keadaannya ke dok domain lewat `/sync-docs`.
+**Status**: ✅ Kode kedua task **merged ke `main`** (T1 PR #3405 2026-10-21; T2 PR #3413, masuk `main` lewat PR #3427 2026-10-22), disinkronkan ke dok domain 2026-10-22. Sisa **bukan kode**: deploy prod, dua isian kv, dan verifikasi di Accurate (lihat § Sisa sesudah merge). Keputusannya [[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]] **🟢 Diterima 2026-10-21 oleh bagusizzanm**. Cara kerja dan akunnya di [[Finance - Pemetaan Komponen Marketplace ke Akun Accurate]] dan [[Microservices - Integration Service]]. Dok ini papan kerja, bukan arsitektur: coret item begitu PR-nya merge dan pindahkan keadaannya ke dok domain lewat `/sync-docs`.
 
 **Pemutus:** @bagusizzanm · **Ukuran: Kecil** (satu repo `bip-erp`; dua issue sejajar, masing-masing satu PR, tanpa induk).
 
@@ -19,18 +19,26 @@ Permintaan itu diterima sebagai kebutuhan "pembukuan penerimaan Shopee cocok den
 
 ## Task
 
-### T1. Komisi AMS dompet Shopee dibukukan ke Biaya Affiliate (6113)
+### ~~T1. Komisi AMS dompet Shopee dibukukan ke Biaya Affiliate (6113)~~ ✅ merged (PR #3405, issue #3397 tertutup)
 - **Repo**: bip-erp · **Ukuran**: Kecil, 1 PR · **Urutan**: 1 (lebih kecil dan selisihnya terus bertambah)
 - **Issue**: https://github.com/bip-itteam-internal/bip-erp/issues/3397
 - **Isi**: kategori baru untuk `AMS_COMMISSION_FEE_DEDUCT`, satu baris per toko-hari ke kv `affiliate-commision`, rincian per pesanan di ekspor, kv tanggal `shopee-ams-wallet-cutover-date` (≥ 2026-10-01).
 - **Verifikasi**: penerimaan 12 dan 13 Okt memuat 99 potongan (−Rp1.136.138); Beautyhack's Original Shop −Rp908.333 cocok sheet.
 
-### T2. Retur sebagian Shopee dibalik Retur Penjualan dan penerimaan melunasi qty sisa
+### ~~T2. Retur sebagian Shopee dibalik Retur Penjualan dan penerimaan melunasi qty sisa~~ ✅ merged (PR #3413 via #3427; ⚠️ issue #3398 masih terbuka karena #3413 masuk ke branch bukan `main`, tutup manual)
 - **Repo**: bip-erp · **Ukuran**: Kecil (1 repo), 1 PR karena dua sisi wajib berubah serentak (ADR 0195 butir 4) · **Urutan**: 2
 - **Issue**: https://github.com/bip-itteam-internal/bip-erp/issues/3398
 - **Isi**: gerbang retur dilonggarkan untuk retur sebagian Shopee, base penerimaan dikurangi qty retur, refund identitas dari `seller_return_refund`, klasifikasi dibetulkan, kv `shopee-retur-sebagian-cutover-date` (≥ 2026-10-01).
 - **Verifikasi**: `INC/2026/10/17/008-BH` memuat Bayar faktur Rp92.000 dan Biaya Admin sekitar Rp16.035, dengan Retur Penjualan Rp92.000 NOT_RETURNED.
 - **Dependensi**: tidak bergantung pada T1.
+
+## Sisa sesudah merge (manusia, belum terukur selesai)
+
+1. Deploy `integration-service` saat `worker_locks` kosong (prod dijalankan manusia).
+2. Isi kv `shopee-ams-wallet-cutover-date` dan `shopee-retur-sebagian-cutover-date` = `2026-10-01` di layar Config Accurate. **Retur sebagian sebelum 31 Okt**: sapuan hanya menjangkau release 14 hari terakhir dan order contoh `261010944296TR` cair 17 Okt.
+3. Beri tahu finance: penerimaan Oktober SENT ditulis ulang otomatis; kas tidak bergeser.
+4. Verifikasi di Accurate, bukan `docker ps`: `INC/2026/10/17/008-BH` (Bayar faktur 92.000, Biaya Admin ±16.035, Retur Penjualan 92.000 NOT_RETURNED) dan mutasi AMS 12–13 Okt di Biaya Affiliate (Beautyhack's Original Shop −908.333).
+5. Celah yang diketahui (pengawas retur sekali-tembak, order escrow ≤ 0, hari AMS-saja tanpa order) dicatat di § Implementasi ADR 0195; belum ada issue.
 
 ## Yang masih terbuka dari analisa yang sama (bukan bagian ADR ini)
 
