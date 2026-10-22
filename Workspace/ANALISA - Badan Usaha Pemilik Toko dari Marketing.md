@@ -15,11 +15,11 @@ Setiap toko tercatat dibuka atas nama badan usaha mana, oleh orang yang membukan
 ## Issue
 
 ### Induk: Badan usaha pemilik toko diisi Marketing (T8a)
-- **Repo**: bip-erp · **Issue**: (diisi saat dibuat)
+- **Repo**: bip-erp · **Issue**: [bip-erp#3434](https://github.com/bip-itteam-internal/bip-erp/issues/3434)
 - Tanpa PR sendiri. Sub-issue: [BE] lalu [FE]. Ditutup manual saat keduanya merged.
 
 ### [BE] Badan usaha pemilik toko di department_shops, tab Toko membacanya
-- **Repo**: bip-erp · **Urutan**: 1 · **Issue**: (diisi saat dibuat)
+- **Repo**: bip-erp · **Urutan**: 1 · **Issue**: [bip-erp#3435](https://github.com/bip-itteam-internal/bip-erp/issues/3435)
 
 **Pemutus:** irfanarfianto
 **PIC:** (diisi saat In Progress)
@@ -51,7 +51,7 @@ PROD 2026-10-22 (baca saja): `accurate_shops` 69 (47 MARKETING - BEAUTYHACKS, 22
 ADR 0197 Diterima.
 
 ### [FE] Pilih badan usaha di Kepemilikan Toko, tab Toko membacanya
-- **Repo**: erp-frontend · **Urutan**: 2 · **Issue**: (diisi saat dibuat)
+- **Repo**: erp-frontend · **Urutan**: 2 · **Issue**: [erp-frontend#2725](https://github.com/bip-itteam-internal/erp-frontend/issues/2725)
 
 **Pemutus:** irfanarfianto
 **PIC:** (diisi saat In Progress)
