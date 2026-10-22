@@ -119,6 +119,13 @@ Untuk tiap komponen ditampilkan proyeksi dan realisasinya per minggu.
    - Operasional (marketing, gaji, adum) diambil dari RAPB tanpa penyusutan.
    - Material, BOP, Pajak, dan Aset diambil dari **isian proyeksi per komponen per bulan** oleh Cost Control. Gerbang izinnya `finance.anggaran.kelola`, dengan pola isian yang sama dengan anggaran gabungan.
    - BOP = isian proyeksi ditambah bagian RAPB bila akun 5xxx dianggarkan. Aturannya dikunci di task BE supaya tidak terhitung ganda.
+   - **Diamandemen 2026-10-22 (sesi orkestrator, atas permintaan Finance):** isian proyeksi menjadi sumber utama untuk **seluruh enam komponen**.
+     - Alasannya: forecast Finance (sheet "Kebutuhan Modal / Belanja per Bulan") menghitung **uang yang harus keluar**, bukan beban RAPB. Contoh Oktober: Marketing ± Rp 4,92 M di sheet vs RAPB 61xx, dan Pajak ± Rp 293 jt.
+     - **Semua komponen menerima isian**, termasuk Marketing, Gaji, dan Ops adum.
+     - **Isian MENGGANTIKAN RAPB** untuk komponen itu pada bulan itu. Ini berlaku juga untuk BOP: aturan "ditambah RAPB" dicabut. RAPB tetap menjadi **nilai bawaan** bila isian komponen itu kosong, sehingga bulan tanpa isian berperilaku seperti sekarang.
+     - Satu komponen tidak pernah memuat RAPB dan isian sekaligus, jadi tidak ada hitung ganda.
+     - Isian semua komponen tunduk aturan yang sama: kunci minggu, kelonggaran masa transisi s.d. 31 Des 2026 dengan maks 2 susulan, riwayat dan penanda, serta ikut basis akurasi dan KPI.
+     - "Atur proyeksi" (porsi mingguan) tetap berlaku atas total bulan yang memuat isian.
 3. ~~**Aset tahunan.** Anggaran aset diisi per tahun, dan layar menampilkan "sisa anggaran tahun berjalan" = anggaran tahun − realisasi aset sejak Januari. Aset ikut total bulanan hanya lewat proyeksi bulan itu.~~
 
    **Diamandemen 2026-10-21 (Azzerith, atas usulan Finance/Tika di WA hari itu): Belanja Modal (CapEx) di luar cashflow bulanan.**
