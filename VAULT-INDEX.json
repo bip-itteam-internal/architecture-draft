@@ -10628,8 +10628,8 @@
       "judul": "ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-22, oleh `/analisa-kebutuhan`. Bentuk A disetujui user dalam sesi yang sama; berlaku setelah Pemutus menulis baris Diterima, dan karena menyentuh lingkup [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] (T8), SPV FAT ikut diminta menyetujui. Pemutus: `irfanarfianto`. Blueprint: `Workspace/ANALISA - Badan Usaha Pemilik Toko dari Marketing.md`.",
+      "status_emoji": null,
+      "status_teks": "🟢 Diterima, 2026-10-22, oleh irfanarfianto (Pemutus). Diusulkan 2026-10-22 oleh `/analisa-kebutuhan`, bentuk A. Menyentuh lingkup [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] (T8); persetujuan SPV FAT belum tercatat. Pemutus: `irfanarfianto`. Blueprint: `Workspace/ANALISA - Badan Usaha Pemilik Toko dari Marketing.md`.",
       "publik": true,
       "tautan": [
         "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
@@ -10641,19 +10641,20 @@
         "Microservices - Integration Service",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing"
       ],
-      "hash": "8fd43ba3c76ae5fd0cb59a74526e038410cfdeab2fad670e08da796ebf20c057",
+      "hash": "9754b554065e6fd7feeee728ae0dbea738a6830b2fa43523f0ceb1c53efba705",
       "ukuran_kb": 9.6,
-      "ringkasan": "Menjawab: bagaimana tiap toko marketplace dicatat atas nama badan usaha (CV/PT) mana, yaitu dipilih leader/SPV Marketing saat klaim kepemilikan toko dan disimpan sebagai `payroll_company_id` di `department_shops`. Menjelaskan kenapa pemasangan otomatis lewat nama dan rekening gagal (0 dari 69 toko), bagaimana tab Toko di sheet Badan Usaha membaca data ini, dan bagaimana T8 ADR 0096 dipecah jadi T8a.",
+      "ringkasan": "Menjawab: toko marketplace dibuka atas nama badan usaha (CV/PT) mana, siapa yang mengisinya (leader/SPV Marketing lewat tab Kepemilikan Toko di ICC Management), dan di mana disimpan (payroll_company_id di department_shops). Juga menjelaskan kenapa pemasangan otomatis lewat nama dan turunan rekening Accurate gagal (0 dari 69 toko), bagaimana tab Toko di sheet Badan Usaha Sekretariat membaca data ini, dan bagaimana T8 ADR 0096 dipecah menjadi T8a.",
       "kata_kunci": [
-        "badan usaha pemilik toko",
-        "toko ke CV",
+        "badan usaha",
+        "pemilik toko",
+        "CV",
+        "PT",
         "department_shops",
         "payroll_company_id",
         "kepemilikan toko",
         "shop ownership",
-        "ICC Management",
         "T8a",
-        "ADR 0197"
+        "legal entity"
       ]
     },
     {
@@ -21285,8 +21286,8 @@
       "judul": "ANALISA - Badan Usaha Pemilik Toko dari Marketing",
       "area": "Workspace",
       "jenis": "workspace",
-      "status_emoji": "⛔",
-      "status_teks": "Menunggu ADR [[ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko]] Diterima: sebelum itu ANALISA ini BUKAN keputusan yang bisa ditunjuk `/brief`.",
+      "status_emoji": null,
+      "status_teks": "ADR [[ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko]] Diterima 2026-10-22; issue siap dikerjakan.",
       "publik": false,
       "tautan": [
         "ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko",
@@ -21295,19 +21296,20 @@
         "RUN - Onboarding Toko Marketplace Baru",
         "REF - Kepemilikan Data"
       ],
-      "hash": "163a2fd7f78414d4856ed0a4d69a3601ffd8040854fd2c31cc4e1d3d41c00d5a",
+      "hash": "a5c9c3d4b85f1fec1ae093fdf4363fd2fa7131a5be0f52a72d583d78539504dc",
       "ukuran_kb": 5.7,
-      "ringkasan": "Menjawab: bagaimana kebutuhan pencatatan badan usaha pemilik toko dipecah jadi issue induk bip-erp#3434 dengan sub-issue [BE] bip-erp#3435 dan [FE] erp-frontend#2725, beserta keputusan, kriteria 'yang harus benar', data PROD pendukung, cakupan, dan prasyaratnya. Berguna untuk mengetahui apa yang harus diubah di `department_shops`, endpoint finance tab Toko, dan layar Kepemilikan Toko.",
+      "ringkasan": "Menjawab: issue apa saja (induk, [BE] bip-erp, [FE] erp-frontend) untuk mencatat badan usaha pemilik toko oleh Marketing, apa kriteria 'yang harus benar' tiap PR (validasi payroll_company_id, upsert yang tak mengosongkan nilai, endpoint pilihan badan usaha, tab Toko sheet Badan Usaha), dan urutan deploy BE sebelum FE. Memuat juga data pendukung PROD 2026-10-22 (69 toko, 76 department_shops, 72 entitas) dan yang di luar cakupan.",
       "kata_kunci": [
         "analisa kebutuhan",
-        "badan usaha pemilik toko",
-        "T8a",
-        "sub-issue",
-        "department_shops",
-        "payroll_company_id",
+        "badan usaha toko",
         "Kepemilikan Toko",
-        "tab Toko",
-        "ADR 0197"
+        "ICC Management",
+        "sub-issue BE FE",
+        "payroll_company_id",
+        "sheet Badan Usaha",
+        "Sekretariat",
+        "store legal entity",
+        "T8a"
       ]
     },
     {
