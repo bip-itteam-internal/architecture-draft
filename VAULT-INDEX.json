@@ -1,6 +1,6 @@
 {
   "versi_skema": 1,
-  "digenerate": "2026-10-16",
+  "digenerate": "2026-10-23",
   "jumlah_dokumen": 530,
   "dokumen": [
     {
@@ -13580,19 +13580,20 @@
         "Microservices - Form Builder Service",
         "ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia"
       ],
-      "hash": "a9e088c12711133c0f654ef3417d98b41ad83a5a30b92cedc30386726195e5ce",
-      "ukuran_kb": 50.4,
-      "ringkasan": "Menjawab: issue backlog mana saja yang disentuh agent otonom pada Oktober 2026, apa hasilnya (PR, Butuh Info, atau dilewati), dan mengapa sebagian besar berhenti di Butuh Info (keputusan belum ada, prasyarat belum merged, sub-issue tanpa badan). Juga memuat ketepatan estimasi, sebab keterlambatan, dan pelajaran per issue dari runner backlog.",
+      "hash": "b41fd18a5e589adba935bf6518288eb4db4e983fe9e63acac9c3e12dcee75abd",
+      "ukuran_kb": 51.7,
+      "ringkasan": "Menjawab: issue backlog mana yang disentuh agent otonom pada Oktober 2026, apa hasilnya (PR terbuka, Butuh Info, atau dilewati), dan mengapa agent berhenti di tiap issue. Memuat tabel per issue dengan tanggal mulai, estimasi, ketepatan, sebab terlambat, dan pelajaran, serta bagian Pelajaran. Berguna untuk melihat pola kegagalan Definition of Ready, misalnya keputusan belum ada, lintas repo, atau menunggu issue lain.",
       "kata_kunci": [
         "agent backlog otonom",
         "runner backlog",
+        "log operasional",
         "Butuh Info",
-        "log Oktober 2026",
+        "Oktober 2026",
         "GitHub Project #15",
         "estimasi selesai",
-        "keterlambatan",
-        "pelajaran agent",
-        "issue triage"
+        "ketepatan estimasi",
+        "pelajaran",
+        "Siap Agent"
       ]
     },
     {
