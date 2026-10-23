@@ -43,6 +43,28 @@ Rekomendasi disertakan; Pemutus boleh memilih lain.
 
 Status tetap Diusulkan: butir 4 dan 5 belum final, dan belum ditegaskan apakah jawaban ini sudah atas nama Finance Supervisor.
 
+### Lembar penyelesaian (disiapkan 2026-10-23)
+
+Tiga hal tersisa sebelum status bisa menjadi Diterima. Daftar akun dan gudang di bawah dibaca dari Accurate prod 2026-10-23 (baca saja), supaya Finance cukup memilih.
+
+**A. Penegasan.** Apakah jawaban 1 ("ERP sync ke Accurate") dan 3 ("wajib cek FAT") dari Senior Accountant sudah atas nama Finance Supervisor? Bila ya, kedua butir itu final.
+
+**B. Akun lawan per jenis penyesuaian (pertanyaan 4).** Akun persediaan mengikuti jenis barang yang tersedia di Accurate: 1601 Persediaan Bahan Baku, 1602 Persediaan Bahan Kemas, 1603 Persediaan Bahan Penolong, 1605 Persediaan Produk Jadi.
+
+| Jenis penyesuaian | Usulan akun lawan | Catatan |
+|---|---|---|
+| Pemakaian bahan untuk produksi | 1604 Persediaan Barang dalam Proses - Manufaktur, atau 5100 Harga Pokok Produksi | Pilihan ini bergantung pada zona WIP (K-2) dan pemilik HPP per batch (K-6); boleh dijawab "tunda" |
+| Barang rusak atau kedaluwarsa | 5308 Biaya Barang Rusak | |
+| Selisih stock opname (kurang atau lebih) | 5313 Laba/Rugi Selisih Persediaan | Sesudah validasi FAT (jawaban 3) |
+| Sampel QC | 5309 Biaya Sample QC | |
+| Selisih RM susut/hilang | 5313 Laba/Rugi Selisih Persediaan, atau 5104 Biaya Varian Produksi | Lihat [[ADR - 0201 Selisih RM Dicatat Dua Sisi lalu Masuk Satu Jalur Penyesuaian Stok]] |
+
+Pengiriman hari ini tidak menyebut akun sama sekali, sehingga Accurate memakai bawaannya, Ekuitas Saldo Awal (lihat Context). Mengisi tabel ini menghentikan itu.
+
+**C. Gudang tujuan.** Menurut IT (2026-10-23), stok pabrik di Accurate dicatat di **Gudang Utama**; Accurate memang tidak punya gudang bernama bahan baku (8 gudang: Utama, Sadewa, Shopee, Gentara, Iis, Sidareja, Rework, GA). Pengaturan gudang tujuan kiriman ERP (`ACCURATE_WMS_WAREHOUSE`) hari ini **kosong**. Yang ditanyakan: apakah semua penyesuaian pabrik, bahan maupun barang jadi, masuk Gudang Utama? Bila barang jadi punya gudang lain, sebutkan.
+
+**D. Angka awal (pertanyaan 5).** Konfirmasi opname fisik penuh di hari peralihan, beserta tanggal peralihannya dan siapa dari FAT yang memvalidasi hasilnya.
+
 ## Deskripsi
 
 *Stok pabrik (manufacture `stok_sekarang`) menjadi stok operasional yang hanya diubah lewat transaksi ERP dan penyesuaian tervalidasi; Accurate menerima Penyesuaian Persediaan otomatis dan tidak lagi menimpa angka ERP; selisih ERP vs Accurate dilaporkan, tidak ditimpakan.*
@@ -78,7 +100,7 @@ Tidak ada penguncian atau versi: penulis "menimpa" yang terakhir menang, dan tra
 - Tanggal dokumen memakai tanggal pemindaian, bukan tanggal transaksi.
 - Koreksi lewat proposal mengubah qty transaksi di tempat, sementara outbox hanya diisi sekali per transaksi; koreksi kemungkinan tidak ikut terkirim (dugaan, belum dibuktikan).
 - Ketiga temuan di atas dilacak di bip-itteam-internal/bip-erp#3278.
-- **Akun penyesuaian tidak dikirim.** Permintaan Penyesuaian Persediaan sengaja tidak memuat akun, sehingga Accurate memakai akun bawaannya: Ekuitas Saldo Awal, bukan akun beban (komentar di klien Accurate integration-service, terbukti pada satu dokumen Penyesuaian Persediaan prod Juli 2026). Gudang tujuan diambil dari env `ACCURATE_WMS_WAREHOUSE` yang bawaannya kosong, dan compose mencatat Accurate belum punya gudang bahan baku (pemetaan RM menunggu Finance).
+- **Akun penyesuaian tidak dikirim.** Permintaan Penyesuaian Persediaan sengaja tidak memuat akun, sehingga Accurate memakai akun bawaannya: Ekuitas Saldo Awal, bukan akun beban (komentar di klien Accurate integration-service, terbukti pada satu dokumen Penyesuaian Persediaan prod Juli 2026). Gudang tujuan diambil dari env `ACCURATE_WMS_WAREHOUSE` yang bawaannya kosong, dan compose mencatat Accurate belum punya gudang bahan baku (pemetaan RM menunggu Finance). Per IT 2026-10-23, stok pabrik di Accurate dicatat di Gudang Utama (lihat Lembar penyelesaian C).
 - **Status pengiriman tidak seragam di dokumentasi.** [[ADR - 0015 Push Pergerakan WMS ke Accurate]] masih menulis pengiriman MATI di prod, sementara compose menyalakannya sejak 18 Juli, dan komentar kode per 2026-08-09 mencatat pengiriman harian gagal karena format tanggal (kini ada normalisasi tanggal). Berapa dokumen yang benar-benar sampai ke Accurate diukur bersama #3278.
 
 **Syarat Finance yang sudah tercatat** ([[Manufacture - Kajian Fondasi Sistem]] TBD 1): ERP mengikuti aturan pencatatan masuk/keluar (penjualan, retur, pembelian, pemakaian produksi); penyesuaian opname dibukukan setelah validasi Finance.
