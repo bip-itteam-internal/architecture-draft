@@ -72,6 +72,7 @@ Repo: **BE** = bip-erp, **FE** = erp-frontend. Status per 2026-10-13.
 | M-27 | Dashboard KPI Quality | BE #2246 | M-11, M-13 | Menunggu |
 | M-28 | CAPA dari komplain dan penyimpangan | BE #2251, #2191, #2247; #2235 (Marketing) | keputusan QA Manager | Menunggu keputusan. Ditinjau 2026-10-21: satu-satunya bagian kode (#2191, CAPA menyimpan id komplain) bertentangan dengan [[ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori]] keputusan 9 ("tidak disambungkan ke CAPA sekarang"); perlu tunda atau amandemen ADR, plus satu komplain satu CAPA atau banyak. #2251, #2247, #2235 soal adopsi (kode ada, belum dipakai), bukan kode |
 | M-29 | Pengawasan proses produksi | FE #1848 | M-10 | Menunggu |
+| M-30 | Lacak lot maju-mundur dan penarikan produk (recall): dari satu lot bahan tahu batch, produk, dan Surat Jalan/pelanggan yang terdampak, dan sebaliknya; prosedur tarik produk. Syarat CPOTB; didaftarkan 2026-10-23 dari perbandingan rancangan dengan ERP manufaktur yang lazim | - | M-13 (lot sejak bahan masuk), M-10 (lot bahan di Batch Record), M-21 (Surat Jalan per batch) | Menunggu |
 
 ## Fase 4: berikutnya
 

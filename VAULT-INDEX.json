@@ -21694,8 +21694,8 @@
         "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "0478470923a0ba719e44ca86c22151452be48ab307c829211bd7c84e2918c1bd",
-      "ukuran_kb": 13.4,
+      "hash": "0f18d35b796d9430d2d3428d3d546f586e4b69d5835e8f07d215a9efe3343ab3",
+      "ukuran_kb": 13.9,
       "ringkasan": "Menjawab: butir pekerjaan apa saja (kode M-nn) dalam penataan fondasi sistem Manufaktur (produksi, PPIC, gudang bahan dan barang jadi, Quality), statusnya, dan issue GitHub mana yang terkait. Juga menjawab keputusan K-1 sampai K-11 yang ditunggu beserta Pemutus dan ADR-nya, serta aturan pakai papan sebelum membuat issue, kode, atau master data baru.",
       "kata_kunci": [
         "fondasi manufaktur",
