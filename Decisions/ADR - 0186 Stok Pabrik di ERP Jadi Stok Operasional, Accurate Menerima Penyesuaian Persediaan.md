@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan**, 2026-10-19. Menunggu keputusan **Finance Supervisor** (keputusan K-1 di [[ANALISA - Fondasi Manufaktur]]). **Belum ada kode baru**; yang ditulis di sini usulan beserta pertanyaan yang harus dijawab Pemutus.
+> **Status**: 🟢 **Diterima**, 2026-10-23, oleh **Finance** (jawaban Senior Accounting, ditegaskan IT sebagai jawaban Pemutus pada 2026-10-23). Diusulkan 2026-10-19 sebagai keputusan K-1 di [[ANALISA - Fondasi Manufaktur]]. Akun pemakaian produksi ditunda bersama K-2/K-6; tanggal peralihan belum ditetapkan.
 
 ## Untuk Manajemen
 
@@ -86,7 +86,7 @@ Pengiriman hari ini tidak menyebut akun sama sekali, sehingga Accurate memakai b
 | Perlengkapan pabrik (bulanan) | 5306 Biaya Perlengkapan Pabrik | Gudang Utama |
 | **Pemakaian bahan untuk produksi** | **tidak ada contohnya** di dokumen yang dibaca | ditunda bersama K-2 (zona WIP) dan K-6 (HPP per batch) |
 
-Sisa sebelum status menjadi Diterima: penegasan bahwa jawaban ini berasal dari Pemutus (Finance Supervisor, atau Senior Accounting bila Pemutus K-1 dipindah ke sana). Tanggal peralihan tidak menghalangi pekerjaan kode; ia diumumkan sebelum opname fisik dilakukan. Syarat Decision 6 tetap: pengiriman ke Accurate diperbaiki lebih dulu (bip-itteam-internal/bip-erp#3278).
+Penegasan diterima 2026-10-23: IT menegaskan jawaban ini sebagai jawaban Pemutus, dan status menjadi Diterima. Tanggal peralihan tidak menghalangi pekerjaan kode; ia diumumkan sebelum opname fisik dilakukan. Syarat Decision 6 tetap: pengiriman ke Accurate diperbaiki lebih dulu (bip-itteam-internal/bip-erp#3278).
 
 ## Deskripsi
 
@@ -130,12 +130,12 @@ Tidak ada penguncian atau versi: penulis "menimpa" yang terakhir menang, dan tra
 
 ## Decision
 
-*Usulan; berlaku sesudah status di baris pertama menjadi Diterima.*
+*Diterima 2026-10-23. Butir 3 dan 4 diperjelas oleh jawaban lembar penyelesaian.*
 
 1. **`stok_sekarang` pabrik = stok operasional.** Hanya berubah lewat transaksi ERP dan satu jalur penyesuaian bervalidasi (M-12). Tarik dari Accurate tidak lagi menimpa (otomatis dimatikan, tombol manual dicabut atau diubah menjadi laporan).
 2. **Laporan selisih ERP vs Accurate** (baca saja) menggantikan penimpaan, dengan penanda jeda yang wajar (penerimaan yang fakturnya belum dibukukan).
-3. **Penyesuaian Persediaan otomatis ke Accurate** untuk pergerakan yang tidak sampai lewat dokumen lain (pemakaian produksi, barang rusak/kedaluwarsa, selisih opname tervalidasi), dengan akun dan gudang dari Finance (pertanyaan 4).
-4. **Opname** mengikuti urutan validasi yang dijawab Pemutus (pertanyaan 3) dan baru menjadi penyesuaian sesudah divalidasi Finance.
+3. **Penyesuaian Persediaan otomatis ke Accurate** untuk pergerakan yang tidak sampai lewat dokumen lain (pemakaian produksi, barang rusak/kedaluwarsa, selisih opname tervalidasi), dengan akun mengikuti praktik Finance di Accurate hari ini (tabel di Jawaban lembar penyelesaian) dan gudang **Gudang Utama**. Akun pemakaian produksi ditunda sampai K-2 dan K-6 diputuskan.
+4. **Opname** dilakukan dan divalidasi **Senior Accounting**; tidak ada batas selisih, semua selisih divalidasi sebelum menjadi penyesuaian (jawaban pertanyaan 3).
 5. **Rekonsiliasi Σ ledger** tetap ada sebagai alat periksa, bukan penimpa harian.
 6. Pengiriman ke Accurate **diperbaiki lebih dulu** (temuan push kedua di hari sama) sebelum aturan ini berlaku, supaya Accurate tidak kehilangan baris.
 

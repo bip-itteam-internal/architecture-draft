@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan**, 2026-10-23. Menunggu keputusan **Supervisor Quality** (keputusan K-5 di [[ANALISA - Fondasi Manufaktur]]). **Belum ada kode baru**; yang ditulis di sini usulan beserta pertanyaan yang harus dijawab Pemutus.
+> **Status**: 🟢 **Diterima**, 2026-10-23, oleh **Supervisor Quality** (jawaban diteruskan lewat IT, ditegaskan sebagai jawaban Pemutus pada 2026-10-23). Keputusan K-5 di [[ANALISA - Fondasi Manufaktur]]. Kartu stok menunggu contoh form kertas; lini Pangan ditunda.
 
 ## Untuk Manajemen
 
@@ -42,7 +42,7 @@ Rekomendasi disertakan; Pemutus boleh memilih lain.
 | 4 | Pangan tunda | (c) |
 | 5 | Setuju | (b): kertas dilepas sesudah satu audit internal atau inspeksi menerima cetakan ERP, dinyatakan Supervisor Quality |
 
-Semua pertanyaan sudah terjawab. Status menjadi Diterima begitu ditegaskan bahwa jawaban ini berasal dari Supervisor Quality.
+Semua pertanyaan terjawab dan ditegaskan sebagai jawaban Supervisor Quality pada 2026-10-23.
 
 ## Deskripsi
 
@@ -86,7 +86,7 @@ Diukur di kode `erp-frontend` `origin/main` (e64973711) dan `bip-erp` `origin/ma
 
 ## Decision
 
-*Usulan; berlaku sesudah status di baris pertama menjadi Diterima.*
+*Diterima 2026-10-23.*
 
 1. **Bentuk cetak = form kertas yang berlaku**, termasuk nomor dokumen dan revisi. Perubahan form kertas (revisi baru) diikuti ERP sebagai perubahan tersendiri.
 2. **Batch Record** dicetak dari ERP sesuai jawaban pertanyaan 1. Bila (b), cetakan menyediakan ruang tanda tangan basah di samping paraf digital.

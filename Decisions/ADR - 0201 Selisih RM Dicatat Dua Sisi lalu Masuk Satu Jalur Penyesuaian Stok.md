@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan**, 2026-10-23. Menunggu keputusan **SPV Manufacture** (keputusan K-11 di [[ANALISA - Fondasi Manufaktur]]). **Belum ada kode baru**; yang ditulis di sini usulan beserta pertanyaan yang harus dijawab Pemutus.
+> **Status**: 🟢 **Diterima**, 2026-10-23, oleh **SPV Manufacture** (jawaban diteruskan lewat IT, ditegaskan sebagai jawaban Pemutus pada 2026-10-23). Keputusan K-11 di [[ANALISA - Fondasi Manufaktur]]. Batas waktu sisi terima berlaku dulu dan boleh diubah sesuai keadaan lapangan.
 
 ## Untuk Manajemen
 
@@ -39,10 +39,10 @@ Rekomendasi disertakan; Pemutus boleh memilih lain.
 | 1 | Setuju | (b): bukti dua sisi, selisih menjadi usulan penyesuaian di satu jalur stok |
 | 2 | Setuju | (c): penyetuju memilih "salah hitung kirim" atau "susut/hilang" |
 | 3 | Setuju (bagian dari jawaban 1: disetujui SPV Manufacture lalu dicek FAT) | (b) |
-| 4 | **Ditanyakan balik**: "kenapa di hari yang sama?" | Masih terbuka, lihat penjelasan di bawah |
+| 4 | Ditanyakan balik ("kenapa di hari yang sama?"), lalu usulan revisi disetujui: "ya dulu, nanti bisa diubah sesuai keadaan di lapangan" | Sisi terima dicatat **sebelum bahan ditimbang untuk batch** |
 | 5 | Ya | (b): faktor konversi satuan di master bahan |
 
-**Penjelasan pertanyaan 4.** Yang penting bukan hari kalendernya, melainkan **sebelum bahannya dipakai**. Selama bahan masih di kemasannya, selisih bisa ditimbang ulang dan difoto; begitu bahan ditimbang ke batch dan tercampur, selisih itu tak bisa diperiksa lagi dan yang tersisa hanya angka di kertas. Usulan direvisi: **sisi terima dicatat sebelum bahan ditimbang untuk batch** (bukan "hari yang sama"), dengan pengingat bila catatan kirim masih menunggu lewat 1 hari kerja. Bila bahan memang disimpan dulu di produksi beberapa hari sebelum dipakai, batasnya tetap "sebelum dipakai". Menunggu jawaban SPV Manufacture atas usulan revisi ini.
+**Penjelasan pertanyaan 4.** Yang penting bukan hari kalendernya, melainkan **sebelum bahannya dipakai**. Selama bahan masih di kemasannya, selisih bisa ditimbang ulang dan difoto; begitu bahan ditimbang ke batch dan tercampur, selisih itu tak bisa diperiksa lagi dan yang tersisa hanya angka di kertas. Usulan direvisi: **sisi terima dicatat sebelum bahan ditimbang untuk batch** (bukan "hari yang sama"), dengan pengingat bila catatan kirim masih menunggu lewat 1 hari kerja. Bila bahan memang disimpan dulu di produksi beberapa hari sebelum dipakai, batasnya tetap "sebelum dipakai". Disetujui 2026-10-23 sebagai aturan awal; boleh diubah sesuai keadaan di lapangan.
 
 ## Deskripsi
 
@@ -51,7 +51,7 @@ Rekomendasi disertakan; Pemutus boleh memilih lain.
 - **Status**: lihat blockquote di baris pertama dokumen ini
 - **Keputusan papan**: K-11; bersama K-1 membuka M-12 di [[ANALISA - Fondasi Manufaktur]]
 - **Issue**: bip-itteam-internal/bip-erp#2252, bip-itteam-internal/erp-frontend#1849 (fitur Bukti Selisih RM); bip-itteam-internal/erp-frontend#1868 (opname, jalur yang sama)
-- **Preseden**: [[ADR - 0186 Stok Pabrik di ERP Jadi Stok Operasional, Accurate Menerima Penyesuaian Persediaan]] (Diusulkan; jawaban Finance soal validasi FAT)
+- **Preseden**: [[ADR - 0186 Stok Pabrik di ERP Jadi Stok Operasional, Accurate Menerima Penyesuaian Persediaan]] (Diterima 2026-10-23; validasi FAT oleh Senior Accounting)
 - **Tanggal**: 2026-10-23
 
 ## Context
@@ -83,13 +83,13 @@ Kajian ([[Manufacture - Kajian Fondasi Sistem]] Temuan 2 baris 5) merangkum ini 
 
 ## Decision
 
-*Usulan; berlaku sesudah status di baris pertama menjadi Diterima.*
+*Diterima 2026-10-23.*
 
 1. **Bukti Selisih RM dipertahankan** sebagai catatan dua sisi berfoto. Ia sendiri tidak mengubah stok.
 2. **Catatan berstatus SELESAI dengan selisih bukan nol** otomatis menghasilkan satu usulan penyesuaian di jalur tunggal M-12. Jalur itu dipakai bersama oleh stock opname, selisih RM, dan barang rusak/kedaluwarsa. Usulan membawa rujukan id catatan selisihnya, supaya penelusuran "selisih ini sudah dibukukan atau belum" bisa dijawab.
 3. **Penyetuju memilih alasan baku** (pertanyaan 2): salah hitung kirim (stok RM dikoreksi) atau susut/hilang (dibebankan).
 4. **Urutan persetujuan**: SPV Manufacture menyetujui, FAT memvalidasi, baru stok ERP berubah dan Penyesuaian Persediaan terkirim ke Accurate dengan akun dari Finance.
-5. **Batas waktu sisi terima** mengikuti jawaban pertanyaan 4, dengan pengingat untuk catatan yang masih menunggu.
+5. **Sisi terima dicatat sebelum bahan ditimbang untuk batch**, dengan pengingat bila catatan kirim masih menunggu lewat 1 hari kerja. Batas ini aturan awal dan boleh diubah sesuai keadaan lapangan.
 6. **Faktor konversi satuan** disimpan di master bahan, sehingga penerimaan dalam satuan beli tercatat dalam satuan stok tanpa hitung tangan. Penempatannya mengikuti keputusan pemilik master barang (K-7).
 
 ## Consequences

@@ -10287,8 +10287,8 @@
       "judul": "ADR - 0186 Stok Pabrik di ERP Jadi Stok Operasional, Accurate Menerima Penyesuaian Persediaan",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-19. Menunggu keputusan **Finance Supervisor** (keputusan K-1 di [[ANALISA - Fondasi Manufaktur]]). **Belum ada kode baru**; yang ditulis di sini usulan beserta pertanyaan yang harus dijawab Pemutus.",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-23, oleh **Finance** (jawaban Senior Accounting, ditegaskan IT sebagai jawaban Pemutus pada 2026-10-23). Diusulkan 2026-10-19 sebagai keputusan K-1 di [[ANALISA - Fondasi Manufaktur]]. Akun pemakaian produksi ditunda bersama K-2/K-6; tanggal peralihan belum ditetapkan.",
       "publik": true,
       "tautan": [
         "ANALISA - Fondasi Manufaktur",
@@ -10299,21 +10299,20 @@
         "ADR - 0201 Selisih RM Dicatat Dua Sisi lalu Masuk Satu Jalur Penyesuaian Stok",
         "Manufacture - Kajian Fondasi Sistem"
       ],
-      "hash": "abd27eb642da9c05e6ce68c5bb09e2587b822146551645116b0f72a29872b814",
-      "ukuran_kb": 15.8,
-      "ringkasan": "Menjawab: angka stok bahan baku dan barang jadi pabrik dipegang ERP atau Accurate, kenapa penimpaan stok dari Accurate tiap 6 jam bermasalah, dan siapa memvalidasi selisih stock opname sebelum dibukukan. Memuat pertanyaan untuk Pemutus (Finance Supervisor), jawaban Finance, akun dan gudang Accurate untuk Penyesuaian Persediaan (Gudang Utama), serta syarat angka awal opname fisik.",
+      "hash": "bea6cac292d913c258425f93553fb9e7bb342349721d50a4e09aa7183f76da0b",
+      "ukuran_kb": 16.0,
+      "ringkasan": "Menjawab: angka stok bahan baku dan barang jadi pabrik dipegang di mana (ERP sebagai stok operasional, Accurate menerima Penyesuaian Persediaan), kenapa tarik stok Accurate tiap 6 jam yang menimpa angka ERP dihentikan, dan siapa yang memvalidasi selisih stock opname sebelum dibukukan. Juga menjawab akun lawan Accurate per jenis penyesuaian (pemakaian produksi, barang rusak, selisih opname, sampel QC), gudang tujuan kiriman (Gudang Utama), serta angka awal saat peralihan.",
       "kata_kunci": [
         "stok pabrik",
-        "stok operasional",
+        "inventory",
         "Penyesuaian Persediaan",
+        "inventory adjustment",
         "Accurate",
         "stock opname",
-        "validasi FAT",
-        "sync 6 jam",
+        "SO",
+        "selisih ERP vs Accurate",
         "Gudang Utama",
-        "inventory adjustment",
-        "K-1",
-        "manufaktur"
+        "K-1"
       ]
     },
     {
@@ -10815,8 +10814,8 @@
       "judul": "ADR - 0201 Selisih RM Dicatat Dua Sisi lalu Masuk Satu Jalur Penyesuaian Stok",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-23. Menunggu keputusan **SPV Manufacture** (keputusan K-11 di [[ANALISA - Fondasi Manufaktur]]). **Belum ada kode baru**; yang ditulis di sini usulan beserta pertanyaan yang harus dijawab Pemutus.",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-23, oleh **SPV Manufacture** (jawaban diteruskan lewat IT, ditegaskan sebagai jawaban Pemutus pada 2026-10-23). Keputusan K-11 di [[ANALISA - Fondasi Manufaktur]]. Batas waktu sisi terima berlaku dulu dan boleh diubah sesuai keadaan lapangan.",
       "publik": true,
       "tautan": [
         "ANALISA - Fondasi Manufaktur",
@@ -10824,21 +10823,20 @@
         "ADR - 0136 Pemilik Master Barang dan Master Gudang",
         "Manufacture - Kajian Fondasi Sistem"
       ],
-      "hash": "7e83f6fececc079e5b0b268e4f711abc01cacc9afc841003441065952e2fc037",
-      "ukuran_kb": 10.9,
-      "ringkasan": "Menjawab: apa fungsi menu Bukti Selisih RM, apakah selisih bahan antara gudang RM dan produksi boleh mengubah stok, siapa menyetujui, dan kapan sisi terima harus dicatat. Mencakup usulan jalur penyesuaian stok tunggal (M-12), alasan baku salah hitung kirim vs susut/hilang, faktor konversi satuan, dan jawaban Pemutus (SPV Manufacture).",
+      "hash": "22e00b68c1dd4f02cf7df67687dc22c3a23f92d12cccd378bfc1ef9b813d36da",
+      "ukuran_kb": 11.2,
+      "ringkasan": "Menjawab: apa fungsi menu Bukti Selisih RM, apakah selisih bahan baku antara yang dikirim gudang RM dan yang diterima produksi boleh mengubah stok, dan lewat jalur mana (usulan di satu jalur penyesuaian stok M-12 yang disetujui SPV Manufacture lalu divalidasi FAT). Juga menjawab cara membebankan selisih (salah hitung kirim vs susut/hilang), batas waktu produksi mencatat sisi terima (sebelum bahan ditimbang ke batch), dan pencegahan selisih karena salah satuan lewat faktor konversi.",
       "kata_kunci": [
         "selisih RM",
-        "Bukti Selisih RM",
         "bahan baku",
+        "raw material",
+        "Bukti Selisih RM",
         "penyesuaian stok",
-        "SPV Manufacture",
-        "validasi FAT",
+        "stock adjustment",
+        "susut",
         "faktor konversi satuan",
-        "raw material discrepancy",
-        "M-12",
-        "K-11",
-        "produksi"
+        "SPV Manufacture",
+        "K-11"
       ]
     },
     {
@@ -10846,30 +10844,28 @@
       "judul": "ADR - 0202 Kartu Stok dan Batch Record Dicetak dari ERP Mengikuti Form Kertas yang Berlaku",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-23. Menunggu keputusan **Supervisor Quality** (keputusan K-5 di [[ANALISA - Fondasi Manufaktur]]). **Belum ada kode baru**; yang ditulis di sini usulan beserta pertanyaan yang harus dijawab Pemutus.",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-23, oleh **Supervisor Quality** (jawaban diteruskan lewat IT, ditegaskan sebagai jawaban Pemutus pada 2026-10-23). Keputusan K-5 di [[ANALISA - Fondasi Manufaktur]]. Kartu stok menunggu contoh form kertas; lini Pangan ditunda.",
       "publik": true,
       "tautan": [
         "ANALISA - Fondasi Manufaktur",
         "Manufacture - Kajian Fondasi Sistem",
         "Manufacture - Dokumen Produksi Batch"
       ],
-      "hash": "f0914eaa300b060f3118bece1dff63cedf0820a0b30e9307f964d337e10f2091",
+      "hash": "c8a47b6affade48e40ebbfbbd339d4647c62415c6b7cfc5441d94e40883ed033",
       "ukuran_kb": 9.5,
-      "ringkasan": "Menjawab: dokumen apa yang harus bisa dicetak dari ERP agar pabrik boleh berhenti memakai kertas untuk kartu stok dan Batch Record, dan dalam bentuk apa demi pemeriksaan BPOM. Menjelaskan kondisi cetak Batch Record 7 lembar yang sudah ada, kartu stok yang belum tercetak, tanda tangan basah selama peralihan, dan syarat kertas dilepas oleh Supervisor Quality.",
+      "ringkasan": "Menjawab: dokumen apa yang harus bisa dicetak dari ERP agar pabrik boleh meninggalkan kertas tanpa melanggar kebutuhan audit BPOM, dan dalam bentuk apa (meniru form kertas yang berlaku termasuk nomor dokumen dan revisi). Juga menjawab apakah cetakan Batch Record tujuh lembar diterima dan bagaimana tanda tangannya selama peralihan, bentuk kartu stok per lot untuk kosmetik, obat tradisional, dan bahan kemas, nasib lini Pangan, serta kapan kertas boleh dilepas.",
       "kata_kunci": [
         "kartu stok",
+        "stock card",
         "Batch Record",
+        "BMR",
         "cetak",
+        "print",
         "BPOM",
         "form kertas",
-        "Supervisor Quality",
         "paraf digital",
-        "lot bahan",
-        "audit",
-        "print",
-        "K-5",
-        "M-17"
+        "K-5"
       ]
     },
     {
@@ -21668,21 +21664,19 @@
         "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "2eb6eff60a7b7fba4c11179962bac047e4c13787999537ad27fc61688f3f438e",
-      "ukuran_kb": 12.1,
-      "ringkasan": "Menjawab: apa saja butir penataan fondasi sistem Manufaktur (kode M-nn), keputusan terbuka mana (K-1 sampai K-11) yang ditunggu dan siapa Pemutusnya, serta butir mana yang siap dikerjakan atau menunggu. Berfungsi sebagai papan kerja dengan aturan pakai, fase 1 sampai 4, dan tautan ke issue induk dan ADR terkait.",
+      "hash": "1f2d6d61a1880ba86a2477e6eb121b154cfbe65704b119047852396975946a39",
+      "ukuran_kb": 12.7,
+      "ringkasan": "Menjawab: apa saja butir kerja penataan fondasi sistem Manufaktur (produksi, PPIC, gudang RM/FG, Quality) beserta kode M-nn, issue GitHub terkait, prasyarat, dan fasenya, serta keputusan K-1 sampai K-11 yang ditunggu dan siapa Pemutusnya. Juga menjawab aturan pakai papan ini (cari butir sebelum membuat issue, butir Menunggu tak boleh dikerjakan sebelum ADR Diterima) dan urutan kerja yang disepakati.",
       "kata_kunci": [
         "fondasi manufaktur",
+        "manufacturing",
         "papan kerja",
-        "manufacture",
         "PPIC",
-        "gudang RM",
-        "Quality",
-        "keputusan K-1",
-        "butir M-nn",
         "Batch Record",
-        "fase adopsi",
-        "backlog",
+        "Quality",
+        "QC",
+        "keputusan K",
+        "butir M",
         "bip-erp#3068"
       ]
     },
