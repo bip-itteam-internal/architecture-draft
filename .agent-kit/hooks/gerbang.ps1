@@ -98,7 +98,9 @@ elseif ($jenis -eq 'flutter') {
   $alat = Get-GerbangAlat @('dart', 'flutter')
   if ($alat) { $gerbang += $alat }
   else {
-    $fd = Get-FolderDart $berkas
+    # Berkas yang DIHAPUS diff ikut di daftar tersentuh; foldernya bisa sudah tak ada, dan
+    # `dart analyze <folder-hilang>` gagal exit 64 tanpa menganalisis apa pun (2026-10-23, my-bharata#248).
+    $fd = Get-FolderDart @($berkas | Where-Object { Test-Path -LiteralPath (Join-Path $top $_) })
     if ($fd.terpotong) { $catatan += ("folder .dart tersentuh lebih dari {0}: hanya {0} pertama yang dianalisis, sisanya TIDAK diperiksa" -f $script:BatasFolderDart) }
     if ($fd.folder.Count -gt 0) { $gerbang += (Invoke-GerbangBatas 'analyze' $top ('dart analyze ' + ($fd.folder -join ' ')) $script:BatasAnalyze) }
     else { $catatan += 'tidak ada berkas .dart tersentuh: dart analyze dilewati' }

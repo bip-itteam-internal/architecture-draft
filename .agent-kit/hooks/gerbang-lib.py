@@ -189,6 +189,13 @@ def folder_dart(berkas, batas=BATAS_FOLDER_DART):
     return akar[:batas], len(akar) > batas
 
 
+def berkas_masih_ada(top, berkas):
+    """Buang berkas tersentuh yang sudah DIHAPUS diff. Foldernya bisa ikut hilang, dan
+    `dart analyze <folder-hilang>` gagal exit 64 tanpa menganalisis apa pun, sehingga gerbang
+    merah karena alatnya sendiri (2026-10-23, my-bharata#248 menghapus modul satgas lama)."""
+    return [b for b in berkas if os.path.exists(os.path.join(top, b))]
+
+
 def berkas_tersentuh(top, base):
     a = []
     mb = git(top, "merge-base", base, "HEAD")
@@ -415,7 +422,7 @@ def cmd_gerbang(argv):
         if g:
             gerbang.append(g)
         else:
-            folder, terpotong = folder_dart(berkas)
+            folder, terpotong = folder_dart(berkas_masih_ada(top, berkas))
             if terpotong:
                 catatan.append("folder .dart tersentuh lebih dari %d: hanya %d pertama yang dianalisis, sisanya TIDAK diperiksa" % (BATAS_FOLDER_DART, BATAS_FOLDER_DART))
             if folder:
