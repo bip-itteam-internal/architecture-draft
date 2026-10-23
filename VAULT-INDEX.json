@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-23",
-  "jumlah_dokumen": 672,
+  "jumlah_dokumen": 673,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -10694,6 +10694,37 @@
         "sertifikat",
         "MyBharata",
         "ADR 0198"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0199 Skor KPI Bulan Lampau Boleh Dihitung Ulang dari Template Terkini oleh HRIS, Maks Tiga Bulan, Skor Lama Disalin.md",
+      "judul": "ADR - 0199 Skor KPI Bulan Lampau Boleh Dihitung Ulang dari Template Terkini oleh HRIS, Maks Tiga Bulan, Skor Lama Disalin",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": null,
+      "status_teks": "🟢 Diterima, 2026-10-23, oleh Azzerith. Empat bentuknya dipilih lewat pilihan ganda di sesi kerja Cost Control (2026-10-23). Kode belum ada. Mengamandemen [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] bab Consequences (\"nilai otomatis yang dihitung ulang belakangan tidak retroaktif\") dan [[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]] butir 3. Amandemen ini **hanya** membuka satu jalur bergerbang, bukan menghapus pembekuan.",
+      "publik": true,
+      "tautan": [
+        "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
+        "ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem",
+        "ADR - 0147 Rata-rata KPI Departemen Dibagi yang Sudah Dinilai, Cakupan Ditampilkan Terpisah",
+        "HRIS - Otomasi Skor KPI",
+        "Microservices - Employee Service"
+      ],
+      "hash": "335fd38d530fe0afd3c749673a947de24d386fe861388bc6b64447958056f0d8",
+      "ukuran_kb": 7.1,
+      "ringkasan": "Menjawab: bagaimana memperbaiki skor KPI bulan lampau yang dibekukan dengan konfigurasi template lama, siapa yang boleh menghitung ulang (hanya HRIS), sampai berapa bulan ke belakang (maksimal tiga bulan yang sudah lewat), dan bagaimana jejaknya disimpan (skor lama disalin ke kpi_score_riwayat beserta alasan). Juga menjelaskan aturan nilai per butir otomatis vs manual dan kapan hitung ulang ditolak.",
+      "kata_kunci": [
+        "hitung ulang KPI",
+        "recalculate",
+        "skor KPI beku",
+        "kpi_score_riwayat",
+        "dihitung_ulang",
+        "template terkini",
+        "bulan lampau",
+        "HRIS",
+        "audit trail",
+        "Cost Control"
       ]
     },
     {
