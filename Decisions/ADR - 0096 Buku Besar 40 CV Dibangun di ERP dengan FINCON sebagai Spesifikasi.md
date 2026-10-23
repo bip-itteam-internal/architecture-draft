@@ -73,7 +73,7 @@ finance-service memegang master entitas CV berkode `CV01` sampai `CV40` (mengiku
 >
 > **Penerapan T1 (merge 2026-09-16, di prod sejak 2026-09-17).** Pemindai drift berbentuk laporan kecocokan yang dihitung saat dibuka (`GET /api/finance/akuntansi-cv/kecocokan`), tanpa penjadwal dan tanpa koleksi hasil; sumber yang gagal dibaca tidak melahirkan temuan. Pemetaan toko marketplace **ditunda ke T8** (keputusan user 2026-09-15): master T1 belum punya field toko.
 
-> **T8 dipecah 2026-10-22 (diusulkan).** Bagian pemetaan toko jadi T8a di [[ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko]]: penulisnya leader Marketing (yang membuka toko), disimpan di integration `department_shops` berkunci `payroll_company_id`, bukan di master entitas Finance. Pemasangan otomatis lewat nama di atas dicoret: di PROD 0 dari 69 toko cocok ke entitas mana pun karena nama toko adalah merek. Jurnal penjualan per CV tetap T8.
+> **T8 dipecah 2026-10-22; T8a di PROD 2026-10-23** (bip-erp #3468 + #3480, erp-frontend #2781; data 0 dari 76 toko terisi hari itu). Bagian pemetaan toko jadi T8a di [[ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko]]: penulisnya leader Marketing (yang membuka toko), disimpan di integration `department_shops` berkunci `payroll_company_id`, bukan di master entitas Finance. Pemasangan otomatis lewat nama di atas dicoret: di PROD 0 dari 69 toko cocok ke entitas mana pun karena nama toko adalah merek. Jurnal penjualan per CV tetap T8.
 
 > **Amandemen 2026-09-26.** 21 PT non-Bharata (dari `LISTING DIREKTUR PT - CV.xlsx`)
 > ditambahkan ke master entitas yang SAMA dengan kode `PT01`..`PT21`, tanpa rujukan

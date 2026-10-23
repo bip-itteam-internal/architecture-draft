@@ -1,6 +1,6 @@
 # ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko
 
-> **Status**: 🟢 Diterima, 2026-10-22, oleh irfanarfianto (Pemutus). Diusulkan 2026-10-22 oleh `/analisa-kebutuhan`, bentuk A. Menyentuh lingkup [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] (T8); persetujuan SPV FAT belum tercatat. Pemutus: `irfanarfianto`. Blueprint: `Workspace/ANALISA - Badan Usaha Pemilik Toko dari Marketing.md`.
+> **Status**: 🟢 Diterima, 2026-10-22, oleh irfanarfianto (Pemutus). Diusulkan 2026-10-22 oleh `/analisa-kebutuhan`, bentuk A. Menyentuh lingkup [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] (T8); persetujuan SPV FAT belum tercatat. ✅ **Kode di PROD sejak 2026-10-23**: bip-erp [#3468](https://github.com/bip-itteam-internal/bip-erp/pull/3468) + [#3480](https://github.com/bip-itteam-internal/bip-erp/pull/3480), erp-frontend [#2781](https://github.com/bip-itteam-internal/erp-frontend/pull/2781); lihat § Catatan Implementasi. Pemutus: `irfanarfianto`. Blueprint: `Workspace/ANALISA - Badan Usaha Pemilik Toko dari Marketing.md`.
 
 ## Untuk Manajemen
 
@@ -17,14 +17,14 @@
 - Jurnal penjualan per CV, penarikan saldo per CV, dan laporan pajak per CV **tidak** termasuk; itu tetap T8 di ADR 0096.
 - Riwayat pindah badan usaha tidak disimpan; yang tercatat badan usaha terkini beserta siapa dan kapan mengubahnya.
 
-**Perkiraan besaran kerja.** Dua PR berurutan: backend (integration + finance) lalu layar web. Tanpa env baru, tanpa kategori notifikasi baru.
+**Perkiraan besaran kerja.** Dua PR berurutan: backend (integration + finance) lalu layar web. Tanpa kategori notifikasi baru. (Realisasi: tiga PR, dan integration ternyata butuh satu env baru; lihat § Catatan Implementasi.)
 
 ## Deskripsi
 
 *Menambahkan badan usaha pemilik toko (`payroll_company_id`) sebagai atribut kepemilikan di `department_shops`, diisi leader Marketing di alur klaim toko yang sudah ada, lalu tab Toko di sheet Badan Usaha membaca atribut itu menggantikan turunan rekening. Memecah bagian "pemetaan toko" dari T8 ADR 0096 menjadi T8a dan memindahkan penulisnya dari Finance ke Marketing.*
 
-- **Status**: 🟢 Diterima 2026-10-22, kode belum ada
-- **Path di repo** (rencana):
+- **Status**: ✅ Diterima 2026-10-22, diimplementasikan dan di PROD 2026-10-23 (data: 0 dari 76 toko terisi per 2026-10-23)
+- **Path di repo** (rencana awal; yang sebenarnya di § Catatan Implementasi):
   - `bip-erp/services/integration/internal/domain/entity/department_shop.go`, `internal/interface/http/department_shop_handler.go`, `internal/infrastructure/repository/department_shop_repo.go`, `internal/interface/http/toko_ringkas_handler.go`, `main.go`
   - `bip-erp/services/payroll/` (daftar pilihan badan usaha untuk panggilan antar-service, bila endpoint yang ada tak bisa dipakai)
   - `bip-erp/services/finance/akuntansi_cv_toko_badan_usaha.go`
@@ -60,6 +60,21 @@ Diukur 2026-10-22 ke bip-erp dan erp-frontend `origin/main` serta data PROD (bac
 - Mengganti badan usaha toko langsung berlaku tanpa persetujuan dan tanpa riwayat. Bila T8 kelak menjurnal per CV, perpindahan di tengah periode perlu tanggal berlaku; itu diputuskan di T8, bukan di sini.
 - Kontrak lintas service baru: integration memanggil payroll untuk daftar badan usaha, dan finance membaca field baru dari integration. Deploy: payroll (bila endpointnya baru) dan integration sebelum finance, BE sebelum FE.
 - [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]], [[ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca]], [[REF - Kepemilikan Data]], [[RUN - Onboarding Toko Marketplace Baru]], [[Finance - Proses Penjualan Marketplace dan Uang Masuk]], dan [[Microservices - Integration Service]] disunting bersama ADR ini.
+
+## Catatan Implementasi
+
+Diperiksa ke kode yang merged dan biner PROD 2026-10-23.
+
+- **payroll** ([#3468](https://github.com/bip-itteam-internal/bip-erp/pull/3468)): `GET /internal/badan-usaha-ringkas` (`common.RequirePanggilanInternal`, `services/payroll/badan_usaha_ringkas.go`) → `[{id, nama}]` badan usaha yang beroperasi (`inactive != true`). `GET /companies` tetap tertutup bagi Marketing.
+- **integration** (#3468):
+  - `department_shops` + `payroll_company_id` (selalu string, `""` = belum), `payroll_company_updated_by`, `payroll_company_updated_at` (`entity/department_shop.go`).
+  - `POST /department-shops`: `payroll_company_id` opsional bertiga keadaan (tidak disebut / `null` = jangan sentuh, `""` = kosongkan, id = isi). Id bukan badan usaha beroperasi → **400**; payroll tak terjangkau atau env kosong → **503** (id tidak diterima; mengosongkan tetap jalan). Penulisan `$set` per field (`SetPemetaanToko`), jadi klaim ulang tanpa field tak menghapus nilai lama.
+  - `GET /department-shops/badan-usaha` (`RequireMarketingLeader`) → `{data:{badan_usaha:[{id,nama}]}}`.
+  - `GET /department-shops/ringkas` (kunci layanan, `GerbangKunciLayanan`) → `{data:{toko:[{channel, shop_id, shop_name, department, payroll_company_id}], total}}`, sumber seluruh `department_shops`.
+  - Env **baru** `PAYROLL_MODULE_URL` di blok `integration-service` compose: integration wajib `--force-recreate`, bukan restart.
+- **finance** ([#3480](https://github.com/bip-itteam-internal/bip-erp/pull/3480)): `GET /akuntansi-cv/badan-usaha/:payrollCompanyId/toko` membaca `/department-shops/ringkas`; `keadaan` selalu `"ok"`, `rekening` `""`, `tak_terpetakan_global` = toko ber-`payroll_company_id` kosong. Tidak lagi membaca `bank_account_no` maupun entitas Finance (badan usaha tanpa entitas tetap mendapat tokonya).
+- **erp-frontend** ([#2781](https://github.com/bip-itteam-internal/erp-frontend/pull/2781)): ICC Management › Kepemilikan Toko (menu Penugasan Toko) memilih badan usaha di dialog Petakan dan lewat tombol "Pilih/Ubah badan usaha" di kartu toko terpetakan (departemen terkunci); jumlah toko tanpa badan usaha di atas daftar. Sheet Badan Usaha › tab Toko tanpa baris rekening, kalimatnya menunjuk ke Kepemilikan Toko.
+- **Data PROD 2026-10-23**: 76 baris `department_shops` (Beautyhacks 54, Kyura 22), **0** berbadan usaha; leader/SPV kedua departemen diminta mengisi lewat WA hari itu. Ukur ulang sebelum dipakai memutuskan.
 
 ## Belum Diputuskan (TBD)
 

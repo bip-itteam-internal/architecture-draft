@@ -357,11 +357,13 @@ Yang **bertahan** hanyalah fungsi ACL "siapa boleh lihat toko apa" — kini `Sho
 
 > Grounded ke `internal/domain/entity/department_shop.go` + `usecase/department_shop_usecase.go`. ✅ **Live di produksi**: 58 toko terpetakan, UI di tab "Kepemilikan Toko" ICC Management, dipakai saringan `/divisi` + kolom `icc` di [[Microservices - Marketing Analytics Service]] DAN ACL `AllowedShops` di bawah — sumber tunggal sejak Fase Contract selesai 2026-09-15.
 
-- `GET /department-shops` — daftar pemetaan · `RequireIntegrationStaff`
-- `GET /department-shops/kesehatan` — **laporan ketidakcocokan**: toko terotorisasi yang belum dipetakan (yatim) + pemetaan tanpa otorisasi (sisa) · `RequireIntegrationStaff`
+- `GET /department-shops` — daftar pemetaan · `RequireDepartmentShopsView` (diperiksa 2026-10-23 ke `department_shop_handler.go` `DaftarkanRute`)
+- `GET /department-shops/kesehatan` — **laporan ketidakcocokan**: toko terotorisasi yang belum dipetakan (yatim) + pemetaan tanpa otorisasi (sisa) · `RequireDepartmentShopsView`
 - `POST /department-shops` (upsert) — **`RequireMarketingLeader`**; non-IT hanya boleh menulis departemennya sendiri (`department_shop_handler.go:50`). Diperiksa ulang 2026-10-22 ke `main.go:1659`.
 - `DELETE /department-shops` — **`RequireIntegrationAdmin`**
-- 🟡 *Direncanakan* ([[ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko]]): field `payroll_company_id` (badan usaha pemilik toko) di baris yang sama, diisi lewat upsert di atas.
+- ✅ **Badan usaha pemilik toko** ([[ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko]], bip-erp #3468, PROD 2026-10-23): field `payroll_company_id` + `payroll_company_updated_by/_at` di baris yang sama, diisi lewat upsert di atas (tidak disebut = jangan sentuh, `""` = kosongkan, id badan usaha beroperasi = isi; 400 id tak dikenal, 503 payroll tak terjangkau).
+- `GET /department-shops/badan-usaha` — pilihan badan usaha `{id, nama}` dari payroll `GET /internal/badan-usaha-ringkas` · `RequireMarketingLeader`. Butuh env `PAYROLL_MODULE_URL` (kosong = 503, service tidak panik saat start).
+- `GET /department-shops/ringkas` — seluruh baris `{channel, shop_id, shop_name, department, payroll_company_id}` untuk finance (tab Toko sheet Badan Usaha) · kunci layanan (`GerbangKunciLayanan`). Pendaftaran keenam rute ini di `DaftarkanRute` (`department_shop_handler.go`), bukan lagi di `main.go`.
 
 **Beda konsep dari §Shop ACL di atas, bukan bertumpuk.** ACL menjawab "siapa boleh lihat toko apa" (satu toko boleh dilihat banyak departemen, lewat filter `AllowedShops`). `department_shops` adalah **kepemilikan**, dan karenanya tunggal: satu toko yang dimiliki dua departemen membuat omzetnya terhitung dua kali dan menaikkan skor dua supervisor sekaligus. Ketunggalan ditegakkan index unik `(channel, shop_id)`. Sejak Fase Contract 2026-09-15, keduanya bahkan membaca koleksi yang SAMA (`department_shops`) — beda konsepnya murni di lapisan pertanyaan yang dijawab, bukan lagi di sumber datanya.
 

@@ -1,6 +1,6 @@
 # ANALISA - Badan Usaha Pemilik Toko dari Marketing
 
-**Status**: ADR [[ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko]] Diterima 2026-10-22; issue siap dikerjakan.
+**Status**: ADR [[ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko]] Diterima 2026-10-22. ✅ [BE] bip-erp#3435 (PR #3468 + #3480) dan ✅ [FE] erp-frontend#2725 (PR #2781) merged dan di PROD 2026-10-23. Sisa: [FE] erp-frontend#2739 (Integrasi Akun, Backlog, bentuk menunggu persetujuan) dan adopsi data (0 dari 76 toko terisi 2026-10-23).
 
 - **Keputusan**: [[ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko]] (memecah T8 [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]])
 - **Dok domain**: [[Microservices - Integration Service]] § Kepemilikan toko per departemen · [[RUN - Onboarding Toko Marketplace Baru]] langkah 2 · [[REF - Kepemilikan Data]]
