@@ -13580,20 +13580,21 @@
         "Microservices - Form Builder Service",
         "ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia"
       ],
-      "hash": "b41fd18a5e589adba935bf6518288eb4db4e983fe9e63acac9c3e12dcee75abd",
-      "ukuran_kb": 51.7,
-      "ringkasan": "Menjawab: issue backlog mana yang disentuh agent otonom pada Oktober 2026, apa hasilnya (PR terbuka, Butuh Info, atau dilewati), dan mengapa agent berhenti di tiap issue. Memuat tabel per issue dengan tanggal mulai, estimasi, ketepatan, sebab terlambat, dan pelajaran, serta bagian Pelajaran. Berguna untuk melihat pola kegagalan Definition of Ready, misalnya keputusan belum ada, lintas repo, atau menunggu issue lain.",
+      "hash": "33213734495ab918ee8e0e1e3eba75dbd4b3adf57cf49fd690ddf6559a246daf",
+      "ukuran_kb": 52.1,
+      "ringkasan": "Menjawab: issue backlog mana saja yang disentuh agent otonom pada Oktober 2026, apa hasilnya (PR terbuka, Butuh Info, atau dilewati), dan kenapa. Juga memuat estimasi vs realisasi, sebab keterlambatan, dan pelajaran per issue, mis. issue yang berhenti karena keputusan belum ada atau toolchain mesin runner tidak tersedia.",
       "kata_kunci": [
         "agent backlog otonom",
-        "runner backlog",
+        "autonomous backlog agent",
         "log operasional",
         "Butuh Info",
-        "Oktober 2026",
+        "In Review",
         "GitHub Project #15",
+        "runner",
         "estimasi selesai",
         "ketepatan estimasi",
         "pelajaran",
-        "Siap Agent"
+        "Oktober 2026"
       ]
     },
     {
