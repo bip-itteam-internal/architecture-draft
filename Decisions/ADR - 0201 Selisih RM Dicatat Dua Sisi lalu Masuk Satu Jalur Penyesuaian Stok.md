@@ -32,6 +32,18 @@ Rekomendasi disertakan; Pemutus boleh memilih lain.
 
 *Dicocokkan ke vault, kode `origin/main`, dan data prod 2026-10-23 sebelum dikirim, supaya Pemutus tak ditanya hal yang sudah tertulis.*
 
+### Jawaban (2026-10-23, disampaikan lewat IT)
+
+| # | Jawaban | Arti untuk keputusan |
+|---|---|---|
+| 1 | Setuju | (b): bukti dua sisi, selisih menjadi usulan penyesuaian di satu jalur stok |
+| 2 | Setuju | (c): penyetuju memilih "salah hitung kirim" atau "susut/hilang" |
+| 3 | Setuju (bagian dari jawaban 1: disetujui SPV Manufacture lalu dicek FAT) | (b) |
+| 4 | **Ditanyakan balik**: "kenapa di hari yang sama?" | Masih terbuka, lihat penjelasan di bawah |
+| 5 | Ya | (b): faktor konversi satuan di master bahan |
+
+**Penjelasan pertanyaan 4.** Yang penting bukan hari kalendernya, melainkan **sebelum bahannya dipakai**. Selama bahan masih di kemasannya, selisih bisa ditimbang ulang dan difoto; begitu bahan ditimbang ke batch dan tercampur, selisih itu tak bisa diperiksa lagi dan yang tersisa hanya angka di kertas. Usulan direvisi: **sisi terima dicatat sebelum bahan ditimbang untuk batch** (bukan "hari yang sama"), dengan pengingat bila catatan kirim masih menunggu lewat 1 hari kerja. Bila bahan memang disimpan dulu di produksi beberapa hari sebelum dipakai, batasnya tetap "sebelum dipakai". Menunggu jawaban SPV Manufacture atas usulan revisi ini.
+
 ## Deskripsi
 
 *Bukti Selisih RM tetap menjadi catatan dua sisi (kirim gudang RM, terima produksi) berfoto; selisih yang tercatat lengkap menjadi usulan penyesuaian di satu jalur penyesuaian stok (M-12) dengan alasan baku, disetujui SPV Manufacture, divalidasi FAT, lalu mengubah stok ERP dan terkirim ke Accurate.*

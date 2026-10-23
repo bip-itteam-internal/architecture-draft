@@ -10299,21 +10299,21 @@
         "ADR - 0201 Selisih RM Dicatat Dua Sisi lalu Masuk Satu Jalur Penyesuaian Stok",
         "Manufacture - Kajian Fondasi Sistem"
       ],
-      "hash": "709248bdadd97d8b30f90234f214e2348bc74cd09d0bbc291e93af6837121eae",
-      "ukuran_kb": 14.0,
-      "ringkasan": "Menjawab: siapa pemilik angka stok bahan baku dan barang jadi pabrik (ERP atau Accurate), mengapa tarik stok dari Accurate tiap 6 jam yang menimpa angka ERP perlu dihentikan, dan bagaimana selisih stock opname divalidasi Finance sebelum dibukukan. Memuat pertanyaan untuk Pemutus beserta jawaban Finance, serta lembar penyelesaian berisi akun lawan Accurate per jenis penyesuaian, gudang tujuan, dan angka awal peralihan.",
+      "hash": "abd27eb642da9c05e6ce68c5bb09e2587b822146551645116b0f72a29872b814",
+      "ukuran_kb": 15.8,
+      "ringkasan": "Menjawab: angka stok bahan baku dan barang jadi pabrik dipegang ERP atau Accurate, kenapa penimpaan stok dari Accurate tiap 6 jam bermasalah, dan siapa memvalidasi selisih stock opname sebelum dibukukan. Memuat pertanyaan untuk Pemutus (Finance Supervisor), jawaban Finance, akun dan gudang Accurate untuk Penyesuaian Persediaan (Gudang Utama), serta syarat angka awal opname fisik.",
       "kata_kunci": [
         "stok pabrik",
         "stok operasional",
-        "Accurate",
         "Penyesuaian Persediaan",
+        "Accurate",
         "stock opname",
         "validasi FAT",
-        "K-1",
-        "manufaktur",
+        "sync 6 jam",
+        "Gudang Utama",
         "inventory adjustment",
-        "sync stok",
-        "M-12"
+        "K-1",
+        "manufaktur"
       ]
     },
     {
@@ -10824,22 +10824,21 @@
         "ADR - 0136 Pemilik Master Barang dan Master Gudang",
         "Manufacture - Kajian Fondasi Sistem"
       ],
-      "hash": "75873d83a6f720e6f8848f84825a398605a0481e637c4c7c2ff445b078773d52",
-      "ukuran_kb": 9.8,
-      "ringkasan": "Menjawab: apakah selisih bahan baku antara yang dikirim gudang RM dan yang diterima produksi hanya bukti atau boleh mengubah stok, siapa yang menyetujui, dan bagaimana selisih satuan (liter vs KG) dicegah. Mengusulkan Bukti Selisih RM menjadi usulan penyesuaian di jalur tunggal M-12, disetujui SPV Manufacture lalu divalidasi FAT, dengan perbandingan jalur penyesuaian stok yang ada.",
+      "hash": "7e83f6fececc079e5b0b268e4f711abc01cacc9afc841003441065952e2fc037",
+      "ukuran_kb": 10.9,
+      "ringkasan": "Menjawab: apa fungsi menu Bukti Selisih RM, apakah selisih bahan antara gudang RM dan produksi boleh mengubah stok, siapa menyetujui, dan kapan sisi terima harus dicatat. Mencakup usulan jalur penyesuaian stok tunggal (M-12), alasan baku salah hitung kirim vs susut/hilang, faktor konversi satuan, dan jawaban Pemutus (SPV Manufacture).",
       "kata_kunci": [
         "selisih RM",
-        "bukti selisih",
+        "Bukti Selisih RM",
         "bahan baku",
-        "raw material",
         "penyesuaian stok",
         "SPV Manufacture",
-        "FAT",
-        "konversi satuan",
-        "K-11",
+        "validasi FAT",
+        "faktor konversi satuan",
+        "raw material discrepancy",
         "M-12",
-        "gudang RM",
-        "manufaktur"
+        "K-11",
+        "produksi"
       ]
     },
     {
@@ -10855,22 +10854,22 @@
         "Manufacture - Kajian Fondasi Sistem",
         "Manufacture - Dokumen Produksi Batch"
       ],
-      "hash": "adb505a206e6cb186846357a7db244df380fa8064601eb29d9981eb6a8d3e6fc",
-      "ukuran_kb": 8.8,
-      "ringkasan": "Menjawab: dokumen apa yang harus bisa dicetak dari ERP agar pabrik boleh berhenti memakai kertas untuk audit BPOM, bagaimana status Batch Record 7 lembar yang sudah tercetak, dan mengapa kartu stok belum bisa dicetak. Memuat pertanyaan untuk Supervisor Quality soal tanda tangan, bentuk kartu stok per lot, lini Pangan, dan kapan kertas boleh dilepas.",
+      "hash": "f0914eaa300b060f3118bece1dff63cedf0820a0b30e9307f964d337e10f2091",
+      "ukuran_kb": 9.5,
+      "ringkasan": "Menjawab: dokumen apa yang harus bisa dicetak dari ERP agar pabrik boleh berhenti memakai kertas untuk kartu stok dan Batch Record, dan dalam bentuk apa demi pemeriksaan BPOM. Menjelaskan kondisi cetak Batch Record 7 lembar yang sudah ada, kartu stok yang belum tercetak, tanda tangan basah selama peralihan, dan syarat kertas dilepas oleh Supervisor Quality.",
       "kata_kunci": [
         "kartu stok",
         "Batch Record",
-        "BPOM",
         "cetak",
+        "BPOM",
         "form kertas",
         "Supervisor Quality",
-        "lot bahan",
         "paraf digital",
+        "lot bahan",
+        "audit",
+        "print",
         "K-5",
-        "M-17",
-        "stock card",
-        "audit"
+        "M-17"
       ]
     },
     {
@@ -21669,22 +21668,22 @@
         "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "a264da59d24901fcd6028cee6cd3b63feeddea82a6209d2ee4641e9e3bc501b5",
-      "ukuran_kb": 11.9,
-      "ringkasan": "Menjawab: butir pekerjaan apa saja dalam penataan fondasi Manufaktur (kode M-nn per fase), keputusan terbuka mana yang ditunggu (K-1 sampai K-11) beserta Pemutus dan ADR-nya, serta aturan pakai papan sebelum membuat issue atau kode baru. Berfungsi sebagai papan kerja yang menautkan issue induk, preseden, dan status Siap/Menunggu keputusan/Berjalan/Selesai.",
+      "hash": "2eb6eff60a7b7fba4c11179962bac047e4c13787999537ad27fc61688f3f438e",
+      "ukuran_kb": 12.1,
+      "ringkasan": "Menjawab: apa saja butir penataan fondasi sistem Manufaktur (kode M-nn), keputusan terbuka mana (K-1 sampai K-11) yang ditunggu dan siapa Pemutusnya, serta butir mana yang siap dikerjakan atau menunggu. Berfungsi sebagai papan kerja dengan aturan pakai, fase 1 sampai 4, dan tautan ke issue induk dan ADR terkait.",
       "kata_kunci": [
         "fondasi manufaktur",
         "papan kerja",
         "manufacture",
         "PPIC",
+        "gudang RM",
+        "Quality",
         "keputusan K-1",
         "butir M-nn",
         "Batch Record",
-        "gudang RM FG",
-        "Quality",
-        "roadmap",
+        "fase adopsi",
         "backlog",
-        "fase"
+        "bip-erp#3068"
       ]
     },
     {

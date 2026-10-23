@@ -65,6 +65,29 @@ Pengiriman hari ini tidak menyebut akun sama sekali, sehingga Accurate memakai b
 
 **D. Angka awal (pertanyaan 5).** Konfirmasi opname fisik penuh di hari peralihan, beserta tanggal peralihannya dan siapa dari FAT yang memvalidasi hasilnya.
 
+### Jawaban lembar penyelesaian (2026-10-23, disampaikan lewat IT)
+
+| Butir | Jawaban | Arti untuk keputusan |
+|---|---|---|
+| A | "Yang melakukan SO Senior Accounting" | Stock opname pabrik dilakukan dan divalidasi **Senior Accounting** (FAT). Apakah jawaban 19 Oktober atas nama Finance Supervisor tidak dijawab langsung |
+| B | "Gunakan yang ada saat ini di Accurate" | Akun mengikuti praktik Finance di Accurate hari ini (tabel di bawah) |
+| C | "Ya, stok masuk Gudang Utama" | Semua penyesuaian pabrik dikirim ke **Gudang Utama** |
+| D | "Tanggal tidak menentu" | Angka awal tetap opname fisik penuh; **tanggal peralihan belum ditetapkan** |
+
+**Akun yang dipakai Finance hari ini**, dibaca dari 45 dokumen Penyesuaian Persediaan manual terbaru di Accurate prod (2026-10-23, baca saja; total 2.338 dokumen):
+
+| Jenis penyesuaian | Akun | Gudang |
+|---|---|---|
+| Sampel QC | 5309 Biaya Sample QC | Gudang Utama |
+| Barang rusak / reject | 5308 Biaya Barang Rusak | Gudang Utama; reject dari gudang online ke Gudang Rework |
+| Rework produk | 6120 Beban Rework Produk | Gudang Utama |
+| Selisih stok (opname, pemindahan pengakuan stok) | 5313 Laba/Rugi Selisih Persediaan | Gudang Utama |
+| Bahan penolong (bulanan) | 5307 Biaya Bahan Penolong | Gudang Utama |
+| Perlengkapan pabrik (bulanan) | 5306 Biaya Perlengkapan Pabrik | Gudang Utama |
+| **Pemakaian bahan untuk produksi** | **tidak ada contohnya** di dokumen yang dibaca | ditunda bersama K-2 (zona WIP) dan K-6 (HPP per batch) |
+
+Sisa sebelum status menjadi Diterima: penegasan bahwa jawaban ini berasal dari Pemutus (Finance Supervisor, atau Senior Accounting bila Pemutus K-1 dipindah ke sana). Tanggal peralihan tidak menghalangi pekerjaan kode; ia diumumkan sebelum opname fisik dilakukan. Syarat Decision 6 tetap: pengiriman ke Accurate diperbaiki lebih dulu (bip-itteam-internal/bip-erp#3278).
+
 ## Deskripsi
 
 *Stok pabrik (manufacture `stok_sekarang`) menjadi stok operasional yang hanya diubah lewat transaksi ERP dan penyesuaian tervalidasi; Accurate menerima Penyesuaian Persediaan otomatis dan tidak lagi menimpa angka ERP; selisih ERP vs Accurate dilaporkan, tidak ditimpakan.*

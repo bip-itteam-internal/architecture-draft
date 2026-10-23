@@ -32,6 +32,18 @@ Rekomendasi disertakan; Pemutus boleh memilih lain.
 
 *Dicocokkan ke vault, kode `origin/main`, dan data prod 2026-10-23 sebelum dikirim, supaya Pemutus tak ditanya hal yang sudah tertulis.*
 
+### Jawaban (2026-10-23, disampaikan lewat IT)
+
+| # | Jawaban | Arti untuk keputusan |
+|---|---|---|
+| 1 | Setuju | (b): Batch Record dicetak dari ERP lalu ditandatangani basah selama peralihan |
+| 2 | "Itu nanti gunakan sementara" | Kartu stok ERP memakai bentuk form kertas yang berlaku **sebagai bentuk sementara**; bentuknya boleh direvisi kemudian. Contoh form kertasnya tetap dibutuhkan untuk membangunnya |
+| 3 | Ya | (a): bahan kemas memakai kartu yang sama tanpa kolom kedaluwarsa |
+| 4 | Pangan tunda | (c) |
+| 5 | Setuju | (b): kertas dilepas sesudah satu audit internal atau inspeksi menerima cetakan ERP, dinyatakan Supervisor Quality |
+
+Semua pertanyaan sudah terjawab. Status menjadi Diterima begitu ditegaskan bahwa jawaban ini berasal dari Supervisor Quality.
+
 ## Deskripsi
 
 *Kartu stok dan Batch Record dicetak dari ERP dengan bentuk meniru form kertas yang berlaku (nomor dokumen dan revisi ikut); Batch Record sudah tercetak tujuh lembar dan tinggal dinyatakan diterima, kartu stok dibangun dari contoh kertas yang dikirim Supervisor Quality; kertas dilepas sesudah Supervisor Quality menyatakan cetakan diterima.*
