@@ -261,6 +261,15 @@ try {
   Check ($ssSh.Contains('triase')) 'session-start.sh mengkualifikasi flow wajib dengan triase (paritas)'
   Check ($cmGen.Contains('triase')) 'CLAUDE.md hasil generate menyebut triase'
 
+  # Status lock receipt-sync (kit 1.43.0): aturan di CLAUDE.md hanya berguna bila skrip yang
+  # disebutnya benar-benar ikut tersalin ke .claude/hooks, keempat berkasnya (keputusan Python,
+  # pengumpul fakta jarak jauh, dan dua pembungkus). Hilang satu = aturan menyuruh menjalankan
+  # sesuatu yang tidak ada.
+  foreach ($b in 'cek-lock-receipt.ps1', 'cek-lock-receipt.sh', 'cek-lock-receipt.py', 'cek-lock-receipt.remote.sh') {
+    Check (Test-Path (Join-Path $claude "hooks/$b")) "hooks/$b tersalin init"
+  }
+  Check ($cmGen.Contains('cek-lock-receipt')) 'CLAUDE.md hasil generate memuat aturan status lock receipt'
+
   # /kerjakan <teks bebas> menjalankan prosedur /brief lalu LANJUT tanpa syarat, sehingga brief
   # ber-Sumber kosong melewati gerbang ragu yang baru dibuat brief.md.
   Check ($kjTriase.Contains('brief `ragu` berhenti')) 'kerjakan: teks bebas yang jadi brief ragu berhenti'
@@ -388,6 +397,66 @@ try {
     if ($barisTools) { $devopsTools = $barisTools.Line }
   }
   Check ((Test-Path $devopsMd) -and $devopsTools -and $devopsTools -notmatch 'PowerShell' -and $devopsTools -notmatch 'Bash') "loop-devops penyiap: tools tanpa shell ('$devopsTools')"
+
+  # ---- judge desain: agen loop-judge-desain ----
+  # Read-only (alat dijaga di frontmatter, bukan di prosa), kontrak keluarannya dibaca /judge, dan isi
+  # ui-checklist.md DIRUJUK bukan disalin (satu fakta satu tempat).
+  $jdsPath = Join-Path $claude 'agents/loop-judge-desain.md'
+  Check (Test-Path $jdsPath) 'agen loop-judge-desain tersalin ke .claude/agents'
+  if (Test-Path $jdsPath) {
+    $jds = Get-Content $jdsPath -Raw -Encoding UTF8
+    Check ($jds -match '(?m)^tools: Read, Grep, Glob\s*$') 'loop-judge-desain: tools hanya Read, Grep, Glob'
+    Check ($jds.Contains('<<VERDICT_DESAIN>>') -and $jds.Contains('<<END>>') -and $jds.Contains('layar_dinilai') -and $jds.Contains('"bantahan"')) 'loop-judge-desain: kontrak keluaran VERDICT_DESAIN, END, layar_dinilai, bantahan'
+    Check (($jds -match '(?m)^model: opus\s*$') -and ($jds -match '(?m)^maxTurns: 40\s*$')) 'loop-judge-desain: model opus, maxTurns 40'
+    Check ($jds.Contains('ui-checklist.md')) 'loop-judge-desain: merujuk path ui-checklist.md'
+    Check (-not [regex]::IsMatch($jds, '(?m)^## 2[a-d]?\. ')) 'loop-judge-desain: tak memuat judul bagian ui-checklist (dirujuk, bukan disalin)'
+  }
+  $peranIsi = Get-Content (Join-Path $kitRoot 'hooks/kantor-agent.py') -Raw -Encoding UTF8
+  Check ($peranIsi.Contains('"loop-judge-desain"')) 'kantor-agent PERAN memuat loop-judge-desain'
+  # ---- judge desain: sambungan ke /judge, /kerjakan, eksekutor, supervisor ----
+  # Tiap pemeriksaan dibatasi ke POTONGAN bagiannya (pola 1.39.0): kata yang sama muncul di langkah
+  # lain, jadi -match atas seluruh berkas tetap hijau walau aturannya hilang dari tempatnya.
+  $S = [string][char]0x00A7  # tanda pasal; berkas ini tanpa BOM, jadi literal non-ASCII terbaca cp1252 di PS 5.1
+  $jdMd = Get-Content (Join-Path $claude 'commands/judge.md') -Raw -Encoding UTF8
+  $jd3 = Potong $jdMd '3. **Agen judge**' '3b. **Judge desain**'
+  $jd3b = Potong $jdMd '3b. **Judge desain**' '4. **Triangulasi'
+  $jd4 = Potong $jdMd '4. **Triangulasi' '## Jangan'
+  Check ($jd3b.Contains('layar-lib.py perlu') -and $jd3b.Contains('tangkap-layar.ps1') -and $jd3b.Contains('loop-judge-desain') -and $jd3b.Contains('layar_dinilai')) '/judge 3b: perlu, tangkap-layar.ps1, loop-judge-desain, layar_dinilai'
+  Check ($jd3b.Contains('layar-lib.py validasi') -and $jd3b.Contains('layar-lib.py ringkas') -and $jd3b.Contains('run_in_background: true') -and $jd3b.Contains('<<VERDICT_DESAIN>>')) '/judge 3b: validasi manifest, tangkap di background, ringkas, urai VERDICT_DESAIN'
+  Check ($jd4.Contains('verdict_desain') -and $jd4.Contains('Desain:')) '/judge 4: triangulasi verdict_desain + baris Desain:'
+  # Satu penilai per aturan: saat judge desain menyala ui-checklist.md tak dikirim ke loop-judge.
+  Check ($jd3 -match 'judge desain menyala[^\n]*ui-checklist\.md[^\n]*TIDAK dikirim' -and -not $jd3.Contains('sertakan juga path')) '/judge 3: ui-checklist.md tidak dikirim ke loop-judge bila judge desain menyala'
+  Check ($jd3.Contains($S + 'F') -and $jd3.Contains($S + 'J')) '/judge 3: prompt loop-judge menyebut lewati F/J saat judge desain menyala'
+  $kjMd = Get-Content (Join-Path $claude 'commands/kerjakan.md') -Raw -Encoding UTF8
+  $kj3 = Potong $kjMd '## 3. Judge' '## 4. Loop perbaikan'
+  $kj4 = Potong $kjMd '## 4. Loop perbaikan' '## 5. Commit'
+  $kj5 = Potong $kjMd '## 5. Commit' '## 6. Tutup'
+  Check ($kj3.Contains('"verdict_desain"') -and $kj3.Contains('"layar"') -and $kj3.Contains('"salah_tuduh"') -and $kj3.Contains('layar-lib.py salah-tuduh')) '/kerjakan 3: field log verdict_desain, layar, salah_tuduh (dari layar-lib.py)'
+  Check ($kj4.Contains('Bantahan') -and $kj4 -match 'desain') '/kerjakan 4: temuan desain + bagian Bantahan'
+  Check ($kj5.Contains('- [ ] salah tuduh:') -and $kj5.Contains('layar tidak tertangkap')) '/kerjakan 5: centang salah tuduh + alasan layar tak tertangkap di badan PR'
+  # Galat global tangkapan (build/port/server) dibawa ke `layar`, bukan hilang di rute kosong.
+  Check ($jd3b.Contains('"galat": str|null') -and $jd3b.Contains('"tidak tersedia: <galat>"')) '/judge 3b(c): galat global ringkas jadi layar tidak tersedia'
+  Check ($jd3b.Contains('<slug>-<n>-layar/') -and $jd3b -match 'Hapus dulu') '/judge 3b(c): folder tangkapan percobaan ini dibersihkan sebelum menangkap'
+  Check ($jd4 -match 'gabungan') '/judge 4: Temuan kritis = gabungan loop-judge + judge desain'
+  # Sisa run lama: manifest tertinggal tak boleh membungkam temuan "manifest layar tidak ada".
+  $kj2 = Potong $kjMd '## 2. Eksekutor' '## 3. Judge'
+  Check ($kj2.Contains('Sebelum dispatch percobaan 1') -and $kj2.Contains('<slug>-layar.json') -and $kj2.Contains('<slug>-<k>-bantahan.json')) '/kerjakan 2: sisa run lama slug ini dibuang di percobaan 1'
+  Check ($kj3 -match 'hanya bila kedua' -and $kj3.Contains('Test-Path')) '/kerjakan 3: salah-tuduh dijaga dua berkas verdict desain'
+  Check ($kj4.Contains('verdict desain tidak terurai')) '/kerjakan 4: verdict desain tak terurai dikirim balik sebagai temuan'
+  Check ($kj5.Contains('tidak diunggah') -and $kj5 -match 'lokal') '/kerjakan 5: PNG terang disebut lokal, tidak diunggah'
+  $ljMd = Get-Content (Join-Path $claude 'agents/loop-judge.md') -Raw -Encoding UTF8
+  # i18n diperiksa di POTONGAN pengecualian, bukan seluruh berkas (i18n juga ada di Pass 1).
+  $ljEks = Potong $ljMd '## Pengecualian saat judge desain menyala' '## Gerbang verifikasi'
+  Check ($ljEks -match ("(?m)^.*judge desain.*" + $S + 'F.*' + $S + 'J.*$') -and $ljEks -match 'i18n') 'loop-judge: lewati F dan J bila judge desain menyala, i18n tetap'
+  foreach ($eks in 'loop-fe', 'loop-test', 'loop-fix', 'loop-refactor') {
+    $eMd = Get-Content (Join-Path $claude ("agents/$eks.md")) -Raw -Encoding UTF8
+    $eLap = Potong $eMd '## Laporan akhir' '#### tak-ada'
+    Check ($eMd.Contains('<slug>-layar.json') -and $eLap.Contains('Bantahan')) "${eks}: manifest <slug>-layar.json + Bantahan di laporan"
+  }
+  $svMd = Get-Content (Join-Path $claude 'commands/supervise.md') -Raw -Encoding UTF8
+  Check ($svMd.Contains('salah_tuduh') -and $svMd.Contains('salah tuduh:') -and $svMd.Contains('gh pr view')) '/supervise: salah_tuduh log + centang PR lewat gh pr view'
+  $lsMd = Get-Content (Join-Path $claude 'agents/loop-supervisor.md') -Raw -Encoding UTF8
+  Check ($lsMd.Contains('salah_tuduh') -and $lsMd.Contains('layar_dinilai')) 'loop-supervisor: hitung salah_tuduh dan layar_dinilai judge desain'
 
   # ---- v1.25.0: dua lubang gerbang ----
   $errf = Join-Path $tmp 'hook.err'
@@ -731,6 +800,26 @@ try {
   # worktree-bersih: worktree baru tanpa commit / kotor / baru disunting tak pernah dibuang (kit 1.36.0)
   $rcWtb = Invoke-Ps (Join-Path $kitRoot 'tests/test-worktree-bersih.ps1') @()
   Check ($rcWtb -eq 0) "tests/test-worktree-bersih.ps1 lulus (exit $rcWtb; jalankan langsung untuk rinciannya)"
+  # tangkap-layar (judge desain): butuh Chrome sungguhan; mesin tanpa Chrome dilewati dengan pesan,
+  # bukan gagal, supaya gerbang kit tak merah permanen karena infrastruktur.
+  $chromeUji = 'C:\Program Files\Google\Chrome\Application\chrome.exe'
+  if (Test-Path -LiteralPath $chromeUji) {
+    # Keluaran test dalam disimpan (Invoke-Ps membuangnya): bila merah, nama Check yang gagal
+    # dicetak di sini, bukan cuma "exit 1" yang memaksa orang menjalankan ulang 2 menit.
+    $logLayar = Join-Path $tmp 'test-tangkap-layar.log'
+    $pLayar = Start-Process -FilePath 'powershell' -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"' + (Join-Path $kitRoot 'tests/test-tangkap-layar.ps1') + '"')) `
+      -RedirectStandardOutput $logLayar -RedirectStandardError ($logLayar + '.err') -Wait -PassThru -NoNewWindow
+    $rcLayar = $pLayar.ExitCode
+    # LEWAT di test dalam (node/pnpm/python hilang) tetap exit 0; tanpa dicetak di sini PASS-nya kosong.
+    @(Get-Content -LiteralPath $logLayar -ErrorAction SilentlyContinue | Where-Object { $_ -match '^LEWAT' }) | ForEach-Object { Write-Host "  tangkap-layar> $_" }
+    Check ($rcLayar -eq 0) "tests/test-tangkap-layar.ps1 lulus (exit $rcLayar)"
+    if ($rcLayar -ne 0) {
+      @(Get-Content -LiteralPath $logLayar -ErrorAction SilentlyContinue | Where-Object { $_ -match '^(FAIL|LEWAT)|gagal$|^tangkap-layar: ' }) | ForEach-Object { Write-Host "  tangkap-layar> $_" }
+      @(Get-Content -LiteralPath ($logLayar + '.err') -ErrorAction SilentlyContinue | Select-Object -Last 5) | ForEach-Object { Write-Host "  tangkap-layar stderr> $_" }
+    }
+  } else {
+    Write-Host "LEWAT tests/test-tangkap-layar.ps1: Chrome tidak ada di $chromeUji"
+  }
   $bashEntry = $ptu | Where-Object { $_.matcher -eq 'Bash' }
   $psEntry   = $ptu | Where-Object { $_.matcher -eq 'PowerShell' }
   Check ($null -ne $bashEntry -and $null -ne $psEntry) "gerbang terpasang untuk tool Bash DAN PowerShell (matcher: $($ptu.matcher -join ', '))"

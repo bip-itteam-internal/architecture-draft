@@ -24,7 +24,7 @@ Daftar jabatan di bawah adalah **seed kode** (`DefaultDepartments()`, key `secre
 | Direktur | Ruang Direktur `/direktur` | 15 kunci modul, lihat catatan di bawah tabel | tidak tercatat |
 | Corporate Secretary | Ruang Direktur | `secretary: supervisor` | `CORPORATE SECRETARY`, 4 metrik |
 | Legal | Perizinan & Sertifikasi, Kontrak & SLA, Dispute & Advis (`/legal/*`) | `legal: staff` | tidak tercatat |
-| QA RND | Registrasi NIE / BPOM / Halal, Pengembangan Produk (`/rnd/*`) | `rnd: staff` ⚠️ | `R&D REGULATORY`, 4 metrik |
+| QA RND | Registrasi NIE / BPOM / Halal, Pengembangan Produk (`/rnd/*`) | `rnd: staff` ⚠️ + `manufacture: rnd` (PJT, bip-erp#3084, merged 2026-10-13, belum deploy PROD) | `R&D REGULATORY`, 4 metrik |
 | Internal Audit | [[APP - Audit Internal]] (aplikasi terpisah, masuk lewat SSO) | tidak ada | `INTERNAL AUDIT`, 5 metrik |
 | Personal Assistant | tidak ada modul khusus | tidak ada, sengaja ([[ADR - 0043 Peran Sistem Diturunkan dari Jabatan]]) | `PERSONAL ASSISTANT`, 4 metrik |
 | Company Branding | tidak ada modul khusus | tidak ada | `COMPANY BRANDING`, 4 metrik |
@@ -50,6 +50,7 @@ Catatan tabel:
   - **Registrasi NIE / BPOM / Halal**, **Pengembangan Produk** (izin `secretary.rnd.view`).
   - **Referensi Procurement**: Kontrak Vendor dan Master Pemasok, baca-saja (izin `secretary.legal.view`).
   - **Data WMS**: Master Produk (BOM), Gudang RM, Analisa Stok, baca-saja (izin `secretary.rnd.view`).
+- ✅ **Badan Usaha** (prod 2026-10-16): Corporate Secretary jadi satu-satunya pintu tambah/ubah PT Bharata, CV, dan PT lain di `/secretary/badan-usaha` (daftar), `/secretary/badan-usaha/baru` dan `/secretary/badan-usaha/[id]` (halaman, bukan dialog), izin `secretary.badanusaha.kelola` (paket "Sekretariat: Badan Usaha", dipasang manusia di Hak per Posisi). Isian identitas, data legal, rekening pengirim gaji, status, dan **kop surat** (disimpan di entitas Finance). Datanya tetap daftar `payroll_company` di payroll-service; HR dan Finance membaca. Halaman memeriksa izin sendiri karena proxy hanya menggerbang `/secretary/kpi`. [[ADR - 0183 Badan Usaha Dikelola Sekretariat, HR dan Finance Membaca]] · [[ANALISA - Badan Usaha Dikelola Sekretariat]].
 - **Alias kategori** (`modul-aktif.ts`): pemegang `system_roles.legal` atau `rnd` diarahkan ke kategori `secretary`. Tanpa alias itu mereka kehilangan seluruh menunya tanpa galat, karena kunci `legal` dan `rnd` sudah tidak ada di objek menu.
 
 ### Ruang Direktur
@@ -63,7 +64,7 @@ Layar `/direktur` dengan tab Persetujuan, Kinerja Divisi, dan Keuangan, disusun 
 | Direktur | jabatan `Direktur`, Kesekretariatan | peran turunan di 15 modul; izin `finance.profit.view` untuk Ruang Direktur | Web ERP |
 | Corporate Secretary | jabatan `Corporate Secretary`, Kesekretariatan | `secretary: supervisor`; wewenang memutus setara Direktur lewat `SetaraDirektur` | Web ERP |
 | Staf Legal | jabatan `Legal`, Kesekretariatan | `legal: staff` atau paket Sekretariat Legal | Web ERP |
-| R&D Regulatory | jabatan `QA RND`, Kesekretariatan | `rnd: staff` atau paket Sekretariat R&D | Web ERP |
+| R&D Regulatory | jabatan `QA RND`, Kesekretariatan | `rnd: staff` (+ `manufacture: rnd`, bip-erp#3084, merged 2026-10-13, belum deploy PROD) atau paket Sekretariat R&D | Web ERP |
 | Internal Audit | jabatan `Internal Audit`, Kesekretariatan | paket `audit_auditor` di aplikasi Audit Internal | Web (aplikasi terpisah) |
 | Pendukung Direktur dan kreatif | Personal Assistant, Administrative, Business Unit Assistant, Company Branding, Graphic Design, Video Editor | tanpa modul kerja khusus | MyBharata (presensi, pengajuan) |
 

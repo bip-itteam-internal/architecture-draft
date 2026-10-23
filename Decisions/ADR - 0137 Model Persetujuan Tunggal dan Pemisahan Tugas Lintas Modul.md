@@ -4,6 +4,8 @@
 
 %% Status di blockquote atas supaya terbaca VAULT-INDEX.json (15 baris pertama), pola sama dengan ADR 0136. %%
 
+> ➡️ **Tahap pertama yang sudah diusulkan**: [[ADR - 0194 Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat]] (🟡 2026-10-21), peta baca-saja "orang ini bisa menyetujui apa" lintas modul. Ia tidak mendahului Decision di sini; mengatur penyetuju dari satu tempat tetap menunggu ADR ini.
+
 %% Vault ini PUBLIK. Celah yang belum ditambal hanya ditulis sebagai kategori, dampak, tingkat, dan rujukan issue Linear. Jangan menambahkan rute, nama berkas, nomor baris, atau cara memicunya ke dok ini. %%
 
 ## Untuk Manajemen

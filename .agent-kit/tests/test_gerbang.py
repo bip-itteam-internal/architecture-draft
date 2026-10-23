@@ -135,6 +135,16 @@ def test_folder_dart_meruntuhkan_ke_akar_alih_alih_memotong():
     assert terpotong is False
 
 
+def test_berkas_masih_ada_membuang_yang_dihapus(tmp_path):
+    # Diff yang menghapus satu modul utuh: foldernya hilang, `dart analyze` atasnya exit 64.
+    (tmp_path / "lib").mkdir()
+    (tmp_path / "lib" / "a.dart").write_text("")
+    hasil = gl.berkas_masih_ada(str(tmp_path), ["lib/a.dart", "test/features/satgas/x_test.dart"])
+    assert hasil == ["lib/a.dart"]
+    folder, _ = gl.folder_dart(hasil)
+    assert folder == ["lib"]
+
+
 def test_folder_dart_tidak_tertipu_prefiks_mirip():
     # 'libx' bukan anak 'lib'; pencocokan prefiks telanjang akan membuangnya tanpa dianalisis.
     folder, _ = gl.folder_dart(["lib/a.dart", "libx/b.dart"])

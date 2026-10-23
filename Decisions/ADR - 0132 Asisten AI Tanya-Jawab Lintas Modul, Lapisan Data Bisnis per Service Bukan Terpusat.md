@@ -2,6 +2,8 @@
 
 > **Status**: ⚠️ **Sebagian diterapkan** (diverifikasi 2026-09-29): fondasi merged dan `Assistant-Service` jalan di prod sejak 2026-09-29, baru satu modul (rekap telat, attendance); sisa di § Yang kurang pada issue. Awalnya Diusulkan 2026-09-28. Diusulkan tim IT/Tech Development — **belum ada konfirmasi eksplisit ini sudah dibicarakan ke Direktur**. Berdiri di atas grounding vault + kode langsung pada tanggal yang sama (lihat § Context untuk koreksi atas klaim vault yang ternyata tidak cocok dengan kode).
 >
+> ⚠️ **Diubah sebagian (diterima 2026-10-13)** oleh [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] (🟢 Diterima 2026-10-13): §4 dan butir 1-2 "Yang sengaja tidak dilakukan". **Bagian lain ADR ini tetap berlaku.** Kode ADR 0173 belum ada, jadi perilaku sistem hari ini masih mengikuti ADR ini.
+>
 > **Issue GitHub**: [bip-erp#2353](https://github.com/bip-itteam-internal/bip-erp/issues/2353) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 
 %% Status ditulis di blockquote atas, bukan bullet di ## Deskripsi, alasan sama dengan ADR 0120/0127:
@@ -228,6 +230,8 @@ data dan status kesegarannya (beberapa mart, mis. marketing-analytics, hanya sin
 menjawab kombinasi yang ditanya, asisten menjawab **tidak tahu** dan menunjuk layar yang ada,
 bukan menaksir atau turun membaca database mentah.
 
+⚠️ *Diubah (diterima 2026-10-13)*: [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] menetapkan pengecualian berpagar untuk data semua service (tool `kueri`, eksekutor bersama di service pemilik, cakupan departemen disisipkan server, kredensial dikecualikan, hasil berlabel eksploratif kecuali kueri terverifikasi). Diterima 2026-10-13; kode belum ada.
+
 ### §5 Korelasi lintas modul lewat banyak pemanggilan tool dalam satu giliran, bukan join database
 
 Pertanyaan yang butuh lebih dari satu modul (mis. KPI + presensi) dijawab dengan memanggil
@@ -277,6 +281,7 @@ Jawaban model berbentuk data terstruktur (bukan cuma prosa), diklasifikasi jenis
 (teks/tabel/chart) sebelum dikirim ke frontend. Chart WAJIB pakai `ChartContainer` + Recharts yang
 sudah baku di erp-frontend (palet `--fb-seri-*`, `connectNulls={false}`, dst) — dilarang membangun
 sistem chart baru untuk fitur ini.
+Lihat juga [[REF - Penyajian Laporan Copilot]] untuk cara penyajiannya di kode per 2026-10-08.
 
 ### §8 File (Excel/PDF/dokumen) hanya dibuat saat diminta eksplisit
 
@@ -325,6 +330,7 @@ bip-erp#2389). Belum ada uji end-to-end lewat gateway per alat.
 
 - **Tidak ada akses database langsung atau lintas-database** untuk fitur ini.
 - **Tidak ada tool query bebas** (SQL/Mongo) yang bisa ditulis model sendiri.
+  ⚠️ *Dua butir di atas diubah* oleh [[ADR - 0173 Copilot Boleh Kueri Eksploratif Baca-Saja ke Data Semua Service, Dijalankan Service Pemilik, Kredensial Dikecualikan]] (🟢 Diterima 2026-10-13) menjadi izin berpagar untuk data semua service. Kredensial dan token tetap terlarang. Data identitas pribadi tetap tertahan samaran sampai ada persetujuan tertulis Direksi.
 - **Tidak streaming** di iterasi pertama; tidak memperbaiki infrastruktur gateway bersama sebagai
   bagian dari fitur ini.
 - **Tidak eksekusi apa pun** — murni baca, sama seperti batas [[ADR - 0058]] §5 yang tetap berlaku
@@ -340,3 +346,4 @@ bip-erp#2389). Belum ada uji end-to-end lewat gateway per alat.
 - [[REF - Kepemilikan Data]] — prinsip "konsumsi lewat pemilik" yang mendasari §2
 - [[CORE - Kapabilitas AI dan Machine Learning]] — peta kapabilitas AI, aturan kolom Marketing
 - [[CORE - API Master Gateway]] — mekanisme `Reroute`, batas §6
+- Lihat juga (2026-10-10): [[ADR - 0165 Data Upah di Copilot Hanya untuk Direktur, Supervisor HRD, dan IT, Tanpa Daftar Gaji per Orang]] (gerbang tambahan yang lebih sempit di atas gerbang §3 untuk data upah) · [[ADR - 0166 Copilot Tidak Menyimpulkan Ketiadaan atau Sebab dari Satu Sumber, Cek Silang Dikerjakan Sistem dengan Tiga Keadaan]] (cek silang dan penjaga angka)

@@ -139,4 +139,4 @@ Aturannya dinyatakan terang karena ADR 0114 keputusan 1 sudah pernah tergelincir
 - [[ADR - 0099 Komplain dari Ulasan Marketplace Dirutekan per Departemen lewat Register Komplain yang Ada]] — dua register, tanpa register ketiga, dan notifikasi ulasan bintang rendah
 - [[ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko]] — paket izin yang belum dipasang
 - [[REF - Alur Persetujuan]] — kelas cacat "wewenang tanpa kemampuan melihat"
-- [[Microservices - Employee Service]] · [[Microservices - Warehouse Service]] · [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]] · [[APP - Web ERP]] · [[CORE - RBAC dan Permission Set]] · [[Sales - ICC Account Manager Mapping]] · [[REF - Kepemilikan Data]]
+- [[Microservices - Employee Service]] · [[Microservices - Warehouse Service]] · [[QA - Quality Operasional (CAPA, Incoming, Batch Release)]] · [[APP - Web ERP]] · [[CORE - RBAC dan Permission Set]] · [[Marketing - ICC Account Manager Mapping]] · [[REF - Kepemilikan Data]]

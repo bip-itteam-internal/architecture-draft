@@ -28,7 +28,7 @@ Format nama file **selalu**: `Prefix - Nama.md` — flat, tanpa `/` di nama (pak
 | Gateway / SSO / Orchestrator / shared service | Core System and Modules | `CORE -` |
 | Database / skema / koleksi | Core System and Modules | `DB -` |
 | Aplikasi FE / mobile / desktop | Application | `APP -` / `BASE -` |
-| Konsep bisnis Marketing | Sales | `Sales -` |
+| Konsep bisnis Marketing | Marketing | `Marketing -` |
 | Konsep bisnis HR | Human Resource Information System | `HRIS -` |
 | General Affairs | General Affairs | `GA -` |
 | Tech Development / IT ops | IT | `IT -` |
@@ -52,13 +52,13 @@ Format nama file **selalu**: `Prefix - Nama.md` — flat, tanpa `/` di nama (pak
 | Bentuk | Untuk | Template | Urutan section |
 |---|---|---|---|
 | **Implementasi / Service** | dok grounded ke kode (service, gateway, DB, app) | [[Template - Implementasi Service]] | Deskripsi (Stack/Path/Status) → Endpoint/Fitur (Sudah Diimplementasikan) → Belum Diimplementasikan/Catatan → Dependensi & Integrasi → Dokumen Terkait |
-| **Konsep / Domain** | konsep bisnis sisi domain (Sales/HRIS/GA/…) | [[Template - Konsep Domain]] | Deskripsi → Latar Belakang → Ruang Lingkup/Cakupan → Konsumen Data → Kendala → Belum Diputuskan (TBD) → Dokumen Terkait |
+| **Konsep / Domain** | konsep bisnis sisi domain (Marketing/HRIS/GA/…) | [[Template - Konsep Domain]] | Deskripsi → Latar Belakang → Ruang Lingkup/Cakupan → Konsumen Data → Kendala → Belum Diputuskan (TBD) → Dokumen Terkait |
 | **Log Operasional** | artefak point-in-time (korespondensi, access-log, insiden) | [[Template - Log Operasional]] | header Tipe/Tanggal/Konteks → isi point-in-time |
 | **Runbook** | prosedur operasional non-kode (grounded, di-publish) | [[Template - Runbook]] | Tujuan → Kapan dipakai → Prasyarat → Langkah → Verifikasi → Bila gagal/Rollback → Dokumen Terkait |
 | **Persona / Pengguna** | siapa pemakai fitur (alur banyak-aktor kompleks) | [[Template - Persona]] | Aktor (ringkas) → Persona detail (Peran/RBAC/Device/Tujuan/Pain/Aksi) → Alur (opsional) → Skenario Gagal (opsional) → Dokumen Terkait |
 | **Capture (privat)** | daily note / notulen — TIDAK di-publish, exempt | [[Template - Daily Note]] · [[Template - Meeting Note]] | bebas / Agenda → Catatan → Keputusan → Aksi → Naik kelas |
 
-Konsep & implementasi **saling di-link**: konsep di folder domain ↔ implementasi di Core System and Modules. Contoh nyata: [[Sales - Marketplace Integration]] (konsep) ↔ [[Microservices - Integration Service]] (implementasi).
+Konsep & implementasi **saling di-link**: konsep di folder domain ↔ implementasi di Core System and Modules. Contoh nyata: [[Marketing - Marketplace Integration]] (konsep) ↔ [[Microservices - Integration Service]] (implementasi).
 
 > **Persona / Pengguna** (CLAUDE.md §6): dok **domain** & **service ber-UI** cantumkan seksi `## Persona / Pengguna` — tabel aktor (Persona · Peran & Divisi · Akses/RBAC · Device) + Tujuan/Pain/Aksi. Cukup **inline** untuk kasus sederhana; alur **banyak-aktor kompleks** → **dok terpisah** dari [[Template - Persona]], nama `<Prefix> - <Fitur> Persona` di folder domain, link dua arah dg dok induk. Persona **ikut status** dok induk, tetap grounded (dari peran/RBAC nyata).
 
@@ -159,7 +159,7 @@ Kamu menyinkronkan dokumentasi ERP dengan perubahan kode terbaru.
 
 ```text
 Kamu menulis dokumentasi KONSEP/bisnis (bukan implementasi) untuk domain
-<Sales/HRIS/GA/Warehouse/Finance/...>.
+<Marketing/HRIS/GA/Warehouse/Finance/...>.
 
 1. Baca `CLAUDE.md` + `IT/IT - SOP Dokumentasi Vault.md`, patuhi aturannya.
 2. Buat dok `<Folder domain>/<Prefix> - <Nama>.md` mengikuti template

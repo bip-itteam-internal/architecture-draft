@@ -108,18 +108,20 @@ Keputusan 2026-09-12: draf tidak dikirim ke karyawan lebih dulu; karyawan meneri
 
 ### Gelombang 3: layar
 
-**T10. MyBharata: Kontrak Saya (baca-saja).** Daftar kontrak milik sendiri dan buka PDF terproteksi (unduh byte lewat `DioApi`, tampilkan dengan `SfPdfViewer.memory`), **di balik gerbang PIN** seperti slip gaji karena memuat gaji. Sekalian verifikasi temuan sampingan: tap notifikasi yang melewati gerbang PIN karena `user_pin` tak pernah ditulis.
-*Prasyarat: T9.* Rilis aplikasi: version name dan code naik bersama.
+**T10. MyBharata: Kontrak Saya.** (Diperbarui 2026-10-11 mengikuti ADR 0089 §12; mockup layar 1-4 di Artifact privat sesi rancangan, bukan di vault.) Dipecah dua:
+- **T10a, lihat-saja (Gelombang 1, tak menunggu T9):** endpoint self-service di employee-service (daftar kontrak milik sendiri, detail, PDF lewat proxy; pola `/payroll-runs/my`), lalu menu MyBharata **di balik gerbang PIN** seperti slip gaji: riwayat kontrak (kontrak hasil migrasi ditandai "tanggal mulai perkiraan"), detail, buka PDF (unduh byte lewat `DioApi`, tampilkan dengan `SfPdfViewer.memory`). Sekalian verifikasi temuan sampingan: tap notifikasi yang melewati gerbang PIN karena `user_pin` tak pernah ditulis.
+- **T10b, pintu tanda tangan:** kartu "Kontrak baru menunggu tanda tanganmu" selama akses yang dibuka HRD masih berlaku (hanya bila `has_registered = true`), layar baca + centang setuju + kanvas goresan + minta koreksi, jejak tanda tangan di detail. *Prasyarat: T9, T11.*
+Rilis aplikasi: version name dan code naik bersama.
 
-**T11. Web ERP HR: sesi tanda tangan tatap muka + status.** Layar tanda tangan di perangkat HR (input NIK dari KTP, tampilan kontrak, kanvas goresan, setuju/minta koreksi), status tanda tangan di halaman Kontrak dan panel riwayat, unggah PDF bermeterai, lembar bukti; unggah dikunci setelah final; halaman membaca `?employee=` untuk deep link.
-*Prasyarat: T9.*
+**T11. Web ERP HR: sesi tanda tangan tatap muka + status + pintu web.** (Diperbarui 2026-10-11, ADR 0089 §12.) Panel sesi tanda tangan HRD: input NIK dari KTP (tiga kali salah mengunci 15 menit), buka/tutup akses 15 menit sekali pakai, QR menuju halaman web untuk yang belum registrasi MyBharata (email cadangan), status akses langsung. Halaman web publik bertoken: baca kontrak, centang setuju, kanvas goresan, layar selesai dan kedaluwarsa. Status tanda tangan di halaman Kontrak dan panel riwayat, unggah PDF bermeterai, lembar bukti; unggah dikunci setelah final; halaman membaca `?employee=` untuk deep link.
+*Prasyarat: T9 (termasuk rute publik bertoken di employee-service + gateway).*
 
 **T12. Ruang Direktur: antrean kontrak + tanda tangan massal.** Antrean "Kontrak menunggu tanda tangan" di infrastruktur antrean yang ada, seleksi banyak baris, konfirmasi eksplisit untuk kelompok terpilih. Ingat jebakan dialog di panel persetujuan direktur (`modal={false}`, baris yang lenyap setelah mutasi).
 *Prasyarat: T9.*
 
 ### Keamanan akun (terpisah, tidak menahan tanda tangan)
 
-Tanda tangan tidak memakai akun maupun PIN karyawan, jadi task ini tidak menahan Gelombang 1-3. Tetap nyata dan relevan untuk "Kontrak Saya" (T10), yang berada di balik PIN.
+Tanda tangan tidak memakai akun maupun PIN karyawan, jadi task ini tidak menahan Gelombang 1-3. Tetap nyata dan relevan untuk "Kontrak Saya" (T10), yang berada di balik PIN. ⚠️ **Revisi ADR 0089 §12 (2026-10-11)**: pintu tanda tangan MyBharata (T10b) memakai akun karyawan, jadi K1 dan perbaikan reset akun IT sebaiknya selesai sebelum T10b dirilis.
 
 **K1. Limiter PIN + verifikasi PIN terikat token.** Limiter di gateway untuk `/auth/login/pin` dan `/auth/verify/pin`; `verify-pin` memakai identitas token, bukan `employee_id` dari body.
 **K2. Jejak reset akun dan forget-device.** Siapa, kapan, akun mana; pemiliknya diberi tahu.

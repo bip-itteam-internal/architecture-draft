@@ -73,6 +73,8 @@ Rantai ini berada di **satu service yang sama**, jadi ia membuktikan penyebabnya
 
 ⚠️ **Yang lahir sebagai gantinya, dan belum diputuskan**: modul pengganti menerbitkan **PO dan penerimaan sendiri**, sementara jalur `permintaan_erp` → `pesanan_erp` → `penerimaan_erp` di §4 tetap hidup. Dua jalur pengadaan berdampingan di satu service yang sama. Ini konsekuensi yang dicatat sadar di ADR-nya, bukan temuan baru.
 
+✅ **Diputuskan 2026-10-20**: `permintaan_erp` dan `pesanan_erp` **dihapus** (rute, sumber antrean Pusat Persetujuan, modul FE; bip-erp#3309, erp-frontend#2640). `penerimaan_erp` lama tetap untuk sementara. Rantai §4 di bawah tinggal catatan sejarah untuk dua entitas itu.
+
 📏 **Diukur di PROD 2026-09-29 (`procurement_db`, baca saja)**: kedua jalur ERP nyaris tak terpakai. `pengajuan_barang` **2 dokumen total**; `permintaan_erp`, `pesanan_erp`, `penerimaan_erp`, dan `purchase_order` masing-masing **0**. Yang aktif 30 hari terakhir justru koleksi hasil tarik dari Accurate: `pesanan_pembelian` 37 (total 1.109), `penerimaan` 68 (total 1.965), `permintaan_barang` 11 (total 261), `katalog` 56 (`sync_pembelian.go`; penerimaan RI hanya list/detail dari Accurate, `accurate_penerimaan.go:30`, `:63`). Jadi pengadaan harian masih dikerjakan di Accurate, dan pertanyaan "dua jalur dilebur atau tidak" (§TBD) kini punya pertanyaan yang lebih dulu: jalur ERP mana yang akan benar-benar dipakai.
 
 ### 4. PR → PO → Penerimaan (setengah jalan, dan inilah yang paling menyesatkan)

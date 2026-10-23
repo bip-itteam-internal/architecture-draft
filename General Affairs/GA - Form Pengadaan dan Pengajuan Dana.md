@@ -4,6 +4,8 @@
 
 - **Status**: 🟡 Konsep / kajian awal. Belum ada kode. Tiga keputusan sudah turun (lihat bab Sudah Diputuskan), sisanya menunggu jawaban SPV HRGA.
 
+> **Pembaruan 2026-10-18: keadaan kode sudah jauh melampaui kajian ini.** Form Permintaan Barang kini hidup sebagai **lembar** di modul Pengajuan Barang (tipe UMUM): GA dan HRGA mengisinya langsung di layar, dengan tanda tangan, cek stok GA, dan realisasi (nomor PONV) terhitung server; PO Barang Umum bernomor `PONV/BIP/<yymm>/<urut>`; Form Pengajuan Dana + BKK menjadi lembar ketiga halaman dokumen yang sama. Bab "Keadaan Sistem Hari Ini" di bawah bertanggal 4 Agustus 2026 dan **tidak lagi benar** ("Belum ada kode"); jangan dipakai sebagai gambaran sistem. Yang berlaku: [[Microservices - Procurement Service]] §Pengajuan Barang: lembar dokumen pembelian dan [[API - Procurement Service]]. Pertanyaan SPV HRGA di bawah belum dibuktikan terjawab; diperiksa ulang bukan bagian pembaruan ini (TBD).
+
 > **Lingkupnya sudah membesar.** Blueprint dari Finance (4 Agustus 2026) menjadikan kas kecil sebagai **modul lintas divisi**, bukan fitur GA saja: tujuh divisi punya plafon bulanan sendiri, dan ambang pemisah jalurnya ditetapkan **Rp 500.000**. Dokumen induknya kini [[Finance - Kas Kecil dan Pengajuan Budget]]. Halaman ini tetap dipertahankan karena memuat isi dua form kertas GA apa adanya, yang tidak ada di blueprint.
 - **Sumber**: dua form kertas resmi (kop PT Bharata Internasional Pharmaceutical) + spreadsheet rekap PR + arahan tim GA, dikumpulkan 4 Agustus 2026.
 - **Keadaan sistem**: diperiksa langsung di produksi 4 Agustus 2026 (lihat bab Keadaan Sistem Hari Ini).

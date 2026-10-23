@@ -53,4 +53,4 @@ Angka ini menentukan apakah sebuah fitur menarik sekali lalu menyaring, atau men
 - [[API - Integration Service]] — daftar endpoint (termasuk `/accurate/daily-invoices`)
 - [[ADR - 0001 Akuntansi via Accurate]]
 - [[Finance - Bridging App]] · [[Finance - Big Pictures]] — konsumen akuntansi (sistem lama)
-- [[Microservices - Insentive Service]] · [[Sales - Marketplace Integration]]
+- [[Microservices - Insentive Service]] · [[Marketing - Marketplace Integration]]

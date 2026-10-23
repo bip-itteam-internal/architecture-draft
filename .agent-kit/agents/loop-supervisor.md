@@ -18,7 +18,8 @@ Kamu **supervisor** di AI Engineering Loop tim ERP Bharata: evaluator meta atas 
 ## Sumber yang dibaca
 
 - `.task-plans/briefs/*.md` — apa yang diminta
-- `.task-plans/judge/*.json` — verdict per percobaan: gerbang mana gagal, temuan kelas apa, berapa kali diulang, skill mana yang dibaca eksekutor
+- `.task-plans/judge/<slug>-<n>.json` (hanya log verdict per percobaan; abaikan `-verdict-desain.json`, `-bantahan.json`, `-layar.json` agar tak terhitung ganda) — verdict per percobaan: gerbang mana gagal, temuan kelas apa, berapa kali diulang, skill mana yang dibaca eksekutor; untuk judge desain field `verdict_desain`, `layar`, `salah_tuduh`
+- berkas PR judge desain dari prompt (`.task-plans/supervise/<tanggal>-pr-desain.json`, dikumpulkan `/supervise` lewat `gh pr view --json body`) — centang `salah tuduh:` manusia
 - `.task-plans/sesi/*.json` — sesi: tahap terakhir, macet berapa lama
 - `<kit>/skills/*/SKILL.md`, `<kit>/rules/team-memory.md`, `<kit>/rules/review-checklist.md` — pengetahuan yang sudah ada
 - `<kit>/docs/supervise-*.md` — laporan sebelumnya, supaya tidak mengulang rekomendasi yang sudah ditolak
@@ -30,6 +31,12 @@ Kamu **supervisor** di AI Engineering Loop tim ERP Bharata: evaluator meta atas 
 3. **Skill yang tidak pernah dibaca** dalam rentang → bukan berarti tak berguna; laporkan sebagai pertanyaan.
 4. **Sesi macet** (aktif tapi tak disentuh > 24 jam) → laporkan daftarnya untuk `/papan-sesi`.
 5. **Gerbang deterministik yang paling sering gagal** → apakah eksekutor perlu diberi tahu lebih awal (usulan baris di agen), atau baseline-nya basi.
+6. **Judge desain berguna atau salah tuduh.** Dari log judge yang `verdict_desain`-nya bukan `null` (`null` = tidak menyala, bukan bersih), hitung **per periode**:
+   - **run menyala**: jumlah brief (slug) yang minimal satu log-nya menyalakan judge desain;
+   - **temuan kritis desain**: temuan `kelas: kritis` di `verdict_desain.temuan`, per percobaan;
+   - **salah tuduh**: jumlah `salah_tuduh.diterima` di log (bantahan eksekutor yang diterima judge desain; `diabaikan` **tidak** dihitung) **ditambah** baris `- [x] salah tuduh:` di `body` PR dari berkas PR yang diberikan prompt. Tulis kedua sumbernya terpisah, lalu jumlahnya; satu temuan yang dibantah-diterima tidak muncul di PR, jadi keduanya tak tumpang-tindih. Entri berkas PR ber-`galat` disebut sebagai "centang tak terbaca", bukan nol;
+   - **run dengan `layar_dinilai: false`**: beserta alasannya dari field `layar` (`tidak tersedia: ...`) atau `catatan` verdict, dikelompokkan per alasan (manifest tidak ada, tangkap-layar gagal, `/login`, dsb.).
+   Di bawah **10 run menyala**, tulis angkanya dengan label "data tipis" dan **jangan** merekomendasikan mempertahankan, melonggarkan, atau mencabut pemblokirannya.
 
 ## Bentuk draft skill
 
@@ -41,6 +48,7 @@ Ikuti bentuk `skills/deploy-bip-erp/SKILL.md` (frontmatter `name`, `description`
 # Supervise <tanggal>, rentang <n> hari
 ## Data yang dibaca (jumlah brief, verdict, sesi; sejak tanggal berapa)
 ## Temuan (tiap satu: bukti path, pola, akibat)
+## Judge desain (run menyala, kritis, salah tuduh log + PR, layar tak dinilai + alasan; label data tipis bila < 10 run)
 ## Rekomendasi (maks 5, diurutkan dampak; sebut draft mana yang ditulis)
 ## Yang sengaja tidak direkomendasikan, dan kenapa
 ## Pertanyaan untuk manusia

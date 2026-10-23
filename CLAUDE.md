@@ -20,12 +20,12 @@ Tidak wajib semua repo — cukup vault + repo yang sedang didokumentasikan.
 ## 1. Prinsip utama
 
 - **Grounded-in-code**: tulis hanya yang benar-benar ada di kode/sumber. Yang belum ada → tandai **TBD**. **Jangan mengarang.** Bila rencana ≠ implementasi, catat gap-nya secara eksplisit.
-- **Konsep ↔ implementasi**: dok konsep/bisnis ada di folder domain (mis. Sales, HRIS), implementasi/service di Core System and Modules. Keduanya **saling di-link**.
+- **Konsep ↔ implementasi**: dok konsep/bisnis ada di folder domain (mis. Marketing, HRIS), implementasi/service di Core System and Modules. Keduanya **saling di-link**.
 - **Bahasa**: Bahasa Indonesia, istilah teknis tetap English (endpoint, request, service, JWT, dll).
 
 ## 2. Struktur folder (domain)
 
-`Application` · `Core System and Modules` · `Finance System` · `General Affairs` · `Human Resource Information System` · `Manufacture` · `Sales` · `Quality & Regulatory` · `IT` · `Third-party Software` · `Warehouse` · `Unknown or not listed`
+`Application` · `Core System and Modules` · `Finance System` · `General Affairs` · `Human Resource Information System` · `Manufacture` · `Marketing` · `Quality & Regulatory` · `IT` · `Third-party Software` · `Warehouse` · `Unknown or not listed`
 
 > `Quality & Regulatory` (prefix `QA -`) = domain fungsi **QA/RA farmasi** (CPOB/GMP, BPOM/izin edar, batch record & traceability, deviation/CAPA, ED & recall, CDOB). Mengikuti §1/§4/§5 seperti domain lain.
 
@@ -52,7 +52,7 @@ Tidak wajib semua repo — cukup vault + repo yang sedang didokumentasikan.
 Format: **`Prefix - Nama.md`**. Prefix sesuai domain/jenis:
 - `CORE -` (gateway, SSO, orchestrator, shared service), `Microservices -` (service bip-erp), `DB -` → **Core System and Modules**
 - `APP -` / `BASE -` → **Application**
-- `HRIS -` → HRIS · `Sales -` → Sales · `GA -` → General Affairs · `IT -` → IT · `WH -` → Warehouse · `Manufacture -` → Manufacture · `Finance -` → Finance System · `External -` / `Vendor -` → Third-party Software
+- `HRIS -` → HRIS · `Marketing -` → Marketing · `GA -` → General Affairs · `IT -` → IT · `WH -` → Warehouse · `Manufacture -` → Manufacture · `Finance -` → Finance System · `External -` / `Vendor -` → Third-party Software
 - `LOG -` → **Logs** (artefak operasional; mis. `LOG - Shopee API Rate Limit Request`)
 - `QA -` → **Quality & Regulatory** (QA/RA farmasi; mis. `QA - CPOB (GMP)`)
 - `REF -` → **Reference** (glosarium, data dictionary, ownership; mis. `REF - Glossary`)
@@ -105,8 +105,8 @@ Untuk dok konsep murni: `## Latar Belakang`, `## Ruang Lingkup`, `## Belum Diput
 | `erp-frontend` (Next.js) | `Application/APP - Web ERP`, `BASE - Enterance Point` |
 | `task-management/bharata-task-manager-fe` | `Application/APP - Dynamic Task Tracker` (backend = Microservices - Task Management Service) |
 | `guestbook-system` (Astro) | `General Affairs/GA - Guestbook System (Complete)` |
-| `ideamiils` (Next.js + Veo) | `Application/APP - Ideamills` (app); konsep: `Sales/Sales - Veo (Gemini) Implementation` (manual) & `... Automation Layer` |
-| `scraping` (Python/FastAPI) | `Application/APP - Tiktok Insight Analyzer` (app) & `Sales/Sales - TikTok Sentiment Pipeline` (konsep) |
+| `ideamiils` (Next.js + Veo) | `Application/APP - Ideamills` (app); konsep: `Marketing/Marketing - Veo (Gemini) Implementation` (manual) & `... Automation Layer` |
+| `scraping` (Python/FastAPI) | `Application/APP - Tiktok Insight Analyzer` (app) & `Marketing/Marketing - TikTok Sentiment Pipeline` (konsep) |
 | `website-bharata` (Next.js + Go, **repo terpisah**, bukan bip-erp) | `Application/APP - Website Bharata Internasional` |
 | `career-bharata` (Next.js 16, **repo terpisah**; konsumen `/public/recruitment/*`) | `Application/APP - Portal Karir Bharata` |
 | `consolidated-accounting-app` (Next.js 16 + Supabase, **repo PRIBADI di luar org**; tidak menyentuh gateway) | `Application/APP - Buku Besar Konsolidasi CV FINCON` (app) & `Decisions/ADR - 0068 Buku Besar Konsolidasi 40 CV di Luar Accurate` (arah) |

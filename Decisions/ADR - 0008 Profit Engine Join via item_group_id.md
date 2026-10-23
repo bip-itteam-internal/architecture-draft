@@ -2,7 +2,7 @@
 
 - **Status**: ✅ Implemented (2026-07-04, mekanisme data model BERBEDA dari rencana persis — lihat *Catatan Implementasi* di bawah) — diperluas multi-channel (Shopee) + fitur Cash Flow 2026-07-10, lihat [[Microservices - Integration Service]] §Gross Profit per Product
 - **Tanggal**: 2026-07-01
-- **Konteks dok**: [[Microservices - Integration Service]] · [[Sales - GMV Creative]] · [[DB - Data Dictionary]] · [[ADR - 0001 Akuntansi via Accurate]]
+- **Konteks dok**: [[Microservices - Integration Service]] · [[Marketing - GMV Creative]] · [[DB - Data Dictionary]] · [[ADR - 0001 Akuntansi via Accurate]]
 
 ## Context
 
@@ -48,8 +48,8 @@ Masalah: menyambungkan ad-spend (item_group_id) → order → HPP tidak ada satu
 ## Dokumen Terkait
 
 Analisis lengkap dashboard Marketing & Ads (folder `Marketing Dashboard Analysis/`):
-- [[Sales - Marketing Dashboard (Analisis Rekap)]] — **index** (baca dulu)
-- [[Sales - Marketing Dashboard (Master Roadmap)]] — roadmap 8 scope + 9 engine + join + affiliate
-- [[Sales - Profit Engine (Design)]] — spec profit engine + HPP
-- [[Sales - HPP Master (Plan)]] — plan HPP master (field cost + upload xlsx)
+- [[Marketing - Marketing Dashboard (Analisis Rekap)]] — **index** (baca dulu)
+- [[Marketing - Marketing Dashboard (Master Roadmap)]] — roadmap 8 scope + 9 engine + join + affiliate
+- [[Marketing - Profit Engine (Design)]] — spec profit engine + HPP
+- [[Marketing - HPP Master (Plan)]] — plan HPP master (field cost + upload xlsx)
 - [[ADR - 0009 Affiliate via Search Seller Affiliate Orders API]]

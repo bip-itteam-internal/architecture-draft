@@ -27,4 +27,4 @@ Beberapa toko di-banned marketplace, tetapi tidak ada konsep status per-toko di 
 
 ## Dokumen Terkait
 
-[[API - Integration Service]] · [[Microservices - Integration Service]] · [[APP - Web ERP]] · [[ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace]] · [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] · [[ADR - 0011 Integration Read Cache + Singleflight (Fase 1 Perf)]] · [[Sales - Marketplace Integration]]
+[[API - Integration Service]] · [[Microservices - Integration Service]] · [[APP - Web ERP]] · [[ADR - 0027 Status Sinkron Resi Terpisah dari Update_Time Marketplace]] · [[ADR - 0031 Prefix internal Bukan Batas Keamanan]] · [[ADR - 0011 Integration Read Cache + Singleflight (Fase 1 Perf)]] · [[Marketing - Marketplace Integration]]

@@ -55,5 +55,5 @@ Satu dokumen `engagement_giliran` per departemen (kunci **kanonik**: trim + lipa
 
 - [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]] — §1-§3 DIGANTIKAN ADR ini; §4 (reassign), §5 (revisi ke orang sama), §6 (notifikasi personal) TETAP BERLAKU
 - [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] — kolam pengerja lintas departemen (§4) yang giliran ini memakai sebagai sumber kandidat sebelum disaring per departemen
-- [[Sales - Engagement Team (Modul)]] — konsep bisnis modul, status cacat terkini
+- [[Marketing - Engagement Team (Modul)]] — konsep bisnis modul, status cacat terkini
 - [[Microservices - Task Management Service]] · [[API - Task Management Service]]

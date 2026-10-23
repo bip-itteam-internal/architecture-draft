@@ -30,8 +30,8 @@ Dipasang di `SyncOrderReturn` (auto) & `RetryDailyReturn` (manual tolak payout>0
 
 ## Consequences
 
-- **Dobel mustahil by-design**: payout>0 & payout≈0 saling eksklusif — Receipt ATAU Retur, tak pernah keduanya.
-- **Income/Auto Sync Income sync TIDAK diubah** — ia sudah benar (menyerap refund payout>0, defer payout≈0 ke retur). Perbaikan 100% di sisi retur.
+- **Dobel mustahil by-design**: payout>0 & payout≈0 saling eksklusif — Receipt ATAU Retur, tak pernah keduanya. ⚠️ *Untuk retur sebagian Shopee mulai penerimaan 1 Okt 2026 premis ini diubah ([[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]], 🟢 Diterima 2026-10-21, kode merged ke `main` 2026-10-22, aktif bila kv tanggalnya terisi): retur dibukukan DAN penerimaan hanya melunasi qty sisa, serentak lewat satu penanda di income, bukan keduanya menyerap nilai yang sama.*
+- **Income/Auto Sync Income sync TIDAK diubah** — ia sudah benar (menyerap refund payout>0, defer payout≈0 ke retur). Perbaikan 100% di sisi retur. ⚠️ *Terukur 2026-10-21 tidak benar untuk retur sebagian Shopee: `refundShopee` menjumlahkan `seller_return_refund` dan `drc_adjustable_refund` sehingga refund terbaca −20.616 (bukan −92.001) dan sisanya Rp112.617 masuk Biaya Admin 6112 (order `261010944296TR`). Sisi income juga diubah oleh ADR 0195 (refund identitas dari `seller_return_refund` saja, `drc_adjustable_refund` tak ikut).*
 - **Tanggal benar go-forward**: refund-only pakai tanggal ajukan (stabil), barang-balik pakai tanggal fisik sampai gudang.
 - **Menggantikan**: ADR-0023 **keputusan #1** (accepted-seragam) — premisnya salah; ADR-0023 **keputusan #2** — struktur split tetap, **basis cutover retur diubah** (tanggal-retur → hari-kirim, lihat Decision #3). Juga menutup premis "refund-only selalu jadi retur" di [[ADR - 0022 Retur via Sales Return per Mode + Keep Invoice Line]] / [[ADR - 0012 Retur Refund-only Push-all]].
 - **Cleanup data existing (✅ SELESAI 2026-07-19)**: `cmd/returndescope` mengeluarkan **1565 retur hari-kirim < 1 Jul** dari auto (**1007 dok Retur Penjualan dihapus dari Accurate** via `delete.do`, semua ditandai `SKIPPED`); **1 dobel post-cutover** `RTR/2026/07/16/006-BH` (payout>0 + receipt) di-void. Era kept ≥ 1 Jul: 615 SENT sah + 8 FAILED (SKU era-baru, ditunda).
@@ -118,7 +118,19 @@ Pembatalan kini memakai `basePorsi` (harga faktur) dan selisih basis pulang lewa
 
 📌 **Belum dikerjakan**: menyembunyikan baris jejak `SKIPPED` saat ordernya sudah punya baris hidup. Menyaring setelah paginasi merusak ukuran halaman; menandai baris saat booking adalah perubahan tulis tersendiri. Sesudah PR ini `2607180VU58AJP` tampil **2 baris** (1 jejak + 1 retur nyata), bukan 3.
 
+### ⚠️ Temuan 2026-10-22 — payout dibaca tanpa penyesuaian setelah cair (BELUM diputuskan)
+
+Gerbang menilai "uang cair" dari `PayoutCair()` (untuk TikTok `total_settlement_amount`, `transaction.go:981`) dan, bila `total_refund` tak nol, menganggap refund sudah ternetto (`returnPayoutGate`, `accurate_rts_usecase.go:3478`; `bip-erp` `origin/main` `3a8271ef9`, 2026-10-23). Gerbang **tidak membaca `total_adjustment`**. Order TikTok barang-kembali yang dananya cair lalu **ditarik kembali lewat penyesuaian setelah cair** tetap terbaca bermuatan payout positif, sehingga retur-nya DILEWATI (atau tak berbaris sama sekali) padahal pendapatannya tak pernah dibalik.
+
+Diukur prod 2026-10-22 (baca-saja): dari **28** order TikTok (retur disetujui dengan barang kembali, kirim sejak 10 Juli, settlement positif, `total_refund` tak nol), **17** sudah punya dokumen retur SENT dan **11** belum. Dari 11 itu, **6** punya `settlement + adjustment` nol atau negatif (dana ditarik penuh, sisa hanya biaya): lima berbaris DILEWATI dan satu tak berbaris. Contoh `585744368980558975`: cair Rp75.459, penyesuaian −Rp90.002, sisa −Rp14.543, sama dengan jumlah tiga biaya (690 + 6.927 + 6.926); gudang mencatat barangnya datang (PJB-010 rework, segel terbuka) dan finance mengonfirmasi retur dengan barang kembali. Lima dari 11 lainnya masih bermuatan uang positif dan bukan kelas ini.
+
+Yang **belum terbukti**: bahwa penyesuaian itu memang penarikan refund (itu kesimpulan dari angkanya, belum dicocokkan ke dokumen penerimaan di Accurate), dan bahwa penerimaan tak memuat Potongan Penjualan untuk refund itu. Tiga keterangan sistem saling bertentangan untuk order yang sama: baris retur menulis "refund ditangani Auto Sync Income", lacak order menyimpulkan "RETUR_SEBELUM_CAIR, refund sudah diperhitungkan di penerimaan" (dengan tanda perhatian), dan `/why` penerimaan melaporkan `return_absorbed_by_receipt: false`. Satu kelas dengan amandemen 2026-08-07 di atas: "sudah diserap" harus dijawab dengan **akun mana** yang tersentuh. Perubahan gerbang terbaru untuk retur sebagian Shopee ([[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]]) tidak menyentuh cabang TikTok ini.
+
+Belum diputuskan: apakah gerbang memakai uang cair **setelah** penyesuaian, atau keputusan bisnis 2026-08-05 di bawah (nilai barang selalu via retur) yang diimplementasikan lebih dulu. Selama itu, finance membukukan Retur Penjualan di Accurate dan menandainya di ERP ([[ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync]]; prosedur di [[Finance - Proses Retur dan Piutang Marketplace]]).
+
 ### 🟡 Keputusan bisnis 2026-08-05 — nilai barang SELALU via retur (BELUM diimplementasi)
+
+> **Diperbarui 2026-10-21:** untuk **retur sebagian Shopee** (payout > 0) keputusan ini dijabarkan dan diimplementasikan oleh [[ADR - 0195 Retur Sebagian Shopee Dibalik Retur Penjualan dan Komisi AMS Dompet Dibukukan ke Biaya Affiliate]] (🟢 Diterima; kode merged ke `main` 2026-10-22, belum terukur aktif di prod), digerbangi kv tanggal per hari penerimaan, lantai 2026-10-01. Kanal lain dan jalur dompet RR tetap seperti tertulis di bawah.
 
 **Status: 🟡 Diputuskan, belum ada di kode.** Gerbang payout masih aktif di produksi per 2026-08-06.
 

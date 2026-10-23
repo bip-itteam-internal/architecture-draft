@@ -1,12 +1,14 @@
 ---
 tags: [adr, marketing-analytics, ai, frontend]
-status: Accepted
+status: Superseded
 tanggal: 2026-09-28
 ---
 
 # ADR - 0134 Sajian Laporan Asisten Analisa Berupa Blok Terstruktur, AI Memilih Bentuk, Angka dari Backend
 
 > **Status**: ⚠️ **Implemented (ada catatan)** — diukur 2026-09-28. §1 (katalog dataset beku per kiriman) dan §2 (model memilih jenis+urutan blok) **merged** ke `origin/main` bip-erp lewat dua PR (§ Realisasi di bawah), **BELUM deploy prod** — saklar dan status deploy sama dengan [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] (satu mekanisme, satu panggilan model, satu saklar `MARKETING_ANALYTICS_AI_KEPUTUSAN_ENABLED`). §3 (perender FE: blok di tab Hasil analisa dan dokumen PDF) **MERGED** erp-frontend [#1784](https://github.com/bip-itteam-internal/erp-frontend/pull/1784). Melengkapi [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] §5 dan [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] §4; tidak menggantikan keduanya.
+>
+> ⛔ **Dicabut** oleh [[ADR - 0169 Asisten Analisa Marketing Dihapus, Copilot Jadi Pintu Tunggal, Mesin Keputusan Dipertahankan]] (2026-10-11): sajian blok laporan ikut dihapus bersama Asisten Analisa. Isi di bawah dipertahankan sebagai riwayat.
 
 ## Context
 

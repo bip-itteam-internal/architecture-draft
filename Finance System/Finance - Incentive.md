@@ -292,7 +292,7 @@ Aturan "Syarat khusus ICC 2026" di atas (CTR ≥ 2%, Watch ≥ 30%, ROI GMV Max 
 | Atribusi | **`creator_username`**, dijoin lewat `tt_business_campaign_items`; tanggal tayang dari snapshot `tt_shop_video_performances` |
 | Konsumen aturan | **Tidak ada lagi.** `EvaluateICCVideoIncentive` dan `IsICCVideoEligible` tak ada di kode. `services/insentive/business_rules.go:195-200` mencatat penghapusannya, dan `func.go:86-92` serta `main.go:580` menolak perhitungan ICC per-video dengan pesan "skema insentif ICC per-video sudah dicabut (SK 011/DIR/SK6/VII/2026)". |
 
-⚠️ Dua komentar integration-service masih menyebut konsumen lama (`icc_video_metric.go:6`, `tiktok_business_handler.go:1191`). Dari situlah klaim basi itu sempat tersalin ke [[Sales - Dashboard per Posisi (Beauty Hacks & Kyura)]] dan [[Microservices - Integration Service]].
+⚠️ Dua komentar integration-service masih menyebut konsumen lama (`icc_video_metric.go:6`, `tiktok_business_handler.go:1191`). Dari situlah klaim basi itu sempat tersalin ke [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]] dan [[Microservices - Integration Service]].
 
 **Frontend.** `erp-frontend/src/features/finance/incentive/components/form/video-metrics-fields.tsx` masih ada, berisi field **manual** untuk Video ID, Tanggal Tayang, CTR, Watch 25%, ROAS, dan Orders, satu set per video. Nol berkas frontend memanggil endpoint di atas (diverifikasi 2026-09-12 dengan kontrol positif: 302 berkas memanggil `/api/integration`). Nasib formulir itu belum diputuskan (TBD), karena skema yang memakainya sudah dicabut.
 
@@ -390,25 +390,25 @@ Sistem insentif dibangun **gabung ke ERP**, basis **MongoDB**, dengan **RBAC per
 | Beban karyawan | [[Microservices - Payroll Service]] `GET /employer-cost` |
 | Beban operasional non-gaji | [[External - Accurate]] per proyek, lewat integration `GET /profit/incentive/opex` |
 | Struktur tim, target | `insentive_db` (master data di [[Microservices - Insentive Service]]) |
-| Pemilik toko (ICC) | `icc_account_mappings` di integration — lihat [[Sales - ICC Account Manager Mapping]] |
+| Pemilik toko (ICC) | `icc_account_mappings` di integration — lihat [[Marketing - ICC Account Manager Mapping]] |
 
-**Sumber skema LAMA yang tak lagi dipakai**: skor KPI dari [[APP - Dynamic Task Tracker]] dan jumlah konversi dari [[Sales - GMV Creative]] — keduanya tak masuk rumus profit-based. KPI tetap dipakai untuk evaluasi & kenaikan gaji, bukan penentu nominal insentif.
+**Sumber skema LAMA yang tak lagi dipakai**: skor KPI dari [[APP - Dynamic Task Tracker]] dan jumlah konversi dari [[Marketing - GMV Creative]] — keduanya tak masuk rumus profit-based. KPI tetap dipakai untuk evaluasi & kenaikan gaji, bukan penentu nominal insentif.
 
 > Rincian desain & investigasi (pertimbangan Desty, pertanyaan terbuka, rancangan field lengkap) di-capture di `Workspace/Inbox` sampai sistem dibangun — lihat catatan naik-kelas.
 
 ## Dependensi & Integrasi
 
-- [[Sales - Incentive]]
-- [[Sales - GMV Creative]]
+- [[Marketing - Incentive]]
+- [[Marketing - GMV Creative]]
 - [[External - Accurate]]
 - [[Finance - Bridging App]]
 - [[APP - Dynamic Task Tracker]]
 
 ## Dokumen Terkait
 
-- [[Sales - Incentive]] — irisan sisi marketing
+- [[Marketing - Incentive]] — irisan sisi marketing
 - [[Microservices - Insentive Service]] — backend perhitungan insentif
 - [[ADR - 0033 Beban Operasional Insentif dari Proyek Accurate]] — keputusan sumber biaya operasional
 - [[Microservices - Integration Service]] (komponen profit) · [[Microservices - Payroll Service]] (beban karyawan) · [[External - Accurate]] (pembukuan)
-- [[Sales - GMV Creative]] · [[APP - Dynamic Task Tracker]] — sumber skema LAMA, tak dipakai rumus profit
+- [[Marketing - GMV Creative]] · [[APP - Dynamic Task Tracker]] — sumber skema LAMA, tak dipakai rumus profit
 - [[Finance - Bridging App]] · [[HRIS - Compensation & Benefits]]

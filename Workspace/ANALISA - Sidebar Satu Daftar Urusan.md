@@ -54,6 +54,8 @@ U2 urusan umum ─────────────────> U3 penyatuan
 
 ## Marketing (percontohan)
 
+> 2026-10-10: dikerjakan di induk bip-erp#2924 (sub-issue bip-erp#2925 BE, PR #2938; erp-frontend#2279 FE). Kontrak dan rencana: `.task-plans/2026-10-10-menu-marketing-*` di workspace. M-SG, M-BE, M-B, M-NEW selesai ditulis dan lolos gerbang; belum merge. Menyimpang dari rancangan: Host Live tanpa Jadwal Host Live dan Analisis Live (server tak punya jalur baca milik sendiri / tak bisa memprorata), Rincian Insentif tetap bagi semua pemegang peran insentif. Tambahan di luar rancangan: halaman Panduan per menu (pondasi semua departemen) dan kartu Lapor ke IT.
+
 - [ ] **M-SG [FE]** Susunan per Artifact Marketing: Toko & Penjualan, Iklan & Kampanye, Live, Layanan Pelanggan, Permintaan ke Unit Lain (Komplain Gudang + QC jadi Komplain Produk), Tim & Penugasan, Insentif (Rincian hanya bagi anggota skema lewat `GET /profit-dashboard/saya/keanggotaan`), Analisis, Kamus Metrik. Rekap KPI Tim jadi tab KPI. Setoran Tema & Teaser satu halaman. Gerbang per daun.
 - [ ] **M-BE [BE]** Shop Quality dikenali `peranJabatanTabel` (`services/employee/peran_dari_jabatan.go`); cakupan S (toko milik sendiri) di endpoint marketing-analytics yang ditandai "baru" untuk pemegang toko. Deploy BE sebelum FE.
 - [ ] **M-NEW [FE+BE]** Halaman Komplain Belum Dibalas dan SLA Chat (dari mart yang sudah ada). Task terpisah, sesudah M-SG.

@@ -1,6 +1,8 @@
 # ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI
 
 > **Status**: ⚠️ **Implemented (ada catatan)** — irisan 1 **hidup di PRODUKSI** sejak 2026-09-23, backend saja; layar FE belum ada. Irisan 2 dan 3 belum. Rinciannya di § Realisasi. **§5 dan §7 digantikan** [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] (2026-09-25).
+>
+> ⛔ **Dicabut** oleh [[ADR - 0169 Asisten Analisa Marketing Dihapus, Copilot Jadi Pintu Tunggal, Mesin Keputusan Dipertahankan]] (2026-10-11): fitur Asisten Analisa dihapus dari kode, analisa percakapan pindah ke Copilot. Isi di bawah dipertahankan sebagai riwayat.
 
 %% Status ditulis DI SINI, bukan sebagai bullet di ## Deskripsi seperti ADR lain, dan itu
 bukan gaya bebas: `## Untuk Manajemen` mendorong bagian Deskripsi melewati baris ke-15, dan

@@ -64,7 +64,7 @@ Yang dipisah cuma bentuk datanya; infrastruktur di sekitarnya sengaja **tidak** 
 - **Sebaliknya, mengubah alur engagement menuntut deploy**, sedangkan stage tiket IT bisa diubah dari layar. Diterima: alur ini punya aturan wewenang per transisi yang memang tak pantas diserahkan ke layar pengaturan.
 - **Laporan, SLA, CSAT, dan audit trail tiket IT tidak melihat tiket engagement sama sekali.** Modul ini punya dashboard dan log sendiri. Siapa pun yang ingin angka gabungan harus menggabungkannya sendiri.
 - **`Notification.TaskID` tak bisa dipakai** — bertipe ObjectID tugas, dan menaruh id tiket engagement di sana akan membuat klien membuka detail tugas yang tak ada. Identitas tiket dititipkan lewat `meta` (`modul`, `engagement_ticket_id`, `no_tiket`), dan klien mana pun yang ingin membuka detail dari notifikasi harus membacanya dari sana.
-- **Dua definisi "tiket" di satu service.** Pembaca berikutnya wajib memeriksa koleksi mana yang sedang dibicarakan sebuah fungsi. Sudah terbukti berbahaya sekali: rute lampiran yang ada beroperasi atas `tasks`, dan modul engagement **tak punya rute lampiran sama sekali** — sementara handler-nya mewajibkan lampiran. Lihat cacat nomor 1 di [[Sales - Engagement Team (Modul)]].
+- **Dua definisi "tiket" di satu service.** Pembaca berikutnya wajib memeriksa koleksi mana yang sedang dibicarakan sebuah fungsi. Sudah terbukti berbahaya sekali: rute lampiran yang ada beroperasi atas `tasks`, dan modul engagement **tak punya rute lampiran sama sekali** — sementara handler-nya mewajibkan lampiran. Lihat cacat nomor 1 di [[Marketing - Engagement Team (Modul)]].
 
 **Yang belum diputuskan (TBD):**
 
@@ -73,7 +73,7 @@ Yang dipisah cuma bentuk datanya; infrastruktur di sekitarnya sengaja **tidak** 
 
 ## Terkait
 
-- [[Sales - Engagement Team (Modul)]] — konsep bisnis modul ini
+- [[Marketing - Engagement Team (Modul)]] — konsep bisnis modul ini
 - [[Microservices - Task Management Service]] — service tempat kedua model tiket hidup berdampingan · [[API - Task Management Service]] — kontrak endpoint
 - [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]] — keputusan pasangannya, tentang siapa yang menentukan pengerja
 - [[ADR - 0002 Database-per-Service]] — batas yang TIDAK dilanggar di sini: koleksinya terpisah, databasenya tetap satu milik service ini

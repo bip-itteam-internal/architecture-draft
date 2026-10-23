@@ -133,6 +133,8 @@ Aturan pemilihannya, ditulis karena akibatnya senyap: master ber-`jenis` lain **
 | GET | `/forms/:id/analytics` | Rekap per pertanyaan + tren harian + tingkat pengisian (lihat bentuk respons di bawah). `?period=` menyaring satu putaran form berulang |
 | GET | `/forms/:id/responses` | Daftar jawaban berhalaman (`?page=`, `?limit=` maks 200), terbaru dulu. `?period=` |
 | GET | `/forms/:id/export` | CSV (`text/csv`). Header `X-Export-Truncated` muncul bila menyentuh batas 20.000 baris. `?period=` |
+| GET | `/forms/:id/ai-summary` | ⚠️ *(branch, belum merge)* Keadaan ringkasan AI: `{data:{layak, alasan_tak_layak?, minimal_pengisi, pengisi_kini, jumlah_kini, ringkasan, basi, boleh_perbarui, pending_usang, dapat_diperbarui_pada?}}`. `ringkasan` null bila belum pernah dibuat. `?period=` |
+| POST | `/forms/:id/ai-summary` | ⚠️ *(branch, belum merge)* Memulai pembuatan ringkasan async. `202 {dimulai:true}`; `200 {dimulai:false, data}` bila tak perlu; `422` bila bukan survei atau kurang dari 5 pengisi. `?period=`. Aturannya di [[ADR - 0185 Ringkasan AI Hasil Survei Dibuat Saat Dibaca, Hanya Survei Bercukup Pengisi]] |
 
 > **`?period=` kosong berarti SELURUH periode di sini**, dan itu KEBALIKAN dari arti periode kosong pada penjaga duplikat saat mengisi (di sana kosong berarti "hanya jawaban yang memang tak punya periode"). Pemilik form yang membuka halaman analisa tanpa memilih periode mengharapkan rekap penuh, bukan rekap yang diam-diam menyusut.
 

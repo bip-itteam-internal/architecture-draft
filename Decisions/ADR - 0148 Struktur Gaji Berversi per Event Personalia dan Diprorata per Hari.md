@@ -125,6 +125,7 @@ Butir ketiga **merevisi** keputusan produk di [[ADR - 0035 HR Menonaktifkan Akun
 - Perubahan Gaji Pokok atau Tunjangan Jabatan (dua komponen ber-`bpjs_base`) **tidak dapat disimpan** sebelum dasar upah BPJS dikonfirmasi, entah diubah atau sengaja dibiarkan. Dok Payroll mencatat nol dari 120 record lama punya dasar upah yang masuk akal; gerbang ini mencegah kelas itu tumbuh lagi.
 - Versi yang menaikkan struktur untuk karyawan ber-SP II aktif memunculkan **peringatan** (Pasal 55 jo. 53), tidak menolak.
 - **Persetujuan**: versi baru berstatus menunggu persetujuan **Manajer HRD** sebelum menjadi terjadwal atau berlaku. Sampai [[ADR - 0137 Model Persetujuan Tunggal dan Pemisahan Tugas Lintas Modul]] diputuskan, gerbangnya paket SPV HRD yang sudah ada di [[ADR - 0129 Persetujuan Payroll Run Bertingkat dan Dibayar per Badan Usaha sebelum Terbit]]. Pengisi dan penyetuju tak boleh orang yang sama.
+  - ⚠️ **Pengecualian (2026-10-20, 🟡 Diusulkan)**: versi yang hanya mengganti badan usaha penggaji lewat penetapan massal HRIS lahir `terjadwal` tanpa persetujuan, berpengaman notifikasi ke SPV HRD dan riwayat versi. Lihat [[ADR - 0189 Penetapan Badan Usaha Penggaji Massal dari HRIS, Tanpa Persetujuan bila Hanya Penggaji Berganti]].
 - **Visibilitas** tetap mengikuti ADR 0129 dan 0089: staf payroll berizin, karyawan yang bersangkutan, dan Direktur. Atasan tidak.
 
 ### 9. Migrasi dan pensiun sheet
@@ -160,6 +161,30 @@ Butir ketiga **merevisi** keputusan produk di [[ADR - 0035 HR Menonaktifkan Akun
 - **Tidak berhenti di log audit + satu dokumen.** Lebih murah, tetapi engine tetap hanya tahu satu struktur per run sehingga prorata tak bisa dihitung benar.
 - **Rentang gaji per jenjang** tidak dibangun: belum ada keputusan HRD tentang rentangnya, dan jenjang sengaja bukan sumbu hak.
 - **Sistem tidak membatasi komponen mana yang boleh berubah per event.** Itu kebijakan HRD; sistem hanya menandai yang wajib disentuh.
+
+## Catatan Implementasi (2026-10-21)
+
+> 🟡 **Jalur offer ke payroll ada di PR, belum merged/deploy (2026-10-21).** Baris status ADR di atas **tidak diubah** (wewenang manusia). Kalimat "kode belum ada" di blockquote status sudah usang: versi gaji berhulu dan rute internalnya (S1) ada di `origin/main` (`bip-erp/services/payroll/models_salary_version.go:25` `StatusVersiMenunggu`, `salary_version_internal.go`), dan jalur offer ke payroll (§5 baris offer, §6) dikodekan di bip-erp [#3419](https://github.com/bip-itteam-internal/bip-erp/pull/3419) (branch `recruitment/kanal-komunikasi-kandidat`), sisi FE di erp-frontend [#2716](https://github.com/bip-itteam-internal/erp-frontend/pull/2716) dan [#2720](https://github.com/bip-itteam-internal/erp-frontend/pull/2720). Dibaca dari ref remote, bukan checkout lokal.
+
+**Yang dikodekan di PR #3419** (nomor baris = branch itu):
+
+- **Bentuk offer.** `Offer` mendapat `komponen_evaluasi`, `komponen_kontrak` (baris `{component_id, nama, amount, gaji_pokok?}`) dan `akhir_evaluasi` (`YYYY-MM-DD`) (`services/recruitment/models_offer.go:49-51`, `offer_komponen.go:32-37`). Server menghitung `gaji_evaluasi`/`gaji_kontrak` dari komponen bila komponen ada (`terapkanKomponenOffer`, `offer_komponen.go:61-75`) dan menolak komponen kembar, negatif, atau akhir evaluasi sebelum tanggal mulai. Offer tanpa komponen (offer lama, klien lama) mempertahankan totalnya.
+- **Pemicu satu kali di `link-employee`.** Sesudah penautan tersimpan, `kirimGajiOfferKePayroll` (`candidate_handlers.go:349`) mengambil offer `Accepted` terbaru kandidat dan memanggil `POST /internal/salary-versions` payroll (kunci layanan `PAYROLL_SERVICE_KEY`) sekali per tahap, dengan `hulu{jenis:"offer", id:<offer>, tahap:"evaluasi"|"kontrak"}` (`offer_komponen.go:115-159`, `:192-205`). Payroll yang menjamin idempoten per (jenis, id, tahap) dan melahirkan versi `menunggu_persetujuan`; recruitment tak menyimpan salinan hasilnya.
+- **Tanggal berlaku.** Versi evaluasi berlaku di `tanggal_mulai` offer, versi kontrak sehari sesudah `akhir_evaluasi`; tanpa komponen evaluasi, angka kontrak berlaku sejak tanggal mulai; tanpa komponen sama sekali tidak ada versi (`offer_komponen.go:139-159`).
+- **Gaji Pokok masuk `basic_salary`, bukan `component_values`.** Payroll membuang entri Gaji Pokok dari `component_values` (`normalisasiKomponenVersi`; dicatat di komentar `services/payroll/komponen_struktur_internal.go:9-12`), jadi pengirim yang tak membedakannya kehilangan gaji pokok tanpa galat. Karena itu payroll menambah `GET /internal/salary-components` (Gaji Pokok + komponen struktur tetap aktif, bertanda `gaji_pokok`; `komponen_struktur_internal.go:22-53`, rute `salary_version_internal.go:168`), recruitment menyajikannya ke form offer lewat `GET /offers/komponen-gaji` (`offer_komponen.go:241-265`), dan `versiDariKomponen` menaruh baris `gaji_pokok` ke `basic_salary` serta melewatkan komponen bernilai nol (`:126-133`). Aturan "komponen mana yang struktur tetap" tetap milik payroll (`komponenStrukturTetap`), tidak disalin ke recruitment.
+- **Gagal tidak senyap.** Penautan tetap tersimpan; respons `link-employee` membawa `gaji_ke_payroll{status: diajukan|tidak_ada|gagal, versi, pesan}` (`offer_komponen.go:208-238`) dan bisa diulang lewat `POST /candidates/:id/gaji-ke-payroll` (`candidate_handlers.go:355`, 409 bila belum tertaut). Bentuk rute: [[API - Recruitment Service]] §Komunikasi kandidat terkendali.
+- **Ketergantungan baru yang diramal Consequences terealisasi**: recruitment-service membaca `PAYROLL_MODULE_URL` dan `PAYROLL_SERVICE_KEY` (`docker-compose.yml`, blok recruitment di PR); env dibaca saat container dibuat, jadi naik dengan `--force-recreate`.
+
+**Selisih dengan teks ADR** (dicatat, bukan dibetulkan diam-diam):
+
+1. §6 menyatakan total "tidak disimpan" dan menggantikan `gaji_evaluasi`/`gaji_kontrak`. Kode **tetap menyimpan** keduanya sebagai total turunan yang ditulis server, karena portal persetujuan, email offer, dan ringkasan asisten masih membacanya. Satu sumber tetap komponen; totalnya tidak boleh diketik.
+2. §6 menyatakan `masa_evaluasi` teks bebas **diganti** tanggal. Kode **menambah** `akhir_evaluasi` dan membiarkan `masa_evaluasi` (`models_offer.go:44`). Penggantian penuh: TBD.
+3. §5 menyatakan versi evaluasi berlaku di `join_date` sebenarnya, bukan tanggal mulai di offer. Kode memakai `tanggal_mulai` offer (`offer_komponen.go:143,152`). Apakah `join_date` sudah diketahui saat `link-employee`: TBD, belum diperiksa.
+4. §8 menuntut dasar upah BPJS dikonfirmasi sebelum versi disimpan. Offer tak membawa dasar upah, jadi kode mengirim `bpjs_konfirmasi: "dibiarkan"` (`offer_komponen.go:119-121`); HR payroll yang melengkapinya sebelum menyetujui.
+5. §8 menyebut versi menunggu persetujuan Manajer HRD. Apakah versi `menunggu_persetujuan` dari offer tampil di [[HRIS - Payroll]] atau Portal Persetujuan: `git grep` atas `salary-version|SalaryVersion|versi_gaji` di `services/employee/antrean*` pada `origin/main` (2026-10-21) menghasilkan **nol** baris, sementara `registriAntrean` ada (`antrean_pengajuan.go:373`), jadi versi gaji **belum tersetor ke Portal Persetujuan**. Risikonya HR payroll tak tahu ada versi yang menunggu. Perlu keputusan: issue terpisah milik payroll (TBD).
+6. "Offer Accepted dibekukan" ditegakkan hanya oleh aturan lama bahwa `PUT /offers/:id` hanya untuk `Draft` (`offer_komponen.go:27-28`, [[API - Recruitment Service]]); tak ada penjaga baru. Perubahan sesudah Accepted dikerjakan di payroll sebagai versi baru, sesuai §6.
+
+**Belum diverifikasi:** perjalanan nyata di DEV (versi muncul di payroll untuk karyawan hasil `link-employee`), dan uji kontrak terhadap rekaman respons asli `/internal/salary-versions`. Tandai ulang ✅ hanya sesudah keduanya terbukti.
 
 ## Dokumen Terkait
 

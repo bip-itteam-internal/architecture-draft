@@ -11,7 +11,7 @@ from vault_index.paths import klasifikasi_path
     ("Reference/REF - Glossary.md", "Reference", "reference", True),
     ("API Reference/API - Employee Service.md", "API Reference", "api", True),
     ("HOMEPAGE.md", "root", "meta", True),
-    ("Sales/Sales - HPP Master (Plan).md", "Sales", "domain", True),
+    ("Marketing/Marketing - HPP Master (Plan).md", "Marketing", "domain", True),
 ])
 def test_folder_dikenal(rel_path, area, jenis, publik):
     hasil = klasifikasi_path(rel_path)

@@ -10,7 +10,7 @@
 - **BPJS**: Kesehatan & Ketenagakerjaan (data BPJS dikelola di [[HRIS - Personalia]] / [[Microservices - Employee Service]])
 - **Pajak PPh21**: perhitungan & pelaporan (**belum** terdokumentasi)
 - **Benefit** lain: THR, tunjangan kesehatan, dll
-- **Variabel**: lembur ([[HRIS - Overtime]]), insentif ([[Sales - Incentive]] / [[Finance - Incentive]])
+- **Variabel**: lembur ([[HRIS - Overtime]]), insentif ([[Marketing - Incentive]] / [[Finance - Incentive]])
 
 ## Persona / Pengguna
 
@@ -131,5 +131,5 @@ Contoh, periode 26 Agustus s.d. 25 September (31 hari), Gaji Pokok Rp 5.000.000:
 
 - [[ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari]]
 - [[HRIS - Payroll]] · [[HRIS - Personalia]] · [[HRIS - Overtime]] · [[Microservices - Payroll Service]]
-- [[Sales - Incentive]] · [[Finance - Incentive]]
+- [[Marketing - Incentive]] · [[Finance - Incentive]]
 - [[Microservices - Employee Service]] · [[Microservices - Recruitment Service]]

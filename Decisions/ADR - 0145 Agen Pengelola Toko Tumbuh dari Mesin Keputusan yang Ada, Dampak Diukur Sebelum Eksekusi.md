@@ -1,6 +1,8 @@
 # ADR - 0145 Agen Pengelola Toko Tumbuh dari Mesin Keputusan yang Ada, Dampak Diukur Sebelum Eksekusi
 
 > **Status**: 🟡 **Diusulkan**, 2026-10-01, kode belum ada. Disetujui pemohon lewat `/analisa-kebutuhan` (opsi C dari tiga). Diusulkan dari Tech Development; **belum ada konfirmasi bahwa manajemen marketing, Finance, atau Direktur sudah membahasnya**. Berdiri di atas grounding vault + kode `origin/main` + pengukuran prod read-only pada 2026-09-30.
+>
+> ⚠️ **Landasan berubah** oleh [[ADR - 0169 Asisten Analisa Marketing Dihapus, Copilot Jadi Pintu Tunggal, Mesin Keputusan Dipertahankan]] (2026-10-11): mesin keputusan (katalog, kelayakan, jendela matang, orkestrator) dipertahankan, tetapi laporan terjadwal, kiriman keputusan, dan jawaban setuju/tolak yang dirancang dipakai ADR ini **dihapus**. Bila ADR ini dilanjutkan, lapisan pengiriman ke Leader/SPV dan persetujuannya harus dirancang ulang (kandidat: di atas Copilot).
 
 %% Status ditulis di blockquote atas, alasan sama dengan ADR 0120/0127/0132/0135:
 ## Untuk Manajemen mendorong Deskripsi melewati baris ke-15 sehingga status tak terbaca VAULT-INDEX.json. %%
@@ -26,7 +28,7 @@
 
 - **Path di repo**: `bip-erp/services/marketing-analytics/keputusan_dampak*.go` (baru) · `bip-erp/services/marketing-analytics/keputusan_pilot*.go` (baru) · `erp-frontend/src/features/marketing-analytics/` layar hasil keputusan (baru, lokasi persis diputuskan `/plan`)
 - **Tanggal**: 2026-10-01
-- **Dok domain**: [[Sales - Agen Pengelola Toko]] · daftar task: `Workspace/ANALISA - Agen Pengelola Toko`
+- **Dok domain**: [[Marketing - Agen Pengelola Toko]] · daftar task: `Workspace/ANALISA - Agen Pengelola Toko`
 
 ## Context
 
@@ -124,4 +126,4 @@ Selama tahap 1, pemetaan pemegang di `icc_account_mappings` **tidak diubah**; in
 
 ## Terkait
 
-[[Sales - Agen Pengelola Toko]] · [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] · [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] · [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] · [[ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai]] · [[ADR - 0138 Penugasan Toko Marketplace Bertanggal Berlaku untuk KPI dan Insentif]] · [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] · [[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]] · [[ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko]] · [[ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak]] · [[Microservices - Marketing Analytics Service]] · [[Finance - Incentive]] · [[APP - Ideamills]]
+[[Marketing - Agen Pengelola Toko]] · [[ADR - 0127 Laporan Asisten Analisa Membawa Keputusan AI, Orang Menjalankan atau Menolak]] · [[ADR - 0120 Asisten Analisa Marketing Jadi Menu ERP, Template dan Jadwal Lebih Dulu Tanpa AI]] · [[ADR - 0058 Kapabilitas AI Digerbang Kelayakan Data, Bukan Kelayakan Teknologi]] · [[ADR - 0135 Jadwal Tugas Copilot Mengirim Pengingat, Bukan Menjalankan Tanpa Kehadiran Pemakai]] · [[ADR - 0138 Penugasan Toko Marketplace Bertanggal Berlaku untuk KPI dan Insentif]] · [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] · [[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]] · [[ADR - 0107 Alat Kerja Pemegang Akun Toko lewat Izin Posisi akuntoko]] · [[ADR - 0077 Otonomi Merge Agent Digerbang Mekanisme yang Bisa Menolak]] · [[Microservices - Marketing Analytics Service]] · [[Finance - Incentive]] · [[APP - Ideamills]]

@@ -27,7 +27,7 @@
 | PO | Purchase Order | Pesanan pembelian ke vendor | [[GA - Procurement System]] |
 | WMS | Warehouse Management System | Sistem kelola gudang | [[WH - Management System]] |
 | SO | Stock Opname | Penghitungan fisik stok | [[Manufacture - Issue ED Material after Stock Opname]] |
-| GMV | Gross Merchandise Value | Nilai total transaksi marketplace | [[Sales - GMV Creative]] |
+| GMV | Gross Merchandise Value | Nilai total transaksi marketplace | [[Marketing - GMV Creative]] |
 | KPI | Key Performance Index | Ukuran kinerja karyawan | [[HRIS - Key Performance Index]] |
 | SP | Surat Peringatan | Sanksi disiplin karyawan | [[HRIS - Disciplinary (Surat Peringatan)]] |
 | PKWT | Perjanjian Kerja Waktu Tertentu | Kontrak kerja kontrak (Indonesia) | (TBD penggunaan internal) |
@@ -58,7 +58,7 @@
 |---|---|---|
 | Accurate | Software akuntansi (sumber kebenaran finance) | [[External - Accurate]] |
 | Desty | Tool integrasi marketplace | [[External - Desty]] |
-| TikTok Shop / Shopee | Marketplace tempat berjualan | [[Sales - Marketplace Integration]] |
+| TikTok Shop / Shopee | Marketplace tempat berjualan | [[Marketing - Marketplace Integration]] |
 | Glints / TapLoker | Portal lowongan/ATS untuk rekrutmen | [[HRIS - Recruitment]] |
 
 ## Dokumen Terkait

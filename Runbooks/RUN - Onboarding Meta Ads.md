@@ -49,6 +49,6 @@ Saat memulai implementasi client Meta Ads di `services/integration` (lihat renca
 ## Dokumen Terkait
 
 - [[Microservices - Integration Service]] — rencana teknis §Meta Ads, pola TikTok Business/Ads sebagai acuan
-- [[Sales - Marketplace Integration]] — dokumen konsolidasi (Meta Ads dicatat di sini atas keputusan tim, meski bukan channel order/marketplace)
+- [[Marketing - Marketplace Integration]] — dokumen konsolidasi (Meta Ads dicatat di sini atas keputusan tim, meski bukan channel order/marketplace)
 - [[Finance - Incentive]] — skema insentif "ADV Meta" yang jadi konsumen data konversi/CPA ini
 - [[LOG - Shopee API Rate Limit Request]] — preseden mitigasi rate-limit vendor ads/marketplace

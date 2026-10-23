@@ -65,7 +65,7 @@ Memindahkan `team_shops` saja **tidak cukup**: kelima tokonya semua Beauty Hacks
 2. **Kode modul `system_roles` DILARANG dipakai sebagai kunci identitas tim.** Ia menyatakan hak akses modul, bukan unit organisasi.
 3. **Kepemilikan toko = `department_shops`** (satu toko satu departemen). `marketing_teams` dan `team_shops` dipensiunkan setelah pembacanya pindah.
 4. **Penugasan orang → akun toko = `icc_account_mappings`** (satu toko satu pemegang aktif). Ini pertanyaan **berbeda** dari kepemilikan divisi dan tetap terpisah.
-5. **Kepemilikan akun affiliate = `icc_affiliate_accounts`**, `employee_id` opsional (kosong = belum ditugaskan, bukan akun luar). Lihat [[Sales - ICC Affiliate Mapping]].
+5. **Kepemilikan akun affiliate = `icc_affiliate_accounts`**, `employee_id` opsional (kosong = belum ditugaskan, bukan akun luar). Lihat [[Marketing - ICC Affiliate Mapping]].
 6. **Keanggotaan tim TIDAK disimpan di mana pun** — diturunkan dari `work_data.department`. `team_members` (1 baris) dibuang.
 7. **Sub-tim di dalam divisi DITOLAK untuk sekarang.** Bila kelak dibutuhkan, bentuknya wajib entitas tim ber-ID stabil **dengan induk `department_key`** — bukan nama bebas seperti `marketing_teams`. Syarat memperkenalkannya: ada lebih dari satu tim nyata dalam satu divisi yang perlu dibedakan atribusinya, dan pemiliknya bersedia merawat datanya.
 8. **Migrasi wajib expand → migrate → contract**, dengan gerbang cakupan (lihat §Migrasi). Big-bang swap dilarang.
@@ -218,4 +218,4 @@ Urutannya mengikat. Mencabut lebih dulu tidak menghasilkan error — hanya kolom
 - [[ADR - 0002 Database-per-Service]] — dasar pembacaan lintas-database baca-saja
 - [[Microservices - Integration Service]] — pemilik `department_shops`, `icc_*`, `marketing_teams`
 - [[Microservices - Marketing Analytics Service]] — konsumen; cakupan penanggung jawab & saringan divisi
-- [[Sales - ICC Account Manager Mapping]] · [[Sales - ICC Affiliate Mapping]] — fitur yang memakai identitas tim ini
+- [[Marketing - ICC Account Manager Mapping]] · [[Marketing - ICC Affiliate Mapping]] — fitur yang memakai identitas tim ini

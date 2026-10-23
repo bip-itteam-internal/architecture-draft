@@ -217,7 +217,7 @@ Urutan mengikuti usulan penulis; disesuaikan bila opsi lain dipilih.
 4. **Pembaca**: predikat "berlaku pada tanggal t" di satu tempat; `ListIccShopOwners` dan pembaca marketing-analytics menerima periode dan membagi toko yang berpindah di tengah periode.
 5. **Toko banned**: rincian cakupan membaca tanggal DISABLED dari `shop_status_histories`; penanda data pasca-nonaktif sesuai jawaban §Settlement.
 6. **`department_shops` dan pemetaan CS** dengan pola yang sama, sesudah butir 3 dan 4 terbukti.
-7. **Sinkron dok**: [[REF - Kepemilikan Data]] (baris pemegang toko aktif dan toko per divisi), [[Sales - ICC Account Manager Mapping]], [[Microservices - Integration Service]], [[Microservices - Marketing Analytics Service]], [[HRIS - Otomasi Skor KPI]], dan amandemen keputusan 4 di ADR 0045.
+7. **Sinkron dok**: [[REF - Kepemilikan Data]] (baris pemegang toko aktif dan toko per divisi), [[Marketing - ICC Account Manager Mapping]], [[Microservices - Integration Service]], [[Microservices - Marketing Analytics Service]], [[HRIS - Otomasi Skor KPI]], dan amandemen keputusan 4 di ADR 0045.
 
 ## Penjaga yang dibutuhkan
 
@@ -230,7 +230,7 @@ Urutan mengikuti usulan penulis; disesuaikan bila opsi lain dipilih.
 
 ## Dokumen Terkait
 
-- [[REF - Kepemilikan Data]] · [[Sales - ICC Account Manager Mapping]] · [[REF - Penamaan Metrik & Sumber KPI]]
+- [[REF - Kepemilikan Data]] · [[Marketing - ICC Account Manager Mapping]] · [[REF - Penamaan Metrik & Sumber KPI]]
 - [[ADR - 0052 Status Sinkron per Toko]] · [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] · [[ADR - 0079 Target Profit Satu Pintu di Insentif, KPI Membacanya]] · [[ADR - 0125 Insentif Profit Dibayar lewat Slip Gaji dari Snapshot yang Disetujui Finance]] · [[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]] · [[ADR - 0086 Metrik Live Lintas Channel Digabung Satu Angka, Rincian Tetap per Channel]]
 - [[Microservices - Integration Service]] · [[Microservices - Marketing Analytics Service]] · [[Microservices - Insentive Service]] · [[Finance - Incentive]]
 - [[HRIS - Otomasi Skor KPI]] · [[HRIS - Alur KPI Otomatis]]

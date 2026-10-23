@@ -29,7 +29,8 @@ otomatis → perbaikan maks 2× → **PR**). **Merge tetap manusia** (ADR 0077 �
 `/papan-sesi` (sesi mana mengerjakan apa), `/dashboard` (HTML statis: SHIPPED, MIX, LOOP, CYCLE,
 SESI dari gh + data lokal), `/kantor-agent` (denah kantor isometrik: sesi hidup sedang apa), `/ekstrak-skill` (sesi → draft skill), `/supervise` (evaluasi loop →
 draft, tidak auto-apply). Gerbang lokal: pre-commit **menolak** commit di branch
-utama repo kode; pre-push menjalankan tsc/lint/build atau go build. Jangan `--no-verify` tanpa
+utama repo kode; pre-push menjalankan tsc/lint (repo Node, **tanpa** `pnpm build` sejak kit 1.42.0;
+build tetap dijalankan gerbang `/judge` dan wajib sebelum merge) atau go build. Jangan `--no-verify` tanpa
 alasan tertulis. Papan tim (`dev-activity-board`) menerima peristiwa loop bila mesin ini punya
 `~/.agent-kit/loop-ingest.json` (opt-in, best-effort, tanpa judul brief/teks task).
 
@@ -38,6 +39,7 @@ alasan tertulis. Papan tim (`dev-activity-board`) menerima peristiwa loop bila m
 - Grounded-in-code: jangan mengarang; yang belum ada tandai TBD.
 - Dokumentasi disinkronkan via `/sync-docs` (delegasi ke rulebook vault).
 - **i18n dua bahasa (`erp-frontend`)**: SEMUA teks user-facing **baru** WAJIB lewat `react-i18next` — `t("domain.key")`, key ditaruh di **dua** file `src/i18n/locales/id.ts` **dan** `en.ts`. **JANGAN hardcode** string yang tampil ke user. Default **Indonesia**; **istilah teknis lazim English biarkan English** di kedua locale (Dashboard, Export, KPI, Score, dll) — jangan dipaksa Indonesia. Tanggal/bulan/angka pakai `toLocaleDateString(intlLocale(lang))`, bukan hardcode `"id-ID"`. Aturan lengkap: **ADR 0010** di vault (`Decisions/ADR - 0010 Internasionalisasi (i18n) Dua Bahasa.md`).
+- ⛔ **Status lock receipt-sync WAJIB ditutup di akhir tiap jawaban dan sesudah tugas perubahan kode** (kit ≥ 1.43.0, permintaan user 2026-10-23): satu baris teks polos, dari `hooks/cek-lock-receipt.ps1` (mac/linux `.sh`), ditaruh tepat di atas baris waktu. Bentuk: `Receipt lock kosong dari <jam> sampai <jam>, aman deploy sekarang`, atau `Receipt lock TIDAK aman: ...`. Alasannya: membuat ulang container `integration-service` saat `receipt-sync` berjalan (08:30/11:30/14:30/17:30/20:30 WIB, 60 sampai 90 menit) memotong putaran income dan **tidak meninggalkan jejak**. Salin keluaran skrip **apa adanya**; keputusan aman/tidaknya SATU tempat di `hooks/cek-lock-receipt.py`, jangan menghitung sendiri dan jangan menebak. Skrip membaca prod **baca-saja** lewat ssh dan butuh konfigurasi per orang `~/.agent-kit/prod-ssh.json` (`{"host": "<user>@<alamat>", "key": "<path kunci>"}`; host dan kunci TIDAK ada di kit). Tanpa itu, atau ssh gagal, keluarannya `tidak bisa dicek`: tulis itu apa adanya, **jangan pernah menuliskan "aman" tanpa hasil skrip**. Menjalankannya tidak mengizinkan deploy: deploy prod tetap dijalankan manusia.
 
 ## Ingatan tim (shared memory)
 Indeks memori bersama antar-agent/dev (gotchas, konvensi, sumber-kebenaran) — di-import LANGSUNG dari vault; update cukup `git pull architecture-draft` (tanpa re-run init):

@@ -58,6 +58,10 @@ Bukan selera. Untuk halaman berisi angka dan bagan, komposisinya diatur
 baca); untuk halaman daftar, skill `/migrasi-tabel-hris`; untuk warna bagan, `team-memory.md`
 § Bagan/chart. Yang di bawah berlaku untuk semua layar.
 
+- **Tampilan jawaban atau laporan Copilot** (blok, grafik, paragraf, PDF/Excel): baca
+  [[REF - Penyajian Laporan Copilot]] dulu. Bentuknya dipilih sistem dan dirakit dari
+  komponen serta token yang ada; jangan membangun gaya sendiri per alat.
+
 1. **Tujuan utama terbaca dari bentuk layarnya.** Pembaca tahu harus mulai dari mana tanpa
    paragraf panduan. Satu **aksi utama** per area memakai `Button` bawaan; aksi lain memakai
    varian `outline` atau `ghost`. Dua tombol utama bersebelahan berarti belum ada keputusan
@@ -336,6 +340,69 @@ git -c core.fsmonitor=false grep -n -e 'John Doe' -e 'example\.com' -e lorem ori
 **Yang TIDAK bisa diukur perintah**: stat card berangka karangan, delta tanpa periode
 pembanding, dan judul bagan yang tak memuat pertanyaan. Ketiganya sah menurut tipe dan lolos
 lint, jadi satu-satunya gerbangnya `/review` dan mata orang yang membuka layarnya.
+
+## 2d. Input tanggal: komponen tim, BUKAN `<input type="date">` bawaan browser
+
+⛔ **Di erp-frontend, input tanggal BARU wajib memakai komponen bersama.** Input bawaan
+browser tampil sebagai kotak `dd/mm/tttt` bergaya sistem operasi, tidak ikut tema, dan nama
+bulan serta formatnya mengikuti bahasa OS pemakai, bukan bahasa aktif aplikasi
+([[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]). Ia terlihat seperti potongan aplikasi
+lain di tengah layar kita, dan itu yang ditegur pemilik produk 2026-10-12 di layar Rencana
+Kerja yang baru merged.
+
+| Kebutuhan | Pakai | Letak |
+|---|---|---|
+| Satu tanggal, nilai string `yyyy-MM-dd` (paling umum, termasuk `react-hook-form`) | `DateStringPicker` | `@/components/ui/date-picker` |
+| Satu tanggal, nilai objek `Date` | `DatePicker` | `@/components/ui/date-picker` |
+| Rentang dari/sampai | `DatePickerWithRange` | `@/components/ui/date-picker-with-range` |
+| Filter tanggal di tabel | `FilterTable` tipe `date` | `@/components/table` (sudah memakai `Calendar` bersama) |
+| Bulan (`type="month"`), jam (`type="time"`), tanggal+jam (`type="datetime-local"`) | **belum ada komponen bersama** | lihat di bawah |
+
+- **`DateStringPicker` mengeluarkan `yyyy-MM-dd` yang sama** dengan input bawaan, jadi payload
+  API tidak berubah saat mengganti. Beri prop `id` supaya `<Label htmlFor>` tetap tersambung;
+  tanpa itu pembaca layar kehilangan nama field dan `getByLabelText` di test berhenti
+  menemukannya.
+- **Jangan membuat pemilih tanggal baru di folder fitur**, dan jangan membungkus input bawaan
+  dengan gaya sendiri supaya "terlihat mirip". Itu tiruan look-alike (§1).
+- **Bulan, jam, dan tanggal+jam belum punya komponen bersama.** `DeadlinePicker` hanya hidup
+  lokal di `features/marketing/engagement`. Untuk ketiganya **jangan mengarang komponen
+  shared baru di tengah task lain**; keputusannya ada di erp-frontend#2333. Sampai
+  diputuskan, input bawaan untuk ketiga jenis itu boleh, tetapi **tulis di rencana** bahwa ia
+  menunggu komponen bersama.
+- **Mengubah berkas yang sudah memakai input bawaan bukan kewajiban untuk sekalian
+  memigrasinya.** Migrasinya per area di erp-frontend#2333; menyelipkannya ke PR lain membuat
+  diff sulit direview. Yang wajib adalah **tidak menambah** yang baru.
+
+### Keadaan terukur (2026-10-12, `origin/main` `23c969df5`)
+
+Tanpa komentar dan tanpa berkas test: `type="date"` **138 kemunculan di 86 berkas**,
+`type="month"` 11/11, `type="datetime-local"` 5/4, `type="time"` 23/12. Pemakai komponen
+bersama baru **17 berkas** (`DateStringPicker` 7, `DatePicker` 7, `DatePickerWithRange` 3).
+Terbanyak di `features/manufacture` dan `features/integration` (38 masing-masing). Angka ini
+bergerak; ukur ulang, jangan mengutipnya ke brief.
+
+### Membuktikannya
+
+⚠️ **PowerShell 5.1 membuang tanda kutip ganda di argumen program native**, jadi
+`git grep -F 'type="date"'` dari PowerShell diam-diam mencari `type=date` dan membalas **nol**.
+Dua hitungan pertama audit 2026-10-12 keluar 0 dan 1 karena ini. Pakai pola tanpa karakter
+kutip, `-a` supaya berkas ber-NUL tetap keluar sebagai `berkas:baris`, dan **kontrol positif**
+(satu input bawaan yang kamu tahu ada harus tertangkap):
+
+```
+git -c core.fsmonitor=false grep -a -n -E 'type=[^a-zA-Z0-9]{1,3}(date|month|time|datetime-local)[^a-zA-Z0-9-]' origin/main -- src
+```
+
+Buang baris komentar (`//`, `*`, `{/*`) sebelum menghitung: berkas yang SUDAH bermigrasi sering
+menulis `<input type="date">` di komentar penjelasnya (`components/table/filter.tsx`,
+`components/ui/date-picker.tsx`), dan itu positif palsu.
+
+### Yang dijaga dan yang belum
+
+Penjaga test (pemindai sumber + daftar `BELUM_MIGRASI_INPUT_TANGGAL` yang hanya boleh
+menyusut) direncanakan di erp-frontend#2332, khusus `type="date"`. **Sampai test itu
+merged, satu-satunya gerbangnya `/review` dan judge** (`review-checklist.md` §J). Jangan
+menganggap `pnpm test` hijau berarti aturan ini dipatuhi.
 
 ## 3. Arah visual boleh dari luar, komponen tetap dari repo
 

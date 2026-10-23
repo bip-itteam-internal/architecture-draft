@@ -2,7 +2,7 @@
 
 *Jatah cuti tahunan terbit otomatis di **ulang tahun kontrak masing-masing karyawan**, bukan diketik HR per orang dan bukan serentak 1 Januari. Patokannya `start_date` kontrak paling awal yang tipenya sudah lepas masa evaluasi. Saldo dicatat sebagai **ledger kejadian** (`vacation_ledger`), dan `work_data.vacation` turun pangkat jadi salinan ringkas demi kompatibilitas MyBharata.*
 
-- **Status**: 🟡 **Diusulkan** — belum ada di kode. Keputusan diambil 2026-08-29 setelah pengukuran data produksi; daftar task ada di `Workspace/ANALISA - Akrual Cuti Tahunan Otomatis`.
+- **Status**: 🟡 **Diusulkan** — belum ada di kode, **kecuali §8** (pemotongan per hari kerja) yang sudah diterapkan terpisah lewat bip-erp [#2983](https://github.com/bip-itteam-internal/bip-erp/pull/2983) (PROD 2026-10-12). Keputusan diambil 2026-08-29 setelah pengukuran data produksi; daftar task ada di `Workspace/ANALISA - Akrual Cuti Tahunan Otomatis`.
 - ⚠️ **Nomor ganda**: nomor 0061 juga dipakai [[ADR - 0061 Kaizen Ada di Sistem tapi Tidak Dipakai untuk Otomasi KPI]]. Rujuk ADR ini dengan **judul**, bukan nomor saja. Diputuskan 2026-09-29 tidak dinomori ulang karena kutipan nomornya sudah tersebar di kode, PR, dan issue; nomor ganda baru ditolak pre-push (`gerbang-adr.py`).
 - **Issue GitHub**: [bip-erp#2337](https://github.com/bip-itteam-internal/bip-erp/issues/2337) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 - **Path di repo (yang akan disentuh)**: `bip-erp/services/employee/vacation_accrual.go` (baru) · `vacation_ledger.go` (baru) · `cron.go` (ubah) · `main.go` (endpoint cuti) · `bip-erp/shared-library/models/employee/models.go` · `bip-erp/services/attendance/main.go` (pemotongan hari kerja) · `erp-frontend/src/features/hris/vacation/**`
@@ -142,6 +142,13 @@ Ledger sekaligus menutup satu cacat yang sudah ada: hari ini `used` dan `history
 `decrementVacationQuota` di attendance-service merangkai tanggal dengan `AddDate(0, 0, 1)` dari tanggal awal sampai akhir tanpa menyaring hari non-kerja, sehingga cuti Jumat sampai Senin memotong 4 hari. Jatahnya hari kerja, jadi pemotongannya harus hari kerja. Perusahaan bekerja Senin sampai Sabtu, sehingga yang dikecualikan adalah Minggu, `Libur Nasional`, dan `Cuti Bersama` di `company_holiday`.
 
 Selama kuota diisi manual selisih ini tersamar. Begitu penerbitannya presisi, selisihnya jadi terlihat.
+
+✅ **Diterapkan 2026-10-12** (bip-erp [#2983](https://github.com/bip-itteam-internal/bip-erp/pull/2983), merged + PROD), terpisah dari sisa ADR ini. Dua hal berbeda dari rumusan di atas, dan bentuk yang berjalan yang benar:
+
+- **Hari libur dibaca dari jadwal ORANG ITU**, bukan "Minggu + `Libur Nasional` + `Cuti Bersama`" yang tetap. Penghitungnya (`tanggalKerjaPengajuan`, `services/attendance/hari_kerja_pengajuan.go`) memakai resolver jadwal kalender presensi (`getEmployeeScheduleDateRange`) lalu `isHolidaySchedule`, sehingga shift, roster, rotasi, tukar shift, dan libur perusahaan ikut. Untuk karyawan Senin-Sabtu hasilnya sama dengan rumusan di atas.
+- ⚠️ **`COMPANY_EVENT` dihitung hari kerja** (tak ada di `isHolidaySchedule`). Belum ada keputusan HR apakah cuti di hari event perusahaan semestinya memotong kuota.
+
+Cek sisa kuota saat pengajuan dibuat memakai penghitung yang sama, jadi yang dicek dan yang dipotong tidak bisa menyimpang. Rincian: [[HRIS - Leave Request]] §Durasi = hari kerja.
 
 ### 9. Akrual tidak pernah mencabut hak, dan backfill hanya periode berjalan
 

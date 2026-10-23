@@ -88,7 +88,7 @@ Dua pertanyaan dijawab terpisah: apakah prosesnya **tercover** modul ERP, dan ap
 
 ## Prinsip rancangan
 
-1. **Pakai yang sudah ada sebelum membangun.** Rantai pengajuan, pembayaran, bukti transfer, kas kecil, payroll, dan Tax Control sudah ada di kode. Membangun tambahan di atas modul yang belum dipakai menghasilkan nol efisiensi.
+1. **Pakai yang sudah ada sebelum membangun.** Rantai pengajuan, pembayaran, bukti transfer, payroll, dan Tax Control sudah ada di kode (kas kecil dihapus 2026-10-12, diganti Pengajuan Dana). Membangun tambahan di atas modul yang belum dipakai menghasilkan nol efisiensi.
 2. **Data diinput sekali, oleh pemiliknya, di sumbernya.** Pemohon mengajukan sendiri, HR menjalankan payroll, gudang men-scan retur. Finance memeriksa dan memakai, bukan mengetik ulang. Pemilik tiap fakta ada di [[REF - Kepemilikan Data]].
 3. **Satu data acuan untuk semua pemakai.** Penjualan per entitas, omzet pajak, dan jurnal diambil dari data yang sama, bukan direkap ulang tiap posisi. Basis data kerja paralel di Excel adalah gejala data sistem belum dipercaya; yang diperbaiki datanya, bukan dibuatkan basis data baru.
 4. **Pemisahan tugas dijaga, pengetikan ulang dihapus.** Pembuat, pemeriksa, penyetuju, dan pelaku rekonsiliasi tetap peran berbeda. Otomasi menghapus langkah ketik ulang dan arsip ganda, tidak menghapus pemeriksanya.

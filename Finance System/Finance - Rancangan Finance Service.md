@@ -71,7 +71,7 @@ Kontrak `SumberCuplikan` menyatakannya harfiah: *"Sumber tidak menghitung nilai 
 
 ### Metrik AR bersifat departemen, dan itu diterima
 
-Endpoint AR (`/orders/piutang/summary`, `/accounting/receivables`) tidak punya dimensi karyawan, sehingga AR Leader dan ketiga AR Staf menerima **angka yang sama**. Ini **bukan cacat**: seluruh toko dikelola bersama oleh tim AR Sales, jadi tidak ada pembagian per orang yang bisa diukur. Pemetaan karyawan→toko seperti `icc_account_mappings` di [[Sales - ICC Account Manager Mapping]] **tidak diperlukan di sini**.
+Endpoint AR (`/orders/piutang/summary`, `/accounting/receivables`) tidak punya dimensi karyawan, sehingga AR Leader dan ketiga AR Staf menerima **angka yang sama**. Ini **bukan cacat**: seluruh toko dikelola bersama oleh tim AR Sales, jadi tidak ada pembagian per orang yang bisa diukur. Pemetaan karyawan→toko seperti `icc_account_mappings` di [[Marketing - ICC Account Manager Mapping]] **tidak diperlukan di sini**.
 
 Konsekuensi yang diterima sadar: metrik AR menilai **kinerja tim**, bukan membedakan individu. Pembeda antar-orang harus datang dari metrik lain di templatnya. Bila kelak perlu dibedakan per orang, `TargetBerlaku` sudah mendukung `target_per_karyawan` — cukup lewat target, tanpa menyentuh metriknya.
 
@@ -218,13 +218,13 @@ flowchart LR
 
 Seluruhnya di `bip-erp/shared-library/common/catalog_finance.go` — `finance.ar.view`, `finance.ar.export`, `finance.ap.view`, `finance.profit.view`, `finance.payout.view`, `finance.kastoko.view`, `finance.accounting.view`.
 
-> ⚠️ **Ketujuh-tujuhnya izin BACA. Modul finance belum punya satu pun izin TULIS.** Akibatnya layar tulis `/finance/anggaran` hari ini dijaga `finance.accounting.view` — izin *melihat laporan keuangan* menjaga tombol *hapus baris anggaran*. Ini harus dibetulkan bersamaan, bukan diwariskan ke modul baru.
+> ⚠️ **Ketujuh-tujuhnya izin BACA. Modul finance belum punya satu pun izin TULIS.** Akibatnya layar tulis `/finance/anggaran` hari ini dijaga `finance.accounting.view` — izin *melihat laporan keuangan* menjaga tombol *hapus baris anggaran*. Ini harus dibetulkan bersamaan, bukan diwariskan ke modul baru. ✅ **Dibetulkan 2026-10-08 untuk anggaran**: lima rute tulis `/accounting/anggaran*` kini digerbang `finance.anggaran.kelola`, bukan lagi izin baca (lihat tabel "izin yang diusulkan" di bawah).
 >
 > ✅ **Koreksi 2026-09-12, khusus modul Tax**: kalimat di atas usang untuknya. `finance.pajak.view` / `finance.pajak.kelola` / `finance.pajak.tenggat` **sudah ada** (`catalog_finance.go:39-41`, diverifikasi langsung), dan dua di antaranya (`kelola`, `tenggat`) memang izin TULIS. Tier `supervisor` memegang ketiganya; tier `staff` finance **tidak memegang satu pun** izin pajak sama sekali (`catalog_finance.go:69-85`). Paket siap-pakai `finance_pajak` = `pajak.view` + `pajak.kelola` **tanpa** `pajak.tenggat` (`catalog_finance.go:140-149`), dirancang untuk Tax Officer, orang yang justru dinilai oleh tenggat itu sendiri; menggeser tenggat tetap kewenangan SPV FAT. Diukur prod 2026-09-12: Account Payable dan Tax Staff tidak memegang paket apa pun (lihat [[Finance - FAT Persona]]).
 
 ### Izin yang diusulkan (belum ada)
 
-⚠️ **Tabel ini sebagian usang sejak 2026-09-12**: dua baris pertama SUDAH ada (lihat koreksi di atas), disisakan di sini apa adanya sebagai jejak keputusan awal. Dua baris terakhir **masih benar-benar belum ada**: diverifikasi `finance.costcontrol.*` dan `finance.anggaran.kelola` nihil di `catalog_finance.go` (Grep, 2026-09-12).
+⚠️ **Tabel ini sebagian usang sejak 2026-09-12**: dua baris pertama SUDAH ada (lihat koreksi di atas), disisakan di sini apa adanya sebagai jejak keputusan awal. Baris `finance.costcontrol.*` **masih benar-benar belum ada** (diverifikasi nihil di `catalog_finance.go`, Grep, 2026-09-12). ✅ **Koreksi 2026-10-08**: `finance.anggaran.kelola` kini ADA (`catalog_finance.go:40`, dibaca dari `origin/main`).
 
 | Izin | Untuk | Diberikan ke | Status 2026-09-12 |
 |---|---|---|---|
@@ -232,7 +232,7 @@ Seluruhnya di `bip-erp/shared-library/common/catalog_finance.go` — `finance.ar
 | `finance.pajak.kelola` | mencatat & mengubah kewajiban, SPT, temuan, klasifikasi deductible | Tax Officer, SPV FAT | ✅ ADA |
 | `finance.costcontrol.view` | melihat register penghematan & forecast | Finance staff, SPV | 🟡 belum ada |
 | `finance.costcontrol.kelola` | mencatat & mengubah penghematan, forecast | Cost Control, SPV FAT | 🟡 belum ada |
-| `finance.anggaran.kelola` | menulis & menghapus baris anggaran OPEX | Cost Control, SPV FAT | 🟡 belum ada |
+| `finance.anggaran.kelola` | menulis & menghapus baris anggaran OPEX | Cost Control, SPV FAT | ✅ ADA sejak 2026-10-08 (merged bip-erp#2811, deploy prod TBD): tier supervisor/admin + paket `finance_anggaran`; lihat [[CORE - RBAC dan Permission Set]] dan [[Finance - Serapan Anggaran dan Cost Control]] |
 
 Penambahan izin dilakukan di `catalog_finance.go` (satu sumber: dipakai seed employee-service, service penegak, dan gerbang halaman FE) plus mendaftarkan titik penegakannya.
 
@@ -728,6 +728,12 @@ menerima seperlima anggaran sebulan, lalu realisasi tiga harinya dibandingkan ja
 dan akurasi minggu terakhir selalu tampak anjlok tanpa ada yang salah pada belanjanya. Sisa
 pembulatan ditimpakan ke minggu terakhir supaya jumlahnya kembali **tepat** ke anggaran bulanan.
 
+> ⚠️ **Berubah 2026-10-09 (kode merged, deploy prod TBD):** porsi tiap minggu bisa diatur Cost
+> Control dengan jumlah sebulan tetap sama dengan RAPB; pembagian menurut jumlah hari menjadi
+> bawaan untuk periode yang tidak diatur. Keputusannya
+> [[ADR - 0161 Proyeksi Forecast Kas Mingguan Diatur Porsinya per Minggu oleh Cost Control, Jumlah Sebulan Tetap RAPB]].
+> Paragraf di atas kini hanya menggambarkan periode yang tidak diatur.
+
 **Minggu = potongan 7 hari dari tanggal 1, bukan minggu kalender Senin–Minggu.** Minggu kalender
 melintasi batas bulan (29 Juli–4 Agustus adalah satu minggu), sedangkan anggaran dan realisasi
 keduanya dikunci per periode bulanan; minggu yang kakinya di dua bulan tak punya anggaran
@@ -759,6 +765,8 @@ murni memberi −442,81% pada baris itu, dan nilai negatif tak berarti pada skal
 **Akurasi dihitung dari TOTAL, bukan rata-rata akurasi mingguan.** Rata-rata memberi bobot sama
 pada minggu 3 hari dan minggu 7 hari, sehingga satu minggu pendek menggeser nilai sebulan; rekap
 Finance sendiri menutup bulannya dari total.
+
+> ⚠️ **Sejak 2026-10-09 (bip-erp #2872, merged, deploy prod TBD):** total itu hanya menjumlahkan **minggu yang sudah selesai** (hari terakhirnya lewat menurut WIB). Minggu berjalan dan yang belum mulai tidak ikut, supaya akurasi bulan berjalan tidak anjlok hanya karena bulannya belum tutup. Periode lampau tidak berubah. Rinciannya di [[Finance - Serapan Anggaran dan Cost Control]].
 
 **Pencocokan nama akun WAJIB ternormalisasi.** Nama yang tersimpan di `anggaran_opex` berasal dari
 **katalog Accurate**, sedangkan daftar enam akun disalin dari berkas Finance — keduanya tak
@@ -825,7 +833,7 @@ berbeda, dikonfirmasi satu-satu via tanya-jawab sebelum diimplementasi.
 
 **Budget adalah sumbu TERPISAH dari Aktual, dan itu yang membuat pola 1–3 di atas aman.**
 Budget tiap kartu (6 dari 7 — semua kecuali Laptop/PC) berasal dari **Master Anggaran yang
-sudah ada** (`anggaran_opex`), difilter akun × departemen Marketing (Beauty Hacks + Kyura,
+sudah ada** (`anggaran_opex`), difilter akun × departemen Marketing (Beautyhacks + Kyura,
 dijumlah client-side dari `GET /accounting/anggaran?akun_no=`). Ini murni input manusia
 (form/Excel), sama sekali tidak bergantung pada bagaimana Accurate mencatat departemen
 untuk akun Aktual-nya — sehingga aman dipasang bahkan untuk Internet & Iklan yang sisi
@@ -871,13 +879,33 @@ dari 7 kategori grid (bukan panggil `/anggaran/varians`), label & pola SAMA deng
 `KartuVariansOpex` di tab "Master Anggaran" sebelahnya, supaya "varians OPEX" berarti hal
 yang sama di kedua tab.
 
+**Galat akses dibedakan dari galat Accurate (2026-10-13, erp-frontend #2377, merged; deploy
+prod TBD).** Tiga sumber otomatis tab ini, `GET /profit/incentive/beban-marketing`,
+`/summary`, dan `/biaya-engine`, digerbang `RequireMenu("finance.insentif")` di
+integration-service. Akun yang tokennya membawa kunci menu Insentif tanpa izinnya mendapat
+**403**.
+
+Sebelum perbaikan, layar menampilkan 403 itu secara keliru:
+- kartu kategori menulis "Gagal memuat data Accurate.", sehingga Accurate yang tertuduh;
+- kartu Biaya Engine merender **Rp 0** palsu karena tidak punya keadaan galat;
+- kartu Beban Iklan menyembunyikan galatnya.
+
+Kini 403 dikenali lewat `galatTakBerhak` (`src/lib/pesan-galat.ts`) dan tampil sebagai "tidak
+punya akses Insentif" (`finance.opexManual.hintTakBerhak`). Galat lain tetap memakai
+`hintGagalMuat`, dan Biaya Engine menampilkan penanda kosong + pesan, bukan nol.
+
+⚠️ Yang menentukan siapa boleh melihat angka di tab ini adalah izin menu **Insentif**, bukan
+izin Anggaran. Apakah tab ini seharusnya terbuka bagi non-pemegang menu Insentif belum
+diputuskan (TBD); gerbangnya sengaja dipertahankan karena isinya beban per karyawan yang
+menentukan insentif.
+
 **Revisi lanjutan 2026-08-20 (form vertikal + Daftar Pemegang Laptop/PC):**
 
 - **Form "Tambah catatan" jadi vertikal**, bukan grid 2/4 kolom — drawer sisi kanan
   sempit (`sm:max-w-lg`) membuat grid horizontal melipat label dan mengecilkan field.
   Berlaku ke SEMUA kategori manual sekaligus karena satu komponen `FormTambahBeban`
   dipakai ulang oleh kelimanya.
-- **Kartu Laptop/PC kini punya "Daftar Pemegang (Beauty Hacks/Kyura)"** — daftar
+- **Kartu Laptop/PC kini punya "Daftar Pemegang (Beautyhacks/Kyura)"** — daftar
   Laptop/PC yang dipegang staff Marketing, ditarik dari **`services/inventory`**
   (field `held_by`), BUKAN `aset_tetap` (salinan Accurate tanpa data pemegang, sempat
   keliru disebut sebagai solusi di draf awal) dan BUKAN entri manual. Reuse penuh —
@@ -902,7 +930,7 @@ yang sama di kedua tab.
   - **Form manual TETAP ADA** — daftar pemegang melengkapi, bukan menggantikan;
     Finance masih mengetik nominal beban penyusutan sendiri. Draf sempat
     mempertimbangkan filter berdasar posisi HRIS "ICC" (sesuai kata user), diputuskan
-    memakai departemen (Beauty Hacks/Kyura) supaya KONSISTEN dengan 6 kategori lain
+    memakai departemen (Beautyhacks/Kyura) supaya KONSISTEN dengan 6 kategori lain
     di grid yang semuanya berbasis departemen, bukan posisi.
 
 ### Registry catatan beban manual (dasar untuk 5 dari 7 kategori)
@@ -939,7 +967,7 @@ AI, dst) sebaliknya sengaja bebas-ketik: daftar vendor/item memang terus bertamb
 tergantung pengajuan tim marketing, dan menguncinya ke daftar tetap berarti deploy tiap
 kali ada tool baru.
 
-**PIC dipilih dari karyawan Beauty Hacks/Kyura, tidak diketik bebas.** "Staff marketing"
+**PIC dipilih dari karyawan Beautyhacks/Kyura, tidak diketik bebas.** "Staff marketing"
 di organisasi ini secara struktural berarti kedua departemen itu — tidak ada departemen
 bernama "Marketing" (lihat [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]]).
 Nama yang diketik manual tidak bisa diatribusikan balik ke `employee_id`, jadi breakdown

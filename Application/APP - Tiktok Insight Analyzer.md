@@ -1,6 +1,6 @@
 ## Deskripsi
 
-*Implementasi teknis **TikTok Sentiment Pipeline** (folder `scraping`): backend **Python/FastAPI** yang men-scrape komentar TikTok kompetitor → analisis sentimen + klasifikasi tema dengan Claude AI → simpan ke MongoDB, plus **dashboard web Next.js** untuk insight. Konsep/bisnis & nilai pemakaiannya ada di [[Sales - TikTok Sentiment Pipeline]] (sisi Marketing).*
+*Implementasi teknis **TikTok Sentiment Pipeline** (folder `scraping`): backend **Python/FastAPI** yang men-scrape komentar TikTok kompetitor → analisis sentimen + klasifikasi tema dengan Claude AI → simpan ke MongoDB, plus **dashboard web Next.js** untuk insight. Konsep/bisnis & nilai pemakaiannya ada di [[Marketing - TikTok Sentiment Pipeline]] (sisi Marketing).*
 
 - **Stack**: Python 3.11+ (FastAPI), Apify (scraping), Anthropic **Claude** (sentimen + sintesis insight), MongoDB; frontend Next.js 16 + React 19 + Tailwind v4 + Recharts
 - **Path**: `scraping` (repo terpisah), branch `master`
@@ -58,6 +58,6 @@ Jadwal otomatis: **tiap Senin 08:00** via Windows Task Scheduler (`scripts/regis
 
 ## Dokumen Terkait
 
-- [[Sales - TikTok Sentiment Pipeline]] — konsep/bisnis (sisi Marketing)
-- [[Sales - Veo (Gemini) Implementation]] — sama-sama pakai Apify untuk discovery tren TikTok
+- [[Marketing - TikTok Sentiment Pipeline]] — konsep/bisnis (sisi Marketing)
+- [[Marketing - Veo (Gemini) Implementation]] — sama-sama pakai Apify untuk discovery tren TikTok
 - [[Microservices - Integration Service]] — scraping TikTok yang **berbeda** (order/iklan marketplace, bukan sentimen)

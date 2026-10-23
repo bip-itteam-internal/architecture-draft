@@ -375,4 +375,4 @@ Status yang sudah ter-cover di data order: COMPLETED → `completed_at`; SHIPPED
 - [[Finance - Big Pictures]] — overview domain Finance System
 - [[Microservices - Integration Service]] — dokumentasi lengkap service (129 endpoint, semua modul)
 - [[External - Accurate]] — detail integrasi Accurate Online
-- [[Sales - Marketplace Integration]] — konteks bisnis sisi marketing
+- [[Marketing - Marketplace Integration]] — konteks bisnis sisi marketing

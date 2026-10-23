@@ -24,7 +24,7 @@
 | POST | `/item` | Buat item inventaris | GeneralAffair |
 | GET | `/items` | List item | publik |
 | GET/PATCH/DELETE | `/item/:id` | Detail/update/hapus item (PATCH juga = serahkan/ubah pemegang **& ceklis rekonsiliasi** via `accurate_asset_no`) | GeneralAffair |
-| PATCH | `/item/:id/approve-handover` | SPV menyetujui serah-terima | **SPV penaung** (gate `SupervisedDepartments`, bukan GeneralAffair) |
+| PATCH | `/item/:id/approve-handover` | SPV menyetujui serah-terima | **SPV penaung STRICT** departemen penyerah DAN bukan penyerahnya sendiri (`putuskanApproveHandover`, `approve_handover.go:80`), bukan GeneralAffair |
 | GET | `/item/master/:master_id/spec-template` | Template spesifikasi | GeneralAffair |
 | POST/GET | `/item/upload/presigned-url` · `/item/upload/presigned-get` | Presigned upload/download dokumen (`purchase` · `arrived` · `handover`) | GeneralAffair |
 
@@ -91,7 +91,7 @@ Grounded ke `services/inventory/peminjaman_*.go`. Keputusan desain: [[ADR - 0094
 | GET | `/peminjaman/penyetuju[?company=]` | Daftar penyetuju satu perusahaan | identitas + `RequireHRISOrITSupervisor` | `{data: PenyetujuPeminjaman}` |
 | PUT | `/peminjaman/penyetuju[?company=]` | Menimpa seluruh daftar penyetuju | identitas + `RequireHRISOrITSupervisor` | `{data: PenyetujuPeminjaman}` |
 | GET | `/peminjaman[?status=&ruang_id=&dari=&sampai=]` | Jadwal seluruh booking perusahaan pemanggil, `mulai_at` terbaru dulu, maks 200 | identitas + `ga.view` | `{data: [Peminjaman], batas: 200, terpotong: bool}` |
-| POST | `/peminjaman` | Ajukan booking | identitas | 201 `{data: Peminjaman}` |
+| POST | `/peminjaman` | Ajukan booking. 🟡 **(bip-erp [#3418](https://github.com/bip-itteam-internal/bip-erp/pull/3418), belum merged/deploy 2026-10-21)** badan menerima `asal{modul, id}` opsional untuk booking yang lahir dari modul lain: `modul` harus ada di daftar-izin `modulAsalPeminjamanDiizinkan` (kini hanya `interview`), `id` wajib dan maksimal 64 karakter; selain itu `400`. Booking ber-`asal` tetap `DIAJUKAN` dan butuh persetujuan, dan tidak ikut feed kalender pemohon | identitas | 201 `{data: Peminjaman}` |
 | POST | `/peminjaman/:nomor/setujui` | Setujui | identitas + ditunjuk HR | `{data: Peminjaman, ditolak_otomatis: [nomor]}` |
 | POST | `/peminjaman/:nomor/tolak` | Tolak, badan `{alasan}` wajib | identitas + ditunjuk HR | `{data: Peminjaman}` |
 | POST | `/peminjaman/:nomor/batal` | Batal oleh pemohon, badan `{alasan}` opsional (badan kosong sah) | identitas + pemohon | `{data: Peminjaman}` |
@@ -155,6 +155,30 @@ Grounded ke `services/inventory/peminjaman_*.go`. Keputusan desain: [[ADR - 0094
 - Yang dipancarkan hanya booking ber-`pemohon_id` pemanggil, ber-`company_id` perusahaan pemanggil, tanpa `asal`, dan beririsan dengan rentang (`filterFeedPeminjaman` + `saringFeedPeminjaman`). Jadwal ruang orang lain tidak masuk kalender siapa pun.
 - Prefix `/internal/` tidak membuat rute ini privat: penyaringan hak akses dikerjakan handler. Lihat [[Microservices - Calendar Service]].
 
+## Permintaan Barang GA & Stok Perlengkapan (spec permintaan GA 2026-10-13)
+
+Diukur ke `bip-erp` `origin/main` 2026-10-13 sesudah `bip-erp#3039`, `#3041`, `#3043` merged. Spec: `docs/superpowers/specs/2026-10-13-permintaan-ga-menunggu-stok-design.md` (bip-erp). Permintaan baru **tanpa persetujuan**: stok kurang → `MENUNGGU_STOK` (yang ada dicadangkan), semua tercadang → `SIAP_DISERAHKAN`; stok yang bertambah dibagi urut waktu (`BagiStok`). Dokumen lama berjenjang (`DIAJUKAN`) tetap terbaca.
+
+| Method | Path | Fungsi | Gerbang |
+|---|---|---|---|
+| GET | `/permintaan/katalog` | Katalog barang + `tersedia` (sudah dikurangi cadangan) | `ga.request.ajukan` (semua akun, bip-erp#3030) |
+| GET | `/permintaan/saya` | Permintaan milik pemanggil | `ga.request.ajukan` |
+| GET | `/permintaan/perlu-aksi` | Antrean dokumen lama berjenjang | salah satu izin permintaan |
+| GET | `/permintaan/kebutuhan` | Kebutuhan pembelian per barang: `qty_menunggu`, `jumlah_permintaan`, `tertua_pada`, `permintaan[]`, `pembelian_berjalan[]` (menggantikan `/sinyal-stok`) | `ga.request.serah` |
+| GET | `/permintaan/cadangan-mengendap` | Permintaan yang menahan cadangan lama | `ga.request.serah` |
+| POST | `/permintaan` | Buat; 201 → `SIAP_DISERAHKAN` atau `MENUNGGU_STOK`, tak ada lagi 409 stok kurang | `ga.request.ajukan` |
+| POST | `/permintaan/:nomor/tolak` | Body `{alasan}` wajib; melepas cadangan lalu membagi ulang | salah satu izin permintaan (penindak diperiksa di handler) |
+| POST | `/permintaan/:nomor/batal` | Pemohon membatalkan sebelum selesai | `ga.request.ajukan` |
+| POST | `/permintaan/:nomor/serahkan` | `SIAP_DISERAHKAN` → `SELESAI`, seluruh qty sekaligus. Body `{aset_ids: [][]}`: baris aset WAJIB membawa tag unit tepat sebanyak `qty` (`ValidasiAsetIDsPenyerahan`); perlengkapan dipotong dari stok | `ga.request.serah` |
+| GET | `/permintaan/:nomor/unit-tersedia` | 🟡 `bip-erp#3049` belum merged. Per baris aset yang belum diserahkan: `{indeks, master_id, nama_barang, varian, qty, unit:[{id, lokasi, catatan, accurate_asset_no}]}` dari `filterAsetMenganggur` (aturan yang sama dengan pembagian dan penyerahan); `data`/`unit` selalu array | `ga.request.serah` |
+| GET | `/permintaan` · `/permintaan/:nomor` | Daftar semua (staf GA saja) · detail | `ga.request.serah` atau `ga.view` · salah satu izin permintaan |
+| GET | `/ga-stok` | Barang ber-sifat perlengkapan + `qty_fisik`, `qty_dicadangkan`, `tersedia` | `ga.view` + `RequireGeneralAffair` |
+| POST | `/ga-stok/penyesuaian` | Body `{master_id, jenis: OPNAME\|TAMBAH\|KURANGI, qty, alasan}`; alasan wajib; tak boleh di bawah cadangan | `ga.work` + `RequireGeneralAffair` |
+| GET | `/ga-stok/:master_id/riwayat` | Riwayat perubahan stok fisik (`OPNAME`, `TAMBAH`, `KURANGI`, `PENERIMAAN`, `PENYERAHAN`) beserta `rujukan` dan `oleh{id,nama}` | `ga.view` + `RequireGeneralAffair` |
+| POST · PATCH | `/ga-katalog/perlengkapan` · `/ga-katalog/:master_id/sifat` | Tambah barang perlengkapan ke katalog · ubah jenis aset ↔ perlengkapan (`sifat` dibaca huruf kecil) | `ga.work` + `RequireGeneralAffair` |
+
+Bentuk dokumen permintaan tetap memakai nama field lama (`items`, `pemohon_id`/`pemohon_nama`, `metadata.created_at`, riwayat `{oleh, nama, aksi, alasan, waktu}`); usulan ganti nama di kontrak issue `bip-erp#3036` **tidak** dikerjakan. Progres pembelian (`pembelian_berjalan`) dibaca dari [[API - Procurement Service]] `GET /internal/pembelian-berjalan`, best-effort (gagal = kosong, timeout 3 detik).
+
 ## Kontrak request & validasi (grounded)
 
 Detail berikut grounded ke `services/inventory` (`controller.go`, `validation.go`).
@@ -168,7 +192,13 @@ Detail berikut grounded ke `services/inventory` (`controller.go`, `validation.go
 - Grounded: `CreateInventory` (held_by opsional, `resolveCategory`, `ValidateDocumentsExists`) + `ValidateSpecs` + `generateUniqueID`.
 
 ### `PATCH /item/:id/approve-handover` — SPV menyetujui serah-terima
-- **Otorisasi non-standar**: di **luar** grup `/item` (tak di-gate `RequireGeneralAffair`). Handler menolak `403` bila `held_by.handover_dept` **tidak** ada di `common.SupervisedDepartments(c)` (klaim `supervised_departments` / header `BIP-Supervised-Departments`). Tolak `400` bila status ≠ `menunggu_spv`.
+- **Otorisasi non-standar**: di **luar** grup `/item` (tak di-gate `RequireGeneralAffair`; didaftarkan SEBELUM grup itu, `daftarkanRuteInventory`, supaya lantai `ga.view` tak berlaku: penyetujunya SPV departemen penyerah yang biasanya bukan orang GA). Keputusan dijatuhkan di handler (`putuskanApproveHandover`, bip-erp#2539 merged 2026-10-02), `403` bila salah satu:
+  - identitas pemanggil (`BIP-Employee-ID`) tak dikenal;
+  - dokumen tak punya data penyerah sama sekali (serah-terima lama, "ajukan ulang");
+  - pemanggil adalah **penyerahnya sendiri**: dibandingkan dengan `held_by.handover_by_id`; pada data lama tanpa id, dibandingkan lewat **nama** (`handover_by`), dan nama kosong atau sama dengan nama pemanggil ditolak;
+  - `held_by.handover_dept` **tidak** ada di cakupan supervisi **STRICT** pemanggil (`common.SupervisedDepartmentsStrict`, via `menaungiDepartemen`, `permintaan_gate.go:129`). Varian non-strict jatuh kembali ke departemen pemanggil sendiri bila header cakupan kosong sehingga setiap staf tampak menaungi departemennya; varian itu tidak dipakai di sini.
+  Tolak `400` bila status ≠ `menunggu_spv`.
+- **Data penyerah distempel SERVER, bukan diterima dari body**: id, nama, dan departemen penyerah (`held_by.handover_by_id` / `handover_by` / `handover_dept`) diisi dari identitas pemanggil lewat `serahkanUnitAset` (departemen = konstanta GA) dan `PATCH /item/:id` (`stempelSerahTerima`, `controller.go:537`; nilai klien diabaikan bila status `menunggu_spv`). Hasil persetujuan juga tak bisa ditentukan klien lewat `PATCH /item/:id`: status `disetujui` dan `known_by_spv(_id)` dari body dibuang kecuali dokumen tersimpan memang sudah disetujui untuk pemegang yang sama (`kunciHasilPersetujuan`, `controller.go:535`). Satu-satunya jalan ke `disetujui` adalah endpoint ini.
 - **Efek**: `held_by.known_by_spv` = nama SPV (dari body), `known_by_spv_id` dari header, `handover_status=disetujui`.
 - Grounded: `ApproveHandover` + `common.SupervisedDepartments`.
 

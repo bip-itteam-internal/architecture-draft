@@ -71,6 +71,7 @@ Baris bertanda ° belum saya buka sendiri dan berasal dari penelusuran; ia perlu
 | Yang diatur | Yang dijalankan | Nilai tinggal di | Nilai prod | Status |
 |---|---|---|---|---|
 | Jatah **12 hari kerja** setelah 12 bulan bekerja | kuota diisi **manual per karyawan** oleh HR; tidak ada aturan penerbitan ° | Master data `work_data.vacation.quota` | 123 dari 180 karyawan berkuota **5** ° | ⛔ **BELUM ADA** aturannya di sistem |
+| Jatah dinyatakan dalam **hari kerja**, jadi cuti memotong hari kerja saja | cek sisa kuota dan pemotongan kuota Cuti tahunan menghitung **hari kerja pemohon** menurut jadwalnya (`tanggalKerjaPengajuan`); jadwal tak terbaca → hari kalender | `services/attendance/hari_kerja_pengajuan.go` + `isHolidaySchedule` (`func.go`) | sejak 2026-10-12 (bip-erp #2983, diukur di biner prod) | ✅ cocok; ⚠️ `COMPANY_EVENT` dihitung hari kerja, belum diputuskan HR |
 | Tambahan **2 hari** untuk masa kerja ≥ 5 tahun | tidak ditemukan implementasinya ° | tidak ada | tidak ada | ⛔ **BELUM ADA** |
 | Cuti hangus akhir tahun berikutnya | cron 1 Januari me-reset pemakaian, sisa hangus lebih cepat ° | Konstanta Go, jadwal cron ° | ° | ⛔ **MENYIMPANG** |
 | Durasi izin dibayar: nikah 5, nikah anak 3, istri melahirkan 3, kematian keluarga 5, kematian saudara 1, wisuda 1, sunat/baptis 2, bencana 1 | katalog durasi maksimum per subtipe ° | Konstanta Go `LeaveSubtypeDetails` ° | ° | ⚠️ sebagian cocok, perlu pembandingan baris per baris |

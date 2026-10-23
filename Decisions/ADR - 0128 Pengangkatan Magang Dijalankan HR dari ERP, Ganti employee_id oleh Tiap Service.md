@@ -8,7 +8,7 @@
 
 *Pengangkatan magang ke PKWT/PKWTT dijalankan HR sendiri dari halaman Kontrak. employee-service mengoordinasi penggantian `employee_id`, dan SETIAP service mengganti rujukan di databasenya sendiri lewat satu fungsi bersama di `shared-library`, sehingga ADR 0002 (database-per-service) tetap utuh. Menggantikan [[ADR - 0126 employee_id Diterbitkan Sistem, Magang yang Diangkat Mendapat ID Reguler dengan Migrasi Riwayat]] §5 ("dijalankan manusia per angkatan lewat alat"); §4 (ID memang berganti) tetap berlaku.*
 
-- **Status**: ⚠️ **Implemented, belum pernah dipakai di PROD.** Diusulkan 2026-09-26 dan disetujui pemilik produk lewat `/analisa-kebutuhan`. Rute ganti ID per service, koordinator berstatus, dan daftar magang menunggu diangkat merged bip-erp [#2106](https://github.com/bip-itteam-internal/bip-erp/pull/2106), [#2107](https://github.com/bip-itteam-internal/bip-erp/pull/2107), [#2116](https://github.com/bip-itteam-internal/bip-erp/pull/2116); tombol dan banner di halaman Kontrak erp-frontend [#1760](https://github.com/bip-itteam-internal/erp-frontend/pull/1760), [#1768](https://github.com/bip-itteam-internal/erp-frontend/pull/1768) (2026-09-26..27). Terpasang di PROD (backend `bc8d37e4`, frontend `44c780311`), tetapi koleksi `employee_pengangkatan` masih **0 dokumen** (diukur 2026-09-29): pengangkatan sungguhan pertama belum terjadi, jadi jalur ganti ID lintas service belum terbukti di PROD. Papan kerja: [[ANALISA - Pengangkatan Magang dari ERP]]
+- **Status**: ✅ **Implemented, terpakai di PROD sejak 2026-10-09** (satu pengangkatan: percobaan pertama gagal di tengah tahap apply, tuntas di 20 service sesudah §6 ter-deploy; dua celah terbuka di Consequences). Diusulkan 2026-09-26 dan disetujui pemilik produk lewat `/analisa-kebutuhan`. Rute ganti ID per service, koordinator berstatus, dan daftar magang menunggu diangkat merged bip-erp [#2106](https://github.com/bip-itteam-internal/bip-erp/pull/2106), [#2107](https://github.com/bip-itteam-internal/bip-erp/pull/2107), [#2116](https://github.com/bip-itteam-internal/bip-erp/pull/2116); tombol dan banner di halaman Kontrak erp-frontend [#1760](https://github.com/bip-itteam-internal/erp-frontend/pull/1760), [#1768](https://github.com/bip-itteam-internal/erp-frontend/pull/1768) (2026-09-26..27). Terpasang di PROD (backend `bc8d37e4`, frontend `44c780311`), dan koleksi `employee_pengangkatan` masih 0 dokumen saat diukur 2026-09-29. Pengangkatan sungguhan pertama terjadi 2026-10-09 (1 dokumen, status selesai). Papan kerja: [[ANALISA - Pengangkatan Magang dari ERP]]
 - **Path di repo**: `bip-erp/shared-library/common/ganti_employee_id.go` (baru) · `bip-erp/services/*/main.go` (satu rute internal per service) · `bip-erp/services/employee/pengangkatan*.go` (baru, koordinator + status) · `bip-erp/services/employee/contract.go` (`segarkanSalinan`, penanda siap-diangkat) · `erp-frontend/src/features/hris/contract/` (tombol + status)
 - **Tanggal**: 2026-09-26
 
@@ -54,11 +54,28 @@ Tombol muncul di riwayat kontrak bila karyawan ber-ID magang memiliki kontrak PK
 - Menggantikan ADR 0126 §5 (alat manusia per angkatan). Alat `.task-plans/jalankan-migrasi-ganti-id.ps1` tetap sah sampai fitur ini live dan untuk kasus di luar pengangkatan (perapian nomor).
 - ADR 0126 §1-§4 dan §6 tetap berlaku. Nomor induk terpisah **tidak** dibangun.
 
+### 6. Koleksi besar dideklarasikan service pemiliknya, dan pemeriksaannya berlaku sejak dry (tambahan 2026-10-09)
+
+Diputuskan pemilik produk 2026-10-09 sesudah pengangkatan pertama di PROD gagal di tengah tahap apply; bip-erp [#2908](https://github.com/bip-itteam-internal/bip-erp/pull/2908).
+
+Semula field ber-ID di koleksi besar (>50 ribu dokumen) ditebak dari sampel 500 dokumen, dan koleksi yang sampelnya tak memuat field ber-ID hanya ditolak saat **apply**. Dua akibatnya terukur di PROD: koleksi yang memang tak menyimpan ID karyawan tak bisa dibedakan dari koleksi yang sampelnya meleset (19 koleksi marketplace di `integration_db` menolak setiap pengangkatan), dan dry meloloskan lalu apply menolak sesudah service sebelumnya sudah ditulis.
+
+Yang berlaku sekarang:
+
+1. Tiap service mendeklarasikan koleksi besarnya beserta path ber-ID-karyawan di dalamnya (`idreplaceroute.Config.LargeCollections`). **Daftar path kosong berarti "memang tanpa ID karyawan".** Deklarasi tinggal di service pemilik koleksi, satu tempat.
+2. Koleksi yang dideklarasikan dipindai **pasti** pada path itu, ditambah apa pun yang ditemukan sampel, termasuk pada pemindaian ulang sesudah apply.
+3. Koleksi besar yang **belum** dideklarasikan dan sampelnya tak menghasilkan kandidat ditolak di **dry maupun apply**, sehingga koordinator berhenti di tahap pemeriksaan sebelum satu service pun ditulis.
+4. Path dibuktikan dari struct entity dan penulis koleksinya, bukan dari sampel saja: dua path (`packed_by` di `fulfillment_orders`, `metadata.updated_by` di `manufacture_resi`) tak muncul di sampel 3.000 dokumen tetapi ada penulisnya.
+
+Deklarasi saat ditulis: `integration` (19 koleksi, semua tanpa path), `marketing-analytics` (`mart_profit_attribution`, `mart_video_performance`), `tiktok-shop-service` (`tiktok_shop_webhooks`), `manufacture` (`manufacture_resi`), `warehouse` (`fulfillment_orders`). Daftar yang mengikat ada di `services/<service>/ganti_employee_id_route.go`, bukan di dok ini.
+
 ## Consequences
 
 - **Setiap service baru wajib mendaftarkan rute ganti-ID**, kalau tidak koordinator menolak semua pengangkatan. Ini disengaja: kegagalan keras lebih murah daripada rujukan lama yang tertinggal diam-diam.
 - **Perubahan `shared-library` menaikkan semua service** yang mendaftarkan rute; deploy pertama menyentuh seluruh container.
-- **Koleksi besar** (>50 ribu dokumen) dipindai lewat field ber-ID yang ditemukan dari sampel, seperti alat hari ini; field ber-ID yang jarang muncul bisa lolos dari sampel. Laporan per service wajib menyebut koleksi yang tak bisa dipindai.
+- **Koleksi besar** (>50 ribu dokumen) **wajib dideklarasikan service pemiliknya** (§6, sejak 2026-10-09). Koleksi besar baru yang tak dideklarasikan dan sampelnya tak memuat field ber-ID menolak **setiap** pengangkatan di tahap pemeriksaan sampai dideklarasikan lewat perubahan kode. Path yang dideklarasikan salah ketik tidak tertangkap penjaga (penjaga hanya memeriksa nama koleksi), dan field ber-ID baru di koleksi yang sudah dideklarasikan tetap bisa terlewat bila jarang terisi dan tak ikut dideklarasikan.
+- **Salinan sinkron tertinggal sampai 30 menit.** `attendance_db.work_schedule` disalin penuh dari `employee_db` tiap 30 menit, dan employee berganti ID paling akhir, jadi sesudah pengangkatan selesai resolusi jadwal orang itu bisa gagal sampai sinkronisasi berikutnya (terukur PROD 2026-10-09; bip-erp [#2911](https://github.com/bip-itteam-internal/bip-erp/issues/2911), belum diputuskan). Sampai diperbaiki, pengangkatan dilakukan di luar jam kerja orangnya.
+- **Service `assistant` belum ikut ganti-ID** (tanpa rute, tak ada di daftar koordinator; bip-erp [#2912](https://github.com/bip-itteam-internal/bip-erp/issues/2912)). Ini menyimpang dari butir pertama di atas tanpa satu pun galat.
 - **Login orang yang diangkat putus sekali** (JWT memuat `employee_id`); username tetap.
 - **Tanpa `mongodump` per pengangkatan.** Pengamannya pemetaan permanen + pembalikan nilai persis; ini lebih lemah daripada backup dan diterima sadar karena pengangkatan sering dan dijalankan non-IT.
 - **Label "NIK" pada slip gaji** yang sebenarnya `employee_id` (`payslip_pdf.go:222`) tetap membingungkan dengan NIK KTP; dicatat, tidak diperbaiki di sini.

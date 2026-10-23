@@ -94,7 +94,7 @@ AREA_ALAT = {
 # dengan nama mentah `loop-xxx`: tidak salah, tetapi tak terbaca sebagai peran, dan gagalnya senyap.
 PERAN = {
     "general-purpose": "Generalis", "Explore": "Peneliti", "Plan": "Arsitek", "loop-fix": "Engineer",
-    "loop-test": "QA", "loop-refactor": "Refactor", "loop-judge": "Juri", "loop-docs": "Penulis",
+    "loop-test": "QA", "loop-refactor": "Refactor", "loop-judge": "Juri", "loop-judge-desain": "Juri Desain", "loop-docs": "Penulis",
     "claude-code-guide": "Pemandu",
     "loop-fe": "Frontend Dev", "loop-be": "Backend Dev", "loop-mobile": "Mobile Dev", "loop-devops": "DevOps",
     "loop-supervisor": "Supervisor", "loop-ekstrak-skill": "Ekstraktor",

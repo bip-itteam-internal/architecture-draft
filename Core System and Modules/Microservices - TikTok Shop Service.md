@@ -36,4 +36,4 @@ _TikTok Shop Service adalah penerima minimal untuk **OAuth callback + webhook Ti
 
 ## Dokumen Terkait
 
-- [[Sales - GMV Creative]]
+- [[Marketing - GMV Creative]]

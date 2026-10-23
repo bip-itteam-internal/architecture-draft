@@ -36,6 +36,16 @@ terduplikasi di dua berkas persis karena tak ada yang mencari lebih dulu. Aturan
 dengan `audit-keamanan` yang menuntut menyebut berapa kandidat dibuang — pencarian yang tak
 disebutkan tidak dianggap terjadi.
 
+⛔ **Larangan atau klaim "sudah begini" di rencana WAJIB dibuktikan Grep, bukan diasumsikan.**
+Terbukti 2026-10-15: rencana A4 (erp-frontend#2500) menulis `bulan` sengaja dipertahankan
+saat pindah tab, padahal issue §"Yang harus benar" + `page.test.tsx:188` sudah menguncinya
+dibuang — kebalikan kriteria, bukan tafsir; rencana A3 (erp-frontend#2499) melarang menyentuh
+`panel-aksi-pengajuan.tsx` padahal `LABEL_AKSI: Record<Aksi,string>` di baris 13 ekshaustif
+dan pasti pecah begitu union `Aksi` ditambah. Keduanya baru ketemu di `## REVIEW RENCANA`
+sebagai temuan KRITIS karena tak di-Grep/dibaca dulu saat menulis rencana. Sebelum menulis
+kalimat "tidak boleh disentuh" atau "sudah ada perilaku X", jalankan Grep/baca berkasnya dan
+tempel hasilnya — bukan sesudahnya, saat QA yang menemukan.
+
 Yang wajib dicek di sini:
 
 - **Komponen shared frontend.** Reuse yang asli lewat adapter, jangan bikin tiruan
@@ -58,6 +68,20 @@ Yang wajib dicek di sini:
   menangnya sering berlapis, dan salinan itu pasti menyimpang.
 - **Kalender terpusat.** Fitur bertanggal WAJIB mendaftarkan feed ke `calendar-service`;
   dilarang bikin halaman kalender sendiri.
+- **Portal Persetujuan.** Rencana yang menambah tahap persetujuan atau tahap yang menunggu
+  tindakan orang tertentu (cek, isi, transfer, konfirmasi, catat, triase) WAJIB menulis satu
+  baris di artefak: `Portal Persetujuan: kategori <kunci>, aksi <kode>, detail di
+  <rute/komponen>, riwayat <endpoint>`. Tanpa baris itu rencananya belum lengkap. Dilarang
+  membuat tab/antrean "perlu disetujui" tandingan di modul tanpa juga menyetor ke portal
+  ([[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] butir 13).
+- **Endpoint baca baru dan Copilot.** Rencana yang menambah endpoint GET berisi data bisnis
+  (ringkasan, rekap, peringkat, daftar yang wajar ditanyakan manajemen) WAJIB menulis satu
+  baris keputusan di artefak: `Copilot: ya (alat <nama>) / tidak, karena <alasan> / nanti
+  (<issue>)`. Tidak semua endpoint perlu jadi alat: yang hanya melayani satu layar (isian
+  dropdown, detail satu dokumen, daftar mentah tanpa arti bisnis) cukup "tidak". Bila "ya",
+  ikuti daftar periksa menambah alat di [[REF - Penyajian Laporan Copilot]], dan endpoint
+  sumbernya harus bergerbang peran, bukan sekadar butuh login (ADR 0132: Copilot mewarisi
+  lubang gerbang endpoint yang diteruskannya).
 - **Dok arsitektur di vault.** Apakah sudah ada dok/ADR yang mengatur ini? Rencana yang
   menyimpang wajib menyebut dok mana dan apakah penyimpangannya disengaja.
 

@@ -1,6 +1,6 @@
 # ANALISA - Model Departemen Engagement
 
-Spesifikasi teknis untuk task `t_9d06c153`. Keputusan arsitekturalnya di [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]]; konsep bisnisnya di [[Sales - Engagement Team (Modul)]].
+Spesifikasi teknis untuk task `t_9d06c153`. Keputusan arsitekturalnya di [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]]; konsep bisnisnya di [[Marketing - Engagement Team (Modul)]].
 
 **Dibuat**: 2026-08-29 · **Status**: siap dikerjakan, dengan satu TBD yang ditandai ⛔ di §1.
 
@@ -358,5 +358,5 @@ Modul ini **belum pernah diverifikasi lewat gateway sama sekali**. Minimal, deng
 ## Dokumen Terkait
 
 - [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] — keputusan yang dieksekusi spesifikasi ini
-- [[Sales - Engagement Team (Modul)]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]] · [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]]
+- [[Marketing - Engagement Team (Modul)]] · [[ADR - 0059 Penugasan Langsung Menggantikan Antrian Bersama]] · [[ADR - 0058 Tiket Engagement Memakai Koleksi dan State Machine Sendiri]]
 - [[Microservices - Task Management Service]] · [[API - Task Management Service]] · [[Microservices - Employee Service]]

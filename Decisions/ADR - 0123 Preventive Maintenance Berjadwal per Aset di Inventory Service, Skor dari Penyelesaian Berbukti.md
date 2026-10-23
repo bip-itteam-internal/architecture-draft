@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan** (2026-09-24) — kode belum ada. Mengikuti **cetakan arsitektur** [[ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval]] (entitas sendiri per subjek, bukan form-builder; approve sebagai **konfirmasi** dan skor **dihitung sistem**, bukan diketik), tetapi **sengaja berbeda pada model skornya** — lihat Decision §5. Tidak menyentuh [[ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor]], [[ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI]], maupun [[ADR - 0112 Ronda Security di Attendance Service, GPS Membuktikan Lokasi Bukan Titik]].
+> **Status**: 🟢 **Diterima**, 2026-10-16, oleh irfanarfianto (IT lead). Supervisor GA belum mengonfirmasi; keputusan saat diterima ada di §9. Diusulkan 2026-09-24, kode belum ada. Mengikuti **cetakan arsitektur** [[ADR - 0122 Satgas Per-PIC Input Bebas Gantikan Form Builder, SLA Temuan dan Skor dari Approval]] (entitas sendiri per subjek, bukan form-builder; approve sebagai **konfirmasi** dan skor **dihitung sistem**, bukan diketik), tetapi **sengaja berbeda pada model skornya** — lihat Decision §5. Tidak menyentuh [[ADR - 0111 Inspeksi 5R Area per Department sebagai Catatan Non-KPI dengan Peringatan ke Supervisor]], [[ADR - 0085 Industrial Relation Catatan Kepatuhan Ringan Terpisah dari SP dan KPI]], maupun [[ADR - 0112 Ronda Security di Attendance Service, GPS Membuktikan Lokasi Bukan Titik]].
 >
 > **Issue GitHub**: [bip-erp#2351](https://github.com/bip-itteam-internal/bip-erp/issues/2351) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 
@@ -18,7 +18,7 @@ Perawatan berkala gedung dan alat (servis AC, cek panel, genset) sekarang dinila
 
 *Metrik `Realisasi Preventif Maintenance Building & Fasilitas` (bobot 0,30) dan `Persentase SLA Preventife Maintenance Alat Operational Tepat Waktu` (bobot 0,25) mendapat sumber data nyata lewat **dua koleksi baru di inventory-service**: `pm_jadwal` (rencana perawatan per aset + frekuensi, menjadi **penyebut**) dan `pm_realisasi` (penyelesaian + foto bukti + verifikasi, menjadi **pembilang**). Subjeknya **aset**, karena itu ia tinggal bersama `inventory` dan `repair_history`, bukan di employee-service (subjek orang) dan bukan di form-builder (mesin periodik yang justru sedang ditinggalkan). Skornya **berbasis penyelesaian**, bukan pengecualian: tanpa bukti bernilai nol, bukan seratus.*
 
-- **Status**: 🟡 **Diusulkan** — kode belum ada. Daftar task: `Workspace/ANALISA - Preventive Maintenance Berjadwal per Aset.md`
+- **Status**: 🟢 **Diterima** (2026-10-16, IT lead), kode belum ada. Daftar task: `Workspace/ANALISA - Preventive Maintenance Berjadwal per Aset.md`
 - **Path di repo** (yang **akan** disentuh):
   - bip-erp: `services/inventory/models_pm.go` (baru) · `services/inventory/pm_jadwal.go` (baru: CRUD jadwal + penurunan jatuh tempo) · `services/inventory/pm_realisasi.go` (baru: tandai selesai, unggah foto, verifikasi) · `services/inventory/pm_metrik.go` (baru: `GET /internal/pm-metrik`) · `services/inventory/main.go` (revisi: pendaftaran rute, mengikuti `gateGa` yang sudah dipakai `/perlengkapan-opname`) · `services/employee/kpi_sumber_pemeliharaan_preventif.go` (baru: sumber KPI, memetakan payload jadi `Cuplikan`, **tidak menghitung ulang**)
   - erp-frontend: `src/app/(main)/ga/preventive-maintenance/page.tsx` (baru) · `src/features/ga/preventive-maintenance/*` (baru) · reuse pola unggah multi-foto dan sheet isian dari track Inspeksi Area
@@ -109,6 +109,14 @@ Metrik yang dilayaninya **dua**, di dua posisi berbeda: `Realisasi Preventif Mai
 - **Metrik biaya** (`Mengontrol biaya (Realisasi/Budget)` 0,35 dan `Efisiensi biaya operasional GA` 0,20) menunggu master anggaran GA, yang belum ada dan bukan lingkup ADR ini.
 - **Apakah tiket task-management atau `repair_history` yang menjadi catatan resmi kerusakan gedung** tetap terbuka. ADR ini hanya menetapkan bahwa **perawatan berkala** tinggal di inventory-service; pertanyaan tentang **perbaikan kerusakan** belum dijawab dan tetap tercatat sebagai TBD di [[GA - Building Maintenance]].
 - **Pemindahan dokumen Google teknisi ke dalam sistem** tidak dijanjikan oleh ADR ini, walau menjadi ukuran keberhasilannya (lihat Consequences).
+
+### 9. Keputusan saat diterima (2026-10-16, IT lead)
+
+1. **Diterima apa adanya.** Supervisor GA belum mengonfirmasi. Bila GA meminta perubahan, ADR ini diamandemen, bukan diabaikan.
+2. **Sifat daftar perawatan (T0 ANALISA): TETAP per aset dengan frekuensinya** (bulanan, triwulan, semesteran, tahunan). Daftar itulah penyebutnya. Pekerjaan insidental dan perbaikan kerusakan TIDAK masuk penyebut; keduanya tetap lewat tiket dan sudah dinilai metrik `kinerja_tiket`. Bila daftar GA ternyata memuat frekuensi mingguan atau lebih rapat, ADR ini diamandemen dulu, jangan menambah enum diam-diam.
+3. **T1 sampai T5 boleh dibangun sebelum T0 terisi.** Jadwal kosong menghasilkan nilai absen (§5), bukan 0 dan bukan 100, jadi sumber KPI aman dipasang lebih awal.
+4. **Verifikasi SPV GA wajib disetor ke Portal Persetujuan.** [[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] (Diterima 2026-10-15) lahir sesudah ADR ini: realisasi berstatus `menunggu` adalah tahap yang menunggu tindakan orang tertentu, jadi masuk `registriAntrean` employee-service dengan `aksi` dari backend, terurut paling lama menunggu dulu. Ini sekaligus memenuhi kewajiban §6 menampilkan tunggakan beserta umurnya.
+5. **Pemecahan kerja: satu PR per butir**, sub-issue saudara di bawah bip-erp#2351: (a) T1+T3 `pm_jadwal` + fungsi jatuh tempo, (b) T2 `pm_realisasi` + foto + verifikasi, (c) T4 `GET /internal/pm-metrik`, (d) T5 sumber KPI `pemeliharaan_preventif`, (e) setoran Portal Persetujuan. Urutan a, b, c, d; (e) sesudah (b). Layar web (erp-frontend#1895) sesudah BE.
 
 ## Consequences
 

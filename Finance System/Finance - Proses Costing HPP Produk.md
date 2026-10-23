@@ -18,7 +18,7 @@ Formula dari APJ, harga bahan baku dan kemas diminta ke Procurement, kapasitas p
 
 ## Sudah ada di ERP
 
-BOM/formula dan master bahan di manufacture-service ([[Manufacture - Stock & Material Management]]); HPP dipakai perhitungan insentif ([[Finance - Incentive]]); kartu "Costing HPP valid" di dashboard AP (`erp-frontend/src/features/finance/posisi/data/ap.ts:72-78`); rencana master HPP per SKU ([[Sales - HPP Master (Plan)]], 🟡).
+BOM/formula dan master bahan di manufacture-service ([[Manufacture - Stock & Material Management]]); HPP dipakai perhitungan insentif ([[Finance - Incentive]]); kartu "Costing HPP valid" di dashboard AP (`erp-frontend/src/features/finance/posisi/data/ap.ts:72-78`); rencana master HPP per SKU ([[Marketing - HPP Master (Plan)]], 🟡).
 
 ## Alur target
 
@@ -41,4 +41,4 @@ Sumber data baseline: Catatan permintaan dan persetujuan costing.
 ## Dokumen Terkait
 
 - [[Finance - Proses Bisnis dan Kebutuhan Sistem]] · [[Finance - Kalender dan Rantai Tenggat]] · [[Finance - Sambungan dan Permintaan Data Lintas Departemen]] · [[Finance - FAT Persona]]
-- [[Manufacture - Stock & Material Management]] · [[Finance - Incentive]] · [[Sales - HPP Master (Plan)]]
+- [[Manufacture - Stock & Material Management]] · [[Finance - Incentive]] · [[Marketing - HPP Master (Plan)]]

@@ -64,4 +64,4 @@ Aturan turunannya:
 - [[Microservices - Attendance Service]] (gerbang dua lapis, rute) · [[API - Attendance Service]]
 - [[ADR - 0036 Roster Harian Menimpa Jadwal Dasar]] (lapisan roster, tetap milik HRIS)
 - [[APP - Web ERP]] (menu Marketing → Jadwal Host Live)
-- [[HRIS - Attendance System]] (konsep presensi) · [[Sales - Incentive]] (insentif Host Live)
+- [[HRIS - Attendance System]] (konsep presensi) · [[Marketing - Incentive]] (insentif Host Live)

@@ -7,7 +7,7 @@
 - **Status**: ⚠️ **Kode selesai di branch `feat/engagement-realisasi-per-jenis` (bip-erp dan erp-frontend), belum merge, belum deploy, belum diverifikasi lewat gateway.** Test backend hijau (paket `task-management` seluruhnya, paket `employee` hanya gagal di satu test yang sama-sama gagal di `origin/main`).
 - ⚠️ **Nomor ganda**: nomor 0117 juga dipakai [[ADR - 0117 Riwayat Komplain Produk Terpusat di Satu Tabel, Register Tetap Dua]]. Rujuk ADR ini dengan **judul**, bukan nomor saja. Diputuskan 2026-09-29 tidak dinomori ulang karena kutipan nomornya sudah tersebar di kode, PR, dan issue; nomor ganda baru ditolak pre-push (`gerbang-adr.py`).
 - **Tanggal**: 2026-09-21
-- **Terkait**: [[Sales - Engagement Team (Modul)]] · [[Microservices - Task Management Service]] · [[API - Task Management Service]] · [[Microservices - Employee Service]] · [[HRIS - Otomasi Skor KPI]] · [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] · [[APP - Web ERP]]
+- **Terkait**: [[Marketing - Engagement Team (Modul)]] · [[Microservices - Task Management Service]] · [[API - Task Management Service]] · [[Microservices - Employee Service]] · [[HRIS - Otomasi Skor KPI]] · [[ADR - 0060 Cakupan Keterlihatan Tiket Engagement]] · [[APP - Web ERP]]
 
 ## Untuk Manajemen
 
@@ -22,7 +22,7 @@
 1. **Metrik `quantity` membaca `volume_realisasi / volume_target`, tetapi `EngagementItem.VolumeRealisasi` tak punya penulis.** Diukur 2026-09-21 dengan `git grep` atas `origin/main` di kedua repo: satu-satunya sentuhannya adalah guard `> 0` di `itemBolehDiubah`, penjumlahan KPI, dan pembacaan tombol di layar. Rasio tiap tiket karenanya selalu 0 dan skor Quantity 0 untuk semua orang. Gejalanya senyap: tak ada galat, angkanya wajar.
 2. **ADR 0058 §1 menyatakan koleksi baris target terpisah "karena `volume_realisasi` diperbarui per baris saat pengerja melapor"**, tetapi rute pelapornya tak pernah ditulis. Fase A (2026-09-16) sempat menghapus tampilan "x/y" di detail tiket karena angkanya selalu 0.
 3. **Jenis pekerjaan milik tiket, padahal satu tiket memuat URL yang meminta kombinasi berbeda.** `EngagementTicket.JenisPekerjaan` satu daftar untuk semua URL. `EngagementItem.Jenis` (satu string) ada tetapi tak pernah dikirim frontend mana pun. Volume target pun satu angka per URL, tanpa pecahan per jenis, sehingga "500 like tetapi 100 komentar" tak bisa dinyatakan.
-4. **Tak ada jalan otomatis.** Akun boosting adalah akun personal tanpa API ([[Sales - Engagement Team (Modul)]] § Kendala); tak ada klien mana pun di `services/` yang menarik statistik konten (integrasi TikTok yang ada seluruhnya TikTok Shop). Klaim pengerja satu-satunya masukan yang mungkin.
+4. **Tak ada jalan otomatis.** Akun boosting adalah akun personal tanpa API ([[Marketing - Engagement Team (Modul)]] § Kendala); tak ada klien mana pun di `services/` yang menarik statistik konten (integrasi TikTok yang ada seluruhnya TikTok Shop). Klaim pengerja satu-satunya masukan yang mungkin.
 5. **KPI menghitung tiket `CLOSED`, dan periodenya dari `closed_at` menurut UTC** (`rentangPeriodeEngagement` memakai `time.Parse("2006-01")`), sedangkan nomor tiket memakai WIB. Skor bulanan dibekukan saat penilaian ([[HRIS - Otomasi Skor KPI]]), biasanya awal bulan berikutnya.
 
 ## Decision
@@ -51,7 +51,7 @@
 
 **Dibuka kembali dari keputusan sebelumnya:**
 
-- ADR 0058 §1 dan [[Sales - Engagement Team (Modul)]] bagian "Cacat yang Diketahui" tak lagi berlaku untuk `volume_realisasi`: field itu kini punya penulis.
+- ADR 0058 §1 dan [[Marketing - Engagement Team (Modul)]] bagian "Cacat yang Diketahui" tak lagi berlaku untuk `volume_realisasi`: field itu kini punya penulis.
 
 ## Belum Diputuskan (TBD)
 

@@ -2,10 +2,30 @@
 
 *Modul kas kecil per divisi beserta jalur pengajuan budget, menggantikan aturan yang kini berjalan lewat kesepakatan lisan dan chat. **Lintas divisi**, bukan fitur satu departemen: Finance yang menetapkan plafon dan aturannya, tiap divisi yang memakainya. Dokumen ini menggabungkan blueprint dari Finance dengan hasil pemeriksaan langsung ke data produksi, supaya lubang datanya terlihat sebelum ada yang mulai menulis kode.*
 
-- **Status**: ⚠️ **Digantikan sebagian; kode kas kecil TETAP hidup dan dipakai, koreksi 2026-09-12.** Jalur **pengajuan budget** diganti [[ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget]] (dan modul pengganti itu sendiri sudah digantikan lagi, lihat catatan di bagian Tabrakan dengan Arsitektur); **kas kecil dipensiunkan bertahap** oleh ADR yang sama. Delapan PR kas kecil merge 5 Agustus 2026. **Koreksi**: versi dok sebelumnya menulis modul ini "belum deploy, dan kini tidak akan dilanjutkan"; itu usang. Diukur prod 2026-09-12: `kas_transaksi` **69** dokumen (terakhir 2026-08-26, 0 dalam 7 hari terakhir), `kas_plafon` **6**, `kas_parameter` **6**, `kas_unit` **1**, `kas_kategori` **1**, `kas_jurnal_outbox` **1**, `pengajuan_budget` **1** (2026-08-19). Modul ini SUDAH deploy dan datanya terus bertambah sesudah 5 Agustus, bukan berhenti di merge. Dokumen ini dipertahankan sebagai catatan aturan bisnis dan lubang data yang ditemukan; aturan yang masih berlaku bagi modul penggantinya adalah ambang nominal, bukan plafon per divisi.
+- **Status**: ⚠️ **DIHAPUS dari kode 2026-10-12, diganti Pengajuan Dana** (bip-erp#2717; BE-1 PR #2990, BE-2 PR #2997, FE erp-frontend #2334/#2335/#2341, semua merged; diukur atas `origin/main` 2026-10-12). Rute `/kas/*` dan `/budget/*` tidak ada lagi; dok ini tinggal **catatan historis** aturan bisnis dan lubang data, BUKAN deskripsi sistem yang berjalan. Pengganti: Pengajuan Dana (koleksi `pengajuan_barang_*`, rute `/pengajuan-barang/*`), lihat bab Pengajuan Barang di [[Microservices - Procurement Service]] dan alur per peran di [[Finance - Proses Pengajuan Pengeluaran dan Persetujuan]]; keputusan penggantian awalnya [[ADR - 0055 Pengajuan Pembelian Empat Tipe Menggantikan Pengajuan Budget]]. Bagian "Sudah Ada di Kode" dan "Endpoint" di bawah menggambarkan kode SEBELUM penghapusan. Ringkasan apa yang tetap dan apa yang hilang ada di bagian **Setelah Penghapusan** persis di bawah. *Riwayat status sebelumnya (2026-09-12):* "Digantikan sebagian; kode kas kecil TETAP hidup dan dipakai"; angka prod saat itu (`kas_transaksi` 69, `kas_plafon` 6, `kas_parameter` 6, `kas_unit` 1, `kas_kategori` 1, `kas_jurnal_outbox` 1, `pengajuan_budget` 1) tetap valid sebagai ukuran historis dan datanya tidak dihapus.
 - **Sumber requirement**: Blueprint Modul Kas Kecil & Pengajuan Budget v1.0 (draft), disusun dari percakapan WhatsApp dengan Finance.
 - **Sumber angka sistem**: sensus langsung `employee_db` dan `procurement_db` produksi, **4 Agustus 2026**.
 - **Terkait**: [[GA - Form Pengadaan dan Pengajuan Dana]] mencatat dua form kertas GA yang menjadi bagian dari alur ini.
+
+## Setelah Penghapusan (2026-10-12)
+
+Diverifikasi ke `bip-erp` dan `erp-frontend` `origin/main` 2026-10-12. Tahapnya mengikuti [issue #2717](https://github.com/bip-itteam-internal/bip-erp/issues/2717).
+
+**Yang hilang**
+- Backend (BE-2, PR #2997): rute `/kas/*` dan `/budget/*` dicabut dari procurement-service beserta migrasi startup dan index modulnya; 77 berkas `kas_*`/`pengajuan_budget_*` dihapus (angka dari PR, tidak dihitung ulang). `git grep -E '\.(Get|Post|Put|Patch|Delete|Group)\("/(kas|budget)' origin/main -- services/procurement` kosong. Alat assistant `pengajuan_budget` dihapus ([[Microservices - Assistant Service]]); pengecualian cache api-gateway untuk `/kas/transaksi/:nomor/bukti` dicabut.
+- Frontend (#2335, #2341): rute `/kas-kecil/**`, `/pengajuan/**`, `/persetujuan/pengajuan`, fitur `procurement/{budget,kas}`, entri `portal-menu` terkait, dan namespace i18n `kasKecil` serta `budget`. Tautan lama dialihkan non-permanen ke `/portal/pengajuan` (`next.config.js:69-76`), lihat [[APP - Web ERP]].
+- Gerbang katalog: pemegang izin `kaskecil.*` murni kini **403** di `/katalog/*` (`gateKatalogBaca`, `services/procurement/katalog_gate.go`); yang lolos `budget.view` efektif atau supervisor/Supervisor IT. Rincian di [[API - Procurement Service]].
+
+**Yang TETAP (dipakai Pengajuan Dana, simbolnya dipindah ke berkas netral oleh BE-1 PR #2990)**
+- Outbox jurnal: koleksi `kas_jurnal_outbox` dan index `kas_jurnal_outbox_status` (`main.go:392-394`), ditulis `pengajuan_barang_jurnal_kirim.go:93`; kode di `jurnal_accurate_outbox.go`, `jurnal_accurate_payload.go`.
+- Kill switch `ACCURATE_KAS_PUSH`: `jurnal_accurate_kirim.go:21-23` (`pushJurnalAktif`). Penjelasan kenapa mati bawaan tetap di bagian Tabrakan dengan Arsitektur di bawah (satu fakta satu tempat).
+- Katalog Accurate (`katalog_accurate.go`, `katalog_accurate_handler.go`), `gate_budget.go`, `nomor_pengajuan.go`, `format_rupiah.go`, dan `saldo_kas_bank.go` (`GET /katalog/kas-bank/saldo`, kartu Kas & Bank Finance).
+- Data lama: koleksi `kas_*` dan `pengajuan_budget` **tidak dihapus** dari `procurement_db` (tak ada lagi pembaca/penulis). Grant MinIO prefix `kas-kecil/` di file-service **dipertahankan** untuk audit objek lama ([[Microservices - File Service]]).
+
+**Belum selesai (TBD)**
+- Katalog izin `kaskecil` dan seed paket `kaskecil_*` MASIH terdaftar di `origin/main`. Pencabutannya ada di BE-3 (PR bip-erp#3004, **draft, belum merged** per 2026-10-13). Prasyaratnya, BE-0, **sudah dijalankan di prod 2026-10-13**: paket `kaskecil_*` dan paket key `budget` bernama "SPV" (modul `kaskecil`) dilepas manual dari 3 jabatan dan 6 akun; alat perapian-paket tidak bisa melakukannya. Dokumen paketnya baru dihapus sesudah BE-3 naik. Alasan urutan di [[CORE - RBAC dan Permission Set]].
+- Izin `budget.*` lama (`budget.pengajuan.save`, `budget.approve.aset`, `budget.master.save`) sudah dicabut dari katalog lewat PR bip-erp#3014 (merged 2026-10-12; Employee-Service prod memuatnya sejak 2026-10-13). Sisa di data: 8 paket `budget_*` di prod masih memuat izin itu dan perlu `$pull` manual. Perapian-paket tidak mencabut satu izin mati dari paket yang masih hidup. Rincian di [[CORE - RBAC dan Permission Set]].
+- Dok proses bisnis dan blueprint di bawah (aturan plafon, matriks approval) belum ditandai satu per satu mana yang diwarisi Pengajuan Dana; sebelum itu diukur, anggap aturan plafon per divisi TIDAK berlaku (modul penggantinya memakai ambang nominal, bukan plafon per divisi, lihat riwayat status di atas).
 
 ## Tujuan
 
@@ -161,7 +181,7 @@ Ketujuh baris plafon punya **tiga bentuk yang berbeda**, dan hanya lima di antar
 
 | Blueprint | Induk di ERP | Bentuk | Karyawan induk |
 |---|---|---|---:|
-| BH Beautyhacks | `Beauty Hacks` (ejaan berbeda) | departemen utuh | 48 |
+| BH Beautyhacks | `Beautyhacks` (sebelum 2026-10-11 bernama `Beauty Hacks`, ejaan berbeda; sejak itu sama dengan blueprint) | departemen utuh | 48 |
 | KY Kyura | `Kyura` | departemen utuh | 31 |
 | GA General Affair | `General Affair` | departemen utuh | 21 |
 | SK Sekretariat | `Kesekretariatan` (nama berbeda) | departemen utuh | 11 |

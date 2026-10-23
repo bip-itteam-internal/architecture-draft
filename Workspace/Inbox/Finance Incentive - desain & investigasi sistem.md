@@ -24,7 +24,7 @@ Jawaban :
 	
 	### SPV Marketing
 	1. insentive
-	2. [[Sales - GMV Creative]]/Dashboard TikTok
+	2. [[Marketing - GMV Creative]]/Dashboard TikTok
 	3. [[APP - Dynamic Task Tracker]]
 	4. [[External - Accurate]]
 	5. insentive
@@ -38,12 +38,12 @@ Jawaban :
 
 	### ADV META DAN MARKETPLACE
 	11.  insentive
-	12. [[APP - Dynamic Task Tracker]] dan [[Sales - GMV Creative]]/Dashboard TikTok
+	12. [[APP - Dynamic Task Tracker]] dan [[Marketing - GMV Creative]]/Dashboard TikTok
 	13. insentive
 
 	### ICC
 	14. insentive
-	15. [[APP - Dynamic Task Tracker]] dan [[Sales - GMV Creative]]/Dashboard TikTok
+	15. [[APP - Dynamic Task Tracker]] dan [[Marketing - GMV Creative]]/Dashboard TikTok
 	16. insentive
 
 	### HOST LIVE
@@ -91,7 +91,7 @@ Data ini adalah metrik absolut yang menentukan besaran uang yang akan dikali ata
         
 - **Jumlah Konversi (Sales/Closing)**
     
-    - **Cara Memperoleh:** Agregasi data dari **Sales - GMV Creative** atau Dashboard Akun Pengiklan (TikTok). Penjualan di luar TikTok (Shopee, Tokopedia, Lazada) tidak dihitung untuk Advertiser.
+    - **Cara Memperoleh:** Agregasi data dari **Marketing - GMV Creative** atau Dashboard Akun Pengiklan (TikTok). Penjualan di luar TikTok (Shopee, Tokopedia, Lazada) tidak dihitung untuk Advertiser.
         
     - **Digunakan Untuk:** Menjadi angka pengali dasar untuk insentif **ADV Leader, ADV Meta, ICC, Host Live, Affiliator, dan CRM**.
         

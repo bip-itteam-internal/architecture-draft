@@ -19,8 +19,18 @@
 | Method | Path | Fungsi |
 |---|---|---|
 | POST | `/inbox/send` | Simpan notifikasi ke inbox (category tervalidasi) **lalu push ke browser DAN ponsel**. `400` category tak dikenal · `503` database belum terhubung |
-| POST | `/wa/send-personal` · `/wa/send-group` | Kirim WhatsApp personal/grup |
+| POST | `/wa/send-personal` | Kirim WhatsApp personal. Body `{employee_id \| phone_number, message}` |
+| POST | `/wa/send-group` | Kirim WhatsApp grup. Body `{group, message, title?}`; `group` = alias (tabel di bawah). `400` field wajib kosong atau field tak dikenal · `500` NotifAPI membalas selain 200 |
 | POST | `/fcm/send-personal` · `/fcm/send-department` · `/fcm/send-broadcast` | Kirim/broadcast FCM (`?platform=mobile|web_browser`) |
+
+### Alias grup WhatsApp (`group` di `/wa/send-group`)
+| Alias (tidak peka huruf besar-kecil) | Env id grup |
+|---|---|
+| `it` · `tech development` | `WHATSAPP_IT_GROUP_ID` |
+| `it-alert` | `WHATSAPP_IT_ALERT_GROUP_ID` |
+| `sales` | `WHATSAPP_SALES_GROUP_ID` |
+
+> ⚠️ Alias di luar tabel **tidak ditolak** service ini: `group_id` terkirim kosong ke NotifAPI. Dan rute publik gateway `POST /public/feedback?group=<alias>` (body `{message}`) yang meneruskan ke sini **selalu membalas `{"success": true}`** selama service ini bisa dihubungi, apa pun balasan `/wa/send-group`; `group` diambil dari query, `title` tidak diteruskan. Detail: [[Microservices - Notification Service]] · [[API - API Gateway]].
 
 ## Sistem
 | Method | Path | Fungsi |

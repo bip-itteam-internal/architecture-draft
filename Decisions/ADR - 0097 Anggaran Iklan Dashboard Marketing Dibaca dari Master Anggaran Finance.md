@@ -26,7 +26,7 @@ SPV dan Leader Beauty Hacks serta Kyura kini langsung melihat Ringkasan Marketin
 4. **Anggaran iklan per brand per bulan sudah dikelola Finance.** Master Anggaran OPEX (`anggaran_opex`, `services/integration/internal/infrastructure/repository/anggaran_repo.go:19`; cara pengisiannya di [[Finance - Rancangan Finance Service]] §Cara Master Data Terisi) menyimpan akun "Beban Iklan" per departemen Accurate. PROD September 2026: `MARKETING - BEAUTYHACKS` Rp2.278.839.202 dan `MARKETING - KY + GB` Rp1.860.010.318, dibuat 13-14 September; Oktober sampai Desember baru punya baris seluruh perusahaan (`departemen` kosong).
 5. **Pasangan brand ke departemen Accurate sudah dipakai Finance**, tetapi hanya tersirat dari urutan dua larik terpisah (`DEPARTEMEN_MARKETING`, `DEPARTEMEN_MARKETING_ACCURATE`). `MARKETING - KY + GB` dihitung 100% Kyura (keputusan produk 2026-08-25).
 6. **Id `GET /divisi` adalah nama departemen** sejak [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] (`services/marketing-analytics/divisi.go`, `ID == Nama == Department`). PROD `department_shops` 2026-09-15: "Beauty Hacks" 41 toko, "Kyura" 22, tanpa ejaan lain.
-7. **"ROI" berarti lebih dari satu hal**: KPI Leader menyebut ROAS terhadap target sebagai ROI (target 3,2, [[Sales - Dashboard per Posisi (Beauty Hacks & Kyura)]]), ambang `roas_min` modul ini (PROD `mart_ambang` 4,5 berlaku 2026-08-01), dan ROI laba di kartu (`hitungRoi` = laba ÷ belanja iklan × 100).
+7. **"ROI" berarti lebih dari satu hal**: KPI Leader menyebut ROAS terhadap target sebagai ROI (target 3,2, [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]]), ambang `roas_min` modul ini (PROD `mart_ambang` 4,5 berlaku 2026-08-01), dan ROI laba di kartu (`hitungRoi` = laba ÷ belanja iklan × 100).
 
 ## Decision
 
@@ -86,7 +86,7 @@ Kartu ROAS vs target naik ke lapis satu dengan rumus "omzet ÷ biaya iklan" dan 
 
 ## Dokumen Terkait
 
-- [[Microservices - Marketing Analytics Service]] · [[API - Marketing Analytics Service]] · [[Sales - Marketing Analytics (Audit Ketersediaan Data)]]
+- [[Microservices - Marketing Analytics Service]] · [[API - Marketing Analytics Service]] · [[Marketing - Marketing Analytics (Audit Ketersediaan Data)]]
 - [[Finance - Rancangan Finance Service]] (Master Anggaran OPEX) · [[REF - Kepemilikan Data]]
-- [[APP - Web ERP]] (dashboard per posisi, Ringkasan Marketing) · [[Sales - Dashboard per Posisi (Beauty Hacks & Kyura)]]
+- [[APP - Web ERP]] (dashboard per posisi, Ringkasan Marketing) · [[Marketing - Dashboard per Posisi (Beauty Hacks & Kyura)]]
 - [[ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing]] · [[ADR - 0076 Isi Dashboard Posisi Diturunkan dari KPI, Antrean, dan Ambang]] · [[ADR - 0010 Internasionalisasi (i18n) Dua Bahasa]]

@@ -7,9 +7,9 @@
 ## Belum Diputuskan (TBD)
 
 - Sumber data & owner master data sales.
-- Domain tujuan — kemungkinan [[Sales - Big Pictures]]; pindahkan keluar dari "Unknown or not listed" setelah jelas.
+- Domain tujuan — kemungkinan [[Marketing - Big Pictures]]; pindahkan keluar dari "Unknown or not listed" setelah jelas.
 - Struktur field & keterkaitan ke service terkait (grounded ke kode saat tersedia).
 
 ## Dokumen Terkait
 
-- [[Sales - Big Pictures]]
+- [[Marketing - Big Pictures]]

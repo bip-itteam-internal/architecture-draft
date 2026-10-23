@@ -2,7 +2,7 @@
 
 Daftar task hasil `/analisa-kebutuhan` (2026-09-30 sampai 2026-10-01). Keputusan arsitekturnya di
 [[ADR - 0145 Agen Pengelola Toko Tumbuh dari Mesin Keputusan yang Ada, Dampak Diukur Sebelum Eksekusi]],
-cara kerjanya di [[Sales - Agen Pengelola Toko]]. Baca keduanya dulu sebelum `/start-task` tiap item.
+cara kerjanya di [[Marketing - Agen Pengelola Toko]]. Baca keduanya dulu sebelum `/start-task` tiap item.
 Daftar ini papan kerja, bukan rencana per berkas: path dan fungsi persis tetap digali `/plan` dari kode
 saat itu.
 
@@ -62,7 +62,7 @@ kebenaran final; verifikasi ulang ke `origin/main`), dan **Kriteria selesai** (b
   - **Tujuan**: jantung tahap 1. Tiap keputusan `jalankan` dinilai selisih `laba_matang` 30 hari
     sesudah vs sebelum, dikurangi perubahan toko pembanding.
   - **Bergantung**: T2, T4.
-  - **Baca dulu**: ADR 0145 §3; [[Sales - Agen Pengelola Toko]] § Aturan pemakaian angka;
+  - **Baca dulu**: ADR 0145 §3; [[Marketing - Agen Pengelola Toko]] § Aturan pemakaian angka;
     `keputusan_jendela_matang.go`; `analisis_penanggung_jawab.go` (laba_matang). Definisi toko pembanding
     diputuskan di `/plan` dan ditulis balik ke dok domain.
   - **Kriteria selesai**: status `belum_matang` dan `tak_bisa_dinilai` terbukti bukan nol (test); hasil
@@ -98,6 +98,7 @@ kebenaran final; verifikasi ulang ke `origin/main`), dan **Kriteria selesai** (b
 - [ ] **T9. Cek izin scope API tulis TikTok Shop dan Shopee.** Tujuan: lead time izin marketplace tidak
   menahan tahap 2. Kriteria: daftar scope yang dibutuhkan per tindakan (balas ulasan, promo, budget iklan),
   status aplikasi kita, dan perkiraan waktu persetujuan, bertanggal.
+  - Sebagian, 2026-10-13: **Shopee balas ulasan** sudah boleh. Dokumentasi `v2.product.reply_comment` menyebut tipe app ERP System, dan app ERP_SYSTEM kita ("One Bharata", Live Partner_id 2032314) berkategori itu. Balas ulasan **oleh orang** diputuskan terpisah di [[ADR - 0176 Ulasan Shopee Dibalas dari ERP oleh Pemegang Toko, Otomatisasi Menyusul]]. Belum dicek: TikTok, promo Shopee, budget iklan Shopee.
 - [ ] **T10. Ukur pekerjaan Account Specialist.** Tujuan: tahu apa yang sebenarnya akan diganti. Kriteria:
   survei atau wawancara minimal 5 orang, porsi waktu per jenis pekerjaan termasuk pembuatan video AI.
 
@@ -105,6 +106,9 @@ kebenaran final; verifikasi ulang ke `origin/main`), dan **Kriteria selesai** (b
 
 - [ ] **T11. ADR eksekusi tindakan pertama** (usulan: balas ulasan), menggantikan ADR 0127 §2 khusus
   tindakan itu, dengan eksekusi saat disetujui memakai identitas penyetuju. Bergantung: T6 (gerbang), T9.
+  - Catatan 2026-10-13: klien `reply_comment`, jejak pengirim, dan aturan siapa boleh membalas akan lahir dari
+    [[ADR - 0176 Ulasan Shopee Dibalas dari ERP oleh Pemegang Toko, Otomatisasi Menyusul]] (balasan ditulis orang, bukan
+    usulan agent). T11 tetap terbuka untuk balasan yang **diusulkan agent lalu disetujui**, dan cukup memakai ulang bagian itu.
 
 ## Terpisah, diputuskan saat dibutuhkan
 

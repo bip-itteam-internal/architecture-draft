@@ -54,6 +54,20 @@ Empat hal yang perlu diketahui pemilik produk:
 
 Detail kontrak: [[API - Form Builder Service]].
 
+## Ringkasan AI hasil survei
+
+> **Status**: ⚠️ **Branch `feat/form-builder-ringkasan-ai`**, terverifikasi lokal, **belum merge dan belum deploy.**
+
+Halaman Analisa form survei mendapat kartu **Ringkasan AI**: tema utama, hal yang dinilai baik, keluhan, dan rekomendasi, tiap butir menunjuk pertanyaan sumbernya. Ringkasan pertama dibuat lewat tombol; sesudahnya ia memperbarui diri saat halaman dibuka bila ada jawaban baru, paling sering sekali per 10 menit.
+
+Yang perlu diketahui pemilik produk:
+
+- **Hanya survei dengan minimal 5 pengisi.** Form penilaian karyawan tidak ditawari ringkasan, dan survei kecil tidak, supaya ringkasan tak membuka siapa menulis apa.
+- **Tidak memuat angka.** Angka tetap dari tab analisa; ringkasan menerangkan isinya.
+- **Isi jawaban teks dikirim ke layanan AI** (lewat endpoint internal), tanpa identitas pengisi. Teksnya ditulis AI dan wajib diperiksa sebelum dipakai sebagai dasar keputusan.
+
+Keputusan lengkap: [[ADR - 0185 Ringkasan AI Hasil Survei Dibuat Saat Dibaca, Hanya Survei Bercukup Pengisi]].
+
 ## Menuju hak per jabatan
 
 > **Status**: ⚠️ **Merged & live di dev DAN prod, 2026-08-10** (PR [#1138](https://github.com/bip-itteam-internal/bip-erp/pull/1138)), keduanya terverifikasi. Tapi **belum ada satu jabatan pun yang dipasangi paketnya**, jadi bagi semua orang akses hari ini masih sama persis seperti sebelumnya. Manfaatnya baru terasa setelah HR memasang paket ke jabatan — itu keputusan organisasi, bukan langkah rilis.

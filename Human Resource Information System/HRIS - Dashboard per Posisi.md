@@ -58,7 +58,7 @@ Tab yang tampak kosong **bukan karena belum dirapikan**, melainkan karena metrik
 | 0,25 | Pengkinian data karyawan | belum dipetakan | ❌ |
 | 0,2 | Administrasi BPJS, rekening, surat | `GET /employee/bpjs` tersedia | ⚠️ payroll baru 1 run |
 | 0,2 | Administrasi kontrak baru & perpanjangan | `kontrak_karyawan` (koleksi `employee_contract`) | ✅ |
-| 0,1 | Kedisiplinan sendiri | `kedisiplinan_absensi` / `ketepatan_waktu` | ✅ |
+| 0,1 | Kehadiran & ketepatan waktu seluruh karyawan (bukan kedisiplinan sendiri; diputuskan 2026-10-07) | `kedisiplinan_absensi` / `kehadiran_perusahaan`, sama dengan kartu Kehadiran | ✅ kode merged; template masih `ketepatan_waktu` per 2026-10-08 |
 
 **Bisa ditampilkan sekarang.** Ini posisi paling siap di divisinya, dan tabnya sudah mendekati bentuk yang benar: dua antrean (pengajuan menunggu, absensi belum lengkap) plus tenggat kontrak dan cuti hari ini.
 

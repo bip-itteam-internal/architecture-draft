@@ -179,6 +179,30 @@ Rincian fitur: **[[HRIS - Psikotes Kraepelin]]**.
 | POST | `/offers/:id/negotiate` · `/accept` · `/decline` | Transisi status offer, menghormati `offerTransitions`; tak sah → `409`. Accept/decline mengisi `responded_at` | HR (`recruitment.work`) |
 | GET | `/audits` | Audit log keputusan | HR admin |
 
+### Komunikasi kandidat terkendali
+
+> 🟡 **Di PR, belum merged/deploy (2026-10-21).** bip-erp [#3419](https://github.com/bip-itteam-internal/bip-erp/pull/3419) (recruitment + payroll) dan [#3418](https://github.com/bip-itteam-internal/bip-erp/pull/3418) (inventory); dibaca dari branch `recruitment/kanal-komunikasi-kandidat`, bukan `main`. Aturan perilaku (tiga kanal, masa berlaku link, booking ruang, tanggal dan angka batas) hidup di [[HRIS - Recruitment]] §Komunikasi Kandidat Terkendali; tabel di bawah hanya bentuk request dan respons. Rute yang sudah ada di tabel atas tetap sama, hanya field di bawah yang bertambah.
+
+**`kanal`** = `email` \| `wa` \| `tidak`; kosong = `email`; nilai lain = `400`. **`pengiriman`** di respons = `{kanal, status, pesan?}` dengan `status` salah satu `terkirim` \| `gagal` \| `template_mati` \| `tanpa_email` \| `tidak_dikirim` (`kanal.go:39-54`). Tindakan utama tersimpan apa pun statusnya; `kanal` selain `email` selalu `tidak_dikirim`. Tiap tindakan menulis audit `candidate.komunikasi` ("<event> via <kanal>: <status>"), termasuk `tidak`.
+
+| Method | Path | Request baru | Respons baru / galat |
+|---|---|---|---|
+| PUT | `/candidates/:id/reject` | `kanal` (di samping `reason`) | + `pengiriman` |
+| POST | `/candidates/:id/hire` | `kanal` | + `pengiriman` |
+| POST | `/offers/:id/send` | body opsional `{kanal}`; `tidak` ditolak `400` ("offer wajib disampaikan ke kandidat") | + `pengiriman` |
+| POST | `/candidates/:id/interviews` | `kanal_kandidat`; tatap muka: `ruang_id`, `no_wa_pemohon` (wajib bila `ruang_id` diisi), `location` = alamat | `201` berisi Interview (`ruangan`, `booking_nomor` terisi bila ruang dipesan) **+ `pengiriman`** di akar yang sama. Galat booking diteruskan dengan status inventory: `400` tanpa WA / tanpa tanggal, `409` bentrok, `422` tanpa penyetuju, `503` `INVENTORY_MODULE_URL` kosong, `502` inventory tak terjangkau. Interview gagal tersimpan: `500` + `booking_yatim` (nomor booking yang gagal dibatalkan, kosong bila batal berhasil) |
+| POST | `/candidates/:id/psikotes` · `/psikotes/reissue` | `kanal`, `berlaku_sampai` (`YYYY-MM-DD`, kosong = bawaan; format salah / masa lalu / melewati maksimum = `400`) | `201 {session_id, status, link, berlaku_sampai, pengiriman}` |
+| GET | `/candidates/psikotes/status` | - | tiap baris + `berlaku_sampai?`, `dikirim_via?`, `link_kedaluwarsa?` (turunan, hanya sesi `pending`) |
+| GET | `/public/recruitment/psikotes/:token` · `POST .../start` | - | sesi `pending` lewat batas: **`410 {error, kode: "link_kedaluwarsa"}`**; `410` tanpa `kode` tetap "sesi sudah selesai" |
+| POST | `/settings/email-templates/:event/preview?candidate_id=` | body opsional `{vars: {...}}` menimpa variabel tindakan | `{subject, html, text, to, enabled}`: template **tersimpan** dirender dengan data kandidat nyata; `enabled=false` = email tak akan terkirim. Kandidat di luar cakupan perusahaan pemanggil `404`, `candidate_id` cacat `400`. Tanpa `candidate_id` perilaku lama (data contoh) |
+| GET | `/candidates/:id/lokasi-interview` | - | `{alamat, nama}` dari Lokasi Kerja lowongan kandidat; kosong bila tak ada. Gerbang `PermRecruitmentView` + `isHR` |
+| GET | `/offers/komponen-gaji` | - | `{data: [{id, nama, gaji_pokok}]}` dari payroll `GET /internal/salary-components` (Gaji Pokok + komponen struktur tetap aktif). Gerbang `PermRecruitmentWork` + `isHR`; payroll tak terjangkau `503`, payroll menolak `502`, bentuk respons tak dikenal `502` (kunci `data` hilang = galat, bukan daftar kosong). Didaftarkan sebelum `GET /offers` / rute ber-`:id` |
+| POST/PUT | `/offers` · `/offers/:id` | `komponen_evaluasi[]`, `komponen_kontrak[]` (`{component_id, nama, amount, gaji_pokok?}`), `akhir_evaluasi` (`YYYY-MM-DD`) | `gaji_evaluasi`/`gaji_kontrak` = total turunan yang dihitung server bila komponen ada; komponen kembar / negatif / akhir evaluasi sebelum tanggal mulai = `400`. `PUT` menimpa seluruh isian draft termasuk komponen |
+| PUT | `/candidates/:id/link-employee` | - | + `gaji_ke_payroll {status: diajukan \| tidak_ada \| gagal, versi?, pesan?}`; penautan tersimpan walau `gagal`. Aturan versi: [[ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari]] §Catatan Implementasi |
+| POST | `/candidates/:id/gaji-ke-payroll` | - | Ulangi pengajuan gaji offer; `409` bila kandidat belum tertaut; `{gaji_ke_payroll}`. Gerbang `PermRecruitmentWork` + `isHR` |
+
+Sumber: `services/recruitment/{kanal.go, psikotes_hr_handlers.go, psikotes_berlaku.go, stage_handlers.go, interview_booking.go, lokasi_interview.go, pratinjau_kandidat.go, offer_komponen.go, routes.go}` di branch di atas. Env recruitment baru: `INVENTORY_MODULE_URL`, `PAYROLL_MODULE_URL`, `PAYROLL_SERVICE_KEY` (`--force-recreate`). Kontrak lintas service diuji terhadap rekaman respons asli: **belum** (TBD).
+
 ### Katalog psikotes (sisi HR)
 
 **(2026-09-11, bip-erp #1837 merged `40323aae`, belum prod.)** Rincian aturan dan alur: [[HRIS - Bank Soal dan Paket Psikotes]]. "lihat" = `PermRecruitmentView` + `isHR`; "tulis" = `PermRecruitmentWork` + `isHR`.
