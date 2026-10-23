@@ -197,6 +197,7 @@
         "Finance - FAT Persona",
         "ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual",
         "Finance - Buku Besar CV",
+        "ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko",
         "API - Payroll Service",
         "CORE - RBAC dan Permission Set",
         "ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik",
@@ -205,20 +206,20 @@
         "ADR - 0073 Modul Audit Internal di finance-service dan Kertas Kerja yang Dipegang Sendiri",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "990f676acf850143cc949b4f153368c522a0ff57fc27b3cea26efea23502a18e",
-      "ukuran_kb": 29.2,
-      "ringkasan": "Menjawab: endpoint apa saja untuk mencatat dan membaca rekomendasi efisiensi Cost Control, rute kewajiban dan setoran pajak, audit internal, biaya variabel produksi, serta penugasan pemegang CV untuk Buku Besar CV. Juga menjelaskan gerbang kunci layanan pada rute /internal/ dan aturan rute gateway yang membuang prefix /api/finance.",
+      "hash": "fe3f61a9ccc7ca3f9ed87e383aa256a9a9f93a35e3569c05e77f2c430d6d69ec",
+      "ukuran_kb": 29.9,
+      "ringkasan": "Menjawab: endpoint apa saja yang dimiliki finance-service (Cost Control rekomendasi efisiensi, Tax kewajiban per masa, Biaya Variabel Produksi, Audit Internal, Buku Besar CV) dan izin apa yang menggerbangnya. Juga menjelaskan rute mesin `/internal/` (penugasan pemegang CV untuk procurement, forecast kas pajak dan arus keluar untuk integration) beserta gerbang `FINANCE_SERVICE_KEY` dan kenapa header gateway tetap wajib.",
       "kata_kunci": [
-        "endpoint finance",
+        "finance-service",
+        "API finance",
         "cost control",
-        "rekomendasi efisiensi",
         "pajak",
         "tax",
-        "audit internal",
         "buku besar CV",
         "penugasan CV",
-        "API finance service",
-        "gateway"
+        "forecast kas",
+        "FINANCE_SERVICE_KEY",
+        "audit internal"
       ]
     },
     {
@@ -459,27 +460,25 @@
         "ADR - 0052 Status Sinkron per Toko",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing",
         "Microservices - Marketing Analytics Service",
+        "ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko",
         "External - Desty",
         "Marketing - Marketplace Integration",
         "External - Accurate"
       ],
-      "hash": "bebec4826b5235ac314adda5d9f56a78ae5e7d90fdf6d5183be959f1152e6a88",
-      "ukuran_kb": 124.7,
-      "ringkasan": "Menjawab: endpoint apa saja yang disediakan integration-service lewat gateway /api/integration/* (webhook, order/transaksi, TikTok Shop/Business, Shopee, Accurate, accounting dashboard FAT, profit, ICC mapping, fulfillment WMS, kas toko, ulasan, status sinkron toko, worker/jobs), parameter dan filter tiap endpoint, serta endpoint mana yang publik atau butuh gateway key. Juga menjawab detail kontrak seperti filter shopee_attribution, feed retur lintas-channel, aging piutang, packet tracking, dan gerbang baca uang. Termasuk isian proyeksi komponen dan riwayatnya.",
+      "hash": "eaf2f95550a688fb7cb318d5a55f9518b12b548920527f153e30ac0a93a3463e",
+      "ukuran_kb": 125.9,
+      "ringkasan": "Menjawab: rute apa saja yang tersedia di integration-service (webhook marketplace, order terpadu, packet tracking, piutang, retur, TikTok/Shopee, Accurate, dashboard FAT accounting, ICC mapping, kas toko, ulasan, status sinkron toko, kepemilikan toko per departemen) beserta parameter dan bentuk responsnya. Berguna untuk mengetahui filter seperti `shopee_attribution`, konsumen tiap endpoint, dan gerbang akses seperti `RequireFinanceBaca`.",
       "kata_kunci": [
         "integration-service",
-        "API endpoint",
-        "gateway",
+        "API integration",
+        "marketplace",
         "webhook",
-        "transactions orders",
+        "order",
         "packet tracking",
-        "aging piutang",
-        "shopee_attribution",
-        "retur feed",
-        "accounting FAT",
-        "ICC mapping",
+        "piutang",
         "Accurate",
-        "marketplace"
+        "department-shops",
+        "kepemilikan toko"
       ]
     },
     {
@@ -731,27 +730,26 @@
         "RUN - Menyalakan Persetujuan Payroll Bertingkat",
         "Finance - Buku Besar CV",
         "ADR - 0031 Prefix internal Bukan Batas Keamanan",
+        "ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko",
         "ADR - 0148 Struktur Gaji Berversi per Event Personalia dan Diprorata per Hari",
         "CORE - RBAC dan Permission Set",
         "Microservices - Attendance Service",
         "Microservices - Insentive Service"
       ],
-      "hash": "f6912112f1c2f4a72e346ef5e2522d89155ac228ccf194c9b5559900add10ed6",
-      "ukuran_kb": 28.6,
-      "ringkasan": "Menjawab: rute apa saja yang dimiliki payroll-service, izin permission-set mana yang menggerbanginya, dan bagaimana config, gaji karyawan, payroll run, THR, impor run, slip self-service, serta persetujuan bertingkat per badan usaha diakses. Juga memuat rute internal dan catatan keadaan produksi.",
+      "hash": "06881f8625dbf7769173c3e51a89a775961ce72bc4a362dcc1d29af607d43444",
+      "ukuran_kb": 29.2,
+      "ringkasan": "Menjawab: endpoint payroll-service apa saja (konfigurasi BPJS/pajak/potongan kehadiran, master badan usaha dan komponen gaji, gaji per karyawan, payroll run dan THR, impor run, slip self-service, persetujuan bertingkat) dan izin `payroll.*` mana yang menggerbang tiap rute. Juga menjelaskan fallback tier HR, kenapa `payroll.salary.write` dipisah, gerbang badan usaha milik Sekretariat, dan rute internal `/internal/badan-usaha`.",
       "kata_kunci": [
-        "payroll",
-        "penggajian",
-        "API endpoint",
+        "payroll-service",
+        "API payroll",
+        "gaji",
+        "salary",
         "payroll run",
-        "slip gaji",
         "THR",
-        "employee salary",
+        "slip gaji",
+        "badan usaha",
         "BPJS",
-        "PPh21 TER",
-        "persetujuan payroll",
-        "RBAC",
-        "badan usaha"
+        "RBAC payroll"
       ]
     },
     {
@@ -2715,27 +2713,20 @@
         "Finance - Bridging App",
         "Vendor - CRM"
       ],
-      "hash": "448b63150b8a5805650ae54c90c8c99085ee08a6c21c6e652ad198f58a5a87b2",
-      "ukuran_kb": 484.3,
-      "ringkasan": "Menjawab: apa saja yang dikerjakan integration-service (integrasi marketplace TikTok Shop/Business, Shopee, Lazada, bridging ke Accurate), endpoint webhook, kredensial, holiday, GMV Max dan laporan iklan apa yang tersedia, dan bagaimana transaksi dinormalkan lalu di-push sebagai Sales Invoice/Return ke Accurate. Juga menjawab: bagaimana ACL toko, kepemilikan toko per departemen, ICC account mapping, worker/cron, observability Shopee, dan status sinkron per toko bekerja, serta bagian mana yang masih konsep atau belum diimplementasikan.",
+      "hash": "34950cd4430cc5a8ebc64150f30c40065ab27ec06eba890d46e96ff4f0cf9976",
+      "ukuran_kb": 485.0,
+      "ringkasan": "Menjawab: apa peran integration-service sebagai penghubung marketplace (TikTok Shop, TikTok Ads, Shopee, Lazada) ke Accurate, fitur apa yang sudah diimplementasikan (webhook, GMV Max, ICC mapping, shop ACL, kepemilikan toko per departemen, fulfillment WMS, profit, ulasan, cron worker), dan apa yang belum. Juga memuat catatan bug dan perbaikan seperti rate limit TikTok, ketahanan Shopee, index MongoDB, dan status sinkron per toko.",
       "kata_kunci": [
         "integration service",
         "marketplace",
         "TikTok Shop",
-        "TikTok Business",
         "Shopee",
-        "Lazada",
         "Accurate",
-        "webhook",
         "GMV Max",
-        "transaction",
-        "Sales Invoice",
         "ICC",
-        "shop ACL",
-        "worker",
-        "cron",
-        "Desty",
-        "Meta Ads"
+        "department_shops",
+        "webhook",
+        "cron worker"
       ]
     },
     {
@@ -3863,7 +3854,7 @@
         "Microservices - Integration Service"
       ],
       "hash": "076b1a4fb212adebd3801ec7b3443d492438a6a76da2345516b17d06f0ada9bb",
-      "ukuran_kb": 4.8,
+      "ukuran_kb": 4.9,
       "ringkasan": "Menjawab sumber tanggal yang dipakai untuk membukukan retur TikTok ke Accurate: kenapa update_time menyesatkan (ikut mundur karena settle refund) dan kenapa order_update_date dipilih sebagai gantinya, serta perbaikan zona waktu WIB untuk penomoran dokumen retur (RTR).",
       "kata_kunci": [
         "tanggal retur",
@@ -4601,7 +4592,7 @@
         "RUN - Menambah Metrik KPI Otomatis"
       ],
       "hash": "ddca0201da7959b033620b4d876a8b18d58d146a1dd721bf9d3f6b75c917f3ec",
-      "ukuran_kb": 15.1,
+      "ukuran_kb": 15.2,
       "ringkasan": "Menjawab: bagaimana aset GA di ERP direkonsiliasi terhadap Aktiva Tetap di Accurate untuk menghasilkan skor KPI akurasi input aset staff GA, dan kenapa pencocokannya per-item lewat ceklis manual berbantuan (bukan agregat per-golongan) dengan `accurate_asset_no` disimpan agar periode berikutnya cocok otomatis. Menjelaskan pula kenapa aset yang belum ada di Accurate dihitung 100% (antrean tanggung jawab Finance, bukan GA) sementara Cakupan wajib tampil berdampingan dengan Akurasi, tiga tab modul Aset, penempatan yang menghormati batas service (inventory menyimpan nomor Accurate, feed KPI lewat employee-service), serta bagian mana yang di-supersede ADR-0049.",
       "kata_kunci": [
         "rekonsiliasi aset",
@@ -5774,7 +5765,7 @@
         "External - Accurate"
       ],
       "hash": "140f2789e531f6209bfdfc17bceca336e6f6048522951825a418bd4a22e2da22",
-      "ukuran_kb": 10.4,
+      "ukuran_kb": 10.5,
       "ringkasan": "Menjawab: mengapa opname perlengkapan GA dibuat sebagai perluasan tab Data Accurate (lewat pemilih tipe Aset Tetap/Perlengkapan) alih-alih modul baru, bagaimana perlengkapan dicocokkan per-KUANTITAS (hitung fisik GA vs qty Accurate) bukan per-unit, dan bagaimana skor akurasi opname dihitung untuk KPI staff GA. Menjelaskan juga koleksi ga_opname + endpoint /perlengkapan-opname, penangkapan kategori item Accurate saat sync, serta amandemen 2026-09-02 yang mengubah tab FE dari form opname jadi explorer padanan read-only (BE dibiarkan dormant).",
       "kata_kunci": [
         "opname perlengkapan",
@@ -6988,10 +6979,11 @@
         "External - Accurate",
         "HRIS - Matriks KPI per Departemen"
       ],
-      "hash": "cd941baf78ae2a2cb437ba36b54df5759d4e894f7d2a8adae0316bac85a928f2",
-      "ukuran_kb": 23.3,
-      "ringkasan": "Menjawab: kenapa pembukuan 40 CV grup dibangun di dalam ERP (bukan Accurate) dengan aplikasi FINCON sebagai spesifikasi dan sumber migrasi, sementara PT tetap di Accurate, serta tahapan task-nya (identitas CV, akses per CV, antrean transfer per pemegang CV, buku besar, konsolidasi, jurnal otomatis, pemetaan toko ke CV T8). Juga menjelaskan bug FINCON yang wajib diperbaiki, hubungan dengan Accurate PT, dan apa yang tidak dijanjikan (Coretax, API bank, konsolidasi PT).",
+      "hash": "576036ed79a363de008c86f43a1eb7f6359d1d50cf8ae95864aac8749c8d4faf",
+      "ukuran_kb": 23.4,
+      "ringkasan": "Menjawab: kenapa pembukuan 40 CV dibangun di dalam ERP (bukan Accurate atau FINCON) sementara PT tetap di Accurate, dan bagaimana tahapannya (identitas CV, cakupan akses per CV, antrean transfer per pemegang CV, buku besar setara FINCON, jurnal otomatis, konsolidasi). Juga menjelaskan bug FINCON yang wajib diperbaiki, data survei kerja manual Finance, dan apa yang sengaja tidak dijanjikan.",
       "kata_kunci": [
+        "ADR 0096",
         "buku besar CV",
         "general ledger",
         "FINCON",
@@ -6999,9 +6991,8 @@
         "40 CV",
         "Accurate",
         "Junior Accountant",
-        "entitas CV",
-        "jurnal",
-        "ADR 0096"
+        "penugasan CV",
+        "T8"
       ]
     },
     {
@@ -7876,7 +7867,7 @@
         "APP - Web ERP"
       ],
       "hash": "4d7a4749403407de1c1518929ce4516203c1a8ce866baee74f53c3ffb05ebf09",
-      "ukuran_kb": 25.2,
+      "ukuran_kb": 25.3,
       "ringkasan": "Menjawab: mengapa beban ongkir Shopee di pembukuan bisa tercatat lebih besar daripada yang ditampilkan Shopee (rumus lama menghitung ongkir aktual dua kali lewat final_shipping_fee), dan bagaimana rumus yang benar dihitung — ongkir aktual dikurangi bagian pembeli, ditambah proteksi kirim dan ongkir retur, dengan subsidi Shopee sengaja tidak ikut dikurangkan di rumus ini karena sudah ditangani mekanisme lain. Menjawab juga sejarah penerapannya: tanggal cutover per-order, status deploy, amandemen backfill September yang belum merge, dan amandemen kedua (2026-10-06) untuk instance kedua dari kelas bug yang sama pada premi proteksi pengiriman seller dan order retur penuh.",
       "kata_kunci": [
         "ongkir Shopee",
@@ -8436,7 +8427,7 @@
         "Finance - Proses Retur dan Piutang Marketplace"
       ],
       "hash": "80e288d1aed5fd5b5df5d918351ef6e9f58b21bf3d759eb7df01614f615cf120",
-      "ukuran_kb": 14.1,
+      "ukuran_kb": 14.4,
       "ringkasan": "Menjawab: bagaimana kompensasi logistik TikTok yang turun SETELAH retur pesanan sudah dibukukan di Accurate harus diperlakukan tergantung kondisi fisik barang hasil scan gudang (reject vs reuse/rework), dan kenapa aturannya dijalankan manual dulu (SOP) bukan langsung diotomasi. Menjelaskan populasi terukur (16 dari 458 kompensasi logistik, 8.647 total retur) yang jadi alasan otomasi ditunda, serta bagaimana keputusan ini mengamandemen ADR-0119 (pemisahan kompensasi ke Pendapatan Lain-lain) dan keputusan lama soal retur reject tetap menambah stok WMS, khusus untuk sub-populasi sempit ini.",
       "kata_kunci": [
         "kompensasi logistik",
@@ -8830,7 +8821,7 @@
         "ANALISA - Retur Dibukukan Manual oleh Finance"
       ],
       "hash": "cb1f9fcee141acee6cafb924062356addd0e91511763a063a56fab8768e3feed",
-      "ukuran_kb": 16.4,
+      "ukuran_kb": 16.5,
       "ringkasan": "Menjawab: bagaimana finance menandai retur sebuah order yang sudah dibukukan manual di Accurate agar Auto-Sync Retur tidak membukukannya lagi, siapa yang boleh menandai atau mencabut, dan apa yang wajib diisi. Juga menjelaskan mengapa baris SKIPPED bisa hidup kembali, penanda per order di transaction_orders yang dibaca returTakDibukukan, serta apa yang tidak dijanjikan.",
       "kata_kunci": [
         "retur manual",
@@ -9132,7 +9123,7 @@
         "ADR - 0077 Koreksi Faktur via Impor Rekap Lengkap Mengalir ke Master-Data, Bukan Override per Baris"
       ],
       "hash": "2417a26dea2922bdde8b9fa43f5b19ed020b22f1ee737ffb86589145fa5e04e5",
-      "ukuran_kb": 14.8,
+      "ukuran_kb": 14.9,
       "ringkasan": "Menjawab: apa yang terjadi pada INC dan faktur harian bila order ditandai FO (fake order) sesudah uangnya cair, siapa yang menghapus INC kosong, dan bagaimana FO yang dilaporkan sesudah tutup buku diperlakukan. Juga menjawab kenapa kaskade FO belum bisa mengecilkan INC sampai nol, jawaban finance tentang uang FO, dan bagian yang masih TBD.",
       "kata_kunci": [
         "FO",
@@ -9335,7 +9326,7 @@
         "ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync"
       ],
       "hash": "7c2e5c522fbbaf82566727eaa2edbfad8c41fcf0895f61703cafa279a98748c2",
-      "ukuran_kb": 25.1,
+      "ukuran_kb": 25.3,
       "ringkasan": "Menjawab: bagaimana scan retur di gudang dijaga agar satu retur fisik hanya menambah stok sekali, mengapa retur tercatat dua kali, dan apa yang berubah di form (kunci Simpan, konfirmasi jumlah kurang, tawarkan hanya sisa, batas kumulatif di server). Juga memuat pengukuran produksi, tahap koreksi lewat Proposal yang belum dibangun, dan prosedur manual selama itu.",
       "kata_kunci": [
         "scan retur",
@@ -10164,20 +10155,20 @@
         "Unlisted - Kesekretariatan (Big Pictures)",
         "ADR - 0131 Tanda Tangan Direktur-Sekutu pada BKK Otomatis Tanpa Approval"
       ],
-      "hash": "5706033ab8d13b27425dee824c318b738b49d7b307f12bda49ad012128025256",
-      "ukuran_kb": 14.6,
-      "ringkasan": "Menjawab: siapa yang boleh menambah dan mengubah badan usaha (PT/CV), yaitu Kesekretariatan lewat izin `secretary.badanusaha.kelola` di menu Sekretariat › Badan Usaha, sementara HR dan Finance hanya membaca. Juga menjelaskan isian legal baru (NPWP, NIB, akta, SK Kemenkumham, status beroperasi), kop surat yang diunggah Sekretariat, dan bahwa data `payroll_company` tetap di payroll-service.",
+      "hash": "e1e61a73092b18359ad39650f44d00de93097f7eb4508de8dd7d10ea572388bc",
+      "ukuran_kb": 14.8,
+      "ringkasan": "Menjawab: siapa yang boleh menambah dan mengubah badan usaha (PT/CV) dan kenapa pintunya dipindah dari HR ke Kesekretariatan lewat izin `secretary.badanusaha.kelola`. Juga menjelaskan isian legal baru (NIB, akta, SK Kemenkumham, status beroperasi), kop surat diunggah Sekretariat, dan dampaknya bagi HR, payroll, dan Entitas CV Finance.",
       "kata_kunci": [
+        "ADR 0183",
         "badan usaha",
-        "legal entity",
         "Sekretariat",
         "Corporate Secretary",
         "payroll_company",
+        "secretary.badanusaha.kelola",
         "kop surat",
-        "NPWP",
-        "akta",
-        "izin secretary",
-        "ADR 0183"
+        "legal entity",
+        "NIB",
+        "akta"
       ]
     },
     {
@@ -10575,7 +10566,7 @@
         "Finance - Proses Penjualan Marketplace dan Uang Masuk"
       ],
       "hash": "a24029823cc4e3c7111a2b7ee7d0f9fae9eeccdd247e6beb35c9842836c61d11",
-      "ukuran_kb": 23.1,
+      "ukuran_kb": 23.2,
       "ringkasan": "Menjawab: bagaimana retur sebagian Shopee (payout tetap cair) dibukukan sebagai dokumen Retur Penjualan per qty dan penerimaan hanya melunasi qty sisa, serta mengapa Biaya Admin sebelumnya membengkak. Juga menjawab bagaimana komisi AMS yang dipotong dari dompet Shopee dibukukan ke Biaya Affiliate, kapan berlaku (kv tanggal cutover 2026-10-01), apa yang tidak disentuh (periode tutup buku, TikTok, Lazada), dan status merge/deploy-nya.",
       "kata_kunci": [
         "retur sebagian",
@@ -10637,7 +10628,7 @@
       "area": "Decisions",
       "jenis": "adr",
       "status_emoji": null,
-      "status_teks": "🟢 Diterima, 2026-10-22, oleh irfanarfianto (Pemutus). Diusulkan 2026-10-22 oleh `/analisa-kebutuhan`, bentuk A. Menyentuh lingkup [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] (T8); persetujuan SPV FAT belum tercatat. Pemutus: `irfanarfianto`. Blueprint: `Workspace/ANALISA - Badan Usaha Pemilik Toko dari Marketing.md`.",
+      "status_teks": "🟢 Diterima, 2026-10-22, oleh irfanarfianto (Pemutus). Diusulkan 2026-10-22 oleh `/analisa-kebutuhan`, bentuk A. Menyentuh lingkup [[ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi]] (T8); persetujuan SPV FAT belum tercatat. ✅ **Kode di PROD sejak 2026-10-23**: bip-erp [#3468](https://github.com/bip-itteam-internal/bip-erp/pull/3468) + [#3480](https://github.com/bip-itteam-internal/bip-erp/pull/3480), erp-frontend [#2781](https://github.com/bip-itteam-internal/erp-frontend/pull/2781); lihat § Catatan Implementasi. Pemutus: `irfanarfianto`. Blueprint: `Workspace/ANALISA - Badan Usaha Pemilik Toko dari Marketing.md`.",
       "publik": true,
       "tautan": [
         "ADR - 0096 Buku Besar 40 CV Dibangun di ERP dengan FINCON sebagai Spesifikasi",
@@ -10649,20 +10640,20 @@
         "Microservices - Integration Service",
         "ADR - 0045 Identitas Tim Tunggal dan Peta Kepemilikan Marketing"
       ],
-      "hash": "9754b554065e6fd7feeee728ae0dbea738a6830b2fa43523f0ceb1c53efba705",
-      "ukuran_kb": 9.7,
-      "ringkasan": "Menjawab: toko marketplace dibuka atas nama badan usaha (CV/PT) mana, siapa yang mengisinya (leader/SPV Marketing lewat tab Kepemilikan Toko di ICC Management), dan di mana disimpan (payroll_company_id di department_shops). Juga menjelaskan kenapa pemasangan otomatis lewat nama dan turunan rekening Accurate gagal (0 dari 69 toko), bagaimana tab Toko di sheet Badan Usaha Sekretariat membaca data ini, dan bagaimana T8 ADR 0096 dipecah menjadi T8a.",
+      "hash": "afaa833b3e91cc35b3fff8bdea5bc7f68a19348b586480dd6a36f1f0f5e6ba99",
+      "ukuran_kb": 12.5,
+      "ringkasan": "Menjawab: bagaimana toko marketplace dipetakan ke badan usaha (CV/PT) pemiliknya, siapa yang mengisinya (leader Marketing saat klaim toko di ICC Management), dan di mana disimpan (`department_shops.payroll_company_id`). Juga menjelaskan kenapa pemasangan otomatis lewat nama atau rekening gagal (0 dari 69), bagaimana tab Toko di sheet Badan Usaha membacanya, dan hubungannya dengan T8 ADR 0096.",
       "kata_kunci": [
-        "badan usaha",
+        "ADR 0197",
+        "badan usaha toko",
         "pemilik toko",
-        "CV",
-        "PT",
         "department_shops",
         "payroll_company_id",
         "kepemilikan toko",
-        "shop ownership",
+        "ICC Management",
         "T8a",
-        "legal entity"
+        "CV",
+        "shop owner"
       ]
     },
     {
@@ -10958,7 +10949,7 @@
         "Finance - Incentive"
       ],
       "hash": "8a3dba53269a5104fd1106064d8ed8159f96a7207b2c5a97ffc4a66f7a399504",
-      "ukuran_kb": 19.5,
+      "ukuran_kb": 19.6,
       "ringkasan": "Menjawab fitur dan struktur sistem Finance lama (Java/PostgreSQL/ReactJS) sebagai jembatan antara Accurate dan marketplace: master data, upload Excel per platform (TikTok/Shopee/Lazada/Tokopedia/KiriminAja), sinkronisasi ke Accurate, dan lokasi repositori kodenya.",
       "kata_kunci": [
         "Finance Bridging lama",
@@ -11735,7 +11726,7 @@
       "area": "Finance System",
       "jenis": "domain",
       "status_emoji": "⚠️",
-      "status_teks": "**Implemented (ada catatan)**. Sinkron marketplace ke Accurate berjalan; pemetaan toko ke CV 🟡 diusulkan (T8a, [[ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko]]) dan penjualan per CV 🟡 direncanakan (T8).",
+      "status_teks": "**Implemented (ada catatan)**. Sinkron marketplace ke Accurate berjalan; pemetaan toko ke CV ✅ di kode dan PROD 2026-10-23, datanya belum diisi (T8a, [[ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko]]) dan penjualan per CV 🟡 direncanakan (T8).",
       "publik": true,
       "tautan": [
         "Finance - Proses Bisnis dan Kebutuhan Sistem",
@@ -11751,20 +11742,20 @@
         "Finance - Sambungan dan Permintaan Data Lintas Departemen",
         "Finance - FAT Persona"
       ],
-      "hash": "d48e446ecb145cac881fb36cffd5ab4ccbacfe11e8b46c69206b99b79c6c4817",
-      "ukuran_kb": 9.4,
-      "ringkasan": "Menjawab: bagaimana penjualan marketplace, potongan platform, dan penarikan saldo dicatat Finance hari ini dan di ERP, apa alur target per CV, serta celah apa yang masih terbuka (pemetaan toko ke CV, retur sebagian Shopee dan komisi AMS, faktur periode tutup buku yang ditulis ulang). Juga menjelaskan arti status FAILED 'tak balance' di Auto-Sync Penerimaan dan cara memperbaikinya lewat Koreksi Manual.",
+      "hash": "63f1a93b7f484857503e41f4528a03868c393bbec7d23bccbcb77814d3fa52c3",
+      "ukuran_kb": 9.6,
+      "ringkasan": "Menjawab: bagaimana penjualan marketplace dan uang masuk dicatat Finance hari ini, apa yang sudah ada di ERP (sinkron ke Accurate, auto-sync penerimaan, dompet marketplace), alur target per CV, dan celah yang masih terbuka. Juga menjelaskan arti status penerimaan FAILED tak balance, masalah retur sebagian Shopee dan komisi AMS, faktur periode tutup buku yang ditulis ulang, serta kontrol dan ukuran efisiensinya.",
       "kata_kunci": [
         "penjualan marketplace",
         "uang masuk",
-        "penerimaan",
         "sales receipt",
-        "Auto-Sync Penerimaan",
+        "penerimaan",
+        "Accurate",
         "rekonsiliasi",
-        "penarikan saldo",
-        "Koreksi Manual",
-        "tutup buku",
-        "P3"
+        "tak balance",
+        "penjualan per CV",
+        "AMS",
+        "tutup buku"
       ]
     },
     {
@@ -18733,19 +18724,19 @@
         "REF - Rantai Pengajuan Lintas Modul",
         "Microservices - Manufacture Service"
       ],
-      "hash": "4920dd2b993ccdac31c9a594388a3e996a17cecac56f3a2802b9c267f44e743f",
-      "ukuran_kb": 94.1,
-      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis (karyawan, departemen, divisi, hak akses, kontrak, jadwal, produk/SKU, toko, entitas CV, dll), siapa yang boleh menulisnya, dan lewat jalan apa service lain boleh membacanya. Juga mendaftar salinan yang sah beserta penjaganya, pengecualian ADR 0002 yang masih hidup, duplikasi yang belum diputuskan, dan cara memakainya sebelum membangun fitur baru.",
+      "hash": "2536f8a7860c89b64aba8b0e647e2a6f1d9902ab4b1229384f8fd4d1cb97bdac",
+      "ukuran_kb": 94.0,
+      "ringkasan": "Menjawab: service dan koleksi mana yang memiliki tiap fakta bisnis (karyawan, departemen, divisi, hak akses, kontrak, jadwal, produk, toko, entitas CV, dll), siapa yang boleh menulisnya, dan lewat jalan apa service lain membacanya. Juga mencatat salinan yang sah beserta penjaganya, pengecualian database-per-service yang masih hidup, duplikasi yang belum diputuskan, dan cara memeriksanya sebelum membangun fitur baru.",
       "kata_kunci": [
         "kepemilikan data",
         "data ownership",
         "sumber kebenaran",
         "source of truth",
-        "duplikasi",
+        "duplikasi data",
         "salinan",
+        "database-per-service",
         "SyncCollection",
-        "database per service",
-        "master data",
+        "pemilik fakta",
         "audit trail"
       ]
     },
@@ -19741,7 +19732,7 @@
         "APP - Web ERP"
       ],
       "hash": "0115ceffe21b522769faac6e9286fe16c1737ff46d15d0f58ff2e9333c9cd7f0",
-      "ukuran_kb": 14.0,
+      "ukuran_kb": 14.2,
       "ringkasan": "Menjawab: bagaimana menerbitkan akun ERP untuk vendor, mitra, atau kontraktor tanpa menjadikannya karyawan, lalu memberinya akses ke modul tertentu. Menjelaskan cara memilih antara dua sumbu hak akses yang paling sering tertukar (Paket Hak vs Role Modul), cara memperpanjang dan menutup akses beserta batasnya, serta gejala umum saat vendor sudah dibuat tapi tetap tak bisa masuk.",
       "kata_kunci": [
         "akun eksternal",
@@ -19867,19 +19858,20 @@
         "ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi",
         "APP - Web ERP"
       ],
-      "hash": "1e618802a18efc889d40d264c80afba821420c96fdd35a7648a467bb028a13cd",
-      "ukuran_kb": 5.2,
-      "ringkasan": "Menjawab: langkah apa saja untuk memasukkan toko marketplace baru ke ERP, mulai dari menghubungkan OAuth, klaim kepemilikan ke departemen, memetakan pemegang toko di ICC Management, mendaftarkan Config Accurate, sampai Mapping SKU, siapa yang mengerjakan tiap langkah, dan cara memverifikasinya. Juga menjawab apa yang dilakukan bila toko tak muncul, salah klaim departemen, atau gagal kirim ke Accurate.",
+      "hash": "c6b718117b6a090689421a1a30c02854a1d55ccc34579b9e0abfa4b83b1d8c81",
+      "ukuran_kb": 5.5,
+      "ringkasan": "Menjawab: langkah apa saja untuk memasukkan toko marketplace baru ke ERP, siapa yang mengerjakan tiap langkah (OAuth, klaim kepemilikan dan badan usaha, pemetaan pemegang toko, Config Accurate, Mapping SKU), dan bagaimana memverifikasinya. Juga menjelaskan apa yang harus dilakukan bila gagal, misalnya toko Lazada tak muncul, salah klaim departemen, atau galat `accurate shop not found`.",
       "kata_kunci": [
         "onboarding toko",
         "toko baru",
         "new shop",
         "OAuth marketplace",
+        "kepemilikan toko",
         "Config Accurate",
         "Mapping SKU",
         "ICC Management",
-        "Kepemilikan Toko",
-        "runbook"
+        "runbook",
+        "badan usaha toko"
       ]
     },
     {
@@ -20721,7 +20713,7 @@
         "APP - Web ERP"
       ],
       "hash": "c4637f8509f5c1a5a4144b1a335e575e34704efa5110b9829b98aa991eb3b130",
-      "ukuran_kb": 8.4,
+      "ukuran_kb": 8.5,
       "ringkasan": "Menjawab: apa rencana penyatuan menu-menu gudang yang kini terpecah per-tahap (Perlu Diproses, Antrian Pesanan, Pengambilan, Pengemasan, Riwayat Cetak Resi, Serah Terima) menjadi satu layar omnichannel \"Kelola Pesanan\" ala Desty tanpa mengubah backend, dan apa beda pratinjau Beta FE-only (data dummy, aksi mati) dengan menu produksi yang sudah wired ke endpoint nyata. Juga menjelaskan pemetaan tiap tab/sub-tab \"Siap Dikirim\" ke endpoint warehouse/integration, rencana mutasi bertahap fase 0-5 sampai cutover, gerbang dan nuansa yang wajib dipertahankan saat \"cuma ganti UI\" (gerbang rekon `exported_at`, kode packer T1/T2, guard TikTok `package_id` kosong, batch cap 100), persona pengguna dan RBAC-nya, serta hal yang belum diputuskan (tab Belum Dibayar, cakupan Sadewa, nasib menu lama).",
       "kata_kunci": [
         "Kelola Pesanan",
@@ -20759,7 +20751,7 @@
         "RUN - Deploy Microservices bip-erp"
       ],
       "hash": "68b724ac75ee130ffd22ea9f7beaa779cfb2b35b1bea55ee394e95ff6a6d639d",
-      "ukuran_kb": 15.5,
+      "ukuran_kb": 15.6,
       "ringkasan": "Menjawab: bagaimana laporan harian produk terkirim, dibatalkan, dan diretur per produk master untuk gudang Sadewa dan Tinggarjaya dihitung (rumus Qty Terkirim, Cancel, Retur, Total), siapa pemakainya, dan bagaimana keluarannya berbentuk Excel maupun pesan WhatsApp terjadwal ke grup stok. Juga menjelaskan pembagian gudang lewat sadewa_shops, pemecahan bundle dan produk tak terpetakan, aturan hari yang dilewati, rute manual, env, serta catatan status rilis.",
       "kata_kunci": [
         "laporan produk terkirim",
@@ -21405,7 +21397,7 @@
       "area": "Workspace",
       "jenis": "workspace",
       "status_emoji": null,
-      "status_teks": "ADR [[ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko]] Diterima 2026-10-22; issue siap dikerjakan.",
+      "status_teks": "ADR [[ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko]] Diterima 2026-10-22. ✅ [BE] bip-erp#3435 (PR #3468 + #3480) dan ✅ [FE] erp-frontend#2725 (PR #2781) merged dan di PROD 2026-10-23. Sisa: [FE] erp-frontend#2739 (Integrasi Akun, Backlog, bentuk menunggu persetujuan) dan adopsi data (0 dari 76 toko terisi 2026-10-23).",
       "publik": false,
       "tautan": [
         "ADR - 0197 Badan Usaha Pemilik Toko Diisi Marketing saat Klaim Kepemilikan Toko",
@@ -21414,20 +21406,19 @@
         "RUN - Onboarding Toko Marketplace Baru",
         "REF - Kepemilikan Data"
       ],
-      "hash": "a5c9c3d4b85f1fec1ae093fdf4363fd2fa7131a5be0f52a72d583d78539504dc",
-      "ukuran_kb": 5.7,
-      "ringkasan": "Menjawab: issue apa saja (induk, [BE] bip-erp, [FE] erp-frontend) untuk mencatat badan usaha pemilik toko oleh Marketing, apa kriteria 'yang harus benar' tiap PR (validasi payroll_company_id, upsert yang tak mengosongkan nilai, endpoint pilihan badan usaha, tab Toko sheet Badan Usaha), dan urutan deploy BE sebelum FE. Memuat juga data pendukung PROD 2026-10-22 (69 toko, 76 department_shops, 72 entitas) dan yang di luar cakupan.",
+      "hash": "050efc677b660a2c69131101d4959c827b69b08cc18ad2fb0d31f5a27b690a2b",
+      "ukuran_kb": 5.9,
+      "ringkasan": "Menjawab: bagaimana kebutuhan mencatat badan usaha pemilik tiap toko diterjemahkan jadi issue BE dan FE, apa kriteria \"yang harus benar\" untuk tiap issue, dan data PROD apa yang mendasarinya. Berguna untuk melacak issue induk bip-erp#3434, sub-issue [BE] bip-erp#3435 dan [FE] erp-frontend#2725, serta sisa pekerjaan dan adopsi datanya.",
       "kata_kunci": [
         "analisa kebutuhan",
         "badan usaha toko",
-        "Kepemilikan Toko",
-        "ICC Management",
-        "sub-issue BE FE",
+        "pemilik toko",
+        "department_shops",
         "payroll_company_id",
-        "sheet Badan Usaha",
-        "Sekretariat",
-        "store legal entity",
-        "T8a"
+        "T8a",
+        "issue BE FE",
+        "Kepemilikan Toko",
+        "Siap Agent"
       ]
     },
     {
@@ -22139,7 +22130,7 @@
         "Finance - Proses Retur dan Piutang Marketplace"
       ],
       "hash": "e2d143889408149960b09d92d58880acfbe2c83c31ea38eff0341e09067932aa",
-      "ukuran_kb": 3.2,
+      "ukuran_kb": 3.3,
       "ringkasan": "Menjawab: apa saja task tindak lanjut dari ADR-0133 soal kompensasi logistik TikTok pasca-retur — menyebarkan SOP ke tim finance/accounting, pertanyaan terbuka yang masih perlu dikonfirmasi (dokumen retur campuran kondisi barang), cara mengukur ulang populasi secara berkala, dan daftar task kode yang TERTUNDA sampai pemicu otomasi (Opsi A) terpenuhi.",
       "kata_kunci": [
         "kompensasi logistik",
@@ -22483,7 +22474,7 @@
         "ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync"
       ],
       "hash": "be4a2cb592eb77e76cd7eecd52d4775f52b56ebd8185b086e1b9bfd7d904b0a7",
-      "ukuran_kb": 6.5,
+      "ukuran_kb": 6.6,
       "ringkasan": "Menjawab: daftar task (T0 sampai T9) untuk melaksanakan ADR 0158, mana yang masuk tahap pagar dan mana tahap koreksi, apa dependensinya, dan repo mana yang disentuh (FE, BE manufacture, BE integration). Juga mencatat task mana yang sudah merged/deploy, hasil pengukuran T4, dan dua keputusan yang masih memblokir tahap koreksi.",
       "kata_kunci": [
         "analisa",
@@ -22776,7 +22767,7 @@
         "API - Integration Service"
       ],
       "hash": "15311d96ce19afd582bf5609ce8312b1a5433f1db782391b9b5f1d1bfe023c1f",
-      "ukuran_kb": 15.8,
+      "ukuran_kb": 15.9,
       "ringkasan": "Menjawab: bagaimana mekanisme ACL yang membatasi daftar toko marketplace yang boleh dilihat staf marketing (AllowedShops di endpoint GET /transactions/master/shops, integration-service) bekerja, kenapa sumber datanya bisa dipindah dari team_members/team_shops ke department_shops + work_data.department, dan bug apa yang sempat membuat staf non-marketing menerima daftar toko kosong. Mencatat status FINAL: redesign merge+deploy+live (PR #1727, 2026-09-05) DAN Fase Contract-nya SENDIRI SUDAH SELESAI (2026-09-15, bip-erp PR #1888 + erp-frontend PR #1579) — team_shops/team_members/menu Teams/CRUD-nya sudah dicabut fisik dari kode. Juga mencatat batas lingkup keputusan yang sengaja tidak diubah (gate rute RequireIntegrationStaff, exemption admin/supervisor integration).",
       "kata_kunci": [
         "AllowedShops",
@@ -22930,7 +22921,7 @@
         "ADR - 0116 Setelan Akun Marketplace Bergerbang dan Berjejak, Komponen Tak Dikenal Wajib Terlihat"
       ],
       "hash": "502459db9078ed7439df8748be1bfdda0af7c4bf4e9fbcd046d5f84fcb04c1cf",
-      "ukuran_kb": 7.9,
+      "ukuran_kb": 8.0,
       "ringkasan": "Menjawab: seberapa besar dampak dua masalah yang dilaporkan tiket finance \"Revisi Sistem Income\" (ongkir Shopee salah pos 3.870 pesanan senilai Rp96.826.227 dan masih bertambah sekitar Rp16 juta per bulan, versus kompensasi TikTok atas pesanan yang sudah cair 14 pesanan senilai Rp1.610.697, dengan 360 pesanan kompensasi yang sudah benar sebagai kontrol), kenapa Shopee didahulukan, dan apa urutan kerja T1 sampai T5 beserta mana yang eksekusi prod-nya dijalankan manusia. Juga memuat 10 pertanyaan terbuka untuk Finance/FAT yang menahan penerapan (akun tersendiri untuk baris Penyesuaian yang kini berbagi akun dengan Beban Admin E-Commerce 6112, pos yang benar untuk ongkir pengembalian barang, proteksi pengiriman Rp7,4 juta di 21.148 pesanan, 208 dokumen retur menggantung, 54 penyesuaian TikTok tanpa pesanan padanan) serta daftar utang di luar lingkup tiket. Menjelaskan pula cara mengukur ulang angkanya secara read-only di VPS Biznet lewat `docker exec Integration-MongoDB mongosh` dan kenapa `10.10.10.120` tidak boleh dipakai sebagai pembanding.",
       "kata_kunci": [
         "Revisi Sistem Income",
@@ -23647,7 +23638,7 @@
         "WH - Warehouse Sadewa"
       ],
       "hash": "256b39d712a784b9ff443d528747ca065ab9eb8bbe91a08ffc13607cc07cb67a",
-      "ukuran_kb": 17.7,
+      "ukuran_kb": 17.9,
       "ringkasan": "Menjawab kenapa sidebar erp-frontend memicu request polling 30 detik ke endpoint warehouse/sadewa/accurate untuk semua karyawan tanpa peduli role atau halaman yang dibuka, dan rencana perbaikannya lewat gerbang enabled yang diturunkan dari menu yang benar-benar tampil. Memuat dua pembaruan 2026-08-29 yang menandai sebagian rencana ini usang lalu sebagian lagi sudah dikerjakan lewat jalan lain: branch fix/badge-sidebar-per-halaman memilih gerbang HALAMAN, sehingga Task 4 (kuartet refetch) gugur karena keduanya alternatif bukan pelengkap, Task 1 dan 3 turun prioritas, dan Task 5 tetap berdiri sendiri.",
       "kata_kunci": [
         "sidebar",
