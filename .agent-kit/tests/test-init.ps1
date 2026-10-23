@@ -261,6 +261,15 @@ try {
   Check ($ssSh.Contains('triase')) 'session-start.sh mengkualifikasi flow wajib dengan triase (paritas)'
   Check ($cmGen.Contains('triase')) 'CLAUDE.md hasil generate menyebut triase'
 
+  # Status lock receipt-sync (kit 1.43.0): aturan di CLAUDE.md hanya berguna bila skrip yang
+  # disebutnya benar-benar ikut tersalin ke .claude/hooks, keempat berkasnya (keputusan Python,
+  # pengumpul fakta jarak jauh, dan dua pembungkus). Hilang satu = aturan menyuruh menjalankan
+  # sesuatu yang tidak ada.
+  foreach ($b in 'cek-lock-receipt.ps1', 'cek-lock-receipt.sh', 'cek-lock-receipt.py', 'cek-lock-receipt.remote.sh') {
+    Check (Test-Path (Join-Path $claude "hooks/$b")) "hooks/$b tersalin init"
+  }
+  Check ($cmGen.Contains('cek-lock-receipt')) 'CLAUDE.md hasil generate memuat aturan status lock receipt'
+
   # /kerjakan <teks bebas> menjalankan prosedur /brief lalu LANJUT tanpa syarat, sehingga brief
   # ber-Sumber kosong melewati gerbang ragu yang baru dibuat brief.md.
   Check ($kjTriase.Contains('brief `ragu` berhenti')) 'kerjakan: teks bebas yang jadi brief ragu berhenti'
