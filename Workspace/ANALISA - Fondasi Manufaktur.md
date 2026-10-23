@@ -16,17 +16,17 @@
 
 | Kode | Keputusan | Pemutus | Preseden / dok |
 |---|---|---|---|
-| K-1 | Pemilik angka stok pabrik (ERP lalu dikirim ke Accurate, atau Accurate) dan urutan validasi opname | Finance Supervisor | Lembar keputusan: [[ADR - 0186 Stok Pabrik di ERP Jadi Stok Operasional, Accurate Menerima Penyesuaian Persediaan]] (Diusulkan; Finance menjawab 2026-10-19: stok di ERP lalu sync ke Accurate, semua selisih opname wajib dicek FAT; akun Accurate menunggu rapat Finance, angka awal condong ke opname fisik); preseden GA [[ADR - 0175 Stok GA di ERP Jadi Stok Operasional, Barang Keluar dan Penyesuaian Dikirim ke Accurate]] |
+| K-1 | Pemilik angka stok pabrik (ERP lalu dikirim ke Accurate, atau Accurate) dan urutan validasi opname | Finance Supervisor | Lembar keputusan: [[ADR - 0186 Stok Pabrik di ERP Jadi Stok Operasional, Accurate Menerima Penyesuaian Persediaan]] (Diusulkan; Finance menjawab 2026-10-19: stok di ERP lalu sync ke Accurate, semua selisih opname wajib dicek FAT; akun Accurate menunggu rapat Finance, angka awal condong ke opname fisik); preseden GA [[ADR - 0175 Stok GA di ERP Jadi Stok Operasional, Barang Keluar dan Penyesuaian Dikirim ke Accurate]]; lembar penyelesaian (penegasan atas nama Finance Supervisor, akun per jenis penyesuaian dari daftar Accurate, Gudang Utama, angka awal) disiapkan 2026-10-23 di ADR yang sama |
 | K-2 | Zona WIP: kapan stok bahan berkurang, kapan pemakaian final dihitung | SPV Manufacture + Supervisor Quality | kajian, Temuan 3 |
 | K-3 | Satu keputusan rilis oleh Penanggung Jawab Teknis; pilihan nasib barang yang ditolak | Supervisor Quality + PJT | kajian, Temuan 6-7 |
 | K-4 | Status bahan masuk (Karantina, Lulus, Reject, Ditolak) | Leader Warehouse + Supervisor Quality | Lembar keputusan: [[ADR - 0187 Status Bahan Masuk Satu Gerbang Karantina, Hanya Qty Lulus Jadi Stok Siap Pakai]] (Diusulkan; Quality menjawab 2026-10-19: Reject = Ditolak (terkonfirmasi), penolakan cukup QC, QC per batch; menunggu Leader Warehouse RM soal barang di luar pengajuan); kajian, Temuan 3 |
-| K-5 | Format cetak yang diterima BPOM (kartu stok, Batch Record) | Supervisor Quality | kajian |
+| K-5 | Format cetak yang diterima BPOM (kartu stok, Batch Record) | Supervisor Quality | Lembar keputusan: [[ADR - 0202 Kartu Stok dan Batch Record Dicetak dari ERP Mengikuti Form Kertas yang Berlaku]] (Diusulkan 2026-10-23; Batch Record sudah tercetak 7 lembar, kartu stok menunggu contoh form kertas); kajian |
 | K-6 | Pemilik perhitungan HPP per batch | Finance Supervisor | kajian |
 | K-7 | Pemilik master barang dan gudang | TBD (IT + manajemen) | [[ADR - 0136 Pemilik Master Barang dan Master Gudang]] |
 | K-8 | COA keluar: format per lini (Pangan, OT, Kosmetik), per batch atau per Surat Jalan, penanda tangan | Supervisor Quality + PJT | kajian, Temuan 5 |
 | K-9 | Gerbang ketersediaan bahan; siapa menyetujui bahan pengganti | SPV Manufacture + PJT | kajian, Temuan 7 |
 | K-10 | MOQ dan aturan ubah Production Order | SPV Manufacture + SPV Marketing | kajian, Temuan 3 |
-| K-11 | Selisih RM: fitur sendiri (#2252, FE #1849) atau bagian dari satu jalur penyesuaian stok | SPV Manufacture | konflik terbuka, lihat M-12 |
+| K-11 | Selisih RM: fitur sendiri (#2252, FE #1849) atau bagian dari satu jalur penyesuaian stok | SPV Manufacture | Lembar keputusan: [[ADR - 0201 Selisih RM Dicatat Dua Sisi lalu Masuk Satu Jalur Penyesuaian Stok]] (Diusulkan 2026-10-23); konflik terbuka, lihat M-12 |
 
 # Daftar butir
 
