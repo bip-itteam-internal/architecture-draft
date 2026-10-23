@@ -1632,23 +1632,20 @@
         "GA - Inventory Management",
         "ADR - 0092 Rekrutmen Lintas Perusahaan lewat Paket Izin"
       ],
-      "hash": "9ad45fd3b6ffc4a1ec411f1690a1f0b81951883bbfdfa03dae4de362d0092715",
-      "ukuran_kb": 598.8,
-      "ringkasan": "Menjawab: apa stack dan fungsi portal web ERP/HRIS \"One Bharata\" (erp-frontend), bagaimana login, penyimpanan token, SSO Identity Provider, dan role gating sidebar bekerja, serta fitur multi-perusahaan apa saja yang ada. Juga memuat konvensi data-fetching TanStack Query, konvensi bagan Recharts, daftar modul yang sudah diimplementasikan, dan catatan yang belum dikerjakan.",
+      "hash": "bb8a8c60d34437e7ca9fe1b106a7c5f192aa3997589952b42f7f3f9b36cf38cc",
+      "ukuran_kb": 599.2,
+      "ringkasan": "Menjawab: apa itu portal web ERP/HRIS \"One Bharata\" (erp-frontend), stack dan modul apa saja yang ada, bagaimana login, token, SSO, dan gating menu per role/izin bekerja, serta bagaimana pemilih perusahaan multi-tenant dipakai admin pusat. Juga menjawab konvensi data-fetching TanStack Query di sidebar, konvensi bagan Recharts/ChartContainer, dan fitur mana yang belum diimplementasikan.",
       "kata_kunci": [
         "web ERP",
         "erp-frontend",
-        "hris-dashboard",
         "One Bharata",
-        "Next.js",
-        "login",
+        "hris-dashboard",
         "SSO",
+        "login token",
+        "sidebar menu",
         "system_roles",
-        "sidebar",
-        "multi-perusahaan",
         "TanStack Query",
-        "Recharts",
-        "i18n"
+        "multi-perusahaan"
       ]
     },
     {
@@ -2021,20 +2018,20 @@
         "ADR - 0003 SSO-only Gateway",
         "DB - Overview and Notes"
       ],
-      "hash": "cf265370af6e747509adc2b0f723d8a9ae3bb3626d999d6b85a67202c705901d",
-      "ukuran_kb": 151.9,
-      "ringkasan": "Menjawab: bagaimana hak akses bip-erp bekerja lewat tiga sumbu (modul, tingkat aksi, cakupan data), paket hak (permission set) yang menempel pada posisi/jabatan, dan di mana penegakannya (gateway, service, frontend). Juga menjawab katalog izin apa saja yang terdaftar per modul, modul mana yang sudah menegakkan izin per-aksi vs masih bergantung pada system_roles tier, serta apa itu fase dua (tier fallback) dan paket Semua Izin.",
+      "hash": "94aa628b524212211a3ce7e9b7134e306eca1aa87ebc311f99efd12d450ff131",
+      "ukuran_kb": 152.0,
+      "ringkasan": "Menjawab: bagaimana hak akses bip-erp diatur lewat tiga sumbu (modul, tingkat aksi, cakupan data), bagaimana paket hak (permission set) menempel pada posisi/jabatan dan diresolusi saat login, serta modul mana yang sudah menegakkan izin per aksi dan katalog izinnya. Juga menjawab cara gerbang di gateway, service, dan layar frontend, status fase dua cadangan tier, serta paket bawaan Semua Izin.",
       "kata_kunci": [
         "RBAC",
+        "hak akses",
         "permission set",
         "paket hak",
-        "hak akses",
         "katalog izin",
+        "reach cakupan",
         "system_roles",
         "tier fallback",
-        "reach cakupan",
         "posisi jabatan",
-        "ADR 0030"
+        "Siapa Boleh Apa"
       ]
     },
     {
@@ -2535,11 +2532,12 @@
         "CORE - API Master Gateway",
         "CORE - SSO Flow"
       ],
-      "hash": "2606b79eeb747c5cbc5bf82f6e2a47c6839e3e2b9308f0577f3b1bc11a584776",
-      "ukuran_kb": 137.3,
-      "ringkasan": "Menjawab: bagaimana departemen membuat, menerbitkan, dan menganalisa form dinamis (survei, penilaian karyawan, checklist, kaizen) tanpa coding, tipe pertanyaan dan tipe form apa yang didukung, serta siapa yang boleh mengelola form. Juga menjelaskan form berulang per periode, gerbang presensi yang menahan clock-in bila form wajib belum diisi, kerahasiaan penilai, notifikasi inbox, ringkasan AI, program Culture, inspeksi 5R/K3, dan lampiran berkas.",
+      "hash": "3481c44a5939ea9746009763cbbe2c5c264ecd50f965ff95a5f77fa2912abf41",
+      "ukuran_kb": 138.0,
+      "ringkasan": "Menjawab: bagaimana departemen membuat, menerbitkan, dan menganalisa form dinamis (survei, penilaian karyawan, checklist, kaizen) tanpa coding, siapa yang boleh mengelola form, dan bagaimana form berulang bulanan/mingguan serta gerbang presensi untuk form wajib bekerja. Juga menjawab cara kerja program Kaizen dan Culture, setoran metrik ke KPI, lampiran berkas, inspeksi Satgas 5R & K3, dan notifikasi inbox yang terkait.",
       "kata_kunci": [
         "form builder",
+        "form dinamis",
         "survei",
         "survey",
         "penilaian karyawan",
@@ -2547,8 +2545,7 @@
         "kaizen",
         "form berulang",
         "gerbang presensi",
-        "form_type",
-        "requireFormManager"
+        "form-builder-service"
       ]
     },
     {
@@ -10874,8 +10871,8 @@
       "judul": "ADR - 0203 Daftar Gudang dan Transfer Antar Gudang Pabrik",
       "area": "Decisions",
       "jenis": "adr",
-      "status_emoji": "🟡",
-      "status_teks": "**Diusulkan**, 2026-10-23. Lembar keputusan K-7 bagian **gudang** di [[ANALISA - Fondasi Manufaktur]], dipecah dari [[ADR - 0136 Pemilik Master Barang dan Master Gudang]]; bagian barang tetap di ADR itu. Pemutus: **Achmad Fauzi** (Warehouse Leader, Manufaktur; dikenal Oji/Ozi), ditunjuk lewat IT 2026-10-23. Pertanyaan 4 juga butuh persetujuan Finance (Senior Accounting), karena menyangkut pembukuan Accurate.",
+      "status_emoji": null,
+      "status_teks": "🟢 **Diterima**, 2026-10-23, oleh **Achmad Fauzi** (Warehouse Leader, Manufaktur; dikenal Oji/Ozi) dan **Finance** (Senior Accounting) untuk butir 4. Jawaban diteruskan lewat IT dan ditegaskan sebagai jawaban kedua Pemutus pada 2026-10-23. Lembar keputusan K-7 bagian **gudang** di [[ANALISA - Fondasi Manufaktur]], dipecah dari [[ADR - 0136 Pemilik Master Barang dan Master Gudang]]; bagian barang tetap di ADR itu.",
       "publik": true,
       "tautan": [
         "ANALISA - Fondasi Manufaktur",
@@ -10883,18 +10880,18 @@
         "ADR - 0186 Stok Pabrik di ERP Jadi Stok Operasional, Accurate Menerima Penyesuaian Persediaan",
         "ADR - 0201 Selisih RM Dicatat Dua Sisi lalu Masuk Satu Jalur Penyesuaian Stok"
       ],
-      "hash": "7497591bcc7d5424e7e9478ca13b060afb3fb386c417cba4ec7faa4d059ff61a",
-      "ukuran_kb": 8.7,
-      "ringkasan": "Menjawab: gudang mana saja yang masuk daftar gudang ERP, apakah stok pabrik dipecah per gudang, siapa yang mencatat kirim dan terima saat barang dipindah antar gudang, dan apakah pindahan otomatis dikirim ke Accurate sebagai Pemindahan Barang. Juga menjelaskan cara menangani selisih jumlah terima lewat jalur penyesuaian stok M-12, serta fitur Mutasi Gudang dan master lokasi yang sudah ada di manufacture-service.",
+      "hash": "2793f50d9806ee2a2fa92863a8dc55b71439260ed2c37b52fcbb9c449077c6a5",
+      "ukuran_kb": 10.8,
+      "ringkasan": "Menjawab: bagaimana pindahan barang antar gudang pabrik dicatat di ERP, gudang mana yang ada di daftar (nama sama dengan Accurate), dan apakah stok pabrik dipecah per gudang (tidak, tetap isi Gudang Utama). Juga menjawab siapa yang mencatat kirim dan terima, bagaimana pindahan dikirim ke Accurate sebagai Pemindahan Barang, dan bagaimana selisih jumlah terima masuk jalur penyesuaian stok M-12.",
       "kata_kunci": [
         "transfer antar gudang",
         "warehouse transfer",
         "mutasi gudang",
         "Pemindahan Barang",
-        "item-transfer",
-        "daftar gudang",
+        "item transfer",
         "Gudang Utama",
-        "stok pabrik",
+        "Accurate",
+        "master lokasi gudang",
         "M-18",
         "K-7"
       ]
@@ -14217,20 +14214,20 @@
         "HRIS - Big Pictures",
         "HRIS - Personalia"
       ],
-      "hash": "f344eb630a5330d3c5a2efc606ba430ac6f06607a03ac02e823f3527fb42dfcd",
-      "ukuran_kb": 61.8,
-      "ringkasan": "Menjawab: bagaimana departemen, posisi/jabatan (`position_items`), jenjang jabatan, penyetuju pengajuan per departemen (`is_supervisor`), Manager departemen, dan cakupan supervisi `supervised_by` (mis. HRGA) dimodelkan dan dikelola. Juga menjelaskan urutan pencarian atasan, beda penyetuju dengan atasan langsung, bagan organisasi, kenapa jenjang bukan sumber hak akses, dan rencana struktur bertingkat Direksi.",
+      "hash": "268f5dbeb1f3303690ced33de93d6405dd6b1b9bfe4eca874dd48c667cda1c63",
+      "ukuran_kb": 62.3,
+      "ringkasan": "Menjawab: bagaimana struktur organisasi (departemen, posisi/jabatan, jenjang jabatan, atasan) disimpan dan dikelola di master_department, serta bagaimana bagan organisasi dan Peta Struktur ditampilkan. Juga menjawab siapa penyetuju pengajuan per departemen (is_supervisor), manager departemen, cakupan supervisi antar-departemen (supervised_by, label HRGA), dan urutan rantai pencarian atasan.",
       "kata_kunci": [
         "struktur organisasi",
         "organization structure",
+        "org chart",
+        "bagan organisasi",
         "master_department",
         "jabatan",
         "jenjang jabatan",
         "job level",
-        "is_supervisor",
         "supervised_by",
-        "HRGA",
-        "org chart"
+        "atasan supervisor"
       ]
     },
     {
@@ -16043,22 +16040,23 @@
         "LOG - Agent Backlog Otonom 2026-09",
         "ADR - 0098 Audit Internal Beralih ke Uji Petik Dua Arah Manual",
         "REF - PRD ERP",
+        "ADR - 0167 Izin HRIS Dipecah per Fitur dengan Cadangan Peran per Fitur",
+        "CORE - RBAC dan Permission Set",
+        "Microservices - Form Builder Service",
         "ADR - 0151 Issue Siap Dikerjakan Agent Bila Keputusannya Bisa Ditunjuk, Ditandai Manusia"
       ],
-      "hash": "21416c969a2b416d041fbdba23576a92625b1d09041accfd4f061507dccadc79",
-      "ukuran_kb": 27.0,
-      "ringkasan": "Menjawab: issue GitHub mana saja yang disentuh agent backlog otonom selama Oktober 2026, apa hasil tiap issue (PR terbuka, Butuh Info, dilewati), dan kenapa sebuah issue dikembalikan ke manusia. Berguna untuk mencari keputusan apa yang masih ditunggu pada issue tertentu (mis. reminder piutang, audit trail, dashboard KPI, QC, pajak) dan pelajaran estimasi atau keterlambatan yang dicatat agent.",
+      "hash": "33213734495ab918ee8e0e1e3eba75dbd4b3adf57cf49fd690ddf6559a246daf",
+      "ukuran_kb": 51.9,
+      "ringkasan": "Menjawab: issue mana saja yang disentuh agent backlog otonom selama Oktober 2026, apa hasilnya (PR terbuka, Butuh Info, dilewati), dan kenapa sebagian besar berhenti di Butuh Info. Juga menjawab pelajaran yang dipetik dari tiap issue, misalnya keputusan yang belum ada, prasyarat yang sedang dikerjakan orang lain, atau audit yang salah membaca kode.",
       "kata_kunci": [
         "agent backlog otonom",
-        "log Oktober 2026",
+        "log agent",
+        "runner backlog",
         "Butuh Info",
-        "GitHub Project 15",
-        "issue backlog",
-        "estimasi selesai",
-        "keterlambatan",
-        "pelajaran",
-        "runner",
-        "PR agent"
+        "Siap Agent",
+        "GitHub Project",
+        "issue",
+        "Oktober 2026"
       ]
     },
     {
@@ -18686,20 +18684,20 @@
         "HRIS - Otomasi Skor KPI",
         "RUN - Menambah Metrik KPI Otomatis"
       ],
-      "hash": "1d2e97cc16f3bf3f20ede9eb572daeaaab1fffa432f9e106f803357cb43cf9a6",
-      "ukuran_kb": 12.9,
-      "ringkasan": "Menjawab: posisi mana saja di 10 divisi yang sudah atau belum punya dashboard, berapa metrik KPI yang benar-benar otomatis, dan penghambat lintas divisi mana yang paling besar daya ungkitnya. Juga mendaftar metrik salah petak (sumber data menjawab pertanyaan lain), posisi yang tidak direkomendasikan dibuatkan dashboard, dan menunjuk dok rancangan per divisi.",
+      "hash": "c53966e34d0d6b8d06e2ffe3def50e4b2349b6969c353cb28da68b2d60cc788c",
+      "ukuran_kb": 13.2,
+      "ringkasan": "Menjawab: posisi mana saja yang ada lintas divisi, mana yang sudah punya lembar dashboard, berapa metrik KPI yang benar-benar otomatis, dan penghambat apa yang muncul di banyak divisi sehingga satu pekerjaan membuka banyak metrik. Juga menjawab metrik KPI mana yang salah petak sumber datanya, posisi mana yang tidak direkomendasikan dibuatkan dashboard, dan dok rancangan per divisi yang mana yang harus dibuka.",
       "kata_kunci": [
         "dashboard per posisi",
         "indeks cakupan",
-        "KPI otomatis",
-        "metrik manual",
+        "KPI",
+        "metrik otomatis",
         "salah petak",
         "penghambat lintas divisi",
         "Kaizen",
         "Batch Record",
-        "ADR 0076",
-        "position dashboard"
+        "lembar dashboard",
+        "coverage"
       ]
     },
     {
@@ -21696,20 +21694,20 @@
         "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "97e066259ca4d2764e577a012a3bd2339bbcdf3615c026ae959da08da3c5a027",
-      "ukuran_kb": 13.2,
-      "ringkasan": "Menjawab: butir kerja apa saja dalam penataan fondasi Manufaktur (produksi, PPIC, gudang bahan dan barang jadi, Quality), keputusan K-1 sampai K-11 mana yang masih ditunggu beserta Pemutusnya, dan butir mana yang Siap dikerjakan atau masih menunggu keputusan. Juga memuat aturan pakai papan (cari kode M-nn sebelum membuat issue, urutan fase kerja) dan tautan ke ADR serta issue terkait.",
+      "hash": "0478470923a0ba719e44ca86c22151452be48ab307c829211bd7c84e2918c1bd",
+      "ukuran_kb": 13.4,
+      "ringkasan": "Menjawab: butir pekerjaan apa saja (kode M-nn) dalam penataan fondasi sistem Manufaktur (produksi, PPIC, gudang bahan dan barang jadi, Quality), statusnya, dan issue GitHub mana yang terkait. Juga menjawab keputusan K-1 sampai K-11 yang ditunggu beserta Pemutus dan ADR-nya, serta aturan pakai papan sebelum membuat issue, kode, atau master data baru.",
       "kata_kunci": [
         "fondasi manufaktur",
         "manufacture",
         "PPIC",
         "Batch Record",
-        "Quality Control",
-        "QC",
+        "stok pabrik",
         "penyesuaian stok",
-        "stock opname",
-        "papan kerja",
-        "M-12"
+        "M-12",
+        "keputusan K",
+        "Quality QC",
+        "bip-erp#3068"
       ]
     },
     {
@@ -22742,20 +22740,20 @@
       "status_teks": null,
       "publik": false,
       "tautan": [],
-      "hash": "f71a435b6a65cf404eb26f960d784249da6cf68405a01b6930e90050d5d1cc17",
-      "ukuran_kb": 7.1,
-      "ringkasan": "Menjawab: apa saja task untuk membangun Preventive Maintenance berjadwal per aset, urutannya, dan mana yang saling bergantung (T0 sampai T8). Menjelaskan mana yang bukan pekerjaan dev (GA menyusun daftar perawatan per aset, dan pemasangan sumber ke template KPI), jebakan teknis tiap task seperti fungsi murni penurunan jatuh tempo, nama koleksi literal untuk penjaga soft-delete, dan balasan kosong yang bukan `null`. Juga menjawab urutan deploy, bukti verifikasi end-to-end yang diterima, ukuran keberhasilan berupa dokumen Google teknisi berhenti dipakai, serta apa yang sengaja di luar lingkup seperti metrik biaya dan patroli Security.",
+      "hash": "6def8d27feffe19d9ac70bc4ce6f2439deed904f2ae73a11991da459429250aa",
+      "ukuran_kb": 8.2,
+      "ringkasan": "Menjawab: urutan task (T0 sampai T8) dan ketergantungan untuk membangun preventive maintenance berjadwal per aset di inventory-service, termasuk koleksi pm_jadwal dan pm_realisasi, verifikasi berfoto oleh SPV GA, dan penurunan jatuh tempo. Juga menjawab bagaimana metrik pm-metrik disetor ke sumber KPI pemeliharaan_preventif untuk posisi Building Maintenance dan GA Staff, apa ukuran keberhasilannya, dan apa yang sengaja tidak dikerjakan.",
       "kata_kunci": [
-        "daftar task",
         "preventive maintenance",
         "PM",
+        "perawatan berkala",
         "pm_jadwal",
         "pm_realisasi",
         "inventory-service",
-        "employee-service",
-        "urutan deploy",
-        "GA Staff",
-        "papan kerja"
+        "building maintenance",
+        "GA",
+        "KPI pemeliharaan_preventif",
+        "ADR 0123"
       ]
     },
     {

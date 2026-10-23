@@ -1,4 +1,4 @@
-> **Status**: 🟡 **Diusulkan**, 2026-10-23. Lembar keputusan K-7 bagian **gudang** di [[ANALISA - Fondasi Manufaktur]], dipecah dari [[ADR - 0136 Pemilik Master Barang dan Master Gudang]]; bagian barang tetap di ADR itu. Pemutus: **Achmad Fauzi** (Warehouse Leader, Manufaktur; dikenal Oji/Ozi), ditunjuk lewat IT 2026-10-23. Pertanyaan 4 juga butuh persetujuan Finance (Senior Accounting), karena menyangkut pembukuan Accurate.
+> **Status**: 🟢 **Diterima**, 2026-10-23, oleh **Achmad Fauzi** (Warehouse Leader, Manufaktur; dikenal Oji/Ozi) dan **Finance** (Senior Accounting) untuk butir 4. Jawaban diteruskan lewat IT dan ditegaskan sebagai jawaban kedua Pemutus pada 2026-10-23. Lembar keputusan K-7 bagian **gudang** di [[ANALISA - Fondasi Manufaktur]], dipecah dari [[ADR - 0136 Pemilik Master Barang dan Master Gudang]]; bagian barang tetap di ADR itu.
 
 ## Untuk Manajemen
 
@@ -33,6 +33,18 @@ Rekomendasi disertakan; Pemutus boleh memilih lain.
 
 *Dicocokkan ke kode `origin/main` dan data prod (baca saja) 2026-10-23 sebelum dikirim, supaya Pemutus tak ditanya hal yang sudah tertulis.*
 
+### Jawaban (2026-10-23, disampaikan lewat IT)
+
+Kelima rekomendasi disetujui ("ok setuju"). IT menegaskan bahwa persetujuan itu berasal dari Achmad Fauzi, dan untuk butir 4 juga dari Finance.
+
+| # | Jawaban |
+|---|---|
+| 1 | (a) nama gudang Accurate. Gudang mana saja yang dipakai ditetapkan tim gudang saat mengisi master lokasi, bukan di dokumen ini |
+| 2 | (a) stok pabrik = isi Gudang Utama, tanpa stok per gudang |
+| 3 | (a) dua langkah, pengirim dan penerima berbeda, tanpa persetujuan tambahan |
+| 4 | (a) otomatis ke Accurate sebagai Pemindahan Barang dua langkah, lalu Finance berhenti mencatat manual untuk pindahan yang sama |
+| 5 | (a) selisih terima menjadi usulan penyesuaian di jalur M-12 |
+
 ## Deskripsi
 
 *Pindahan antar gudang dicatat dua langkah (kirim, terima) memakai daftar gudang bernama sama dengan Accurate; stok pabrik ERP tetap satu angka per barang (isi Gudang Utama) yang berkurang/bertambah saat barang keluar/masuk Gudang Utama; pindahan dikirim ke Accurate sebagai Pemindahan Barang; selisih terima masuk jalur penyesuaian M-12.*
@@ -61,11 +73,18 @@ Diukur di kode `bip-erp` `origin/main` (f241829be) dan data prod (baca saja) 202
 
 ## Decision
 
-**TBD.** Diisi setelah Pemutus menjawab §Pertanyaan. Pertanyaan 4 juga membutuhkan persetujuan Finance (Senior Accounting).
+*Diterima 2026-10-23.*
+
+1. **Daftar gudang** di ERP adalah master lokasi bertipe Gudang yang namanya sama persis dengan gudang Accurate. Tepat satu lokasi ditandai **gudang pabrik**, dan tanda itu satu-satunya sumber nama gudang pabrik bagi seluruh kode (hari ini Gudang Utama, sesuai ADR 0186).
+2. **Stok pabrik ERP tetap satu angka per barang**, yaitu isi gudang pabrik. Kirim dari gudang pabrik mengurangi stok pabrik; terima di gudang pabrik menambahnya sebesar jumlah yang benar-benar diterima. Pindahan antar gudang lain tidak mengubah stok pabrik.
+3. **Pindahan dicatat dua langkah** lewat dokumen Mutasi Gudang yang sudah ada: kirim oleh gudang asal, terima oleh gudang tujuan. Pengirim dan penerima harus orang berbeda; tidak ada persetujuan tambahan.
+4. **Pindahan dikirim otomatis ke Accurate** sebagai Pemindahan Barang dua langkah (keluar saat dikirim, masuk saat diterima). Finance berhenti mencatat manual pindahan yang sama mulai tanggal yang diumumkan bersama Warehouse Leader.
+5. **Penerima wajib mengisi jumlah nyata.** Selisih terhadap jumlah kirim menjadi usulan penyesuaian `selisih_transfer` di jalur M-12 (disetujui SPV Manufaktur, divalidasi Senior Accounting), dengan dua alasan baku seperti Bukti Selisih RM ([[ADR - 0201 Selisih RM Dicatat Dua Sisi lalu Masuk Satu Jalur Penyesuaian Stok]]).
+6. Mutasi ke atau dari lokasi **Toko** (konsinyasi) tidak berubah sampai status toko konsinyasi diputuskan di [[ADR - 0136 Pemilik Master Barang dan Master Gudang]] butir 5.
+
+Pekerjaan kodenya: sub-issue M-18 di bip-itteam-internal/bip-erp#3068 (lihat [[ANALISA - Fondasi Manufaktur]]).
 
 ## Consequences
-
-*Bila usulan diterima:*
 
 **Yang didapat.** Pindahan yang hari ini diketik dua kali (di kertas atau chat, lalu di Accurate oleh Finance) cukup dicatat sekali oleh gudang. Stok pabrik di ERP ikut bergerak saat barang keluar atau masuk Gudang Utama. Selisih di perjalanan terlihat dan punya jalan resmi untuk dibetulkan.
 
