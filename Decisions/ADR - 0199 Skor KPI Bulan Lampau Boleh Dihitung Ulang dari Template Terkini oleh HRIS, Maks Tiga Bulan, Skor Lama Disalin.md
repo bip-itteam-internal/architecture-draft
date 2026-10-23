@@ -1,6 +1,6 @@
 # ADR - 0199 Skor KPI Bulan Lampau Boleh Dihitung Ulang dari Template Terkini oleh HRIS, Maks Tiga Bulan, Skor Lama Disalin
 
-> **Status**: 🟢 Diterima, 2026-10-23, oleh Azzerith. Empat bentuknya dipilih lewat pilihan ganda di sesi kerja Cost Control (2026-10-23). Kode belum ada. Mengamandemen [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] bab Consequences ("nilai otomatis yang dihitung ulang belakangan tidak retroaktif") dan [[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]] butir 3. Amandemen ini **hanya** membuka satu jalur bergerbang, bukan menghapus pembekuan.
+> **Status**: 🟢 Diterima, 2026-10-23, oleh Azzerith. Empat bentuknya dipilih lewat pilihan ganda di sesi kerja Cost Control (2026-10-23). **Kode**: BE di bip-erp PR [#3484](https://github.com/bip-itteam-internal/bip-erp/pull/3484), lolos judge, **belum merge**, belum deploy. FE erp-frontend#2769 belum dikerjakan. Mengamandemen [[ADR - 0032 Kepemilikan kpi_score dan Batas Pengumpul Metrik]] bab Consequences ("nilai otomatis yang dihitung ulang belakangan tidak retroaktif") dan [[ADR - 0048 Skor KPI Otomatis Penuh Dibekukan Sistem]] butir 3. Amandemen ini **hanya** membuka satu jalur bergerbang, bukan menghapus pembekuan.
 
 ## Untuk Manajemen
 

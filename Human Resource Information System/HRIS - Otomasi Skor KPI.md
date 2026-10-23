@@ -562,6 +562,11 @@ Ini contoh sempurna dari peringatan yang sudah lama ada di runbook itu: **salah 
 
 #### ⛔ Skor yang sudah beku TIDAK ikut terperbaiki
 
+> 🟡 **Jalur koreksi baru, belum merge**: [[ADR - 0199 Skor KPI Bulan Lampau Boleh Dihitung Ulang dari Template Terkini oleh HRIS, Maks Tiga Bulan, Skor Lama Disalin]]. Isinya `GET`/`POST /kpi/hitung-ulang` (bip-erp PR [#3484](https://github.com/bip-itteam-internal/bip-erp/pull/3484)) plus tombol di kartu skor (erp-frontend#2769, belum dikerjakan).
+> - HRIS bisa menghitung ulang skor satu karyawan, untuk maksimal 3 bulan terakhir yang sudah lewat, dengan template terkini.
+> - Pratinjau ditampilkan dulu, dan alasan wajib diisi. Skor lama disalin ke `kpi_score_riwayat` sebelum ditimpa.
+> - Bila PR itu sudah ter-deploy, jalur ini **menggantikan** butir 4 di bawah (penilai mengetik ulang angka di `POST /kpi`). Butir 3 (jangan menyunting Mongo langsung) tetap berlaku.
+
 `shared-library/models/employee/models.go:351-377,646-651`: dokumen `kpi_score` membawa **snapshot template**, dan `AutoValue`/`AutoBasis` ikut disalin ke dalamnya. Begitu `POST /kpi` tersimpan, snapshot itu beku — **memperbaiki `kpi_template` tidak menyentuh dokumen `kpi_score` yang sudah ada.**
 
 Konsekuensinya, dan apa yang harus dilakukan manusia:
