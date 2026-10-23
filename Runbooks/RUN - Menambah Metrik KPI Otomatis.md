@@ -308,7 +308,7 @@ Untuk arah `turun`, **`target: 0` sah dan bermakna**: "zero accident", "zero maj
 
 Gradasi ini belum diputuskan ADR mana pun. Bila pemilik KPI menghendaki lulus/gagal, nyalakan `hit_miss`.
 
-⚠️ **Menyimpan template bertarget negatif masih ditolak** sampai dua PR berikut ter-deploy (keduanya **belum merge** per 2026-10-22):
+✅ **Menyimpan template bertarget negatif pada arah turun kini diterima.** Kedua PR berikut merged 2026-10-22 dan ter-deploy: Employee-Service prod dibangun 13:06 WIB dan pesan lama sudah tidak ada di binernya; frontend prod dibangun 13:57 WIB (diukur 2026-10-23). Sebelumnya, simpan ditolak di dua lapis:
 - `ValidateKPIAutoConfig` (`shared-library/models/employee/kpi_source.go`) membalas 400 "target otomatis tidak boleh negatif". Ditambal di PR [bip-erp#3432](https://github.com/bip-itteam-internal/bip-erp/pull/3432) (issue #3174).
 - Layar KPI memblokir target < 0 untuk arah turun (`auto-block-rules.ts`, `konfigurasi-otomatis-rules.ts`). Ditambal di PR [erp-frontend#2729](https://github.com/bip-itteam-internal/erp-frontend/pull/2729) (issue #2724).
 - Deploy employee-service lebih dulu, lalu frontend.

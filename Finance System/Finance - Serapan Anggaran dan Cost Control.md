@@ -74,7 +74,7 @@ Cara kerja:
   - Pembelian aset
 
   Akun penyusutan dikecualikan. Pemetaan akun ke komponen ditulis di satu tempat di integration-service. Layar menerima komponen dari respons dan tidak memetakan sendiri.
-- **Proyeksi.** Operasional (marketing, gaji, adum) diambil dari RAPB tanpa penyusutan. Material, BOP, Pajak, dan Aset berasal dari isian Cost Control per komponen per bulan. Jumlah sebulan = Σ proyeksi komponen, bukan lagi = RAPB.
+- **Proyeksi.** ~~Operasional (marketing, gaji, adum) diambil dari RAPB tanpa penyusutan. Material, BOP, Pajak, dan Aset berasal dari isian Cost Control per komponen per bulan.~~ **Sejak 2026-10-22** (ADR 0184 Decision 2, amandemen): keenam komponen menerima isian Cost Control per bulan, dan isian **menggantikan** RAPB untuk komponen itu, termasuk BOP. RAPB menjadi bawaan bila isian kosong. Jumlah sebulan = Σ proyeksi komponen, bukan lagi = RAPB. Rincian di §Isian di bawah.
 - **Aset.** Anggaran aset bersifat tahunan. Layar menampilkan sisa anggaran tahun berjalan, sedangkan total bulanan hanya memuat proyeksi aset bulan itu.
 - **Minggu.** Satu bulan selalu dibagi 4 minggu. Minggu 1–3 masing-masing 7 hari dari tanggal 1, dan minggu 4 mencakup tanggal 22 sampai akhir bulan. Porsi bawaan rata ¼. Atur proyeksi tetap berlaku.
 - **Realisasi bertahap.**
@@ -91,10 +91,10 @@ Cara kerja:
 | Komponen | Akun | Sumber proyeksi | Sumber realisasi tahap 1 |
 |---|---|---|---|
 | Material | 1601 Bahan Baku, 1602 Bahan Kemas, 1603 Bahan Penolong | isian | buku besar akun persediaan, **hanya** jenis "Penerimaan Barang" dan "Faktur Pembelian"; "Retur Pembelian" mengurangi (`usecase/realisasi_material.go`, penyegar harian 03:50, koleksi `realisasi_material_mingguan`) · akrual |
-| BOP | 5201, 5102, 53xx | isian + RAPB 5xxx | mutasi akun · akrual |
-| Marketing | 61xx bukan gaji | RAPB | mutasi akun · akrual |
-| Gaji | 61xx/62xx yang namanya memuat "gaji" | RAPB | mutasi akun · akrual |
-| Ops adum | 62xx/73xx bukan gaji | RAPB | mutasi akun · akrual |
+| BOP | 5201, 5102, 53xx | isian, atau RAPB 5xxx bila isian kosong (sejak 2026-10-22; dulu isian + RAPB) | mutasi akun · akrual |
+| Marketing | 61xx bukan gaji | isian, atau RAPB bila kosong (sejak 2026-10-22) | mutasi akun · akrual |
+| Gaji | 61xx/62xx yang namanya memuat "gaji" | isian, atau RAPB bila kosong (sejak 2026-10-22) | mutasi akun · akrual |
+| Ops adum | 62xx/73xx bukan gaji | isian, atau RAPB bila kosong (sejak 2026-10-22) | mutasi akun · akrual |
 | Pajak | — | isian | setoran nyata PT Bharata dari finance-service (`GET /internal/forecast-kas/pajak`) · kas |
 | Aset | — | isian | salinan aset tetap `accurate_fixed_assets` (biaya perolehan per tanggal transaksi, draft dibuang) · akrual |
 
@@ -105,6 +105,20 @@ Aturan pengecualian:
 **Isian.** Isian per komponen per bulan disimpan di koleksi `anggaran_proyeksi_komponen`. Anggaran aset per tahun disimpan di `anggaran_aset_tahunan`. Pengisinya Cost Control, dengan gerbang `finance.anggaran.kelola`.
 - Laporan mengirim `komponen[].dapat_diisi` dan `ditambah_rapb`. Layar membaca kedua penanda ini dan tidak menyalin daftarnya; salinan lama di `isian-komponen.ts` hanya tinggal sebagai fallback untuk backend lama.
 - Isian sebuah komponen yang sudah masuk basis akurasi tunduk pada kunci minggu dan batas ubah ADR 0161. Pada bulan berjalan, isian itu praktis terkunci sejak minggu 1 mulai (422 `minggu_terkunci`).
+- ✅ **Isian untuk semua komponen, menggantikan RAPB** (bip-erp#3466 dalam PR #3465, merged 2026-10-22; Integration-Service prod dibangun 2026-10-22 19:12 WIB dan memuatnya):
+  - `DariIsian` dan `IsianMasukBasis` bernilai true untuk keenam komponen.
+  - Satu fungsi `gabungIsian` (`usecase/proyeksi_mingguan.go`) membuang akun RAPB milik komponen yang punya isian. Isian 0 juga menggantikan. Fungsi ini dipakai laporan, proyeksi minggu, dan Atur proyeksi.
+  - Baris akun RAPB yang diganti dikirim dengan `proyeksi: 0` dan `proyeksi_diganti_isian: true`, supaya tidak terhitung ganda.
+  - `ditambah_rapb` bernilai false untuk semua komponen.
+  - ⚠️ Bulan yang sudah punya isian BOP berubah angkanya, karena RAPB 5xxx tidak lagi ditambahkan.
+- ✅ **Kelonggaran masa transisi** (bip-erp#3464 dalam PR #3465, ter-deploy pada image yang sama):
+  - Hingga 31 Des 2026 23:59:59 WIB (`usecase.AkhirMasaTransisiIsian`, satu tempat), isian boleh menggeser minggu yang sudah mulai, termasuk bulan lalu.
+  - Batasnya 2 susulan per komponen per bulan (`BatasUbahProyeksiMingguan`). Susulan ke-3 dibalas 422 `batas_ubah`.
+  - Setiap PUT/DELETE isian tercatat hanya-tambah di `anggaran_proyeksi_komponen_riwayat`. Bila riwayat gagal dicatat, perubahan isian ikut gagal (500).
+  - Penanda di laporan `komponen[].isian_susulan`. GET komponen memuat `susulan_kali`, `kunci_longgar_sampai`, dan `batas_susulan`. Ada rute baru `GET /accounting/anggaran/mingguan/komponen/riwayat`.
+  - Atur proyeksi porsi tetap terkunci.
+  - Celah yang disadari: dua simpan susulan yang berbarengan bisa meloloskan susulan ke-3.
+- ⚠️ **Layar** (erp-frontend#2752): penanda "Diisi susulan", info masa transisi di dialog, dan label "Diganti isian" pada baris akun. Sudah **merged 2026-10-22 17:07 WIB, tetapi belum ada di prod**: bundel frontend prod dibangun 13:57 WIB dan belum memuat teksnya (diukur 2026-10-23). Tombol Isi proyeksi untuk Marketing, Gaji, dan Ops adum sudah tampil di prod karena dibaca dari `dapat_diisi`.
 
 **Uang keluar riil.** Nilainya adalah Σ `keluar` rekening milik PT Bharata dari salinan arus kas-bank finance-service (`GET /internal/forecast-kas/arus-keluar`). Pemilik rekening ditentukan oleh `PemilikDariFakta` yang sama dengan layar arus kas-bank.
 
@@ -131,7 +145,7 @@ Keputusan: ADR 0184 Decision 5, bagian "Tahap 2 ditetapkan 2026-10-21" dan "Pene
 - Transaksi dikunci jenis + nomor lintas akun kas. Jenis **"Penerimaan Penjualan" dikecualikan**, dan transfer antar-akun kas netonya nol.
   - ⚠️ **Cacat terukur 2026-10-22.** Accurate memberi semua jurnal penutupan bulan nomor yang sama (`"September 2026"`), sehingga jurnal-jurnal itu terlebur menjadi satu transaksi. Akibatnya penyusutan dan selisih biaya produksi ikut terhitung. Contoh September: 5104 −168,6 jt masuk "tak terpetakan", dan 6222 kelebihan 729.167.
   - Laporan Accurate yang dicetak ulang 22 Okt cocok persis untuk 62 akun.
-  - Perbaikannya ada di PR bip-erp#3442 (issue #3440, **belum merge**): kunci menjadi `transId` dari `glaccount/history.do` lewat satu fungsi `KunciTransaksi`, yang juga dipakai netting realisasi aset.
+  - ✅ Perbaikannya ada di PR bip-erp#3442 (issue #3440), merged 2026-10-22 dan ada di Integration-Service prod per 2026-10-23. Kunci menjadi `transId` dari `glaccount/history.do` lewat satu fungsi `KunciTransaksi`, yang juga dipakai netting realisasi aset.
   - Sesudah deploy, bulan berjalan dan bulan lalu ditulis ulang. Bulan yang lebih lama tetap memakai kunci lama sampai ditarik ulang.
 - Gagal satu akun berarti bulan itu tidak ditulis ulang: angka lama utuh dan penanda gagal dicatat. Bulan yang belum pernah berhasil punya `disinkron_pada: null`, artinya belum ditarik, bukan nol.
 - Rute baca untuk verifikasi: `GET /accounting/anggaran/arus-kas` ([[API - Integration Service]]).
