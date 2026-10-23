@@ -1,7 +1,7 @@
 {
   "versi_skema": 1,
   "digenerate": "2026-10-23",
-  "jumlah_dokumen": 676,
+  "jumlah_dokumen": 677,
   "dokumen": [
     {
       "path": "API Reference/API - API Gateway.md",
@@ -8563,6 +8563,7 @@
       "status_teks": "**Diusulkan**, 2026-09-29, BELUM diputuskan dan nol kode. Pengambil keputusan: **TBD** (tim IT bersama manajemen; lihat §Pertanyaan yang harus dijawab manusia, butir 1). Dok ini memetakan masalah, opsi, dan usulan penulis; ia tidak menetapkan apa pun sampai bagian §Decision diisi orang yang berwenang.",
       "publik": true,
       "tautan": [
+        "ADR - 0203 Daftar Gudang dan Transfer Antar Gudang Pabrik",
         "REF - Kepemilikan Data",
         "ADR - 0001 Akuntansi via Accurate",
         "ADR - 0002 Database-per-Service",
@@ -8584,20 +8585,20 @@
         "GA - Inventory Management",
         "WH - Warehouse Sadewa"
       ],
-      "hash": "14afa794f173eeea3d8bfe54beebef42217f5f1a964a3985cbe58d2818e2a62f",
-      "ukuran_kb": 23.1,
-      "ringkasan": "Menjawab: siapa yang seharusnya menjadi pemilik data master barang (produk jadi, SKU marketplace, bahan baku, barang GA) dan master gudang di ERP, mengapa data itu sekarang tersebar tanpa penjaga di sembilan tempat barang dan lima tempat gudang, opsi apa yang dibandingkan untuk menyatukannya (Accurate sebagai master, satu service ERP jadi pemilik, atau pemilik per jenis barang), dan akibat nyata yang sudah terjadi akibat duplikasi ini (HPP insentif meledak, gudang faktur tertinggal 241 dokumen). Status ADR ini masih diusulkan, belum diputuskan dan belum ada kode.",
+      "hash": "42e7a1691f35058f87d5c416b95e25a29a8eddd2704abcc17824a5ef8db301fd",
+      "ukuran_kb": 23.4,
+      "ringkasan": "Menjawab: di mana saja daftar barang (produk jadi, SKU marketplace, bundle, bahan baku, barang GA) disimpan di ERP, kenapa tak ada satu sumber yang benar, dan apa akibatnya pada HPP, stok, laba, dan insentif. Membandingkan opsi siapa pemilik master barang (Accurate saja, satu service ERP, atau per jenis barang dengan satu kunci bersama) beserta pertanyaan yang harus diputuskan manusia dan penjaga salinan satu arah; bagian gudang sudah dipindah ke ADR 0203.",
       "kata_kunci": [
         "master barang",
-        "master gudang",
-        "item master",
-        "warehouse master",
-        "ADR 0136",
-        "kepemilikan data barang",
-        "duplikasi SKU",
-        "HPP insentif",
-        "bundle produk",
-        "Accurate"
+        "master item",
+        "master data",
+        "SKU",
+        "bundle",
+        "product_sku_mappings",
+        "HPP",
+        "Accurate item/save.do",
+        "kepemilikan data",
+        "K-7"
       ]
     },
     {
@@ -10866,6 +10867,36 @@
         "form kertas",
         "paraf digital",
         "K-5"
+      ]
+    },
+    {
+      "path": "Decisions/ADR - 0203 Daftar Gudang dan Transfer Antar Gudang Pabrik.md",
+      "judul": "ADR - 0203 Daftar Gudang dan Transfer Antar Gudang Pabrik",
+      "area": "Decisions",
+      "jenis": "adr",
+      "status_emoji": "🟡",
+      "status_teks": "**Diusulkan**, 2026-10-23. Lembar keputusan K-7 bagian **gudang** di [[ANALISA - Fondasi Manufaktur]], dipecah dari [[ADR - 0136 Pemilik Master Barang dan Master Gudang]]; bagian barang tetap di ADR itu. Pemutus: **Achmad Fauzi** (Warehouse Leader, Manufaktur; dikenal Oji/Ozi), ditunjuk lewat IT 2026-10-23. Pertanyaan 4 juga butuh persetujuan Finance (Senior Accounting), karena menyangkut pembukuan Accurate.",
+      "publik": true,
+      "tautan": [
+        "ANALISA - Fondasi Manufaktur",
+        "ADR - 0136 Pemilik Master Barang dan Master Gudang",
+        "ADR - 0186 Stok Pabrik di ERP Jadi Stok Operasional, Accurate Menerima Penyesuaian Persediaan",
+        "ADR - 0201 Selisih RM Dicatat Dua Sisi lalu Masuk Satu Jalur Penyesuaian Stok"
+      ],
+      "hash": "7497591bcc7d5424e7e9478ca13b060afb3fb386c417cba4ec7faa4d059ff61a",
+      "ukuran_kb": 8.7,
+      "ringkasan": "Menjawab: gudang mana saja yang masuk daftar gudang ERP, apakah stok pabrik dipecah per gudang, siapa yang mencatat kirim dan terima saat barang dipindah antar gudang, dan apakah pindahan otomatis dikirim ke Accurate sebagai Pemindahan Barang. Juga menjelaskan cara menangani selisih jumlah terima lewat jalur penyesuaian stok M-12, serta fitur Mutasi Gudang dan master lokasi yang sudah ada di manufacture-service.",
+      "kata_kunci": [
+        "transfer antar gudang",
+        "warehouse transfer",
+        "mutasi gudang",
+        "Pemindahan Barang",
+        "item-transfer",
+        "daftar gudang",
+        "Gudang Utama",
+        "stok pabrik",
+        "M-18",
+        "K-7"
       ]
     },
     {
@@ -21657,6 +21688,7 @@
         "ADR - 0175 Stok GA di ERP Jadi Stok Operasional, Barang Keluar dan Penyesuaian Dikirim ke Accurate",
         "ADR - 0187 Status Bahan Masuk Satu Gerbang Karantina, Hanya Qty Lulus Jadi Stok Siap Pakai",
         "ADR - 0202 Kartu Stok dan Batch Record Dicetak dari ERP Mengikuti Form Kertas yang Berlaku",
+        "ADR - 0203 Daftar Gudang dan Transfer Antar Gudang Pabrik",
         "ADR - 0201 Selisih RM Dicatat Dua Sisi lalu Masuk Satu Jalur Penyesuaian Stok",
         "Microservices - Manufacture Service",
         "API - Manufacture Service",
@@ -21664,20 +21696,20 @@
         "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "1f2d6d61a1880ba86a2477e6eb121b154cfbe65704b119047852396975946a39",
-      "ukuran_kb": 12.7,
-      "ringkasan": "Menjawab: apa saja butir kerja penataan fondasi sistem Manufaktur (produksi, PPIC, gudang RM/FG, Quality) beserta kode M-nn, issue GitHub terkait, prasyarat, dan fasenya, serta keputusan K-1 sampai K-11 yang ditunggu dan siapa Pemutusnya. Juga menjawab aturan pakai papan ini (cari butir sebelum membuat issue, butir Menunggu tak boleh dikerjakan sebelum ADR Diterima) dan urutan kerja yang disepakati.",
+      "hash": "97e066259ca4d2764e577a012a3bd2339bbcdf3615c026ae959da08da3c5a027",
+      "ukuran_kb": 13.2,
+      "ringkasan": "Menjawab: butir kerja apa saja dalam penataan fondasi Manufaktur (produksi, PPIC, gudang bahan dan barang jadi, Quality), keputusan K-1 sampai K-11 mana yang masih ditunggu beserta Pemutusnya, dan butir mana yang Siap dikerjakan atau masih menunggu keputusan. Juga memuat aturan pakai papan (cari kode M-nn sebelum membuat issue, urutan fase kerja) dan tautan ke ADR serta issue terkait.",
       "kata_kunci": [
         "fondasi manufaktur",
-        "manufacturing",
-        "papan kerja",
+        "manufacture",
         "PPIC",
         "Batch Record",
-        "Quality",
+        "Quality Control",
         "QC",
-        "keputusan K",
-        "butir M",
-        "bip-erp#3068"
+        "penyesuaian stok",
+        "stock opname",
+        "papan kerja",
+        "M-12"
       ]
     },
     {
