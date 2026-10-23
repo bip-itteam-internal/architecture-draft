@@ -19,6 +19,7 @@ Urutan di bawah mengikuti dependensi. Tiap item ditulis supaya bisa langsung dil
 - **Repo**: bip-erp (integration)
 - **Bergantung**: T1
 - **Selesai bila**: dipanggil **lewat gateway** dengan tiga token (finance, pengguna tanpa izin, header hilang) → 200 / 403 / 403; tanpa alasan → 400; order berbaris `SENT` → ditolak dengan nomor dokumen.
+- ✅ **Kode ada di `origin/main`** (diperiksa 2026-10-23): bip-erp PR #2424, `retur_manual_handler.go` (`POST /accurate/orders/retur-manual`, `.../cabut`, `GET /accurate/orders/:order_id/retur-manual`; izin `returselisih.tandai`). Deploy prod dan verifikasi lewat gateway (T6) belum diukur.
 - `/start-task Endpoint tandai dan cabut retur dibukukan manual, digerbang returselisih.tandai, dengan audit (ADR-0144 §4-7)`
 
 ## T3 · Aksi di layar Auto-Sync Retur
@@ -26,6 +27,7 @@ Urutan di bawah mengikuti dependensi. Tiap item ditulis supaya bisa langsung dil
 - **Repo**: erp-frontend
 - **Bergantung**: T2 (deploy backend dulu)
 - **Selesai bila**: satu perjalanan utuh di browser sebagai finance: buka baris, tandai, baris berlabel DILEWATI dengan keterangan nomor dokumen, cabut. Pengguna tanpa izin tak melihat aksinya.
+- ✅ **Kode ada di `origin/main`** (diperiksa 2026-10-23): erp-frontend PR #1942, tombol "Penanda manual" di `return-detail-modal.tsx` dan dialog `retur-manual-dialog.tsx`. Order yang tak punya baris tak punya titik masuk di layar (lihat [[ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync]]).
 - `/start-task Aksi tandai retur dibukukan manual di layar Auto-Sync Retur (ADR-0144)`
 
 ## T4 · Ukur volume di prod lalu tandai ulang order yang sudah ditutup lewat skrip

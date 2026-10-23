@@ -1,6 +1,6 @@
 # ADR - 0158 Scan Retur Gudang Dijaga Satu Kali dan Selaras dengan Pembukuan, Koreksi Bertahap
 
-> **Status**: 🟢 **Diterima**, 2026-10-08, oleh bagusizzanm (IT). ✅ **Tahap pagar (D1–D5) kodenya sudah merged ke `main` 2026-10-08** (bip-erp#2809, erp-frontend#2194) dan **sudah deploy prod 2026-10-08** (FE sekitar 14:06 WIB, BE 14:29 WIB; keduanya terverifikasi di prod); tahap koreksi (D6) belum ada. Berdiri di atas pengukuran langsung produksi 2026-10-08 dan pembacaan kode lokal; mengamandemen satu butir [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]] (Decision #9, ✅ Implemented) dan menjalankan prinsip yang baru ditulis di [[ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok]] §5 (🟡 Diusulkan). Tahap pagar (D1–D5) boleh dibangun. Tahap koreksi (D6) **belum boleh dibangun** sebelum butir di bagian "Belum diputuskan" dan tinjauan kewenangan Proposal terjawab; keputusan tanggal dokumen koreksi sudah ada (lihat bagian "Sudah diputuskan").
+> **Status**: 🟢 **Diterima**, 2026-10-08, oleh bagusizzanm (IT). ✅ **Tahap pagar (D1–D5) kodenya sudah merged ke `main` 2026-10-08** (bip-erp#2809, erp-frontend#2194) dan **sudah deploy prod 2026-10-08** (FE sekitar 14:06 WIB, BE 14:29 WIB; keduanya terverifikasi di prod); tahap koreksi (D6) belum ada, dan selama itu IT membetulkan dokumen satu per satu lewat konfirmasi gudang (20 sampai 22 Oktober 2026 untuk lima order; lihat bagian "Pelaksanaan koreksi manual dan pengukuran 20 Oktober 2026"). ⚠️ Pagar **belum terbukti rapat**: tiga order lolos setelah pagar aktif dan penyebabnya belum terbukti. Berdiri di atas pengukuran langsung produksi 2026-10-08 dan pembacaan kode lokal; mengamandemen satu butir [[ADR - 0025 Log Sumber vs Input WMS + Stempel Penginput]] (Decision #9, ✅ Implemented) dan menjalankan prinsip yang baru ditulis di [[ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok]] §5 (🟡 Diusulkan). Tahap pagar (D1–D5) boleh dibangun. Tahap koreksi (D6) **belum boleh dibangun** sebelum butir di bagian "Belum diputuskan" dan tinjauan kewenangan Proposal terjawab; keputusan tanggal dokumen koreksi sudah ada (lihat bagian "Sudah diputuskan").
 
 ## Untuk Manajemen
 
@@ -115,9 +115,50 @@ Mengubah semantik "ganti" pembukuan, mengubah arti tiga kondisi (Reuse, Rework, 
 
 **Tanggal dokumen saat koreksi mengikuti tanggal koreksinya, bukan tanggal scan awal** (bagusizzanm, 2026-10-08). Alasannya: perubahan harus terlacak di pembukuan; dokumen yang tanggalnya tetap di tanggal scan awal menyembunyikan bahwa ada koreksi. Ini sejalan dengan perilaku yang sudah ada (tanggal dokumen mengikuti scan terbaru). Konsekuensi yang diterima sadar: koreksi atas retur yang sudah dibukukan di bulan lalu memindahkan pembalikan penjualannya ke periode koreksi (terlihat pada insiden 7 Okt: tiga dokumen berpindah dari 26 Sep, 12 Sep, dan 30 Sep ke 7 Okt), dan dokumen yang bulan bukunya sudah lewat batas sync toko bisa ditahan gerbang bulan buku, itu ranah finance. Finance perlu diberi tahu aturan ini sebelum tahap koreksi dibangun; ia tidak lagi menahan pembangunan.
 
+**Pengecualian: dokumen pengganti tetap bertanggal fisik barang tiba bila periodenya masih terbuka** (jawaban finance 2026-10-15, diteruskan oleh IT). Untuk order `585279137460029417` (dokumen `RTR/2026/08/07/242-KY+GB` bertanggal 7 Agustus), finance memilih dokumen pengganti **tetap bertanggal Agustus**, dan menyatakan periode Agustus masih bisa direvisi. Alasan finance: barangnya tiba di Agustus, jadi dokumen bertanggal Oktober membuat stok Agustus dan September kurang dan stok Oktober lebih. Ini mengecualikan aturan "tanggal koreksi mengikuti tanggal koreksi" di atas, berlaku hanya bila periodenya masih terbuka dan finance menyetujuinya per kasus; bila periodenya terkunci, Accurate menolak menghapus dokumen lama dan pembangunan ulang berhenti dengan galat. Untuk order yang barang fisiknya berbeda dari faktur, finance memilih **dokumen mengikuti faktur** (cara 2), dan selisih fisiknya dijurnal sendiri lewat Penyesuaian Persediaan di Accurate, bukan dicatat sebagai keterangan.
+
+## Pelaksanaan koreksi manual dan pengukuran 20 Oktober 2026
+
+Selama D6 belum dibangun, koreksi dikerjakan IT satu per satu. Bagian ini mencatat jalur yang terbukti jalan dan apa yang diukur; angka dan nomor bertanggal, ukur ulang sebelum dipakai.
+
+**Jalur koreksi dokumen yang sudah dibukukan** (dibaca di `bip-erp` `origin/main` `3a8271ef9`, 2026-10-23; nomor baris bergeser tiap merge, cari lewat nama fungsi):
+
+- Dokumen SENT dikoreksi dengan **mengirim ulang konfirmasi gudang** (`POST /accurate/daily-returns/warehouse-confirm`) berisi jumlah yang benar per (order, SKU) dan `scan_date`. Konfirmasi **mengganti** jumlah per (order, SKU) (`mergeWarehouseItems`, `accurate_rts_usecase.go:4397`), tanggal dokumen diambil dari `scan_date` item dan bukan dari hari konfirmasi diproses (`scanDateFromItems`, `:4417`), lalu dokumen dibangun ulang (`rebuildAndSendGroup`) dengan **nomor RTR yang sama** dan tanggal yang tersimpan di baris (`:6182`, `:6214`), yaitu dihapus lalu dibuat bila isinya berubah (`:6291`). Mengisi `scan_date` dengan tanggal fisik barang tiba menjaga dokumen tetap di tanggal itu.
+- `RetryDailyReturn` untuk baris yang sudah SENT **langsung keluar tanpa berbuat apa-apa** (`:7298`): Retry bukan jalur koreksi dokumen SENT. Baris FAILED (mis. "melebihi qty terjual di faktur") dikoreksi dengan konfirmasi yang sama, dan hasilnya dokumen baru bernomor baru.
+- Yang **tidak** dipakai: menyunting `warehouse_items` langsung di database, dan konfirmasi tanpa `scan_date` (tanggal dokumen jatuh ke hari konfirmasi, melanggar keputusan finance di atas).
+
+**Yang dijalankan** (skrip sekali pakai milik IT, dry-run bawaan, cadangan baris sebelum diubah, tidak masuk repo): lima order, 20 dan 22 Oktober 2026.
+
+| Order | Dokumen | Perubahan |
+|---|---|---|
+| `585867761144006565` | `RTR/2026/10/09/167-BH` | PJB-002 dari 2 menjadi 1, Rp189.000 menjadi Rp94.500 |
+| `586016295544259817` | `RTR/2026/10/02/091-BH` | sama |
+| `585879810814215442` | baris FAILED menjadi dokumen baru `RTR/2026/10/09/181-BH` | PJB-002 ×1, tanggal 9 Okt |
+| `585279137460029417` | `RTR/2026/08/07/242-KY+GB` | PJG-002 1 reuse + 1 rework, PJG-004 2 reuse; tanggal 7 Agu tetap, Rp98.000 menjadi Rp196.000 |
+| `586201339375748436` | `RTR/2026/10/03/093-KY+GB` | mengikuti faktur: PJG-002 ×1 + PJG-004 ×1 |
+
+Finance memeriksa dua yang pertama di Accurate dan cocok; pemeriksaan tiga lainnya belum tercatat di sini. Stok WMS untuk transaksi yang jumlahnya lebih belum ikut dikoreksi oleh skrip ini: itu urusan Proposal koreksi (di bawah).
+
+**Pengukuran 2026-10-20 (baca-saja, prod):** dari 3.972 transaksi retur tertaut sejak 8 Oktober, 3.958 pasangan (order, SKU) bisa dinilai terhadap klaim marketplace (item retur, atau item order untuk order batal, dipecah ke komponen lewat pemetaan); **enam pasangan di empat order melebihi klaim** dan ada **empat ref kembar**. Pengelompokannya:
+
+- 8 Okt 11:08 WIB (satu order, tiga SKU): tiap SKU tersimpan dua kali dalam 0 sampai 3 detik, **tiga jam sebelum** backend pagar naik (14:29 WIB). Penyebabnya pagar belum ada.
+- 9 Okt, gudang Sadewa (dua order): **satu** transaksi berjumlah 2 padahal klaim terbaca 1 di integration, **sesudah** pagar aktif. Penyebab **belum terbukti**.
+- 15 dan 17 Okt, gudang Tinggar (satu order, PJB-006): ref yang sama tersimpan dua kali selang dua hari (reject 1 dan 1, klaim 1), padahal seharusnya dijawab "sudah tercatat". Penyebab **belum terbukti**.
+- Satu order lagi (2 Okt, jumlah 2 untuk klaim 1) terjadi sebelum pagar.
+
+Dua dugaan yang belum dibuktikan untuk dua kelompok terakhir: klaim gagal terambil saat itu (pagar sengaja terbuka bila klaim tak terbaca, dan hanya mencatat peringatan di log container), atau pemetaan SKU gagal terbaca. Log container hilang tiap deploy, jadi keputusan pagar tidak bisa dibuktikan sesudah kejadian. Usulan yang belum dikerjakan: menyimpan keputusan pagar (diterima, sudah tercatat, ditolak, klaim tak terambil) ke database per simpan.
+
+**Proposal koreksi di layar** (dibaca di `erp-frontend` `origin/main`, 2026-10-22), karena jalurnya tak ketemu bagi yang mencarinya:
+
+- Diajukan dari menu **Riwayat Aktivitas** (`/manufacture/history`, tab Ledger Transaksi, tombol "Koreksi Input"), disetujui di **Persetujuan & Akses Akun** (`/manufacture/approvals`, PPIC lalu SPV). Kedua tab diberi daftar peran **kosong** (`akses.ts:55-56`), artinya hanya PPIC dan SPV yang melihatnya.
+- Layar **menolak jumlah nol atau kurang** (`HistoryView.tsx:110`), jadi koreksi ke nol tidak bisa diajukan; itu bagian butir "Koreksi ke nol" di bawah.
+- Koreksi hanya mengubah `qty` transaksi dan stok (`proposal.go:154`); rincian kondisi (reuse, rework, reject) **tidak ikut berubah**, sehingga laporan yang membaca rincian kondisi masih menampilkan jumlah lama dan kirim-ulang konfirmasi bisa mengirim angka lama.
+- Tombol Koreksi hanya muncul untuk transaksi bulan berjalan, kecuali pengaju punya izin edit (`period-lock.ts`).
+- Pencarian ledger mencocokkan nomor resi dan nomor order retur sejak erp-frontend PR #2664 (merged 2026-10-21; status deploy prod belum diukur). Sebelumnya hanya SKU, nama barang, No. Dokumen, dan supplier/customer, padahal gudang bekerja dari scan resi.
+
 ## Belum diputuskan
 
-1. **Koreksi ke nol.** Pembukuan membuang baris berjumlah nol, sehingga membuang satu SKU dari dokumen tidak bisa diungkapkan lewat jalur yang ada. Perlu aturan eksplisit sebelum D6.
+1. **Koreksi ke nol.** Pembukuan membuang baris berjumlah nol, sehingga membuang satu SKU dari dokumen tidak bisa diungkapkan lewat jalur yang ada. Perlu aturan eksplisit sebelum D6. Layar Proposal koreksi juga sudah menolak jumlah nol atau kurang, jadi aturannya menyangkut dua tempat (layar dan pembukuan).
 (Butir "SKU yang discan tetapi tidak ada di klaim order" sudah diputuskan, lihat D2.)
 
 ## Consequences

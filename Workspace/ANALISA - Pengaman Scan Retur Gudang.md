@@ -88,7 +88,7 @@ Dependensi: T6, T7.
 
 ### T9. Prosedur manusia dan pembaruan dok
 
-D7. Tulis prosedur gudang dan finance (periksa fisik, input hanya SKU yang belum tercatat, jangan scan ulang, kabari IT bila edit manual di Accurate) di tempat yang dibaca finance dan gudang, lalu koreksi pernyataan "tak ada jalur edit" di [[APP - Web ERP]] dan perbarui [[Microservices - Manufacture Service]] setelah T2 dan T3 deploy. Catatan: status [[ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync]] di vault tertinggal dari kode (endpoint 409 sudah ada); perbarui lewat `/sync-docs`, bukan di sini.
+D7. Tulis prosedur gudang dan finance (periksa fisik, input hanya SKU yang belum tercatat, jangan scan ulang, kabari IT bila edit manual di Accurate) di tempat yang dibaca finance dan gudang, lalu koreksi pernyataan "tak ada jalur edit" di [[APP - Web ERP]] dan perbarui [[Microservices - Manufacture Service]] setelah T2 dan T3 deploy. Catatan: status [[ADR - 0144 Retur yang Sudah Dibukukan Manual oleh Finance Ditandai per Order dan Dihormati Semua Jalur Auto-Sync]] di vault tertinggal dari kode (endpoint 409 sudah ada); perbarui lewat `/sync-docs`, bukan di sini. ✅ **Sudah dikerjakan 2026-10-23 lewat `/sync-docs`**: status ADR 0144 diperbarui; pernyataan "tak ada jalur edit" di [[APP - Web ERP]] dibetulkan (ada Proposal koreksi di menu Riwayat Aktivitas); [[Microservices - Manufacture Service]] dan ADR 0158 memuat jalur koreksi manual, pengukuran 20 Oktober, dan temuan bahwa pagar belum terbukti rapat. Prosedur manusia untuk gudang (D7) belum terbit sebagai dok tersendiri.
 
 Dependensi: T2 dan T3 deploy untuk bagian pembaruan dok; prosedur manusia boleh terbit lebih dulu.
 
