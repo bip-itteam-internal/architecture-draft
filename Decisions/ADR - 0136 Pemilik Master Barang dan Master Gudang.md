@@ -4,7 +4,7 @@
 >
 > **Issue GitHub**: [bip-erp#2357](https://github.com/bip-itteam-internal/bip-erp/issues/2357) (Project #15, dibuat 2026-09-29 dari verifikasi kode + data prod).
 
-> **Dipecah 2026-10-23**: bagian **gudang** (daftar gudang, transfer antar gudang; §Pertanyaan butir 4 dan Rekomendasi butir 5) dipindah ke [[ADR - 0203 Daftar Gudang dan Transfer Antar Gudang Pabrik]] dengan Pemutus Achmad Fauzi (Warehouse Leader). Dok ini tinggal memegang bagian **barang**, dan Pemutusnya tetap TBD.
+> **Dipecah 2026-10-23**: bagian **gudang** (daftar gudang, transfer antar gudang; §Pertanyaan butir 4 dan Rekomendasi butir 5) dipindah ke [[ADR - 0203 Daftar Gudang dan Transfer Antar Gudang Pabrik]] dengan Pemutus Warehouse Leader (Manufaktur). Dok ini tinggal memegang bagian **barang**, dan Pemutusnya tetap TBD.
 
 %% Status di blockquote atas supaya terbaca VAULT-INDEX.json (15 baris pertama), pola sama dengan ADR 0132/0135. %%
 

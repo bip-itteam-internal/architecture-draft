@@ -8582,7 +8582,7 @@
         "GA - Inventory Management",
         "WH - Warehouse Sadewa"
       ],
-      "hash": "42e7a1691f35058f87d5c416b95e25a29a8eddd2704abcc17824a5ef8db301fd",
+      "hash": "163511fd085205a97b71268542096b92131c7a66b34b7ef971bf45878afc615f",
       "ukuran_kb": 23.4,
       "ringkasan": "Menjawab: di mana saja daftar barang (produk jadi, SKU marketplace, bundle, bahan baku, barang GA) disimpan di ERP, kenapa tak ada satu sumber yang benar, dan apa akibatnya pada HPP, stok, laba, dan insentif. Membandingkan opsi siapa pemilik master barang (Accurate saja, satu service ERP, atau per jenis barang dengan satu kunci bersama) beserta pertanyaan yang harus diputuskan manusia dan penjaga salinan satu arah; bagian gudang sudah dipindah ke ADR 0203.",
       "kata_kunci": [
@@ -10880,7 +10880,7 @@
         "ADR - 0186 Stok Pabrik di ERP Jadi Stok Operasional, Accurate Menerima Penyesuaian Persediaan",
         "ADR - 0201 Selisih RM Dicatat Dua Sisi lalu Masuk Satu Jalur Penyesuaian Stok"
       ],
-      "hash": "2793f50d9806ee2a2fa92863a8dc55b71439260ed2c37b52fcbb9c449077c6a5",
+      "hash": "65f9bc3ef3819e8d19edae12d58fe810d7e6e099d8bffe58efc64ff830242ae9",
       "ukuran_kb": 10.8,
       "ringkasan": "Menjawab: bagaimana pindahan barang antar gudang pabrik dicatat di ERP, gudang mana yang ada di daftar (nama sama dengan Accurate), dan apakah stok pabrik dipecah per gudang (tidak, tetap isi Gudang Utama). Juga menjawab siapa yang mencatat kirim dan terima, bagaimana pindahan dikirim ke Accurate sebagai Pemindahan Barang, dan bagaimana selisih jumlah terima masuk jalur penyesuaian stok M-12.",
       "kata_kunci": [
@@ -21694,8 +21694,8 @@
         "ADR - 0103 Satu Pintu Komplain Produk, Unit Tujuan Diturunkan dari Kategori",
         "ADR - 0124 Input Retur Gudang Diukur Komposisinya Dulu, Lalu Konfirmasi Massal Hanya untuk Baris Cocok"
       ],
-      "hash": "0f18d35b796d9430d2d3428d3d546f586e4b69d5835e8f07d215a9efe3343ab3",
-      "ukuran_kb": 13.9,
+      "hash": "af1f17d16373d6bfd1da0b536ed73886572df2fc34aa41c05d1bf008ef2beae5",
+      "ukuran_kb": 13.8,
       "ringkasan": "Menjawab: butir pekerjaan apa saja (kode M-nn) dalam penataan fondasi sistem Manufaktur (produksi, PPIC, gudang bahan dan barang jadi, Quality), statusnya, dan issue GitHub mana yang terkait. Juga menjawab keputusan K-1 sampai K-11 yang ditunggu beserta Pemutus dan ADR-nya, serta aturan pakai papan sebelum membuat issue, kode, atau master data baru.",
       "kata_kunci": [
         "fondasi manufaktur",

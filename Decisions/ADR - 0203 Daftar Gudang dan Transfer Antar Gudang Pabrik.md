@@ -1,4 +1,4 @@
-> **Status**: 🟢 **Diterima**, 2026-10-23, oleh **Achmad Fauzi** (Warehouse Leader, Manufaktur; dikenal Oji/Ozi) dan **Finance** (Senior Accounting) untuk butir 4. Jawaban diteruskan lewat IT dan ditegaskan sebagai jawaban kedua Pemutus pada 2026-10-23. Lembar keputusan K-7 bagian **gudang** di [[ANALISA - Fondasi Manufaktur]], dipecah dari [[ADR - 0136 Pemilik Master Barang dan Master Gudang]]; bagian barang tetap di ADR itu.
+> **Status**: 🟢 **Diterima**, 2026-10-23, oleh **Warehouse Leader** (Manufaktur) dan **Finance** (Senior Accounting) untuk butir 4. Jawaban diteruskan lewat IT dan ditegaskan sebagai jawaban kedua Pemutus pada 2026-10-23. Lembar keputusan K-7 bagian **gudang** di [[ANALISA - Fondasi Manufaktur]], dipecah dari [[ADR - 0136 Pemilik Master Barang dan Master Gudang]]; bagian barang tetap di ADR itu.
 
 ## Untuk Manajemen
 
@@ -35,7 +35,7 @@ Rekomendasi disertakan; Pemutus boleh memilih lain.
 
 ### Jawaban (2026-10-23, disampaikan lewat IT)
 
-Kelima rekomendasi disetujui ("ok setuju"). IT menegaskan bahwa persetujuan itu berasal dari Achmad Fauzi, dan untuk butir 4 juga dari Finance.
+Kelima rekomendasi disetujui ("ok setuju"). IT menegaskan bahwa persetujuan itu berasal dari Warehouse Leader, dan untuk butir 4 juga dari Finance.
 
 | # | Jawaban |
 |---|---|
