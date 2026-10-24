@@ -432,7 +432,7 @@ Koleksi baru `pengajuan_barang`, prefix rute `/pengajuan-barang` (`pengajuan_bar
 
 | Tahap | Izin / dasar wewenang |
 |---|---|
-| `pb_spv_divisi` | Hubungan organisasi: atasan menaungi `Pengaju.Departemen` (bukan izin) |
+| `pb_spv_divisi` | Hubungan organisasi: atasan menaungi `Pengaju.Departemen` (bukan izin). 🟡 Diusulkan [[ADR - 0204 Pengaturan Penyetuju per Kategori dan Tahap, Satu Definisi SPV Departemen]] §1: "atasan" = resolver penyetuju departemen, bukan cakupan token |
 | `pb_spv_manufactur` | Hubungan organisasi: atasan menaungi departemen Manufaktur (nama diambil dari `common.DepartmentNameFromKey`, bukan literal) |
 | `pb_cek_stok_ga` | `budget.cek.stok` |
 | `pb_serah_ga` | `budget.terima.ga` |

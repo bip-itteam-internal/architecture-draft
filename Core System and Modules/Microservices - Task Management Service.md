@@ -51,6 +51,7 @@ Menjawab kalimat yang tak bisa dinyatakan model divisi: *"orang ini yang menerim
 - **Satu pintu** `canActOnSpace` (`space_admin.go`): admin space menang lebih dulu tanpa izin katalog; selain itu izin **dan** cakupan divisi harus terpenuhi bersama.
 - **Gerbang rute cuma membuka pintu.** `gateOrSpaceAdmin` meloloskan pemegang izin ATAU admin di space mana pun (satu `CountDocuments` per request, hanya bagi yang tak lolos lewat izin); space tertentu diputuskan handler. Tanpa pembagian itu admin space bertier staf ditolak 403 sebelum handler melihat space tujuannya.
 - ⚠️ **Menutup lubang lama**: `approveTask`/`rejectTask` **tak pernah** mengecek divisi maupun space — gerbangnya hanya izin `ticket.triage` di rute, sehingga supervisor departemen mana pun bisa menyetujui tiket departemen lain lewat API. Kini 403.
+- 🟡 **Diusulkan 2026-10-24** ([[ADR - 0204 Pengaturan Penyetuju per Kategori dan Tahap, Satu Definisi SPV Departemen]] §1): cabang "supervisor divisi" pada triase memakai resolver penyetuju departemen untuk `space.division`, bukan cakupan token; admin space tetap menang lebih dulu.
 - **Daftar admin tak boleh dikosongkan oleh admin space sendiri** (400); supervisor divisi boleh. Perubahannya ditulis sebagai audit ber-`space_id` (action `space_admins`), bukan audit tugas.
 - Notifikasi **aditif**: permintaan baru & eskalasi SLA response menyapa admin space **di samping** supervisor divisi.
 - `Space.OwnerID` **tetap tak dipakai**: tunggal & bertipe ObjectID, sedangkan yang dibutuhkan daftar employee_id.

@@ -1,4 +1,4 @@
-> **Status**: 🟢 Diterima, 2026-10-21, oleh irfanarfianto. Dari `/analisa-kebutuhan`. Pemutus: irfanarfianto. Kode belum ada. Pecahan kerja: [[ANALISA - Struktur Organisasi Bertingkat dan Peta Penyetuju]].
+> **Status**: 🟢 Diterima, 2026-10-21, oleh irfanarfianto. Dari `/analisa-kebutuhan`. Pemutus: irfanarfianto. Kode belum ada. Pecahan kerja: [[ANALISA - Struktur Organisasi Bertingkat dan Peta Penyetuju]]. §4 diubah sebagian (🟡 Diusulkan) oleh [[ADR - 0204 Pengaturan Penyetuju per Kategori dan Tahap, Satu Definisi SPV Departemen]] §5: wewenang berbasis penetapan boleh diubah dari halaman terpusat; berbasis izin tetap menunggu ADR 0137.
 
 ## Untuk Manajemen
 

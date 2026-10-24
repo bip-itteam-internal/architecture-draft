@@ -19,7 +19,9 @@ Yang membuat inventaris ini sulit disusun, dan mudah salah:
 
 ## Inventaris
 
-> 🟡 **Diusulkan 2026-10-21**: struktur Direksi → Divisi → Departemen ([[ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen]]) mengubah penyetuju pimpinan: pengajuan Direktur langsung ke HR, Manager disetujui Direktur sebagai orang, penyetuju departemen dipilih HR dan boleh lintas departemen dengan cadangan Manager lalu Direktur. Peta per orang seluruh baris inventaris ini: [[ADR - 0194 Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat]].
+> 🟢 **Diterima 2026-10-21**: struktur Direksi → Divisi → Departemen ([[ADR - 0193 Struktur Organisasi Direksi, Manager, Departemen dengan Unit Pimpinan Berjenis dan Penyetuju Lintas Departemen]]) mengubah penyetuju pimpinan: pengajuan Direktur langsung ke HR, Manager disetujui Direktur sebagai orang, penyetuju departemen dipilih HR dan boleh lintas departemen dengan cadangan Manager lalu Direktur. Peta per orang seluruh baris inventaris ini: [[ADR - 0194 Peta Penyetuju per Orang Lintas Modul sebagai Tahap Pertama Persetujuan Terpusat]].
+
+> 🟡 **Diusulkan 2026-10-24** ([[ADR - 0204 Pengaturan Penyetuju per Kategori dan Tahap, Satu Definisi SPV Departemen]]): tahap "atasan departemen" di Pengajuan Barang (tahap berbasis hubungan), Permintaan GA (`spv_divisi`, `spv_hr`), verifikasi Realisasi PM, dan cabang supervisor divisi pada triase tiket pindah dari cakupan token `supervised_departments` (lahir hanya dari `is_supervisor`) ke resolver penyetuju departemen yang sama dengan cuti/izin. Sebabnya: penyetuju pilihan lintas departemen mematikan `is_supervisor` anggota, sehingga tahap itu kehilangan pemegang. Satu halaman Pengaturan Penyetuju per kategori × tahap menandai tahap kosong dan tahap satu orang.
 
 
 ### Berbasis SLOT pada dokumen
