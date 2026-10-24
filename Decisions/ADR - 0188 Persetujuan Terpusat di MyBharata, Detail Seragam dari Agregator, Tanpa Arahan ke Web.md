@@ -1,6 +1,6 @@
 # ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web
 
-> **Status**: 🟢 Diterima, 2026-10-20, oleh irfanarfianto. Pemutus: irfanarfianto. **Diamandemen 2026-10-20** (lihat § Amandemen): modul Permintaan ERP dihapus, butir 6 gugur, cakupan menjadi 15 jenis. Melanjutkan [[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] (yang mengatur isi baris dan kode `aksi`) ke MyBharata, dan menambah bentuk keluar langkah persetujuan yang seragam. **Tidak mengubah** butir 12 ADR 0181 (tanpa penanda SLA). Pecahan kerja: [[ANALISA - Persetujuan Terpusat di MyBharata]].
+> **Status**: 🟢 Diterima, 2026-10-20, oleh irfanarfianto. Pemutus: irfanarfianto. **Diamandemen 2026-10-20** (lihat § Amandemen): modul Permintaan ERP dihapus, butir 6 gugur, cakupan menjadi 15 jenis. Melanjutkan [[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] (yang mengatur isi baris dan kode `aksi`) ke MyBharata, dan menambah bentuk keluar langkah persetujuan yang seragam. **Tidak mengubah** butir 12 ADR 0181 (tanpa penanda SLA). Pecahan kerja: [[ANALISA - Persetujuan Terpusat di MyBharata]]. **Diamandemen 2026-10-24**: layout detail web menjadi split-view persisten, bukan Sheet (butir 7; selaras amandemen 2026-10-24 ADR 0181 §6; MyBharata tak terdampak).
 
 ## Untuk Manajemen
 
@@ -123,6 +123,10 @@ Diputuskan Pemutus (irfanarfianto) sesudah bagian pertama endpoint detail merged
 - **Offer**: `gaji_evaluasi` dan `gaji_kontrak` ditampilkan di rincian. Pembaca antrean Offer sudah pasti pemegang `recruitment.view`, yang di web juga melihat angka ini, dan penyetuju tak bisa menilai offer tanpa gaji.
 - **Bahasa rincian (ADR 0010)**: `rincian[]` berbentuk `{kunci, nilai}`. `kunci` adalah kode yang diterjemahkan klien (web `id.ts`/`en.ts`, MyBharata `app_id.arb`/`app_en.arb`); `nilai` tetap teks siap tampil. Bentuk `{label, nilai}` dari bip-erp#3352 diganti di PR yang sama dengan bip-erp#3347, sebelum ada klien yang memakainya.
 - **Pengajuan Barang yang dikembalikan**: stepper detail menampilkan semua putaran (langkah putaran lama berstatus `dikembalikan`, `putaran` naik), seperti yang sudah dibangun di bip-erp#3352.
+### 2026-10-24: Web split-view persisten, bukan Sheet
+
+Butir 7 ("Sheet untuk 15 jenis") dibaca ulang: di web `/portal/persetujuan`, detail ditampilkan di **panel kanan split-view persisten** (daftar antrean tetap di kiri), bukan Sheet slide-over. Kerangka isi, kontrak `langkah[]`, rincian `{kunci, nilai}`, dan **satu komponen stepper bersama tidak berubah** — hanya wadahnya. MyBharata tetap daftar + detail per layar (butir 2-3), **tidak terdampak**; kontrak agregator tak disentuh, jadi kedua klien tetap aman. Di layar web sempit, panel kanan jatuh kembali ke Sheet/overlay. Selaras amandemen 2026-10-24 [[ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional]] §6.
+
 ## Alternatif yang Ditolak
 
 - **MyBharata memanggil detail tiap sumber langsung.** Tanpa endpoint agregator baru, tetapi logika langkah ditulis dua kali (Dart dan TypeScript) untuk sepuluh sumber: satu fakta di dua tempat, kelas kerusakan yang paling sering tercatat di vault ini.

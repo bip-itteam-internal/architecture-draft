@@ -1,6 +1,6 @@
 # ADR - 0181 Portal Persetujuan Memuat Keputusan dan Tindakan Operasional
 
-> **Status**: 🟢 Diterima, 2026-10-15, oleh irfanarfianto. Pemutus: irfanarfianto. Kode belum ada. Nama menu dan judul tetap "Persetujuan" (keputusan user 2026-10-15). Butir 13 (aturan untuk fitur baru) ditambahkan saat diterima. ADR ini **mengubah sebagian** [[ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service]] (butir 1, 4, 5, 10, dan arti "antrean" di seluruh dokumennya) dan [[ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi]] (§4 butir "Persetujuan hanya berisi hal yang menunggu keputusan pembaca").
+> **Status**: 🟢 Diterima, 2026-10-15, oleh irfanarfianto. Pemutus: irfanarfianto. Kode belum ada. Nama menu dan judul tetap "Persetujuan" (keputusan user 2026-10-15). Butir 13 (aturan untuk fitur baru) ditambahkan saat diterima. ADR ini **mengubah sebagian** [[ADR - 0114 Antrean Persetujuan Terpusat di Web, Satu Tabel Seragam dari Agregator Employee-Service]] (butir 1, 4, 5, 10, dan arti "antrean" di seluruh dokumennya) dan [[ADR - 0149 Sidebar Satu Daftar Urusan, Menu Digerbang Izin Posisi, Beranda Ruang Kerja Posisi]] (§4 butir "Persetujuan hanya berisi hal yang menunggu keputusan pembaca"). **Diamandemen 2026-10-24** (lihat § Amandemen): layout detail web dari Sheet slide-over menjadi split-view persisten (butir 6).
 
 ## Untuk Manajemen
 
@@ -144,6 +144,17 @@ Diukur di `origin/main` 2026-10-15:
 - **(e) Notifikasi inbox** untuk tahap itu mengarah ke item yang sama dengan tautan di portal.
 
 Pengecualian hanya lewat ADR. Aturan ini lahir dari empat kegagalan yang semuanya senyap: PB/284/10/26 di tahap cek stok GA menumpang tab "Perlu Disetujui" modul Pengajuan Barang sementara di portal ia buntu (§ Context); Live Support masuk portal dengan tahap kosong sehingga berbunyi "Tidak menunggu keputusan"; 5 offer Draft palsu tampil karena sumbernya tak menyaring status; dan 288 dokumen menunggu dicatat Accounting tanpa tempat yang jelas bagi pencatatnya. Tiap kasus adalah tahap yang lahir di modul tanpa ada yang memutuskan di mana orangnya akan menemukannya.
+
+## Amandemen
+
+### 2026-10-24: Layout detail web dari Sheet slide-over ke split-view persisten
+
+Pemutus (irfanarfianto) mengganti cara menampilkan detail di web `/portal/persetujuan`, berlaku atas **butir 6**: dari **klik baris membuka panel samping (Sheet) slide-over** menjadi **split-view persisten** — daftar antrean tetap di kiri, panel detail per aksi menetap di kanan, baris terpilih menyorot. Isi panel (kotak "Yang harus Anda lakukan", ringkasan, rincian, stepper `langkah[]`, footer aksi) dan **kontrak agregator tidak berubah**; yang berganti hanya wadahnya. Perubahan **FE-only**; kontrak agregator tak disentuh, jadi MyBharata ([[ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web]]) tak terdampak.
+
+- **Butir 6 dibaca ulang**: "panel samping (Sheet)" menjadi "panel kanan split-view persisten". Kerangka tiga bagian (`ui-checklist.md` §2a: header tetap, badan menggulir, footer) tetap berlaku di dalam panel kanan. "Buka halaman penuh" tetap ada.
+- **Responsif**: di layar sempit panel kanan jatuh kembali ke Sheet/overlay; split-view dua-panel hanya di layar lebar. Mobile MyBharata tetap daftar + detail per layar ([[ADR - 0188 Persetujuan Terpusat di MyBharata, Detail Seragam dari Agregator, Tanpa Arahan ke Web]] butir 2-3).
+- **Rujukan visual**: mockup Figma `eYcaRMmESsa7XqacmyX13B` (disetujui Pemutus 2026-10-24). Mockup salinan bertanggal, bukan sumber kebenaran.
+- ⚠️ **Yang dibalik**: butir 6 semula memilih Sheet demi kesederhanaan, dan ukuran prod 2026-10-15 (§ Context) menunjukkan mayoritas staf melihat halaman kosong sehingga interaktivitas tinggi tak banyak berguna. Split-view menambah kompleksitas layout demi triase lebih cepat pada peran bervolume tinggi (mis. Accounting 288 dok). Trade-off ini diterima Pemutus; bila di produksi tak terbukti berguna, butir 6 bisa dikembalikan ke Sheet lewat amandemen berikutnya.
 
 ## Consequences
 
