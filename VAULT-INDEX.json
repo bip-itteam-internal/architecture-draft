@@ -10898,20 +10898,20 @@
         "ADR - 0171 Izin per Jam Dihitung Ulang dari Semua Pengajuan dan Dipotong per Subtipe",
         "ADR - 0071 Peta Kepatuhan Peraturan Perusahaan dan Kewajiban ADR untuk Penyimpangan"
       ],
-      "hash": "3b8e1d40992a3bfb08df8154a0d86ebac0704292a0290c2848ab2961bc8889eb",
-      "ukuran_kb": 6.9,
-      "ringkasan": "Menjawab: kenapa karyawan yang datang terlambat tetapi sudah mengajukan izin per jam untuk jam itu tidak lagi dipotong dua kali, dan bagaimana jam telat yang dikirim ke payroll dikurangi irisannya dengan jendela waktu izin yang disetujui sehingga tiap jam ketidakhadiran dihitung tepat sekali. Juga menjawab: kenapa pengurangan jam buta (`telat − jam_izin`) ditolak sebagai perbaikan permanen (salah untuk izin tengah hari yang tak beririsan), komponen apa yang terpengaruh (hanya Tunjangan Kehadiran & Uang Makan, bukan gaji pokok), perluasan `LeavePart` dengan jendela from/to, dan kasus mana yang di luar cakupan (izin per jam tanpa clock-in tetap dihitung sehari; slip terbit tidak dikoreksi otomatis).",
+      "hash": "de0062261e1b221d585a759b2c461a975da964b3aa57bb002e2d928d5ee7a603",
+      "ukuran_kb": 7.8,
+      "ringkasan": "Menjawab: kenapa jam telat dan jam izin untuk jam yang sama tidak boleh dipotong dua kali di payroll, dan bagaimana jam telat yang dikirim ke payroll dikurangi irisannya dengan jendela waktu izin per jam yang disetujui. Menjelaskan siapa yang terdampak (karyawan yang izin per jamnya menutupi keterlambatan masuk, terukur 16 karyawan/21 entri prod), kasus apa yang di luar cakupan (izin per jam tanpa clock-in sama sekali tetap dihitung sehari, slip terbit tidak dikoreksi otomatis), dan kenapa pengurangan jam buta (telat - jam_izin) ditolak untuk perbaikan permanen. Juga menjawab mengapa subtipe 'Datang terlambat' tidak dihidupkan kembali dan menyentuh hanya Tunjangan Kehadiran & Uang Makan, bukan gaji pokok.",
       "kata_kunci": [
         "izin jam",
+        "hourly leave",
         "keterlambatan",
         "telat",
-        "double potong",
-        "payroll",
-        "tunjangan kehadiran",
-        "uang makan",
-        "computePayoutBreakdown",
-        "leave_parts",
-        "ADR 0205"
+        "late_hour",
+        "leave_hour",
+        "potongan kehadiran",
+        "attendance deduction",
+        "Tunjangan Kehadiran",
+        "payroll"
       ]
     },
     {
