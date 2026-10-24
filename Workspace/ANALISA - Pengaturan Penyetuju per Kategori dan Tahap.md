@@ -20,7 +20,7 @@ HR/IT tidak bisa menjawab "tahap X dipegang siapa, dan apakah ada pengajuan yang
 ### Induk: Pengaturan Penyetuju per kategori × tahap
 
 - **Repo**: bip-erp
-- **Issue**: TBD
+- **Issue**: [bip-erp#3528](https://github.com/bip-itteam-internal/bip-erp/issues/3528)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -54,7 +54,7 @@ ADR di atas Diterima.
 ### [BE] Pengaturan penyetuju bagian 1/4: tahap atasan departemen memakai resolver penyetuju departemen
 
 - **Repo**: bip-erp
-- **Issue**: TBD
+- **Issue**: [bip-erp#3529](https://github.com/bip-itteam-internal/bip-erp/issues/3529)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -95,7 +95,7 @@ ADR di atas Diterima. Deploy: procurement, inventory, task-management, employee-
 ### [BE] Pengaturan penyetuju bagian 2/4: agregator `GET /pengaturan-penyetuju` + tahap pengajuan karyawan, pelatihan, Live Support
 
 - **Repo**: bip-erp
-- **Issue**: TBD
+- **Issue**: [bip-erp#3530](https://github.com/bip-itteam-internal/bip-erp/issues/3530)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -134,7 +134,7 @@ Prod 2026-10-23 (`employee_db`): `hris.pengajuan.approve` 3 pemegang (akun 1, po
 ### [BE] Pengaturan penyetuju bagian 3/4: tahap pengajuan barang dan payroll
 
 - **Repo**: bip-erp
-- **Issue**: TBD
+- **Issue**: [bip-erp#3531](https://github.com/bip-itteam-internal/bip-erp/issues/3531)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -171,7 +171,7 @@ Prod 2026-10-23: `payroll.approve.cost_control`, `.hrd`, `.finance` masing-masin
 ### [BE] Pengaturan penyetuju bagian 4/4: tahap Permintaan GA, Realisasi PM, triase tiket, rekrutmen
 
 - **Repo**: bip-erp
-- **Issue**: TBD
+- **Issue**: [bip-erp#3532](https://github.com/bip-itteam-internal/bip-erp/issues/3532)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -208,7 +208,7 @@ Prod 2026-10-23: `ticket.triage` 7 pemegang, `recruitment.approve` 4, `ga.reques
 ### [FE] Pengaturan penyetuju bagian 1/2: halaman Per Kategori (baca) + tab Per Orang
 
 - **Repo**: erp-frontend
-- **Issue**: TBD
+- **Issue**: [erp-frontend#2805](https://github.com/bip-itteam-internal/erp-frontend/issues/2805)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
@@ -247,7 +247,7 @@ Deploy sesudah `bip-erp` [BE] 2/4, 3/4, 4/4 live.
 ### [FE] Pengaturan penyetuju bagian 2/2: gabung tiga menu, alihkan rute lama, edit penetapan
 
 - **Repo**: erp-frontend
-- **Issue**: TBD
+- **Issue**: [erp-frontend#2806](https://github.com/bip-itteam-internal/erp-frontend/issues/2806)
 
 **Pemutus:** @irfanarfianto
 **PIC:** @
