@@ -13,7 +13,7 @@
 *Jam telat dan jam izin untuk jam yang sama tidak lagi dijumlahkan. Jam telat yang dikirim ke payroll dikurangi irisannya dengan jendela waktu izin berformat jam yang disetujui pada hari itu, sehingga setiap jam ketidakhadiran dihitung tepat sekali.*
 
 - **Status**: 🟡 **Diusulkan**, 2026-10-24. Pemutus: irfanarfianto. Kodenya belum ada.
-- **Issue**: _(diisi setelah issue dibuat)_
+- **Issue**: [bip-erp#3541](https://github.com/bip-itteam-internal/bip-erp/issues/3541)
 - **Path di repo**: `bip-erp/services/attendance/payroll_treatment.go` (`computePayoutBreakdown`, saat menyusun `DayBasis.LateHours` untuk hari ter-clock ber-izin jam) · `bip-erp/shared-library/models/attendance/models.go` (`LeavePart` — tambah jendela `from`/`to` agar irisan bisa dihitung) · penulis hitung-ulang yang mengisi `leave_parts`: `bip-erp/services/attendance/main.go`, `cron.go`, `roster.go` **(baru)**
 - **Tanggal**: 2026-10-24
 

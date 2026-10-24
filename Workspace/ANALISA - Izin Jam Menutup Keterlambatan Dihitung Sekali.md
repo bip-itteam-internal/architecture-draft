@@ -15,7 +15,7 @@
 **Repo**: `bip-erp`
 **Pemutus:** irfanarfianto
 **PIC:** _(diisi saat ditugaskan)_
-**Issue GitHub:** _(diisi setelah dibuat)_
+**Issue GitHub:** [bip-itteam-internal/bip-erp#3541](https://github.com/bip-itteam-internal/bip-erp/issues/3541)
 
 ### Masalah
 Hari yang sudah tap dengan izin per jam yang menutupi keterlambatan dihitung dobel: `computePayoutBreakdown` melaporkan `DayBasis.LateHours` (telat penuh dari jam mulai shift) DAN `DayBasis.LeaveHours` (izin), lalu payroll menjumlah keduanya. Irisan jam telat dan jendela izin terpotong dua kali. Diukur prod 2026-10-24: 16 karyawan / 21 entri (status Terlambat dengan `leave_hour > 0`) sepanjang waktu, 7 di periode gaji 2026-09.
